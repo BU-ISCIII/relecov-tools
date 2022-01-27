@@ -2,6 +2,25 @@
 from jsonschema import validate
 from jsonschema import Draft202012Validator
 import json
+import pandas as pd
+
+class RelecovSchema :
+    def __init__ (self, schema):
+        self.schema = schema
+        
+        
+
+class PhagePlus :
+    def __init__ (self,data, json_schema):
+        self.data = data
+        self.schema = json_schema
+        
+        
+    def convert_json(schema):
+        pass
+    
+    def get_data(self, field):
+        return self.data[field])
 
 data = {"sample_name":'s1', "collecting_institution" :'inst2',
     "submitting_institution":'sub',
@@ -20,15 +39,23 @@ data = {"sample_name":'s1', "collecting_institution" :'inst2',
 
 schema_file = open('/home/lchapado/Projects/Proyecto_ERA/relecov-tools/schema/phage_plus_V0.json')
 
-fage_plus_schema = json.load(schema_file)
+json_phage_plus_schema = json.load(schema_file)
 try:
-    Draft202012Validator.check_schema(fage_plus_schema)
+    Draft202012Validator.check_schema(json_phage_plus_schema)
 except:
     print('Invalid schema')
     exit(1)
+phage_plus_schema = RelecovSchema(json_phage_plus_schema)
 try:
-    validate(instance=data,schema=fage_plus_schema)
+    validate(instance=data,schema=json_phage_plus_schema)
 except:
     print('Invalid input data')
-    exit()
+    exit(1)
+
+sample_list = []
+df = pd.read_excel('sample.xlsx')
+for idx, row in df.iterrows():
+    sample_list.append(PhagePlus(row.to_dict(),phage_plus_schema))
+   
+
 print('Completed')
