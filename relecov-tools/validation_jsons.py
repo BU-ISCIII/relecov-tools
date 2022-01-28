@@ -6,8 +6,13 @@ import pandas as pd
 
 class RelecovSchema :
     def __init__ (self, schema):
-        self.schema = schema
+        self.schema = json.load(schema)
         
+    def get_gontology(self,geontology):
+        for key, value in schema['properties'].items():
+            if value['ontology'] == geontology :
+                return value
+        return None
         
 
 class PhagePlus :
