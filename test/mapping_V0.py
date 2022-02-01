@@ -1,7 +1,28 @@
 import json
 from types import SimpleNamespace
 
-# data = '{"name": "John Smith", "hometown": {"name": "New York", "id": 123}}'
+module_path = str(Path.cwd().parents[0])
+module_path
+
+# %cd ..
+
+# +
+import sys
+from pathlib import Path
+
+# in jupyter (lab / notebook), based on notebook path
+module_path = str(Path.cwd().parents[0])
+# in standard python
+#module_path = str(Path.cwd(__file__).parents[0] / "py")
+
+#if module_path not in sys.path:
+#    sys.path.append(module_path)
+
+#from modules import preparations
+#import tools
+# -
+
+module_path
 
 schema_file = open('/Users/erika/Desktop/BU-ISCIII/Relecov/ECDC-HERA/JSON SCHEMA/26_ENERO/ena_v01.json')
 
