@@ -90,6 +90,18 @@ sample_list = []
 df = pd.read_excel('sample.xlsx')
 for idx, row in df.iterrows():
     sample_list.append(PhagePlus(row.to_dict(),phage_plus_schema))
+from openpyxl import Workbook
+wbFile = openpyxl.load_workbook('my_test_file.xlsx', data_only=True)
+wsFile = wbFile['METADATA_LAB']
+heading = []
+for cell in wsFile[1]:
+    heading.append(cell.value)
+
+for row in islice(wsFile.values,1,wsFile.max_row):
+    samples = OrderedDict()
+    for idx in range(len(heading)):
+        samples[heading[idx]] = row[idx].value
+    
 
 
 print('Completed')
