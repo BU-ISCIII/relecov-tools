@@ -119,15 +119,16 @@ for cell in ws_metadata_lab[1]:
 for row in islice(ws_metadata_lab.values,1,ws_metadata_lab.max_row):
     sample_data_row = {}
     for idx in range(len(heading)):
-        sample_data_row[heading[idx]] = row[idx]
-
+        if 'date' in heading[idx]:
+            sample_data_row[heading[idx]] = row[idx].strftime('%d/%m/%Y')
+        else:
+            sample_data_row[heading[idx]] = row[idx]
     try:
-        import pdb; pdb.set_trace()
-        validate(instance=json.dumps(sample_data_row),schema=json_phage_plus_schema)
+        validate(instance=sample_data_row,schema=json_phage_plus_schema)
     except:
         print('Unsuccessful validation for sample ' , sample_data_row['sample_name'])
-        continue
 
-        sample_list.append(PhagePlusData(sample_data_row,phage_plus_schema))
-import pdb; pdb.set_trace()
+        continue
+    sample_list.append(PhagePlusData(sample_data_row,phage_plus_schema))
+
 print('Completed')
