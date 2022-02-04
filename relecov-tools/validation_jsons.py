@@ -12,7 +12,7 @@ class PhagePlusSchema :
         self.schema = schema
         self.ontology = {}
         for key , values in schema['properties'].items():
-            self.ontology[values['onotlogy']] = key
+            self.ontology[values['ontology']] = key
 
 
     def get_gontology(self,property_item):
@@ -32,17 +32,17 @@ class PhagePlusSchema :
     def maping_schemas_based_on_geontology(mapped_to_schema):
         '''
         Description:
-            The function return a dictionnary with
+            The function return a dictionnary with the properties of the mapped_to_schema as key and
+            properties of phagePlusSchema as value
         Input:
             mapped_to_schema    # json schema to be mapped
-
         Return:
             mapped_dict contains as key the property in the mapped_to_schema and value de property in the self.schema
         '''
         mapped_dict = OrderedDict()
         for key, values in mapped_to_schema.items():
             try:
-                mapped_dict[key] = self.ontology[values['onotology']]
+                mapped_dict[key] = self.ontology[values['ontology']]
             except:
                 # There is no exact match on ontology. Search for the parent
                 # to be implemented later
@@ -90,7 +90,7 @@ def check_arg (args=None) :
     parser.add_argument('-i', '--inputFile', required =True,
                         help='Execl file with the user collected data')
     parser.add_argument('-c', '--convertedSchema', required = True,
-                        help='schema where the user input must be mapped to')
+                        help='schema to be mapped')
     return parser.parse_args()
 
 
