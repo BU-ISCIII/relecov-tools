@@ -40,7 +40,7 @@ class PhagePlusSchema :
             mapped_dict contains as key the property in the mapped_to_schema and value de property in the self.schema
         '''
         mapped_dict = OrderedDict()
-        for key, values in mapped_to_schema.items():
+        for key, values in mapped_to_schema['properties'].items():
             try:
                 mapped_dict[key] = self.ontology[values['ontology']]
             except:
@@ -160,7 +160,7 @@ if __name__ == '__main__':
             continue
         sample_list.append(PhagePlusData(sample_data_row,phage_plus_schema))
     # create the information mapped to the new schema
-    mapped_structure = maping_schemas_based_on_geontology(arguments.convertedSchema)
+    mapped_structure = phage_plus_schema.maping_schemas_based_on_geontology(arguments.convertedSchema)
     mapped_sample_list = []
     for sample in sample_list:
         mapped_sample_list.append(map_sample_to_schema(mapped_structure))
