@@ -7,6 +7,13 @@ import openpyxl
 from itertools import islice
 from utils import *
 
+'''
+References:
+    genepio.owl https://github.com/GenEpiO/genepio/blob/master/genepio.owl
+
+
+'''
+
 class PhagePlusSchema :
     def __init__ (self, schema):
         self.schema = schema
