@@ -31,7 +31,7 @@ END_OF_HEADER
 
 import paramiko
 
-class SFTP_Connection:
+class SftpHandle:
     def __init__(self,host,port,user,key):
         '''
         Initializes the Connection object and starts its host, port, user and key attributes.
