@@ -48,7 +48,7 @@ class SftpHandle:
         '''
         Check if there is a SFTP connection
         Usage:
-            SFTP_Connection_object.check_connection()
+            sftp.check()
         Return:
             True if a connection still exists
             False if connection doesnt exist (not established or timed out for instance)
