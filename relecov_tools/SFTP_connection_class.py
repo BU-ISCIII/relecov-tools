@@ -20,6 +20,7 @@ REQUIREMENTS:
 TO DO:
 
 -Check minimal required Python version
+-Method to check connection 
 
 ================================================================
 END_OF_HEADER
@@ -44,21 +45,51 @@ class SFTP_Connection:
     self.key = key
     self.client = None       
         
-    def open(self):
+    def check_connection(self):
     '''
-    Uses the class attributes to make a connection
+    Check if there is a SFTP connection
     Usage:
-        SFTP_Connection_object = 
+        SFTP_Connection_object.check_connection()
+    Return:
+        True if a connection still exists
+        False if connection doesnt exist (not established or timed out for instance)
     '''
-        self.client = paramiko.SSHClient()
-                self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                self.client.connect(hostname = self.host,
-                                        port = self.port,
-                                        username = self.user,
-                                        password = self.key,
-                                        allow_agent=False,
-                                        look_for_keys=False)
+    try:
+        self.client.getcwd()
+        return True
+    except:
+        return False
+    
+    def open_connection(self):
+    '''
+    Uses the class attributes to make a SFTP connection
+    Usage:
+        SFTP_Connection_object.open_connection()
+    Return:
+        None (by now)
+    '''
+        if self.check_connection():
+            self.client = paramiko.SSHClient()
+                    self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                    self.client.connect(hostname = self.host,
+                                            port = self.port,
+                                            username = self.user,
+                                            password = self.key,
+                                            allow_agent=False,
+                                            look_for_keys=False)
 
-                self.client = self.client.open_sftp()
+                    self.client = self.client.open_sftp()
+
+
+    def close_connection(self):
+    '''
+    Closes the SFTP connection if there is any
+    Usage:
+        SFTP_Connection_object.close_connection()
+    Return:
+        None (by now)
+    '''
+    if self.check_connection():
+        self.client.close()
 
 
