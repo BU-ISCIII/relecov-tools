@@ -11,7 +11,7 @@ REVISED: 11-2-2022
 REVISED BY: guillermo.gorines@urjc.es
 DESCRIPTION:
 
-    Includes the SFTP connection class, and its methods.
+    Includes the SFTP connection class, and its associated methods.
 
 REQUIREMENTS:
     -Python
