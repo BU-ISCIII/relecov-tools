@@ -69,7 +69,7 @@ class SftpHandle:
             True if connected succesfully
             False if failed connection
         '''
-        if not self.check_connection():
+        if not self.check():
             try:
                 self.client = paramiko.SSHClient()
                 self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
