@@ -111,6 +111,6 @@ my_sftp = SFTP_Connection(HOST,PUERTO,USUARIO,CLAVE)
 if not my_sftp.open():
     print("No connection!")
 else:
-    print(my_sftp.check_connection())
+    print(my_sftp.check())
 
 print(my_sftp.client.listdir())
