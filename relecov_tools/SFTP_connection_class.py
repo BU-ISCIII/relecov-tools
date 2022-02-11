@@ -44,7 +44,7 @@ class SftpHandle:
         self.key = key
         self.client = None       
         
-    def check_connection(self):
+    def check(self):
         '''
         Check if there is a SFTP connection
         Usage:
