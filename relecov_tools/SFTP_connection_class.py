@@ -60,7 +60,7 @@ class SftpHandle:
             return False
         
     
-    def open_connection(self):
+    def open(self):
         '''
         Uses the class attributes to make a SFTP connection
         Usage:
