@@ -108,7 +108,7 @@ PUERTO = 420
 USUARIO = 'ARTURITO'
 
 my_sftp = SFTP_Connection(HOST,PUERTO,USUARIO,CLAVE)
-if not my_sftp.open_connection():
+if not my_sftp.open():
     print("No connection!")
 else:
     print(my_sftp.check_connection())
