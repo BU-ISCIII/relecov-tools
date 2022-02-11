@@ -31,12 +31,12 @@ END_OF_HEADER
 
 import paramiko
 
-class SFTP_Connection:
+class SftpHandle:
     def __init__(self,host,port,user,key):
         '''
         Initializes the Connection object and starts its host, port, user and key attributes.
         Declaration:
-            SFTP_Connection_object = SFTP_Connection(host,port,user,key)
+            sftp = SftpHandle(host,port,user,key)
         '''
         self.host = host
         self.port = port
@@ -44,11 +44,11 @@ class SFTP_Connection:
         self.key = key
         self.client = None       
         
-    def check_connection(self):
+    def check(self):
         '''
         Check if there is a SFTP connection
         Usage:
-            SFTP_Connection_object.check_connection()
+            sftp.check()
         Return:
             True if a connection still exists
             False if connection doesnt exist (not established or timed out for instance)
@@ -60,7 +60,7 @@ class SFTP_Connection:
             return False
         
     
-    def open_connection(self):
+    def open(self):
         '''
         Uses the class attributes to make a SFTP connection
         Usage:
@@ -69,7 +69,7 @@ class SFTP_Connection:
             True if connected succesfully
             False if failed connection
         '''
-        if not self.check_connection():
+        if not self.check():
             try:
                 self.client = paramiko.SSHClient()
                 self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -108,9 +108,9 @@ PUERTO = 420
 USUARIO = 'ARTURITO'
 
 my_sftp = SFTP_Connection(HOST,PUERTO,USUARIO,CLAVE)
-if not my_sftp.open_connection():
+if not my_sftp.open():
     print("No connection!")
 else:
-    print(my_sftp.check_connection())
+    print(my_sftp.check())
 
 print(my_sftp.client.listdir())
