@@ -36,7 +36,7 @@ class SftpHandle:
         '''
         Initializes the Connection object and starts its host, port, user and key attributes.
         Declaration:
-            SFTP_Connection_object = SFTP_Connection(host,port,user,key)
+            sftp = SftpHandle(host,port,user,key)
         '''
         self.host = host
         self.port = port
