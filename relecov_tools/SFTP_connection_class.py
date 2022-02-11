@@ -20,7 +20,7 @@ REQUIREMENTS:
 TO DO:
 
 -Check minimal required Python version
--Method to check connection 
+-Delete testing inside this script 
 
 ================================================================
 END_OF_HEADER
@@ -30,6 +30,7 @@ END_OF_HEADER
 # Imports
 
 import paramiko
+import sys
 
 class SftpHandle:
     def __init__(self,host,port,user,key):
@@ -64,7 +65,7 @@ class SftpHandle:
         '''
         Uses the class attributes to make a SFTP connection
         Usage:
-            SFTP_Connection_object.open_connection()
+            sftp.open()
         Return:
             True if connected succesfully
             False if failed connection
@@ -80,37 +81,46 @@ class SftpHandle:
                                         allow_agent=False,
                                         look_for_keys=False)
 
-                self.client = self.client.open_sftp()
+                self.client = self.client.open()
+
                 return True
             except:
                 return False
             
-    def close_connection(self):
+    def close(self):
         '''
         Closes the SFTP connection if there is any
         Usage:
-            SFTP_Connection_object.close_connection()
+            sftp.close()
         Return:
             -True if connection closed successfully
             -False if connection closing failed
             -None if no connection was established
         '''
-        if self.check_connection():
+        if self.check():
             try:    
                 self.client.close()
                 return True
             except:
                 return False
-            
+
+if __name__ == '__main__':
+    sys.exit(main()) 
+
+
+
+# TESTING ZONE, must be deleted later
 CLAVE = "RANDOM_KEY_FOR_TESTING"
 HOST = 'RANDOM_SFTP_FOR_TESTING'
 PUERTO = 420
 USUARIO = 'ARTURITO'
 
-my_sftp = SFTP_Connection(HOST,PUERTO,USUARIO,CLAVE)
+my_sftp = SftpHandle(HOST,PUERTO,USUARIO,CLAVE)
 if not my_sftp.open():
     print("No connection!")
 else:
     print(my_sftp.check())
 
+# testing the client attribute
+# works fine by now
 print(my_sftp.client.listdir())
