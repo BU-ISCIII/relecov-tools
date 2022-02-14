@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
-class ReadMetadata():
+class RelecovMetadata():
     def __init__():
         self.origin_file = file
-        slef.metadata = {}
-
+        self.metadata = {}
+        self.isklims_db = iskylims_db
+        self.relecov_db = relecov_db
+        
 
 # reade_metadata
 def read_metadata_workflow(self):
@@ -15,6 +17,35 @@ def read_metadata_workflow(self):
     '''
 
     # Perform workflow details
+
+
+def check_new_metadata(folder):
+    """ Check if there is a new metadata to be processed
+
+    folder  Directory to be checked
+    """
+    pass
+
+def fetch_metadata_file(folder, file_name):
+    """ Fetch the metadata file
+    folder  Directory to fetch metadata file
+    file_name   metadata file name
+    """
+    pass
+
+
+def add_extra_data (metadata_file, extra_data, result_metadata):
+    """ Add the additional information that must be included in final metadata
+    metadata Origin metadata file
+    extra_data  additional data to be included
+    result_metadata    final metadata after adding the additional data
+    """
+    pass
+
+def store_in_database()
+
+
+
 
 wb_file = openpyxl.load_workbook(arguments.inputFile, data_only=True)
 ws_metadata_lab = wb_file['METADATA_LAB']
