@@ -4,9 +4,9 @@ class RelecovMetadata():
     def __init__():
         self.origin_file = file
         self.metadata = {}
-        self.isklims_db = iskylims_db
-        self.relecov_db = relecov_db
-        
+        self.isklims_url = iskylims_url
+        self.relecov_url = relecov_url
+
 
 # reade_metadata
 def read_metadata_workflow(self):
@@ -33,6 +33,9 @@ def fetch_metadata_file(folder, file_name):
     """
     pass
 
+    def validate_metadata_sample(row_sample):
+        """ Validate sample information
+
 
 def add_extra_data (metadata_file, extra_data, result_metadata):
     """ Add the additional information that must be included in final metadata
@@ -42,7 +45,23 @@ def add_extra_data (metadata_file, extra_data, result_metadata):
     """
     pass
 
-def store_in_database()
+def request_information(external_url, request):
+    """ Get information from external database server using Rest API
+
+    external_url
+    request
+    """
+    pass
+
+def store_information (external_url, request, data):
+    """ Update information
+
+    """
+    pass
+
+
+
+
 
 
 
