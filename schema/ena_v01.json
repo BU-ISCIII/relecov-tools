@@ -25,39 +25,39 @@
     "type": "object",
     "properties": {
         "sample_name": {
-            "examples": ["prov_rona_99"],
-             "ontology": "GENEPIO_0000079",
-             "type": "string",
-             "description": "The user-defined name for the sample.",
-             "clasification":"Database Identifiers",
-             "genepio_label":"sequencing run sample identifier",
+          "examples": ["prov_rona_99"],
+          "ontology": "GENEPIO:0001123",
+          "type": "string",
+          "description": "The user-defined name for the sample.",
+          "clasification":"Database Identifiers",
+          "label":"Collecting Sample id"
 
         },
         "collecting_institution": {
-            "examples": ["Public Health Agency of Canada"],
-             "ontology": "GENEPIO_0001651",
-             "type": "string",
-             "description": "The name of the agency that collected the original sample.",
-             "genepio_label":"INSDC institution code",
+          "examples": ["Public Health Agency of Canada"],
+          "ontology": "GENEPIO:0001153",
+          "type": "string",
+          "description": "Name of the institution to which the person collecting the specimen belongs. Format: Institute Name, Institute Address",
+          "label":"Collecting Institution"
 
         },
         "collection_date": {
-          "examples": ["19/03/2020"],
+          "examples": ["3/19/2020"],
           "ontology": "GENEPIO:0001174",
           "type": "string",
-          "description": "The date on which the sample was collected. ",
-          "format": "date",
-          "genepio_label":"",
-
+          "description": "The date on which the sample was collected.",
+          "format":"date",
+          "classification":"Sample collection and processing",
+          "label":"Sample Collection Date"
         },
         "receipt_date": {
-          "examples": ["20/03/2020"],
+          "examples": ["3/21/2020"],
           "ontology": "GENEPIO:0001179",
           "type": "string",
           "description": "The date on which the sample was received.",
-          "format": "date",
-          "genepio_label":"",
-
+          "format":"date",
+          "clasification":"Sample collection and processing",
+          "label":"Sample Received Date"
         },
         "geographic_location_(country_and/or_sea)": {
           "Enums": [
@@ -338,11 +338,12 @@
             "Missing [GENEPIO:0001618]",
             "Restricted Access [GENEPIO:0001810]"
           ],
-          "ontology": "GENEPIO_0000118",
+          "ontology": "GENEPIO:0001181          ",
           "type": "string",
           "description": "The country of origin of the sample.",
           "examples": ["South Africa [GAZ:00001094]"],
-          "genepio_label":"specimen collection location - country",
+          "clasification":"Sample collection and processing",
+          "label":"Geo Loc Autonomic Country"
 
         },
         "geographic location (region and locality)": {
@@ -350,7 +351,8 @@
           "type": "string",
           "description": "The county/region of origin of the sample.",
           "examples": ["Derbyshire"],
-          "genepio_label":"",
+          "clasification":"Sample collection and processing",
+          "label":"Geo Loc Province"
 
         },
         "geographic location (latitude)": {
@@ -358,7 +360,8 @@
           "type": "string",
           "description": "The latitude coordinates of the geographical location of sample collection.",
           "examples": ["38.98 N"],
-          "genepio_label":"",
+          "clasification":"Sample collection and processing",
+          "label":"Geo Loc Latitude",
 
         },
         "geographic location (longitude)": {
@@ -366,25 +369,8 @@
           "type": "string",
           "description": "The longitude coordinates of the geographical location of sample collection.",
           "examples": ["77.11 W"],
-          "genepio_label":"",
-
-        },
-        "scientific_name": {
-          "Enums": [
-            "Coronaviridae [NCBITaxon:11118]",
-            "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]",
-            "Not Applicable [GENEPIO:0001619]",
-            "Not Collected [GENEPIO:0001620]",
-            "Not Provided [GENEPIO:0001668]",
-            "Missing [GENEPIO:0001618]",
-            "Restricted Access [GENEPIO:0001810]"
-          ],
-          "ontology": "GENEPIO:0001191",
-          "type": "string",
-          "description": "Taxonomic name of the organism.",
-          "examples": ["Severe acute respiratory syndrome coronavirus 2 "],
-          "genepio_label":"",
-
+          "clasification":"Sample collection and processing",
+          "label":"Geo Loc Longitude"
         },
         "isolate": {
           "ontology": "GENEPIO:0001644",
@@ -392,6 +378,8 @@
           "description": "Identifier of the specific isolate.",
           "examples": ["SARS-CoV-2/human/USA/CA-CDPH-001/2020"],
           "genepio_label":"isolate identifier",
+          "clasification":"Sample collection and processing",
+          "label":"Isolate"
 
         },
         "purpose_sampling": {
@@ -422,8 +410,57 @@
           "type": "string",
           "description": "A substance obtained from an anatomical part of an organism e.g. tissue, blood.",
           "examples": ["Blood [UBERON:0000178]"],
-          "genepio_label":"",
+          "classification":"Sample collection and processing",
+          "label":"Organism Substance"
 
+        },
+        "isolation source non-host-associated": {
+          "Enums": [
+            "Air vent [ENVO:03501208]",
+            "Banknote [ENVO:00003896]",
+            "Bed rail [ENVO:03501209]",
+            "Building Floor [ENVO:01000486]",
+            "Cloth [ENVO:02000058]",
+            "Control Panel [ENVO:03501210]",
+            "Door [ENVO:03501220]",
+            "Door Handle [ENVO:03501211]",
+            "Face Mask [OBI:0002787]",
+            "Face Shield [OBI:0002791]",
+            "Food [FOODON:00002403]",
+            "Food Packaging [FOODON:03490100]",
+            "Glass [ENVO:01000481]",
+            "Handrail [ENVO:03501212]",
+            "Hospital Gown [OBI:0002796]",
+            "Light Switch [ENVO:03501213]",
+            "Locker [ENVO:03501214]",
+            "N95 Mask [OBI:0002790]",
+            "Nurse Call Button [ENVO:03501215]",
+            "Paper [ENVO:03501256]",
+            "Particulate Matter [ENVO:01000060]",
+            "Plastic [ENVO:01000404]",
+            "PPE Gown [GENEPIO:0100025]",
+            "Sewage [ENVO:00002018]",
+            "Sink [ENVO:01000990]",
+            "Soil [ENVO:00001998]",
+            "Stainless Steel [ENVO:03501216]",
+            "Tissue Paper [ENVO:03501217]",
+            "Toilet Bowl [ENVO:03501218]",
+            "Water [ENVO:00002006]",
+            "Wastewater [ENVO:00002001]",
+            "Window [ENVO:03501219]",
+            "Wood [ENVO:00002040]",
+            "Not Applicable [GENEPIO:0001619]",
+            "Not Collected [GENEPIO:0001620]",
+            "Not Provided [GENEPIO:0001668]",
+            "Missing [GENEPIO:0001618]",
+            "Restricted Access [GENEPIO:0001810]"
+          ],
+          "ontology": "GENEPIO:0001223",
+          "type": "string",
+          "description": "A substance obtained from the natural or man-made environment e.g. soil, water, sewage, door handle, bed handrail, face mask.",
+          "examples": ["Face Mask [OBI:0002787]"],
+          "clasification":"Sample collection and processing",
+          "label":"Environmental Material"
         },
         "host common name": {
           "Enums": [
@@ -446,11 +483,12 @@
             "Missing [GENEPIO:0001618]",
             "Restricted Access [GENEPIO:0001810]"
           ],
-          "ontology": "GENEPIO_0001724",
+          "ontology": "GENEPIO:0001386",
           "type": "string",
           "description": "The commonly used name of the host.",
           "examples": ["Human [NCBITaxon:9606]"],
-          "genepio_label":"subject organism common name",
+          "classification":"Host information",
+          "label":"Host Common Name"
 
         },
         "host scientific name": {
@@ -477,11 +515,12 @@
             "Missing [GENEPIO:0001618]",
             "Restricted Access [GENEPIO:0001810]"
           ],
-          "ontology": "GENEPIO_0001567",
+          "ontology": "GENEPIO:0001387",
           "type": "string",
           "description": "The taxonomic, or scientific name of the host.",
           "examples": ["Homo sapiens [NCBITaxon:9606]"],
-          "genepio_label":"subject organism (host) taxonomic species",
+          "clasification":"Host information",
+          "label":"Host Scientific Name"
 
         },
         "host_health_state": {
@@ -521,95 +560,125 @@
            },
          "type exposure": {
           "examples": ["Date, Location e.g. type of gathering, Family cluster, etc."],
-           "ontology": "GENEPIO:0001156",
+           "ontology": "GENEPIO:0001417",
            "type": "string",
            "description": "If the information is unknown or can not be shared, leave blank.",
            "clasification":"Host information",
-           "genepio_label":"",
+           "label":"Outbreak Exposure Event Location"
 
          },
          "subject exposure duration": {
             "examples": ["e.g. Patient infected while traveling in …."],
-             "ontology": "GENEPIO:0001156",
+             "ontology": "0",
              "type": "string",
              "description": "If the information is unknown or can not be shared, leave blank.",
              "clasification":"Host information",
-             "genepio_label":"",
+             "label":"Additional Host Information"
 
         },
         "instrument_model": {
-          "Enums": ["454 Genome Sequencer [GENEPIO:0001937]",
-            "454 Genome Sequence 20 [OBI:0000689]",
-            "454 Genome Sequencer FLX [OBI:0000702]",
-            "454 Genome Sequencer FLX Titanium [GENEPIO:0001936]",
-            "454 Genome Sequencer Junior [GENEPIO:0001938]",
-            "AB SOLiD System [OBI:0000696]",
-            "SOLiD 3 Plus System [OBI:0002007]",
-            "SOLiD 4 [OBI:0002024]",
-            "SOLiD 4hq System [GENPIO:0001928]",
-            "SOLiD 5500 [GENPIO:0001929]",
-            "SOLiD 5500xl [GENPIO:0001930]",
-            "SOLiD PI System [GENPIO:0001931]",
-            "SOLiD System 2.0 [GENPIO:0001932]",
-            "SOLiD System 3.0 [GENPIO:0001933]",
-            "HeliScope Single Molecule Sequencer [OBI:0000717]",
-            "Illumina Genome Analyzer II [OBI:0000703]",
-            "Genome Analyzer IIe [OBI:0002027]",
-            "Genome Analyzer IIx [OBI:0002000]",
-            "Illumina HiSeq Sequencer [GENPIO:0001939]",
-            "Illumina HiSeq 1000 [OBI:0002022]",
-            "Illumina HiSeq 2000 [OBI:0002001]",
-            "Illumina HiSeq 2500 [OBI:0002002]",
-            "Illumina HiSeq 3000 [OBI:0002048]",
-            "Illumina HiSeq 4000 [OBI:0002049]",
-            "Ion Torrent PGM [GENPIO:0001935]",
-            "MiSeq [OBI:0002003]",
-            "NextSeq 500 [OBI:0002021]",
-            "PacBio RS II [OBI:0002012]",
+          "Enums": [
+            "Illumina sequencing instrument [GENEPIO:0100105]",
+            "Illumina Genome Analyzer [GENEPIO:0100106]",
+            "Illumina Genome Analyzer II [GENEPIO:0100107]",
+            "Illumina Genome Analyzer IIx [GENEPIO:0100108]",
+            "Illumina HiScanSQ [GENEPIO:0100109]",
+            "Illumina HiSeq [GENEPIO:0100110]",
+            "Illumina HiSeq X [GENEPIO:0100111]",
+            "Illumina HiSeq X Five [GENEPIO:0100112]",
+            "Illumina HiSeq X Ten [GENEPIO:0100113]",
+            "Illumina HiSeq 1000 [GENEPIO:0100114]",
+            "Illumina HiSeq 1500 [GENEPIO:0100115]",
+            "Illumina HiSeq 2000 [GENEPIO:0100116]",
+            "Illumina HiSeq 2500 [GENEPIO:0100117]",
+            "Illumina HiSeq 3000 [GENEPIO:0100118]",
+            "Illumina HiSeq 4000 [GENEPIO:0100119]",
+            "Illumina iSeq [GENEPIO:0100120]",
+            "Illumina iSeq 100 [GENEPIO:0100121]",
+            "Illumina NovaSeq [GENEPIO:0100122]",
+            "Illumina NovaSeq 6000 [GENEPIO:0100123]",
+            "Illumina MiniSeq [GENEPIO:0100124]",
+            "Illumina MiSeq [GENEPIO:0100125]",
+            "Illumina NextSeq [GENEPIO:0100126]",
+            "Illumina NextSeq 500 [GENEPIO:0100127]",
+            "Illumina NextSeq 550 [GENEPIO:0100128]",
+            "Illumina NextSeq 2000 [GENEPIO:0100129]",
+            "Pacific Biosciences sequencing instrument [GENEPIO:0100130]",
+            "PacBio RS [GENEPIO:0100131]",
+            "PacBio RS II [GENEPIO:0100132]",
+            "PacBio Sequel [GENEPIO:0100133]",
+            "PacBio Sequel II [GENEPIO:0100134]",
+            "Ion Torrent sequencing instrument [GENEPIO:0100135]",
+            "Ion Torrent PGM [GENEPIO:0100136]",
+            "Ion Torrent Proton [GENEPIO:0100137]",
+            "Ion Torrent S5 XL [GENEPIO:0100138]",
+            "Ion Torrent S5 [GENEPIO:0100139]",
+            "Oxford Nanopore sequencing instrument [GENEPIO:0100140]",
+            "Oxford Nanopore GridION [GENEPIO:0100141]",
+            "Oxford Nanopore MinION [GENEPIO:0100142]",
+            "Oxford Nanopore PromethION [GENEPIO:0100143]",
+            "BGI Genomics sequencing instrument [GENEPIO:0100144]",
+            "BGI SEQ-500 [GENEPIO:0100145]",
+            "MGI sequencing instrument [GENEPIO:0100146]",
+            "MGI DNBSEQ-T7 [GENEPIO:0100147]",
+            "MGI DNBSEQ-G400 [GENEPIO:0100148]",
+            "MGI DNBSEQ-G400RS FAST [GENEPIO:0100149]",
+            "MGI DNBSEQ-G50 [GENEPIO:0100150]",
+            "Not Applicable [GENEPIO:0001619]",
+            "Not Collected [GENEPIO:0001620]",
+            "Not Provided [GENEPIO:0001668]",
+            "Missing [GENEPIO:0001618]",
+            "Restricted Access [GENEPIO:0001810]"
           ],
-          "ontology": "GENEPIO_0001921",
+          "ontology": "GENEPIO:0001452",
           "type": "string",
           "description": "The model of the sequencing instrument used.",
-          "examples": ["Oxford Nanopore MinION "],
-          "genepio_label":"sequencing instrument model",
-
+          "examples": ["Oxford Nanopore MinION [GENEPIO:0100142]"],
+          "classification":"Sequencing",
+          "label":"Sequencing Instrument Model"
         },
         "instrument_platform ": {
           "examples": ["MinIon"],
-           "ontology": "GENEPIO:0001156",
+           "ontology": "0",
            "type": "string",
            "description": "The model of the sequencing instrument used.",
-           "genepio_label":"",
-
-      },
-      "file_name": {
-            "examples": ["ABC123_S1_L001_R1_001.fastq.gz"],
-            "ontology": "GENEPIO:0001476",
-            "type": "string",
-            "description": "The user-specified filename of the r1 FASTQ file.",
-            "clasification":"Bioinformatics and QC metrics",
-            "genepio_label":"",
-
-      },
-      "tax_id": {
+           "label":"Sequencing Platforms "
+        },
+        "file_name": {
+          "examples": ["ABC123_S1_L001_R1_001.fastq.gz"],
+          "ontology": "GENEPIO:0001476",
+          "type": "string",
+          "description": "The user-specified filename of the r1 FASTQ file.",
+          "clasification":"Bioinformatics and QC metrics",
+          "label":"Sequence file R1 fastq"
+        },
+        "tax_id": {
             "examples": ["probably 2697049 in all cases"],
              "ontology": "GENEPIO:0001156",
              "type": "string",
              "description": "The NCBITaxon identifier for the organism being sequenced.",
              "clasification":"Sample collection and processing",
-             "genepio_label":"",
-
-      },
-      "scientific_name": {
+             "genepio_label":""
+        },
+        "scientific_name": {
+            "Enums": [
+              "Coronaviridae [NCBITaxon:11118]",
+              "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]",
+              "Not Applicable [GENEPIO:0001619]",
+              "Not Collected [GENEPIO:0001620]",
+              "Not Provided [GENEPIO:0001668]",
+              "Missing [GENEPIO:0001618]",
+              "Restricted Access [GENEPIO:0001810]"
+            ],
             "examples": [""],
-             "ontology": "GENEPIO:0001156",
-             "type": "string",
-             "description": "The taxonomic name of the organism.",
-             "clasification":"Sample collection and processing",
-             "genepio_label":"",
-
-      },
-      "common_name": {
+            "ontology": "GENEPIO:0001191",
+            "type": "string",
+            "description": "The taxonomic name of the organism.",
+            "clasification":"Sample collection and processing",
+            "classification":"Sample collection and processing",
+            "label":"Organism"
+        },
+        "common_name": {
             "examples": [""],
              "ontology": "GENEPIO:0001156",
              "type": "string",
@@ -617,8 +686,8 @@
              "clasification":"Sample collection and processing",
              "genepio_label":"",
 
-      },
-      "sample_description": {
+        },
+        "sample_description": {
             "examples": [""],
              "ontology": "GENEPIO:0001156",
              "type": "string",
@@ -626,15 +695,15 @@
              "clasification":"Sample collection and processing",
              "genepio_label":"",
 
-      },
-      "sample_storage_conditions": {
+        },
+        "sample_storage_conditions": {
             "examples": ["24 degrees celsius"],
              "ontology": "NCIT_C115535",
              "type": "string",
              "description": "The name and version of a particular protocol used for sampling.",
              "clasification":"Sample collection and processing"
-      },
-      "library_source": {
+        },
+        "library_source": {
         "Enums": ["5-methycytidine antibody method [GENPIO:0001941]",
           "CAGE method [GENPIO:0001942]",
           "CF-H method [GENPIO:0001943]",

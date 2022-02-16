@@ -5,7 +5,7 @@
         "virus_name",
         "submitter",
         "originating_lab",
-        "address",
+        "collecting_address",
         "collection_date",
         "location",
         "host",
@@ -18,60 +18,74 @@
     "properties": {
         "type": {
             "examples": ["betacoronavirus"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "NCBITaxon:694002",
             "type": "string",
-            "description": "default must remain betacoronavirus",
-            "clasification":"Database Identifiers",
+            "description": "default must remain 'betacoronavirus'",
+            "clasification":"Database Identifiers"
         },
         "virus_name": {
-            "examples": ["e.g. hCoV-19/Netherlands/Gelderland-01/2020 (Must be FASTA-Header from the FASTA file all_sequences.fasta)"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "The user-defined GISAID virus name assigned to the sequence.",
-            "clasification":"Database Identifiers",
+            "examples": ["hCoV-19/Canada/prov_rona_99/2020"],
+             "ontology": "GENEPIO:0100282",
+             "type": "string",
+             "description": "The user-defined GISAID virus name assigned to the sequence.",
+             "clasification":"Database Identifiers",
+             "label":"GISAID Virus Name"
         },
         "submitter": {
-            "examples": ["Public Health Agency of Canada"],
-            "ontology": "GENEPIO:0001156",
+            "examples": [""],
+            "ontology": "0",
             "type": "string",
-            "description": "enter your GISAID-Username",
-            "clasification":"Database Identifiers",
+            "description": "",
+            "clasification":"enter your GISAID-Username",
+            "label":"GISAID Username"
         },
         "originating_lab": {
-            "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "examples": ["Public Health Agency of Canada"],
+            "ontology": "GENEPIO:0001153",
             "type": "string",
-            "description": "Where the clinical specimen or virus isolate was first obtained",
-            "clasification":"Sample collection and processing",
+            "description": "The name of the agency that collected the original sample.",
+            "label":"Collecting Institution"
         },
-        "address": {
-            "examples": [""],
-            "ontology": "GENEPIO:0001156",
+        "collecting_address": {
+            "examples": ["655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"],
+            "ontology": "GENEPIO:0001158",
             "type": "string",
             "description": "The mailing address of the agency submitting the sample.",
             "clasification":"Sample collection and processing",
+            "label":"Collecting Institution Address"
+        },
+        "submitting_address": {
+            "examples": ["123 Sunnybrooke St, Toronto, Ontario, M4P 1L6, Canada"],
+            "ontology": "GENEPIO:0001167",
+            "type": "string",
+            "description": "The mailing address of the agency submitting the sequence.",
+            "clasification":"Sample collection and processing",
+            "label":"Submitting Institution Address"
         },
         "collection_date": {
-            "examples": [""],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "Date in the format YYYY or YYYY-MM or YYYY-MM-DD. Caution: collection date may be considered public health identifiable information. If this date is considered identifiable, it is acceptable to add 'jitter' to the collection date by adding or subtracting a calendar day (acceptable by GISAID). Do not change the collection date in your original records. Alternatively, ”received date” may be used as a substitute in the data you share. The date should be provided in ISO 8601 standard format YYYY-MM-DD.",
-            "format":"date",
-            "clasification":"Sample collection and processing",
+            "examples": ["3/19/2020"],
+             "ontology": "GENEPIO:0001174",
+             "type": "string",
+             "description": "The date on which the sample was collected.",
+             "format":"date",
+             "classification":"Sample collection and processing",
+             "label":"Sample Collection Date"
         },
         "location": {
             "examples": ["e.g. Europe / Germany / Bavaria / Munich"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "GENEPIO:0001181            ",
             "type": "string",
             "description": "The country of origin of the sample.",
             "clasification":"Sample collection and processing",
+            "label":"Geo Loc Autonomic Country"
         },
         "host": {
             "examples": ["e.g. Human, Environment, Canine, Manis javanica, Rhinolophus affinis, etc"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "GENEPIO:0001387",
             "type": "string",
             "description": "The taxonomic, or scientific name of the host.",
             "clasification":"Host information",
+            "label":"Host Scientific Name"
         },
         "patient_age": {
             "Enums": [
@@ -96,7 +110,39 @@
             "ontology": "GENEPIO:0001394",
             "type": "string",
             "description": "The age category of the host at the time of sampling.",
-            "clasification":"Host information",
+            "clasification":"Host information"
+        },
+        "specimen_source": {
+            "Enums": [
+              "Blood [UBERON:0000178]",
+              "Fluid [UBERON:0006314]",
+              "Fluid (Cerebrospinal (CSF)) [UBERON:0001359]",
+              "Fluid (Pericardial) [UBERON:0002409]",
+              "Fluid (Pleural) [UBERON:0001087]",
+              "Fluid (Vaginal) [UBERON:0036243]",
+              "Fluid (Amniotic) [UBERON:0000173]",
+              "Saliva [UBERON:0001836]",
+              "Tissue [UBERON:0000479]",
+              "Not Applicable [GENEPIO:0001619]",
+              "Not Collected [GENEPIO:0001620]",
+              "Not Provided [GENEPIO:0001668]",
+              "Missing [GENEPIO:0001618]",
+              "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001211",
+            "type": "string",
+            "description": "A substance obtained from an anatomical part of an organism e.g. tissue, blood.",
+            "examples": ["Blood [UBERON:0000178]"],
+            "classification":"Sample collection and processing",
+            "label":"Organism Substance"
+        },
+        "Assembly method": {
+            "examples": ["Ivar"],
+            "ontology": "GENEPIO:0001463",
+            "type": "string",
+            "description": "The name of software used to generate the consensus sequence.",
+            "clasification":"Bioinformatics and QC metrics",
+            "label":"Consensus sequence software name"
         },
         "gender": {
             "Enums": [
@@ -120,10 +166,27 @@
         },
         "sequencing_technology": {
             "examples": ["e.g. Illumina Miseq, Sanger, Nanopore MinION, Ion Torrent, etc."],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "GENEPIO:0001452",
             "type": "string",
             "description": "The model of the sequencing instrument used.",
-            "clasification":"Sequencing",
+            "classification":"Sequencing",
+            "label":"Sequencing Instrument Model"
+        },
+        "authors": {
+            "examples": [""],
+            "ontology": "GENEPIO:0001517",
+            "type": "string",
+            "description": "",
+            "clasification":"Contributor Acknowledgement",
+            "label":"Authors"
+        },
+        "coverage": {
+            "examples": ["400x"],
+            "ontology": "GENEPIO:0001474",
+            "type": "string",
+            "description": "The average number of reads representing a given nucleotide in the reconstructed sequence.",
+            "clasification":"Bioinformatics and QC metrics",
+            "label":"Depth of coverage value "
         },
         "fasta_filename": {
             "examples": ["e.g. all_sequences.fasta not c:\users\meier\docs\all_sequences.fasta"],
@@ -134,10 +197,11 @@
         },
         "additional_host_information": {
             "examples": ["e.g. Patient infected while traveling in …."],
-             "ontology": "GENEPIO:0001156",
+             "ontology": "0",
              "type": "string",
              "description": "If the information is unknown or can not be shared, leave blank.",
              "clasification":"Host information",
+             "label":"Additional Host Information"
         },
         "Last vaccinated": {
             "examples": ["e.g. 04/09/2021"],
@@ -149,18 +213,34 @@
         },
         "outbreak": {
             "examples": ["Date, Location e.g. type of gathering, Family cluster, etc."],
-             "ontology": "GENEPIO:0001156",
+             "ontology": "GENEPIO:0001417",
              "type": "string",
              "description": "If the information is unknown or can not be shared, leave blank.",
              "clasification":"Host information",
+             "label":"Outbreak Exposure Event Location"
         },
         "Sampling Strategy": {
             "examples": ["e.g. Sentinel surveillance (ILI), Sentinel surveillance (ARI), Sentinel surveillance (SARI), Non-sentinel-surveillance (hospital), Non-sentinel-surveillance (GP network), Longitudinal sampling on same patient(s), S gene dropout"],
-             "ontology": "GENEPIO:",
+             "ontology": "GENEPIO:0001445",
              "type": "string",
              "description": "The reason that the sample was sequenced.",
-             "clasification":"Sequencing",
+             "classification":"Sequencing",
+             "label":"Purpose of Sequencing"
         },
+        "submitting_lab_sequence_id": {
+            "examples": [""],
+            "ontology": "0",
+            "type": "string",
+            "description": "Sample ID given by the submitting laboratory",
+            "clasification":"Database Identifiers"
+        },
+        "submitting_lab": {
+            "examples": ["Centers for Disease Control and Prevention"],
+            "ontology": "GENEPIO:0001159",
+            "type": "string",
+            "description": "The name of the agency that generated the sequence.",
+            "label":"Submitting Institution"
+        }
     }
 
 }
