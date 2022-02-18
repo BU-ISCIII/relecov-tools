@@ -22,13 +22,16 @@
       "ontology": "GENEPIO:0001156",
       "type": "string",
       "description": "The email address of the contact responsible for follow-up regarding the sample.",
-      "format": "email"
+      "clasification":"Sample collection and processing", 
+      "label":"Collecting Institution Email"
     },
     "depth_of_coverage_value": {
+      "examples": ["400x"],
       "ontology": "GENEPIO:0001474",
-      "type": "number",
+      "type": "string",
       "description": "The average number of reads representing a given nucleotide in the reconstructed sequence.",
-      "examples": [400.0]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Depth of coverage value "
     },
     "exposure_details": {
       "ontology": "GENEPIO:0001431",
@@ -37,10 +40,12 @@
       "examples": ["Host role - Other: Bus Driver"]
     },
     "breadth_of_coverage_value": {
+      "examples": ["95%"],
       "ontology": "GENEPIO:0001472",
-      "type": "number",
+      "type": "string",
       "description": "The percentage of the reference genome covered by the sequenced data, to a prescribed depth.",
-      "examples": [0.95]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Breadth of coverage value"
     },
     "most_recent_travel_departure_date": {
       "examples": ["16/03/2020"],
@@ -50,13 +55,37 @@
       "format": "date"
     },
     "sequencing_protocol": {
-      "ontology": "GENEPIO:0001454",
-      "type": "string",
-      "description": "The protocol used to generate the sequence.",
-      "examples": [
-        "Genomes were generated through amplicon sequencing of 1200 bp amplicons with Freed schema primers. Libraries were created using Illumina DNA Prep kits, and sequence data was produced using Miseq Micro v2 (500 cycles) sequencing kits."
-      ]
+      "examples": ["Genomes were generated through amplicon sequencing of 1200 bp amplicons with Freed schema primers. Libraries were created using Illumina DNA Prep kits, and sequence data was produced using Miseq Micro v2 (500 cycles) sequencing kits."],
+       "ontology": "GENEPIO:0001454",
+       "type": "string",
+       "description": "The protocol used to generate the sequence.",
+       "clasification":"Sequencing",
+       "label":"Sequencing Protocol"
     },
+    "%Ns": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Pathogen diagnostic testing",
+      "label":"%Ns"
+    },
+    "Number_of_variants_(AF_greater_75%)": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Pathogen diagnostic testing",
+      "label":"Number of variants (AF greater 75%)"
+    },
+    "Numer_of_variants_with_effect": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Pathogen diagnostic testing",
+      "label":"Numer of variants with effect"
+   },
     "host_age_bin": {
       "Enums": [
         "0 - 9 [GENEPIO:0100049]",
@@ -101,20 +130,27 @@
       "ontology": "GENEPIO:0001211",
       "type": "string",
       "description": "A substance obtained from an anatomical part of an organism e.g. tissue, blood.",
-      "examples": ["Blood [UBERON:0000178]"]
+      "examples": ["Blood [UBERON:0000178]"],
+      "classification":"Sample collection and processing",
+      "label":"Organism Substance"
+
     },
     "sample_collection_date": {
-      "examples": ["19/03/2020"],
+      "examples": ["3/19/2020"],
       "ontology": "GENEPIO:0001174",
       "type": "string",
-      "description": "The date on which the sample was collected. ",
-      "format": "date"
+      "description": "The date on which the sample was collected.",
+      "format":"date",
+      "classification":"Sample collection and processing",
+      "label":"Sample Collection Date"
     },
-    "diagnostic_pcr_ct_value_2": {
+    "diagnostic_pcr_Ct_value_2": {
+      "examples": ["36"],
       "ontology": "GENEPIO:0001512",
-      "type": "integer",
+      "type": "string",
       "description": "The cycle threshold (CT) value result from a diagnostic SARS-CoV-2 RT-PCR test.",
-      "examples": [36]
+      "clasification":"Pathogen diagnostic testing",
+      "label":"Diagnostic Pcr Ct Value-2"
     },
     "number_of_vaccine_doses_received": {
       "ontology": "GENEPIO:0001406",
@@ -149,7 +185,9 @@
       "ontology": "GENEPIO:0001255",
       "type": "string",
       "description": "Name and description of the laboratory host used to propagate the source organism or material from which the sample was obtained.",
-      "examples": ["Vero E6 Cell Line [BTO:0004755]"]
+      "examples": ["Vero E6 Cell Line [BTO:0004755]"],
+      "classification":"Sample collection and processing",
+      "label":"Lab passage Host"
     },
     "anatomical_part": {
       "Enums": [
@@ -186,7 +224,9 @@
       "ontology": "GENEPIO:0001214",
       "type": "string",
       "description": "An anatomical part of an organism e.g. oropharynx. ",
-      "examples": ["Nasopharynx (NP) [UBERON:0001728]"]
+      "examples": ["Nasopharynx (NP) [UBERON:0001728]"],
+      "classification":"Sample collection and processing",
+      "label":"Anatomical Structure"
     },
     "host_health_outcome": {
       "Enums": [
@@ -205,24 +245,38 @@
       "description": "Disease outcome in the host.",
       "examples": ["Recovered [NCIT:C49498]"]
     },
+    "rna_extraction_protocol": {
+        "examples": [""],
+          "ontology": "0",
+          "type": "string",
+          "description": "",
+          "clasification":"Sequencing",
+          "label":"Rna Extraction Protocol"
+    },
     "sequencing_date": {
       "examples": ["22/06/2020"],
       "ontology": "GENEPIO:0001447",
       "type": "string",
       "description": "The date the sample was sequenced.",
-      "format": "date"
+      "format": "date",
+      "clasification":"Sequencing",
+      "label":"Sequencing date"
     },
     "passage_number": {
       "ontology": "GENEPIO:0001261",
       "type": "integer",
       "description": "Number of passages.",
-      "examples": [3]
+      "examples": [3],
+      "clasification":"Sample collection and processing",
+      "label":"Passage Number"
     },
     "ns_per_100_kbp": {
+      "examples": ["300"],
       "ontology": "GENEPIO:0001484",
-      "type": "integer",
+      "type": "string",
       "description": "The number of N symbols present in the consensus fasta sequence, per 100kbp of sequence.",
-      "examples": [300]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Ns per 100 kbp"
     },
     "case_id": {
       "ontology": "GENEPIO:0100281",
@@ -231,11 +285,12 @@
       "examples": ["ABCD1234"]
     },
     "biosample_accession": {
-      "pattern": "^SAM(D|N|E([AG]?))[0-9]+",
+      "examples": ["SAMN14180202"],
       "ontology": "GENEPIO:0001139",
       "type": "string",
       "description": "The identifier assigned to a BioSample in INSDC archives.",
-      "examples": ["SAMN14180202"]
+      "clasification":"Database Identifiers",
+      "label":"Biosample accession ENA"
     },
     "last_dose_vacicnation_date": {
       "examples": ["09/04/2021"],
@@ -245,12 +300,76 @@
       "format": "date"
     },
     "bioinformatics_protocol": {
+      "examples": ["https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"],
       "ontology": "GENEPIO:0001489",
       "type": "string",
-      "description": "The name and version number of the bioinformatics protocol used.",
-      "examples": [
-        "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
-      ]
+      "description": "The name  of the bioinformatics protocol used.",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Bioinformatics protocol"
+    },
+    "if_bioinformatic_protocol_is_other_specify": {
+      "examples": ["https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"],
+      "ontology": "0",
+      "type": "string",
+      "description": "The name  of the bioinformatics protocol used.",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"If bioinformatic protocol Is Other, Specify"
+    },
+    "bioinformatic_protocol_version": {
+      "examples": ["https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"],
+      "ontology": "0",
+      "type": "string",
+      "description": "The version number of the bioinformatics protocol used.",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"bioinformatics protocol version"
+    },
+    "preprocessing": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Preprocessing"
+    },
+    "if_preprocessing_other": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"If preprocessing Is Other, Specify"
+    },
+    "preprocessing_params": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Preprocessing params"
+    },
+    "mapping": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Lineage and Variant information",
+      "label":"Mapping"
+    },
+    "mapping_params": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Lineage and Variant information",
+      "label":"Mapping params"
+    },
+    "commercial/open-source/both": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Commercial/Open-source/both"
     },
     "prior_sars_cov_2_antiviral_treatment": {
       "Enums": [
@@ -311,7 +430,9 @@
       "ontology": "GENEPIO:0001510",
       "type": "string",
       "description": "The name of the gene used in the diagnostic RT-PCR test.",
-      "examples": ["RdRp gene (nsp12) [GENEPIO:0100168]"]
+      "examples": ["RdRp gene (nsp12) [GENEPIO:0100168]"],
+      "classification":"Pathogen diagnostic testing",
+      "label":"Gene Name 2"
     },
     "body_product": {
       "Enums": [
@@ -332,7 +453,9 @@
       "ontology": "GENEPIO:0001216",
       "type": "string",
       "description": "A substance excreted/secreted from an organism e.g. feces, urine, sweat.",
-      "examples": ["Feces [UBERON:0001988]"]
+      "examples": ["Feces [UBERON:0001988]"],
+      "classification":"Sample collection and processing",
+      "label":"Body product"
     },
     "host_age": {
       "ontology": "GENEPIO:0001392",
@@ -377,7 +500,9 @@
       "ontology": "GENEPIO:0001234",
       "type": "string",
       "description": "The instrument or container used to collect the sample e.g. swab.",
-      "examples": ["Swab [GENEPIO:0100027]"]
+      "examples": ["Swab [GENEPIO:0100027]"],
+      "clasification":"Sample collection and processing",
+      "label":"Collection Device"
     },
     "purpose_of_sequencing": {
       "Enums": [
@@ -414,25 +539,33 @@
       "ontology": "GENEPIO:0001445",
       "type": "string",
       "description": "The reason that the sample was sequenced.",
-      "examples": ["Baseline surveillance (random sampling) [GENEPIO:0100005]"]
+      "examples": ["Baseline surveillance (random sampling) [GENEPIO:0100005]"],
+      "classification":"Sequencing",
+      "label":"Purpose of Sequencing"
     },
     "raw_sequence_data_processing_method": {
+      "examples": ["Porechop 0.2.3"],
       "ontology": "GENEPIO:0001458",
       "type": "string",
       "description": "The method used for raw data processing such as removing barcodes, adapter trimming, filtering etc.",
-      "examples": ["Porechop 0.2.3,Porechop 0.2.3"]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Raw sequence data processin method"
     },
     "sequence_submitter_contact_address": {
+      "examples": ["123 Sunnybrooke St, Toronto, Ontario, M4P 1L6, Canada"],
       "ontology": "GENEPIO:0001167",
       "type": "string",
       "description": "The mailing address of the agency submitting the sequence.",
-      "examples": ["123 Sunnybrooke St, Toronto, Ontario, M4P 1L6, Canada"]
+      "clasification":"Sample collection and processing",
+      "label":"Submitting Institution Address"
     },
     "depth_of_coverage_threshold": {
-      "ontology": "GENEPIO:0001475",
-      "type": "number",
+      "examples": ["100x"],
+      "ontology":  "GENEPIO:0001475",
+      "type": "string",
       "description": "The threshold used as a cut-off for the depth of coverage.",
-      "examples": [100.0]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Depth of coverage threshold"
     },
     "specimen_processing": {
       "Enums": [
@@ -448,19 +581,17 @@
       "ontology": "GENEPIO:0001253",
       "type": "string",
       "description": "Any processing applied to the sample during or after receiving the sample. ",
-      "examples": ["Virus Passage [GENEPIO:0100039]"]
-    },
-    "flow_cell_barcode": {
-      "ontology": "GENEPIO:0001451",
-      "type": "string",
-      "description": "The barcode of the flow cell used for sequencing.",
-      "examples": ["FAB06069"]
+      "examples": ["Virus Passage [GENEPIO:0100039]"],
+      "classification":"Sample collection and processing",
+      "label":"Specimen Processing"
     },
     "r1_fastq_filename": {
+      "examples": ["ABC123_S1_L001_R1_001.fastq.gz"],
       "ontology": "GENEPIO:0001476",
       "type": "string",
       "description": "The user-specified filename of the r1 FASTQ file.",
-      "examples": ["ABC123_S1_L001_R1_001.fastq.gz"]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Sequence file R1 fastq"
     },
     "destination_of_most_recent_travel_city": {
       "ontology": "GENEPIO:0001411",
@@ -469,19 +600,77 @@
       "examples": ["New York City"]
     },
     "r1_fastq_filepath": {
+      "examples": ["/User/Documents/RespLab/Data/"],
       "ontology": "GENEPIO:0001478",
       "type": "string",
       "description": "The filepath of the r1 FASTQ file.",
-      "examples": [
-        "/User/Documents/RespLab/Data/ABC123_S1_L001_R1_001.fastq.gz"
-      ]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Filepath R1 fastq"
     },
     "library_id": {
       "ontology": "GENEPIO:0001448",
       "type": "string",
       "description": "The user-specified identifier for the library prepared for sequencing.",
-      "examples": ["XYZ_123345"]
+      "examples": ["XYZ_123345"],
+      "clasification":"Sequencing",
+      "labe":"Library Id"
     },
+    "enrichment_protocol": {
+      "examples": [""],
+       "ontology": "0",
+       "type": "string",
+       "description": "",
+       "clasification":"Sequencing",
+       "label":"Enrichment_protocol"
+    },
+    "if_enrichment_protocol_is_other_specify": {
+      "examples": [""],
+       "ontology": "0",
+       "type": "string",
+       "description": "",
+       "clasification":"Sequencing",
+       "label":"If Enrichment Protocol Is Other, Specify"
+    },
+    "if_consensus_other": {
+      "examples": ["1.3"],
+      "ontology": "0",
+      "type": "string",
+      "description": "The version of the software used to generate the consensus sequence.",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"If consensus Is Other, Specify"
+    },
+    "if_mapping_other": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Lineage and Variant information",
+      "label":"If mapping Is Other, Specify"
+    },
+    "amplicon protocol": {
+      "examples": [""],
+       "ontology": "0",
+       "type": "string",
+       "description": "",
+       "clasification":"Sequencing",
+       "label":"Amplicon Protocol"
+    },
+    "if_amplicon_protocol_if_other_especify": {
+      "examples": [""],
+       "ontology": "0",
+       "type": "string",
+       "description": "",
+       "clasification":"Sequencing",
+       "labe":"If Amplicon Protocol If Other, Especify"
+    },
+    "amplicon_version": {
+      "examples": [""],
+       "ontology": "0",
+       "type": "string",
+       "description": "",
+       "clasification":"Sequencing",
+       "label":"Amplicon Version"
+  },
     "host_vaccination_status": {
       "Enums": [
         "Fully Vaccinated [GENEPIO:0100100]",
@@ -502,27 +691,49 @@
       "ontology": "OBI:0001621",
       "type": "string",
       "description": "The longitude coordinates of the geographical location of sample collection.",
-      "examples": ["77.11 W"]
+      "examples": ["77.11 W"],
+      "clasification":"Sample collection and processing",
+      "label":"Geo Loc Longitude"
     },
     "genbank_ena_ddbj_accession": {
-      "pattern": "^([a-zA-Z]{2})\\d*.\\d{1}",
+      "examples": ["MN908947.3"],
       "ontology": "GENEPIO:0001145",
       "type": "string",
       "description": "The GenBank/ENA/DDBJ identifier assigned to the sequence in the INSDC archives.",
-      "examples": ["MN908947.3"]
+      "clasification":"Database Identifiers",
+      "label":"GenBank/ENA/DDBJ accession"
     },
     "bioproject_accession": {
-      "pattern": "^PRJ(N|E|D)([a-zA-Z]?)[0-9]+*",
+      "examples": ["PRJNA12345"],
       "ontology": "GENEPIO:0001136",
       "type": "string",
-      "description": "The INSDC accession number of the BioProject(s) to which the BioSample belongs. ",
-      "examples": ["PRJNA12345"]
+      "description": "The INSDC accession number of the BioProject(s) to which the BioSample belongs.",
+      "clasification":"Database Identifiers",
+      "label":"Bioproject accession ENA"
     },
-    "lineage_clade_analysis_software_name": {
+    "lineage/clade_analysis_software_name": {
+      "examples": ["Pangolin"],
       "ontology": "GENEPIO:0001501",
       "type": "string",
       "description": "The name of the software used to determine the lineage/clade.",
-      "examples": ["Pangolin"]
+      "clasification":"Lineage and Variant information",
+      "label":"lineage/clade analysis software name"
+    },
+    "analysis_author": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Contributor Acknowledgement",
+      "label":"Analysis Authors"
+    },
+    "if_lineage_identification_other": {
+      "examples": ["Other than Pangolin"],
+      "ontology": "0",
+      "type": "string",
+      "description": "The name of the software used to determine the lineage/clade.",
+      "clasification":"Lineage and Variant information",
+      "label":"If lineage identification Is Other, Specify"
     },
     "location_of_exposure_geo_loc_name_country": {
       "Enums": [
@@ -803,7 +1014,7 @@
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
-      "ontology": "GENEPIO:0001410",
+      "ontology": "GENEPIO:0001181",
       "type": "string",
       "description": "The country where the host was likely exposed to the causative agent of the illness.",
       "examples": ["South Africa [GAZ:00001094]"]
@@ -822,22 +1033,44 @@
       "format": "date"
     },
     "library_preparation_kit": {
-      "ontology": "GENEPIO:0001450",
-      "type": "string",
-      "description": "The name of the DNA library preparation kit used to generate the library being sequenced.",
-      "examples": ["Nextera XT"]
+      "examples": ["Nextera XT"],
+       "ontology": "GENEPIO:0001450",
+       "type": "string",
+       "description": "The name of the DNA library preparation kit used to generate the library being sequenced.",
+       "clasification":"Sequencing",
+       "label":"Library Preparation Kit"
+    },
+    "flow_cell_barcode": {
+      "examples": ["FAB06069"],
+       "ontology": "GENEPIO:0001451",
+       "type": "string",
+       "description": "The barcode of the flow cell used for sequencing.",
+       "clasification":"Sequencing",
+       "label":"Flow Cell Barcode"
+    },
+    "library_kit": {
+      "examples": [""],
+       "ontology": "0",
+       "type": "string",
+       "description": "",
+       "clasification":"Sequencing",
+       "label":"Library Kit"
     },
     "fast5_filename": {
+      "examples": ["batch1a_sequences.fast5"],
       "ontology": "GENEPIO:0001480",
       "type": "string",
       "description": "The user-specified filename of the FAST5 file.",
-      "examples": ["batch1a_sequences.fast5"]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Filename fast5"
     },
-    "diagnostic_pcr_ct_value_1": {
+    "diagnostic_pcr_Ct_value_1": {
+      "examples": ["21"],
       "ontology": "GENEPIO:0001509",
-      "type": "integer",
+      "type": "string",
       "description": "The Ct value result from a diagnostic SARS-CoV-2 RT-PCR test.",
-      "examples": [21]
+      "clasification":"Pathogen diagnostic testing",
+      "label":"Diagnostic Pcr Ct Value 1"
     },
     "collection_method": {
       "Enums": [
@@ -871,7 +1104,9 @@
       "ontology": "GENEPIO:0001241",
       "type": "string",
       "description": "The process used to collect the sample e.g. phlebotomy, necropsy.",
-      "examples": ["Bronchoalveolar Lavage (BAL) [GENEPIO:0100032]"]
+      "examples": ["Bronchoalveolar Lavage (BAL) [GENEPIO:0100032]"],
+      "clasification":"Sample collection and processing",
+      "label":"Collection Method"
     },
     "geo_loc_name_county_region": {
       "ontology": "GENEPIO:0100280",
@@ -880,18 +1115,28 @@
       "examples": ["Derbyshire"]
     },
     "consensus_genome_length": {
+      "examples": ["38677"],
       "ontology": "GENEPIO:0001483",
-      "type": "integer",
+      "type": "string",
       "description": "Size of the assembled genome described as the number of base pairs.",
-      "examples": [38677]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Consensus genome length"
     },
     "r2_fastq_filepath": {
+      "examples": ["/User/Documents/RespLab/Data/"],
       "ontology": "GENEPIO:0001479",
       "type": "string",
       "description": "The filepath of the r2 FASTQ file.",
-      "examples": [
-        "/User/Documents/RespLab/Data/ABC123_S1_L001_R2_001.fastq.gz"
-      ]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Filepath R2 fastq"
+    },
+    "consensus_criteria": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Consensus criteria"
     },
     "destination_of_most_recent_travel_state_province_territory": {
       "ontology": "GENEPIO:0001412",
@@ -899,12 +1144,22 @@
       "description": "The name of the province that was the destination of most recent travel.",
       "examples": ["California"]
     },
-    "sample_received_date": {
-      "examples": ["20/03/2020"],
+    "reception_date": {
+      "examples": ["3/21/2020"],
       "ontology": "GENEPIO:0001179",
       "type": "string",
       "description": "The date on which the sample was received.",
-      "format": "date"
+      "format":"date",
+      "clasification":"Sample collection and processing",
+      "label":"Sample Received Date"
+    },
+    "quality_control_metrics": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Quality control metrics "
     },
     "host_common_name": {
       "Enums": [
@@ -930,13 +1185,17 @@
       "ontology": "GENEPIO:0001386",
       "type": "string",
       "description": "The commonly used name of the host.",
-      "examples": ["Human [NCBITaxon:9606]"]
+      "examples": ["Human [NCBITaxon:9606]"],
+      "classification":"Host information",
+      "label":"Host Common Name"
     },
     "geo_loc_name_state_province_territory": {
       "ontology": "GENEPIO:0001185",
       "type": "string",
       "description": "The state/province/territory of origin of the sample.",
-      "examples": ["Western Cape"]
+      "examples": ["Western Cape"],
+      "classification":"Sample collection and processing",
+      "label":"Geo Loc Autonomic Community"
     },
     "lineage_clade_analysis_software_version": {
       "ontology": "GENEPIO:0001502",
@@ -951,17 +1210,28 @@
       "examples": ["BCxy123"]
     },
     "sra_accession": {
-      "pattern": "^(SRR|ERR|DRR)[0-9]+",
-      "ontology": "GENEPIO:0001142",
+       "examples": ["SRR11177792"],
+       "ontology": "GENEPIO:0001142",
+       "type": "string",
+       "description": "The Sequence Read Archive (SRA), European Nucleotide Archive (ENA) or DDBJ Sequence Read Archive (DRA) identifier linking raw read data, methodological metadata and quality control metrics submitted to the INSDC.",
+       "clasification":"Database Identifiers",
+       "label":"SRA accession"
+    },
+    "author_submitter": {
+      "examples": [""],
+      "ontology": "0",
       "type": "string",
-      "description": "The Sequence Read Archive (SRA), European Nucleotide Archive (ENA) or DDBJ Sequence Read Archive (DRA) identifier linking raw read data, methodological metadata and quality control metrics submitted to the INSDC.",
-      "examples": ["SRR11177792"]
+      "description": "",
+      "clasification":"Contributor Acknowledgement",
+      "label":"Author Submitter"
     },
     "authors": {
+      "examples": [""],
       "ontology": "GENEPIO:0001517",
       "type": "string",
-      "description": "Names of individuals contributing to the processes of sample collection, sequence generation, analysis, and data submission.",
-      "examples": ["Tejinder Singh, Fei Hu, Johnny Blogs"]
+      "description": "",
+      "clasification":"Contributor Acknowledgement",
+      "label":"Authors"
     },
     "host_role": {
       "Enums": [
@@ -1013,12 +1283,37 @@
       "description": "The name of the consensus sequence.",
       "examples": ["ncov123assembly3"]
     },
-    "gisaid_accession": {
-      "pattern": "^EPI_ISL_\\d*",
-      "ontology": "GENEPIO:0001147",
+    "assembly": {
+      "examples": [""],
+      "ontology": "0",
       "type": "string",
-      "description": "The GISAID accession number assigned to the sequence.",
-      "examples": ["EPI_ISL_123456"]
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Assembly"
+    },
+    "if_assembly_other": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"If assembly Is Other, Specify"
+    },
+    "assembly_params": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Assambly params"
+    },
+    "gisaid_accession": {
+      "examples": ["hCoV-19/Canada/prov_rona_99/2020"],
+      "ontology": "GENEPIO:0100282",
+      "type": "string",
+      "description": "The user-defined GISAID virus name assigned to the sequence.",
+      "clasification":"Database Identifiers",
+      "label":"GISAID Virus Name"
     },
     "geo_loc_name_country": {
       "Enums": [
@@ -1302,19 +1597,24 @@
       "ontology": "GENEPIO:0001181",
       "type": "string",
       "description": "The country of origin of the sample.",
-      "examples": ["South Africa [GAZ:00001094]"]
+      "examples": ["South Africa [GAZ:00001094]"],
+      "label":"Geo Loc Autonomic Country"
     },
     "consensus_sequence_filepath": {
+      "examples": ["/User/Documents/RespLab/Data/ncov123assembly.fasta"],
       "ontology": "GENEPIO:0001462",
       "type": "string",
       "description": "The filepath of the consesnsus sequence file.",
-      "examples": ["/User/Documents/RespLab/Data/ncov123assembly.fasta"]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Consensus sequence filepath"
     },
     "number_of_base_pairs_sequenced": {
+      "examples": ["387566"],
       "ontology": "GENEPIO:0001482",
-      "type": "integer",
+      "type": "string",
       "description": "The number of total base pairs generated by the sequencing process.",
-      "examples": [387566]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Number of base pairs sequenced "
     },
     "destination_of_most_recent_travel_country": {
       "ontology": "GENEPIO:0001413",
@@ -1323,10 +1623,12 @@
       "examples": ["United Kingdom"]
     },
     "fast5_filepath": {
+      "examples": ["/User/Documents/RespLab/Data/"],
       "ontology": "GENEPIO:0001481",
       "type": "string",
       "description": "The filepath of the FAST5 file.",
-      "examples": ["/User/Documents/RespLab/Data/rona123assembly.fast5"]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Filepath fast5"
     },
     "culture_collection": {
       "ontology": "GENEPIO:0100284",
@@ -1334,31 +1636,62 @@
       "description": "The name of the source collection and unique culture identifier. ",
       "examples": ["/culture_collection=\"ATCC:26370\""]
     },
+    "was_phix_used?": {
+      "examples": [""],
+       "ontology": "0",
+       "type": "string",
+       "description": "",
+       "clasification":"Sequencing",
+       "label":"Was Phix Used"
+    },
+    "number_of_samples_in_run": {
+      "examples": [""],
+       "ontology": "0",
+       "type": "string",
+       "description": "",
+       "clasification":"Sequencing",
+       "label":"Number Of Samples In Run"
+    },
     "amplicon_size": {
-      "ontology": "GENEPIO:0001449",
-      "type": "string",
-      "description": "The length of the amplicon generated by PCR amplification.",
-      "examples": ["300bp"]
+      "examples": ["300bp"],
+       "ontology": "GENEPIO:0001449",
+       "type": "string",
+       "description": "The length of the amplicon generated by PCR amplification.",
+       "clasification":"Sequencing",
+       "label":"Amplicon Size"
+    },
+    "flowcell_kit": {
+      "examples": [""],
+       "ontology": "0",
+       "type": "string",
+       "description": "",
+       "clasification":"Sequencing",
+       "labe":"Flowcell Kit"
     },
     "sample_collector_contact_address": {
+      "examples": ["655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"],
       "ontology": "GENEPIO:0001158",
       "type": "string",
       "description": "The mailing address of the agency submitting the sample.",
-      "examples": ["655 Lab St,Vancouver, British Columbia, V5N 2A2, Canada"]
+      "clasification":"Sample collection and processing",
+      "label":"Collecting Institution Address"
     },
     "collection_protocol": {
       "ontology": "GENEPIO:0001243",
       "type": "string",
       "description": "The name and version of a particular protocol used for sampling.",
-      "examples": ["SC2SamplingProtocol 1.2"]
+      "examples": ["SC2SamplingProtocol 1.2"],
+      "clasification":"Sample collection and processing",
+      "label":"Collection Protocol"
+
     },
     "variant_evidence": {
-      "ontology": "GENEPIO:0001504",
+      "examples": ["lineage-defining mutations: ORF1ab (K1655N), Spike (K417N, E484K, N501Y, D614G, A701V), N (T205I), E (P71L)"],
+      "ontology":  "GENEPIO:0001504",
       "type": "string",
       "description": "The evidence used to make the variant determination.",
-      "examples": [
-        "lineage-defining mutations: ORF1ab (K1655N), Spike (K417N, E484K, N501Y, D614G, A701V), N (T205I), E (P71L)"
-      ]
+      "clasification":"Lineage and Variant information",
+      "label":"Variant evidence"
     },
     "most_recent_travel_return_date": {
       "examples": ["26/04/2020"],
@@ -1384,6 +1717,21 @@
       "description": "The exposure transmission contact type.",
       "examples": ["Direct (human-to-human contact) [TRANS:0000001]"]
     },
+    "runID": {
+      "examples": [""],
+       "ontology": "0",
+       "type": "string",
+       "description": "",
+       "clasification":"Sequencing",
+       "label":"RunID"
+    },
+    "sequencing_instrument_platform": {
+      "examples": ["MinIon"],
+       "ontology": "0",
+       "type": "string",
+       "description": "The model of the sequencing instrument used.",
+       "label":"Sequencing Platforms "
+  },
     "prior_sars_cov_2_infection": {
       "Enums": [
         "Prior infection [GENEPIO:0100234]",
@@ -1406,10 +1754,12 @@
       "examples": ["hCoV-19/Canada/prov_rona_99/2020"]
     },
     "specimen_collector_sample_id": {
+      "examples": ["prov_rona_99"],
       "ontology": "GENEPIO:0001123",
       "type": "string",
-      "description": "The user-defined name for the sample. ",
-      "examples": ["prov_rona_99"]
+      "description": "The user-defined name for the sample.",
+      "clasification":"Database Identifiers",
+      "label": "Collecting Sample id"
     },
     "host_scientific_name": {
       "Enums": [
@@ -1438,7 +1788,9 @@
       "ontology": "GENEPIO:0001387",
       "type": "string",
       "description": "The taxonomic, or scientific name of the host.",
-      "examples": ["Homo sapiens [NCBITaxon:9606]"]
+      "examples": ["Homo sapiens [NCBITaxon:9606]"],
+      "clasification":"Host information",
+      "label":"Host Scientific Name"
     },
     "host_disease": {
       "Enums": [
@@ -1459,28 +1811,79 @@
       "type": "string",
       "description": "Description of how organism was passaged.",
       "examples": [
-        "AVL buffer+30%EtOH lysate received from Respiratory Lab. P3 passage in Vero-1 via bioreactor large-scale batch passage. P3 batch derived from the SP-2/reference lab strain."
-      ]
+        "AVL buffer+30%EtOH lysate received from Respiratory Lab. P3 passage in Vero-1 via bioreactor large-scale batch passage. P3 batch derived from the SP-2/reference lab strain.",],
+      "clasification":"Sample collection and processing",
+      "label":"Passage Method"
+    },
+    "%qc_filtered": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Pathogen diagnostic testing",
+      "label":"%qc filtered"
+     },
+     "%reads_host": {
+        "examples": [""],
+        "ontology": "0",
+        "type": "string",
+        "description": "",
+        "clasification":"Pathogen diagnostic testing",
+        "label":"%reads host"
+    },
+    "%reads_virus": {
+        "examples": [""],
+        "ontology": "0",
+        "type": "string",
+        "description": "",
+        "clasification":"Pathogen diagnostic testing",
+        "label":"%reads virus"
+    },
+    "%unmapped": {
+        "examples": [""],
+        "ontology": "0",
+        "type": "string",
+        "description": "",
+        "clasification":"Pathogen diagnostic testing",
+        "label":"%unmapped"
+    },
+    "%genome _greater_10x": {
+        "examples": [""],
+        "ontology": "0",
+        "type": "string",
+        "description": "",
+        "clasification":"Pathogen diagnostic testing",
+        "label":"% genome  greater 10x"
+    },
+    "mean_depth_of_coverage_value": {
+        "examples": [""],
+        "ontology": "0",
+        "type": "string",
+        "description": "",
+        "clasification":"Pathogen diagnostic testing",
+        "label":"mean depth of coverage value"
     },
     "symptom_onset_date": {
-      "examples": ["16/03/2020"],
-      "ontology": "GENEPIO:0001399",
-      "type": "string",
-      "description": "The date on which the symptoms began or were first noted.",
-      "format": "date"
+        "examples": ["16/03/2020"],
+        "ontology": "GENEPIO:0001399",
+        "type": "string",
+        "description": "The date on which the symptoms began or were first noted.",
+        "format": "date"
     },
-    "r2_fastq_filename": {
-      "ontology": "GENEPIO:0001477",
-      "type": "string",
-      "description": "The user-specified filename of the r2 FASTQ file.",
-      "examples": ["ABC123_S1_L001_R2_001.fastq.gz"]
+    "r2 fastq filename": {
+        "examples": ["ABC123_S1_L001_R2_001.fastq.gz"],
+        "ontology": "GENEPIO:0001477",
+        "type": "string",
+        "description": "The user-specified filename of the r2 FASTQ file.",
+        "clasification":"Bioinformatics and QC metrics",
+        "label":"Sequence file R2 fastq"
     },
     "prior_sars_cov_2_infection_date": {
-      "examples": ["23/01/2021"],
-      "ontology": "GENEPIO:0001437",
-      "type": "string",
-      "description": "The date of diagnosis of the prior SARS-CoV-2 infection.",
-      "format": "date"
+        "examples": ["23/01/2021"],
+        "ontology": "GENEPIO:0001437",
+        "type": "string",
+        "description": "The date of diagnosis of the prior SARS-CoV-2 infection.",
+        "format": "date"
     },
     "exposure_event": {
       "Enums": [
@@ -1511,10 +1914,12 @@
       "examples": ["Mass Gathering [GENEPIO:0100237]"]
     },
     "sequencing_kit_number": {
-      "ontology": "GENEPIO:0001455",
-      "type": "string",
-      "description": "The manufacturer's kit number.",
-      "examples": ["AB456XYZ789"]
+      "examples": ["AB456XYZ789"],
+       "ontology": "GENEPIO:0001455",
+       "type": "string",
+       "description": "The manufacturer's kit number.",
+       "clasification":"Sequencing",
+       "label":"Sequencing Kit Number"
     },
     "purpose_of_sampling_details": {
       "ontology": "GENEPIO:0001200",
@@ -1547,17 +1952,21 @@
       "description": "The name of the antiviral treatment agent administered during the prior SARS-CoV-2 infection.",
       "examples": ["Remdesivir"]
     },
-    "diagnostic_pcr_protocol_2": {
-      "ontology": "GENEPIO:0001511",
-      "type": "string",
-      "description": "The name and version number of the protocol used for diagnostic marker amplification.",
-      "examples": ["PCRRdRpGene 3.0"]
-    },
     "diagnostic_pcr_protocol_1": {
+      "examples": ["PCREGene 2.0"],
       "ontology": "GENEPIO:0001508",
       "type": "string",
       "description": "The name and version number of the protocol used for diagnostic marker amplification.",
-      "examples": ["PCREGene 2.0"]
+      "clasification":"Pathogen diagnostic testing",
+      "label":"Diagnostic Pcr Protocol 1"
+    },
+    "diagnostic_pcr_protocol_2": {
+      "examples": ["PCRRdRpGene 3.0"],
+      "ontology": "GENEPIO:0001511",
+      "type": "string",
+      "description": "The name and version number of the protocol used for diagnostic marker amplification.",
+      "clasification":"Pathogen diagnostic testing",
+      "label":"Diagnostic Pcr Protocol 2"
     },
     "host_specimen_voucher": {
       "ontology": "GENEPIO:0100283",
@@ -1692,20 +2101,34 @@
       "ontology": "GENEPIO:0001507",
       "type": "string",
       "description": "The name of the gene used in the diagnostic RT-PCR test.",
-      "examples": ["E gene (orf4) [GENEPIO:0100151]"]
+      "examples": ["E gene (orf4) [GENEPIO:0100151]"],
+      "classification":"Pathogen diagnostic testing",
+      "label":"Gene Name 1"
+    },
+    "Protocol_SARS-CoV-2_detection": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Pathogen diagnostic testing",
+      "label":"Protocol SARS-CoV-2 detection"
     },
     "consensus_sequence_software_name": {
+      "examples": ["Ivar"],
       "ontology": "GENEPIO:0001463",
       "type": "string",
       "description": "The name of software used to generate the consensus sequence.",
-      "examples": ["Ivar"]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Consensus sequence software name"
     },
     "reference_genome_accession": {
+      "examples": [""],
       "ontology": "GENEPIO:0001485",
       "type": "string",
-      "description": "A persistent, unique identifier of a genome database entry.",
-      "examples": ["NC_045512.2"]
-    },
+      "description": "",
+      "clasification":"Pathogen diagnostic testing",
+      "label":"reference genome accession"
+  },
     "host_residence_geo_loc_name_country": {
       "Enums": [
         "Afghanistan [GAZ:00006882]",
@@ -1996,11 +2419,13 @@
       "description": "Travel history in last six months.",
       "examples": ["Canada, Vancouver, USA, Seattle, Italy, Milan"]
     },
-    "consensus_sequence_software_version": {
-      "ontology": "GENEPIO:0001469",
+    "lineage/clade_analysis_software_version": {
+      "examples": ["2.1.10"],
+      "ontology":"GENEPIO:0001502",
       "type": "string",
-      "description": "The version of the software used to generate the consensus sequence.",
-      "examples": ["1.3"]
+      "description": "The version of the software used to determine the lineage/clade.",
+      "clasification":"Lineage and Variant information",
+      "label":"Lineage/clade analysis software version"
     },
     "complications": {
       "Enums": [
@@ -2097,14 +2522,17 @@
       "ontology": "GENEPIO:0001189",
       "type": "string",
       "description": "The city of origin of the sample.",
-      "examples": ["Vancouver"]
+      "examples": ["Vancouver"],
+      "clasification":"Sample collection and processing",
+      "label":"Geo Loc City"
     },
-    "umbrella_bioproject_accession": {
-      "pattern": "^PRJ(N|E|D)([a-zA-Z]?)[0-9]+*",
-      "ontology": "GENEPIO:0001133",
+    "bioproject umbrella accession": {
+      "examples": ["PRJNA623807"],
+      "ontology":  "GENEPIO:0001133",
       "type": "string",
-      "description": "The INSDC umbrella accession number of the BioProject to which the BioSample belongs. ",
-      "examples": ["PRJNA623807"]
+      "description": "The INSDC umbrella accession number of the BioProject to which the BioSample belongs.",
+      "clasification":"Database Identifiers",
+      "label":"umbrella bioproject accession",
     },
     "biomaterial_extracted": {
       "Enums": [
@@ -2121,7 +2549,9 @@
       "ontology": "GENEPIO:0001266",
       "type": "string",
       "description": "The biomaterial extracted from samples for the purpose of sequencing.",
-      "examples": ["RNA (Total) [OBI:0000895]"]
+      "examples": ["RNA (Total) [OBI:0000895]"],
+      "classification":"Sample collection and processing",
+      "label":"Biomaterial Extracted"
     },
     "host_age_unit": {
       "Enums": [
@@ -2142,7 +2572,9 @@
       "ontology": "OBI:0001620",
       "type": "string",
       "description": "The latitude coordinates of the geographical location of sample collection.",
-      "examples": ["38.98 N"]
+      "examples": ["38.98 N"],
+      "clasification":"Sample collection and processing",
+      "label":"Geo Loc Latitude",
     },
     "environmental_material": {
       "Enums": [
@@ -2188,14 +2620,17 @@
       "ontology": "GENEPIO:0001223",
       "type": "string",
       "description": "A substance obtained from the natural or man-made environment e.g. soil, water, sewage, door handle, bed handrail, face mask.",
-      "examples": ["Face Mask [OBI:0002787]"]
+      "examples": ["Face Mask [OBI:0002787]"],
+      "clasification":"Sample collection and processing",
+      "label":"Environmental Material"
     },
     "sequence_submitter_contact_email": {
       "examples": ["RespLab@lab.ca"],
       "ontology": "GENEPIO:0001165",
       "type": "string",
       "description": "The email address of the contact responsible for follow-up regarding the sequence.",
-      "format": "email"
+      "clasification":"Sample collection and processing",
+      "label":"Submitting Institution Email"
     },
     "environmental_site": {
       "Enums": [
@@ -2229,7 +2664,9 @@
       "ontology": "GENEPIO:0001232",
       "type": "string",
       "description": "An environmental location may describe a site in the natural or built environment e.g. hospital, wet market, bat cave.",
-      "examples": ["Hospital [ENVO:00002173]"]
+      "examples": ["Hospital [ENVO:00002173]"],
+      "classification":"Sample collection and processing",
+      "label":"Anthropogenic Geographic Feature"
     },
     "pre_existing_conditions_and_risk_factors": {
       "Enums": [
@@ -2351,7 +2788,33 @@
       "ontology": "GENEPIO:0001503",
       "type": "string",
       "description": "The variant classification of the lineage/clade i.e. variant, variant of concern.",
-      "examples": ["Variant of Concern (VOC) [GENEPIO:0100083]"]
+      "examples": ["Variant of Concern (VOC) [GENEPIO:0100083]"],
+      "classification":"Lineage and Variant information",
+      "label":"Variant designation"
+    },
+    "variant_calling": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Variant Calling"
+    },
+    "if_variant_calling_other": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"If variant calling Is Other, Specify"
+    },
+    "variant_calling_params": {
+      "examples": [""],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Variant Calling params"
     },
     "sample_collected_in_quarantine": {
       "Enums": [
@@ -2369,10 +2832,11 @@
       "examples": ["Yes [NCIT:C49488]"]
     },
     "sample_collected_by": {
+      "examples": ["Public Health Agency of Canada"],
       "ontology": "GENEPIO:0001153",
       "type": "string",
       "description": "The name of the agency that collected the original sample.",
-      "examples": ["Public Health Agency of Canada"]
+      "label":"Collecting Institution"
     },
     "sequencing_instrument": {
       "Enums": [
@@ -2431,7 +2895,9 @@
       "ontology": "GENEPIO:0001452",
       "type": "string",
       "description": "The model of the sequencing instrument used.",
-      "examples": ["Oxford Nanopore MinION [GENEPIO:0100142]"]
+      "examples": ["Oxford Nanopore MinION [GENEPIO:0100142]"],
+      "classification":"Sequencing",
+      "label":"Sequencing Instrument Model"
     },
     "host_health_status_details": {
       "Enums": [
@@ -2457,7 +2923,9 @@
       "ontology": "GENEPIO:0001644",
       "type": "string",
       "description": "Identifier of the specific isolate.",
-      "examples": ["SARS-CoV-2/human/USA/CA-CDPH-001/2020"]
+      "examples": ["SARS-CoV-2/human/USA/CA-CDPH-001/2020"],
+      "clasification":"Sample collection and processing",
+      "label":"Isolate"
     },
     "host_health_state": {
       "Enums": [
@@ -2580,18 +3048,20 @@
       ]
     },
     "dehosting_method": {
+      "examples": ["Nanostripper"],
       "ontology": "GENEPIO:0001459",
       "type": "string",
       "description": "The method used to remove host reads from the pathogen sequence.",
-      "examples": ["Nanostripper"]
+      "clasification":"Bioinformatics and QC metrics",
+      "label":"Dehosting Method"
     },
     "amplicon_pcr_primer_scheme": {
-      "ontology": "GENEPIO:0001456",
-      "type": "string",
-      "description": "The specifications of the primers (primer sequences, binding positions, fragment size generated etc) used to generate the amplicons to be sequenced.",
-      "examples": [
-        "https://github.com/joshquick/artic-ncov2019/blob/master/primer_schemes/nCoV-2019/V3/nCoV-2019.tsv"
-      ]
+      "examples": ["https://github.com/joshquick/artic-ncov2019/blob/master/primer_schemes/nCoV-2019/V3/nCoV-2019.tsv"],
+       "ontology": "GENEPIO:0001456",
+       "type": "string",
+       "description": "The specifications of the primers (primer sequences, binding positions, fragment size generated etc) used to generate the amplicons to be sequenced.",
+       "clasification":"Sequencing",
+       "label":"Amplicon Pcr Primer Scheme"
     },
     "vaccine_name": {
       "ontology": "GENEPIO:0001405",
@@ -2634,19 +3104,24 @@
       "ontology": "GENEPIO:0001446",
       "type": "string",
       "description": "The description of why the sample was sequenced providing specific details.",
-      "examples": ["Screened for S gene target failure (S dropout)"]
+      "examples": ["Screened for S gene target failure (S dropout)"],
+      "clasification":"Sequencing",
+      "label":"Purpose Of Sequencing Details"
     },
     "sequence_submitted_by": {
+      "examples": ["Centers for Disease Control and Prevention"],
       "ontology": "GENEPIO:0001159",
       "type": "string",
       "description": "The name of the agency that generated the sequence.",
-      "examples": ["Centers for Disease Control and Prevention"]
+      "label":"Submitting Institution"
     },
     "sequencing_protocol_name": {
-      "ontology": "GENEPIO:0001453",
-      "type": "string",
-      "description": "The name and version number of the sequencing protocol used.",
-      "examples": ["1D_DNA_MinION, ARTIC Network Protocol V3"]
+      "examples": ["1D_DNA_MinION, ARTIC Network Protocol V3"],
+       "ontology": "GENEPIO:0001453",
+       "type": "string",
+       "description": "The name and version number of the sequencing protocol used.",
+       "clasification":"Sequencing",
+       "label":"Sequencing Protocol Name"
     },
     "prior_sars_cov_2_infection_isolate": {
       "ontology": "GENEPIO:0001436",
@@ -2669,7 +3144,9 @@
       "description": "Taxonomic name of the organism.",
       "examples": [
         "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]"
-      ]
+      ],
+      "classification":"Sample collection and processing",
+      "label":"Organism"
     },
     "purpose_of_sampling": {
       "Enums": [
