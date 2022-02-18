@@ -961,33 +961,28 @@
         },
         "tax_id": {
             "examples": ["probably 2697049 in all cases"],
-             "ontology": "GENEPIO:0001156",
+             "ontology": "GENEPIO_0001800",
              "type": "string",
              "description": "The NCBITaxon identifier for the organism being sequenced.",
-             "clasification":"Sample collection and processing"
-        },
-        "scientific_name": {
-            "examples": [""],
-             "ontology": "GENEPIO:0001156",
-             "type": "string",
-             "description": "The taxonomic name of the organism.",
-             "clasification":"Sample collection and processing"
+             "clasification":"Sample collection and processing",
+             "label":"Tax ID"
         },
         "common_name": {
             "examples": [""],
-             "ontology": "GENEPIO:0001156",
+             "ontology": "BU_ISCIII:003",
              "type": "string",
              "description": "The common name of the organism.",
-             "clasification":"Sample collection and processing"
+             "clasification":"Sample collection and processing",
+             "label":"Common name"
         },
         "center_name": {
             "examples": [" KAROLINSKA INSITUTET"],
-             "ontology": "GENEPIO:0001156",
+             "ontology": "NCIT_C19983",
              "type": "string",
              "description": "The name of the institution",
-             "clasification":"Sample collection and processing"
+             "clasification":"Sample collection and processing",
+             "label":"Center Name"
         },
-
         "virus_id": {
             "examples": [""],
              "ontology": "GENEPIO:0001156",
@@ -1272,47 +1267,66 @@
              "clasification":"Sequencing",
              "label":"Amplicon Pcr Primer Scheme"
         },
-        "library_source": {
-            "examples": ["METAGENOMIC"],
-             "ontology": "GENEPIO:0001156",
-             "type": "string",
-             "description": "Molecule type used to make the library.",
-             "clasification":"Sequencing"
-        },
         "library_selection": {
-            "examples": ["RANDOM PCR"],
-             "ontology": "GENEPIO:0001156",
-             "type": "string",
-             "description": "Library capture method.",
-             "clasification":"Sequencing"
+           "examples": ["RANDOM PCR"],
+           "ontology": "GENPIO_0001940",
+           "type": "string",
+           "description": "Library capture method.",
+           "clasification":"Sequencing",
+           "label":"Capture method"
         },
         "library_strategy": {
+          "Enums": ["Bisultife-Seq strategy [GENPIO:0001975]",
+            "CTS strategy [GENPIO:0001978]",
+            "ChIP-Seq strategy [GENPIO:0001979]",
+            "DNase-Hypersensitivity strategy [GENPIO:0001980]",
+            "EST strategy [GENPIO:0001981]",
+            "FL-cDNA strategy [GENPIO:0001983]",
+            "MB-Seq strategy [GENPIO:0001984]",
+            "MNase-Seq strategy [GENPIO:0001985]",
+            "MRE-Seq strategy [GENPIO:0001986]",
+            "MeDIP-Seq strategy [GENPIO:0001987]",
+            "RNA-Seq strategy [GENPIO:0001990]",
+            "WCS strategy [GENPIO:0001991]",
+            "WGS strategy [GENPIO:0001992]",
+            "WXS strategy [GENPIO:0001993]",
+            "amplicon strategy [GENPIO:0001974]",
+            "clone end strategy [GENPIO:0001976]",
+            "clone strategy [GENPIO:0001977]",
+            "finishing strategy [GENPIO:0001982]",
+            "other library strategy [GENPIO:0001988]",
+            "pool clone strategy [GENPIO:0001989]",
+          ],
             "examples": ["WGS"],
-             "ontology": "GENEPIO:0001156",
+             "ontology": "GENPIO_0001973",
              "type": "string",
              "description": "Overall sequencing strategy or approach.",
-             "clasification":"Sequencing"
+             "clasification":"Sequencing",
+             "label":"Sequencing technique"
         },
         "library_layout": {
             "examples": ["PAIRED"],
-             "ontology": "GENEPIO:0001156",
+             "ontology":"BU_ISCIII:007",
              "type": "string",
              "description": "Single or paired.",
-             "clasification":"Sequencing"
+             "clasification":"Sequencing",
+             "label":"Library Layout"
         },
         "library_name": {
             "examples": ["P17157_1007"],
-             "ontology": "GENEPIO:0001156",
+             "ontology": "GENEPIO_0001995",
              "type": "string",
              "description": "Name of the used library",
-             "clasification":"Sequencing"
+             "clasification":"Sequencing",
+             "label":"LibraryName"
         },
         "nominal_length ": {
             "examples": ["350"],
-             "ontology": "GENEPIO:0001156",
+             "ontology": "GENEPIO_0000076",
              "type": "string",
              "description": "",
-             "clasification":"Sequencing"
+             "clasification":"Sequencing",
+             "label":"Nominal Length"
         },
         "raw_sequence_data_processing_method": {
             "examples": ["Porechop 0.2.3"],
@@ -1721,87 +1735,99 @@
         },
         "%qc_filtered": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"%qc filtered"
         },
         "%reads_host": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"%reads host"
         },
         "%reads_virus": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"%reads virus"
         },
         "%unmapped": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"%unmapped"
         },
-        "% genome _greater_10x": {
+        "%genome _greater_10x": {
             "examples": [""],
             "ontology": "GENEPIO:0001156",
             "type": "string",
             "description": "",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"% genome  greater 10x"
         },
         "mean_depth_of_coverage_value": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"mean depth of coverage value"
         },
         "%Ns": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"%Ns"
         },
         "Number_of_variants_(AF_greater_75%)": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"Number of variants (AF greater 75%)"
         },
         "Numer_of_variants_with_effect": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"Numer of variants with effect"
         },
         "reference_genome_accession": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "GENEPIO:0001485",
             "type": "string",
             "description": "",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"reference genome accession"
         },
         "diagnostic_pcr_protocol_1": {
             "examples": ["PCREGene 2.0"],
             "ontology": "GENEPIO:0001508",
             "type": "string",
             "description": "The name and version number of the protocol used for diagnostic marker amplification.",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"Diagnostic Pcr Protocol 1"
         },
         "diagnostic_pcr_Ct_value_1": {
             "examples": ["21"],
             "ontology": "GENEPIO:0001509",
             "type": "string",
             "description": "The Ct value result from a diagnostic SARS-CoV-2 RT-PCR test.",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"Diagnostic Pcr Ct Value 1"
         },
         "gene_name_2": {
           "Enums": [
@@ -1847,35 +1873,41 @@
           "ontology": "GENEPIO:0001510",
           "type": "string",
           "description": "The name of the gene used in the diagnostic RT-PCR test.",
-          "examples": ["RdRp gene (nsp12) [GENEPIO:0100168]"]
+          "examples": ["RdRp gene (nsp12) [GENEPIO:0100168]"],
+          "classification":"Pathogen diagnostic testing",
+          "label":"Gene Name 2"
         },
         "diagnostic_pcr_protocol_2": {
             "examples": ["PCRRdRpGene 3.0"],
             "ontology": "GENEPIO:0001511",
             "type": "string",
             "description": "The name and version number of the protocol used for diagnostic marker amplification.",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"Diagnostic Pcr Protocol 2"
         },
         "diagnostic_pcr_Ct_value_2": {
             "examples": ["36"],
             "ontology": "GENEPIO:0001512",
             "type": "string",
             "description": "The cycle threshold (CT) value result from a diagnostic SARS-CoV-2 RT-PCR test.",
-            "clasification":"Pathogen diagnostic testing"
+            "clasification":"Pathogen diagnostic testing",
+            "label":"Diagnostic Pcr Ct Value-2"
         },
         "analysis_author": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification":"Contributor Acknowledgement"
+            "clasification":"Contributor Acknowledgement",
+            "label":"Analysis Authors"
         },
         "author_submitter": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification":"Contributor Acknowledgement"
+            "clasification":"Contributor Acknowledgement",
+            "label":"Author Submitter"
         },
         "submitter": {
             "examples": [""],
@@ -1889,7 +1921,8 @@
             "ontology": "GENEPIO:0001517",
             "type": "string",
             "description": "",
-            "clasification":"Contributor Acknowledgement"
+            "clasification":"Contributor Acknowledgement",
+            "label":"Authors"
         },
         "tax_id": {
             "examples": [""],
@@ -1897,13 +1930,6 @@
             "type": "string",
             "description": "",
             "clasification":"Sample collection and processing"
-        },
-        "scientific_name": {
-            "examples": [""],
-             "ontology": "GENEPIO:0001156",
-             "type": "string",
-             "description": "",
-             "clasification":"Sample collection and processing"
         },
         "common_name": {
             "examples": [""],
@@ -1913,39 +1939,37 @@
             "clasification":"Sample collection and processing"
         },
         "library_source": {
-            "examples": [""],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Sequencing"
-        },
-        "library_selection": {
-            "examples": [""],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Sequencing"
-        },
-        "library_strategy": {
-            "examples": [""],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Sequencing"
-        },
-        "library_layout": {
-            "examples": [""],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Sequencing"
-        },
-        "library_name": {
-            "examples": [""],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Sequencing"
+          "Enums": ["5-methycytidine antibody method [GENPIO:0001941]",
+            "CAGE method [GENPIO:0001942]",
+            "CF-H method [GENPIO:0001943]",
+            "CF-M method ]GENPIO:0001944]",
+            "CF-S method [GENPIO:0001945]",
+            "CF-T method [GENPIO:0001946]",
+            "ChIP method ]GENPIO:0001947]",
+            "DNAse method [GENPIO:0001948]",
+            "HMPR method [GENPIO:0001949]",
+            "Hybrid Selection Method [GENPIO:0001950]",
+            "MBD2 protein methyl-CpG binding domain method [GENPIO:0001951]",
+            "MF method [GENPIO:0001952]",
+            "MNase method [GENPIO:0001953]",
+            "MSLL method [GENPIO:0001954]",
+            "PCR method [GENPIO:0001955]",
+            "RACE method [GENPIO:0001956]",
+            "RANDOM PCR method [GENPIO:0001957]",
+            "RANDOM method [GENPIO:0001958]",
+            "RT-PCR method [GENPIO:0001959]",
+            "Reduced Representation method [GENPIO:0001960]",
+            "Resctriction Digest method [GENPIO:0001961]",
+            "cDNA method [GENPIO:0001962]",
+            "other library method [GENPIO:0001964]",
+            "size fractionation method [GENPIO:0001963]",
+          ],
+            "examples": ["METAGENOMIC"],
+              "ontology": "GENEPIO_0001965",
+              "type": "string",
+              "description": "Molecule type used to make the library.",
+              "clasification":"Sequencing",
+              "label":"Source material"
         },
         "nominal_length": {
             "examples": [""],
@@ -1956,263 +1980,299 @@
         },
         "analysis_accession": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "study_accession": {
-            "examples": ["e.g PRJEB39632"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "secondary_study_accession": {
-            "examples": ["e.g ERP123173"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "sample_accession": {
-            "examples": ["e.g SAMEA7098096"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "secondary_sample_accession": {
-            "examples": ["e.g ERS4858671"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "experiment_accession": {
-            "examples": ["e.g ERX4331406"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "run_accession": {
-            "examples": ["e.g ERX4331406"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "submission_accession": {
-            "examples": ["e.g ERA2794974"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "read_count": {
-            "examples": ["e.g 837055"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "read_length": {
-            "examples": [""],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "base_count": {
-            "examples": ["e.g 503907110"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "first_public": {
-            "examples": ["e.g 2020-08-07"],
-            "ontology": "GENEPIO:0001156",
-            "type": "string",
-            "description": "",
-            "clasification":"Submission ENA"
-        },
-        "last_updated": {
-            "examples": ["e.g 2020-07-29"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "GENEPIO_0001145",
             "type": "string",
             "description": "",
             "clasification":"Submission ENA",
-            "format":"date"
+            "label":"Analysis Accession"
+        },
+        "study_accession": {
+            "examples": ["e.g PRJEB39632"],
+            "ontology": "GENEPIO_0001136",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"Study accession"
+        },
+        "secondary_study_accession": {
+            "examples": ["e.g ERP123173"],
+            "ontology": "BU_ISCIII:012",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"Secondary study accession"
+        },
+        "sample_accession": {
+            "examples": ["e.g SAMEA7098096"],
+            "ontology": "GENEPIO_0001139",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"Sample accession"
+        },
+        "secondary_sample_accession": {
+            "examples": ["e.g ERS4858671"],
+            "ontology": "BU_ISCIII:014",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"Secondary sample accession"
+        },
+        "experiment_accession": {
+            "examples": ["e.g ERX4331406"],
+            "ontology": "BU_ISCIII:015",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"Experiment Accession"
+        },
+        "run_accession": {
+            "examples": ["e.g ERX4331406"],
+            "ontology": "BU_ISCIII:016",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"Run Accession"
+        },
+        "submission_accession": {
+            "examples": ["e.g ERA2794974"],
+            "ontology": "BU_ISCIII:017",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"Submission Accession"
+        },
+        "read_count": {
+            "examples": ["e.g 837055"],
+            "ontology": "STATO_0000064",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"Read count"
+        },
+        "read_length": {
+            "examples": [""],
+            "ontology": "STATO_0000064",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"Read length"
+        },
+        "base_count": {
+            "examples": ["e.g 503907110"],
+            "ontology": "UO_0000244",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"Base count"
+        },
+        "first_public": {
+            "examples": ["e.g 2020-08-07"],
+            "ontology": "NCIT_C142711",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "label":"First Public date"
+        },
+        "last_updated": {
+            "examples": ["e.g 2020-07-29"],
+            "ontology": "OMIABIS_0001005",
+            "type": "string",
+            "description": "",
+            "clasification":"Submission ENA",
+            "format":"Last Updated"
         },
         "experiment_title": {
             "examples": ["e.g Illumina MiSeq paired end sequencing"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "ORNASEQ_0000004",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Experiment title"
         },
         "study_title": {
             "examples": ["e.g SARS-CoV-2 genomes from late April in Stockholm"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "OPMI_0000380",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Study title"
         },
         "study_alias": {
             "examples": ["e.g Sweden"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "SIO_001066",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Study alias"
         },
         "experiment_alias": {
             "examples": ["e.g ena-STUDY-KAROLINSKA INSITUTET-29-07-2020-14:18:07:925-2092"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "NCIT_C42790",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Experiment alias"
         },
         "run_alias": {
             "examples": ["e.g ena-EXPERIMENT-KAROLINSKA INSITUTET-29-07-2020-14:50:07:151-1"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "NCIT_C47911",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Run Alias"
         },
         "fastq_bytes": {
             "examples": ["e.g ena-RUN-KAROLINSKA INSITUTET-29-07-2020-14:50:07:151-1"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "NCIT_C48047",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Fastq bytes"
         },
         "fastq_md5": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "MS_1000568",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Fastq md5"
         },
         "fastq_ftp": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "PRIDE_0000469",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Fastq ftp"
         },
         "fastq_aspera": {
             "examples": ["e.g ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_1.fastq.gz;ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_2.fastq.gz"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:032",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Fastq aspera"
         },
         "fastq_galaxy": {
             "examples": ["e.g fasp.sra.ebi.ac.uk:/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_1.fastq.gz;fasp.sra.ebi.ac.uk:/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_2.fastq.gz"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "ENVO_01000807",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Fastq galaxy"
         },
         "submitted_bytes": {
             "examples": ["e.g ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_1.fastq.gz;ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_2.fastq.gz"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "NCIT_C172872",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Submitted bytes "
         },
         "submitted_md5": {
             "examples": ["e.g 139853010;166270048"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:035",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Submitted md5"
         },
         "submitted_ftp": {
             "examples": ["e.g d726a9abc918e2b43bd68b24c7d01b3a;f01eba1b2bad974bdf61b81b1ae8ac2a"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:036",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Submitted ftp"
         },
         "submitted_aspera": {
             "examples": ["e.g ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R1_001.fastq.gz;ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R2_001.fastq.gz"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:037",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Submitted aspera"
         },
         "submitted_galaxy": {
             "examples": ["e.g fasp.sra.ebi.ac.uk:/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R1_001.fastq.gz;fasp.sra.ebi.ac.uk:/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R2_001.fastq.gz"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:038",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Submitted Galaxy"
         },
         "submitted_format": {
             "examples": ["e.g  ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R1_001.fastq.gz;ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R2_001.fastq.gz"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:039",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Submitted Format"
         },
         "sra_bytes": {
             "examples": ["e.g FASTQ;FASTQ"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:040",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"SRA bytes"
         },
         "sra_md5": {
             "examples": ["e.g 260236789"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:041",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"SRA md5"
         },
         "sra_ftp": {
             "examples": ["e.g 2cf0d467d6dc4ae0a5473774d54c059c"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:042",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"SRA ftp"
         },
         "sra_aspera": {
             "examples": ["e.g ftp.sra.ebi.ac.uk/vol1/err/ERR438/005/ERR4387385"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:043",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"SRA aspera"
         },
         "sra_galaxy": {
             "examples": ["e.g fasp.sra.ebi.ac.uk:/vol1/err/ERR438/005/ERR4387385"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:044",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"SRA galaxy"
         },
         "broker_name": {
             "examples": ["P17157_1007"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "BU_ISCIII:045",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Broker Name"
         },
         "nominal_sdev": {
             "examples": [""],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "STATO_0000237",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"Nominal sdev"
         },
         "first_created": {
             "examples": ["e.g 2020-08-07"],
-            "ontology": "GENEPIO:0001156",
+            "ontology": "NCIT_C164483",
             "type": "string",
             "description": "",
-            "clasification":"Submission ENA"
+            "clasification":"Submission ENA",
+            "label":"First created date"
         },
         "type": {
             "examples": ["betacoronavirus"],
