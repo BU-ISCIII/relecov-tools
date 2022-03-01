@@ -7,9 +7,11 @@ import openpyxl
 from itertools import islice
 import argparse
 
-# import test.utils
+import utils
 
-from utils import *
+# import relecov_tools.utils
+
+# from utils import *
 
 
 """
@@ -139,13 +141,13 @@ if __name__ == "__main__":
         print("Try  validation_jsons.py --help for more information.")
         exit(2)
     arguments = check_arg(sys.argv[1:])
-    if not test.utils.file_exists(arguments.phagePlusSchema):
+    if not utils.file_exists(arguments.phagePlusSchema):
         print("phage plus schema file does not exist\n")
         exit(2)
-    if not test.utils.file_exists(arguments.inputFile):
+    if not utils.file_exists(arguments.inputFile):
         print("excel file does not exist\n")
         exit(2)
-    if not test.utils.file_exists(arguments.convertedSchema):
+    if not utils.file_exists(arguments.convertedSchema):
         print("file for converting schema does not exist\n")
         exit(2)
     # schema_file = open('/home/lchapado/Projects/Proyecto_ERA/relecov-tools/schema/phage_plus_V0.json')
