@@ -6,7 +6,7 @@
 [![install with Bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](https://bioconda.github.io/recipes/nf-core/README.html)
 [![install with PyPI](https://img.shields.io/badge/install%20with-PyPI-blue.svg)](https://pypi.org/project/nf-core/)
 
-A python package with helper tools for the relecov project.
+A Python package with helper tools for the relecov project.
 
 
 ## Table of contents <!-- omit in toc -->
