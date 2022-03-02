@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft/2019-09/schema#",
+  "schema": "ENA",
   "required": [
     "sample_name",
     "collecting_institution",
@@ -369,7 +369,7 @@
         "38.98 N"
       ],
       "clasification": "Sample collection and processing",
-      "label": "Geo Loc Latitude",
+      "label": "Geo Loc Latitude"
     },
     "geographic location (longitude)": {
       "ontology": "OBI:0001621",
@@ -548,7 +548,7 @@
       "type": "string",
       "description": "a unique identifier by which each subject can be referred to, de-identified.",
       "clasification": "Host information",
-      "genepio_label": "",
+      "genepio_label": ""
     },
     "type exposure": {
       "examples": [
@@ -700,7 +700,7 @@
       "type": "string",
       "description": "Free text description of the sample.",
       "clasification": "Sample collection and processing",
-      "genepio_label": "",
+      "genepio_label": ""
     },
     "sample_storage_conditions": {
       "examples": [
@@ -736,7 +736,7 @@
         "Resctriction Digest method [GENPIO:0001961]",
         "cDNA method [GENPIO:0001962]",
         "other library method [GENPIO:0001964]",
-        "size fractionation method [GENPIO:0001963]",
+        "size fractionation method [GENPIO:0001963]"
       ],
       "examples": [
         "METAGENOMIC"
@@ -778,7 +778,7 @@
         "clone strategy [GENPIO:0001977]",
         "finishing strategy [GENPIO:0001982]",
         "other library strategy [GENPIO:0001988]",
-        "pool clone strategy [GENPIO:0001989]",
+        "pool clone strategy [GENPIO:0001989]"
       ],
       "examples": [
         "WGS"

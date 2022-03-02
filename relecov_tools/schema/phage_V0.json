@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft/2019-09/schema#",
+  "schema": "PHAGE",
   "required": [
     "sequence_submitted_by",
     "sample_collected_by",
@@ -2064,7 +2064,7 @@
       "type": "string",
       "description": "Description of how organism was passaged.",
       "examples": [
-        "AVL buffer+30%EtOH lysate received from Respiratory Lab. P3 passage in Vero-1 via bioreactor large-scale batch passage. P3 batch derived from the SP-2/reference lab strain.",
+        "AVL buffer+30%EtOH lysate received from Respiratory Lab. P3 passage in Vero-1 via bioreactor large-scale batch passage. P3 batch derived from the SP-2/reference lab strain."
       ],
       "clasification": "Sample collection and processing",
       "label": "Passage Method"
@@ -2842,7 +2842,7 @@
       "type": "string",
       "description": "The INSDC umbrella accession number of the BioProject to which the BioSample belongs.",
       "clasification": "Database Identifiers",
-      "label": "umbrella bioproject accession",
+      "label": "umbrella bioproject accession"
     },
     "biomaterial_extracted": {
       "Enums": [
@@ -2890,7 +2890,7 @@
         "38.98 N"
       ],
       "clasification": "Sample collection and processing",
-      "label": "Geo Loc Latitude",
+      "label": "Geo Loc Latitude"
     },
     "environmental_material": {
       "Enums": [

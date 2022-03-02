@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft/2022-01/gisaid_schema#",
+    "schema": "GISAID#",
     "required": [
         "type",
         "virus_name",
@@ -198,7 +198,7 @@
             "ontology": "GENEPIO:0001395",
             "type": "string",
             "description": "The gender of the host at the time of sample collection.",
-            "clasification": "Host information",
+            "clasification": "Host information"
         },
         "sequencing_technology": {
             "examples": [
@@ -237,7 +237,7 @@
             "ontology": "GENEPIO:0001156",
             "type": "string",
             "description": "Filename that contains the sequence without path",
-            "clasification": "Bioinformatics and QC metrics",
+            "clasification": "Bioinformatics and QC metrics"
         },
         "additional_host_information": {
             "examples": [
@@ -257,7 +257,7 @@
             "type": "string",
             "description": "The date the host received their last dose of vaccine.",
             "format": "date",
-            "clasification": "Host information",
+            "clasification": "Host information"
         },
         "outbreak": {
             "examples": [

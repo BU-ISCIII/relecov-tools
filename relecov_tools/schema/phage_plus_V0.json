@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft/2020-12/schema",
+    "schema": "PHAGE_PLUS",
     "required": [
         "sample_name",
         "collecting_institution",
@@ -366,7 +366,7 @@
             "type": "string",
             "description": "Taxonomic name of the organism.",
             "examples": [
-                "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]",
+                "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]"
             ],
             "classification": "Sample collection and processing",
             "label": "Organism"
@@ -673,7 +673,7 @@
             "type": "string",
             "description": "The latitude coordinates of the geographical location of sample collection.",
             "clasification": "Sample collection and processing",
-            "label": "Geo Loc Latitude",
+            "label": "Geo Loc Latitude"
         },
         "geo_loc_longitude": {
             "examples": [
@@ -1421,7 +1421,7 @@
                 "clone strategy [GENPIO:0001977]",
                 "finishing strategy [GENPIO:0001982]",
                 "other library strategy [GENPIO:0001988]",
-                "pool clone strategy [GENPIO:0001989]",
+                "pool clone strategy [GENPIO:0001989]"
             ],
             "examples": [
                 "WGS"
@@ -2047,16 +2047,6 @@
             "clasification": "Pathogen diagnostic testing",
             "label": "Numer of variants with effect"
         },
-        "reference_genome_accession": {
-            "examples": [
-                ""
-            ],
-            "ontology": "GENEPIO:0001485",
-            "type": "string",
-            "description": "",
-            "clasification": "Pathogen diagnostic testing",
-            "label": "reference genome accession"
-        },
         "diagnostic_pcr_protocol_1": {
             "examples": [
                 "PCREGene 2.0"
@@ -2187,7 +2177,9 @@
             "label": "Authors"
         },
         "common_name": {
-            "examples": "",
+            "examples": [
+                ""
+            ],
             "ontology": "NCIT:C164471",
             "type": "string",
             "description": "",
@@ -2218,7 +2210,7 @@
                 "Resctriction Digest method [GENPIO:0001961]",
                 "cDNA method [GENPIO:0001962]",
                 "other library method [GENPIO:0001964]",
-                "size fractionation method [GENPIO:0001963]",
+                "size fractionation method [GENPIO:0001963]"
             ],
             "examples": [
                 "METAGENOMIC"
