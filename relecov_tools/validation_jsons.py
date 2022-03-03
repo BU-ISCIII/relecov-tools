@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from logging import exception
 from jsonschema import validate
 from jsonschema import Draft202012Validator
 import json, sys
@@ -6,6 +7,8 @@ from openpyxl import Workbook
 import openpyxl
 from itertools import islice
 import argparse
+
+from questionary import ValidationError
 
 import utils
 
@@ -166,6 +169,7 @@ if __name__ == "__main__":
     ws_metadata_lab = wb_file["METADATA_LAB"]
     heading = []
     for cell in ws_metadata_lab[1]:
+
         heading.append(cell.value)
 
     for row in islice(ws_metadata_lab.values, 1, ws_metadata_lab.max_row):
@@ -175,19 +179,30 @@ if __name__ == "__main__":
                 sample_data_row[heading[idx]] = row[idx].strftime("%d/%m/%Y")
             else:
                 sample_data_row[heading[idx]] = row[idx]
+
         try:
-            validate(instance=sample_data_row, schema=json_phage_plus_schema)
-        except:
-            print("Unsuccessful validation for sample ", sample_data_row["sample_name"])
+            validate(
+                instance=list(sample_data_row.keys()),
+                schema=json_phage_plus_schema["properties"],
+            )
+            print("Success")
+        except ValidationError:
+
+            print(
+                "Unsuccessful validation for sample ",
+                sample_data_row["Collecting Sample id"],
+            )
 
             continue
-        sample_list.append(PhagePlusData(sample_data_row, phage_plus_schema))
+        # sample_list.append(PhagePlusData(sample_data_row, phage_plus_schema))
     # create the information mapped to the new schema
+    """
+    
     mapped_structure = phage_plus_schema.maping_schemas_based_on_geontology(
         arguments.convertedSchema
     )
     mapped_sample_list = []
     for sample in sample_list:
         mapped_sample_list.append(map_sample_to_schema(mapped_structure))
-
+    """
     print("Completed")
