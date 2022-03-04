@@ -10,7 +10,6 @@
     "host_subject_id",
     "instrument_model",
     "file_name",
-    "sample_name",
     "tax_id",
     "scientific_name",
     "common_name",
@@ -548,7 +547,7 @@
       "type": "string",
       "description": "a unique identifier by which each subject can be referred to, de-identified.",
       "clasification": "Host information",
-      "genepio_label": ""
+      "label": "Host Subject Id"
     },
     "type exposure": {
       "examples": [
@@ -700,7 +699,7 @@
       "type": "string",
       "description": "Free text description of the sample.",
       "clasification": "Sample collection and processing",
-      "genepio_label": ""
+      "label": "Sample Description"
     },
     "sample_storage_conditions": {
       "examples": [

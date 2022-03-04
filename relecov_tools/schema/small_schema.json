@@ -10,11 +10,23 @@
         "organism",
         "isolate",
         "host_scientific_name",
+        "host_common_name",
         "host_disease",
         "sequencing_instrument_model",
         "sequencing_instrument_platform",
         "consensus_sequence_software_name",
-        "consensus_sequence_software_version"
+        "consensus_sequence_software_version",
+        "file_name",
+        "tax_id",
+        "sample_description",
+        "library_source",
+        "library_selection",
+        "library_strategy",
+        "library_layout",
+        "type",
+        "virus_name",
+        "submitter",
+        "collecting_institution_address"
     ],
     "type": "object",
     "properties": {
@@ -521,6 +533,192 @@
             "description": "The version of the software used to generate the consensus sequence.",
             "clasification": "Bioinformatics and QC metrics",
             "label": "Consensus sequence software version"
+        },
+        "host_common_name": {
+            "Enums": [
+                "Human [NCBITaxon:9606]",
+                "Bat [NCBITaxon:9397]",
+                "Cat [NCBITaxon:9685]",
+                "Chicken [NCBITaxon:9031]",
+                "Civet [NCBITaxon:9673]",
+                "Cow [NCBITaxon:9913]",
+                "Dog [NCBITaxon:9615]",
+                "Lion [NCBITaxon:9689]",
+                "Mink [NCBITaxon:452646]",
+                "Pangolin [NCBITaxon:9973]",
+                "Pig [NCBITaxon:9825]",
+                "Pigeon [NCBITaxon:8930]",
+                "Tiger [NCBITaxon:9694]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001386",
+            "type": "string",
+            "description": "The commonly used name of the host.",
+            "examples": [
+                "Human [NCBITaxon:9606]"
+            ],
+            "classification": "Host information",
+            "label": "Host Common Name"
+        },
+        "file_name": {
+            "examples": [
+                "ABC123_S1_L001_R1_001.fastq.gz"
+            ],
+            "ontology": "GENEPIO:0001476",
+            "type": "string",
+            "description": "The user-specified filename of the r1 FASTQ file.",
+            "clasification": "Bioinformatics and QC metrics",
+            "label": "Sequence file R1 fastq"
+        },
+        "tax_id": {
+            "examples": [
+                "probably 2697049 in all cases"
+            ],
+            "ontology": "GENEPIO_0001724",
+            "type": "string",
+            "description": "The NCBITaxon identifier for the organism being sequenced.",
+            "clasification": "Sample collection and processing",
+            "label": "Tax ID"
+        },
+        "sample_description": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0001156",
+            "type": "string",
+            "description": "Free text description of the sample.",
+            "clasification": "Sample collection and processing",
+            "label": "Sample Description"
+        },
+        "library_source": {
+            "Enums": [
+                "5-methycytidine antibody method [GENPIO:0001941]",
+                "CAGE method [GENPIO:0001942]",
+                "CF-H method [GENPIO:0001943]",
+                "CF-M method ]GENPIO:0001944]",
+                "CF-S method [GENPIO:0001945]",
+                "CF-T method [GENPIO:0001946]",
+                "ChIP method ]GENPIO:0001947]",
+                "DNAse method [GENPIO:0001948]",
+                "HMPR method [GENPIO:0001949]",
+                "Hybrid Selection Method [GENPIO:0001950]",
+                "MBD2 protein methyl-CpG binding domain method [GENPIO:0001951]",
+                "MF method [GENPIO:0001952]",
+                "MNase method [GENPIO:0001953]",
+                "MSLL method [GENPIO:0001954]",
+                "PCR method [GENPIO:0001955]",
+                "RACE method [GENPIO:0001956]",
+                "RANDOM PCR method [GENPIO:0001957]",
+                "RANDOM method [GENPIO:0001958]",
+                "RT-PCR method [GENPIO:0001959]",
+                "Reduced Representation method [GENPIO:0001960]",
+                "Resctriction Digest method [GENPIO:0001961]",
+                "cDNA method [GENPIO:0001962]",
+                "other library method [GENPIO:0001964]",
+                "size fractionation method [GENPIO:0001963]"
+            ],
+            "examples": [
+                "METAGENOMIC"
+            ],
+            "ontology": "GENEPIO_0001965",
+            "type": "string",
+            "description": "Molecule type used to make the library.",
+            "clasification": "Sequencing",
+            "label": "Source material"
+        },
+        "library_selection": {
+            "examples": [
+                "RANDOM PCR"
+            ],
+            "ontology": "GENPIO_0001940",
+            "type": "string",
+            "description": "Library capture method.",
+            "clasification": "Sequencing",
+            "label": "Capture method"
+        },
+        "library_strategy": {
+            "Enums": [
+                "Bisultife-Seq strategy [GENPIO:0001975]",
+                "CTS strategy [GENPIO:0001978]",
+                "ChIP-Seq strategy [GENPIO:0001979]",
+                "DNase-Hypersensitivity strategy [GENPIO:0001980]",
+                "EST strategy [GENPIO:0001981]",
+                "FL-cDNA strategy [GENPIO:0001983]",
+                "MB-Seq strategy [GENPIO:0001984]",
+                "MNase-Seq strategy [GENPIO:0001985]",
+                "MRE-Seq strategy [GENPIO:0001986]",
+                "MeDIP-Seq strategy [GENPIO:0001987]",
+                "RNA-Seq strategy [GENPIO:0001990]",
+                "WCS strategy [GENPIO:0001991]",
+                "WGS strategy [GENPIO:0001992]",
+                "WXS strategy [GENPIO:0001993]",
+                "amplicon strategy [GENPIO:0001974]",
+                "clone end strategy [GENPIO:0001976]",
+                "clone strategy [GENPIO:0001977]",
+                "finishing strategy [GENPIO:0001982]",
+                "other library strategy [GENPIO:0001988]",
+                "pool clone strategy [GENPIO:0001989]"
+            ],
+            "examples": [
+                "WGS"
+            ],
+            "ontology": "GENPIO_0001973",
+            "type": "string",
+            "description": "Overall sequencing strategy or approach.",
+            "clasification": "Sequencing",
+            "label": "Sequencing technique"
+        },
+        "library_layout": {
+            "examples": [
+                "PAIRED"
+            ],
+            "ontology": "BU_ISCIII:007",
+            "type": "string",
+            "description": "Single or paired.",
+            "clasification": "Sequencing",
+            "label": "Library Layout"
+        },
+        "type": {
+            "examples": [
+                "betacoronavirus"
+            ],
+            "ontology": "NCBITaxon:694002",
+            "type": "string",
+            "description": "default must remain 'betacoronavirus'",
+            "clasification": "Database Identifiers"
+        },
+        "virus_name": {
+            "examples": [
+                "hCoV-19/Canada/prov_rona_99/2020"
+            ],
+            "ontology": "GENEPIO:0100282",
+            "type": "string",
+            "description": "The user-defined GISAID virus name assigned to the sequence.",
+            "clasification": "Database Identifiers",
+            "label": "GISAID Virus Name"
+        },
+        "submitter": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "clasification": "enter your GISAID-Username",
+            "label": "GISAID Username"
+        },
+        "collecting_institution_address": {
+            "examples": [
+                "655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"
+            ],
+            "ontology": "GENEPIO:0001158",
+            "type": "string",
+            "description": "The mailing address of the agency submitting the sample.",
+            "clasification": "Originating Laboratory Address"
         }
     }
 }
