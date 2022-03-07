@@ -120,6 +120,7 @@ def check_arg(args=None):
     return parser.parse_args()
 
 
+"""
 data = {
     "sample_name": "s1",
     "collecting_institution": "inst2",
@@ -136,6 +137,7 @@ data = {
     "consensus_sequence_software_name": "MinIon",
     "consensus_sequence_software_version": "Ivar",
 }
+"""
 
 
 if __name__ == "__main__":
@@ -157,6 +159,8 @@ if __name__ == "__main__":
     schema_file = open(arguments.phagePlusSchema)
 
     json_phage_plus_schema = json.load(schema_file)
+    map_file = open("schema/mapping_file.json")
+    mapping_file = json.load(map_file)
     try:
         Draft202012Validator.check_schema(json_phage_plus_schema)
     except:
@@ -172,18 +176,29 @@ if __name__ == "__main__":
 
         heading.append(cell.value)
 
+    for i in range(len(heading)):
+        if heading[i] in list(mapping_file.keys()):
+            index = list(mapping_file).index(heading[i])
+            heading[index] = list(mapping_file.values())[index]
+
     for row in islice(ws_metadata_lab.values, 1, ws_metadata_lab.max_row):
         sample_data_row = {}
         for idx in range(len(heading)):
             if "date" in heading[idx]:
-                sample_data_row[heading[idx]] = row[idx].strftime("%d/%m/%Y")
+                try:
+                    sample_data_row[heading[idx]] = row[idx].strftime("%d/%m/%Y")
+                except AttributeError:
+                    pass
             else:
                 sample_data_row[heading[idx]] = row[idx]
 
         try:
+            import pdb
+
+            pdb.set_trace()
             validate(
-                instance=list(sample_data_row.keys()),
-                schema=json_phage_plus_schema["properties"],
+                instance=sample_data_row,
+                schema=json_phage_plus_schema,
             )
             print("Success")
         except ValidationError:

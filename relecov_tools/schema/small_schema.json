@@ -579,7 +579,10 @@
                 "probably 2697049 in all cases"
             ],
             "ontology": "GENEPIO_0001724",
-            "type": "string",
+            "type": [
+                "number",
+                "string"
+            ],
             "description": "The NCBITaxon identifier for the organism being sequenced.",
             "clasification": "Sample collection and processing",
             "label": "Tax ID"
@@ -719,6 +722,36 @@
             "type": "string",
             "description": "The mailing address of the agency submitting the sample.",
             "clasification": "Originating Laboratory Address"
+        },
+        "broker_name": {
+            "examples": [
+                "P17157_1007"
+            ],
+            "ontology": "BU_ISCIII:045",
+            "type": "string",
+            "description": "",
+            "clasification": "Submission ENA",
+            "label": "Broker Name"
+        },
+        "nominal_sdev": {
+            "examples": [
+                ""
+            ],
+            "ontology": "STATO_0000237",
+            "type": "number",
+            "description": "",
+            "clasification": "Submission ENA",
+            "label": "Nominal sdev"
+        },
+        "first_created": {
+            "examples": [
+                "e.g 2020-08-07"
+            ],
+            "ontology": "NCIT_C164483",
+            "format": "date",
+            "description": "",
+            "clasification": "Submission ENA",
+            "label": "First created date"
         }
     }
 }

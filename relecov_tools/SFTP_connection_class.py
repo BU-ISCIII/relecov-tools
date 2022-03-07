@@ -1,4 +1,4 @@
-'''
+"""
 =============================================================
 HEADER
 =============================================================
@@ -25,70 +25,72 @@ TO DO:
 ================================================================
 END_OF_HEADER
 ================================================================
-'''
+"""
 
 # Imports
 
 import paramiko
 import sys
 
+
 class SftpHandle:
-    def __init__(self,host,port,user,key):
-        '''
+    def __init__(self, host, port, user, key):
+        """
         Initializes the Connection object and starts its host, port, user and key attributes.
         Declaration:
             sftp = SftpHandle(host,port,user,key)
-        '''
+        """
         self.host = host
         self.port = port
         self.user = user
         self.key = key
-        self.client = None       
-        
+        self.client = None
+
     def check(self):
-        '''
+        """
         Check if there is a SFTP connection
         Usage:
             sftp.check()
         Return:
             True if a connection still exists
             False if connection doesnt exist (not established or timed out for instance)
-        '''
+        """
         try:
             self.client.getcwd()
             return True
         except:
             return False
-        
-    
+
     def open(self):
-        '''
+        """
         Uses the class attributes to make a SFTP connection
         Usage:
             sftp.open()
         Return:
             True if connected succesfully
             False if failed connection
-        '''
+        """
         if not self.check():
             try:
                 self.client = paramiko.SSHClient()
                 self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                self.client.connect(hostname = self.host,
-                                        port = self.port,
-                                        username = self.user,
-                                        password = self.key,
-                                        allow_agent=False,
-                                        look_for_keys=False)
+                self.client.connect(
+                    hostname=self.host,
+                    port=self.port,
+                    username=self.user,
+                    password=self.key,
+                    allow_agent=False,
+                    look_for_keys=False,
+                )
 
                 self.client = self.client.open()
 
                 return True
             except:
                 return False
-            
+
     def close(self):
-        '''
+        """
         Closes the SFTP connection if there is any
         Usage:
             sftp.close()
@@ -96,26 +98,26 @@ class SftpHandle:
             -True if connection closed successfully
             -False if connection closing failed
             -None if no connection was established
-        '''
+        """
         if self.check():
-            try:    
+            try:
                 self.client.close()
                 return True
             except:
                 return False
 
-if __name__ == '__main__':
-    sys.exit(main()) 
 
+if __name__ == "__main__":
+    sys.exit(main())
 
 
 # TESTING ZONE, must be deleted later
 CLAVE = "RANDOM_KEY_FOR_TESTING"
-HOST = 'RANDOM_SFTP_FOR_TESTING'
+HOST = "RANDOM_SFTP_FOR_TESTING"
 PUERTO = 420
-USUARIO = 'ARTURITO'
+USUARIO = "ARTURITO"
 
-my_sftp = SftpHandle(HOST,PUERTO,USUARIO,CLAVE)
+my_sftp = SftpHandle(HOST, PUERTO, USUARIO, CLAVE)
 if not my_sftp.open():
     print("No connection!")
 else:
