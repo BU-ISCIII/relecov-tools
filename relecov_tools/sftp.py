@@ -105,8 +105,9 @@ class SftpHandle:
             except:
                 return False
 
-    def 
-
+    def main(args):
+        pass
+        return
 
 if __name__ == "__main__":
     sys.exit(main())
