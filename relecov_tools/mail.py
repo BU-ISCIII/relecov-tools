@@ -43,10 +43,24 @@ class Email:
         self.message = text
         return
 
+    def generate_HTML(self):
+        pass
+        return
+
     def send_message(self):
         msg = MIMEMultipart('alternative')
         msg['To'] = self.receiver
         msg['From'] = self.sender
         msg['Subject'] = self.subject
 
-        s = smtplib.SMTP('localhost')
+        text_part = MIMEText(self.text, 'plain')
+        msg.attach(text_part)
+
+        if self.html:
+            html_part = MIMEText(self.html, 'html')
+            msg.attach(html_part)
+
+        # open server, send email, close email
+        server = smtplib.SMTP('localhost')
+        server.sendmail(self.sender, self.receiver, msg.as_string())
+        server.quit()
