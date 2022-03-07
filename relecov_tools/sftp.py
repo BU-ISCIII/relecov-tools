@@ -32,13 +32,12 @@ END_OF_HEADER
 import paramiko
 import sys
 
-
 class SftpHandle:
     def __init__(self, host, port, user, key):
         """
         Initializes the Connection object and starts its host, port, user and key attributes.
         Declaration:
-            sftp = SftpHandle(host,port,user,key)
+            sftp = SftpHandle(host, port, user, key)
         """
         self.host = host
         self.port = port
@@ -105,6 +104,8 @@ class SftpHandle:
                 return True
             except:
                 return False
+
+    def 
 
 
 if __name__ == "__main__":
