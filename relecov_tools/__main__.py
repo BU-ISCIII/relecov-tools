@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-
+import os
+import utils
+import logging
 # from click.types import File
 from rich import print
 
@@ -8,14 +10,14 @@ import click
 import rich.console
 import rich.logging
 import rich.traceback
-import os
-import utils
+
+
+import relecov_tools.read_metadata
 
 log = logging.getLogger()
 
 
-
-def run_bu_isciii():
+def run_relecov_tools():
     # Set up rich stderr console
     stderr = rich.console.Console(stderr=True, force_terminal=utils.rich_force_colors())
 
@@ -52,7 +54,7 @@ def run_bu_isciii():
     )
 
     # Lanch the click cli
-    bu_isciii_cli()
+    relecov_tools_cli()
 
 
 # Customise the order of subcommands for --help
@@ -92,7 +94,7 @@ class CustomHelpOrder(click.Group):
 
 
 @click.group(cls=CustomHelpOrder)
-# @click.version_option(nf_core.__version__)
+@click.version_option(relecov_tools.__version__)
 @click.option(
     "-v",
     "--verbose",
@@ -103,22 +105,10 @@ class CustomHelpOrder(click.Group):
 @click.option(
     "-l", "--log-file", help="Save a verbose log to a file.", metavar="<filename>"
 )
-def bu_isciii_cli(verbose, log_file):
+def relecov_tools_cli(verbose, log_file):
 
     # Set the base logger to output DEBUG
     log.setLevel(logging.DEBUG)
-
-    # Set up logs to the console
-    log.addHandler(
-        rich.logging.RichHandler(
-            level=logging.DEBUG if verbose else logging.INFO,
-            console=rich.console.Console(
-                stderr=True, force_terminal=nf_core.utils.rich_force_colors()
-            ),
-            show_time=False,
-            markup=True,
-        )
-    )
 
     # Set up logs to a file if we asked for one
     if log_file:
@@ -133,7 +123,7 @@ def bu_isciii_cli(verbose, log_file):
 
 
 # pipeline list
-@bu_isciii_cli.command(help_priority=1)
+@relecov_tools_cli.command(help_priority=1)
 @click.argument("keywords", required=False, nargs=-1, metavar="<filter keywords>")
 @click.option(
     "-s",
@@ -156,7 +146,7 @@ def list(keywords, sort, json, show_archived):
 
 
 # sftp
-@bu_isciii_cli.command(help_priority=2)
+@relecov_tools_cli.command(help_priority=2)
 @click.argument("pipeline", required=False, metavar="<pipeline name>")
 @click.option(
     "-r", "--revision", help="Release/branch/SHA of the project to run (if remote)"
@@ -191,14 +181,16 @@ def sftp(
     Download files located in sftp server.
 
     """
-    print(nf_core.list.list_workflows(keywords, sort, json, show_archived))
-
 
 # metadata
-@bu_isciii_cli.command(help_priority=3)
-@click.argument("pipeline", required=False, metavar="<pipeline name>")
+@relecov_tools_cli.command(help_priority=3)
+# @click.option("metadata_file", required=False, metavar="<metadata file>")
 @click.option(
-    "-r", "--revision", help="Release/branch/SHA of the project to run (if remote)"
+    "-m",
+    "--metadata_file",
+    type=click.Path(),
+    default=None,
+    help="file containing metadata"
 )
 @click.option("-i", "--id", help="ID for web-gui launch parameter set")
 @click.option(
@@ -215,23 +207,16 @@ def sftp(
     default=os.path.join(os.getcwd(), "nf-params.json"),
     help="Path to save run parameters file",
 )
-def metadata(
-    pipeline,
-    id,
-    revision,
-    command_only,
-    params_in,
-    params_out,
-    save_all,
-    show_hidden,
-    url,
+def read_metadata(
+    metadata_file
 ):
     """
-    Read Metadata .
-
+    Create the json complaining the relecov schema from the Metadata file.
     """
-    print(nf_core.list.list_workflows(keywords, sort, json, show_archived))
+    new_metadata = relecov_tools.read_metadata.RelecovMetadata(metadata_file)
+    relecov_json = new_metadata.create_json()
+    return relecov_json
 
 
 if __name__ == "__main__":
-    run_bu_isciii()
+    run_relecov_tools()
