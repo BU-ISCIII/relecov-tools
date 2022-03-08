@@ -1,0 +1,6 @@
+include LICENSE
+include README.md
+graft bu_isciii/templates
+graft bu_isciii/schemas
+graft bu_isciii/conf
+include requirements.txt
