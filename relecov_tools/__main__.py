@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-from click.types import File
+# from click.types import File
 from rich import print
-from rich.prompt import Confirm
+
+# from rich.prompt import Confirm
 import click
 import rich.console
 import rich.logging
@@ -11,6 +12,7 @@ import os
 import utils
 
 log = logging.getLogger()
+
 
 
 def run_bu_isciii():
@@ -90,6 +92,7 @@ class CustomHelpOrder(click.Group):
 
 
 @click.group(cls=CustomHelpOrder)
+# @click.version_option(nf_core.__version__)
 @click.option(
     "-v",
     "--verbose",

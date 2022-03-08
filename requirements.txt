@@ -1,0 +1,10 @@
+click
+questionary
+jinja2
+jsonschema
+packaging
+prompt_toolkit>=3.0.3
+rich>=10.0.0
+sysrsync==1.0.1 
+requests==2.27.1 
+markdown==3.3.6
