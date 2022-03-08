@@ -146,7 +146,6 @@ def list(keywords, sort, json, show_archived):
 
 # sftp
 @relecov_tools_cli.command(help_priority=2)
-@click.argument("pipeline", required=False, metavar="<pipeline name>")
 @click.option(
     "-r", "--revision", help="Release/branch/SHA of the project to run (if remote)"
 )
@@ -178,7 +177,6 @@ def sftp(
 
 # metadata
 @relecov_tools_cli.command(help_priority=3)
-# @click.option("metadata_file", required=False, metavar="<metadata file>")
 @click.option(
     "-m",
     "--metadata_file",
@@ -186,28 +184,24 @@ def sftp(
     default=None,
     help="file containing metadata"
 )
-@click.option("-i", "--id", help="ID for web-gui launch parameter set")
 @click.option(
-    "-c",
-    "--command-only",
-    is_flag=True,
-    default=False,
-    help="Create Nextflow command with params (no params file)",
+    "-a",
+    "--add_metadata",
+    type=click.Path(),
+    default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "additional_metadata.json"),
+    help="Json with the additional metadata to add to the received user metadata"
 )
 @click.option(
     "-o",
-    "--params-out",
+    "--metadata-out",
     type=click.Path(),
-    default=os.path.join(os.getcwd(), "nf-params.json"),
-    help="Path to save run parameters file",
+    help="Path to save output  metadata file"
 )
-def read_metadata(
-    metadata_file
-):
+def read_metadata(metadata_file, add_metadata, metadata_out):
     """
     Create the json complaining the relecov schema from the Metadata file.
     """
-    new_metadata = relecov_tools.read_metadata.RelecovMetadata(metadata_file)
+    new_metadata = relecov_tools.read_metadata.RelecovMetadata(metadata_file, add_metadata, metadata_out)
     relecov_json = new_metadata.create_json()
     return relecov_json
 

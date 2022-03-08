@@ -1,23 +1,40 @@
 #!/usr/bin/env python
 from itertools import islice
+import logging
+import rich.console
 from openpyxl import Workbook
 import openpyxl
 import relecov_tools.utils
+
+log = logging.getLogger(__name__)
+stderr = rich.console.Console(
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=relecov_tools.utils.rich_force_colors(),
+)
 
 
 class RelecovMetadata:
     def __init__(
         self,
-        excel_file=None,
-        inpuf_folder=None,
+        metadata_file=None,
+        additional_metadata_file=None,
+        output_folder=None
     ):
-
-        if excel_file is None:
-            self.excel_file = relecov_tools.prompt_path(
+        if metadata_file is None:
+            self.metadata_file = relecov_tools.utils.prompt_path(
                 msg="Select the excel file which contains metadata"
             )
         else:
-            self.excel_file = excel_file
+            self.metadata_file = metadata_file
+        if output_folder is None:
+            self.output_folder = relecov_tools.utils.prompt_path(
+                msg="Select the output folder"
+            )
+        else:
+            self.output_folder = output_folder
+        self.additional_metadata_file = additional_metadata_file
 
 
 # read_metadata
