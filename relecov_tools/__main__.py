@@ -3,7 +3,7 @@ import os
 import utils
 import logging
 # from click.types import File
-from rich import print
+# from rich import print
 
 # from rich.prompt import Confirm
 import click
@@ -142,7 +142,7 @@ def list(keywords, sort, json, show_archived):
     Checks the web for a list of nf-core pipelines with their latest releases.
     Shows which nf-core pipelines you have pulled locally and whether they are up to date.
     """
-    print(nf_core.list.list_workflows(keywords, sort, json, show_archived))
+    pass
 
 
 # sftp
@@ -181,6 +181,7 @@ def sftp(
     Download files located in sftp server.
 
     """
+
 
 # metadata
 @relecov_tools_cli.command(help_priority=3)
