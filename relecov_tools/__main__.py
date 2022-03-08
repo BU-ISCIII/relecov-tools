@@ -11,7 +11,6 @@ import rich.console
 import rich.logging
 import rich.traceback
 
-
 import relecov_tools.read_metadata
 
 log = logging.getLogger()

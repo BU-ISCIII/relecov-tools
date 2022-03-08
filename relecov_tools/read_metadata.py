@@ -1,25 +1,26 @@
 #!/usr/bin/env python
 
+import relecov_tools.utils
+
 
 class RelecovMetadata:
-    def __init__():
-        self.origin_file = file
-        self.metadata = {}
-        self.isklims_url = iskylims_url
-        self.relecov_url = relecov_url
+    def __init__(
+        self,
+        excel_file=None,
+        inpuf_folder=None,
+    ):
+
+        if excel_file is None:
+            self.excel_file = relecov_tools.prompt_path(
+                msg="Select the excel file which contains metadata"
+            )
+        else:
+            self.excel_file = excel_file
 
 
 # read_metadata
 
 
-def read_metadata_workflow(self):
-    def __init__(
-        self,
-    ):
-
-        """
-        Description :   Starts the read metada workflow
-        """
 
     # Perform workflow details
 
@@ -37,7 +38,12 @@ def fetch_metadata_file(folder, file_name):
     folder  Directory to fetch metadata file
     file_name   metadata file name
     """
-    pass
+    wb_file = openpyxl.load_workbook(file_name, data_only=True)
+    ws_metadata_lab = wb_file["METADATA_LAB"]
+    heading = []
+    for cell in ws_metadata_lab[1]:
+        heading.append(cell.value)
+
 
 
 def validate_metadata_sample(row_sample):
@@ -67,12 +73,11 @@ def store_information(external_url, request, data):
     pass
 
 
-wb_file = openpyxl.load_workbook(arguments.inputFile, data_only=True)
-ws_metadata_lab = wb_file["METADATA_LAB"]
-heading = []
-for cell in ws_metadata_lab[1]:
-    heading.append(cell.value)
 
+def read_metadata_workflow(self):
+    """
+    Description :   Starts the read metada workflow
+    """
 
 for row in islice(ws_metadata_lab.values, 1, ws_metadata_lab.max_row):
     sample_data_row = {}
