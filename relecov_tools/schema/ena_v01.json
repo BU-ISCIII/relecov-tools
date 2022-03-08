@@ -790,7 +790,7 @@
     },
     "library_layout": {
       "examples": [
-        "PAIRED"
+        "CTS strategy"
       ],
       "ontology": "BU_ISCIII:007",
       "type": "string",
@@ -800,7 +800,7 @@
     },
     "library_name": {
       "examples": [
-        "e.g P17157_1007"
+        "e.g PAIRED"
       ],
       "ontology": "GENEPIO_0001995",
       "type": "string",
@@ -938,7 +938,7 @@
       "clasification": "Sample collection and processing",
       "label": "Center Name"
     },
-    "first_public": {
+    "first_public_date": {
       "examples": [
         "e.g 2020-08-07"
       ],
@@ -948,7 +948,7 @@
       "clasification": "Submission ENA",
       "label": "First Public date"
     },
-    "last_updated": {
+    "last_updated_date": {
       "examples": [
         "e.g 2020-07-29"
       ],

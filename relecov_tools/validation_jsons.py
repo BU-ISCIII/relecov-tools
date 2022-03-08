@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 from logging import exception
+from tkinter import E
+
+# from types import NoneType
+import jsonschema
 from jsonschema import validate
 from jsonschema import Draft202012Validator
 import json, sys
@@ -195,24 +199,34 @@ if __name__ == "__main__":
         try:
             import pdb
 
-            pdb.set_trace()
             validate(
                 instance=sample_data_row,
                 schema=json_phage_plus_schema,
             )
             print("Success")
-        except ValidationError:
+        except jsonschema.ValidationError as e:
 
-            print(
-                "Unsuccessful validation for sample ",
-                sample_data_row["Collecting Sample id"],
-            )
-
+            e
             continue
         # sample_list.append(PhagePlusData(sample_data_row, phage_plus_schema))
     # create the information mapped to the new schema
     """
-    
+    variable_errores = {
+        "sample":["jsonschema.exceptions.ValidationError: 2697049 is not of type 'string'
+
+Failed validating 'type' in schema['properties']['tax_id']:
+    {'clasification': 'Sample collection and processing',
+     'description': 'The NCBITaxon identifier for the organism being '
+                    'sequenced.',
+     'examples': ['probably 2697049 in all cases'],
+     'label': 'Tax ID',
+     'ontology': 'GENEPIO_0001800',
+     'type': 'string'}
+
+On instance['tax_id']:
+    2697049
+"]        
+    }
     mapped_structure = phage_plus_schema.maping_schemas_based_on_geontology(
         arguments.convertedSchema
     )
