@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import utils
 import logging
 # from click.types import File
 # from rich import print
@@ -11,6 +10,7 @@ import rich.console
 import rich.logging
 import rich.traceback
 
+import relecov_tools.utils
 import relecov_tools.read_metadata
 
 log = logging.getLogger()
@@ -18,7 +18,7 @@ log = logging.getLogger()
 
 def run_relecov_tools():
     # Set up rich stderr console
-    stderr = rich.console.Console(stderr=True, force_terminal=utils.rich_force_colors())
+    stderr = rich.console.Console(stderr=True, force_terminal=relecov_tools.utils.rich_force_colors())
 
     # Set up the rich traceback
     rich.traceback.install(console=stderr, width=200, word_wrap=True, extra_lines=1)
@@ -166,20 +166,14 @@ def list(keywords, sort, json, show_archived):
     help="Path to save run parameters file",
 )
 def sftp(
-    pipeline,
-    id,
-    revision,
-    command_only,
-    params_in,
-    params_out,
-    save_all,
-    show_hidden,
-    url,
+    host,
+    port,
+    user,
+    passwd
 ):
-    """
-    Download files located in sftp server.
-
-    """
+    """Download files located in sftp server."""
+    sftp_connection = relecov_tools.sftp.SftpHandle(host, port, user, passwd)
+    sftp_connection.open()
 
 
 # metadata
@@ -216,6 +210,38 @@ def read_metadata(
     new_metadata = relecov_tools.read_metadata.RelecovMetadata(metadata_file)
     relecov_json = new_metadata.create_json()
     return relecov_json
+
+
+# validation
+@relecov_tools_cli.command(help_priority=4)
+@click.argument("pipeline", required=False, metavar="<pipeline name>")
+@click.option(
+    "-r", "--revision", help="Release/branch/SHA of the project to run (if remote)"
+)
+@click.option("-i", "--id", help="ID for web-gui launch parameter set")
+@click.option(
+    "-c",
+    "--command-only",
+    is_flag=True,
+    default=False,
+    help="Create Nextflow command with params (no params file)",
+)
+@click.option(
+    "-o",
+    "--params-out",
+    type=click.Path(),
+    default=os.path.join(os.getcwd(), "nf-params.json"),
+    help="Path to save run parameters file",
+)
+def validation(
+    host,
+    port,
+    user,
+    passwd
+):
+    """Download files located in sftp server."""
+    relecov_json = relecov_tools.validation_jsons.ValidationJson(host, port, user, passwd)
+    relecov_json.open()
 
 
 if __name__ == "__main__":

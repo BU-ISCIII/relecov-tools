@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """
-Common utility function for bu-isciii package.
+Common utility function for relecov_tools package.
 """
 import os
-import rich
+from rich.console import Console
 import questionary
 
 
@@ -32,7 +32,7 @@ def rich_force_colors():
     return None
 
 
-stderr = rich.console.Console(
+stderr = Console(
     stderr=True, style="dim", highlight=False, force_terminal=rich_force_colors()
 )
 
