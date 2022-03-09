@@ -85,18 +85,17 @@ class RelecovMetadata:
         """Update information"""
         pass
 
-    def update_heading_to_json_schema(self, heading, meta_map_json):
+    def update_heading_to_json(self, heading, meta_map_json):
         """Change the heading values from the metadata file for the ones defined
         in the json schema
         """
-        map_heading = list(meta_map_json.keys())
-        import pdb
-
-        pdb.set_trace()
-        for i in range(len(heading)):
-            if heading[i] in meta_map_json:
-                heading[i] = meta_map_json[heading[i]]
-        return heading
+        mapped_heading = []
+        for cell in heading:
+            if cell.value in meta_map_json:
+                mapped_heading.append(meta_map_json[cell.value])
+            else:
+                mapped_heading.append(cell.value)
+        return mapped_heading
 
     def read_json_file(self, j_file):
         """Read json file."""
@@ -105,23 +104,29 @@ class RelecovMetadata:
         return data
 
     def read_metadata_file(self, meta_map_json):
-        """Read the input metadata file. Return list of dict with data"""
+        """Read the input metadata file, mapping the metadata heading with
+        the values used in json. Convert the date colunms value to the
+        dd/mm/yyyy format. Return list of dict with data, and errors
+        """
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
-        heading = []
-        for cell in ws_metadata_lab[1]:
-            heading.append(cell.value)
-        for i in range(len(heading)):
-            if heading[i] in list(mapping_file.keys()):
-                index = list(mapping_file).index(heading[i])
-                heading[index] = list(mapping_file.values())[index]
+        heading = self.update_heading_to_json(ws_metadata_lab[1], meta_map_json)
+        metadata_values = []
+        errors = {}
         for row in islice(ws_metadata_lab.values, 1, ws_metadata_lab.max_row):
             sample_data_row = {}
             for idx in range(len(heading)):
                 if "date" in heading[idx]:
-                    sample_data_row[heading[idx]] = row[idx].strftime("%d/%m/%Y")
+                    try:
+                        sample_data_row[heading[idx]] = row[idx].strftime("%d/%m/%Y")
+                    except AttributeError:
+                        if row[0] not in errors:
+                            errors[row[0]] = {}
+                        errors[row[0]][heading[idx]] = "Invalid date format"
                 else:
                     sample_data_row[heading[idx]] = row[idx]
+            metadata_values.append(sample_data_row)
+        return metadata_values
 
     def create_metadata_json(self):
         config_json = ConfigJson()
@@ -139,7 +144,5 @@ class RelecovMetadata:
             os.path.dirname(os.path.realpath(__file__)), "schema", metadata_mapping_json
         )
         meta_map_json = self.read_json_file(meta_map_json_file)
-        import pdb
 
-        pdb.set_trace()
         input_metadata = self.read_metadata_file(meta_map_json)
