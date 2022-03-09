@@ -11,7 +11,7 @@ with open("requirements.txt") as f:
     required = f.read().splitlines()
 
 setup(
-    name="bu-isciii",
+    name="relecov_tools",
     version=version,
     description="Tools for managing and resolution of buisciii services.",
     long_description=readme,
@@ -26,9 +26,9 @@ setup(
     ],
     author="Sara Monzon",
     author_email="smonzon@isciii.es",
-    url="https://github.com/BU-ISCIII/buisciii-tools",
+    url="https://github.com/BU-ISCIII/relecov_tools",
     license="GNU GENERAL PUBLIC LICENSE v.3",
-    entry_points={"console_scripts": ["bu-isciii=bu_isciii.__main__:run_bu_isciii"]},
+    entry_points={"console_scripts": ["relecov_tools=relecov_tools.__main__:run_relecov_tools"]},
     install_requires=required,
     packages=find_packages(exclude=("docs")),
     include_package_data=True,
