@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from logging import exception
 from tkinter import E
 import logging
@@ -10,34 +9,19 @@ import jsonschema
 from jsonschema import validate
 from jsonschema import Draft202012Validator
 import json, sys
-from openpyxl import Workbook
-import openpyxl
+
+# from openpyxl import Workbook
+# import openpyxl
 from itertools import islice
 import argparse
-
 from questionary import ValidationError
 
 import utils
 
-# import relecov_tools.utils
-
-# from utils import *
-
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
-    stderr=True,
-    style="dim",
-    highlight=False,
-    force_terminal=utils.rich_force_colors(),
+    stderr=True, style="dim", highlight=False, force_terminal=utils.rich_force_colors()
 )
-
-
-"""
-References:
-    genepio.owl https://github.com/GenEpiO/genepio/blob/master/genepio.owl
-
-
-"""
 
 
 class PhagePlusSchema:
@@ -50,11 +34,11 @@ class PhagePlusSchema:
     def get_gontology(self, property_item):
         """
         Description:
-            The function return the geontology value for a property in the schema
+        The function return the geontology value for a property in the schema
         Input:
-            property_item    # property name to fetch its geontology
+        property_item    # property name to fetch its geontology
         Return:
-            Return ontology value or None
+        Return ontology value or None
         """
         try:
             return self.schema["properties"][property_item]["ontology"]
@@ -75,13 +59,14 @@ class PhagePlusSchema:
         for key, values in mapped_to_schema["properties"].items():
             try:
                 mapped_dict[key] = self.ontology[values["ontology"]]
-            except:
+            except OSError:
                 # There is no exact match on ontology. Search for the parent
                 # to be implemented later
                 pass
         return mapped_dict
 
 
+""""
 class PhagePlusData:
     def __init__(self, data, json_schema):
         self.data = data
@@ -98,6 +83,7 @@ class PhagePlusData:
         for item, value in mapped_structure.items:
             mapped_sample_list[item] = self.data[value]
         return map_sample_dict
+"""
 
 
 def check_arg(args=None):
@@ -133,26 +119,6 @@ def check_arg(args=None):
         "-c", "--convertedSchema", required=True, help="schema to be mapped"
     )
     return parser.parse_args()
-
-
-"""
-data = {
-    "sample_name": "s1",
-    "collecting_institution": "inst2",
-    "submitting_institution": "sub",
-    "sample_collection_date": "12/02/2022",
-    "geo_loc_country": "Afghanistan",
-    "geo_loc_state": "Western",
-    "organism": "Coronaviridae",
-    "isolate": "SARS-CoV-2/",
-    "host_scientific_name": "Bos taurus",
-    "host_disease": "Homo sapiens",
-    "sequencing_instrument_model": "COVID-19",
-    "sequencing_instrument_platform": "Illumina sequencing instrument",
-    "consensus_sequence_software_name": "MinIon",
-    "consensus_sequence_software_version": "Ivar",
-}
-"""
 
 
 if __name__ == "__main__":
@@ -222,30 +188,8 @@ if __name__ == "__main__":
 
             log.error(e)
             continue
-        # sample_list.append(PhagePlusData(sample_data_row, phage_plus_schema))
+
+    # sample_list.append(PhagePlusData(sample_data_row, phage_plus_schema))
     # create the information mapped to the new schema
-    """
-    variable_errores = {
-        "sample":["jsonschema.exceptions.ValidationError: 2697049 is not of type 'string'
 
-Failed validating 'type' in schema['properties']['tax_id']:
-    {'clasification': 'Sample collection and processing',
-     'description': 'The NCBITaxon identifier for the organism being '
-                    'sequenced.',
-     'examples': ['probably 2697049 in all cases'],
-     'label': 'Tax ID',
-     'ontology': 'GENEPIO_0001800',
-     'type': 'string'}
-
-On instance['tax_id']:
-    2697049
-"]        
-    }
-    mapped_structure = phage_plus_schema.maping_schemas_based_on_geontology(
-        arguments.convertedSchema
-    )
-    mapped_sample_list = []
-    for sample in sample_list:
-        mapped_sample_list.append(map_sample_to_schema(mapped_structure))
-    """
     print("Completed")
