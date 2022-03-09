@@ -14,48 +14,6 @@ References:
 
 '''
 
-class PhagePlusSchema :
-    def __init__ (self, schema):
-        self.schema = schema
-        self.ontology = {}
-        for key , values in schema['properties'].items():
-            self.ontology[values['ontology']] = key
-
-
-    def get_gontology(self,property_item):
-        '''
-        Description:
-            The function return the geontology value for a property in the schema
-        Input:
-            property_item    # property name to fetch its geontology
-        Return:
-            Return ontology value or None
-        '''
-        try:
-             return self.schema['properties'][property_item]['ontology']
-        except:
-            return None
-
-    def maping_schemas_based_on_geontology(mapped_to_schema):
-        '''
-        Description:
-            The function return a dictionnary with the properties of the mapped_to_schema as key and
-            properties of phagePlusSchema as value
-        Input:
-            mapped_to_schema    # json schema to be mapped
-        Return:
-            mapped_dict contains as key the property in the mapped_to_schema and value de property in the self.schema
-        '''
-        mapped_dict = OrderedDict()
-        for key, values in mapped_to_schema['properties'].items():
-            try:
-                mapped_dict[key] = self.ontology[values['ontology']]
-            except:
-                # There is no exact match on ontology. Search for the parent
-                # to be implemented later
-                pass
-        return mapped_dict
-
 
 class PhagePlusData :
     def __init__ (self,data, json_schema):
@@ -74,7 +32,6 @@ class PhagePlusData :
         for item, value in mapped_structure.items:
             mapped_sample_list[item] = self.data[value]
         return map_sample_dict
-
 
 
 def check_arg (args=None) :
