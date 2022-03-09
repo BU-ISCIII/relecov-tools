@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 from logging import exception
 from tkinter import E
+import logging
+import rich
+from rich.console import Console
 
 # from types import NoneType
 import jsonschema
@@ -19,6 +22,14 @@ import utils
 # import relecov_tools.utils
 
 # from utils import *
+
+log = logging.getLogger(__name__)
+stderr = rich.console.Console(
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=utils.rich_force_colors(),
+)
 
 
 """
@@ -199,6 +210,7 @@ if __name__ == "__main__":
         try:
             import pdb
 
+            pdb.set_trace()
             validate(
                 instance=sample_data_row,
                 schema=json_phage_plus_schema,
@@ -206,7 +218,9 @@ if __name__ == "__main__":
             print("Success")
         except jsonschema.ValidationError as e:
 
-            e
+            # print(e)
+
+            log.error(e)
             continue
         # sample_list.append(PhagePlusData(sample_data_row, phage_plus_schema))
     # create the information mapped to the new schema

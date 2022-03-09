@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # from click.types import File
+import logging
 from rich import print
 
 # from rich.prompt import Confirm
@@ -16,6 +17,9 @@ import utils
 # import nf_core
 # conda install -c conda-forge click
 # conda install -c conda-forge rich
+
+
+log = logging.getLogger()
 
 
 def run_bu_isciii():
