@@ -3,6 +3,7 @@ from itertools import islice
 import json
 import logging
 import rich.console
+
 # from openpyxl import Workbook
 import openpyxl
 import os
@@ -22,10 +23,7 @@ stderr = rich.console.Console(
 
 class RelecovMetadata:
     def __init__(
-        self,
-        metadata_file=None,
-        additional_metadata_file=None,
-        output_folder=None
+        self, metadata_file=None, additional_metadata_file=None, output_folder=None
     ):
         if metadata_file is None:
             self.metadata_file = relecov_tools.utils.prompt_path(
@@ -44,10 +42,7 @@ class RelecovMetadata:
             self.output_folder = output_folder
         self.additional_metadata_file = additional_metadata_file
 
-
-
-            # Perform workflow details
-
+        # Perform workflow details
 
     def check_new_metadata(folder):
         """Check if there is a new metadata to be processed
@@ -55,7 +50,6 @@ class RelecovMetadata:
         folder  Directory to be checked
         """
         pass
-
 
     def fetch_metadata_file(folder, file_name):
         """Fetch the metadata file
@@ -68,11 +62,8 @@ class RelecovMetadata:
         for cell in ws_metadata_lab[1]:
             heading.append(cell.value)
 
-
-
     def validate_metadata_sample(row_sample):
         """Validate sample information"""
-
 
     def add_extra_data(metadata_file, extra_data, result_metadata):
         """Add the additional information that must be included in final metadata
@@ -82,7 +73,6 @@ class RelecovMetadata:
         """
         pass
 
-
     def request_information(external_url, request):
         """Get information from external database server using Rest API
 
@@ -90,7 +80,6 @@ class RelecovMetadata:
         request
         """
         pass
-
 
     def store_information(external_url, request, data):
         """Update information"""
@@ -101,7 +90,9 @@ class RelecovMetadata:
         in the json schema
         """
         map_heading = list(meta_map_json.keys())
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         for i in range(len(heading)):
             if heading[i] in meta_map_json:
                 heading[i] = meta_map_json[heading[i]]
@@ -134,13 +125,21 @@ class RelecovMetadata:
 
     def create_metadata_json(self):
         config_json = ConfigJson()
-        schema_location = config_json.get_topic_data("json_schemas", "phage_plus_schema")
-        schema_location_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "schema", schema_location)
+        schema_location = config_json.get_topic_data(
+            "json_schemas", "phage_plus_schema"
+        )
+        schema_location_file = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "schema", schema_location
+        )
         schema_json = self.read_json_file(schema_location_file)
         phage_plus_schema = relecov_tools.schema_json.PhagePlusSchema(schema_json)
         properties_in_schema = phage_plus_schema.get_schema_properties()
         metadata_mapping_json = config_json.get_configuration("mapping_metadata_json")
-        meta_map_json_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "schema" , metadata_mapping_json)
+        meta_map_json_file = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "schema", metadata_mapping_json
+        )
         meta_map_json = self.read_json_file(meta_map_json_file)
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         input_metadata = self.read_metadata_file(meta_map_json)
