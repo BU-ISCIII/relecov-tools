@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import logging
+
 # from click.types import File
 # from rich import print
 
@@ -18,7 +19,9 @@ log = logging.getLogger()
 
 def run_relecov_tools():
     # Set up rich stderr console
-    stderr = rich.console.Console(stderr=True, force_terminal=relecov_tools.utils.rich_force_colors())
+    stderr = rich.console.Console(
+        stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
+    )
 
     # Set up the rich traceback
     rich.traceback.install(console=stderr, width=200, word_wrap=True, extra_lines=1)
@@ -164,12 +167,7 @@ def list(keywords, sort, json, show_archived):
     default=os.path.join(os.getcwd(), "nf-params.json"),
     help="Path to save run parameters file",
 )
-def sftp(
-    host,
-    port,
-    user,
-    passwd
-):
+def sftp(host, port, user, passwd):
     """Download files located in sftp server."""
     sftp_connection = relecov_tools.sftp.SftpHandle(host, port, user, passwd)
     sftp_connection.open()
@@ -182,27 +180,30 @@ def sftp(
     "--metadata_file",
     type=click.Path(),
     default=None,
-    help="file containing metadata"
+    help="file containing metadata",
 )
 @click.option(
     "-a",
     "--add_metadata",
     type=click.Path(),
-    default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "additional_metadata.json"),
-    help="Json with the additional metadata to add to the received user metadata"
+    default=os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "assets",
+        "additional_metadata.json",
+    ),
+    help="Json with the additional metadata to add to the received user metadata",
 )
 @click.option(
-    "-o",
-    "--metadata-out",
-    type=click.Path(),
-    help="Path to save output  metadata file"
+    "-o", "--metadata-out", type=click.Path(), help="Path to save output  metadata file"
 )
 def read_metadata(metadata_file, add_metadata, metadata_out):
     """
     Create the json complaining the relecov schema from the Metadata file.
     """
-    new_metadata = relecov_tools.read_metadata.RelecovMetadata(metadata_file, add_metadata, metadata_out)
-    relecov_json = new_metadata.create_json()
+    new_metadata = relecov_tools.read_metadata.RelecovMetadata(
+        metadata_file, add_metadata, metadata_out
+    )
+    relecov_json = new_metadata.create_metadata_json()
     return relecov_json
 
 
@@ -227,14 +228,11 @@ def read_metadata(metadata_file, add_metadata, metadata_out):
     default=os.path.join(os.getcwd(), "nf-params.json"),
     help="Path to save run parameters file",
 )
-def validation(
-    host,
-    port,
-    user,
-    passwd
-):
+def validation(host, port, user, passwd):
     """Download files located in sftp server."""
-    relecov_json = relecov_tools.validation_jsons.ValidationJson(host, port, user, passwd)
+    relecov_json = relecov_tools.validation_jsons.ValidationJson(
+        host, port, user, passwd
+    )
     relecov_json.open()
 
 
