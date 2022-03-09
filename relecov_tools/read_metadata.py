@@ -46,14 +46,12 @@ class RelecovMetadata:
 
     def check_new_metadata(folder):
         """Check if there is a new metadata to be processed
-
         folder  Directory to be checked
         """
         pass
 
     def fetch_metadata_file(folder, file_name):
-        """Fetch the metadata file
-        folder  Directory to fetch metadata file
+        """Fetch the metadata file folder  Directory to fetch metadata file
         file_name   metadata file name
         """
         wb_file = openpyxl.load_workbook(file_name, data_only=True)
