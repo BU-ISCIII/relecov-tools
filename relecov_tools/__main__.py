@@ -2,7 +2,10 @@
 import os
 import logging
 # from click.types import File
-# from rich import print
+
+import logging
+from rich import print
+
 
 # from rich.prompt import Confirm
 import click
@@ -16,7 +19,10 @@ import relecov_tools.read_metadata
 log = logging.getLogger()
 
 
+
 def run_relecov_tools():
+
+
     # Set up rich stderr console
     stderr = rich.console.Console(stderr=True, force_terminal=relecov_tools.utils.rich_force_colors())
 
