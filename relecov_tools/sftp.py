@@ -32,6 +32,7 @@ END_OF_HEADER
 import paramiko
 import sys
 
+
 class SftpHandle:
     def __init__(self, host, port, user, key):
         """
@@ -108,6 +109,7 @@ class SftpHandle:
     def main(args):
         pass
         return
+
 
 if __name__ == "__main__":
     sys.exit(main())
