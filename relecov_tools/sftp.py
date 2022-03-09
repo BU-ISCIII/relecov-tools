@@ -61,7 +61,7 @@ class SftpHandle:
         except:
             return False
 
-    def open(self):
+    def open_connection(self):
         """
         Uses the class attributes to make a SFTP connection
         Usage:
@@ -89,7 +89,7 @@ class SftpHandle:
             except:
                 return False
 
-    def close(self):
+    def close_connection(self):
         """
         Closes the SFTP connection if there is any
         Usage:
