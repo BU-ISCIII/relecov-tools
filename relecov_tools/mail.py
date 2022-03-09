@@ -30,6 +30,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+
 class Email:
     def __init__(self, receiver, sender, password, subject):
         self.receiver = receiver
@@ -48,19 +49,19 @@ class Email:
         return
 
     def send_message(self):
-        msg = MIMEMultipart('alternative')
-        msg['To'] = self.receiver
-        msg['From'] = self.sender
-        msg['Subject'] = self.subject
+        msg = MIMEMultipart("alternative")
+        msg["To"] = self.receiver
+        msg["From"] = self.sender
+        msg["Subject"] = self.subject
 
-        text_part = MIMEText(self.text, 'plain')
+        text_part = MIMEText(self.text, "plain")
         msg.attach(text_part)
 
         if self.html:
-            html_part = MIMEText(self.html, 'html')
+            html_part = MIMEText(self.html, "html")
             msg.attach(html_part)
 
         # open server, send email, close email
-        server = smtplib.SMTP('localhost')
+        server = smtplib.SMTP("localhost")
         server.sendmail(self.sender, self.receiver, msg.as_string())
         server.quit()
