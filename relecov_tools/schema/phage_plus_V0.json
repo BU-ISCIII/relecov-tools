@@ -1240,7 +1240,7 @@
             "clasification": "Sequencing",
             "label": "If Enrichment Protocol Is Other, Specify"
         },
-        "amplicon protocol": {
+        "amplicon_protocol": {
             "examples": [
                 ""
             ],
