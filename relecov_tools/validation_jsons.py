@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 import logging
 import rich.console
@@ -41,3 +42,4 @@ def validate_json_vs_schena(json_schema_file=None, json_data_file=None):
             log.error("Invalid sample data %s", e)
             invalid_json.append(item_row)
     return validated_json_data, invalid_json, errors
+
