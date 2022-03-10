@@ -105,7 +105,8 @@ if __name__ == "__main__":
     for row in islice(ws_metadata_lab.values, 1, ws_metadata_lab.max_row):
         sample_data_row = {}
         for idx in range(len(heading)):
-            if "date" in heading[idx]:
+
+            if "date" in heading[idx] or "Date" in heading[idx]:
                 try:
                     sample_data_row[heading[idx]] = row[idx].strftime("%d/%m/%Y")
                 except AttributeError:
@@ -117,6 +118,7 @@ if __name__ == "__main__":
             import pdb
 
             pdb.set_trace()
+
             validate(
                 instance=sample_data_row,
                 schema=json_phage_plus_schema,
@@ -124,9 +126,9 @@ if __name__ == "__main__":
             print("Success")
         except jsonschema.ValidationError as e:
 
-            # print(e)
+            print(e)
 
-            log.error(e)
+            # log.error(e)
             continue
 
     # sample_list.append(PhagePlusData(sample_data_row, phage_plus_schema))

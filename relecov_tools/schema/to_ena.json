@@ -1,0 +1,19 @@
+{
+    "sample_name": "ID_001",
+    "collecting_institution": "Hospital Universitario de Basurto",
+    "geographic_location_(country_and/or_sea)": "Spain",
+    "isolate": "ID_001",
+    "host_scientific_name": "Homo sapiens",
+    "host_common_name": "Human",
+    "host_subject_id": "#131",
+    "instrument_model": "Illumina MiSeq",
+    "file_name": "ABC123_S1_L001_R1_001.fastq.gz",
+    "tax_id": "2697049",
+    "scientific_name": "severe acute respiratory syndrome coronavirus 2",
+    "common_name": "SARS-CoV-2",
+    "sample_description": "SARS-CoV-2 Sample #1",
+    "library_source": "METAGENOMIC",
+    "library_selection": "RANDOM PCR",
+    "library_strategy": "WGS",
+    "library_layout": "PAIRED"
+}

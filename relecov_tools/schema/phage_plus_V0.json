@@ -2182,7 +2182,7 @@
             ],
             "ontology": "NCIT:C164471",
             "type": "string",
-            "description": "",
+            "description": "The common name of the organism.",
             "clasification": "Sample collection and processing"
         },
         "library_source": {
