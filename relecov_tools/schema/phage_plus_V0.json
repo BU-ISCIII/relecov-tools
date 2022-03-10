@@ -54,7 +54,7 @@
             "description": "The date on which the sample was collected.",
             "format": "date"
         },
-        "geo_loc_name_country": {
+        "geo_loc_country": {
             "Enums": [
                 "Afghanistan [GAZ:00006882]",
                 "Albania [GAZ:00002953]",
