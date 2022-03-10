@@ -46,14 +46,12 @@ class RelecovMetadata:
 
     def check_new_metadata(folder):
         """Check if there is a new metadata to be processed
-
         folder  Directory to be checked
         """
         pass
 
     def fetch_metadata_file(folder, file_name):
-        """Fetch the metadata file
-        folder  Directory to fetch metadata file
+        """Fetch the metadata file folder  Directory to fetch metadata file
         file_name   metadata file name
         """
         wb_file = openpyxl.load_workbook(file_name, data_only=True)
@@ -146,3 +144,6 @@ class RelecovMetadata:
         meta_map_json = self.read_json_file(meta_map_json_file)
 
         input_metadata = self.read_metadata_file(meta_map_json)
+
+        # fake return data, just for litin
+        return input_metadata, properties_in_schema
