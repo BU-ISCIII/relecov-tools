@@ -64,22 +64,28 @@ class RelecovMetadata:
     def validate_metadata_sample(row_sample):
         """Validate sample information"""
 
-    def add_extra_data(self, metadata_file, extra_data, result_metadata):
+    def add_extra_data(self, metadata, extra_data):
         """Add the additional information that must be included in final metadata
-        metadata Origin metadata file
+        metadata Origin metadata
         extra_data  additional data to be included
         result_metadata    final metadata after adding the additional data
         """
         geo_loc_data = {}
-        for row in metadata_file:
+        extra_metadata = []
+        for row in metadata:
+            for new_field, value in extra_data.items():
+                row[new_field] = value
             # get the geo location latitude and longitude
             country = row["geo_loc_country"]
             city = row["geo_loc_state"]
             if city not in geo_loc_data:
                 geo_loc_data[city] = self.get_geo_location_data(city, country)
             row["geo_loc_latitude"], row["geo_loc_longitude"] = geo_loc_data[city]
-
-        pass
+            # update isolate qith the name of the sample
+            row["isolate"] = row["sample_name"]
+            extra_metadata.append(row)
+        import pdb; pdb.set_trace()
+        return extra_metadata
 
     def request_information(external_url, request):
         """Get information from external database server using Rest API
@@ -163,6 +169,6 @@ class RelecovMetadata:
         meta_map_json = self.read_json_file(meta_map_json_file)
 
         valid_metadata_rows, errors = self.read_metadata_file(meta_map_json)
-        completed_metadata = self.update_heading_to_json(valid_metadata_rows, meta_map_json)
+        completed_metadata = self.add_extra_data(valid_metadata_rows, meta_map_json["Additional_fields"])
         # fake return data, just for litin
         return completed_metadata, properties_in_schema
