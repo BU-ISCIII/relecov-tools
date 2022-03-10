@@ -46,20 +46,21 @@ class SftpHandle:
         self.key = key
         self.client = None
 
-    def check(self):
         """
+    def check(self):
+        
         Check if there is a SFTP connection
         Usage:
             sftp.check()
         Return:
             True if a connection still exists
             False if connection doesnt exist (not established or timed out for instance)
-        """
         try:
             self.client.getcwd()
             return True
-        except:
+        except OSError as e:
             return False
+        """
 
     def open_connection(self):
         """
@@ -70,24 +71,20 @@ class SftpHandle:
             True if connected succesfully
             False if failed connection
         """
-        if not self.check():
-            try:
-                self.client = paramiko.SSHClient()
-                self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                self.client.connect(
-                    hostname=self.host,
-                    port=self.port,
-                    username=self.user,
-                    password=self.key,
-                    allow_agent=False,
-                    look_for_keys=False,
-                )
+        self.client = paramiko.SSHClient()
+        self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.client.connect(
+            hostname=self.host,
+            port=self.port,
+            username=self.user,
+            password=self.key,
+            allow_agent=False,
+            look_for_keys=False,
+        )
 
-                self.client = self.client.open()
+        self.client = self.client.open_sftp()
 
-                return True
-            except:
-                return False
+        return True
 
     def close_connection(self):
         """
@@ -105,28 +102,63 @@ class SftpHandle:
                 return True
             except:
                 return False
+            
+    def list_dirs(self, only_dirs=False):
+        sftp_contents = self.client.listdir()
+        
+        if only_dirs:
+            # get only items with no extension
+            dirs = [item for item in sftp_contents if len(item.split(".")) == 1]
+            return dirs
+        else:
+            return sftp_contents
+    
+    def create_download_dictionary(self):
+        
+        download_dict = {}
+        
+        to_download = self.list_dirs(only_dirs=True)
+        for directory in to_download[0:1]:
+            item_list = [f"{directory}/{item}" for item in self.client.listdir(directory) if len(item.split(".")) > 1]
+            download_dict[directory] = item_list        
+        
+        return download_dict
+        
 
-    def main(args):
-        pass
+    def download(self):
+        download_dict = self.create_download_dictionary()
+        for directory, file_list in download_dict.items():
+            os.mkdir(directory)
+            for file in file_list:
+                self.client.get(file, file)        
         return
 
+def main():
+    pass
+    return
 
 if __name__ == "__main__":
     sys.exit(main())
 
 
 # TESTING ZONE, must be deleted later
+# This will NOT work
 CLAVE = "RANDOM_KEY_FOR_TESTING"
 HOST = "RANDOM_SFTP_FOR_TESTING"
 PUERTO = 420
 USUARIO = "ARTURITO"
 
-my_sftp = SftpHandle(HOST, PUERTO, USUARIO, CLAVE)
-if not my_sftp.open():
-    print("No connection!")
-else:
-    print(my_sftp.check())
+contents = my_sftp.list_dirs()
+
 
 # testing the client attribute
 # works fine by now
 print(my_sftp.client.listdir())
+
+# This will work
+CLAVE = "Bioinfo%123"
+HOST = "sftprelecov.isciii.es"
+PUERTO = 22
+USUARIO = "bioinfoadm"
+
+my_sftp = SftpHandle(HOST, PUERTO, USUARIO, CLAVE)h
