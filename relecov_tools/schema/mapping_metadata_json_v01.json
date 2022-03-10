@@ -86,7 +86,6 @@
         },
         "tax_id": "",
         "host_disease":"covid-19",
-        "type":"betacoronavirus",
         "sequence_file_R1_fastq": "",
         "sequence_file_R2_fastq": "",
         "type" : "betacoronavirus"
