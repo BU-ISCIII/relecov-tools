@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from itertools import islice
+from geopy.geocoders import Nominatim
 import json
 import logging
 import rich.console
@@ -63,12 +64,21 @@ class RelecovMetadata:
     def validate_metadata_sample(row_sample):
         """Validate sample information"""
 
-    def add_extra_data(metadata_file, extra_data, result_metadata):
+    def add_extra_data(self, metadata_file, extra_data, result_metadata):
         """Add the additional information that must be included in final metadata
         metadata Origin metadata file
         extra_data  additional data to be included
         result_metadata    final metadata after adding the additional data
         """
+        geo_loc_data = {}
+        for row in metadata_file:
+            # get the geo location latitude and longitude
+            country = row["geo_loc_country"]
+            city = row["geo_loc_state"]
+            if city not in geo_loc_data:
+                geo_loc_data[city] = self.get_geo_location_data(city, country)
+            row["geo_loc_latitude"], row["geo_loc_longitude"] = geo_loc_data[city]
+
         pass
 
     def request_information(external_url, request):
@@ -82,6 +92,15 @@ class RelecovMetadata:
     def store_information(external_url, request, data):
         """Update information"""
         pass
+
+    def get_geo_location_data(self, state, country):
+        """Get the geo_loc_latitude and geo_loc_longitude from state """
+        geolocator = Nominatim(user_agent="geoapiRelecov")
+        loc = geolocator.geocode(state + "," + country)
+        return [loc.latitude, loc.longitude]
+
+
+
 
     def update_heading_to_json(self, heading, meta_map_json):
         """Change the heading values from the metadata file for the ones defined
@@ -124,7 +143,7 @@ class RelecovMetadata:
                 else:
                     sample_data_row[heading[idx]] = row[idx]
             metadata_values.append(sample_data_row)
-        return metadata_values
+        return metadata_values, errors
 
     def create_metadata_json(self):
         config_json = ConfigJson()
@@ -143,7 +162,7 @@ class RelecovMetadata:
         )
         meta_map_json = self.read_json_file(meta_map_json_file)
 
-        input_metadata = self.read_metadata_file(meta_map_json)
-
+        valid_metadata_rows, errors = self.read_metadata_file(meta_map_json)
+        completed_metadata = self.update_heading_to_json(valid_metadata_rows, meta_map_json)
         # fake return data, just for litin
-        return input_metadata, properties_in_schema
+        return completed_metadata, properties_in_schema

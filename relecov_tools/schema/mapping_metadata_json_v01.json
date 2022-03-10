@@ -3,10 +3,8 @@
     "Originating Laboratory": "collecting_institution",
     "Submitting Institution": "submitting_institution",
     "Sample Collection Date": "sample_collection_date",
-    "geo_loc_country": "geo_loc_country",
-    "geo_loc_state": "geo_loc_state",
-    "organism": "organism",
-    "isolate": "isolate",
+    "Geo Loc Country": "geo_loc_country",
+    "Geo Loc State": "geo_loc_state",
     "host_scientific_name": "host_scientific_name",
     "Host Common Name": "host_common_name",
     "host_disease": "host_disease",
@@ -27,5 +25,18 @@
     "Originating Laboratory Address": "collecting_institution_address",
     "broker_name": "broker_name",
     "nominal_sdev": "nominal_sdev",
-    "first_created_date": "first_created_date"
+    "first_created_date": "first_created_date",
+    "Additional_fields": {
+        "geo_loc_latitude": "",
+        "geo_loc_longitude",
+        "organism": "sars_cov_2",
+        "isolate": "",
+        "host_scientific_name" : "",
+        "tax_id" : "",
+        "host_disease":"covid-19",
+        "type":"betacoronavirus",
+        "sequence_file_R1_fastq" : "",
+        "sequence_file_R2_fastq" : "",
+        "type" : "betacoronavirus"
+    }
 }
