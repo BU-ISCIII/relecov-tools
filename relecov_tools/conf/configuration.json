@@ -1,0 +1,8 @@
+{
+    "json_schemas": {
+        "phage_plus": "phage_plus_V0.json",
+        "ene_schema": "ena_v01.json",
+        "gisaid_schema": "gisaid_v01.json"
+    },
+    "additional_metadata": "additional_metadata_v01.json"
+}
