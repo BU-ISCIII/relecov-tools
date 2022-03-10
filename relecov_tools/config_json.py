@@ -14,20 +14,13 @@ class ConfigJson:
         self.topic_config = list(self.json_data.keys())
 
     def get_configuration(self, topic):
-        """
-        Description:
-            Obtain the topic configuration from json data
-        """
+        """Obtain the topic configuration from json data"""
         if topic in self.topic_config:
             return self.json_data[topic]
         return None
 
-    def get_find(self, topic, found):
-        """
-        Owner: Pablo
-        Description:
-            Obtain from topic any forward items from json data
-        """
+    def get_topic_data(self, topic, found):
+        """Obtain from topic any forward items from json data"""
         if found in self.json_data[topic]:
             return self.json_data[topic][found]
         else:

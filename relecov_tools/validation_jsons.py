@@ -8,82 +8,22 @@ from rich.console import Console
 import jsonschema
 from jsonschema import validate
 from jsonschema import Draft202012Validator
-import json, sys
+import json
+import sys
 
 # from openpyxl import Workbook
-# import openpyxl
+import openpyxl
 from itertools import islice
 import argparse
 from questionary import ValidationError
 
 import utils
+from schema_json import PhagePlusSchema
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True, style="dim", highlight=False, force_terminal=utils.rich_force_colors()
 )
-
-
-class PhagePlusSchema:
-    def __init__(self, schema):
-        self.schema = schema
-        self.ontology = {}
-        for key, values in schema["properties"].items():
-            self.ontology[values["ontology"]] = key
-
-    def get_gontology(self, property_item):
-        """
-        Description:
-        The function return the geontology value for a property in the schema
-        Input:
-        property_item    # property name to fetch its geontology
-        Return:
-        Return ontology value or None
-        """
-        try:
-            return self.schema["properties"][property_item]["ontology"]
-        except:
-            return None
-
-    def maping_schemas_based_on_geontology(mapped_to_schema):
-        """
-        Description:
-            The function return a dictionnary with the properties of the mapped_to_schema as key and
-            properties of phagePlusSchema as value
-        Input:
-            mapped_to_schema    # json schema to be mapped
-        Return:
-            mapped_dict contains as key the property in the mapped_to_schema and value de property in the self.schema
-        """
-        mapped_dict = OrderedDict()
-        for key, values in mapped_to_schema["properties"].items():
-            try:
-                mapped_dict[key] = self.ontology[values["ontology"]]
-            except OSError:
-                # There is no exact match on ontology. Search for the parent
-                # to be implemented later
-                pass
-        return mapped_dict
-
-
-""""
-class PhagePlusData:
-    def __init__(self, data, json_schema):
-        self.data = data
-        self.schema = json_schema
-
-    def convert_json(schema):
-        pass
-
-    def get_data(self, field):
-        return self.data[field]
-
-    def map_sample_to_schema(mapped_structure):
-        map_sample_dict = OrderedDict()
-        for item, value in mapped_structure.items:
-            mapped_sample_list[item] = self.data[value]
-        return map_sample_dict
-"""
 
 
 def check_arg(args=None):

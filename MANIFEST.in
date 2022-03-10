@@ -1,6 +1,6 @@
 include LICENSE
 include README.md
-graft bu_isciii/templates
-graft bu_isciii/schemas
-graft bu_isciii/conf
+graft relecov_tools/assets
+graft relecov_tools/schema
+graft relecov_tools/conf
 include requirements.txt
