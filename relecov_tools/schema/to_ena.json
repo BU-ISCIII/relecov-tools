@@ -1,4 +1,11 @@
 {
+    "project": "RELECOV",
+    "study": [
+        {
+            "study_title": "Example project for ENA submission RELECOV",
+            "study_description": "This study was created as part of an ENA submissions example RELECOV"
+        }
+    ],
     "sample_name": "ID_001",
     "collecting_institution": "Hospital Universitario de Basurto",
     "geographic_location_(country_and/or_sea)": "Spain",
@@ -7,7 +14,7 @@
     "host_common_name": "Human",
     "host_subject_id": "#131",
     "instrument_model": "Illumina MiSeq",
-    "file_name": "ABC123_S1_L001_R1_001.fastq.gz",
+    "file_name": "ABC123_S1_L001_R1_001.fasstq.gz",
     "tax_id": "2697049",
     "scientific_name": "severe acute respiratory syndrome coronavirus 2",
     "common_name": "SARS-CoV-2",
