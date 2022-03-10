@@ -35,7 +35,10 @@
                 "prov_rona_99"
             ],
             "ontology": "0",
-            "type": "string",
+            "type": [
+                "string",
+                "null"
+            ],
             "description": "The user-defined name for the sample.",
             "clasification": "Database Identifiers",
             "label": "Collecting Sample id"
@@ -45,16 +48,22 @@
                 "Public Health Agency of Canada"
             ],
             "ontology": "GENEPIO:0001153",
-            "type": "string",
+            "type": [
+                "string",
+                "null"
+            ],
             "description": "The name of the agency that collected the original sample.",
-            "label": "Originating Laboratory"
+            "label": "Originating Laboratory Address"
         },
         "submitting_institution": {
             "examples": [
                 "Centers for Disease Control and Prevention"
             ],
             "ontology": "GENEPIO:0001159",
-            "type": "string",
+            "type": [
+                "string",
+                "null"
+            ],
             "description": "The name of the agency that generated the sequence."
         },
         "sample_collection_date": {
@@ -62,7 +71,10 @@
                 "3/19/2020"
             ],
             "ontology": "GENEPIO:0001174",
-            "type": "string",
+            "type": [
+                "string",
+                "null"
+            ],
             "description": "The date on which the sample was collected.",
             "format": "date"
         },
@@ -346,7 +358,10 @@
                 "Restricted Access [GENEPIO:0001810]"
             ],
             "ontology": "GENEPIO:0001181",
-            "type": "string",
+            "type": [
+                "string",
+                "null"
+            ],
             "description": "The country of origin of the sample.",
             "examples": [
                 "South Africa [GAZ:00001094]"
@@ -359,7 +374,10 @@
                 "Western Cape"
             ],
             "ontology": "GENEPIO:0001185",
-            "type": "string",
+            "type": [
+                "string",
+                "null"
+            ],
             "description": "The state/province/territory of origin of the sample.",
             "classification": "Sample collection and processing",
             "label": "Geo Loc Autonomic Community"
@@ -375,7 +393,10 @@
                 "Restricted Access [GENEPIO:0001810]"
             ],
             "ontology": "GENEPIO:0001191",
-            "type": "string",
+            "type": [
+                "string",
+                "null"
+            ],
             "description": "Taxonomic name of the organism.",
             "examples": [
                 "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]"
@@ -388,7 +409,10 @@
                 "SARS-CoV-2/human/USA/CA-CDPH-001/2020"
             ],
             "ontology": "GENEPIO:0001644",
-            "type": "string",
+            "type": [
+                "string",
+                "null"
+            ],
             "description": "Identifier of the specific isolate.",
             "clasification": "Sample collection and processing",
             "label": "Isolate"
@@ -922,7 +946,8 @@
             "type": "string",
             "description": "",
             "clasification": "Submission ENA",
-            "label": "First Public date"
+            "label": "First Public date",
+            "format": "date"
         },
         "last_updated_date": {
             "examples": [
@@ -932,7 +957,8 @@
             "type": "string",
             "description": "",
             "clasification": "Submission ENA",
-            "format": "Last Updated"
+            "label": "Last Updated",
+            "format": "date"
         },
         "experiment_title": {
             "examples": [
@@ -1170,14 +1196,14 @@
             "clasification": "Submission ENA",
             "label": "Nominal sdev"
         },
-        "first_created": {
+        "first_created_date": {
             "examples": [
                 "e.g 2020-08-07"
             ],
             "ontology": "NCIT_C164483",
-            "format": "date",
             "description": "",
             "clasification": "Submission ENA",
+            "format": "date",
             "label": "First created date"
         }
     }

@@ -24,8 +24,5 @@
     "type": "type",
     "GISAID Virus Name": "virus_name",
     "GISAID Id": "submitter",
-    "Originating Laboratory Address": "collecting_institution_address",
-    "broker_name": "broker_name",
-    "nominal_sdev": "nominal_sdev",
-    "first_created_date": "first_created_date"
+    "Originating Laboratory Address": "collecting_institution_address"
 }
