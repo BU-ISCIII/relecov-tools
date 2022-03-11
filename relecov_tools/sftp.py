@@ -89,7 +89,9 @@ class SftpHandle:
             self.storage_local_folder = config_json.get_topic_data("", "sftp_port")
         else:
             if not os.path.isfile(conf_file):
-                stderr.print("[red] Configuration file does not exist. " + conf_file + "!")
+                stderr.print(
+                    "[red] Configuration file does not exist. " + conf_file + "!"
+                )
                 sys.exit(1)
             with open(conf_file, "r") as fh:
                 config = yaml.load(fh, Loader=yaml.FullLoader)
