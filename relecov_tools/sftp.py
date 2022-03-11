@@ -35,6 +35,7 @@ import paramiko
 import sys
 import os
 
+
 def get_md5(file):
     """
     Get the MD5 of a file, following this schema:
@@ -47,8 +48,8 @@ def get_md5(file):
     """
 
     md5_object = hashlib.md5()
-    with open(file,"rb") as infile:
-        for block in iter(lambda: infile.read(4096),b""):
+    with open(file, "rb") as infile:
+        for block in iter(lambda: infile.read(4096), b""):
             md5_object.update(block)
         return md5_object.hexdigest()
 
@@ -122,7 +123,7 @@ class SftpHandle:
                 return True
             except:
                 return False
-            
+
     def list_dirs(self, only_dirs=False):
         """
         Generates a list of directories inside the root
@@ -132,17 +133,17 @@ class SftpHandle:
             sftp.list_dirs(only_dirs=BOOL)
         Return:
             List with all the contents (dirs or files)
-        
+
         """
         sftp_contents = self.client.listdir()
-        
+
         if only_dirs:
             # get only items with no extension (dirs)
             dirs = [item for item in sftp_contents if len(item.split(".")) == 1]
             return dirs
         else:
             return sftp_contents
-    
+
     def create_download_dictionary(self):
         """
         Generates a dictionary with key: directory in the SFTP
@@ -152,25 +153,29 @@ class SftpHandle:
             sftp.create_download_dictionary()
         Return:
             dictionary with key: dir, val: [contents of dir]
-        
+
         """
         download_dict = {}
-        
+
         to_download = self.list_dirs(only_dirs=True)
         for directory in to_download[0:1]:
             # get only files (strings with extension)
-            item_list = [f"{directory}/{item}" for item in self.client.listdir(directory) if len(item.split(".")) > 1]
-            download_dict[directory] = item_list        
-        
+            item_list = [
+                f"{directory}/{item}"
+                for item in self.client.listdir(directory)
+                if len(item.split(".")) > 1
+            ]
+            download_dict[directory] = item_list
+
         return download_dict
-        
+
     def download(self):
 
         """
         Generates the download dict with create_download_dictionary
         Generates the directories in the keys, download the files in
-        the values inside of them. 
-        
+        the values inside of them.
+
         Then, for each file, checks the md5 with the get_md5 function,
         and the size of the file with os path. This data is transferred
         to a dictionary
@@ -178,7 +183,7 @@ class SftpHandle:
         Usage:
             sftp.download()
         Return:
-            dicionary with key: filename, val: [md5, size]   
+            dicionary with key: filename, val: [md5, size]
         """
         filestats_dict = {}
 
@@ -189,13 +194,15 @@ class SftpHandle:
                 self.client.get(file, file)
                 file_md5_hash = get_md5(file)
                 file_size = os.path.getsize(file)
-                filestats_dict[file] = [file_md5_hash, file_size] 
+                filestats_dict[file] = [file_md5_hash, file_size]
 
-        return
+        return filestats_dict
+
 
 def main():
     pass
     return
+
 
 if __name__ == "__main__":
     sys.exit(main())
