@@ -67,7 +67,7 @@ class SftpHandle:
         """
         Uses the class attributes to make a SFTP connection
         Usage:
-            sftp.open()
+            sftp.open_connection()
         Return:
             True if connected succesfully
             False if failed connection
@@ -91,7 +91,7 @@ class SftpHandle:
         """
         Closes the SFTP connection if there is any
         Usage:
-            sftp.close()
+            sftp.close_connection()
         Return:
             -True if connection closed successfully
             -False if connection closing failed
@@ -105,27 +105,59 @@ class SftpHandle:
                 return False
             
     def list_dirs(self, only_dirs=False):
+        """
+        Generates a list of directories inside the root
+        of the SFTP.
+
+        Usage:
+            sftp.list_dirs(only_dirs=BOOL)
+        Return:
+            List with all the contents (dirs or files)
+        
+        """
         sftp_contents = self.client.listdir()
         
         if only_dirs:
-            # get only items with no extension
+            # get only items with no extension (dirs)
             dirs = [item for item in sftp_contents if len(item.split(".")) == 1]
             return dirs
         else:
             return sftp_contents
     
     def create_download_dictionary(self):
+        """
+        Generates a dictionary with key: directory in the SFTP
+        and value: list with all the files inside that dir
+        To do so, calls self.list_dirs().
+        Usage:
+            sftp.create_download_dictionary()
+        Return:
+            dictionary with key: dir, val: [contents of dir]
         
+        """
         download_dict = {}
         
         to_download = self.list_dirs(only_dirs=True)
         for directory in to_download[0:1]:
+            # get only files (strings with extension)
             item_list = [f"{directory}/{item}" for item in self.client.listdir(directory) if len(item.split(".")) > 1]
             download_dict[directory] = item_list        
         
         return download_dict
         
     def download(self):
+
+        """
+        Generates the download dict with create_download_dictionary
+        Generates the directories in the keys, download the files in
+        the values inside of them.
+
+        Usage:
+            sftp.download()
+        Return:
+            None   
+        """
+
         download_dict = self.create_download_dictionary()
         for directory, file_list in download_dict.items():
             os.mkdir(directory)
