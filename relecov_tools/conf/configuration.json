@@ -9,5 +9,6 @@
     "sftp_connection":{
         "sftp_server": "sftprelecov.isciii.es",
         "sftp_port" : "50122"
-    }
+    },
+    "storage_local_folder" : "/tmp"
 }

@@ -85,19 +85,22 @@ class SftpHandle:
             config_json = ConfigJson()
             self.server = config_json.get_topic_data("sftp_connection", "sftp_server")
             self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
+            self.storage_local_folder = config_json.get_topic_data("", "sftp_port")
         else:
             if not os.path.isfile(conf_file):
                 stderr.print("[red] Configuration file does not exist. " + conf_file + "!")
                 sys.exit(1)
             with open(conf_file, "r") as fh:
-                lines = fh.readlines()
-                if lines[0].split(",")[0] == "sftp_server":
-                    self.server = lines[0].split(",")[1].strip()
-                else:
-                    stderr.print("[red] sftp server not found in configuration file " + conf_file + "!")
-                    sys.exit(1)
-                if lines[1].split(",")[0] == "sftp_port":
-                    self.port = lines[1].split("")[1].strip()
+                config = yaml.load(fh, Loader=yaml.FullLoader)
+            try:
+                self.sftp_server = config_fields["sftp_server"]
+                self.sftp_port = config_fields["sftp_port"]
+                self.storage_local_folder = conf_file["storage_local_folder"]
+            except KeyError as e:
+                log.error("Invalid configuration file %s", e)
+                stderr.print("[red] Invalide configuration file " + e + "!")
+                sys.exit(1)
+                
         self.client = None
 
     """
@@ -224,31 +227,4 @@ class SftpHandle:
 
         return filestats_dict
 
-
-def main():
-    pass
-    return
-
-
-
-if __name__ == "__main__":
-    sys.exit(main())
-
-# TESTING ZONE, must be deleted later
-# This will NOT work
-CLAVE = "RANDOM_KEY_FOR_TESTING"
-HOST = "RANDOM_SFTP_FOR_TESTING"
-PUERTO = 420
-USUARIO = "ARTURITO"
-
-my_sftp = SftpHandle(HOST, PUERTO, USUARIO, CLAVE)
-contents = my_sftp.list_dirs()
-
-
-# This will work
-CLAVE = "Bioinfo%123"
-HOST = "sftprelecov.isciii.es"
-PUERTO = 22
-USUARIO = "bioinfoadm"
-
-my_sftp = SftpHandle(HOST, PUERTO, USUARIO, CLAVE)
+    def
