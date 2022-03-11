@@ -100,7 +100,7 @@ class SftpHandle:
                 log.error("Invalid configuration file %s", e)
                 stderr.print("[red] Invalide configuration file " + e + "!")
                 sys.exit(1)
-                
+
         self.client = None
 
     """
@@ -226,5 +226,3 @@ class SftpHandle:
                 filestats_dict[file] = [file_md5_hash, file_size]
 
         return filestats_dict
-
-    def
