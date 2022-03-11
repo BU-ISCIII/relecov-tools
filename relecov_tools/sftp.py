@@ -30,11 +30,22 @@ END_OF_HEADER
 """
 
 # Imports
-
+import logging
+import rich.console
 import hashlib
 import paramiko
 import sys
 import os
+import relecov_tools.utils
+from relecov_tools.config_json import ConfigJson
+
+log = logging.getLogger(__name__)
+stderr = rich.console.Console(
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=relecov_tools.utils.rich_force_colors(),
+)
 
 
 def get_md5(file):
@@ -55,18 +66,38 @@ def get_md5(file):
         return md5_object.hexdigest()
 
 
-
 class SftpHandle:
-    def __init__(self, host, port, user, key):
+    def __init__(self, user=None, passwd=None, conf_file=None):
         """
         Initializes the Connection object and starts its host, port, user and key attributes.
         Declaration:
             sftp = SftpHandle(host, port, user, key)
         """
-        self.host = host
-        self.port = port
-        self.user = user
-        self.key = key
+        if user is None:
+            self.user = relecov_tools.utils.text(msg="Enter the userid")
+        else:
+            self.user = user
+        if passwd is None:
+            self.passwd = relecov_tools.utils.password(msg="Enter your password")
+        else:
+            self.passwd = passwd
+        if conf_file is None:
+            config_json = ConfigJson()
+            self.server = config_json.get_topic_data("sftp_connection", "sftp_server")
+            self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
+        else:
+            if not os.path.isfile(conf_file):
+                stderr.print("[red] Configuration file does not exist. " + conf_file + "!")
+                sys.exit(1)
+            with open(conf_file, "r") as fh:
+                lines = fh.readlines()
+                if lines[0].split(",")[0] == "sftp_server":
+                    self.server = lines[0].split(",")[1].strip()
+                else:
+                    stderr.print("[red] sftp server not found in configuration file " + conf_file + "!")
+                    sys.exit(1)
+                if lines[1].split(",")[0] == "sftp_port":
+                    self.port = lines[1].split("")[1].strip()
         self.client = None
 
     """
