@@ -18,7 +18,9 @@ REQUIREMENTS:
     -Paramiko
 
 TO DO:
-
+- Dowload the data (DONE)
+- Check MD5 and File size (DONE)
+- Testing
 - Check minimal required Python version
 - Delete testing inside this script
 
