@@ -7,7 +7,7 @@ AUTHOR: Guillermo J. Gorines Cordero
 MAIL: guillermo.gorines@urjc.es
 VERSION: 0
 CREATED: 11-2-2022
-REVISED: 11-2-2022
+REVISED: 11-3-2022
 REVISED BY: guillermo.gorines@urjc.es
 DESCRIPTION:
 
@@ -19,8 +19,9 @@ REQUIREMENTS:
 
 TO DO:
 
--Check minimal required Python version
--Delete testing inside this script 
+- 
+- Check minimal required Python version
+- Delete testing inside this script
 
 ================================================================
 END_OF_HEADER
@@ -31,7 +32,7 @@ END_OF_HEADER
 
 import paramiko
 import sys
-
+import os
 
 class SftpHandle:
     def __init__(self, host, port, user, key):
@@ -46,7 +47,7 @@ class SftpHandle:
         self.key = key
         self.client = None
 
-        """
+    """
     def check(self):
         
         Check if there is a SFTP connection
@@ -60,7 +61,7 @@ class SftpHandle:
             return True
         except OSError as e:
             return False
-        """
+    """
 
     def open_connection(self):
         """
@@ -124,7 +125,6 @@ class SftpHandle:
         
         return download_dict
         
-
     def download(self):
         download_dict = self.create_download_dictionary()
         for directory, file_list in download_dict.items():
@@ -140,7 +140,6 @@ def main():
 if __name__ == "__main__":
     sys.exit(main())
 
-
 # TESTING ZONE, must be deleted later
 # This will NOT work
 CLAVE = "RANDOM_KEY_FOR_TESTING"
@@ -148,12 +147,9 @@ HOST = "RANDOM_SFTP_FOR_TESTING"
 PUERTO = 420
 USUARIO = "ARTURITO"
 
+my_sftp = SftpHandle(HOST, PUERTO, USUARIO, CLAVE)
 contents = my_sftp.list_dirs()
 
-
-# testing the client attribute
-# works fine by now
-print(my_sftp.client.listdir())
 
 # This will work
 CLAVE = "Bioinfo%123"
