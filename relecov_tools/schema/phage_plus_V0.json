@@ -2164,7 +2164,8 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "enter your GISAID-Username"
+            "clasification": "enter your GISAID-Username",
+            "label": "GISAID Id"
         },
         "authors": {
             "examples": [
