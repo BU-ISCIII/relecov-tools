@@ -37,6 +37,16 @@ stderr = Console(
 )
 
 
+def prompt_text(msg):
+    source = questionary.text(msg).ask()
+    return source
+
+
+def prompt_password(msg):
+    source = questionary.password(msg).ask()
+    return source
+
+
 def prompt_tmp_dir_path():
     stderr.print("Temporal directory destination to execute sercive")
     source = questionary.path("Source path").unsafe_ask()
