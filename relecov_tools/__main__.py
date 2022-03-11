@@ -2,12 +2,6 @@
 import os
 import logging
 
-# from click.types import File
-
-import logging
-from rich import print
-
-
 # from rich.prompt import Confirm
 import click
 import rich.console
@@ -16,13 +10,12 @@ import rich.traceback
 
 import relecov_tools.utils
 import relecov_tools.read_metadata
+import relecov_tools.sftp
 
 log = logging.getLogger()
 
 
-
 def run_relecov_tools():
-
 
     # Set up rich stderr console
     stderr = rich.console.Console(
@@ -156,26 +149,23 @@ def list(keywords, sort, json, show_archived):
 # sftp
 @relecov_tools_cli.command(help_priority=2)
 @click.option(
-    "-r", "--revision", help="Release/branch/SHA of the project to run (if remote)"
-)
-@click.option("-i", "--id", help="ID for web-gui launch parameter set")
-@click.option(
-    "-c",
-    "--command-only",
-    is_flag=True,
-    default=False,
-    help="Create Nextflow command with params (no params file)",
+    "-u",
+    "--user",
+    help="User name for login to sftp server"
 )
 @click.option(
-    "-o",
-    "--params-out",
-    type=click.Path(),
-    default=os.path.join(os.getcwd(), "nf-params.json"),
-    help="Path to save run parameters file",
+    "-p",
+    "--password",
+    help="password for the user to login"
 )
-def sftp(host, port, user, passwd):
+@click.option(
+    "-f",
+    "--conf_file",
+    help="Configuration file Create Nextflow command with params (no params file)",
+)
+def sftp(user, password, conf_file):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp.SftpHandle(host, port, user, passwd)
+    sftp_connection = relecov_tools.sftp.SftpHandle(user, password, conf_file)
     sftp_connection.open()
 
 
