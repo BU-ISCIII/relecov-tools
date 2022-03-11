@@ -30,9 +30,28 @@ END_OF_HEADER
 
 # Imports
 
+import hashlib
 import paramiko
 import sys
 import os
+
+def get_md5(file):
+    """
+    Get the MD5 of a file, following this schema:
+    Open it, sequentially add more chunks of it to the hash,
+    return the hash
+    Usage:
+        get_md5(file)
+    Return:
+        md5 hash of the given file
+    """
+
+    md5_object = hashlib.md5()
+    with open(file,"rb") as infile:
+        for block in iter(lambda: infile.read(4096),b""):
+            md5_object.update(block)
+        return md5_object.hexdigest()
+
 
 class SftpHandle:
     def __init__(self, host, port, user, key):
@@ -162,7 +181,8 @@ class SftpHandle:
         for directory, file_list in download_dict.items():
             os.mkdir(directory)
             for file in file_list:
-                self.client.get(file, file)        
+                self.client.get(file, file)
+
         return
 
 def main():
