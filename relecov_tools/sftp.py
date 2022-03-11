@@ -169,19 +169,27 @@ class SftpHandle:
         """
         Generates the download dict with create_download_dictionary
         Generates the directories in the keys, download the files in
-        the values inside of them.
+        the values inside of them. 
+        
+        Then, for each file, checks the md5 with the get_md5 function,
+        and the size of the file with os path. This data is transferred
+        to a dictionary
 
         Usage:
             sftp.download()
         Return:
-            None   
+            dicionary with key: filename, val: [md5, size]   
         """
+        filestats_dict = {}
 
         download_dict = self.create_download_dictionary()
         for directory, file_list in download_dict.items():
             os.mkdir(directory)
             for file in file_list:
                 self.client.get(file, file)
+                file_md5_hash = get_md5(file)
+                file_size = os.path.getsize(file)
+                filestats_dict[file] = [file_md5_hash, file_size] 
 
         return
 
@@ -209,4 +217,4 @@ HOST = "sftprelecov.isciii.es"
 PUERTO = 22
 USUARIO = "bioinfoadm"
 
-my_sftp = SftpHandle(HOST, PUERTO, USUARIO, CLAVE)h
+my_sftp = SftpHandle(HOST, PUERTO, USUARIO, CLAVE)
