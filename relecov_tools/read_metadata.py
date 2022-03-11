@@ -84,7 +84,6 @@ class RelecovMetadata:
             # update isolate qith the name of the sample
             row["isolate"] = row["sample_name"]
             extra_metadata.append(row)
-        import pdb; pdb.set_trace()
         return extra_metadata
 
     def request_information(external_url, request):
@@ -104,9 +103,6 @@ class RelecovMetadata:
         geolocator = Nominatim(user_agent="geoapiRelecov")
         loc = geolocator.geocode(state + "," + country)
         return [loc.latitude, loc.longitude]
-
-
-
 
     def update_heading_to_json(self, heading, meta_map_json):
         """Change the heading values from the metadata file for the ones defined
