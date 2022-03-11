@@ -28,7 +28,9 @@ setup(
     author_email="smonzon@isciii.es",
     url="https://github.com/BU-ISCIII/relecov_tools",
     license="GNU GENERAL PUBLIC LICENSE v.3",
-    entry_points={"console_scripts": ["relecov_tools=relecov_tools.__main__:run_relecov_tools"]},
+    entry_points={
+        "console_scripts": ["relecov_tools=relecov_tools.__main__:run_relecov_tools"]
+    },
     install_requires=required,
     packages=find_packages(exclude=("docs")),
     include_package_data=True,

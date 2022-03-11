@@ -148,16 +148,8 @@ def list(keywords, sort, json, show_archived):
 
 # sftp
 @relecov_tools_cli.command(help_priority=2)
-@click.option(
-    "-u",
-    "--user",
-    help="User name for login to sftp server"
-)
-@click.option(
-    "-p",
-    "--password",
-    help="password for the user to login"
-)
+@click.option("-u", "--user", help="User name for login to sftp server")
+@click.option("-p", "--password", help="password for the user to login")
 @click.option(
     "-f",
     "--conf_file",

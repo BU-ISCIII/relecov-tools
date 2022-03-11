@@ -99,7 +99,7 @@ class RelecovMetadata:
         pass
 
     def get_geo_location_data(self, state, country):
-        """Get the geo_loc_latitude and geo_loc_longitude from state """
+        """Get the geo_loc_latitude and geo_loc_longitude from state"""
         geolocator = Nominatim(user_agent="geoapiRelecov")
         loc = geolocator.geocode(state + "," + country)
         return [loc.latitude, loc.longitude]
@@ -167,6 +167,8 @@ class RelecovMetadata:
         meta_map_json = self.read_json_file(meta_map_json_file)
 
         valid_metadata_rows, errors = self.read_metadata_file(meta_map_json)
-        completed_metadata = self.add_extra_data(valid_metadata_rows, meta_map_json["Additional_fields"])
+        completed_metadata = self.add_extra_data(
+            valid_metadata_rows, meta_map_json["Additional_fields"]
+        )
         # fake return data, just for litin
         return completed_metadata, properties_in_schema
