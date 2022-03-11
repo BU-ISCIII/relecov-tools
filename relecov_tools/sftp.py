@@ -36,6 +36,7 @@ import hashlib
 import paramiko
 import sys
 import os
+import yaml
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -93,9 +94,9 @@ class SftpHandle:
             with open(conf_file, "r") as fh:
                 config = yaml.load(fh, Loader=yaml.FullLoader)
             try:
-                self.sftp_server = config_fields["sftp_server"]
-                self.sftp_port = config_fields["sftp_port"]
-                self.storage_local_folder = conf_file["storage_local_folder"]
+                self.sftp_server = config["sftp_server"]
+                self.sftp_port = config["sftp_port"]
+                self.storage_local_folder = config["storage_local_folder"]
             except KeyError as e:
                 log.error("Invalid configuration file %s", e)
                 stderr.print("[red] Invalide configuration file " + e + "!")
