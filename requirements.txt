@@ -9,3 +9,4 @@ sysrsync==1.0.1
 requests==2.27.1
 markdown==3.3.6
 geopy==2.2.0
+paramiko==2.9.2
