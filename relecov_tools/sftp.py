@@ -19,7 +19,6 @@ REQUIREMENTS:
 
 TO DO:
 
-- 
 - Check minimal required Python version
 - Delete testing inside this script
 
@@ -69,7 +68,6 @@ class SftpHandle:
 
     """
     def check(self):
-        
         Check if there is a SFTP connection
         Usage:
             sftp.check()
@@ -114,15 +112,9 @@ class SftpHandle:
             sftp.close_connection()
         Return:
             -True if connection closed successfully
-            -False if connection closing failed
-            -None if no connection was established
         """
-        if self.check():
-            try:
-                self.client.close()
-                return True
-            except:
-                return False
+        self.client.close()
+        return True
 
     def list_dirs(self, only_dirs=False):
         """
