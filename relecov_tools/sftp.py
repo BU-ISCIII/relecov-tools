@@ -1,35 +1,5 @@
-"""
-=============================================================
-HEADER
-=============================================================
-INSTITUTION: BU-ISCIII
-AUTHOR: Guillermo J. Gorines Cordero
-MAIL: guillermo.gorines@urjc.es
-VERSION: 0
-CREATED: 11-2-2022
-REVISED: 11-3-2022
-REVISED BY: guillermo.gorines@urjc.es
-DESCRIPTION:
+#!/usr/bin/env python
 
-    Includes the SFTP connection class, and its associated methods.
-
-REQUIREMENTS:
-    -Python
-    -Paramiko
-
-TO DO:
-- Dowload the data (DONE)
-- Check MD5 and File size (DONE)
-- Testing
-- Check minimal required Python version
-- Delete testing inside this script
-
-================================================================
-END_OF_HEADER
-================================================================
-"""
-
-# Imports
 import logging
 import rich.console
 import hashlib
@@ -74,19 +44,11 @@ class SftpHandle:
         Declaration:
             sftp = SftpHandle(host, port, user, key)
         """
-        if user is None:
-            self.user = relecov_tools.utils.text(msg="Enter the userid")
-        else:
-            self.user = user
-        if passwd is None:
-            self.passwd = relecov_tools.utils.password(msg="Enter your password")
-        else:
-            self.passwd = passwd
         if conf_file is None:
             config_json = ConfigJson()
             self.server = config_json.get_topic_data("sftp_connection", "sftp_server")
             self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
-            self.storage_local_folder = config_json.get_topic_data("", "sftp_port")
+            self.storage_local_folder = config_json.get_configuration("storage_local_folder")
         else:
             if not os.path.isfile(conf_file):
                 stderr.print(
@@ -99,27 +61,21 @@ class SftpHandle:
                 self.sftp_server = config["sftp_server"]
                 self.sftp_port = config["sftp_port"]
                 self.storage_local_folder = config["storage_local_folder"]
+                self.user = config["user_sftp"]
+                self.passwd = config["password"]
             except KeyError as e:
                 log.error("Invalid configuration file %s", e)
                 stderr.print("[red] Invalide configuration file " + e + "!")
                 sys.exit(1)
-
+        if user is None:
+            self.user = relecov_tools.utils.text(msg="Enter the userid")
+        else:
+            self.user = user
+        if passwd is None:
+            self.passwd = relecov_tools.utils.password(msg="Enter your password")
+        else:
+            self.passwd = passwd
         self.client = None
-
-    """
-    def check(self):
-        Check if there is a SFTP connection
-        Usage:
-            sftp.check()
-        Return:
-            True if a connection still exists
-            False if connection doesnt exist (not established or timed out for instance)
-        try:
-            self.client.getcwd()
-            return True
-        except OSError as e:
-            return False
-    """
 
     def open_connection(self):
         """
@@ -133,17 +89,19 @@ class SftpHandle:
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.client.connect(
-            hostname=self.host,
+            hostname=self.server,
             port=self.port,
             username=self.user,
-            password=self.key,
+            password=self.passwd,
             allow_agent=False,
             look_for_keys=False,
         )
-
-        self.client = self.client.open_sftp()
-
-        return True
+        try:
+            self.client = self.client.open_sftp()
+            return True
+        except paramiko.SSHException as e:
+            log.error("Invalid Username/Password for %s:" , e)
+            return False
 
     def close_connection(self):
         """
@@ -156,53 +114,40 @@ class SftpHandle:
         self.client.close()
         return True
 
-    def list_dirs(self, only_dirs=False):
-        """
-        Generates a list of directories inside the root
-        of the SFTP.
+    def list_folders(self, folder_name):
+        """Creates a directories list from the given path """
+        directory_list = []
+        try:
+            content_list = self.client.listdir(folder_name)
+        except FileNotFoundError as e:
+            log.error("Invalid folder at remote sftp %s" , e)
+            return False
 
-        Usage:
-            sftp.list_dirs(only_dirs=BOOL)
-        Return:
-            List with all the contents (dirs or files)
+        for content in content_list:
+            try:
+                self.client.listdir(content)
+            except FileNotFoundError:
+                continue
+            directory_list.append(content)
 
-        """
-        sftp_contents = self.client.listdir()
+        return directory_list
 
-        if only_dirs:
-            # get only items with no extension (dirs)
-            dirs = [item for item in sftp_contents if len(item.split(".")) == 1]
-            return dirs
-        else:
-            return sftp_contents
+    def get_file_list(self, folder_name):
+        """ Return a tuple with file name and directory path """
+        file_list = []
+        content_list = self.client.listdir(folder_name)
+        for content in content_list:
+            file_list.append(content)
+        return file_list
 
-    def create_download_dictionary(self):
-        """
-        Generates a dictionary with key: directory in the SFTP
-        and value: list with all the files inside that dir
-        To do so, calls self.list_dirs().
-        Usage:
-            sftp.create_download_dictionary()
-        Return:
-            dictionary with key: dir, val: [contents of dir]
-
-        """
-        download_dict = {}
-
-        to_download = self.list_dirs(only_dirs=True)
-        for directory in to_download[0:1]:
-            # get only files (strings with extension)
-            item_list = [
-                f"{directory}/{item}"
-                for item in self.client.listdir(directory)
-                if len(item.split(".")) > 1
-            ]
-            download_dict[directory] = item_list
-
-        return download_dict
+    def create_main_folders(self, root_directory_list):
+        """ Create the main folder structure if not exists """
+        for folder in root_directory_list:
+            full_folder = os.path.join(self.storage_local_folder, folder)
+            os.makedirs(full_folder, exist_ok=True)
+        return True
 
     def download(self):
-
         """
         Generates the download dict with create_download_dictionary
         Generates the directories in the keys, download the files in
@@ -229,3 +174,24 @@ class SftpHandle:
                 filestats_dict[file] = [file_md5_hash, file_size]
 
         return filestats_dict
+
+    def download_from_sftp(self):
+        try:
+            os.makedirs(self.storage_local_folder, exist_ok=True)
+        except OSError as e:
+            log.error("You do not have permissions to create folder %s", e)
+            sys.exit(1)
+        os.chdir(self.storage_local_folder)
+        if not self.open_connection():
+            sys.exit(1)
+
+        root_directory_list = self.list_folders(".")
+        if not root_directory_list:
+            sys.exit(1)
+
+        # create_main_folders(root_directory_list)
+        for folder in root_directory_list:
+            import pdb; pdb.set_trace()
+            list_files = self.get_file_list(folder)
+            if list_files:
+                import pdb; pdb.set_trace()
