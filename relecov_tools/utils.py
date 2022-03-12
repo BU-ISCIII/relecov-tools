@@ -3,6 +3,7 @@
 Common utility function for relecov_tools package.
 """
 import os
+import hashlib
 from rich.console import Console
 import questionary
 
@@ -17,6 +18,24 @@ def file_exists(file_to_check):
     if os.path.isfile(file_to_check):
         return True
     return False
+
+
+def calculate_md5(files_list):
+    """Calculate the md5 value for the list of files"""
+    block_size = 2**20
+    hash_md5 = hashlib.md5()
+    for file_list in files_list:
+        f_name, f_ext = os.path.splitext(file_list)
+        if not f_ext.lowercase() == ".md5":
+            hash_md5.update(open(file_list, "rb").read(block_size))
+    return hash_md5.hexdigest()
+
+
+def save_local_md5(file_name, md5_value):
+    """Save the MD5 value"""
+    with open(file_name, "w") as fh:
+        fh.write(md5_value)
+    return True
 
 
 def rich_force_colors():
