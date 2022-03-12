@@ -48,7 +48,9 @@ class SftpHandle:
             config_json = ConfigJson()
             self.server = config_json.get_topic_data("sftp_connection", "sftp_server")
             self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
-            self.storage_local_folder = config_json.get_configuration("storage_local_folder")
+            self.storage_local_folder = config_json.get_configuration(
+                "storage_local_folder"
+            )
         else:
             if not os.path.isfile(conf_file):
                 stderr.print(
@@ -100,7 +102,7 @@ class SftpHandle:
             self.client = self.client.open_sftp()
             return True
         except paramiko.SSHException as e:
-            log.error("Invalid Username/Password for %s:" , e)
+            log.error("Invalid Username/Password for %s:", e)
             return False
 
     def close_connection(self):
@@ -115,12 +117,12 @@ class SftpHandle:
         return True
 
     def list_folders(self, folder_name):
-        """Creates a directories list from the given path """
+        """Creates a directories list from the given path"""
         directory_list = []
         try:
             content_list = self.client.listdir(folder_name)
         except FileNotFoundError as e:
-            log.error("Invalid folder at remote sftp %s" , e)
+            log.error("Invalid folder at remote sftp %s", e)
             return False
 
         for content in content_list:
@@ -133,15 +135,23 @@ class SftpHandle:
         return directory_list
 
     def get_file_list(self, folder_name):
-        """ Return a tuple with file name and directory path """
+        """Return a tuple with file name and directory path"""
         file_list = []
         content_list = self.client.listdir(folder_name)
         for content in content_list:
-            file_list.append(content)
+            try:
+                sub_folder_files = self.client.listdir(folder_name + "/" + content)
+                for sub_folder_file in sub_folder_files:
+                    file_list.append(
+                        folder_name + "/" + content + "/" + sub_folder_file
+                    )
+            except FileNotFoundError:
+                file_list.append(folder_name + "/" + content)
+
         return file_list
 
     def create_main_folders(self, root_directory_list):
-        """ Create the main folder structure if not exists """
+        """Create the main folder structure if not exists"""
         for folder in root_directory_list:
             full_folder = os.path.join(self.storage_local_folder, folder)
             os.makedirs(full_folder, exist_ok=True)
@@ -188,10 +198,9 @@ class SftpHandle:
         root_directory_list = self.list_folders(".")
         if not root_directory_list:
             sys.exit(1)
-
+        for_downloading_folder = {}
         # create_main_folders(root_directory_list)
         for folder in root_directory_list:
-            import pdb; pdb.set_trace()
             list_files = self.get_file_list(folder)
-            if list_files:
-                import pdb; pdb.set_trace()
+            if len(list_files) > 0:
+                for_downloading_folder[folder] = list_files
