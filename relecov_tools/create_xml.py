@@ -16,12 +16,12 @@ stderr = rich.console.Console(
 )
 
 
-class xml_creation:
-    def __init__(self, source_path=None, output_path=None, action=None):
-        if source_path is None:
-            self.source_path = utils.prompt_source_path()
+class XmlCreation:
+    def __init__(self, source_json=None, output_path=None, action=None):
+        if source_json is None:
+            self.source_json = utils.prompt_source_path()
         else:
-            self.source_path = source_path
+            self.source_json = source_json
         if output_path is None:
             self.output_path = utils.prompt_destination_path()
         else:
@@ -46,7 +46,7 @@ class xml_creation:
             """
 
             # Load validated json
-            with open(self.source_path) as json_format_file:
+            with open(self.source_json) as json_format_file:
                 json_data = j.load(json_format_file)
 
             # Create output directory
@@ -123,6 +123,8 @@ class xml_creation:
 
             # samples_relecov.xml
             data_keys = list(json_data.keys())
+            # just for fix litin
+            print(data_keys)
             r = e.Element("SAMPLE_SET")
             sample = e.SubElement(r, "SAMPLE")
             sample.set("alias", "SARS Sample 1 programmatic")

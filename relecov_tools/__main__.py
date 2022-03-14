@@ -11,6 +11,7 @@ import rich.traceback
 import relecov_tools.utils
 import relecov_tools.read_metadata
 import relecov_tools.sftp
+import relecov_tools.create_xml
 
 log = logging.getLogger()
 
@@ -224,13 +225,15 @@ def validation(host, port, user, passwd):
     relecov_json.open()
 
 
-
-#@click.argument("source_path", required=False, metavar="<source path file>")
-@click.option("-s","--source_path",help="Where the validated json is")
-@click.option("-o","--output_path",help="Output folder for the xml generated files")
+@click.option("-s", "--source_json", help="Where the validated json is")
+@click.option("-o", "--output_path", help="Output folder for the xml generated files")
 @click.option("-a", "--action", help="ADD or MODIFY")
-def xml(source_path,output_path,action)
-
+def xml(source_json, output_path, action):
+    """Parsed data to create xml files to upload to ENA"""
+    xml_creation = relecov_tools.create_xml.XmlCreation(
+        source_json, output_path, action
+    )
+    xml_creation.generate_xml()
 
 
 if __name__ == "__main__":
