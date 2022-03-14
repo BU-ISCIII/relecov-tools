@@ -2,10 +2,11 @@
 from datetime import datetime
 import logging
 import rich.console
-
+import re
 import paramiko
 import sys
 import os
+import shutil
 import yaml
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
@@ -22,13 +23,13 @@ stderr = rich.console.Console(
 class SftpHandle:
     def __init__(self, user=None, passwd=None, conf_file=None):
         """Initializes the sftp object"""
+        config_json = ConfigJson()
+        self.allowed_sample_ext = config_json.get_configuration(
+            "allowed_sample_extensions"
+        )
         if conf_file is None:
-            config_json = ConfigJson()
             self.server = config_json.get_topic_data("sftp_connection", "sftp_server")
             self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
-            self.storage_local_folder = config_json.get_configuration(
-                "storage_local_folder"
-            )
         else:
             if not os.path.isfile(conf_file):
                 stderr.print(
@@ -40,7 +41,18 @@ class SftpHandle:
             try:
                 self.sftp_server = config["sftp_server"]
                 self.sftp_port = config["sftp_port"]
-                self.storage_local_folder = config["storage_local_folder"]
+                try:
+                    self.storage_local_folder = config["storage_local_folder"]
+                except KeyError:
+                    self.storage_local_folder = config_json.get_configuration(
+                        "storage_local_folder"
+                    )
+                try:
+                    self.metadata_tmp_folder = config["tmp_metadata_folder"]
+                except KeyError:
+                    self.metadata_tmp_folder = config_json.get_configuration(
+                        "tmp_folder_for_metadata"
+                    )
                 self.user = config["user_sftp"]
                 self.passwd = config["password"]
             except KeyError as e:
@@ -140,6 +152,64 @@ class SftpHandle:
 
         return result_data
 
+    def verify_md5_checksum(self, local_folder, file_list):
+        """Get the md5 value from sftp match with the generated at local
+        folder
+        """
+        # fetch the md5 file if exists
+        sftp_md5 = relecov_tools.utils.get_md5_from_local_folder(local_folder)
+        local_md5 = relecov_tools.utils.calculate_md5(file_list)
+        # MD5 Checking
+        if sftp_md5:
+            if sftp_md5 == local_md5:
+                log.info(
+                    "Successful file download for files in folder %s",
+                    local_folder,
+                )
+                return True
+            else:
+                log.error(
+                    "MD5 does not match. Files could be corrupted atfolder %s",
+                    local_folder,
+                )
+                return False
+        else:
+            log.info(
+                "Md5 file was not created by lab. Copy the local md5 into folder %s",
+                local_folder,
+            )
+            file_name = os.path.join(local_folder, "generated_locally.md5")
+            relecov_tools.utils.save_md5(file_name, local_md5)
+            return True
+
+    def create_tmp_files_with_metadata_info(self, local_folder, file_list):
+        """Copy metadata file from folder and create a file with the sample
+        names
+        """
+        out_folder = self.metadata_tmp_folder
+        os.makedirs(out_folder, exist_ok=True)
+        metadata_file = "_".join(local_folder.split("/")[-2:]) + "_metadata_lab.xlsx"
+        shutil.copy(
+            os.path.join(local_folder, "Metadata_lab.xlsx"),
+            os.path.join(out_folder, metadata_file),
+        )
+        for ext in self.allowed_sample_ext:
+            sample_names = []
+            for file_name in os.listdir(local_folder):
+                if file_name.endswith("*." + ext):
+                    m = re.search(r"(.*)_R[1,2].*", file_name)
+                    if m.group(1) not in metadata_file:
+                        sample_names.append(m.group(1))
+            if len(sample_names) > 0:
+                break
+        if len(sample_names) == 0:
+            log.error("There is no samples in folder %s", local_folder)
+        file_with_samples = metadata_file.split("_")[0] + "samples.txt"
+        with open(file_with_samples, "w") as fh:
+            for sample_name in sample_names:
+                fh.write(sample_name + "\n")
+        return
+
     def create_main_folders(self, root_directory_list):
         """Create the main folder structure if not exists"""
         for folder in root_directory_list:
@@ -172,29 +242,20 @@ class SftpHandle:
             sys.exit(0)
 
         for folder, files in folders_to_download.items():
+            # get the files in each folder
             result_data = self.get_files_from_sftp_folder(folder, files)
-            sftp_folder_md5 = relecov_tools.utils.get_md5_from_local_folder(
-                result_data["local_folder"]
-            )
-            local_md5 = relecov_tools.utils.calculate_md5(result_data["fetched_files"])
-            # MD5 Checking
-            if sftp_folder_md5:
-                if sftp_folder_md5 == local_md5:
-                    log.info(
-                        "Successful file download for files in folder %s",
-                        result_data["local_folder"],
-                    )
-                else:
+            if not self.verify_md5_checksum(
+                result_data["local_folder"], result_data["fetched_files"]
+            ):
+                # retrasmision of files in folder
+                result_data = self.get_files_from_sftp_folder(folder, files)
+                if not self.verify_md5_checksum(
+                    result_data["local_folder"], result_data["fetched_files"]
+                ):
                     log.error(
-                        "MD5 does not match. Files could be corrupted atfolder %s",
+                        "Second retransmision of files on folder %s",
                         result_data["local_folder"],
                     )
-            else:
-                log.info(
-                    "Md5 file was not created by lab. Copy the local md5 into folder %s",
-                    result_data["local_folder"],
-                )
-                file_name = os.path.join(
-                    result_data["local_folder"], "generated_locally.md5"
-                )
-                relecov_tools.utils.save_md5(file_name, local_md5)
+            self.create_tmp_files_with_metadata_info(
+                result_data["local_folder"], result_data["fetched_files"]
+            )
