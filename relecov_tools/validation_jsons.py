@@ -18,7 +18,7 @@ stderr = rich.console.Console(
 )
 
 
-def validate_json_vs_schena(json_schema_file=None, json_data_file=None):
+def validate_json_vs_schema(json_schema_file=None, json_data_file=None):
 
     # schema_file = open('/home/lchapado/Projects/Proyecto_ERA/relecov-tools/schema/phage_plus_V0.json')
     with open(json_schema_file, "r") as fh:
