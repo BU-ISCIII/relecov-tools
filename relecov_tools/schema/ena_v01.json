@@ -708,7 +708,8 @@
       "ontology": "NCIT_C115535",
       "type": "string",
       "description": "The name and version of a particular protocol used for sampling.",
-      "clasification": "Sample collection and processing"
+      "clasification": "Sample collection and processing",
+      "label": "Biological Sample Storage Condition"
     },
     "library_source": {
       "Enums": [

@@ -2224,7 +2224,8 @@
       "description": "The gender of the host at the time of sample collection.",
       "examples": [
         "Male [NCIT:C46109]"
-      ]
+      ],
+      "label": "Host Gender"
     },
     "prior_sars_cov_2_antiviral_treatment_agent": {
       "ontology": "GENEPIO:0001439",
