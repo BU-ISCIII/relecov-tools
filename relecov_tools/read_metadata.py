@@ -23,9 +23,7 @@ stderr = rich.console.Console(
 
 
 class RelecovMetadata:
-    def __init__(
-        self, metadata_file=None, additional_metadata_file=None, output_folder=None
-    ):
+    def __init__(self, metadata_file=None, sample_list_file=None, output_folder=None):
         if metadata_file is None:
             self.metadata_file = relecov_tools.utils.prompt_path(
                 msg="Select the excel file which contains metadata"
@@ -35,15 +33,18 @@ class RelecovMetadata:
         if not os.path.exists(self.metadata_file):
             log.error("Metadata file %s does not exist ", self.metadata_file)
             sys.exit(1)
+        if sample_list_file is None:
+            self.sample_list_file = relecov_tools.utils.prompt_path(
+                msg="Select the file which contains the sample list"
+            )
+        else:
+            self.sample_list_file = sample_list_file
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
             self.output_folder = output_folder
-        self.additional_metadata_file = additional_metadata_file
-
-        # Perform workflow details
 
     def check_new_metadata(folder):
         """Check if there is a new metadata to be processed

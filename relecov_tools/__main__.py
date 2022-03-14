@@ -172,8 +172,8 @@ def sftp(user, password, conf_file):
     help="file containing metadata",
 )
 @click.option(
-    "-a",
-    "--add_metadata",
+    "-s",
+    "--sample_list_file",
     type=click.Path(),
     default=os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
@@ -185,12 +185,12 @@ def sftp(user, password, conf_file):
 @click.option(
     "-o", "--metadata-out", type=click.Path(), help="Path to save output  metadata file"
 )
-def read_metadata(metadata_file, add_metadata, metadata_out):
+def read_metadata(metadata_file, sample_list_file, metadata_out):
     """
     Create the json complaining the relecov schema from the Metadata file.
     """
     new_metadata = relecov_tools.read_metadata.RelecovMetadata(
-        metadata_file, add_metadata, metadata_out
+        metadata_file, sample_list_file, metadata_out
     )
     relecov_json = new_metadata.create_metadata_json()
     return relecov_json
