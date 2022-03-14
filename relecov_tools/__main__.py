@@ -224,5 +224,14 @@ def validation(host, port, user, passwd):
     relecov_json.open()
 
 
+
+#@click.argument("source_path", required=False, metavar="<source path file>")
+@click.option("-s","--source_path",help="Where the validated json is")
+@click.option("-o","--output_path",help="Output folder for the xml generated files")
+@click.option("-a", "--action", help="ADD or MODIFY")
+def xml(source_path,output_path,action)
+
+
+
 if __name__ == "__main__":
     run_relecov_tools()
