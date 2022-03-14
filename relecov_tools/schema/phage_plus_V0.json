@@ -536,7 +536,8 @@
             "ontology": "GENEPIO:0001139",
             "type": "string",
             "description": "The identifier assigned to a BioSample in INSDC archives.",
-            "clasification": "Database Identifiers"
+            "clasification": "Database Identifiers",
+            "label": "ENA Sample Id"
         },
         "sra_accession": {
             "examples": [
@@ -644,6 +645,82 @@
             "format": "date",
             "clasification": "Sample collection and processing",
             "label": "Results Emission Date"
+        },
+        "sample_storage_conditions": {
+            "examples": [
+                "24 degrees celsius"
+            ],
+            "ontology": "NCIT_C115535",
+            "type": "string",
+            "description": "The name and version of a particular protocol used for sampling.",
+            "clasification": "Sample collection and processing",
+            "label": "Biological Sample Storage Condition"
+        },
+        "host_age": {
+            "ontology": "GENEPIO:0001392",
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "pattern": "\\d+-\\d+",
+                    "type": "string"
+                }
+            ],
+            "description": "Age of host at the time of sampling.",
+            "examples": [
+                79
+            ],
+            "label": "Host Age"
+        },
+        "host_age_bin": {
+            "Enums": [
+                "0 - 9 [GENEPIO:0100049]",
+                "10 - 19 [GENEPIO:0100050]",
+                "20 - 29 [GENEPIO:0100051]",
+                "30 - 39 [GENEPIO:0100052]",
+                "40 - 49 [GENEPIO:0100053]",
+                "50 - 59 [GENEPIO:0100054]",
+                "60 - 69 [GENEPIO:0100055]",
+                "70 - 79 [GENEPIO:0100056]",
+                "80 - 89 [GENEPIO:0100057]",
+                "90 - 99 [GENEPIO:0100058]",
+                "100+ [GENEPIO:0100059]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001394",
+            "type": "string",
+            "description": "The age category of the host at the time of sampling.",
+            "examples": [
+                "50 - 59 [GENEPIO:0100054]"
+            ],
+            "label": "Host Age Bin"
+        },
+        "host_gender": {
+            "Enums": [
+                "Female [NCIT:C46110]",
+                "Male [NCIT:C46109]",
+                "Non-binary Gender [GSSO:000132]",
+                "Transgender (assigned male at birth) [GSSO:004004]",
+                "Transgender (assigned female at birth) [GSSO:004005]",
+                "Undeclared [NCIT:C110959]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001395",
+            "type": "string",
+            "description": "The gender of the host at the time of sample collection.",
+            "examples": [
+                "Male [NCIT:C46109]"
+            ],
+            "label": "Host Gender"
         },
         "geo_loc_region": {
             "examples": [
@@ -1151,6 +1228,29 @@
             ],
             "classification": "Sequencing",
             "label": "Purpose of Sequencing"
+        },
+        "sequencing_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "number",
+            "description": "If the information is unknown or can not be shared, leave blank.",
+            "clasification": "Database Identifiers",
+            "label": "Sequencing Sample Id"
+        },
+        "passage_details": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": [
+                "string",
+                "number"
+            ],
+            "description": "If the information is unknown or can not be shared, leave blank.",
+            "clasification": "Database Identifiers",
+            "label": "Passage Details"
         },
         "purpose_of_sequencing_details": {
             "Enums": [

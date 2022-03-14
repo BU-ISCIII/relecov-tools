@@ -709,7 +709,7 @@
       "type": "string",
       "description": "The name and version of a particular protocol used for sampling.",
       "clasification": "Sample collection and processing",
-      "label": "ENA Sample ID"
+      "label": "Biological Sample Storage Condition"
     },
     "library_source": {
       "Enums": [
