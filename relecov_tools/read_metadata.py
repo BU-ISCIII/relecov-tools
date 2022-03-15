@@ -87,6 +87,23 @@ class RelecovMetadata:
             extra_metadata.append(row)
         return extra_metadata
 
+    def compare_sample_in_metadata(self, completed_metadata):
+        """Compare te samples defined in metadata file and the ones in the
+        sample file
+        """
+        not_found_samples = []
+        if not os.path.exists(self.sample_list_file):
+            return False
+        # get the smaples defined in json
+        with open(self.sample_list_file, "r") as fh:
+            samples = fh.read().split("\n")
+        for line_metadata in completed_metadata:
+            if line_metadata["sample_name"] not in samples:
+                not_found_samples.append(line_metadata["sample_name"])
+        if len(not_found_samples) > 0:
+            return not_found_samples
+        return True
+
     def request_information(external_url, request):
         """Get information from external database server using Rest API
 
@@ -150,8 +167,17 @@ class RelecovMetadata:
             metadata_values.append(sample_data_row)
         return metadata_values, errors
 
+    def write_json_fo_file(self, completed_metadata, file_name):
+        """Write metadata to json file"""
+        os.makedirs(self.output_folder, exist_ok=True)
+        json_file = os.path.join(self.output_folder, file_name)
+        with open(json_file, "w") as fh:
+            fh.write(json.dumps(completed_metadata))
+        return True
+
     def create_metadata_json(self):
         config_json = ConfigJson()
+        """
         schema_location = config_json.get_topic_data(
             "json_schemas", "phage_plus_schema"
         )
@@ -161,6 +187,7 @@ class RelecovMetadata:
         schema_json = self.read_json_file(schema_location_file)
         phage_plus_schema = relecov_tools.schema_json.PhagePlusSchema(schema_json)
         properties_in_schema = phage_plus_schema.get_schema_properties()
+        """
         metadata_mapping_json = config_json.get_configuration("mapping_metadata_json")
         meta_map_json_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", metadata_mapping_json
@@ -171,5 +198,13 @@ class RelecovMetadata:
         completed_metadata = self.add_extra_data(
             valid_metadata_rows, meta_map_json["Additional_fields"]
         )
-        # fake return data, just for litin
-        return completed_metadata, properties_in_schema
+        comp_result = self.compare_sample_in_metadata(completed_metadata)
+        if isinstance(comp_result, list):
+            missing_samples = ",".join(comp_result)
+            log.error("Missing samples %s", missing_samples)
+        elif comp_result:
+            log.info("Samples in metadata matches with the ones uploaded")
+        else:
+            log.error("There is missing samples in metadata and/or uploaded")
+        self.write_json_fo_file(completed_metadata, "completed_metadata.json")
+        return True
