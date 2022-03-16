@@ -148,8 +148,9 @@ class RelecovMetadata:
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
         # removing the None columns in excel heading row
-        heding_without_none = [i for i in ws_metadata_lab[1] if i.value]
-        heading = self.update_heading_to_json(heding_without_none, meta_map_json)
+        heading_without_none = [i for i in ws_metadata_lab[1] if i.value]
+        import pdb; pdb.set_trace()
+        heading = self.update_heading_to_json(heading_without_none, meta_map_json)
         metadata_values = []
         errors = {}
         for row in islice(ws_metadata_lab.values, 1, ws_metadata_lab.max_row):

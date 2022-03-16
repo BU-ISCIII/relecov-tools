@@ -12,6 +12,7 @@ import relecov_tools.utils
 import relecov_tools.read_metadata
 import relecov_tools.sftp
 import relecov_tools.create_xml
+import relecov_tools.validation_json
 
 log = logging.getLogger()
 
@@ -198,31 +199,18 @@ def read_metadata(metadata_file, sample_list_file, metadata_out):
 
 # validation
 @relecov_tools_cli.command(help_priority=4)
-@click.argument("pipeline", required=False, metavar="<pipeline name>")
-@click.option(
-    "-r", "--revision", help="Release/branch/SHA of the project to run (if remote)"
-)
-@click.option("-i", "--id", help="ID for web-gui launch parameter set")
-@click.option(
-    "-c",
-    "--command-only",
-    is_flag=True,
-    default=False,
-    help="Create Nextflow command with params (no params file)",
-)
-@click.option(
-    "-o",
-    "--params-out",
-    type=click.Path(),
-    default=os.path.join(os.getcwd(), "nf-params.json"),
-    help="Path to save run parameters file",
-)
-def validation(host, port, user, passwd):
-    """Download files located in sftp server."""
-    relecov_json = relecov_tools.validation_jsons.ValidationJson(
-        host, port, user, passwd
+@click.option("-j", "--json_file", help="Json file to validate")
+@click.option("-s", "--json_schema", help="Json schema")
+@click.option("-o", "--out_folder", help="Path to save validate json file")
+def validation(json_file, json_schema, out_folder):
+    """Validate json file against schema."""
+    validation_result = relecov_tools.validation_json.validate_json_vs_schema(
+        json_file, json_schema, out_folder
     )
-    relecov_json.open()
+    if validation_result is not True:
+        log.error("Some of the samples in json metadata were not validated")
+    else:
+        log.info("All data in json were validated")
 
 
 @click.option("-s", "--source_json", help="Where the validated json is")
