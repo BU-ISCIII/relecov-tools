@@ -212,6 +212,7 @@ def validation(json_file, json_schema, out_folder):
     else:
         log.info("All data in json were validated")
 
+#mapeo a ena 
 
 @click.option("-s", "--source_json", help="Where the validated json is")
 @click.option("-o", "--output_path", help="Output folder for the xml generated files")
