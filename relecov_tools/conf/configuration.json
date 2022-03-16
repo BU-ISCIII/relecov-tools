@@ -20,5 +20,9 @@
         "alias": "RELECOV",
         "TITLE": "Example project for ENA submission RELECOV",
         "DESCRIPTION": "This study was created as part of an ENA submissions example RELECOV"
+    },
+    "fixed_data": {
+        "tax_id": "2697049",
+        "scientific_name": "Severe acute respiratory syndrome coronavirus 2"
     }
 }
