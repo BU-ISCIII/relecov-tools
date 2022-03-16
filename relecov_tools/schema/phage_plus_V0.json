@@ -12,9 +12,7 @@
         "host_scientific_name",
         "host_disease",
         "sequencing_instrument_model",
-        "sequencing_instrument_platform",
-        "consensus_sequence_software_name",
-        "consensus_sequence_software_version"
+        "sequencing_instrument_platform"
     ],
     "type": "object",
     "properties": {
@@ -672,6 +670,23 @@
                 79
             ],
             "label": "Host Age"
+        },
+        "host_age_unit": {
+            "Enums": [
+                "months [UO:0000035]",
+                "years [UO:0000036]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001393",
+            "type": "string",
+            "description": "The units used to measure the host's age.",
+            "examples": [
+                "years [UO:0000036]"
+            ]
         },
         "host_age_bin": {
             "Enums": [
