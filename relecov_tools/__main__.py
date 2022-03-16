@@ -224,6 +224,7 @@ def validation(host, port, user, passwd):
     )
     relecov_json.open()
 
+#mapeo a ena 
 
 @click.option("-s", "--source_json", help="Where the validated json is")
 @click.option("-o", "--output_path", help="Output folder for the xml generated files")

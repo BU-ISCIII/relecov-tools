@@ -6,11 +6,23 @@
     },
     "mapping_metadata_json": "mapping_metadata_json_v01.json",
     "additional_metadata": "additional_metadata_v01.json",
-    "sftp_connection":{
+    "sftp_connection": {
         "sftp_server": "sftprelecov.isciii.es",
-        "sftp_port" : "50122"
+        "sftp_port": "50122"
     },
-    "storage_local_folder" : "/tmp/relecov",
+    "storage_local_folder": "/tmp/relecov",
     "tmp_folder_for_metadata": "/tmp/relecov/tmp",
-    "allowed_sample_extensions": ["fastq.gz", "fasta"]
+    "allowed_sample_extensions": [
+        "fastq.gz",
+        "fasta"
+    ],
+    "project_relecov_xml": {
+        "alias": "RELECOV",
+        "TITLE": "Example project for ENA submission RELECOV",
+        "DESCRIPTION": "This study was created as part of an ENA submissions example RELECOV"
+    },
+    "fixed_data": {
+        "tax_id": "2697049",
+        "scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+    }
 }
