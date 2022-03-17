@@ -87,24 +87,6 @@ class XmlCreation:
             a.write(os.path.join(self.output_path, "study", "project_relecov.xml"))
 
             # 1.1 Upload study info
-            """
-            import requests
-            from requests.structures import CaseInsensitiveDict
-
-            url = "https://reqbin.com/echo/post/json"
-
-            headers = CaseInsensitiveDict()
-            headers["Content-Type"] = "application/json"
-            headers["Authorization"] = "Basic bG9naW46cGFzc3dvcmQ="
-
-            data = '{"login":"my_login","password":"my_password"}'
-
-
-            resp = requests.post(url, headers=headers, data=data)
-
-            print(resp.status_code)
-            """
-
             #  2. From validated json to xml samples - submission.xml and samples.xml
 
         def xml_samples():
@@ -152,23 +134,16 @@ class XmlCreation:
             a.write(os.path.join(self.output_path, "samples", "samples_relecov.xml"))
 
             # 2.2 Upload samples info
-            """
-            import requests
-            from requests.structures import CaseInsensitiveDict
-
-            url = "https://reqbin.com/echo/post/json"
-
-            headers = CaseInsensitiveDict()
-            headers["Content-Type"] = "application/json"
-            headers["Authorization"] = "Basic bG9naW46cGFzc3dvcmQ="
-
-            data = '{"login":"my_login","password":"my_password"}'
-
-
-            resp = requests.post(url, headers=headers, data=data)
-
-            print(resp.status_code)
-            """
 
             # 3. From sftp upload runs (FASTQ files programmatic)- experiments.xmlm, runs.xml and submission.xml
             # 4. From sftp upload  sequences (FASTA files programmatic) - json using webin-cli-rest
+
+
+# Adaptation to ena_upload 
+with open('../example_data/ena_upload.json','r') as f:
+    data = j.loads(f.read())
+
+df_study = pd.DataFrame.from_dict(data["study"])
+df_samples = pd.DataFrame.from_dict(data["samples"])
+df_runs = pd.DataFrame.from_dict(data["runs"])
+df_experiments = pd.DataFrame.from_dict(data["experiments"])
