@@ -13,6 +13,7 @@ import relecov_tools.read_metadata
 import relecov_tools.sftp
 import relecov_tools.create_xml
 import relecov_tools.validation_json
+import relecov_tools.conversion_schema
 
 log = logging.getLogger()
 
@@ -169,7 +170,6 @@ def sftp(user, password, conf_file):
     "-m",
     "--metadata_file",
     type=click.Path(),
-    default=None,
     help="file containing metadata",
 )
 @click.option(
@@ -217,6 +217,24 @@ def validation(json_file, json_schema, out_folder):
         log.info("All data in json were validated")
 
 
+# mapping to ENA schema
+@relecov_tools_cli.command(help_priority=5)
+@click.option("-p", "--phage_plus_schema", help="File with the phage plus schema")
+@click.option("-j", "--json_data", help="File with the json data to convert")
+@click.option(
+    "-m",
+    "--mapped_schema",
+    type=click.Choice(["ENA", "GSAID", "other"], case_sensitive=True),
+    help="schema to be mapped")
+@click.option("-f", "--schema_file", help="file with the custom schema")
+@click.option("-o", "--output", help="File name and path to store the mapped json")
+def mapped_schema(phage_plus_schema, json_data, destination_schema, output):
+    """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
+    new_schema = relecov_tools.conversion_schema.MappingSchema(phage_plus_schema, json_data, destination_schema, output)
+    new_schema.map_to_ena_schema()
+
+
+@relecov_tools_cli.command(help_priority=6)
 @click.option("-s", "--source_json", help="Where the validated json is")
 @click.option("-o", "--output_path", help="Output folder for the xml generated files")
 @click.option("-a", "--action", help="ADD or MODIFY")
