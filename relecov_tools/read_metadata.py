@@ -84,6 +84,10 @@ class RelecovMetadata:
             row["geo_loc_latitude"], row["geo_loc_longitude"] = geo_loc_data[city]
             # update isolate qith the name of the sample
             row["isolate"] = row["sample_name"]
+            row["host_scientific_name"] = extra_data["host_scientific_name"][
+                row["host_common_name"]
+            ]
+            row["sequencing_instrument_platform"] = "To change"
             extra_metadata.append(row)
         return extra_metadata
 
@@ -120,7 +124,7 @@ class RelecovMetadata:
         """Get the geo_loc_latitude and geo_loc_longitude from state"""
         geolocator = Nominatim(user_agent="geoapiRelecov")
         loc = geolocator.geocode(state + "," + country)
-        return [loc.latitude, loc.longitude]
+        return [str(loc.latitude), str(loc.longitude)]
 
     def update_heading_to_json(self, heading, meta_map_json):
         """Change the heading values from the metadata file for the ones defined
@@ -128,10 +132,10 @@ class RelecovMetadata:
         """
         mapped_heading = []
         for cell in heading:
-            if cell.value in meta_map_json:
-                mapped_heading.append(meta_map_json[cell.value])
+            if cell in meta_map_json:
+                mapped_heading.append(meta_map_json[cell])
             else:
-                mapped_heading.append(cell.value)
+                mapped_heading.append(cell)
         return mapped_heading
 
     def read_json_file(self, j_file):
@@ -148,8 +152,8 @@ class RelecovMetadata:
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
         # removing the None columns in excel heading row
-        heding_without_none = [i for i in ws_metadata_lab[1] if i.value]
-        heading = self.update_heading_to_json(heding_without_none, meta_map_json)
+        heading_without_none = [i.value.strip() for i in ws_metadata_lab[1] if i.value]
+        heading = self.update_heading_to_json(heading_without_none, meta_map_json)
         metadata_values = []
         errors = {}
         for row in islice(ws_metadata_lab.values, 1, ws_metadata_lab.max_row):
@@ -157,13 +161,14 @@ class RelecovMetadata:
             for idx in range(len(heading)):
                 if "date" in heading[idx]:
                     try:
-                        sample_data_row[heading[idx]] = row[idx].strftime("%d/%m/%Y")
+                        sample_data_row[heading[idx]] = row[idx].strftime("%Y/%m/%d")
                     except AttributeError:
                         if row[0] not in errors:
                             errors[row[0]] = {}
                         errors[row[0]][heading[idx]] = "Invalid date format"
                 else:
-                    sample_data_row[heading[idx]] = row[idx]
+                    if heading[idx] == "host_age":
+                        sample_data_row[heading[idx]] = row[idx] if row[idx] else ""
             metadata_values.append(sample_data_row)
         return metadata_values, errors
 
