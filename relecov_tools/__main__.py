@@ -204,15 +204,15 @@ def read_metadata(metadata_file, sample_list_file, metadata_out):
 @click.option("-o", "--out_folder", help="Path to save validate json file")
 def validation(json_file, json_schema, out_folder):
     """Validate json file against schema."""
-    validation_result = relecov_tools.validation_json.validate_json_vs_schema(
+    validated_json_data, invalid_json, errors = relecov_tools.validation_json.validate_json_vs_schema(
         json_file, json_schema, out_folder
     )
-    if validation_result is not True:
+    if len(invalid_json) > 0:
         log.error("Some of the samples in json metadata were not validated")
     else:
         log.info("All data in json were validated")
 
-#mapeo a ena 
+#mapeo a ena
 
 @click.option("-s", "--source_json", help="Where the validated json is")
 @click.option("-o", "--output_path", help="Output folder for the xml generated files")
