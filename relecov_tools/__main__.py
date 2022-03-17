@@ -225,12 +225,15 @@ def validation(json_file, json_schema, out_folder):
     "-m",
     "--mapped_schema",
     type=click.Choice(["ENA", "GSAID", "other"], case_sensitive=True),
-    help="schema to be mapped")
+    help="schema to be mapped",
+)
 @click.option("-f", "--schema_file", help="file with the custom schema")
 @click.option("-o", "--output", help="File name and path to store the mapped json")
 def mapped_schema(phage_plus_schema, json_data, destination_schema, output):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
-    new_schema = relecov_tools.conversion_schema.MappingSchema(phage_plus_schema, json_data, destination_schema, output)
+    new_schema = relecov_tools.conversion_schema.MappingSchema(
+        phage_plus_schema, json_data, destination_schema, output
+    )
     new_schema.map_to_ena_schema()
 
 
