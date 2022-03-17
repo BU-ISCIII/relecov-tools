@@ -498,7 +498,7 @@
             "ontology": "GENEPIO_0000071",
             "type": "string",
             "description": "The model of the sequencing instrument used.",
-            "label": "Sequencing Platforms "
+            "label": "Sequencing Instrument Platform"
         },
         "submitting_lab_sequence_id": {
             "examples": [
