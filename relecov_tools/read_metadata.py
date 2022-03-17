@@ -84,10 +84,11 @@ class RelecovMetadata:
             row["geo_loc_latitude"], row["geo_loc_longitude"] = geo_loc_data[city]
             # update isolate qith the name of the sample
             row["isolate"] = row["sample_name"]
-            row["host_scientific_name"] = extra_data["host_scientific_name"][row["host_common_name"]]
+            row["host_scientific_name"] = extra_data["host_scientific_name"][
+                row["host_common_name"]
+            ]
             row["sequencing_instrument_platform"] = "To change"
             extra_metadata.append(row)
-            import pdb; pdb.set_trace()
         return extra_metadata
 
     def compare_sample_in_metadata(self, completed_metadata):
@@ -166,9 +167,8 @@ class RelecovMetadata:
                             errors[row[0]] = {}
                         errors[row[0]][heading[idx]] = "Invalid date format"
                 else:
-                    if heading[idx] == 'host_age':
-                        import pdb; pdb.set_trace()
-                    sample_data_row[heading[idx]] = row[idx] if row[idx] else ""
+                    if heading[idx] == "host_age":
+                        sample_data_row[heading[idx]] = row[idx] if row[idx] else ""
             metadata_values.append(sample_data_row)
         return metadata_values, errors
 

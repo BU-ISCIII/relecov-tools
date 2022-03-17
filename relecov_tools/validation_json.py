@@ -20,7 +20,9 @@ stderr = rich.console.Console(
 )
 
 
-def validate_json_vs_schema(json_data_file=None, json_schema_file=None, out_folder=None):
+def validate_json_vs_schema(
+    json_data_file=None, json_schema_file=None, out_folder=None
+):
     """Validate json file against the schema"""
     if json_data_file is None:
         json_data_file = relecov_tools.utils.prompt_path(
@@ -50,7 +52,6 @@ def validate_json_vs_schema(json_data_file=None, json_schema_file=None, out_fold
     errors = {}
     for item_row in json_data:
         try:
-            import pdb; pdb.set_trace()
             validate(instance=item_row, schema=json_schema)
             validated_json_data.append(item_row)
         except jsonschema.ValidationError as e:
