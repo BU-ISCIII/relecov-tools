@@ -2474,7 +2474,8 @@
             "type": "string",
             "description": "",
             "clasification": "Submission ENA",
-            "format": "Last Updated"
+            "format": "date", 
+            "label": "Last Updated"
         },
         "experiment_title": {
             "examples": [
