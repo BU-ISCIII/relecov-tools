@@ -85,7 +85,7 @@
             "Human": "Homo sapiens"
         },
         "tax_id": "",
-        "host_disease":"covid-19",
+        "host_disease":"COVID-19",
         "sequence_file_R1_fastq": "",
         "sequence_file_R2_fastq": "",
         "type" : "betacoronavirus"
