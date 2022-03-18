@@ -20,7 +20,7 @@
             "examples": [
                 "prov_rona_99"
             ],
-            "ontology": "0",
+            "ontology": "GENEPIO:0001123",
             "type": "string",
             "description": "The user-defined name for the sample.",
             "clasification": "Database Identifiers",
@@ -2474,7 +2474,7 @@
             "type": "string",
             "description": "",
             "clasification": "Submission ENA",
-            "format": "date", 
+            "format": "date",
             "label": "Last Updated"
         },
         "experiment_title": {
