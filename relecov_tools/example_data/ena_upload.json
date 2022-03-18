@@ -16,7 +16,7 @@
             "study_abstract_1",
             "study_abstract_2"
         ],
-        "pubmed_id": [None,
+        "pubmed_id": ["None",
             "pubmed_id_2"
         ]
     },
@@ -157,7 +157,7 @@
             "single"
         ],
         "insert_size": [
-            "250",None,None
+            "250","None","None"
         ],
         "library_construction_protocol": [
             "library_construction_protocol_1",
