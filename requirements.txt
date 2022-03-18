@@ -9,3 +9,4 @@ geopy==2.2.0
 paramiko==2.9.2
 pyyaml
 openpyxl
+ena-upload-cli
