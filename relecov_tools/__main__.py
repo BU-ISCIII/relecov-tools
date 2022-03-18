@@ -246,12 +246,12 @@ def mapped_schema(phage_plus_schema, json_data, destination_schema, schema_file,
     type=click.Choice(["ADD", "MODIFY"], case_sensitive=True),
     help="Select one of the options ADD or MODIFY"
     )
-def xml(source_json, output_path, action):
+def upload_to_ena(source_json, output_path, action):
     """Parsed data to create xml files to upload to ENA"""
-    xml_creation = relecov_tools.create_xml.XmlCreation(
+    upload_ena = relecov_tools.ena_upload.EnaUpload(
         source_json, output_path, action
     )
-    xml_creation.generate_xml()
+    upload_ena.generate_xml()
 
 
 if __name__ == "__main__":
