@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from collections import OrderedDict
+from datetime import datetime
 import json
 import jsonschema
 from jsonschema import Draft202012Validator
@@ -57,6 +58,10 @@ class MappingSchema:
             )
         else:
             self.json_data_file = json_data
+        if not os.path.isfile(self.json_data_file):
+            log.error("json data file %s does not exist ", self.json_data_file)
+            stderr.print(f"json data file {self.json_data_file} does not exist")
+            sys.exit(1)
 
         if destination_schema is None:
             self.destination_schema = relecov_tools.utils.prompt_selection(
@@ -109,7 +114,6 @@ class MappingSchema:
         for key, values in self.phage_plus_schema["properties"].items():
             self.ontology[values["ontology"]] = key
 
-
     def maping_schemas_based_on_geontology(self):
         """Return a dictionnary with the properties of the mapped_to_schema as key and
         properties of phagePlusSchema as value
@@ -122,24 +126,33 @@ class MappingSchema:
                 # There is no exact match on ontology. Search for the parent
                 # to be implemented later
                 stderr.print(f"[red] Ontology value {e} not in phage plus schema")
-        import pdb; pdb.set_trace()
         return mapped_dict
 
+    def mapping_json_data(self, mapping_schema_dict):
+        """Convert phage plus data to the requested schema"""
+        mapped_data = []
+        with open(self.json_data, "r") as fh:
+            json_data = json.load(fh)
+        for data in json_data:
+            map_sample_dict = OrderedDict()
+            for item, value in mapping_schema_dict.items:
+                map_sample_dict[item] = self.data[value]
+            mapped_data.append(map_sample_dict)
+        return mapped_data
 
-    def convert_json(schema):
-        pass
-
-    def get_data(self, field):
-        return self.data[field]
-
-    def map_sample_to_schema(self, mapped_structure):
-        mapped_sample_list = []
-        map_sample_dict = OrderedDict()
-        for item, value in mapped_structure.items:
-            mapped_sample_list[item] = self.data[value]
-        return map_sample_dict
+    def write_json_fo_file(self, mapped_json_data):
+        """Write metadata to json file"""
+        os.makedirs(self.output_folder, exist_ok=True)
+        time = datetime.now().strftime("%Y_%m_%d_%H_%M")
+        f_sub_name = os.path.basename(self.json_data).split(".")[0]
+        file_name = f_sub_name + "_" + time + "_ena_mapped.json"
+        json_file = os.path.join(self.output_folder, file_name)
+        with open(json_file, "w") as fh:
+            fh.write(json.dumps(mapped_json_data))
+        return True
 
     def map_to_data_to_new_schema(self):
-        """Mapping the json data from phage plus schema to the requested one """
+        """Mapping the json data from phage plus schema to the requested one"""
         mapping_schema_dict = self.maping_schemas_based_on_geontology()
-        mapped_dict = self.mapping_json_data(mapping_schema_dict)
+        mapped_json_data = self.mapping_json_data(mapping_schema_dict)
+        self.write_json_fo_file(mapped_json_data)

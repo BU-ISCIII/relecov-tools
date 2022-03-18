@@ -229,7 +229,9 @@ def validation(json_file, json_schema, out_folder):
 )
 @click.option("-f", "--schema_file", help="file with the custom schema")
 @click.option("-o", "--output", help="File name and path to store the mapped json")
-def mapped_schema(phage_plus_schema, json_data, destination_schema, schema_file, output):
+def mapped_schema(
+    phage_plus_schema, json_data, destination_schema, schema_file, output
+):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
     new_schema = relecov_tools.conversion_schema.MappingSchema(
         phage_plus_schema, json_data, destination_schema, schema_file, output
@@ -244,13 +246,11 @@ def mapped_schema(phage_plus_schema, json_data, destination_schema, schema_file,
     "-a",
     "--action",
     type=click.Choice(["ADD", "MODIFY"], case_sensitive=True),
-    help="Select one of the options ADD or MODIFY"
-    )
+    help="Select one of the options ADD or MODIFY",
+)
 def upload_to_ena(source_json, output_path, action):
     """Parsed data to create xml files to upload to ENA"""
-    upload_ena = relecov_tools.ena_upload.EnaUpload(
-        source_json, output_path, action
-    )
+    upload_ena = relecov_tools.ena_upload.EnaUpload(source_json, output_path, action)
     upload_ena.generate_xml()
 
 
