@@ -10,7 +10,7 @@ import rich.traceback
 
 import relecov_tools.utils
 import relecov_tools.read_metadata
-import relecov_tools.sftp
+import relecov_tools.sftp_handled
 import relecov_tools.create_xml
 import relecov_tools.validation_json
 import relecov_tools.conversion_schema
