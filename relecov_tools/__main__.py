@@ -240,7 +240,12 @@ def mapped_schema(phage_plus_schema, json_data, destination_schema, schema_file,
 @relecov_tools_cli.command(help_priority=6)
 @click.option("-s", "--source_json", help="Where the validated json is")
 @click.option("-o", "--output_path", help="Output folder for the xml generated files")
-@click.option("-a", "--action", help="ADD or MODIFY")
+@click.option(
+    "-a",
+    "--action",
+    type=click.Choice(["ADD", "MODIFY"], case_sensitive=True),
+    help="Select one of the options ADD or MODIFY"
+    )
 def xml(source_json, output_path, action):
     """Parsed data to create xml files to upload to ENA"""
     xml_creation = relecov_tools.create_xml.XmlCreation(
