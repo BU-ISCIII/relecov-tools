@@ -1,0 +1,166 @@
+{
+    "xml_files":["study","runs","samples","experiment"],
+    "study": {
+        "alias": "",
+        "title": "",
+        "study_type": "",
+        "study_abstract": "",
+        "pubmed_id": ""
+    },
+    "runs": {
+        "alias": [
+            "run_alias_1a",
+            "run_alias_1a",
+            "run_alias_3c"
+        ],
+        "experiment_alias": [
+            "experiment_alias_7a",
+            "experiment_alias_7a",
+            "experiment_alias_9c"
+        ],
+        "file_name": [
+            "ENA_TEST2.R1.fastq.gz",
+            "ENA_TEST2.R2.fastq.gz",
+            "ENA_TEST1.R1.fastq.gz"
+        ],
+        "file_type": [
+            "fastq",
+            "fastq",
+            "fastq"
+        ],
+        "file_checksum": [
+            "3e69af1f875fab020aed82f5edbc1f03",
+            "3e69af1f875fab020aed82f5edbc1f03",
+            "3e69af1f875fab020aed82f5edbc1f03"
+        ]
+    },
+    "samples": {
+        "alias": [
+            "sample_alias_4",
+            "sample_alias_5"
+        ],
+        "title": [
+            "sample_title_2",
+            "sample_title_3"
+        ],
+        "taxon_id": [
+            "2697049",
+            "2697049"
+        ],
+        "sample_description": [
+            "sample_description_1",
+            "sample_description_2"
+        ],
+        "collection date": [
+            "2020-10-11",
+            "2008-01-24"
+        ],
+        "geographic location (country and/or sea)": [
+            "Argentina",
+            "Belgium"
+        ],
+        "host common name": [
+            "host_common_name_1",
+            "host_common_name_2"
+        ],
+        "host subject id": [
+            "host_subject_id_1",
+            "host_subject_id_2"
+        ],
+        "host health state": [
+            "diseased",
+            "restricted access"
+        ],
+        "host sex": [
+            "male",
+            "female"
+        ],
+        "host scientific name": [
+            "host_scientific_name_1",
+            "host_scientific_name_2"
+        ],
+        "collector name": [
+            "collector_name_1",
+            "collector_name_2"
+        ],
+        "collecting institution": [
+            "collecting_institution_1",
+            "collecting_institution_2"
+        ],
+        "isolate": [
+            "isolate_1",
+            "isolate_2"
+        ]
+    },
+
+    "experiments": {
+        "alias": [
+            "experiment_alias_7a",
+            "experiment_alias_8b",
+            "experiment_alias_9c"
+        ],
+        "title": [
+            "experiment_title_1",
+            "experiment_title_2",
+            "experiment_title_3"
+        ],
+        "study_alias": [
+            "study_alias_4",
+            "study_alias_5",
+            "study_alias_5"
+        ],
+        "sample_alias": [
+            "study_alias_4",
+            "study_alias_5",
+            "study_alias_5"
+        ],
+        "design_description": [
+            "design_description_1",
+            "design_description_2",
+            "design_description_3"
+        ],
+        "library_name": [
+            "library_name_1",
+            "library_name_2",
+            "library_name_3"
+        ],
+        "library_strategy": [
+            "WGA",
+            "RNA-Seq",
+            "RNA-Seq"
+        ],
+        "library_source": [
+            "GENOMIC",
+            "TRANSCRIPTOMIC",
+            "TRANSCRIPTOMIC"
+        ],
+        "library_selection": [
+            "RANDOM",
+            "repeat fractionation",
+            "repeat fractionation"
+        ],
+        "library_layout": [
+            "paired",
+            "single",
+            "single"
+        ],
+        "insert_size": [
+            "250","None","None"
+        ],
+        "library_construction_protocol": [
+            "library_construction_protocol_1",
+            "library_construction_protocol_2",
+            "library_construction_protocol_2"
+        ],
+        "platform": [
+            "LS454",
+            "illumina",
+            "illumina"
+        ],
+        "instrument_model": [
+            "454 GS 20",
+            "Illumina Genome Analyzer",
+            "Illumina Genome Analyzer"
+        ]
+    }
+}

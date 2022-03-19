@@ -88,6 +88,8 @@
         "host_disease":"COVID-19",
         "sequence_file_R1_fastq": "",
         "sequence_file_R2_fastq": "",
-        "type" : "betacoronavirus"
+        "type" : "betacoronavirus",
+        "tax_id": "2697049",
+        "scientific_name": "Severe acute respiratory syndrome coronavirus 2"
     }
 }

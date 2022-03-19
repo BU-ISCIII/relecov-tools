@@ -11,7 +11,7 @@ import rich.traceback
 import relecov_tools.utils
 import relecov_tools.read_metadata
 import relecov_tools.sftp_handled
-import relecov_tools.create_xml
+import relecov_tools.ena_upload
 import relecov_tools.validation_json
 import relecov_tools.conversion_schema
 
@@ -158,7 +158,7 @@ def list(keywords, sort, json, show_archived):
     "--conf_file",
     help="Configuration file Create Nextflow command with params (no params file)",
 )
-def sftp(user, password, conf_file):
+def download_sftp(user, password, conf_file):
     """Download files located in sftp server."""
     sftp_connection = relecov_tools.sftp.SftpHandle(user, password, conf_file)
     sftp_connection.download_from_sftp()
@@ -240,18 +240,24 @@ def mapped_schema(
 
 
 @relecov_tools_cli.command(help_priority=6)
-@click.option("-s", "--source_json", help="Where the validated json is")
-@click.option("-o", "--output_path", help="Output folder for the xml generated files")
+@click.option("-u", "--user", help="User name for login to sftp server")
+@click.option("-p", "--password", help="password for the user to login")
+@click.option("-e", "--ena_json", help="Where the validated json is")
+@click.option("-s", "--study", help="study/project name to include in xml files")
 @click.option(
     "-a",
     "--action",
-    type=click.Choice(["ADD", "MODIFY"], case_sensitive=True),
-    help="Select one of the options ADD or MODIFY",
+    type=click.Choice(["add", "modify", "cancel", "release"], case_sensitive=False),
+    help="Select one of the available options",
 )
-def upload_to_ena(source_json, output_path, action):
+@click.option("--dev/--production", default=True)
+@click.option("-o", "--output_path", help="Output folder for the xml generated files")
+def upload_to_ena(user, password, ena_json, dev, study, action, output_path):
     """Parsed data to create xml files to upload to ENA"""
-    upload_ena = relecov_tools.ena_upload.EnaUpload(source_json, output_path, action)
-    upload_ena.generate_xml()
+    upload_ena = relecov_tools.ena_upload.EnaUpload(
+        user, password, ena_json, dev, study, action, output_path
+    )
+    upload_ena.upload_files_to_ena()
 
 
 if __name__ == "__main__":

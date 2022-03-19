@@ -4,8 +4,8 @@
         "ena_schema": "ena_schema.json",
         "gisaid_schema": "gisaid_schema.json"
     },
-    "mapping_metadata_json": "mapping_metadata_json_v01.json",
-    "additional_metadata": "additional_metadata_v01.json",
+    "mapping_metadata_json": "mapping_metadata_json.json",
+    "mapping_upload_ena": "mapping_ena_to_upload_ena.json",
     "sftp_connection": {
         "sftp_server": "sftprelecov.isciii.es",
         "sftp_port": "50122"
@@ -16,13 +16,9 @@
         "fastq.gz",
         "fasta"
     ],
-    "project_relecov_xml": {
+    "study": {
         "alias": "RELECOV",
-        "TITLE": "Example project for ENA submission RELECOV",
-        "DESCRIPTION": "This study was created as part of an ENA submissions example RELECOV"
-    },
-    "fixed_data": {
-        "tax_id": "2697049",
-        "scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+        "title": "Example project for ENA submission RELECOV",
+        "study_type": "This study was created as part of an ENA submissions example RELECOV"
     }
 }

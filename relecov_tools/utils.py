@@ -67,21 +67,9 @@ def prompt_password(msg):
 
 
 def prompt_tmp_dir_path():
-    stderr.print("Temporal directory destination to execute sercive")
+    stderr.print("Temporal directory destination to execute service")
     source = questionary.path("Source path").unsafe_ask()
     return source
-
-
-def prompt_source_path():
-    stderr.print("Directory containing files cd to transfer")
-    source = questionary.path("Source path").unsafe_ask()
-    return source
-
-
-def prompt_destination_path():
-    stderr.print("Directory to which the files will be transfered")
-    destination = questionary.path("Destination path").unsafe_ask()
-    return destination
 
 
 def prompt_selection(msg, choices):
