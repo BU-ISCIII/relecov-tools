@@ -57,7 +57,7 @@ class SftpHandle:
                 self.passwd = config["password"]
             except KeyError as e:
                 log.error("Invalid configuration file %s", e)
-                stderr.print("[red] Invalide configuration file " + e + "!")
+                stderr.print("[red] Invalide configuration file {e} !")
                 sys.exit(1)
         if user is None:
             self.user = relecov_tools.utils.text(msg="Enter the userid")
@@ -70,7 +70,7 @@ class SftpHandle:
         self.client = None
 
     def open_connection(self):
-        """Stablish sftp connection"""
+        """Establish sftp connection"""
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.client.connect(
@@ -146,7 +146,7 @@ class SftpHandle:
                 )
             except FileNotFoundError as e:
                 log.error("Unable to fetch file %s ", e)
-                result_data["unable_to_fetch"].append(file_list)
+                result_data["Unable_to_fetch"].append(file_list)
                 continue
             result_data["fetched_files"].append(os.path.basename(file_list))
 
@@ -225,10 +225,13 @@ class SftpHandle:
             sys.exit(1)
         os.chdir(self.storage_local_folder)
         if not self.open_connection():
+            log.error("Unable to establish connection towards sftp server")
+            stderr.print("[red] Unable to establish sftp connection")
             sys.exit(1)
 
         root_directory_list = self.list_folders(".")
         if not root_directory_list:
+            log.error("There is no folders under root directory")
             sys.exit(1)
         folders_to_download = {}
         # create_main_folders(root_directory_list)

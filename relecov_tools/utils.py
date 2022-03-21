@@ -20,6 +20,20 @@ def file_exists(file_to_check):
     return False
 
 
+def get_md5_from_local_folder(local_folder, file_list):
+    """Fetch the md5 values for each file in the file list"""
+    md5_results = {}
+    for file_name in file_list:
+        f_name, f_ext = os.path.splitext(file_name)
+        if f_ext.lowercase() == ".md5":
+            file_md5_path = os.path.join(local_folder, file_name)
+            # file_origin_path = os
+            fh = open(file_path, "r")
+            md5_results[file_name]
+        if file_exists(file_path):
+            pass
+
+
 def calculate_md5(files_list):
     """Calculate the md5 value for the list of files"""
     block_size = 2**20
