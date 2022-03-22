@@ -48,14 +48,14 @@ def calculate_md5(file_name):
 
 
 def write_md5_file(file_name, md5_value):
-    """Write md5 to file """
+    """Write md5 to file"""
     with open(file_name, "wb") as fh:
         fh.write(md5_value)
     return
 
 
 def create_md5_files(file_list):
-    """Create the md5 files and return their value """
+    """Create the md5 files and return their value"""
     md5_results = {}
     for file_name in file_list:
         f_name, f_ext = os.path.splitext(file_name)
