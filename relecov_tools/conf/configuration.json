@@ -10,6 +10,7 @@
         "sftp_server": "sftprelecov.isciii.es",
         "sftp_port": "50122"
     },
+    "abort_if_md5_mismatch": "False",
     "storage_local_folder": "/tmp/relecov",
     "tmp_folder_for_metadata": "/tmp/relecov/tmp",
     "allowed_sample_extensions": [
