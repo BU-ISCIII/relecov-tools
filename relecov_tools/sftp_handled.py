@@ -33,6 +33,7 @@ class SftpHandle:
             self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
             self.storage_local_folder = config_json.get_configuration("storage_local_folder")
             self.metadata_tmp_folder = config_json.get_configuration("tmp_folder_for_metadata")
+            self.abort_if_md5_mismatch = True if config_json.get_configuration("abort_if_md5_mismatch") == "True" else False
         else:
             if not os.path.isfile(conf_file):
                 log.error("Configuration file %s does not exists", conf_file)
@@ -181,57 +182,36 @@ class SftpHandle:
             # create the md5 file from the ones not upload to server
             req_create_md5 = [v for v in file_list if (v not in successful_files and not v.endswith("*.md5"))]
             sftp_md5.update(relecov_tools.utils.create_md5_files(req_create_md5))
-        # MD5 Checking
-        """
-        if required_retransmition:
-            if sftp_md5 == local_md5:
-                log.info(
-                    "Successful file download for files in folder %s",
-                    local_folder,
-                )
-                return True
-            else:
-                log.error(
-                    "MD5 does not match. Files could be corrupted atfolder %s",
-                    local_folder,
-                )
-                return False
-        else:
-            log.info(
-                "Md5 file was not created by lab. Copy the local md5 into folder %s",
-                local_folder,
-            )
-            file_name = os.path.join(local_folder, "generated_locally.md5")
-            relecov_tools.utils.save_md5(file_name, local_md5)
-            return True
-        """
+        return sftp_md5, required_retransmition
 
-    def create_tmp_files_with_metadata_info(self, local_folder, file_list):
+    def create_tmp_files_with_metadata_info(self, local_folder, file_list, md5_data):
         """Copy metadata file from folder and create a file with the sample
         names
         """
         out_folder = self.metadata_tmp_folder
         os.makedirs(out_folder, exist_ok=True)
-        metadata_file = "_".join(local_folder.split("/")[-2:]) + "_metadata_lab.xlsx"
-        shutil.copy(
-            os.path.join(local_folder, "Metadata_lab.xlsx"),
-            os.path.join(out_folder, metadata_file),
-        )
-        for ext in self.allowed_sample_ext:
-            sample_names = []
-            for file_name in os.listdir(local_folder):
-                if file_name.endswith("*." + ext):
-                    m = re.search(r"(.*)_R[1,2].*", file_name)
-                    if m.group(1) not in metadata_file:
-                        sample_names.append(m.group(1))
-            if len(sample_names) > 0:
-                break
-        if len(sample_names) == 0:
+        prefix_file_name = "_".join(local_folder.split("/")[-2:])
+        metadata_file = prefix_file_name + "_metadata_lab.xlsx"
+        sample_data_file = os.path.join(out_folder, prefix_file_name + "samples.csv")
+        try:
+            shutil.copy(
+                os.path.join(local_folder, "Metadata_lab.xlsx"),
+                os.path.join(out_folder, metadata_file),
+            )
+        except OSError as e:
+            log.error("Unable to copy Metadata file %s" , e)
+            stderr.print("[red] Unable to copy Metadata file")
+        sample_data = []
+        for file_data in md5_data:
+            if file_data[0].endswith(tuple(self.allowed_sample_ext)):
+                sample_data.append(",".join(file_data))
+        if len(sample_data) == 0:
             log.error("There is no samples in folder %s", local_folder)
-        file_with_samples = metadata_file.split("_")[0] + "samples.txt"
-        with open(file_with_samples, "w") as fh:
-            for sample_name in sample_names:
-                fh.write(sample_name + "\n")
+            stderr.print("[red] There is no samples for this loacal folder")
+        else:
+            with open(sample_data_file, "w") as fh:
+                for sample in sample_data:
+                    fh.write(sample + "\n")
         return
 
     def create_main_folders(self, root_directory_list):
@@ -267,22 +247,24 @@ class SftpHandle:
             log.info("Exiting download. There is no files on sftp to dowload")
             self.close_connection()
             sys.exit(0)
-        import pdb; pdb.set_trace()
+
         for folder, files in folders_to_download.items():
             # get the files in each folder
             result_data = self.get_files_from_sftp_folder(folder, files)
-            if not self.verify_md5_checksum(
-                result_data["local_folder"], result_data["fetched_files"]
-            ):
-                # retrasmision of files in folder
-                result_data = self.get_files_from_sftp_folder(folder, files)
-                if not self.verify_md5_checksum(
-                    result_data["local_folder"], result_data["fetched_files"]
-                ):
-                    log.error(
-                        "Second retransmision of files on folder %s",
-                        result_data["local_folder"],
-                    )
-            self.create_tmp_files_with_metadata_info(
+            md5_files, req_retransmition = self.verify_md5_checksum(
                 result_data["local_folder"], result_data["fetched_files"]
             )
+            # retrasmision of files in folder
+            if len(req_retransmition) > 0:
+                restransmition_data = self.get_files_from_sftp_folder(folder, req_retransmition)
+                md5_ret_files, corrupted = self.verify_md5_checksum(
+                    result_data["local_folder"], restransmition_data["fetched_files"])
+                md5_files.update(md5_ret_files)
+                if len(corrupted) > 0 and self.abort_if_md5_mismatch:
+                    log.error("Stopping because of corrupted files %s", corrupted)
+                    stderr.print(f"[red] Stop processing folder {folder} because of corrupted files {corrupted}")
+                    continue
+            self.create_tmp_files_with_metadata_info(
+                result_data["local_folder"], result_data["fetched_files"], md5_files
+            )
+        self.close_connection()
