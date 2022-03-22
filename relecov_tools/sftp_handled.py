@@ -27,11 +27,15 @@ class SftpHandle:
         self.allowed_sample_ext = config_json.get_configuration(
             "allowed_sample_extensions"
         )
+
         if conf_file is None:
             self.server = config_json.get_topic_data("sftp_connection", "sftp_server")
             self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
+            self.storage_local_folder = config_json.get_configuration("storage_local_folder")
+            self.metadata_tmp_folder = config_json.get_configuration("tmp_folder_for_metadata")
         else:
             if not os.path.isfile(conf_file):
+                log.error("Configuration file %s does not exists", conf_file)
                 stderr.print(
                     "[red] Configuration file does not exist. " + conf_file + "!"
                 )
@@ -138,6 +142,7 @@ class SftpHandle:
         os.makedirs(local_folder_path)
         log.info("created the folder to download files %s", local_folder_path)
         self.open_connection()
+        import pdb; pdb.set_trace()
         for file_list in files_list:
             try:
                 self.client.get(
@@ -149,18 +154,36 @@ class SftpHandle:
                 result_data["Unable_to_fetch"].append(file_list)
                 continue
             result_data["fetched_files"].append(os.path.basename(file_list))
-
+            import pdb; pdb.set_trace()
         return result_data
 
     def verify_md5_checksum(self, local_folder, file_list):
         """Get the md5 value from sftp match with the generated at local
         folder
         """
+        required_retransmition = []
+        successful_files = []
         # fetch the md5 file if exists
         sftp_md5 = relecov_tools.utils.get_md5_from_local_folder(local_folder)
-        local_md5 = relecov_tools.utils.calculate_md5(file_list)
+        if len(sftp_md5) > 0:
+            # check md5 checksum for eac file
+            for f_name, checksum in sftp_md5.items():
+                if checksum == relecov_tools.utils.calculate_md5(f_name):
+                    log.info(
+                        "Successful file download for %s in folder %s",
+                        f_name, local_folder,
+                    )
+                    successful_files.append(f_name)
+                else:
+                    required_retransmition.append(f_name)
+                    log.error("%s requested file re-sending", f_name)
+        if len(file_list) != len(sftp_md5)*2:
+            # create the md5 file from the ones not upload to server
+            req_create_md5 = [v for v in file_list if (v not in successful_files and not v.endswith("*.md5"))]
+            sftp_md5.update(relecov_tools.utils.create_md5_files(req_create_md5))
         # MD5 Checking
-        if sftp_md5:
+        """
+        if required_retransmition:
             if sftp_md5 == local_md5:
                 log.info(
                     "Successful file download for files in folder %s",
@@ -181,6 +204,7 @@ class SftpHandle:
             file_name = os.path.join(local_folder, "generated_locally.md5")
             relecov_tools.utils.save_md5(file_name, local_md5)
             return True
+        """
 
     def create_tmp_files_with_metadata_info(self, local_folder, file_list):
         """Copy metadata file from folder and create a file with the sample
@@ -243,7 +267,7 @@ class SftpHandle:
             log.info("Exiting download. There is no files on sftp to dowload")
             self.close_connection()
             sys.exit(0)
-
+        import pdb; pdb.set_trace()
         for folder, files in folders_to_download.items():
             # get the files in each folder
             result_data = self.get_files_from_sftp_folder(folder, files)
