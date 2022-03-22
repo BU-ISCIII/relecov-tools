@@ -31,6 +31,8 @@ jobs:
   black_lint:
     runs-on: ubuntu-latest
     steps:
+        - name: Install black in jupyter
+          run: pip install black[jupyter]
         - name: Setup
           uses: actions/checkout@v2
         - name: Check code lints with Black
