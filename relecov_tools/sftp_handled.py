@@ -2,7 +2,6 @@
 from datetime import datetime
 import logging
 import rich.console
-import re
 import paramiko
 import sys
 import os
@@ -151,9 +150,7 @@ class SftpHandle:
         os.makedirs(local_folder_path)
         log.info("created the folder to download files %s", local_folder_path)
         self.open_connection()
-        import pdb
 
-        pdb.set_trace()
         for file_list in files_list:
             try:
                 self.client.get(
@@ -165,9 +162,6 @@ class SftpHandle:
                 result_data["Unable_to_fetch"].append(file_list)
                 continue
             result_data["fetched_files"].append(os.path.basename(file_list))
-            import pdb
-
-            pdb.set_trace()
         return result_data
 
     def verify_md5_checksum(self, local_folder, file_list):
