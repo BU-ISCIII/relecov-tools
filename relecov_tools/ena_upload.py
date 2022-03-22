@@ -78,7 +78,7 @@ class EnaUpload:
             self.json_data = json.loads(fh.read())
 
     def convert_input_json_to_ena(self):
-        """Split the input ena json, in samples and runs json """
+        """Split the input ena json, in samples and runs json"""
         pass
 
     def create_structure_to_ena(self):
