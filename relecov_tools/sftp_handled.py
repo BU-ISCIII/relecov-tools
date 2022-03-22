@@ -31,9 +31,17 @@ class SftpHandle:
         if conf_file is None:
             self.server = config_json.get_topic_data("sftp_connection", "sftp_server")
             self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
-            self.storage_local_folder = config_json.get_configuration("storage_local_folder")
-            self.metadata_tmp_folder = config_json.get_configuration("tmp_folder_for_metadata")
-            self.abort_if_md5_mismatch = True if config_json.get_configuration("abort_if_md5_mismatch") == "True" else False
+            self.storage_local_folder = config_json.get_configuration(
+                "storage_local_folder"
+            )
+            self.metadata_tmp_folder = config_json.get_configuration(
+                "tmp_folder_for_metadata"
+            )
+            self.abort_if_md5_mismatch = (
+                True
+                if config_json.get_configuration("abort_if_md5_mismatch") == "True"
+                else False
+            )
         else:
             if not os.path.isfile(conf_file):
                 log.error("Configuration file %s does not exists", conf_file)
@@ -143,7 +151,9 @@ class SftpHandle:
         os.makedirs(local_folder_path)
         log.info("created the folder to download files %s", local_folder_path)
         self.open_connection()
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         for file_list in files_list:
             try:
                 self.client.get(
@@ -155,7 +165,9 @@ class SftpHandle:
                 result_data["Unable_to_fetch"].append(file_list)
                 continue
             result_data["fetched_files"].append(os.path.basename(file_list))
-            import pdb; pdb.set_trace()
+            import pdb
+
+            pdb.set_trace()
         return result_data
 
     def verify_md5_checksum(self, local_folder, file_list):
@@ -172,15 +184,20 @@ class SftpHandle:
                 if checksum == relecov_tools.utils.calculate_md5(f_name):
                     log.info(
                         "Successful file download for %s in folder %s",
-                        f_name, local_folder,
+                        f_name,
+                        local_folder,
                     )
                     successful_files.append(f_name)
                 else:
                     required_retransmition.append(f_name)
                     log.error("%s requested file re-sending", f_name)
-        if len(file_list) != len(sftp_md5)*2:
+        if len(file_list) != len(sftp_md5) * 2:
             # create the md5 file from the ones not upload to server
-            req_create_md5 = [v for v in file_list if (v not in successful_files and not v.endswith("*.md5"))]
+            req_create_md5 = [
+                v
+                for v in file_list
+                if (v not in successful_files and not v.endswith("*.md5"))
+            ]
             sftp_md5.update(relecov_tools.utils.create_md5_files(req_create_md5))
         return sftp_md5, required_retransmition
 
@@ -199,7 +216,7 @@ class SftpHandle:
                 os.path.join(out_folder, metadata_file),
             )
         except OSError as e:
-            log.error("Unable to copy Metadata file %s" , e)
+            log.error("Unable to copy Metadata file %s", e)
             stderr.print("[red] Unable to copy Metadata file")
         sample_data = []
         for file_data in md5_data:
@@ -256,13 +273,18 @@ class SftpHandle:
             )
             # retrasmision of files in folder
             if len(req_retransmition) > 0:
-                restransmition_data = self.get_files_from_sftp_folder(folder, req_retransmition)
+                restransmition_data = self.get_files_from_sftp_folder(
+                    folder, req_retransmition
+                )
                 md5_ret_files, corrupted = self.verify_md5_checksum(
-                    result_data["local_folder"], restransmition_data["fetched_files"])
+                    result_data["local_folder"], restransmition_data["fetched_files"]
+                )
                 md5_files.update(md5_ret_files)
                 if len(corrupted) > 0 and self.abort_if_md5_mismatch:
                     log.error("Stopping because of corrupted files %s", corrupted)
-                    stderr.print(f"[red] Stop processing folder {folder} because of corrupted files {corrupted}")
+                    stderr.print(
+                        f"[red] Stop processing folder {folder} because of corrupted files {corrupted}"
+                    )
                     continue
             self.create_tmp_files_with_metadata_info(
                 result_data["local_folder"], result_data["fetched_files"], md5_files
