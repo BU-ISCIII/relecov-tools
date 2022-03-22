@@ -1179,6 +1179,13 @@
         "CanCOGeN Sampling Strategy 1.0"
       ]
     },
+    "treatment": {
+      "ontology": "OGMS:0000090",
+      "type": "string",
+      "description": "Include drug name, dosage",
+      "examples": [],
+      "label": "Treatment"
+    },
     "prior_sars_cov_2_antiviral_treatment_date": {
       "examples": [
         "28/01/2021"
@@ -3524,7 +3531,7 @@
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
-      "ontology": "GENEPIO:0001198",
+      "ontology": "NCIT_C146997",
       "type": "string",
       "description": "The reason that the sample was collected.",
       "examples": [

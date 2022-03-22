@@ -49,11 +49,11 @@
             "examples": [
                 ""
             ],
-            "ontology": "0",
+            "ontology": "NCIT:C54269",
             "type": "string",
             "description": "",
             "clasification": "enter your GISAID-Username",
-            "label": "GISAID Username"
+            "label": "GISAID Id"
         },
         "originating_lab": {
             "examples": [
