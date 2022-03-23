@@ -33,5 +33,7 @@ jobs:
     steps:
         - name: Setup
           uses: actions/checkout@v2
+        - name: Install black in jupyter
+          run: pip install black[jupyter]
         - name: Check code lints with Black
           uses: psf/black@stable

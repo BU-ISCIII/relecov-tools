@@ -160,7 +160,7 @@ def list(keywords, sort, json, show_archived):
 )
 def download_sftp(user, password, conf_file):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp.SftpHandle(user, password, conf_file)
+    sftp_connection = relecov_tools.sftp_handled.SftpHandle(user, password, conf_file)
     sftp_connection.download_from_sftp()
 
 

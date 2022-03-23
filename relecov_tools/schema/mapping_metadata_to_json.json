@@ -84,12 +84,17 @@
         "host_scientific_name": {
             "Human": "Homo sapiens"
         },
-        "tax_id": "",
         "host_disease":"COVID-19",
         "sequence_file_R1_fastq": "",
         "sequence_file_R2_fastq": "",
         "type" : "betacoronavirus",
         "tax_id": "2697049",
-        "scientific_name": "Severe acute respiratory syndrome coronavirus 2"
+        "scientific_name": "Severe acute respiratory syndrome coronavirus 2",
+        "study_alias": "",
+        "experiment_alias": "",
+        "run_alias": "",
+        "study_title": "",
+        "experiment_title": "",
+
     }
 }
