@@ -1199,12 +1199,13 @@
       "clasification": "Submission ENA",
       "label": "Nominal sdev"
     },
-    "first_created": {
+    "first_created_date": {
       "examples": [
         "e.g 2020-08-07"
       ],
       "ontology": "NCIT_C164483",
       "type": "string",
+      "format": "date",
       "description": "",
       "clasification": "Submission ENA",
       "label": "First created date"
