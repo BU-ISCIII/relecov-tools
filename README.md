@@ -6,10 +6,10 @@ A Python package with helper tools for the relecov project.
 
 ## Table of contents
 
-* [ installation][*installation]
+* [Install](#installation)
+* [Usage](#usage)
 
-
-## Installation
+## Install
 
 
 
