@@ -174,10 +174,10 @@ class SftpHandle:
         sftp_md5 = relecov_tools.utils.get_md5_from_local_folder(local_folder)
         if len(sftp_md5) > 0:
             # check md5 checksum for eac file
-            for f_name, checksum in sftp_md5.items():
+            for f_name, values in sftp_md5.items():
                 f_path_name = os.path.join(local_folder, f_name)
-                import pdb; pdb.set_trace()
-                if checksum == relecov_tools.utils.calculate_md5(f_path_name):
+                # Checksum value is stored in the index 1
+                if values[1] == relecov_tools.utils.calculate_md5(f_path_name):
                     log.info(
                         "Successful file download for %s in folder %s",
                         f_name,
@@ -187,14 +187,17 @@ class SftpHandle:
                 else:
                     required_retransmition.append(f_name)
                     log.error("%s requested file re-sending", f_name)
-        if len(file_list) != len(sftp_md5) * 2:
+
+        if len(set(file_list)) != len(sftp_md5) * 2:
             # create the md5 file from the ones not upload to server
             req_create_md5 = [
                 v
                 for v in file_list
                 if (v not in successful_files and not v.endswith("*.md5"))
             ]
-            sftp_md5.update(relecov_tools.utils.create_md5_files(local_folder, req_create_md5))
+            sftp_md5.update(
+                relecov_tools.utils.create_md5_files(local_folder, req_create_md5)
+            )
         return sftp_md5, required_retransmition
 
     def create_tmp_files_with_metadata_info(self, local_folder, file_list, md5_data):
@@ -206,7 +209,6 @@ class SftpHandle:
         prefix_file_name = "_".join(local_folder.split("/")[-2:])
         metadata_file = prefix_file_name + "_metadata_lab.xlsx"
         sample_data_file = os.path.join(out_folder, prefix_file_name + "samples.csv")
-        import pdb; pdb.set_trace()
         try:
             shutil.copy(
                 os.path.join(local_folder, "Metadata_lab.xlsx"),
@@ -216,13 +218,13 @@ class SftpHandle:
             log.error("Unable to copy Metadata file %s", e)
             stderr.print("[red] Unable to copy Metadata file")
         sample_data = []
-        import pdb; pdb.set_trace()
-        for file_data in md5_data:
-            if file_data[0].endswith(tuple(self.allowed_sample_ext)):
-                sample_data.append(",".join(file_data))
+
+        for key, values in md5_data.items():
+            if key.endswith(tuple(self.allowed_sample_ext)):
+                sample_data.append(key + "," + ",".join(values))
         if len(sample_data) == 0:
             log.error("There is no samples in folder %s", local_folder)
-            stderr.print("[red] There is no samples for this loacal folder")
+            stderr.print("[red] There is no samples for this local folder")
         else:
             with open(sample_data_file, "w") as fh:
                 for sample in sample_data:
@@ -284,8 +286,8 @@ class SftpHandle:
                         f"[red] Stop processing folder {folder} because of corrupted files {corrupted}"
                     )
                     continue
-            import pdb; pdb.set_trace()
             self.create_tmp_files_with_metadata_info(
                 result_data["local_folder"], result_data["fetched_files"], md5_files
             )
         self.close_connection()
+        return
