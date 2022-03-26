@@ -239,7 +239,7 @@ class SftpHandle:
         return True
 
     def delete_remote_files(self, folder, files):
-        """Delete files from remote server """
+        """Delete files from remote server"""
         self.open_connection()
         for file in files:
             try:
