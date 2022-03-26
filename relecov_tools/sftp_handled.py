@@ -238,6 +238,17 @@ class SftpHandle:
             os.makedirs(full_folder, exist_ok=True)
         return True
 
+    def delete_remote_files(self, folder, files):
+        """Delete files from remote server"""
+        self.open_connection()
+        for file in files:
+            try:
+                self.client.remove(file)
+                log.info("%s Deleted from remote server", file)
+            except FileNotFoundError:
+                continue
+        return
+
     def download_from_sftp(self):
         try:
             os.makedirs(self.storage_local_folder, exist_ok=True)
@@ -289,5 +300,6 @@ class SftpHandle:
             self.create_tmp_files_with_metadata_info(
                 result_data["local_folder"], result_data["fetched_files"], md5_files
             )
+            self.delete_remote_files(folder, files)
         self.close_connection()
         return
