@@ -48,6 +48,8 @@
     "Author Submitter": "author_submitter",
     "Authors": "authors",
     "Additional_fields": {
+        "geo_loc_country" : "",
+        "geo_loc_state": "",
         "geo_loc_latitude": "",
         "geo_loc_longitude": "",
         "organism": "sars_cov_2",
@@ -66,6 +68,7 @@
         "run_alias": "",
         "study_title": "",
         "experiment_title": "",
+        "sequencing_instrument_platform": ""
 
     }
 }
