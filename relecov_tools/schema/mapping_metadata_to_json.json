@@ -13,7 +13,7 @@
     "Sample Collection Date": "sample_collection_date",
     "Sample Received Date": "sample_received_date",
     "Purpose of sampling": "purpose_of_sampling",
-    "Biological Sample Storage Condition": "XXXXXXX",
+    "Biological Sample Storage Condition": "sample_storage_conditions",
     "Specimen source": "anatomical_material",
     "Anatomical Structure": "XXXXXXXXXXXXXXX",
     "Environmental Material": "environmental_material",
