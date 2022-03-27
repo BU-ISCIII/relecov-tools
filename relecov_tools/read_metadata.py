@@ -152,11 +152,11 @@ class RelecovMetadata:
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
         # removing the None columns in excel heading row
-        heading_without_none = [i.value.strip() for i in ws_metadata_lab[1] if i.value]
+        heading_without_none = [i.value.strip() for i in ws_metadata_lab[4] if i.value]
         heading = self.update_heading_to_json(heading_without_none, meta_map_json)
         metadata_values = []
         errors = {}
-        for row in islice(ws_metadata_lab.values, 1, ws_metadata_lab.max_row):
+        for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             sample_data_row = {}
             for idx in range(len(heading)):
                 if "date" in heading[idx]:
@@ -167,9 +167,11 @@ class RelecovMetadata:
                             errors[row[0]] = {}
                         errors[row[0]][heading[idx]] = "Invalid date format"
                 else:
-                    if heading[idx] == "host_age":
-                        sample_data_row[heading[idx]] = row[idx] if row[idx] else ""
+                    # if heading[idx] == "host_age":
+                    #     import pdb; pdb.set_trace()
+                    sample_data_row[heading[idx]] = row[idx] if row[idx] else ""
             metadata_values.append(sample_data_row)
+        import pdb; pdb.set_trace()
         return metadata_values, errors
 
     def write_json_fo_file(self, completed_metadata, file_name):
@@ -200,6 +202,7 @@ class RelecovMetadata:
         meta_map_json = self.read_json_file(meta_map_json_file)
 
         valid_metadata_rows, errors = self.read_metadata_file(meta_map_json)
+
         completed_metadata = self.add_extra_data(
             valid_metadata_rows, meta_map_json["Additional_fields"]
         )
