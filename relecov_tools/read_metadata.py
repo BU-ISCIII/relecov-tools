@@ -62,78 +62,79 @@ class RelecovMetadata:
         for cell in ws_metadata_lab[1]:
             heading.append(cell.value)
 
-    def validate_metadata_sample(row_sample):
-        """Validate sample information"""
+    def read_json_file(self, j_file):
+        """Read json file."""
+        with open(j_file, "r") as fh:
+            data = json.load(fh)
+        return data
 
-    def add_extra_data(self, metadata, extra_data):
+    def get_laboratory_data(self, lab_json, geo_loc_json, lab_name):
+        """Fetch the laboratory location  and return a dictionary"""
+        data = {}
+        for lab in lab_json:
+            if lab_name == lab["collecting_institution"]:
+                for key, value in lab_name.items():
+                    data[key] = value
+                break
+        for city in geo_loc_json:
+            if city["geo_loc_city"] == data["geo_loc_city"]:
+                data[city["geo_loc_city"]] = {}
+                data[city["geo_loc_city"]]["geo_loc_latitude"] = city[
+                    "geo_loc_latitude"
+                ]
+                data[city["geo_loc_city"]]["geo_loc_longitude"] = city[
+                    "geo_loc_longitude"
+                ]
+                break
+        return data
+
+    def add_extra_data(self, metadata, extra_data, lab_json_file, geo_loc_file):
         """Add the additional information that must be included in final metadata
         metadata Origin metadata
         extra_data  additional data to be included
         result_metadata    final metadata after adding the additional data
         """
-        geo_loc_data = {}
+        lab_data = {}
         extra_metadata = []
-        fh_lab = open(
-            os.path.join(os.path.dirname(__file__), "conf", "laboratory_address.json")
-        )
-        laboratory_json = json.load(fh_lab)
-        fh_lab.close()
-        fh_geo = open(
-            os.path.join(os.path.dirname(__file__), "conf", "geo_loc_cities.json")
-        )
-        geo_loc_json = json.load(fh_geo)
-        fh_geo.close()
-        samples_data = {}
-        fh_samples = open(self.sample_list_file, "r")
-        for line in fh_samples.readlines():
-            line_split = line.strip().split(",")
-            samples_data[line_split[0]] = [line_split[1], line_split[2]]
+        lab_json = self.read_json_file(lab_json_file)
+        geo_loc_json = self.read_json_file(geo_loc_file)
+        samples_json = self.read_json_file(self.sample_list_file)
+
         for row in metadata:
             for new_field, value in extra_data.items():
                 row[new_field] = value
-            # from collecting_institution find city, and geo location latitude and longitude
-            for lab in laboratory_json:
-                if row["collecting_institution"] == lab["collecting_institution"]:
-                    for key, value in lab.items():
-                        row[key] = value
-                    if row["geo_loc_city"] in geo_loc_data:
-                        row["geo_loc_latitude"] = geo_loc_data[row["geo_loc_city"]][
-                            "geo_loc_latitude"
-                        ]
-                        row["geo_loc_longitude"] = geo_loc_data[row["geo_loc_city"]][
-                            "geo_loc_longitude"
-                        ]
-                        break
-                    else:
-                        for city in geo_loc_json:
-                            if city["geo_loc_city"] == row["geo_loc_city"]:
-                                geo_loc_data[city["geo_loc_city"]] = {}
-                                geo_loc_data[city["geo_loc_city"]][
-                                    "geo_loc_latitude"
-                                ] = city["geo_loc_latitude"]
-                                geo_loc_data[city["geo_loc_city"]][
-                                    "geo_loc_longitude"
-                                ] = city["geo_loc_longitude"]
-                                row["geo_loc_latitude"] = geo_loc_data[
-                                    city["geo_loc_city"]
-                                ]["geo_loc_latitude"]
-                                row["geo_loc_longitude"] = geo_loc_data[
-                                    city["geo_loc_city"]
-                                ]["geo_loc_longitude"]
-                                break
+            if row["collecting_institution"] not in lab_data:
+                # from collecting_institution find city, and geo location latitude and longitude
+                l_data = self.get_laboratory_data(
+                    lab_json, geo_loc_json, row["collecting_institution"]
+                )
+                row.update(l_data)
+                lab_data[row["collecting_institution"]] = l_data
+            else:
+                row.update(lab_data[row["collecting_institution"]])
+
             try:
-                row["sequence_file_R1_fastq"] = samples_data[
-                    row["collecting_lab_sample_id"]
-                ]
+                s_data = samples_json[row["collecting_lab_sample_id"]]
+                for key, values in s_data.items():
+                    if key.endswith("_R1_fastq.gz"):
+                        row["sequence_file_R1_fastq"] = key
+                        row["r1_fastq_filepath"] = values["local_folder"]
+                        row["fastq_md5"] = values["md5"]
+                    elif key.endswith("_R2_fastq.gz"):
+                        row["sequence_file_R2_fastq"] = key
+                        row["r2_fastq_filepath"] = values["local_folder"]
+                        # # WARNING:  no md5 value for R2 is deficned on schena
+                        # row["fastq_md5"] = values["md5"]
+                    elif key.endswith(".fasta"):
+                        file_path = os.path.join(values["local_folder"], key)
+                        row["consensus_sequence_filepath"] = file_path
+                        # # WARNING:  no md5 value for fasta is deficned on schena
+                        # row["fastq_md5"] = values["md5"]
             except KeyError:
-                pass
-            """
-            country = row["geo_loc_country"]
-            city = row["geo_loc_state"]
-            if city not in geo_loc_data:
-                geo_loc_data[city] = self.get_geo_location_data(city, country)
-            row["geo_loc_latitude"], row["geo_loc_longitude"] = geo_loc_data[city]
-            """
+                log.error(
+                    "There is no files for sample %s", row["collecting_lab_sample_id"]
+                )
+
             # update isolate qith the name of the sample
             row["isolate"] = row["collecting_lab_sample_id"]
             row["host_scientific_name"] = extra_data["host_scientific_name"][
@@ -190,12 +191,6 @@ class RelecovMetadata:
                 mapped_heading.append(cell)
         return mapped_heading
 
-    def read_json_file(self, j_file):
-        """Read json file."""
-        with open(j_file, "r") as fh:
-            data = json.load(fh)
-        return data
-
     def read_metadata_file(self, meta_map_json):
         """Read the input metadata file, mapping the metadata heading with
         the values used in json. Convert the date colunms value to the
@@ -248,6 +243,14 @@ class RelecovMetadata:
         phage_plus_schema = relecov_tools.schema_json.PhagePlusSchema(schema_json)
         properties_in_schema = phage_plus_schema.get_schema_properties()
         """
+        geo_loc_json = config_json.get_configuration("geo_location_data")
+        geo_loc_file = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "conf", geo_loc_json
+        )
+        lab_json = config_json.get_configuration("laboratory_data")
+        lab_json_file = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "conf", lab_json
+        )
         metadata_mapping_json = config_json.get_configuration("mapping_metadata_json")
         meta_map_json_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", metadata_mapping_json
@@ -257,7 +260,10 @@ class RelecovMetadata:
         valid_metadata_rows, errors = self.read_metadata_file(meta_map_json)
 
         completed_metadata = self.add_extra_data(
-            valid_metadata_rows, meta_map_json["Additional_fields"]
+            valid_metadata_rows,
+            meta_map_json["Additional_fields"],
+            lab_json_file,
+            geo_loc_file,
         )
         comp_result = self.compare_sample_in_metadata(completed_metadata)
         if isinstance(comp_result, list):
