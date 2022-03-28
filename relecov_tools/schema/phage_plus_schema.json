@@ -1,7 +1,7 @@
 {
     "schema": "PHAGE_PLUS",
     "required": [
-        "sample_name",
+        "collecting_lab_sample_id",
         "collecting_institution",
         "submitting_institution",
         "sample_collection_date",
@@ -16,7 +16,7 @@
     ],
     "type": "object",
     "properties": {
-        "sample_name": {
+        "collecting_lab_sample_id": {
             "examples": [
                 "prov_rona_99"
             ],
@@ -24,7 +24,7 @@
             "type": "string",
             "description": "The user-defined name for the sample.",
             "clasification": "Database Identifiers",
-            "label": "Collecting Sample id"
+            "label": "Sample ID given by originating laboratory"
         },
         "collecting_institution": {
             "examples": [
@@ -801,7 +801,7 @@
                 "Blood [UBERON:0000178]"
             ],
             "classification": "Sample collection and processing",
-            "label": "Organism Substance"
+            "label": "Specimen source"
         },
         "anatomical_part": {
             "Enums": [
@@ -1248,11 +1248,11 @@
             "examples": [
                 ""
             ],
-            "ontology": "0",
+            "ontology": "GENEPIO:0000079",
             "type": "number",
             "description": "If the information is unknown or can not be shared, leave blank.",
             "clasification": "Database Identifiers",
-            "label": "Sequencing Sample Id"
+            "label": "Sample ID given for sequencing"
         },
         "passage_details": {
             "examples": [
