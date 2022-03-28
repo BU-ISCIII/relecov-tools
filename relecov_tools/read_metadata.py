@@ -73,17 +73,61 @@ class RelecovMetadata:
         """
         geo_loc_data = {}
         extra_metadata = []
+        fh_lab = open(
+            os.path.join(os.path.dirname(__file__), "conf", "laboratory_address.json")
+        )
+
+        laboratory_json = json.load(fh_lab)
+        fh_lab.close()
+        fh_geo = open(
+            os.path.join(os.path.dirname(__file__), "conf", "geo_loc_cities.json")
+        )
+
+        geo_loc_json = json.load(fh_geo)
+        fh_geo.close()
+
         for row in metadata:
             for new_field, value in extra_data.items():
                 row[new_field] = value
-            # get the geo location latitude and longitude
+            # from collecting_institution find city, and geo location latitude and longitude
+            for lab in laboratory_json:
+                if row["collecting_institution"] == lab["collecting_institution"]:
+                    for key, value in lab.items():
+                        row[key] = value
+                    if row["geo_loc_city"] in geo_loc_data:
+                        row["geo_loc_latitude"] = geo_loc_data[row["geo_loc_city"]][
+                            "geo_loc_latitude"
+                        ]
+                        row["geo_loc_longitude"] = geo_loc_data[row["geo_loc_city"]][
+                            "geo_loc_longitude"
+                        ]
+                        break
+                    else:
+                        for city in geo_loc_json:
+                            if city["geo_loc_city"] == row["geo_loc_city"]:
+                                geo_loc_data[city["geo_loc_city"]] = {}
+                                geo_loc_data[city["geo_loc_city"]][
+                                    "geo_loc_latitude"
+                                ] = city["geo_loc_latitude"]
+                                geo_loc_data[city["geo_loc_city"]][
+                                    "geo_loc_longitude"
+                                ] = city["geo_loc_longitude"]
+                                row["geo_loc_latitude"] = geo_loc_data[
+                                    city["geo_loc_city"]
+                                ]["geo_loc_latitude"]
+                                row["geo_loc_longitude"] = geo_loc_data[
+                                    city["geo_loc_city"]
+                                ]["geo_loc_longitude"]
+                                break
+            """
             country = row["geo_loc_country"]
             city = row["geo_loc_state"]
             if city not in geo_loc_data:
                 geo_loc_data[city] = self.get_geo_location_data(city, country)
             row["geo_loc_latitude"], row["geo_loc_longitude"] = geo_loc_data[city]
+            """
             # update isolate qith the name of the sample
-            row["isolate"] = row["sample_name"]
+            row["isolate"] = row["collecting_lab_sample_id"]
             row["host_scientific_name"] = extra_data["host_scientific_name"][
                 row["host_common_name"]
             ]
@@ -92,7 +136,7 @@ class RelecovMetadata:
         return extra_metadata
 
     def compare_sample_in_metadata(self, completed_metadata):
-        """Compare te samples defined in metadata file and the ones in the
+        """Compare the samples defined in metadata file and the ones in the
         sample file
         """
         not_found_samples = []
@@ -102,8 +146,8 @@ class RelecovMetadata:
         with open(self.sample_list_file, "r") as fh:
             samples = fh.read().split("\n")
         for line_metadata in completed_metadata:
-            if line_metadata["sample_name"] not in samples:
-                not_found_samples.append(line_metadata["sample_name"])
+            if line_metadata["collecting_institution"] not in samples:
+                not_found_samples.append(line_metadata["collecting_institution"])
         if len(not_found_samples) > 0:
             return not_found_samples
         return True
@@ -167,19 +211,20 @@ class RelecovMetadata:
                             errors[row[0]] = {}
                         errors[row[0]][heading[idx]] = "Invalid date format"
                 else:
-                    # if heading[idx] == "host_age":
-                    #     import pdb; pdb.set_trace()
                     sample_data_row[heading[idx]] = row[idx] if row[idx] else ""
             metadata_values.append(sample_data_row)
-        import pdb; pdb.set_trace()
         return metadata_values, errors
 
     def write_json_fo_file(self, completed_metadata, file_name):
         """Write metadata to json file"""
         os.makedirs(self.output_folder, exist_ok=True)
         json_file = os.path.join(self.output_folder, file_name)
-        with open(json_file, "w") as fh:
-            fh.write(json.dumps(completed_metadata))
+        with open(json_file, "w", encoding="utf-8") as fh:
+            fh.write(
+                json.dumps(
+                    completed_metadata, indent=4, sort_keys=True, ensure_ascii=False
+                )
+            )
         return True
 
     def create_metadata_json(self):
