@@ -122,7 +122,9 @@ class RelecovMetadata:
                                 ]["geo_loc_longitude"]
                                 break
             try:
-                row["sequence_file_R1_fastq"] = samples_data[row["collecting_lab_sample_id"]]
+                row["sequence_file_R1_fastq"] = samples_data[
+                    row["collecting_lab_sample_id"]
+                ]
             except KeyError:
                 pass
             """
