@@ -76,16 +76,18 @@ class RelecovMetadata:
         fh_lab = open(
             os.path.join(os.path.dirname(__file__), "conf", "laboratory_address.json")
         )
-
         laboratory_json = json.load(fh_lab)
         fh_lab.close()
         fh_geo = open(
             os.path.join(os.path.dirname(__file__), "conf", "geo_loc_cities.json")
         )
-
         geo_loc_json = json.load(fh_geo)
         fh_geo.close()
-
+        samples_data = {}
+        fh_samples = open(self.sample_list_file, "r")
+        for line in fh_samples.readlines():
+            line_split = line.strip().split(",")
+            samples_data[line_split[0]] = [line_split[1], line_split[2]]
         for row in metadata:
             for new_field, value in extra_data.items():
                 row[new_field] = value
@@ -119,6 +121,10 @@ class RelecovMetadata:
                                     city["geo_loc_city"]
                                 ]["geo_loc_longitude"]
                                 break
+            try:
+                row["sequence_file_R1_fastq"] = samples_data[row["collecting_lab_sample_id"]]
+            except KeyError:
+                pass
             """
             country = row["geo_loc_country"]
             city = row["geo_loc_state"]
@@ -146,8 +152,8 @@ class RelecovMetadata:
         with open(self.sample_list_file, "r") as fh:
             samples = fh.read().split("\n")
         for line_metadata in completed_metadata:
-            if line_metadata["collecting_institution"] not in samples:
-                not_found_samples.append(line_metadata["collecting_institution"])
+            if line_metadata["collecting_lab_sample_id"] not in samples:
+                not_found_samples.append(line_metadata["collecting_lab_sample_id"])
         if len(not_found_samples) > 0:
             return not_found_samples
         return True

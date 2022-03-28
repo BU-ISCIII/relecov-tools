@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from datetime import datetime
 import logging
+import json
 import rich.console
 import paramiko
 import sys
@@ -217,18 +218,22 @@ class SftpHandle:
         except OSError as e:
             log.error("Unable to copy Metadata file %s", e)
             stderr.print("[red] Unable to copy Metadata file")
-        sample_data = []
+        sample_data = {}
 
         for key, values in md5_data.items():
             if key.endswith(tuple(self.allowed_sample_ext)):
-                sample_data.append(key + "," + ",".join(values))
+                if key.split(".")[0] not in sample_data:
+                    sample_data[key.split(".")[0]] = {}
+                sample_data[key.split(".")[0]][key] = values
+                # sample_data.append(key + "," + ",".join(values))
         if len(sample_data) == 0:
             log.error("There is no samples in folder %s", local_folder)
             stderr.print("[red] There is no samples for this local folder")
         else:
-            with open(sample_data_file, "w") as fh:
-                for sample in sample_data:
-                    fh.write(sample + "\n")
+            with open(sample_data_file, "w" , encoding="utf-8") as fh:
+                fh.write(json.dumps(
+                        sample_data, indent=4, sort_keys=True, ensure_ascii=False
+                    ))
         return
 
     def create_main_folders(self, root_directory_list):
