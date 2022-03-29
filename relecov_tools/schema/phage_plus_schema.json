@@ -1991,7 +1991,7 @@
             "examples": [
                 "PAIRED"
             ],
-            "ontology": "BU_ISCIII:007",
+            "ontology": "NCIT:C175894",
             "type": "string",
             "description": "Single or paired.",
             "clasification": "Sequencing",
@@ -2106,6 +2106,24 @@
             "description": "",
             "clasification": "Bioinformatics and QC metrics",
             "label": "Variant Calling params"
+        },
+        "consensus_sequence_name": {
+            "ontology": "GENEPIO:0001460",
+            "type": "string",
+            "description": "The name of the consensus sequence.",
+            "examples": [
+                "ncov123assembly3"
+            ],
+            "label": "Consensus sequence name"
+        },
+        "consensus_sequence_name_md5": {
+            "ontology": "NMR:1000568",
+            "type": "string",
+            "description": "The name of the consensus sequence.",
+            "examples": [
+                "ncov123assembly3"
+            ],
+            "label": "Consensus sequence name md5"
         },
         "consensus_sequence_filepath": {
             "examples": [
@@ -3006,7 +3024,7 @@
             "clasification": "Submission ENA",
             "label": "Fastq bytes"
         },
-        "fastq_md5": {
+        "fastq_md5_r1": {
             "examples": [
                 ""
             ],
@@ -3014,7 +3032,17 @@
             "type": "string",
             "description": "",
             "clasification": "Submission ENA",
-            "label": "Fastq md5"
+            "label": "Fastq md5 r1"
+        },
+        "fastq_md5_r2": {
+            "examples": [
+                ""
+            ],
+            "ontology": "MS_1000568",
+            "type": "string",
+            "description": "",
+            "clasification": "Submission ENA",
+            "label": "Fastq md5 r2"
         },
         "fastq_ftp": {
             "examples": [
