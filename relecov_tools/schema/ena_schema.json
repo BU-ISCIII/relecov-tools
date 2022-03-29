@@ -803,7 +803,7 @@
       "examples": [
         "CTS strategy"
       ],
-      "ontology": "BU_ISCIII:007",
+      "ontology": "NCIT:C175894",
       "type": "string",
       "description": "Single or paired.",
       "clasification": "Sequencing",
@@ -1029,7 +1029,7 @@
       "clasification": "Submission ENA",
       "label": "Fastq bytes"
     },
-    "fastq_md5": {
+    "fastq_md5_r1": {
       "examples": [
         ""
       ],
@@ -1037,7 +1037,17 @@
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
-      "label": "Fastq md5"
+      "label": "Fastq md5 r1"
+    },
+    "fastq_md5_r2": {
+      "examples": [
+        ""
+      ],
+      "ontology": "MS_1000568",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Fastq md5 r1"
     },
     "fastq_ftp": {
       "examples": [
