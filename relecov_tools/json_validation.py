@@ -20,9 +20,7 @@ stderr = rich.console.Console(
 )
 
 
-def validate_json_vs_schema(
-    json_data_file=None, json_schema_file=None, out_folder=None
-):
+def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
     """Validate json file against the schema"""
     if json_data_file is None:
         json_data_file = relecov_tools.utils.prompt_path(

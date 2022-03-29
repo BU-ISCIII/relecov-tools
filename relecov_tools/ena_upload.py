@@ -116,7 +116,7 @@ class EnaUpload:
             schema_dataframe[xml_file] = df
         return schema_dataframe
 
-    def upload_files_to_ena(self):
+    def upload(self):
         """Create the required files and upload to ENA"""
         self.convert_input_json_to_ena()
         self.create_structure_to_ena()

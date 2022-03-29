@@ -271,7 +271,7 @@ class SftpHandle:
                 continue
         return
 
-    def download_from_sftp(self):
+    def download(self):
         try:
             os.makedirs(self.storage_local_folder, exist_ok=True)
         except OSError as e:
