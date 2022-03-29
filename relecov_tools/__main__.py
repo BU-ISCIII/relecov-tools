@@ -163,6 +163,7 @@ def download(user, password, conf_file):
     sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file)
     sftp_connection.download()
 
+
 # metadata
 @relecov_tools_cli.command(help_priority=3)
 @click.option(
@@ -207,9 +208,7 @@ def validate(json_file, json_schema, out_folder):
         validated_json_data,
         invalid_json,
         errors,
-    ) = relecov_tools.json_validation.validate(
-        json_file, json_schema, out_folder
-    )
+    ) = relecov_tools.json_validation.validate(json_file, json_schema, out_folder)
     if len(invalid_json) > 0:
         log.error("Some of the samples in json metadata were not validated")
     else:
@@ -228,9 +227,7 @@ def validate(json_file, json_schema, out_folder):
 )
 @click.option("-f", "--schema_file", help="file with the custom schema")
 @click.option("-o", "--output", help="File name and path to store the mapped json")
-def map(
-    phage_plus_schema, json_data, destination_schema, schema_file, output
-):
+def map(phage_plus_schema, json_data, destination_schema, schema_file, output):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
     new_schema = relecov_tools.conversion_schema.MappingSchema(
         phage_plus_schema, json_data, destination_schema, schema_file, output
@@ -258,6 +255,7 @@ def upload_to_ena(user, password, ena_json, dev, study, action, output_path):
     )
     upload_ena.upload_files_to_ena()
 
+
 @relecov_tools_cli.command(help_priority=7)
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
@@ -267,17 +265,20 @@ def upload_to_gisaid(user, password, gisaid_json, output_path):
     """parsed data to create files to upload to gisaid"""
     pass
 
+
 @relecov_tools_cli.command(help_priority=8)
 @click.option("-u", "--user", help="user name for connecting to the server")
 def launch(user):
     """launch viralrecon in hpc"""
     pass
 
+
 @relecov_tools_cli.command(help_priority=9)
 @click.option("-j", "--json", help="data in json format")
 def update_db(user):
     """feed database with metadata jsons"""
     pass
+
 
 if __name__ == "__main__":
     run_relecov_tools()
