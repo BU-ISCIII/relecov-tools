@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from datetime import datetime
+from itertools import islice
 import logging
 import json
 import rich.console
@@ -8,6 +9,7 @@ import sys
 import os
 import shutil
 import yaml
+import openpyxl
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -69,14 +71,13 @@ class SftpHandle:
                     )
                 try:
                     self.abort_if_md5_mismatch = (
-                        True
-                        if config["abort_if_md5_mismatch"] == "True"
-                        else False
+                        True if config["abort_if_md5_mismatch"] == "True" else False
                     )
                 except KeyError:
                     self.abort_if_md5_mismatch = (
                         True
-                        if config_json.get_configuration("abort_if_md5_mismatch") == "True"
+                        if config_json.get_configuration("abort_if_md5_mismatch")
+                        == "True"
                         else False
                     )
                 self.sftp_user = config["sftp_user"]
@@ -89,7 +90,9 @@ class SftpHandle:
         if self.sftp_user is None:
             self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the userid")
         if self.sftp_passwd is None:
-            self.sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
+            self.sftp_passwd = relecov_tools.utils.prompt_password(
+                msg="Enter your password"
+            )
         self.client = None
         self.test = test
 
@@ -260,6 +263,50 @@ class SftpHandle:
             os.makedirs(full_folder, exist_ok=True)
         return True
 
+    def get_sample_fastq_file_names(self, ws_metadata_lab):
+        """ """
+        sample_file_list = {}
+        # find out the index for file names
+        for col in ws_metadata_lab[4]:
+            if "Sequence file R1 fastq" == col.value:
+                index_fastq_r1 = col.column - 1
+            elif "Sequence file R2 fastq" == col.value:
+                index_fastq_r2 = col.column - 1
+        for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
+            if row[2] is not None:
+                if row[2].value not in sample_file_list:
+                    sample_file_list[row[2]] = {}
+                if row[index_fastq_r1] is not None:
+                    sample_file_list[row[2]]["fastq_r1"] = row[index_fastq_r1]
+                else:
+                    log.error(
+                        "Fastq_R1 not defined in Metadata file for sample %s", row[2]
+                    )
+                    stderr.print("[red] No fastq R1 file for sample " + row[2])
+                    return False
+                if row[index_fastq_r2] is not None:
+                    sample_file_list[row[2]]["fastq_r2"] = row[index_fastq_r2]
+        return sample_file_list
+
+    def validate_download_files(self, local_folder):
+        """Check if download sample files are the ones defined on metadata file"""
+        meta_f_path = os.path.join(local_folder, "METADATA_LAB.xlsx")
+        if not os.path.isfile(meta_f_path):
+            log.error("Metadata file does not exists on %s", local_folder)
+            stderr.print("[red] METADATA_LAB.xlsx do not exist in" + local_folder)
+            return False
+        wb_file = openpyxl.load_workbook(meta_f_path, data_only=True)
+        sample_file_list = self.get_sample_fastq_file_names(wb_file["METADATA_LAB"])
+        if not sample_file_list:
+            return False
+        for sample, files in sample_file_list.items():
+            for file in files.values():
+                if not os.path.isfile(os.path.join(local_folder, file)):
+                    log.error("File %s does not exist", file)
+                    stderr.print("[red] File " + file + " does not exist")
+                    return False
+        return True
+
     def delete_remote_files(self, folder, files):
         """Delete files from remote server"""
         self.open_connection()
@@ -319,9 +366,13 @@ class SftpHandle:
                         f"[red] Stop processing folder {folder} because of corrupted files {corrupted}"
                     )
                     continue
-            self.create_tmp_files_with_metadata_info(
-                result_data["local_folder"], result_data["fetched_files"], md5_files
-            )
-            self.delete_remote_files(folder, files)
+            if self.validate_download_files(self, local_folder):
+
+                self.create_tmp_files_with_metadata_info(
+                    result_data["local_folder"], result_data["fetched_files"], md5_files
+                )
+                self.delete_remote_files(folder, files)
+            else:
+                self.delete_local_folder(local_folder)
         self.close_connection()
         return
