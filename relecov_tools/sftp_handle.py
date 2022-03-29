@@ -232,7 +232,7 @@ class SftpHandle:
             os.makedirs(full_folder, exist_ok=True)
         return True
 
-    def download_from_sftp(self):
+    def download(self):
         try:
             os.makedirs(self.storage_local_folder, exist_ok=True)
         except OSError as e:

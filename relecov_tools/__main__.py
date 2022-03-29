@@ -10,10 +10,10 @@ import rich.traceback
 
 import relecov_tools.utils
 import relecov_tools.read_metadata
-import relecov_tools.sftp_handled
+import relecov_tools.sftp_handle
 import relecov_tools.ena_upload
-import relecov_tools.validation_json
-import relecov_tools.conversion_schema
+import relecov_tools.json_validation
+import relecov_tools.map_schema
 
 log = logging.getLogger()
 
@@ -160,9 +160,8 @@ def list(keywords, sort, json, show_archived):
 )
 def download_sftp(user, password, conf_file):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp_handled.SftpHandle(user, password, conf_file)
-    sftp_connection.download_from_sftp()
-
+    sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file)
+    sftp_connection.download()
 
 # metadata
 @relecov_tools_cli.command(help_priority=3)
