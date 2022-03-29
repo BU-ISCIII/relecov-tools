@@ -20,7 +20,7 @@ stderr = rich.console.Console(
 )
 
 
-def validate_json_vs_schema(
+def validate(
     json_data_file=None, json_schema_file=None, out_folder=None
 ):
     """Validate json file against the schema"""
