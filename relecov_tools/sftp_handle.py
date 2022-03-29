@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from datetime import datetime
 import logging
+import json
 import rich.console
 import paramiko
 import sys
@@ -147,7 +148,7 @@ class SftpHandle:
         date = datetime.today().strftime("%Y%m%d")
         local_folder_path = os.path.join(self.storage_local_folder, folder, date)
         result_data["local_folder"] = local_folder_path
-        os.makedirs(local_folder_path)
+        os.makedirs(local_folder_path, exist_ok=True)
         log.info("created the folder to download files %s", local_folder_path)
         self.open_connection()
 
@@ -174,8 +175,10 @@ class SftpHandle:
         sftp_md5 = relecov_tools.utils.get_md5_from_local_folder(local_folder)
         if len(sftp_md5) > 0:
             # check md5 checksum for eac file
-            for f_name, checksum in sftp_md5.items():
-                if checksum == relecov_tools.utils.calculate_md5(f_name):
+            for f_name, values in sftp_md5.items():
+                f_path_name = os.path.join(local_folder, f_name)
+                # Checksum value is stored in the index 1
+                if values[1] == relecov_tools.utils.calculate_md5(f_path_name):
                     log.info(
                         "Successful file download for %s in folder %s",
                         f_name,
@@ -185,14 +188,17 @@ class SftpHandle:
                 else:
                     required_retransmition.append(f_name)
                     log.error("%s requested file re-sending", f_name)
-        if len(file_list) != len(sftp_md5) * 2:
+
+        if len(set(file_list)) != len(sftp_md5) * 2:
             # create the md5 file from the ones not upload to server
             req_create_md5 = [
                 v
                 for v in file_list
                 if (v not in successful_files and not v.endswith("*.md5"))
             ]
-            sftp_md5.update(relecov_tools.utils.create_md5_files(req_create_md5))
+            sftp_md5.update(
+                relecov_tools.utils.create_md5_files(local_folder, req_create_md5)
+            )
         return sftp_md5, required_retransmition
 
     def create_tmp_files_with_metadata_info(self, local_folder, file_list, md5_data):
@@ -212,17 +218,28 @@ class SftpHandle:
         except OSError as e:
             log.error("Unable to copy Metadata file %s", e)
             stderr.print("[red] Unable to copy Metadata file")
-        sample_data = []
-        for file_data in md5_data:
-            if file_data[0].endswith(tuple(self.allowed_sample_ext)):
-                sample_data.append(",".join(file_data))
+        sample_data = {}
+        for f_name, values in md5_data.items():
+            if f_name.endswith(tuple(self.allowed_sample_ext)):
+                sample = f_name.split(".")[0]
+                if sample not in sample_data:
+                    sample_data[sample] = {}
+                sample_data[sample][f_name] = {}
+                sample_data[sample][f_name]["local_folder"] = values[0]
+                sample_data[sample][f_name]["md5"] = values[1]
+
+                # sample_data.append(key + "," + ",".join(values))
         if len(sample_data) == 0:
             log.error("There is no samples in folder %s", local_folder)
-            stderr.print("[red] There is no samples for this loacal folder")
+            stderr.print("[red] There is no samples for this local folder")
         else:
-            with open(sample_data_file, "w") as fh:
-                for sample in sample_data:
-                    fh.write(sample + "\n")
+            with open(sample_data_file, "w", encoding="utf-8") as fh:
+                fh.write(
+                    json.dumps(
+                        sample_data, indent=4, sort_keys=True, ensure_ascii=False
+                    )
+                )
+                fh.close()
         return
 
     def create_main_folders(self, root_directory_list):
@@ -231,6 +248,17 @@ class SftpHandle:
             full_folder = os.path.join(self.storage_local_folder, folder)
             os.makedirs(full_folder, exist_ok=True)
         return True
+
+    def delete_remote_files(self, folder, files):
+        """Delete files from remote server"""
+        self.open_connection()
+        for file in files:
+            try:
+                self.client.remove(file)
+                log.info("%s Deleted from remote server", file)
+            except FileNotFoundError:
+                continue
+        return
 
     def download(self):
         try:
@@ -283,4 +311,6 @@ class SftpHandle:
             self.create_tmp_files_with_metadata_info(
                 result_data["local_folder"], result_data["fetched_files"], md5_files
             )
+            self.delete_remote_files(folder, files)
         self.close_connection()
+        return
