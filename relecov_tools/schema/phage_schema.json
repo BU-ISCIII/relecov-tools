@@ -572,7 +572,8 @@
       "description": "The self-identified ethnicity(ies) of the host.",
       "examples": [
         "Indigenous, European"
-      ]
+      ],
+      "label": "Host ethnicity"
     },
     "collection_device": {
       "Enums": [
@@ -1177,7 +1178,8 @@
       "description": "The name of the sample plan implemented for sample collection.",
       "examples": [
         "CanCOGeN Sampling Strategy 1.0"
-      ]
+      ],
+      "label": "Sample plan name"
     },
     "treatment": {
       "ontology": "OGMS:0000090",
@@ -2015,7 +2017,7 @@
       "type": "string",
       "description": "The user-defined name for the sample.",
       "clasification": "Database Identifiers",
-      "label": "Collecting Sample id"
+      "label": "Sample ID given by originating laboratory"
     },
     "host_scientific_name": {
       "Enums": [
@@ -2143,7 +2145,8 @@
       "ontology": "GENEPIO:0001399",
       "type": "string",
       "description": "The date on which the symptoms began or were first noted.",
-      "format": "date"
+      "format": "date",
+      "label": "Symptom onset date"
     },
     "r2 fastq filename": {
       "examples": [
@@ -2435,7 +2438,7 @@
       "clasification": "Pathogen diagnostic testing",
       "label": "reference genome accession"
     },
-    "host_residence_geo_loc_name_country": {
+    "host_residence_country": {
       "Enums": [
         "Afghanistan [GAZ:00006882]",
         "Albania [GAZ:00002953]",
@@ -2719,7 +2722,8 @@
       "description": "The country where the host resides.",
       "examples": [
         "South Africa [GAZ:00001094]"
-      ]
+      ],
+      "label": "Host residence country"
     },
     "travel_history": {
       "ontology": "GENEPIO:0001416",
@@ -3173,7 +3177,8 @@
       "description": "Whether the sample was collected from an individual in quarantine.",
       "examples": [
         "Yes [NCIT:C49488]"
-      ]
+      ],
+      "label": "Sample collected in quarantine"
     },
     "sample_collected_by": {
       "examples": [
@@ -3267,7 +3272,8 @@
       "description": "Further details pertaining to the health or disease status of the host at time of collection.",
       "examples": [
         "Hospitalized (ICU) [GENEPIO:0100046]"
-      ]
+      ],
+      "label": "Host health status details"
     },
     "isolate": {
       "ontology": "GENEPIO:0001644",
@@ -3277,7 +3283,7 @@
         "SARS-CoV-2/human/USA/CA-CDPH-001/2020"
       ],
       "clasification": "Sample collection and processing",
-      "label": "Isolate"
+      "label": "Sample ID given by originating laboratory"
     },
     "host_health_state": {
       "Enums": [
@@ -3435,7 +3441,8 @@
       "description": "A description of how any data elements were altered to preserve patient privacy.",
       "examples": [
         "Jitter added to publicly shared collection dates to prevent re-identifiability."
-      ]
+      ],
+      "label": "Data abstraction details"
     },
     "consensus_sequence_filename": {
       "ontology": "GENEPIO:0001461",

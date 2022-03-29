@@ -29,7 +29,7 @@
       "type": "string",
       "description": "The user-defined name for the sample.",
       "clasification": "Database Identifiers",
-      "label": "Collecting Sample id"
+      "label": "Sample ID given by originating laboratory"
     },
     "collecting_institution": {
       "examples": [
@@ -399,7 +399,7 @@
       ],
       "genepio_label": "isolate identifier",
       "clasification": "Sample collection and processing",
-      "label": "Isolate"
+      "label": "Sample ID given by originating laboratory"
     },
     "purpose_sampling": {
       "examples": [
