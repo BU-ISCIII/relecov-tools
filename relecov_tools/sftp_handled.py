@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from datetime import datetime
 import logging
+import json
 import rich.console
 import paramiko
 import sys
@@ -217,18 +218,28 @@ class SftpHandle:
         except OSError as e:
             log.error("Unable to copy Metadata file %s", e)
             stderr.print("[red] Unable to copy Metadata file")
-        sample_data = []
+        sample_data = {}
+        for f_name, values in md5_data.items():
+            if f_name.endswith(tuple(self.allowed_sample_ext)):
+                sample = f_name.split(".")[0]
+                if sample not in sample_data:
+                    sample_data[sample] = {}
+                sample_data[sample][f_name] = {}
+                sample_data[sample][f_name]["local_folder"] = values[0]
+                sample_data[sample][f_name]["md5"] = values[1]
 
-        for key, values in md5_data.items():
-            if key.endswith(tuple(self.allowed_sample_ext)):
-                sample_data.append(key + "," + ",".join(values))
+                # sample_data.append(key + "," + ",".join(values))
         if len(sample_data) == 0:
             log.error("There is no samples in folder %s", local_folder)
             stderr.print("[red] There is no samples for this local folder")
         else:
-            with open(sample_data_file, "w") as fh:
-                for sample in sample_data:
-                    fh.write(sample + "\n")
+            with open(sample_data_file, "w", encoding="utf-8") as fh:
+                fh.write(
+                    json.dumps(
+                        sample_data, indent=4, sort_keys=True, ensure_ascii=False
+                    )
+                )
+                fh.close()
         return
 
     def create_main_folders(self, root_directory_list):
