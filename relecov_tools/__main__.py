@@ -243,10 +243,10 @@ def map(phage_plus_schema, json_data, destination_schema, schema_file, output):
 @click.option(
     "-a",
     "--action",
-    type=click.choice(["add", "modify", "cancel", "release"], case_sensitive=false),
+    type=click.choice(["add", "modify", "cancel", "release"], case_sensitive=False),
     help="select one of the available options",
 )
-@click.option("--dev/--production", default=true)
+@click.option("--dev/--production", default=True)
 @click.option("-o", "--output_path", help="output folder for the xml generated files")
 def upload_to_ena(user, password, ena_json, dev, study, action, output_path):
     """parsed data to create xml files to upload to ena"""
