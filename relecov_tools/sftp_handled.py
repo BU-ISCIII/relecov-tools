@@ -27,7 +27,8 @@ class SftpHandle:
         self.allowed_sample_ext = config_json.get_configuration(
             "allowed_sample_extensions"
         )
-
+        self.sftp_user = user
+        self.sftp_passwd = passwd
         if conf_file is None:
             self.server = config_json.get_topic_data("sftp_connection", "sftp_server")
             self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
@@ -66,35 +67,41 @@ class SftpHandle:
                     self.metadata_tmp_folder = config_json.get_configuration(
                         "tmp_folder_for_metadata"
                     )
-                self.user = config["user_sftp"]
-                self.passwd = config["password"]
+                try:
+                    self.abort_if_md5_mismatch = (
+                        True
+                        if config["abort_if_md5_mismatch"] == "True"
+                        else False
+                    )
+                except KeyError:
+                    self.abort_if_md5_mismatch = (
+                        True
+                        if config_json.get_configuration("abort_if_md5_mismatch") == "True"
+                        else False
+                    )
+                self.sftp_user = config["sftp_user"]
+                self.sftp_passwd = config["sftp_passwd"]
+                self.pp = config["allowed_sample_extensions"]
             except KeyError as e:
                 log.error("Invalid configuration file %s", e)
                 stderr.print("[red] Invalide configuration file {e} !")
                 sys.exit(1)
-        if user is None:
-            self.user = relecov_tools.utils.text(msg="Enter the userid")
-        else:
-            self.user = user
-        if passwd is None:
-            self.passwd = relecov_tools.utils.password(msg="Enter your password")
-        else:
-            self.passwd = passwd
+        if self.sftp_user is None:
+            self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the userid")
+        if self.sftp_passwd is None:
+            self.sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
         self.client = None
-        if test is None:
-            self.test = False
-        else:
-            self.test = True
+        self.test = test
 
     def open_connection(self):
         """Establish sftp connection"""
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.client.connect(
-            hostname=self.server,
-            port=self.port,
-            username=self.user,
-            password=self.passwd,
+            hostname=self.sftp_server,
+            port=self.sftp_port,
+            username=self.sftp_user,
+            password=self.sftp_passwd,
             allow_agent=False,
             look_for_keys=False,
         )
