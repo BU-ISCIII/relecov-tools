@@ -208,7 +208,7 @@ def validate(json_file, json_schema, out_folder):
         validated_json_data,
         invalid_json,
         errors,
-    ) = relecov_tools.json_validation.validate(json_file, json_schema, out_folder)
+    ) = relecov_tools.json_validation.validate_json(json_file, json_schema, out_folder)
     if len(invalid_json) > 0:
         log.error("Some of the samples in json metadata were not validated")
     else:
@@ -250,7 +250,7 @@ def map(phage_plus_schema, json_data, destination_schema, schema_file, output):
 @click.option("-o", "--output_path", help="output folder for the xml generated files")
 def upload_to_ena(user, password, ena_json, dev, study, action, output_path):
     """parsed data to create xml files to upload to ena"""
-    upload_ena = relecov_tools.ena_upload.enaupload(
+    upload_ena = relecov_tools.ena_upload.upload(
         user, password, ena_json, dev, study, action, output_path
     )
     upload_ena.upload_files_to_ena()
