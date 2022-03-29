@@ -1,7 +1,7 @@
 {
     "schema": "PHAGE_PLUS",
     "required": [
-        "sample_name",
+        "collecting_lab_sample_id",
         "collecting_institution",
         "submitting_institution",
         "sample_collection_date",
@@ -16,7 +16,7 @@
     ],
     "type": "object",
     "properties": {
-        "sample_name": {
+        "collecting_lab_sample_id": {
             "examples": [
                 "prov_rona_99"
             ],
