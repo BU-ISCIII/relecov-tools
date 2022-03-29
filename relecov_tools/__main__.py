@@ -10,10 +10,10 @@ import rich.traceback
 
 import relecov_tools.utils
 import relecov_tools.read_metadata
-import relecov_tools.sftp_handled
+import relecov_tools.sftp_handle
 import relecov_tools.ena_upload
-import relecov_tools.validation_json
-import relecov_tools.conversion_schema
+import relecov_tools.json_validation
+import relecov_tools.map_schema
 
 log = logging.getLogger()
 
@@ -158,10 +158,10 @@ def list(keywords, sort, json, show_archived):
     "--conf_file",
     help="Configuration file Create Nextflow command with params (no params file)",
 )
-def download_sftp(user, password, conf_file):
+def download(user, password, conf_file):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp_handled.SftpHandle(user, password, conf_file)
-    sftp_connection.download_from_sftp()
+    sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file)
+    sftp_connection.download()
 
 
 # metadata
@@ -202,15 +202,13 @@ def read_metadata(metadata_file, sample_list_file, metadata_out):
 @click.option("-j", "--json_file", help="Json file to validate")
 @click.option("-s", "--json_schema", help="Json schema")
 @click.option("-o", "--out_folder", help="Path to save validate json file")
-def validation(json_file, json_schema, out_folder):
+def validate(json_file, json_schema, out_folder):
     """Validate json file against schema."""
     (
         validated_json_data,
         invalid_json,
         errors,
-    ) = relecov_tools.validation_json.validate_json_vs_schema(
-        json_file, json_schema, out_folder
-    )
+    ) = relecov_tools.json_validation.validate_json(json_file, json_schema, out_folder)
     if len(invalid_json) > 0:
         log.error("Some of the samples in json metadata were not validated")
     else:
@@ -229,9 +227,7 @@ def validation(json_file, json_schema, out_folder):
 )
 @click.option("-f", "--schema_file", help="file with the custom schema")
 @click.option("-o", "--output", help="File name and path to store the mapped json")
-def mapped_schema(
-    phage_plus_schema, json_data, destination_schema, schema_file, output
-):
+def map(phage_plus_schema, json_data, destination_schema, schema_file, output):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
     new_schema = relecov_tools.conversion_schema.MappingSchema(
         phage_plus_schema, json_data, destination_schema, schema_file, output
@@ -240,24 +236,48 @@ def mapped_schema(
 
 
 @relecov_tools_cli.command(help_priority=6)
-@click.option("-u", "--user", help="User name for login to sftp server")
+@click.option("-u", "--user", help="user name for login to ena")
 @click.option("-p", "--password", help="password for the user to login")
-@click.option("-e", "--ena_json", help="Where the validated json is")
+@click.option("-e", "--ena_json", help="where the validated json is")
 @click.option("-s", "--study", help="study/project name to include in xml files")
 @click.option(
     "-a",
     "--action",
-    type=click.Choice(["add", "modify", "cancel", "release"], case_sensitive=False),
-    help="Select one of the available options",
+    type=click.choice(["add", "modify", "cancel", "release"], case_sensitive=False),
+    help="select one of the available options",
 )
 @click.option("--dev/--production", default=True)
-@click.option("-o", "--output_path", help="Output folder for the xml generated files")
+@click.option("-o", "--output_path", help="output folder for the xml generated files")
 def upload_to_ena(user, password, ena_json, dev, study, action, output_path):
-    """Parsed data to create xml files to upload to ENA"""
-    upload_ena = relecov_tools.ena_upload.EnaUpload(
+    """parsed data to create xml files to upload to ena"""
+    upload_ena = relecov_tools.ena_upload.upload(
         user, password, ena_json, dev, study, action, output_path
     )
     upload_ena.upload_files_to_ena()
+
+
+@relecov_tools_cli.command(help_priority=7)
+@click.option("-u", "--user", help="user name for login")
+@click.option("-p", "--password", help="password for the user to login")
+@click.option("-e", "--gisaid_json", help="where the validated json is")
+@click.option("-o", "--output_path", help="output folder for the xml generated files")
+def upload_to_gisaid(user, password, gisaid_json, output_path):
+    """parsed data to create files to upload to gisaid"""
+    pass
+
+
+@relecov_tools_cli.command(help_priority=8)
+@click.option("-u", "--user", help="user name for connecting to the server")
+def launch(user):
+    """launch viralrecon in hpc"""
+    pass
+
+
+@relecov_tools_cli.command(help_priority=9)
+@click.option("-j", "--json", help="data in json format")
+def update_db(user):
+    """feed database with metadata jsons"""
+    pass
 
 
 if __name__ == "__main__":
