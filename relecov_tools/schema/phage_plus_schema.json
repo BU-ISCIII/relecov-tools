@@ -24,7 +24,7 @@
             "type": "string",
             "description": "The user-defined name for the sample.",
             "clasification": "Database Identifiers",
-            "label": "Collecting Sample id"
+            "label": "Sample ID given by originating laboratory"
         },
         "sample_description": {
             "examples": [
