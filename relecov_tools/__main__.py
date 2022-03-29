@@ -161,8 +161,7 @@ def list(keywords, sort, json, show_archived):
 @click.option("--test", is_flag=True, default=False, help="download files for testing")
 def download(user, password, conf_file, test):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp_handled.SftpHandle(user, password, conf_file, test)
-    sftp_connection.download_from_sftp()
+    sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file, test)
     sftp_connection.download()
 
 
@@ -245,7 +244,7 @@ def map(phage_plus_schema, json_data, destination_schema, schema_file, output):
 @click.option(
     "-a",
     "--action",
-    type=click.choice(["add", "modify", "cancel", "release"], case_sensitive=False),
+    type=click.Choice(["add", "modify", "cancel", "release"], case_sensitive=False),
     help="select one of the available options",
 )
 @click.option("--dev/--production", default=True)
