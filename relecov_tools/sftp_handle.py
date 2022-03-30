@@ -232,6 +232,7 @@ class SftpHandle:
         except OSError as e:
             log.error("Unable to copy Metadata file %s", e)
             stderr.print("[red] Unable to copy Metadata file")
+            return False
         sample_data = {}
         for f_name, values in md5_data.items():
             if f_name.endswith(tuple(self.allowed_sample_ext)):
@@ -254,7 +255,7 @@ class SftpHandle:
                     )
                 )
                 fh.close()
-        return
+        return True
 
     def create_main_folders(self, root_directory_list):
         """Create the main folder structure if not exists"""
@@ -374,7 +375,7 @@ class SftpHandle:
             ):
 
                 self.create_tmp_files_with_metadata_info(
-                    result_data["local_folder"], result_data["fetched_files"], md5_files
+                    result_data["local_folder"], sample_file_list, md5_files
                 )
                 self.delete_remote_files(folder, files)
             else:
