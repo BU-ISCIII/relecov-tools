@@ -157,6 +157,7 @@ def relecov_tools_cli(verbose, log_file):
     "--conf_file",
     help="Configuration file (no params file)",
 )
+<<<<<<< HEAD
 def download(user, password, conf_file):
     """Download files located in sftp server."""
     sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file)
