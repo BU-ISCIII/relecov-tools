@@ -155,13 +155,12 @@ def relecov_tools_cli(verbose, log_file):
 @click.option(
     "-f",
     "--conf_file",
-    help="Configuration file Create Nextflow command with params (no params file)",
+    help="Configuration file (no params file)",
 )
-@click.option("--test", is_flag=True, default=False, help="download files for testing")
-def download(user, password, conf_file, test):
+def download(user, password, conf_file):
     """Download files located in sftp server."""
     sftp_connection = relecov_tools.sftp_handle.SftpHandle(
-        user, password, conf_file, test
+        user, password, conf_file
     )
     sftp_connection.download()
 
