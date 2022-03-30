@@ -571,7 +571,9 @@
       ],
       "clasification": "Host information",
       "label": "Host Scientific Name",
-      "table": "runs"
+      "table": [
+        "runs"
+      ]
     },
     "host_subject_id": {
       "examples": [
@@ -582,7 +584,9 @@
       "description": "a unique identifier by which each subject can be referred to, de-identified.",
       "clasification": "Host information",
       "label": "Host Subject Id",
-      "table": "sample"
+      "table": [
+        "sample"
+      ]
     },
     "host_gender": {
       "Enums": [
@@ -605,7 +609,9 @@
         "Male [NCIT:C46109]"
       ],
       "label": "Host Gender",
-      "table": "sample"
+      "table": [
+        "sample"
+      ]
     },
     "type exposure": {
       "examples": [
@@ -714,7 +720,9 @@
       "description": "The user-specified filename of the r1 FASTQ file.",
       "clasification": "Bioinformatics and QC metrics",
       "label": "Sequence file R1 fastq",
-      "table": "runs"
+      "table": [
+        "runs"
+      ]
     },
     "file_type": {
       "examples": [
@@ -725,7 +733,9 @@
       "description": "",
       "clasification": "Bioinformatics and QC metrics",
       "label": "file type",
-      "table": "runs"
+      "table": [
+        "runs"
+      ]
     },
     "file_checksum": {
       "examples": [
@@ -736,7 +746,9 @@
       "description": "",
       "clasification": "Bioinformatics and QC metrics",
       "label": "file checksum",
-      "table": "runs"
+      "table": [
+        "runs"
+      ]
     },
     "tax_id": {
       "examples": [
@@ -747,7 +759,9 @@
       "description": "The NCBITaxon identifier for the organism being sequenced.",
       "clasification": "Sample collection and processing",
       "label": "Tax ID",
-      "table": "sample"
+      "table": [
+        "sample"
+      ]
     },
     "scientific_name": {
       "Enums": [
@@ -1112,7 +1126,9 @@
       "description": "",
       "clasification": "Submission ENA",
       "label": "Sample title",
-      "table": "sample"
+      "table": [
+        "sample"
+      ]
     },
     "study_title": {
       "examples": [
@@ -1123,7 +1139,9 @@
       "description": "",
       "clasification": "Submission ENA",
       "label": "Study title",
-      "table": "study"
+      "table": [
+        "study"
+      ]
     },
     "study_type": {
       "examples": [
