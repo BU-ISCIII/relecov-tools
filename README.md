@@ -182,7 +182,7 @@ SOON
 #### update-db
 SOON
 
-#### Python package mode
+### Python package mode
 relecov-tools is designed in a way that you can use import the different modules and use them in your own scripts, for example:
 
 ```
