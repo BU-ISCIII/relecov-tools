@@ -10,14 +10,15 @@ relecov-tools is a set of helper tools for the assembly of the different element
 
 * [Installation](#installation)
 * [Usage](#usage)
-* [download](#download)
-* [read-metadata](#read-metadata)
-* [validate](#validate)
-* [map](#map)
-* [upload-to-ena](#upload-to-ena)
-* [upload-to-gisaid](#upload-to-gisaid)
-* [launch](#launch)
-* [update-db](#update-db)
+    * [download](#download)
+    * [read-metadata](#read-metadata)
+    * [validate](#validate)
+    * [map](#map)
+    * [upload-to-ena](#upload-to-ena)
+    * [upload-to-gisaid](#upload-to-gisaid)
+    * [launch](#launch)
+    * [update-db](#update-db)
+* [Aknowledgements](#aknowledgements)
 
 ## Installation
 
