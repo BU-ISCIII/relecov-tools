@@ -263,8 +263,15 @@ class SftpHandle:
             os.makedirs(full_folder, exist_ok=True)
         return True
 
-    def get_sample_fastq_file_names(self, ws_metadata_lab):
+    def get_sample_fastq_file_names(self, local_folder):
         """ """
+        meta_f_path = os.path.join(local_folder, "METADATA_LAB.xlsx")
+        if not os.path.isfile(meta_f_path):
+            log.error("Metadata file does not exists on %s", local_folder)
+            stderr.print("[red] METADATA_LAB.xlsx do not exist in" + local_folder)
+            return False
+        wb_file = openpyxl.load_workbook(meta_f_path, data_only=True)
+        ws_metadata_lab = wb_file["METADATA_LAB"]
         sample_file_list = {}
         # find out the index for file names
         for col in ws_metadata_lab[4]:
@@ -288,15 +295,8 @@ class SftpHandle:
                     sample_file_list[row[2]]["fastq_r2"] = row[index_fastq_r2]
         return sample_file_list
 
-    def validate_download_files(self, local_folder):
+    def validate_download_files(self, sample_file_list, local_folder):
         """Check if download sample files are the ones defined on metadata file"""
-        meta_f_path = os.path.join(local_folder, "METADATA_LAB.xlsx")
-        if not os.path.isfile(meta_f_path):
-            log.error("Metadata file does not exists on %s", local_folder)
-            stderr.print("[red] METADATA_LAB.xlsx do not exist in" + local_folder)
-            return False
-        wb_file = openpyxl.load_workbook(meta_f_path, data_only=True)
-        sample_file_list = self.get_sample_fastq_file_names(wb_file["METADATA_LAB"])
         if not sample_file_list:
             return False
         for sample, files in sample_file_list.items():
@@ -366,13 +366,18 @@ class SftpHandle:
                         f"[red] Stop processing folder {folder} because of corrupted files {corrupted}"
                     )
                     continue
-            if self.validate_download_files(self, local_folder):
+            sample_file_list = self.get_sample_fastq_file_names(
+                result_data["local_folder"]
+            )
+            if self.validate_download_files(
+                self, sample_file_list, result_data["local_folder"]
+            ):
 
                 self.create_tmp_files_with_metadata_info(
                     result_data["local_folder"], result_data["fetched_files"], md5_files
                 )
                 self.delete_remote_files(folder, files)
             else:
-                self.delete_local_folder(local_folder)
+                self.delete_local_folder(result_data["local_folder"])
         self.close_connection()
         return
