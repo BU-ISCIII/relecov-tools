@@ -68,9 +68,9 @@ Commands:
     update-db         feed database with metadata jsons
 ```
 #### download
-The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different foldes available in the passed credentials. In addition, it checks if the files in the folder match the files in the metadata file and checks if there are md5sum for each file, if not it creates one before storing in the final repository.
+The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different available folders in the passed credentials. In addition, it checks if the files in the current folder match the files in the metadata file and also checks if there are md5sum for each file. If not, it creates one before storing in the final repository.
 
-```
+``` 
 $ relecov-tools download --help
 Usage: relecov-tools download [OPTIONS]
 
@@ -138,7 +138,7 @@ Usage: relecov-tools validate [OPTIONS]
 ```
 
 #### map
-The command `map` converts a data in json format from relecov data model to ena or gisaid data model using their own schemas acording to their annotated ontoly terms.
+The command `map` converts a data in json format from relecov data model to ena or gisaid data model using their own schemas acording to their annotated ontology terms.
 
 ```
 $ relecov-tools map --help
