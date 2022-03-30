@@ -97,12 +97,12 @@ stderr = Console(
 
 
 def prompt_text(msg):
-    source = questionary.text(msg).ask()
+    source = questionary.text(msg).unsafe_ask()
     return source
 
 
 def prompt_password(msg):
-    source = questionary.password(msg).ask()
+    source = questionary.password(msg).unsafe_ask()
     return source
 
 
