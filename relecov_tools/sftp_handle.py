@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 from datetime import datetime
+from itertools import islice
+import copy
 import logging
+import glob
 import json
 import rich.console
 import paramiko
@@ -8,6 +11,7 @@ import sys
 import os
 import shutil
 import yaml
+import openpyxl
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -21,13 +25,14 @@ stderr = rich.console.Console(
 
 
 class SftpHandle:
-    def __init__(self, user=None, passwd=None, conf_file=None):
+    def __init__(self, user=None, passwd=None, conf_file=None, test=None):
         """Initializes the sftp object"""
         config_json = ConfigJson()
         self.allowed_sample_ext = config_json.get_configuration(
             "allowed_sample_extensions"
         )
-
+        self.sftp_user = user
+        self.sftp_passwd = passwd
         if conf_file is None:
             self.server = config_json.get_topic_data("sftp_connection", "sftp_server")
             self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
@@ -66,31 +71,42 @@ class SftpHandle:
                     self.metadata_tmp_folder = config_json.get_configuration(
                         "tmp_folder_for_metadata"
                     )
-                self.user = config["user_sftp"]
-                self.passwd = config["password"]
+                try:
+                    self.abort_if_md5_mismatch = (
+                        True if config["abort_if_md5_mismatch"] == "True" else False
+                    )
+                except KeyError:
+                    self.abort_if_md5_mismatch = (
+                        True
+                        if config_json.get_configuration("abort_if_md5_mismatch")
+                        == "True"
+                        else False
+                    )
+                self.sftp_user = config["sftp_user"]
+                self.sftp_passwd = config["sftp_passwd"]
+                self.pp = config["allowed_sample_extensions"]
             except KeyError as e:
                 log.error("Invalid configuration file %s", e)
                 stderr.print("[red] Invalide configuration file {e} !")
                 sys.exit(1)
-        if user is None:
-            self.user = relecov_tools.utils.text(msg="Enter the userid")
-        else:
-            self.user = user
-        if passwd is None:
-            self.passwd = relecov_tools.utils.password(msg="Enter your password")
-        else:
-            self.passwd = passwd
+        if self.sftp_user is None:
+            self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the userid")
+        if self.sftp_passwd is None:
+            self.sftp_passwd = relecov_tools.utils.prompt_password(
+                msg="Enter your password"
+            )
         self.client = None
+        self.test = test
 
     def open_connection(self):
         """Establish sftp connection"""
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.client.connect(
-            hostname=self.server,
-            port=self.port,
-            username=self.user,
-            password=self.passwd,
+            hostname=self.sftp_server,
+            port=self.sftp_port,
+            username=self.sftp_user,
+            password=self.sftp_passwd,
             allow_agent=False,
             look_for_keys=False,
         )
@@ -201,52 +217,103 @@ class SftpHandle:
             )
         return sftp_md5, required_retransmition
 
-    def create_tmp_files_with_metadata_info(self, local_folder, file_list, md5_data):
+    def create_tmp_files_with_metadata_info(
+        self, local_folder, file_list, md5_data, metadata_file
+    ):
         """Copy metadata file from folder and create a file with the sample
         names
         """
         out_folder = self.metadata_tmp_folder
         os.makedirs(out_folder, exist_ok=True)
         prefix_file_name = "_".join(local_folder.split("/")[-2:])
-        metadata_file = prefix_file_name + "_metadata_lab.xlsx"
-        sample_data_file = os.path.join(out_folder, prefix_file_name + "samples.csv")
+        new_metadata_file = "metadata_lab_" + prefix_file_name + ".xlsx"
+        sample_data_file = "samples_data_" + prefix_file_name + ".json"
+        sample_data_path = os.path.join(out_folder, sample_data_file)
         try:
             shutil.copy(
-                os.path.join(local_folder, "Metadata_lab.xlsx"),
-                os.path.join(out_folder, metadata_file),
+                os.path.join(local_folder, metadata_file),
+                os.path.join(out_folder, new_metadata_file),
             )
         except OSError as e:
             log.error("Unable to copy Metadata file %s", e)
             stderr.print("[red] Unable to copy Metadata file")
-        sample_data = {}
-        for f_name, values in md5_data.items():
-            if f_name.endswith(tuple(self.allowed_sample_ext)):
-                sample = f_name.split(".")[0]
-                if sample not in sample_data:
-                    sample_data[sample] = {}
-                sample_data[sample][f_name] = {}
-                sample_data[sample][f_name]["local_folder"] = values[0]
-                sample_data[sample][f_name]["md5"] = values[1]
+            return False
+        data = copy.deepcopy(file_list)
 
-                # sample_data.append(key + "," + ",".join(values))
-        if len(sample_data) == 0:
-            log.error("There is no samples in folder %s", local_folder)
-            stderr.print("[red] There is no samples for this local folder")
-        else:
-            with open(sample_data_file, "w", encoding="utf-8") as fh:
-                fh.write(
-                    json.dumps(
-                        sample_data, indent=4, sort_keys=True, ensure_ascii=False
-                    )
-                )
-                fh.close()
-        return
+        for s_name, values in file_list.items():
+            for f_type, f_name in values.items():
+                if not f_name.endswith(tuple(self.allowed_sample_ext)):
+                    stderr.print("[red] " + f_name + " has a not valid extension")
+                data[s_name]["local_folder"] = md5_data[f_name][0]
+                data[s_name][f_type + "_md5"] = md5_data[f_name][1]
+        with open(sample_data_path, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
+
+        return True
 
     def create_main_folders(self, root_directory_list):
         """Create the main folder structure if not exists"""
         for folder in root_directory_list:
             full_folder = os.path.join(self.storage_local_folder, folder)
             os.makedirs(full_folder, exist_ok=True)
+        return True
+
+    def find_metadata_file(self, local_folder):
+        """Find excel extension file which contains metatada"""
+        reg_for_xlsx = os.path.join(local_folder, "*.xlsx")
+        ex_files = glob.glob(reg_for_xlsx)
+        if len(ex_files) == 0:
+            log.error("Excel file for metadata does not exist on %s", local_folder)
+            stderr.print("[red] Metadata file does not exist on " + local_folder)
+            return False
+        if len(ex_files) > 1:
+            log.error("Too many Excel files on folder %s", local_folder)
+            stderr.print("[red] Metadata file does not exist on " + local_folder)
+            return False
+        return ex_files[0]
+
+    def get_sample_fastq_file_names(self, local_folder, meta_f_path):
+        """ """
+        if not os.path.isfile(meta_f_path):
+            log.error("Metadata file does not exists on %s", local_folder)
+            stderr.print("[red] METADATA_LAB.xlsx do not exist in" + local_folder)
+            return False
+        wb_file = openpyxl.load_workbook(meta_f_path, data_only=True)
+        ws_metadata_lab = wb_file["METADATA_LAB"]
+        sample_file_list = {}
+        # find out the index for file names
+        for col in ws_metadata_lab[4]:
+            if "Sequence file R1 fastq" == col.value:
+                index_fastq_r1 = col.column - 1
+            elif "Sequence file R2 fastq" == col.value:
+                index_fastq_r2 = col.column - 1
+        for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
+            if row[2] is not None:
+                if row[2] not in sample_file_list:
+                    sample_file_list[row[2]] = {}
+                if row[index_fastq_r1] is not None:
+                    sample_file_list[row[2]]["fastq_r1"] = row[index_fastq_r1]
+                else:
+                    log.error(
+                        "Fastq_R1 not defined in Metadata file for sample %s", row[2]
+                    )
+                    stderr.print("[red] No fastq R1 file for sample " + row[2])
+                    return False
+                if row[index_fastq_r2] is not None:
+                    sample_file_list[row[2]]["fastq_r2"] = row[index_fastq_r2]
+        return sample_file_list
+
+    def validate_download_files(self, sample_file_list, local_folder):
+        """Check if download sample files are the ones defined on metadata file"""
+        if not sample_file_list:
+            return False
+
+        for sample, files in sample_file_list.items():
+            for file in files.values():
+                if not os.path.isfile(os.path.join(local_folder, file)):
+                    log.error("File %s does not exist", file)
+                    stderr.print("[red] File " + file + " does not exist")
+                    return False
         return True
 
     def delete_remote_files(self, folder, files):
@@ -259,6 +326,11 @@ class SftpHandle:
             except FileNotFoundError:
                 continue
         return
+
+    def delete_local_folder(self, local_folder):
+        """Delete download folder because files does not complain requisites"""
+        shutil.rmtree(local_folder, ignore_errors=True)
+        return True
 
     def download(self):
         try:
@@ -288,6 +360,8 @@ class SftpHandle:
             sys.exit(0)
 
         for folder, files in folders_to_download.items():
+            log.info("Processing folder %s", folder)
+            stderr.print("Processing folder " + folder)
             # get the files in each folder
             result_data = self.get_files_from_sftp_folder(folder, files)
             md5_files, req_retransmition = self.verify_md5_checksum(
@@ -308,9 +382,21 @@ class SftpHandle:
                         f"[red] Stop processing folder {folder} because of corrupted files {corrupted}"
                     )
                     continue
-            self.create_tmp_files_with_metadata_info(
-                result_data["local_folder"], result_data["fetched_files"], md5_files
+            meta_file = self.find_metadata_file(result_data["local_folder"])
+            sample_file_list = self.get_sample_fastq_file_names(
+                result_data["local_folder"], meta_file
             )
-            self.delete_remote_files(folder, files)
+            if self.validate_download_files(
+                sample_file_list, result_data["local_folder"]
+            ):
+
+                self.create_tmp_files_with_metadata_info(
+                    result_data["local_folder"], sample_file_list, md5_files, meta_file
+                )
+                # self.delete_remote_files(folder, files)
+            else:
+                log.info("Deleting local folder %s", result_data["local_folder"])
+                self.delete_local_folder(result_data["local_folder"])
+
         self.close_connection()
         return
