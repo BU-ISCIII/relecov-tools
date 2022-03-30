@@ -191,7 +191,7 @@ def download(user, password, conf_file, test):
 )
 def read_metadata(metadata_file, sample_list_file, metadata_out):
     """
-    Create the json complaining the relecov schema from the Metadata file.
+    Create the json compliant to the relecov schema from the Metadata file.
     """
     new_metadata = relecov_tools.read_metadata.RelecovMetadata(
         metadata_file, sample_list_file, metadata_out

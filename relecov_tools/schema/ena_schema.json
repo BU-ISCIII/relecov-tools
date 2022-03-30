@@ -29,7 +29,11 @@
       "type": "string",
       "description": "The user-defined name for the sample.",
       "clasification": "Database Identifiers",
-      "label": "Sample ID given by originating laboratory"
+      "label": "Sample ID given by originating laboratory",
+      "table": [
+        "sample",
+        "experiments"
+      ]
     },
     "collecting_institution": {
       "examples": [
@@ -38,7 +42,8 @@
       "ontology": "GENEPIO:0001153",
       "type": "string",
       "description": "Name of the institution to which the person collecting the specimen belongs. Format: Institute Name, Institute Address",
-      "label": "Originating Laboratory"
+      "label": "Originating Laboratory",
+      "table": "sample"
     },
     "collector_name": {
       "examples": [
@@ -48,7 +53,8 @@
       "type": "string",
       "description": "Name of the person who collected the specimen",
       "clasification": "Sample collection and processing",
-      "label": "Collector name"
+      "label": "Collector name",
+      "table": "sample"
     },
     "collection_date": {
       "examples": [
@@ -59,7 +65,8 @@
       "description": "The date on which the sample was collected.",
       "format": "date",
       "classification": "Sample collection and processing",
-      "label": "Sample Collection Date"
+      "label": "Sample Collection Date",
+      "table": "sample"
     },
     "receipt_date": {
       "examples": [
@@ -71,6 +78,19 @@
       "format": "date",
       "clasification": "Sample collection and processing",
       "label": "Sample Received Date"
+    },
+    "design_description": {
+      "examples": [
+        "design_description_1"
+      ],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification": "",
+      "label": "Design description",
+      "table": [
+        "experiments"
+      ]
     },
     "geographic_location_(country_and/or_sea)": {
       "Enums": [
@@ -358,7 +378,8 @@
         "South Africa [GAZ:00001094]"
       ],
       "clasification": "Sample collection and processing",
-      "label": "Geo Loc Autonomic Country"
+      "label": "Geo Loc Autonomic Country",
+      "table": "sample"
     },
     "geographic location (region and locality)": {
       "ontology": "GENEPIO:0100280",
@@ -399,7 +420,8 @@
       ],
       "genepio_label": "isolate identifier",
       "clasification": "Sample collection and processing",
-      "label": "Sample ID given by originating laboratory"
+      "label": "Sample ID given by originating laboratory",
+      "table": "sample"
     },
     "purpose_sampling": {
       "examples": [
@@ -486,7 +508,7 @@
       "clasification": "Sample collection and processing",
       "label": "Environmental Material"
     },
-    "host common name": {
+    "host_common_name": {
       "Enums": [
         "Human [NCBITaxon:9606]",
         "Bat [NCBITaxon:9397]",
@@ -514,9 +536,10 @@
         "Human [NCBITaxon:9606]"
       ],
       "classification": "Host information",
-      "label": "Host Common Name"
+      "label": "Host Common Name",
+      "table": "sample"
     },
-    "host scientific name": {
+    "host_scientific_name": {
       "Enums": [
         "Bos taurus [NCBITaxon:9913]",
         "Canis lupus familiaris [NCBITaxon:9615]",
@@ -547,7 +570,10 @@
         "Homo sapiens [NCBITaxon:9606]"
       ],
       "clasification": "Host information",
-      "label": "Host Scientific Name"
+      "label": "Host Scientific Name",
+      "table": [
+        "runs"
+      ]
     },
     "host_subject_id": {
       "examples": [
@@ -557,7 +583,35 @@
       "type": "string",
       "description": "a unique identifier by which each subject can be referred to, de-identified.",
       "clasification": "Host information",
-      "label": "Host Subject Id"
+      "label": "Host Subject Id",
+      "table": [
+        "sample"
+      ]
+    },
+    "host_gender": {
+      "Enums": [
+        "Female [NCIT:C46110]",
+        "Male [NCIT:C46109]",
+        "Non-binary Gender [GSSO:000132]",
+        "Transgender (assigned male at birth) [GSSO:004004]",
+        "Transgender (assigned female at birth) [GSSO:004005]",
+        "Undeclared [NCIT:C110959]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
+      "ontology": "GENEPIO:0001395",
+      "type": "string",
+      "description": "The gender of the host at the time of sample collection.",
+      "examples": [
+        "Male [NCIT:C46109]"
+      ],
+      "label": "Host Gender",
+      "table": [
+        "sample"
+      ]
     },
     "type exposure": {
       "examples": [
@@ -640,7 +694,10 @@
         "Oxford Nanopore MinION [GENEPIO:0100142]"
       ],
       "classification": "Sequencing",
-      "label": "Sequencing Instrument Model"
+      "label": "Sequencing Instrument Model",
+      "table": [
+        "experiments"
+      ]
     },
     "instrument_platform": {
       "examples": [
@@ -649,7 +706,10 @@
       "ontology": "GENEPIO_0000071",
       "type": "string",
       "description": "The model of the sequencing instrument used.",
-      "label": "Sequencing Platforms "
+      "label": "Sequencing Platforms ",
+      "table": [
+        "experiments"
+      ]
     },
     "file_name": {
       "examples": [
@@ -659,7 +719,36 @@
       "type": "string",
       "description": "The user-specified filename of the r1 FASTQ file.",
       "clasification": "Bioinformatics and QC metrics",
-      "label": "Sequence file R1 fastq"
+      "label": "Sequence file R1 fastq",
+      "table": [
+        "runs"
+      ]
+    },
+    "file_type": {
+      "examples": [
+        "fastq"
+      ],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification": "Bioinformatics and QC metrics",
+      "label": "file type",
+      "table": [
+        "runs"
+      ]
+    },
+    "file_checksum": {
+      "examples": [
+        "3e69af1f875fab020aed82f5edbc1f03"
+      ],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification": "Bioinformatics and QC metrics",
+      "label": "file checksum",
+      "table": [
+        "runs"
+      ]
     },
     "tax_id": {
       "examples": [
@@ -669,7 +758,10 @@
       "type": "string",
       "description": "The NCBITaxon identifier for the organism being sequenced.",
       "clasification": "Sample collection and processing",
-      "label": "Tax ID"
+      "label": "Tax ID",
+      "table": [
+        "sample"
+      ]
     },
     "scientific_name": {
       "Enums": [
@@ -689,7 +781,8 @@
       "description": "The taxonomic name of the organism.",
       "clasification": "Sample collection and processing",
       "classification": "Sample collection and processing",
-      "label": "Organism"
+      "label": "Organism",
+      "table": "sample"
     },
     "common_name": {
       "examples": [
@@ -709,7 +802,8 @@
       "type": "string",
       "description": "Free text description of the sample.",
       "clasification": "Sample collection and processing",
-      "label": "Sample Description"
+      "label": "Sample Description",
+      "table": "sample"
     },
     "sample_storage_conditions": {
       "examples": [
@@ -755,7 +849,10 @@
       "type": "string",
       "description": "Molecule type used to make the library.",
       "clasification": "Sequencing",
-      "label": "Source material"
+      "label": "Source material",
+      "table": [
+        "experiments"
+      ]
     },
     "library_selection": {
       "examples": [
@@ -765,7 +862,23 @@
       "type": "string",
       "description": "Library capture method.",
       "clasification": "Sequencing",
-      "label": "Capture method"
+      "label": "Capture method",
+      "table": [
+        "experiments"
+      ]
+    },
+    "library_construction_protocol": {
+      "examples": [
+        "library_construction_protocol_1"
+      ],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification": "Sequencing",
+      "label": "Library Construction protocol",
+      "table": [
+        "experiments"
+      ]
     },
     "library_strategy": {
       "Enums": [
@@ -797,7 +910,10 @@
       "type": "string",
       "description": "Overall sequencing strategy or approach.",
       "clasification": "Sequencing",
-      "label": "Sequencing technique"
+      "label": "Sequencing technique",
+      "table": [
+        "experiments"
+      ]
     },
     "library_layout": {
       "examples": [
@@ -807,7 +923,10 @@
       "type": "string",
       "description": "Single or paired.",
       "clasification": "Sequencing",
-      "label": "Library Layout"
+      "label": "Library Layout",
+      "table": [
+        "experiments"
+      ]
     },
     "library_name": {
       "examples": [
@@ -817,7 +936,10 @@
       "type": "string",
       "description": "The submitter's name for this library.",
       "clasification": "Sequencing",
-      "label": "Library Name"
+      "label": "Library Name",
+      "table": [
+        "experiments"
+      ]
     },
     "nominal_length ": {
       "examples": [
@@ -939,6 +1061,19 @@
       "clasification": "Submission ENA",
       "label": "Base count"
     },
+    "insert_size": {
+      "examples": [
+        "250"
+      ],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Insert size",
+      "table": [
+        "experiments"
+      ]
+    },
     "center_name": {
       "examples": [
         " KAROLINSKA INSITUTET"
@@ -971,13 +1106,29 @@
     },
     "experiment_title": {
       "examples": [
-        "e.g Illumina MiSeq paired end sequencing"
+        "experiment_title_1"
       ],
-      "ontology": "ORNASEQ_0000004",
+      "ontology": "0",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
-      "label": "Experiment title"
+      "label": "Experiment title",
+      "table": [
+        "experiments"
+      ]
+    },
+    "sample_title": {
+      "examples": [
+        ""
+      ],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Sample title",
+      "table": [
+        "sample"
+      ]
     },
     "study_title": {
       "examples": [
@@ -987,7 +1138,47 @@
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
-      "label": "Study title"
+      "label": "Study title",
+      "table": [
+        "study"
+      ]
+    },
+    "study_type": {
+      "examples": [
+        ""
+      ],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Study type",
+      "table": "study"
+    },
+    "pubmed_id": {
+      "examples": [
+        ""
+      ],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "pubmed id",
+      "table": [
+        "study"
+      ]
+    },
+    "study_abstract": {
+      "examples": [
+        ""
+      ],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Study abstract",
+      "table": [
+        "study"
+      ]
     },
     "study_alias": {
       "examples": [
@@ -997,17 +1188,24 @@
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
-      "label": "Study alias"
+      "label": "Study alias",
+      "table": [
+        "study",
+        "experiments"
+      ]
     },
     "experiment_alias": {
       "examples": [
-        "e.g ena-STUDY-KAROLINSKA INSITUTET-29-07-2020-14:18:07:925-2092"
+        "experiment_alias_7a"
       ],
-      "ontology": "NCIT_C42790",
+      "ontology": "0",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
-      "label": "Experiment alias"
+      "label": "Experiment alias",
+      "table": [
+        "experiments"
+      ]
     },
     "run_alias": {
       "examples": [
@@ -1017,7 +1215,10 @@
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
-      "label": "Run Alias"
+      "label": "Run Alias",
+      "table": [
+        "runs"
+      ]
     },
     "fastq_bytes": {
       "examples": [
