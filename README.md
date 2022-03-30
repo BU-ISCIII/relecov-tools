@@ -203,4 +203,4 @@ DOCs soon!!
 
 
 ## Acknowledgements
-Python package idea and designed is really inspired in [nf-core/tools](https://github.com/nf-core/tools).
+Python package idea and design is really inspired in [nf-core/tools](https://github.com/nf-core/tools).
