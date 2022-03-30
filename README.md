@@ -4,7 +4,7 @@
 
 > THIS REPO IS IN ACTIVE DEVELOPMENT.
 
-relecov-tools is a set of helper tools for the assembly of the different elements in the RELECOV platform (Spanish Network for genomic surveillance of SARS-Cov-2) as data download, processing, validation and upload to publica databases, as well as analysis runs and database storage.
+relecov-tools is a set of helper tools for the assembly of the different elements in the RELECOV platform (Spanish Network for genomic surveillance of SARS-Cov-2) as data download, processing, validation and upload to public databases, as well as analysis runs and database storage.
 
 ## Table of contents
 
