@@ -20,10 +20,10 @@ relecov-tools is a set of helper tools for the assembly of the different element
 ## Installation
 
 ### Bioconda
-soon
+Soon
 
 ### Pip
-soon
+Soon
 
 ### Development version
 If you want to install the latest code in the repository:
@@ -64,9 +64,92 @@ Commands:
     launch            launch viralrecon in hpc
     update-db         feed database with metadata jsons
 ```
+#### download
+The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different foldes available in the passed credentials. In addition, it checks if the files in the folder match the files in the metadata file and checks if there are md5sum for each file, if not it creates one before storing in the final repository.
+
+```
+$ relecov-tools download --help
+Usage: relecov-tools download [OPTIONS]
+
+  Download files located in sftp server.
+
+  Options:
+    -u, --user TEXT       User name for login to sftp server
+    -p, --password TEXT   password for the user to login
+    -f, --conf_file TEXT  Configuration file in yaml format (no params file)
+    --help                Show this message and exit.
+```
+
+Configuration can be passed in several formats:
+- if no config_file is passed default values are fetched from conf/configuration.json, and user and password are asked in prompt.
+- Default values can be overwritten using a yml config file, so you can input user, password, sftp_server, etc.
+
+Config file example with all available options:
+```
+sftp_server: "sftprelecov.isciii.es"
+sftp_port: "22"
+sftp_user : "user"
+sftp_passwd : "pass"
+storage_local_folder: "/tmp/relecov"
+tmp_folder_for_metadata: "/tmp/relecov/tmp"
+allowed_sample_extensions:
+    - .fastq.gz
+    - .fasta
+```
+
+#### read-metadata
+`read-metadata` command reads the excel file with laboratory metadata and processes it adding aditional needed fields.
+
+```
+$ relecov-tools read-metadata --help
+Usage: relecov-tools read-metadata [OPTIONS]
+
+  Create the json compliant to the relecov schema from the Metadata file.
+
+  Options:
+    -m, --metadata_file PATH     file containing metadata in xlsx format.
+    -s, --sample_list_file PATH  Json with the additional metadata to add to the
+    received user metadata.
+    -o, --metadata-out PATH      Path to save output  metadata file in json format.
+    --help                       Show this message and exit.
+```
 
 
-# Python package mode
+An example for the metadata excel file can be found [here](./relecov_tools/example_data/METADATA_LAB_TEST.xlsx)
+
+#### validate
+`validate` commands validate the data in json format outputted by `read-metadata` command against a json schema, in this case the relecov [schema specification](./relecov_tools/schema/relecov_schema.json).
+
+```
+$ relecov-tools validate --help
+Usage: relecov-tools validate [OPTIONS]
+
+  Validate json file against schema.
+
+  Options:
+    -j, --json_file TEXT    Json file to validate
+    -s, --json_schema TEXT  Json schema
+    -o, --out_folder TEXT   Path to save validate json file
+    --help                  Show this message and exit.
+
+```
+
+#### map
+
+
+#### upload-to-ena
+
+
+#### upload-to-gisaid
+SOON
+
+#### launch
+SOON
+
+#### update-db
+SOON
+
+#### Python package mode
 relecov-tools is designed in a way that you can use import the different modules and use them in your own scripts, for example:
 
 ```

@@ -126,20 +126,20 @@ def relecov_tools_cli(verbose, log_file):
         log.addHandler(log_fh)
 
 
-#@relecov_tools_cli.command(help_priority=1)
-#@click.argument("keywords", required=False, nargs=-1, metavar="<filter keywords>")
-#@click.option(
+# @relecov_tools_cli.command(help_priority=1)
+# @click.argument("keywords", required=False, nargs=-1, metavar="<filter keywords>")
+# @click.option(
 #    "-s",
 #    "--sort",
 #    type=click.Choice(["release", "pulled", "name", "stars"]),
 #    default="release",
 #    help="How to sort listed pipelines",
-#)
-#@click.option("--json", is_flag=True, default=False, help="Print full output as JSON")
-#@click.option(
+# )
+# @click.option("--json", is_flag=True, default=False, help="Print full output as JSON")
+# @click.option(
 #    "--show-archived", is_flag=True, default=False, help="Print archived workflows"
-#)
-#def list(keywords, sort, json, show_archived):
+# )
+# def list(keywords, sort, json, show_archived):
 #    """
 #    List available bu-isciii workflows used for relecov.
 #    Checks the web for a list of nf-core pipelines with their latest releases.
@@ -159,9 +159,7 @@ def relecov_tools_cli(verbose, log_file):
 )
 def download(user, password, conf_file):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp_handle.SftpHandle(
-        user, password, conf_file
-    )
+    sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file)
     sftp_connection.download()
 
 
