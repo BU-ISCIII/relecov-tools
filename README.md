@@ -135,10 +135,43 @@ Usage: relecov-tools validate [OPTIONS]
 ```
 
 #### map
+The command `map` converts a data in json format from relecov data model to ena or gisaid data model using their own schemas acording to their annotated ontoly terms.
 
+```
+$ relecov-tools map --help
+Usage: relecov-tools map [OPTIONS]
+
+  Convert data between phage plus schema to ENA, GISAID, or any other schema
+
+  Options:
+    -p, --origin_schema TEXT        File with the origin (relecov) schema
+    -j, --json_data TEXT            File with the json data to convert
+    -d, --destination_schema [ENA|GSAID|other]
+    schema to be mapped
+    -f, --schema_file TEXT          file with the custom schema
+    -o, --output TEXT               File name and path to store the mapped json
+    --help                          Show this message and exit.
+```
 
 #### upload-to-ena
+`upload-to-ena` command uses json data mapped to ena schema to use the [ena_upload_cli](https://github.com/usegalaxy-eu/ena-upload-cli) package to upload raw data and metadata to ENA db.
 
+```
+Usage: relecov-tools upload-to-ena [OPTIONS]
+
+  parsed data to create xml files to upload to ena
+
+  Options:
+    -u, --user TEXT                          user name for login to ena
+    -p, --password TEXT                      password for the user to login
+    -e, --ena_json TEXT                      where the validated json is
+    -s, --study TEXT                         study/project name to include in xml files
+    -a, --action [add|modify|cancel|release] select one of the available options
+    --dev / --production
+    -o, --output_path TEXT                   output folder for the xml generated files
+    --help                                   Show this message and exit.
+
+```
 
 #### upload-to-gisaid
 SOON
@@ -167,3 +200,5 @@ sftp_connection.download()
 DOCs soon!!
 
 
+## Acknowledgements
+Python package idea and designed is really inspired in [nf-core/tools](https://github.com/nf-core/tools).

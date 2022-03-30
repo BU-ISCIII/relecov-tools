@@ -216,7 +216,7 @@ def validate(json_file, json_schema, out_folder):
 
 # mapping to ENA schema
 @relecov_tools_cli.command(help_priority=5)
-@click.option("-p", "--phage_plus_schema", help="File with the phage plus schema")
+@click.option("-p", "--origin_schema", help="File with the origin (relecov) schema")
 @click.option("-j", "--json_data", help="File with the json data to convert")
 @click.option(
     "-d",
@@ -229,7 +229,7 @@ def validate(json_file, json_schema, out_folder):
 def map(phage_plus_schema, json_data, destination_schema, schema_file, output):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
     new_schema = relecov_tools.conversion_schema.MappingSchema(
-        phage_plus_schema, json_data, destination_schema, schema_file, output
+        origin_schema, json_data, destination_schema, schema_file, output
     )
     new_schema.map_to_data_to_new_schema()
 
