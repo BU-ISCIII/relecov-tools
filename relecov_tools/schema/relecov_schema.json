@@ -1,5 +1,5 @@
 {
-    "schema": "PHAGE_PLUS",
+    "schema": "RELECOV",
     "required": [
         "collecting_lab_sample_id",
         "collecting_institution",
