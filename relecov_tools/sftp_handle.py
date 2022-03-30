@@ -217,7 +217,9 @@ class SftpHandle:
             )
         return sftp_md5, required_retransmition
 
-    def create_tmp_files_with_metadata_info(self, local_folder, file_list, md5_data, metadata_file):
+    def create_tmp_files_with_metadata_info(
+        self, local_folder, file_list, md5_data, metadata_file
+    ):
         """Copy metadata file from folder and create a file with the sample
         names
         """
@@ -239,17 +241,13 @@ class SftpHandle:
         data = copy.deepcopy(file_list)
 
         for s_name, values in file_list.items():
-            for f_type , f_name in values.items():
+            for f_type, f_name in values.items():
                 if not f_name.endswith(tuple(self.allowed_sample_ext)):
                     stderr.print("[red] " + f_name + " has a not valid extension")
                 data[s_name]["local_folder"] = md5_data[f_name][0]
                 data[s_name][f_type + "_md5"] = md5_data[f_name][1]
         with open(sample_data_path, "w", encoding="utf-8") as fh:
-            fh.write(
-                json.dumps(
-                    data, indent=4, sort_keys=True, ensure_ascii=False
-                )
-            )
+            fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
 
         return True
 
@@ -261,7 +259,7 @@ class SftpHandle:
         return True
 
     def find_metadata_file(self, local_folder):
-        """Find excel extension file which contains metatada """
+        """Find excel extension file which contains metatada"""
         reg_for_xlsx = os.path.join(local_folder, "*.xlsx")
         ex_files = glob.glob(reg_for_xlsx)
         if len(ex_files) == 0:
