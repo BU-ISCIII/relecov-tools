@@ -25,7 +25,7 @@ stderr = rich.console.Console(
 
 
 class SftpHandle:
-    def __init__(self, user=None, passwd=None, conf_file=None, test=None):
+    def __init__(self, user=None, passwd=None, conf_file=None):
         """Initializes the sftp object"""
         config_json = ConfigJson()
         self.allowed_sample_ext = config_json.get_configuration(
@@ -96,7 +96,6 @@ class SftpHandle:
                 msg="Enter your password"
             )
         self.client = None
-        self.test = test
 
     def open_connection(self):
         """Establish sftp connection"""

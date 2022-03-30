@@ -158,7 +158,6 @@ def list(keywords, sort, json, show_archived):
     "--conf_file",
     help="Configuration file Create Nextflow command with params (no params file)",
 )
-@click.option("--test", is_flag=True, default=False, help="download files for testing")
 def download(user, password, conf_file, test):
     """Download files located in sftp server."""
     sftp_connection = relecov_tools.sftp_handle.SftpHandle(
