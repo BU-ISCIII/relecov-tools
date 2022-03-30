@@ -68,7 +68,7 @@ Commands:
     update-db         feed database with metadata jsons
 ```
 #### download
-The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different available folders in the passed credentials. In addition, it checks if the files in the current folder match the files in the metadata file and also checks if there are md5sum for each file. If not, it creates one before storing in the final repository.
+The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different available folders in the passed credentials. In addition, it checks if the files in the current folder match the files in the metadata file and also checks if there are md5sum for each file. Else, it creates one before storing in the final repository.
 
 ``` 
 $ relecov-tools download --help
@@ -84,7 +84,7 @@ Usage: relecov-tools download [OPTIONS]
 ```
 
 Configuration can be passed in several formats:
-- if no config_file is passed default values are fetched from conf/configuration.json, and user and password are asked in prompt.
+- if no config_file is passed, default values are fetched from conf/configuration.json, and user and password are asked in prompt.
 - Default values can be overwritten using a yml config file, so you can input user, password, sftp_server, etc.
 
 Config file example with all available options:
