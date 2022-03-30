@@ -573,7 +573,8 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "Sample ID given by the submitting laboratory"
+            "description": "Sample ID given by the submitting laboratory",
+            "label": "Sample ID given by the submitting laboratory"
         },
         "bioproject_umbrella_accession_ENA": {
             "examples": [
@@ -603,7 +604,7 @@
             "type": "string",
             "description": "The identifier assigned to a BioSample in INSDC archives.",
             "clasification": "Database Identifiers",
-            "label": "ENA Sample Id"
+            "label": "ENA Sample ID"
         },
         "sra_accession": {
             "examples": [
@@ -1295,7 +1296,7 @@
                 "Human [NCBITaxon:9606]"
             ],
             "classification": "Host information",
-            "label": "Host Common Name"
+            "label": "Host"
         },
         "host_residence_country": {
             "Enums": [
@@ -1673,7 +1674,7 @@
             "examples": [
                 "Diagnostic Testing [GENEPIO:0100002]"
             ],
-            "label": "Purpose of Sampling"
+            "label": "Purpose of sampling"
         },
         "purpose_of_sampling_details": {
             "ontology": "GENEPIO:0001200",
@@ -1743,7 +1744,7 @@
             "description": "The date the sample was sequenced.",
             "format": "date",
             "clasification": "Sequencing",
-            "label": "Sequencing date"
+            "label": "Sequencing Date"
         },
         "rna_extraction_protocol": {
             "examples": [
@@ -1763,7 +1764,7 @@
             "type": "string",
             "description": "",
             "clasification": "Sequencing",
-            "label": "Library Kit"
+            "label": "Commercial All-in-one library kit"
         },
         "library_id": {
             "examples": [
@@ -1783,7 +1784,7 @@
             "type": "string",
             "description": "",
             "clasification": "Sequencing",
-            "label": "Enrichment_protocol"
+            "label": "Enrichment Protocol"
         },
         "if_enrichment_protocol_is_other_specify": {
             "examples": [
@@ -1803,7 +1804,7 @@
             "type": "string",
             "description": "",
             "clasification": "Sequencing",
-            "label": "Amplicon Protocol"
+            "label": "Amplicon panel/assay"
         },
         "if_amplicon_protocol_if_other_especify": {
             "examples": [
@@ -1813,7 +1814,7 @@
             "type": "string",
             "description": "",
             "clasification": "Sequencing",
-            "labe": "If Amplicon Protocol If Other, Especify"
+            "label": "If Amplicon Protocol If Other, Especify"
         },
         "amplicon_version": {
             "examples": [
@@ -1863,7 +1864,7 @@
             "type": "string",
             "description": "",
             "clasification": "Sequencing",
-            "labe": "Flowcell Kit"
+            "label": "Flowcell Kit"
         },
         "runID": {
             "examples": [
@@ -1873,7 +1874,7 @@
             "type": "string",
             "description": "",
             "clasification": "Sequencing",
-            "label": "RunID"
+            "label": "Runid"
         },
         "sequencing_platforms": {
             "examples": [
