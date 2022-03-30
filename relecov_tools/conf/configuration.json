@@ -1,6 +1,6 @@
 {
     "json_schemas": {
-        "phage_plus_schema": "phage_plus_schema.json",
+        "relecov_schema": "relecov_schema.json",
         "ena_schema": "ena_schema.json",
         "gisaid_schema": "gisaid_schema.json"
     },
