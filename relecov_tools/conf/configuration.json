@@ -18,7 +18,7 @@
         "fasta"
     ],
     "laboratory_data": "laboratory_address.json",
-    "geo_location_data" : "geo_loc_cities",
+    "geo_location_data" : "geo_loc_cities.json",
     "study": {
         "alias": "RELECOV",
         "title": "Example project for ENA submission RELECOV",
