@@ -42,7 +42,9 @@ class RelecovMetadata:
             self.sample_list_file = sample_list_file
         if not os.path.exists(self.sample_list_file):
             log.error("Sample information file %s does not exist ", self.metadata_file)
-            stderr.print("[red] Sample information " + self.sample_list_file + " does not exist")
+            stderr.print(
+                "[red] Sample information " + self.sample_list_file + " does not exist"
+            )
             sys.exit(1)
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
@@ -52,11 +54,13 @@ class RelecovMetadata:
             self.output_folder = output_folder
         config_json = ConfigJson()
         relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
-        relecov_sch_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema)
+        relecov_sch_path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
+        )
         with open(relecov_sch_path, "r") as fh:
             self.relecov_sch_json = json.load(fh)
         self.label_prop_dict = {}
-        for prop, values in self.relecov_sch_json['properties'].items():
+        for prop, values in self.relecov_sch_json["properties"].items():
             try:
                 self.label_prop_dict[values["label"]] = prop
             except KeyError:
@@ -104,7 +108,7 @@ class RelecovMetadata:
                 break
         return data
 
-    def add_extra_data(self, metadata, extra_data, lab_json_file, geo_loc_file):
+    def add_extra_data(self, metadata, lab_json_file, geo_loc_file):
         """Add the additional information that must be included in final metadata
         metadata Origin metadata
         extra_data  additional data to be included
@@ -112,6 +116,7 @@ class RelecovMetadata:
         """
         lab_data = {}
         extra_metadata = []
+        extra_data = ""
         lab_json = self.read_json_file(lab_json_file)
         geo_loc_json = self.read_json_file(geo_loc_file)
         samples_json = self.read_json_file(self.sample_list_file)
@@ -228,19 +233,26 @@ class RelecovMetadata:
             for idx in range(2, len(heading)):
                 if "date" in heading[idx]:
                     try:
-                        sample_data_row[self.label_prop_dict[heading[idx]]] = row[idx].strftime("%Y/%m/%d")
+                        sample_data_row[self.label_prop_dict[heading[idx]]] = row[
+                            idx
+                        ].strftime("%Y/%m/%d")
                     except AttributeError:
                         if row[2] not in errors:
                             errors[row[2]] = {}
                         errors[row[2]][heading[idx]] = "Invalid date format"
                         log.error("Invalid date format in sample", row[2])
-                        stderr.print("[red] Invalid date format in sample", row[2] + " column " + heading[idx])
+                        stderr.print(
+                            "[red] Invalid date format in sample",
+                            row[2] + " column " + heading[idx],
+                        )
                 else:
                     try:
-                        sample_data_row[self.label_prop_dict[heading[idx]]] = row[idx] if row[idx] else ""
+                        sample_data_row[self.label_prop_dict[heading[idx]]] = (
+                            row[idx] if row[idx] else ""
+                        )
                     except KeyError as e:
-                        print (e)
-            import pdb; pdb.set_trace()
+                        print(e)
+
             metadata_values.append(sample_data_row)
         return metadata_values, errors
 
@@ -288,7 +300,6 @@ class RelecovMetadata:
 
         completed_metadata = self.add_extra_data(
             valid_metadata_rows,
-            meta_map_json["Additional_fields"],
             lab_json_file,
             geo_loc_file,
         )
