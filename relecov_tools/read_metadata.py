@@ -67,12 +67,6 @@ class RelecovMetadata:
             except KeyError:
                 continue
 
-    def check_new_metadata(folder):
-        """Check if there is a new metadata to be processed
-        folder  Directory to be checked
-        """
-        pass
-
     def fetch_metadata_file(folder, file_name):
         """Fetch the metadata file folder  Directory to fetch metadata file
         file_name   metadata file name
@@ -124,6 +118,17 @@ class RelecovMetadata:
         }
         return fixed_data
 
+    def include_processed_data(self, metadata):
+        """Include the data that requires to be processed to set the value
+        """
+        new_data = {}
+        p_data = {"host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]}}
+        for key, values in p_data.items():
+            v_data = metadata[key]
+            if v_data in values:
+                new_data[values[v_data][0]] = values[v_data][1]
+        return new_data
+
     def add_additional_data(self, metadata, lab_json_file, geo_loc_file):
         """Add the additional information that must be included in final metadata
         metadata Origin metadata
@@ -132,7 +137,7 @@ class RelecovMetadata:
         """
         lab_data = {}
         additional_metadata = []
-        extra_data = ""
+
         lab_json = self.read_json_file(lab_json_file)
         geo_loc_json = self.read_json_file(geo_loc_file)
         samples_json = self.read_json_file(self.sample_list_file)
@@ -162,9 +167,9 @@ class RelecovMetadata:
             """
             row_sample.update(self.include_fixed_data())
 
-            """Add information which is already fetched but required
+            """Add information which requires processing
             """
-
+            row_sample.update(self.include_processed_data(row_sample))
             """
             row["isolate"] = row["collecting_lab_sample_id"]
             row["host_scientific_name"] = extra_data["host_scientific_name"][
@@ -173,6 +178,7 @@ class RelecovMetadata:
             row["sequencing_instrument_platform"] = "To change"
             """
             additional_metadata.append(row_sample)
+            import pdb; pdb.set_trace()
         return additional_metadata
 
         # def compare_sample_in_metadata(self, completed_metadata):
