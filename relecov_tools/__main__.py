@@ -234,6 +234,7 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
     new_schema.map_to_data_to_new_schema()
 
 
+# upload to ENA
 @relecov_tools_cli.command(help_priority=6)
 @click.option("-u", "--user", help="user name for login to ena")
 @click.option("-p", "--password", help="password for the user to login")
@@ -249,10 +250,10 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
 @click.option("-o", "--output_path", help="output folder for the xml generated files")
 def upload_to_ena(user, password, ena_json, dev, study, action, output_path):
     """parsed data to create xml files to upload to ena"""
-    upload_ena = relecov_tools.ena_upload.upload(
+    upload_ena = relecov_tools.ena_upload.EnaUpload(
         user, password, ena_json, dev, study, action, output_path
     )
-    upload_ena.upload_files_to_ena()
+    upload_ena.upload()
 
 
 @relecov_tools_cli.command(help_priority=7)
