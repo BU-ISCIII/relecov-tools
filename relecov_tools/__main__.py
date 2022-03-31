@@ -126,27 +126,26 @@ def relecov_tools_cli(verbose, log_file):
         log.addHandler(log_fh)
 
 
-# pipeline list
-@relecov_tools_cli.command(help_priority=1)
-@click.argument("keywords", required=False, nargs=-1, metavar="<filter keywords>")
-@click.option(
-    "-s",
-    "--sort",
-    type=click.Choice(["release", "pulled", "name", "stars"]),
-    default="release",
-    help="How to sort listed pipelines",
-)
-@click.option("--json", is_flag=True, default=False, help="Print full output as JSON")
-@click.option(
-    "--show-archived", is_flag=True, default=False, help="Print archived workflows"
-)
-def list(keywords, sort, json, show_archived):
-    """
-    List available bu-isciii workflows used for relecov.
-    Checks the web for a list of nf-core pipelines with their latest releases.
-    Shows which nf-core pipelines you have pulled locally and whether they are up to date.
-    """
-    pass
+# @relecov_tools_cli.command(help_priority=1)
+# @click.argument("keywords", required=False, nargs=-1, metavar="<filter keywords>")
+# @click.option(
+#    "-s",
+#    "--sort",
+#    type=click.Choice(["release", "pulled", "name", "stars"]),
+#    default="release",
+#    help="How to sort listed pipelines",
+# )
+# @click.option("--json", is_flag=True, default=False, help="Print full output as JSON")
+# @click.option(
+#    "--show-archived", is_flag=True, default=False, help="Print archived workflows"
+# )
+# def list(keywords, sort, json, show_archived):
+#    """
+#    List available bu-isciii workflows used for relecov.
+#    Checks the web for a list of nf-core pipelines with their latest releases.
+#    Shows which nf-core pipelines you have pulled locally and whether they are up to date.
+#    """
+#    pass
 
 
 # sftp
@@ -156,14 +155,11 @@ def list(keywords, sort, json, show_archived):
 @click.option(
     "-f",
     "--conf_file",
-    help="Configuration file Create Nextflow command with params (no params file)",
+    help="Configuration file (no params file)",
 )
-@click.option("--test", is_flag=True, default=False, help="download files for testing")
-def download(user, password, conf_file, test):
+def download(user, password, conf_file):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp_handle.SftpHandle(
-        user, password, conf_file, test
-    )
+    sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file)
     sftp_connection.download()
 
 
@@ -220,7 +216,7 @@ def validate(json_file, json_schema, out_folder):
 
 # mapping to ENA schema
 @relecov_tools_cli.command(help_priority=5)
-@click.option("-p", "--phage_plus_schema", help="File with the phage plus schema")
+@click.option("-p", "--origin_schema", help="File with the origin (relecov) schema")
 @click.option("-j", "--json_data", help="File with the json data to convert")
 @click.option(
     "-d",
@@ -230,10 +226,10 @@ def validate(json_file, json_schema, out_folder):
 )
 @click.option("-f", "--schema_file", help="file with the custom schema")
 @click.option("-o", "--output", help="File name and path to store the mapped json")
-def map(phage_plus_schema, json_data, destination_schema, schema_file, output):
+def map(origin_schema, json_data, destination_schema, schema_file, output):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
     new_schema = relecov_tools.conversion_schema.MappingSchema(
-        phage_plus_schema, json_data, destination_schema, schema_file, output
+        origin_schema, json_data, destination_schema, schema_file, output
     )
     new_schema.map_to_data_to_new_schema()
 

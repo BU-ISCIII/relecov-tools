@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from itertools import islice
-from geopy.geocoders import Nominatim
+
+# from geopy.geocoders import Nominatim
 import json
 import logging
 import rich.console
@@ -32,19 +33,39 @@ class RelecovMetadata:
             self.metadata_file = metadata_file
         if not os.path.exists(self.metadata_file):
             log.error("Metadata file %s does not exist ", self.metadata_file)
+            stderr.print("[red] Metadata file " + self.meta_file + " does not exist")
             sys.exit(1)
         if sample_list_file is None:
             self.sample_list_file = relecov_tools.utils.prompt_path(
-                msg="Select the file which contains the sample list"
+                msg="Select the file which contains the sample information"
             )
         else:
             self.sample_list_file = sample_list_file
+        if not os.path.exists(self.sample_list_file):
+            log.error("Sample information file %s does not exist ", self.metadata_file)
+            stderr.print(
+                "[red] Sample information " + self.sample_list_file + " does not exist"
+            )
+            sys.exit(1)
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
             self.output_folder = output_folder
+        config_json = ConfigJson()
+        relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
+        relecov_sch_path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
+        )
+        with open(relecov_sch_path, "r") as fh:
+            self.relecov_sch_json = json.load(fh)
+        self.label_prop_dict = {}
+        for prop, values in self.relecov_sch_json["properties"].items():
+            try:
+                self.label_prop_dict[values["label"]] = prop
+            except KeyError:
+                continue
 
     def check_new_metadata(folder):
         """Check if there is a new metadata to be processed
@@ -88,7 +109,7 @@ class RelecovMetadata:
                 break
         return data
 
-    def add_extra_data(self, metadata, extra_data, lab_json_file, geo_loc_file):
+    def add_extra_data(self, metadata, lab_json_file, geo_loc_file):
         """Add the additional information that must be included in final metadata
         metadata Origin metadata
         extra_data  additional data to be included
@@ -96,6 +117,7 @@ class RelecovMetadata:
         """
         lab_data = {}
         extra_metadata = []
+        extra_data = ""
         lab_json = self.read_json_file(lab_json_file)
         geo_loc_json = self.read_json_file(geo_loc_file)
         samples_json = self.read_json_file(self.sample_list_file)
@@ -144,9 +166,10 @@ class RelecovMetadata:
             extra_metadata.append(row)
         return extra_metadata
 
-    def compare_sample_in_metadata(self, completed_metadata):
+        # def compare_sample_in_metadata(self, completed_metadata):
         """Compare the samples defined in metadata file and the ones in the
         sample file
+        """
         """
         not_found_samples = []
         if not os.path.exists(self.sample_list_file):
@@ -160,6 +183,7 @@ class RelecovMetadata:
         if len(not_found_samples) > 0:
             return not_found_samples
         return True
+        """
 
     def request_information(external_url, request):
         """Get information from external database server using Rest API
@@ -173,15 +197,18 @@ class RelecovMetadata:
         """Update information"""
         pass
 
-    def get_geo_location_data(self, state, country):
+        # def get_geo_location_data(self, state, country):
         """Get the geo_loc_latitude and geo_loc_longitude from state"""
+        """
         geolocator = Nominatim(user_agent="geoapiRelecov")
         loc = geolocator.geocode(state + "," + country)
         return [str(loc.latitude), str(loc.longitude)]
+        """
 
-    def update_heading_to_json(self, heading, meta_map_json):
+        # def update_heading_to_json(self, heading, meta_map_json):
         """Change the heading values from the metadata file for the ones defined
         in the json schema
+        """
         """
         mapped_heading = []
         for cell in heading:
@@ -190,32 +217,50 @@ class RelecovMetadata:
             else:
                 mapped_heading.append(cell)
         return mapped_heading
+        """
 
-    def read_metadata_file(self, meta_map_json):
-        """Read the input metadata file, mapping the metadata heading with
-        the values used in json. Convert the date colunms value to the
-        dd/mm/yyyy format. Return list of dict with data, and errors
+    def read_metadata_file(self):
+        """Read the input metadata file, changing the metadata heading with
+        their property name values defined in schema.
+        Convert the date colunms value to the dd/mm/yyyy format.
+        Return list of dict with data, and errors
         """
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
         # removing the None columns in excel heading row
-        heading_without_none = [i.value.strip() for i in ws_metadata_lab[4] if i.value]
-        heading = self.update_heading_to_json(heading_without_none, meta_map_json)
+        heading = [i.value.strip() for i in ws_metadata_lab[4] if i.value]
+        # heading = self.update_heading_to_json(heading_without_none, meta_map_json)
         metadata_values = []
         errors = {}
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             sample_data_row = {}
-            for idx in range(len(heading)):
+            # Ignore the empty rows
+            if row[2] is None:
+                continue
+            for idx in range(1, len(heading)):
                 if "date" in heading[idx]:
                     try:
-                        sample_data_row[heading[idx]] = row[idx].strftime("%Y/%m/%d")
+                        sample_data_row[self.label_prop_dict[heading[idx]]] = row[
+                            idx
+                        ].strftime("%Y/%m/%d")
                     except AttributeError:
-                        if row[0] not in errors:
-                            errors[row[0]] = {}
-                        errors[row[0]][heading[idx]] = "Invalid date format"
+                        if row[2] not in errors:
+                            errors[row[2]] = {}
+                        errors[row[2]][heading[idx]] = "Invalid date format"
+                        log.error("Invalid date format in sample %s", row[2])
+                        stderr.print(
+                            "[red] Invalid date format in sample",
+                            row[2] + " column " + heading[idx],
+                        )
                 else:
-                    sample_data_row[heading[idx]] = row[idx] if row[idx] else ""
+                    try:
+                        sample_data_row[self.label_prop_dict[heading[idx]]] = (
+                            row[idx] if row[idx] else ""
+                        )
+                    except KeyError as e:
+                        print(e)
             metadata_values.append(sample_data_row)
+        # import pdb; pdb.set_trace()
         return metadata_values, errors
 
     def write_json_fo_file(self, completed_metadata, file_name):
@@ -251,17 +296,17 @@ class RelecovMetadata:
         lab_json_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "conf", lab_json
         )
+        """
         metadata_mapping_json = config_json.get_configuration("mapping_metadata_json")
         meta_map_json_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", metadata_mapping_json
         )
         meta_map_json = self.read_json_file(meta_map_json_file)
-
-        valid_metadata_rows, errors = self.read_metadata_file(meta_map_json)
+        """
+        valid_metadata_rows, errors = self.read_metadata_file()
 
         completed_metadata = self.add_extra_data(
             valid_metadata_rows,
-            meta_map_json["Additional_fields"],
             lab_json_file,
             geo_loc_file,
         )

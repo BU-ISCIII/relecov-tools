@@ -1,11 +1,9 @@
 {
     "json_schemas": {
-        "phage_plus_schema": "phage_plus_schema.json",
+        "relecov_schema": "relecov_schema.json",
         "ena_schema": "ena_schema.json",
         "gisaid_schema": "gisaid_schema.json"
     },
-    "mapping_metadata_json": "mapping_metadata_to_json.json",
-    "mapping_upload_ena": "mapping_ena_to_upload_ena.json",
     "sftp_connection": {
         "sftp_server": "sftprelecov.isciii.es",
         "sftp_port": "50122"
@@ -18,7 +16,7 @@
         "fasta"
     ],
     "laboratory_data": "laboratory_address.json",
-    "geo_location_data" : "geo_loc_cities",
+    "geo_location_data" : "geo_loc_cities.json",
     "study": {
         "alias": "RELECOV",
         "title": "Example project for ENA submission RELECOV",
