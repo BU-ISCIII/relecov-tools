@@ -88,7 +88,7 @@ class RelecovMetadata:
         data = {}
         for lab in lab_json:
             if lab_name == lab["collecting_institution"]:
-                for key, value in lab_name.items():
+                for key, value in lab.items():
                     data[key] = value
                 break
         for city in geo_loc_json:
@@ -103,7 +103,7 @@ class RelecovMetadata:
                 break
         return data
 
-    def include_fixed_data():
+    def include_fixed_data(self):
         """Include fixed data that are always the same for each samples"""
         fixed_data = {
             "host_disease": "COVID-19",
@@ -122,11 +122,17 @@ class RelecovMetadata:
         """Include the data that requires to be processed to set the value
         """
         new_data = {}
-        p_data = {"host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]}}
+        p_data = {"host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]},
+                "collecting_lab_sample_id": ["isolate", metadata["collecting_lab_sample_id"]]
+                }
+
         for key, values in p_data.items():
             v_data = metadata[key]
-            if v_data in values:
-                new_data[values[v_data][0]] = values[v_data][1]
+            if isinstance(values, dict):
+                if v_data in values:
+                    new_data[values[v_data][0]] = values[v_data][1]
+            else:
+                new_data[values[0]] = values[1]
         return new_data
 
     def add_additional_data(self, metadata, lab_json_file, geo_loc_file):
@@ -162,7 +168,6 @@ class RelecovMetadata:
                 lab_data[row_sample["collecting_institution"]] = l_data
             else:
                 row_sample.update(lab_data[row_sample["collecting_institution"]])
-
             """ Add Fixed information
             """
             row_sample.update(self.include_fixed_data())
@@ -178,7 +183,6 @@ class RelecovMetadata:
             row["sequencing_instrument_platform"] = "To change"
             """
             additional_metadata.append(row_sample)
-            import pdb; pdb.set_trace()
         return additional_metadata
 
         # def compare_sample_in_metadata(self, completed_metadata):
@@ -275,17 +279,18 @@ class RelecovMetadata:
                     except KeyError as e:
                         print(e)
             metadata_values.append(sample_data_row)
-        # import pdb; pdb.set_trace()
+
         return metadata_values, errors
 
-    def write_json_fo_file(self, completed_metadata, file_name):
+    def write_json_fo_file(self, data, file_name):
         """Write metadata to json file"""
         os.makedirs(self.output_folder, exist_ok=True)
         json_file = os.path.join(self.output_folder, file_name)
+        import pdb; pdb.set_trace()
         with open(json_file, "w", encoding="utf-8") as fh:
             fh.write(
                 json.dumps(
-                    completed_metadata, indent=4, sort_keys=True, ensure_ascii=False
+                    data, indent=4, sort_keys=True, ensure_ascii=False
                 )
             )
         return True
@@ -325,7 +330,8 @@ class RelecovMetadata:
             lab_json_file,
             geo_loc_file,
         )
-        comp_result = self.compare_sample_in_metadata(completed_metadata)
+        # comp_result = self.compare_sample_in_metadata(completed_metadata)
+        """
         if isinstance(comp_result, list):
             missing_samples = ",".join(comp_result)
             log.error("Missing samples %s", missing_samples)
@@ -333,5 +339,7 @@ class RelecovMetadata:
             log.info("Samples in metadata matches with the ones uploaded")
         else:
             log.error("There is missing samples in metadata and/or uploaded")
-        self.write_json_fo_file(completed_metadata, "completed_metadata.json")
+        """
+        file_name = "processed_" + os.path.basename(self.metadata_file) + ".json"
+        self.write_json_fo_file(completed_metadata, file_name)
         return True
