@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from itertools import islice
-from geopy.geocoders import Nominatim
+
+# from geopy.geocoders import Nominatim
 import json
 import logging
 import rich.console
@@ -165,9 +166,10 @@ class RelecovMetadata:
             extra_metadata.append(row)
         return extra_metadata
 
-    def compare_sample_in_metadata(self, completed_metadata):
+        # def compare_sample_in_metadata(self, completed_metadata):
         """Compare the samples defined in metadata file and the ones in the
         sample file
+        """
         """
         not_found_samples = []
         if not os.path.exists(self.sample_list_file):
@@ -181,6 +183,7 @@ class RelecovMetadata:
         if len(not_found_samples) > 0:
             return not_found_samples
         return True
+        """
 
     def request_information(external_url, request):
         """Get information from external database server using Rest API
@@ -194,15 +197,18 @@ class RelecovMetadata:
         """Update information"""
         pass
 
-    def get_geo_location_data(self, state, country):
+        # def get_geo_location_data(self, state, country):
         """Get the geo_loc_latitude and geo_loc_longitude from state"""
+        """
         geolocator = Nominatim(user_agent="geoapiRelecov")
         loc = geolocator.geocode(state + "," + country)
         return [str(loc.latitude), str(loc.longitude)]
+        """
 
-    def update_heading_to_json(self, heading, meta_map_json):
+        # def update_heading_to_json(self, heading, meta_map_json):
         """Change the heading values from the metadata file for the ones defined
         in the json schema
+        """
         """
         mapped_heading = []
         for cell in heading:
@@ -211,6 +217,7 @@ class RelecovMetadata:
             else:
                 mapped_heading.append(cell)
         return mapped_heading
+        """
 
     def read_metadata_file(self):
         """Read the input metadata file, changing the metadata heading with
@@ -230,7 +237,7 @@ class RelecovMetadata:
             # Ignore the empty rows
             if row[2] is None:
                 continue
-            for idx in range(2, len(heading)):
+            for idx in range(1, len(heading)):
                 if "date" in heading[idx]:
                     try:
                         sample_data_row[self.label_prop_dict[heading[idx]]] = row[
@@ -240,7 +247,7 @@ class RelecovMetadata:
                         if row[2] not in errors:
                             errors[row[2]] = {}
                         errors[row[2]][heading[idx]] = "Invalid date format"
-                        log.error("Invalid date format in sample", row[2])
+                        log.error("Invalid date format in sample %s", row[2])
                         stderr.print(
                             "[red] Invalid date format in sample",
                             row[2] + " column " + heading[idx],
@@ -252,8 +259,8 @@ class RelecovMetadata:
                         )
                     except KeyError as e:
                         print(e)
-
             metadata_values.append(sample_data_row)
+        # import pdb; pdb.set_trace()
         return metadata_values, errors
 
     def write_json_fo_file(self, completed_metadata, file_name):

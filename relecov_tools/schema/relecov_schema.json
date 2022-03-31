@@ -2758,7 +2758,7 @@
             "type": "string",
             "description": "",
             "clasification": "enter your GISAID-Username",
-            "label": "GISAID Id"
+            "label": "GISAID id"
         },
         "authors": {
             "examples": [
