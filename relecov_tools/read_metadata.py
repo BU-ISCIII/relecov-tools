@@ -109,62 +109,71 @@ class RelecovMetadata:
                 break
         return data
 
-    def add_extra_data(self, metadata, lab_json_file, geo_loc_file):
+    def include_fixed_data():
+        """Include fixed data that are always the same for each samples"""
+        fixed_data = {
+            "host_disease": "COVID-19",
+            "type": "betacoronavirus",
+            "tax_id": "2697049",
+            "scientific_name": "Severe acute respiratory syndrome coronavirus 2",
+            "study_alias": "",
+            "experiment_alias": "",
+            "run_alias": "",
+            "study_title": "",
+            "experiment_title": "",
+        }
+        return fixed_data
+
+    def add_additional_data(self, metadata, lab_json_file, geo_loc_file):
         """Add the additional information that must be included in final metadata
         metadata Origin metadata
         extra_data  additional data to be included
         result_metadata    final metadata after adding the additional data
         """
         lab_data = {}
-        extra_metadata = []
+        additional_metadata = []
         extra_data = ""
         lab_json = self.read_json_file(lab_json_file)
         geo_loc_json = self.read_json_file(geo_loc_file)
         samples_json = self.read_json_file(self.sample_list_file)
 
-        for row in metadata:
-            for new_field, value in extra_data.items():
-                row[new_field] = value
-            if row["collecting_institution"] not in lab_data:
+        for row_sample in metadata:
+            """Include sample data from sample json"""
+            for row_sample_data in samples_json:
+                if row_sample_data == row_sample:
+                    for key, value in row_sample_data.items():
+                        row_sample[key] = value
+
+            """ Fetch the information related to the laboratory.
+                Info is stored in lab_data, to prevent to call get_laboratory_data
+                each time for each sample that belongs to the same lab
+            """
+            if row_sample["collecting_institution"] not in lab_data:
                 # from collecting_institution find city, and geo location latitude and longitude
                 l_data = self.get_laboratory_data(
-                    lab_json, geo_loc_json, row["collecting_institution"]
+                    lab_json, geo_loc_json, row_sample["collecting_institution"]
                 )
-                row.update(l_data)
-                lab_data[row["collecting_institution"]] = l_data
+                row_sample.update(l_data)
+                lab_data[row_sample["collecting_institution"]] = l_data
             else:
-                row.update(lab_data[row["collecting_institution"]])
+                row_sample.update(lab_data[row_sample["collecting_institution"]])
 
-            try:
-                s_data = samples_json[row["collecting_lab_sample_id"]]
-                for key, values in s_data.items():
-                    if key.endswith("_R1_fastq.gz"):
-                        row["sequence_file_R1_fastq"] = key
-                        row["r1_fastq_filepath"] = values["local_folder"]
-                        row["fastq_md5"] = values["md5"]
-                    elif key.endswith("_R2_fastq.gz"):
-                        row["sequence_file_R2_fastq"] = key
-                        row["r2_fastq_filepath"] = values["local_folder"]
-                        # # WARNING:  no md5 value for R2 is deficned on schena
-                        # row["fastq_md5"] = values["md5"]
-                    elif key.endswith(".fasta"):
-                        file_path = os.path.join(values["local_folder"], key)
-                        row["consensus_sequence_filepath"] = file_path
-                        # # WARNING:  no md5 value for fasta is deficned on schena
-                        # row["fastq_md5"] = values["md5"]
-            except KeyError:
-                log.error(
-                    "There is no files for sample %s", row["collecting_lab_sample_id"]
-                )
+            """ Add Fixed information
+            """
+            row_sample.update(self.include_fixed_data())
 
-            # update isolate qith the name of the sample
+            """Add information which is already fetched but required
+            """
+
+            """
             row["isolate"] = row["collecting_lab_sample_id"]
             row["host_scientific_name"] = extra_data["host_scientific_name"][
                 row["host_common_name"]
             ]
             row["sequencing_instrument_platform"] = "To change"
-            extra_metadata.append(row)
-        return extra_metadata
+            """
+            additional_metadata.append(row_sample)
+        return additional_metadata
 
         # def compare_sample_in_metadata(self, completed_metadata):
         """Compare the samples defined in metadata file and the ones in the
@@ -305,7 +314,7 @@ class RelecovMetadata:
         """
         valid_metadata_rows, errors = self.read_metadata_file()
 
-        completed_metadata = self.add_extra_data(
+        completed_metadata = self.add_additional_data(
             valid_metadata_rows,
             lab_json_file,
             geo_loc_file,
