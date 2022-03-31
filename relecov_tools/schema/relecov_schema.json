@@ -825,6 +825,36 @@
             ],
             "label": "Host Gender"
         },
+        "microbiology_lab_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "clasification": "Sample collection and processing",
+            "label": "Sample ID given in the microbiology lab"
+        },
+        "public_health_sample_id_sivies": {
+            "examples": [
+                "2022CEU03926"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "clasification": "Sample collection and processing",
+            "label": "Public Health sample id (SIVIES)"
+        },
+        "isolate_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "clasification": "",
+            "label": "Sample ID given if multiple rna-extraction or passages"
+        },
         "geo_loc_region": {
             "examples": [
                 "Derbyshire"
@@ -1217,36 +1247,6 @@
             "description": "Description of how organism was passaged.",
             "clasification": "Sample collection and processing",
             "label": "Passage Method"
-        },
-        "biomaterial_extracted": {
-            "Enums": [
-                "mRNA (cDNA) [OBI:0002754]",
-                "RNA (Total) [OBI:0000895]",
-                "RNA (Poly-A) [OBI:0000869]",
-                "RNA (Ribo-Depleted) [OBI:0002627]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO_0001965",
-            "type": "string",
-            "description": "The biomaterial extracted from samples for the purpose of sequencing.",
-            "examples": [
-                "RNA (Total) [OBI:0000895]"
-            ],
-            "classification": "Sample collection and processing",
-            "label": "Source material"
-        },
-        "data_abstraction_details": {
-            "ontology": "GENEPIO:0100278",
-            "type": "string",
-            "description": "A description of how any data elements were altered to preserve patient privacy.",
-            "examples": [
-                "Jitter added to publicly shared collection dates to prevent re-identifiability."
-            ],
-            "label": "Data abstraction details"
         },
         "tax_id": {
             "examples": [
@@ -2783,11 +2783,12 @@
             "examples": [
                 "John Smith"
             ],
-            "ontology": "GENEPIO:0001153",
+            "ontology": "NCIT:C164471",
             "type": "string",
             "description": "Name of the person who collected the specimen",
             "clasification": "Sample collection and processing",
-            "label": "Originating Laboratory"
+            "label": "Sample collector name",
+            "table": "sample"
         },
         "library_source": {
             "Enums": [
