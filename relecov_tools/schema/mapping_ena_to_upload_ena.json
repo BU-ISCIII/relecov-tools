@@ -1,6 +1,13 @@
 {
-    "xml_files":["study","runs","samples","experiment"],
-    "one_loop_in_mapping": ["study"]
+    "xml_files": [
+        "study",
+        "runs",
+        "samples",
+        "experiment"
+    ],
+    "one_loop_in_mapping": [
+        "study"
+    ],
     "study": {
         "study_alias": "alias",
         "study_title": "title",
@@ -11,7 +18,7 @@
     "runs": {
         "file_name": "",
         "experiment_alias": "",
-        "host_scientific_name": ""
+        "host_scientific_name": "",
         "file_name": "",
         "file_type": "",
         "file_checksum": ""
@@ -19,7 +26,7 @@
     "samples": {
         "": "alias",
         "title": "",
-        "taxon_id":""
+        "taxon_id": "",
         "sample_description": "",
         "scientific_name": "",
         "common_name": "",
@@ -27,8 +34,7 @@
         "host common name": "",
         "isolate": "",
         "collecting institution": "",
-        "geographic location (country and/or sea)":"",
-
+        "geographic location (country and/or sea)": "",
         "host subject id": [
             "host_subject_id_1",
             "host_subject_id_2"
@@ -41,18 +47,14 @@
             "male",
             "female"
         ],
-        [
-            "host_scientific_name_1",
-            "host_scientific_name_2"
-        ],
+        "host_scientific_name_1": [],
+        "host_scientific_name_2": [],
         "collector name": "",
-
-
-        "collection date":
+        "collection date": ""
     },
-
     "experiments": {
-        "experiment_alias": "alias"
+        "experiment_alias": [
+            "alias"
         ],
         "title": [
             "experiment_title_1",
@@ -100,7 +102,9 @@
             "single"
         ],
         "insert_size": [
-            "250","None","None"
+            "250",
+            "None",
+            "None"
         ],
         "library_construction_protocol": [
             "library_construction_protocol_1",

@@ -1,3 +1,4 @@
+from bdb import set_trace
 import os
 import logging
 import rich.console
@@ -86,15 +87,28 @@ class EnaUpload:
         schema_dataframe = {}
 
         config_json = ConfigJson()
-        map_to_upload = config_json.get_configuration("mapping_ena_to_upload_ena")
+
+        map_to_upload = config_json.get_topic_data("json_schemas", "ena_schema")
+
         map_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", map_to_upload
         )
         fh = open(map_file)
         map_structure_json = json.load(fh)
         fh.close()
+        lista = ["study", "runs", "samples", "experiments"]
 
-        for xml_file in map_structure_json["xml_files"]:
+        for i in map_structure_json["properties"].keys():
+            import pdb
+
+            pdb.set_trace()
+
+            if "table" in i.keys() and "study" in i["table"]:
+
+                print(i["table"])
+
+        """
+        for xml_file in lista:
             if self.project is not None and xml_file in self.project:
                 pass
             elif config_json.get_configuration(xml_file):
@@ -115,11 +129,13 @@ class EnaUpload:
             df = ena_upload.check_columns(df, xml_file, self.action, self.dev, False)
             schema_dataframe[xml_file] = df
         return schema_dataframe
+        """
 
     def upload(self):
         """Create the required files and upload to ENA"""
         self.convert_input_json_to_ena()
         self.create_structure_to_ena()
+
         # df_study = pd.DataFrame.from_dict(data["study"])
         # df_samples = pd.DataFrame.from_dict(data["samples"])
         # df_runs = pd.DataFrame.from_dict(data["runs"])
