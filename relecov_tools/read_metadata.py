@@ -93,13 +93,8 @@ class RelecovMetadata:
                 break
         for city in geo_loc_json:
             if city["geo_loc_city"] == data["geo_loc_city"]:
-                data[city["geo_loc_city"]] = {}
-                data[city["geo_loc_city"]]["geo_loc_latitude"] = city[
-                    "geo_loc_latitude"
-                ]
-                data[city["geo_loc_city"]]["geo_loc_longitude"] = city[
-                    "geo_loc_longitude"
-                ]
+                data["geo_loc_latitude"] = city["geo_loc_latitude"]
+                data["geo_loc_longitude"] = city["geo_loc_longitude"]
                 break
         return data
 
@@ -171,6 +166,7 @@ class RelecovMetadata:
                 lab_data[row_sample["collecting_institution"]] = l_data
             else:
                 row_sample.update(lab_data[row_sample["collecting_institution"]])
+
             """ Add Fixed information
             """
             row_sample.update(self.include_fixed_data())
@@ -188,25 +184,6 @@ class RelecovMetadata:
             additional_metadata.append(row_sample)
         return additional_metadata
 
-        # def compare_sample_in_metadata(self, completed_metadata):
-        """Compare the samples defined in metadata file and the ones in the
-        sample file
-        """
-        """
-        not_found_samples = []
-        if not os.path.exists(self.sample_list_file):
-            return False
-        # get the smaples defined in json
-        with open(self.sample_list_file, "r") as fh:
-            samples = fh.read().split("\n")
-        for line_metadata in completed_metadata:
-            if line_metadata["collecting_lab_sample_id"] not in samples:
-                not_found_samples.append(line_metadata["collecting_lab_sample_id"])
-        if len(not_found_samples) > 0:
-            return not_found_samples
-        return True
-        """
-
     def request_information(external_url, request):
         """Get information from external database server using Rest API
 
@@ -218,28 +195,6 @@ class RelecovMetadata:
     def store_information(external_url, request, data):
         """Update information"""
         pass
-
-        # def get_geo_location_data(self, state, country):
-        """Get the geo_loc_latitude and geo_loc_longitude from state"""
-        """
-        geolocator = Nominatim(user_agent="geoapiRelecov")
-        loc = geolocator.geocode(state + "," + country)
-        return [str(loc.latitude), str(loc.longitude)]
-        """
-
-        # def update_heading_to_json(self, heading, meta_map_json):
-        """Change the heading values from the metadata file for the ones defined
-        in the json schema
-        """
-        """
-        mapped_heading = []
-        for cell in heading:
-            if cell in meta_map_json:
-                mapped_heading.append(meta_map_json[cell])
-            else:
-                mapped_heading.append(cell)
-        return mapped_heading
-        """
 
     def read_metadata_file(self):
         """Read the input metadata file, changing the metadata heading with
@@ -261,7 +216,6 @@ class RelecovMetadata:
                 continue
             for idx in range(1, len(heading)):
                 if "date" in heading[idx].lower():
-                    # import pdb; pdb.set_trace()
                     try:
                         sample_data_row[self.label_prop_dict[heading[idx]]] = row[
                             idx
@@ -290,9 +244,6 @@ class RelecovMetadata:
         """Write metadata to json file"""
         os.makedirs(self.output_folder, exist_ok=True)
         json_file = os.path.join(self.output_folder, file_name)
-        import pdb
-
-        pdb.set_trace()
         with open(json_file, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
         return True
