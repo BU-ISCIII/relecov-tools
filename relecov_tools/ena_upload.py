@@ -1,11 +1,10 @@
-from bdb import set_trace
 import os
 import logging
 import rich.console
 import json
-import pandas as pd
+
+# import pandas as pd
 import sys
-from ena_upload import ena_upload
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -84,7 +83,7 @@ class EnaUpload:
 
     def create_structure_to_ena(self):
         """Convert json to dataframe required by ena-upload-cli package"""
-        schema_dataframe = {}
+        # schema_dataframe = {}
 
         config_json = ConfigJson()
 
@@ -96,7 +95,7 @@ class EnaUpload:
         fh = open(map_file)
         map_structure_json = json.load(fh)
         fh.close()
-        lista = ["study", "runs", "samples", "experiments"]
+        # lista = ["study", "runs", "samples", "experiments"]
 
         for i in map_structure_json["properties"].keys():
             import pdb
