@@ -104,7 +104,7 @@ class RelecovMetadata:
             "host_disease": "COVID-19",
             "type": "betacoronavirus",
             "tax_id": "2697049",
-            "scientific_name": "Severe acute respiratory syndrome coronavirus 2",
+            "organism": "Severe acute respiratory syndrome coronavirus 2",
             "study_alias": "",
             "experiment_alias": "",
             "run_alias": "",
@@ -123,7 +123,16 @@ class RelecovMetadata:
                 metadata["collecting_lab_sample_id"],
             ],
         }
-
+        seq_inst_plat = {
+            "Illumina": [
+                "Illumina iSeq 100",
+                "Illumina MiSeq",
+                "Illumina NextSeq550",
+                "Illumina NovaSeq 6000",
+            ],
+            "MinION": ["Oxford Nanopore"],
+            "Ion Torrent": ["Ion Torrent S5", "Ion Torrent PGM"],
+        }
         for key, values in p_data.items():
             v_data = metadata[key]
             if isinstance(values, dict):
@@ -131,6 +140,11 @@ class RelecovMetadata:
                     new_data[values[v_data][0]] = values[v_data][1]
             else:
                 new_data[values[0]] = values[1]
+        """New fields that required processing from other field """
+        for key, values in seq_inst_plat.items():
+            if metadata["sequencing_instrument_model"] in values:
+                new_data["sequencing_instrument_platform"] = key
+                break
         return new_data
 
     def add_additional_data(self, metadata, lab_json_file, geo_loc_file):
@@ -202,6 +216,7 @@ class RelecovMetadata:
         Convert the date colunms value to the dd/mm/yyyy format.
         Return list of dict with data, and errors
         """
+        exc_format_num = ["Host Age", "Sample ID given for sequencing"]
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
         # removing the None columns in excel heading row
@@ -230,12 +245,23 @@ class RelecovMetadata:
                             row[2] + " column " + heading[idx],
                         )
                 else:
-                    try:
-                        sample_data_row[self.label_prop_dict[heading[idx]]] = (
-                            row[idx] if row[idx] else ""
-                        )
-                    except KeyError as e:
-                        print(e)
+
+                    if isinstance(row[idx], float):
+                        if heading[idx] in exc_format_num:
+                            val = int(row[idx])
+                        else:
+                            val = str(int(row[idx]))
+                        try:
+                            sample_data_row[self.label_prop_dict[heading[idx]]] = val
+                        except TypeError as e:
+                            stderr.print("[red] Error when reading " + row[2] + e)
+                    else:
+                        try:
+                            sample_data_row[self.label_prop_dict[heading[idx]]] = (
+                                row[idx] if row[idx] else ""
+                            )
+                        except KeyError as e:
+                            stderr.print("[red] Error when reading " + row[2] + e)
             metadata_values.append(sample_data_row)
 
         return metadata_values, errors
