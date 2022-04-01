@@ -58,6 +58,7 @@ class RelecovMetadata:
         relecov_sch_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
         )
+        self.configuration = config_json
         with open(relecov_sch_path, "r") as fh:
             self.relecov_sch_json = json.load(fh)
         self.label_prop_dict = {}
@@ -105,12 +106,8 @@ class RelecovMetadata:
             "type": "betacoronavirus",
             "tax_id": "2697049",
             "organism": "Severe acute respiratory syndrome coronavirus 2",
-            "study_alias": "",
-            "experiment_alias": "",
-            "run_alias": "",
-            "study_title": "",
-            "experiment_title": "",
         }
+        fixed_data.update(self.configuration.get_configuration("ENA_configuration"))
         return fixed_data
 
     def include_processed_data(self, metadata):

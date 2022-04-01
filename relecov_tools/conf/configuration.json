@@ -17,9 +17,11 @@
     ],
     "laboratory_data": "laboratory_address.json",
     "geo_location_data" : "geo_loc_cities.json",
-    "study": {
-        "alias": "RELECOV",
-        "title": "Example project for ENA submission RELECOV",
-        "study_type": "This study was created as part of an ENA submissions example RELECOV"
+    "ENA_configuration": {
+        "study_alias": "RELECOV",
+        "experiment_alias": "",
+        "run_alias": "",
+        "experiment_title": "Example project for ENA submission RELECOV",
+        "study_title": "RELECOV Spanish Network for genomics surveillance"
     }
 }
