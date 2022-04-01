@@ -119,12 +119,15 @@ class RelecovMetadata:
         return fixed_data
 
     def include_processed_data(self, metadata):
-        """Include the data that requires to be processed to set the value
-        """
+        """Include the data that requires to be processed to set the value"""
         new_data = {}
-        p_data = {"host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]},
-                "collecting_lab_sample_id": ["isolate", metadata["collecting_lab_sample_id"]]
-                }
+        p_data = {
+            "host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]},
+            "collecting_lab_sample_id": [
+                "isolate",
+                metadata["collecting_lab_sample_id"],
+            ],
+        }
 
         for key, values in p_data.items():
             v_data = metadata[key]
@@ -257,7 +260,8 @@ class RelecovMetadata:
             if row[2] is None:
                 continue
             for idx in range(1, len(heading)):
-                if "date" in heading[idx]:
+                if "date" in heading[idx].lower():
+                    # import pdb; pdb.set_trace()
                     try:
                         sample_data_row[self.label_prop_dict[heading[idx]]] = row[
                             idx
@@ -286,13 +290,11 @@ class RelecovMetadata:
         """Write metadata to json file"""
         os.makedirs(self.output_folder, exist_ok=True)
         json_file = os.path.join(self.output_folder, file_name)
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         with open(json_file, "w", encoding="utf-8") as fh:
-            fh.write(
-                json.dumps(
-                    data, indent=4, sort_keys=True, ensure_ascii=False
-                )
-            )
+            fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
         return True
 
     def create_metadata_json(self):
