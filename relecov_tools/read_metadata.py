@@ -58,6 +58,7 @@ class RelecovMetadata:
         relecov_sch_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
         )
+        self.configuration = config_json
         with open(relecov_sch_path, "r") as fh:
             self.relecov_sch_json = json.load(fh)
         self.label_prop_dict = {}
@@ -66,12 +67,6 @@ class RelecovMetadata:
                 self.label_prop_dict[values["label"]] = prop
             except KeyError:
                 continue
-
-    def check_new_metadata(folder):
-        """Check if there is a new metadata to be processed
-        folder  Directory to be checked
-        """
-        pass
 
     def fetch_metadata_file(folder, file_name):
         """Fetch the metadata file folder  Directory to fetch metadata file
@@ -94,96 +89,111 @@ class RelecovMetadata:
         data = {}
         for lab in lab_json:
             if lab_name == lab["collecting_institution"]:
-                for key, value in lab_name.items():
+                for key, value in lab.items():
                     data[key] = value
                 break
         for city in geo_loc_json:
             if city["geo_loc_city"] == data["geo_loc_city"]:
-                data[city["geo_loc_city"]] = {}
-                data[city["geo_loc_city"]]["geo_loc_latitude"] = city[
-                    "geo_loc_latitude"
-                ]
-                data[city["geo_loc_city"]]["geo_loc_longitude"] = city[
-                    "geo_loc_longitude"
-                ]
+                data["geo_loc_latitude"] = city["geo_loc_latitude"]
+                data["geo_loc_longitude"] = city["geo_loc_longitude"]
                 break
         return data
 
-    def add_extra_data(self, metadata, lab_json_file, geo_loc_file):
+    def include_fixed_data(self):
+        """Include fixed data that are always the same for each samples"""
+        fixed_data = {
+            "host_disease": "COVID-19",
+            "type": "betacoronavirus",
+            "tax_id": "2697049",
+            "organism": "Severe acute respiratory syndrome coronavirus 2",
+        }
+        fixed_data.update(self.configuration.get_configuration("ENA_configuration"))
+        return fixed_data
+
+    def include_processed_data(self, metadata):
+        """Include the data that requires to be processed to set the value"""
+        new_data = {}
+        p_data = {
+            "host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]},
+            "collecting_lab_sample_id": [
+                "isolate",
+                metadata["collecting_lab_sample_id"],
+            ],
+        }
+        seq_inst_plat = {
+            "Illumina": [
+                "Illumina iSeq 100",
+                "Illumina MiSeq",
+                "Illumina NextSeq550",
+                "Illumina NovaSeq 6000",
+            ],
+            "MinION": ["Oxford Nanopore"],
+            "Ion Torrent": ["Ion Torrent S5", "Ion Torrent PGM"],
+        }
+        for key, values in p_data.items():
+            v_data = metadata[key]
+            if isinstance(values, dict):
+                if v_data in values:
+                    new_data[values[v_data][0]] = values[v_data][1]
+            else:
+                new_data[values[0]] = values[1]
+        """New fields that required processing from other field """
+        for key, values in seq_inst_plat.items():
+            if metadata["sequencing_instrument_model"] in values:
+                new_data["sequencing_instrument_platform"] = key
+                break
+        return new_data
+
+    def add_additional_data(self, metadata, lab_json_file, geo_loc_file):
         """Add the additional information that must be included in final metadata
         metadata Origin metadata
         extra_data  additional data to be included
         result_metadata    final metadata after adding the additional data
         """
         lab_data = {}
-        extra_metadata = []
-        extra_data = ""
+        additional_metadata = []
+
         lab_json = self.read_json_file(lab_json_file)
         geo_loc_json = self.read_json_file(geo_loc_file)
         samples_json = self.read_json_file(self.sample_list_file)
 
-        for row in metadata:
-            for new_field, value in extra_data.items():
-                row[new_field] = value
-            if row["collecting_institution"] not in lab_data:
+        for row_sample in metadata:
+            """Include sample data from sample json"""
+            for row_sample_data in samples_json:
+                if row_sample_data == row_sample:
+                    for key, value in row_sample_data.items():
+                        row_sample[key] = value
+
+            """ Fetch the information related to the laboratory.
+                Info is stored in lab_data, to prevent to call get_laboratory_data
+                each time for each sample that belongs to the same lab
+            """
+            if row_sample["collecting_institution"] not in lab_data:
                 # from collecting_institution find city, and geo location latitude and longitude
                 l_data = self.get_laboratory_data(
-                    lab_json, geo_loc_json, row["collecting_institution"]
+                    lab_json, geo_loc_json, row_sample["collecting_institution"]
                 )
-                row.update(l_data)
-                lab_data[row["collecting_institution"]] = l_data
+                row_sample.update(l_data)
+                lab_data[row_sample["collecting_institution"]] = l_data
             else:
-                row.update(lab_data[row["collecting_institution"]])
+                row_sample.update(lab_data[row_sample["collecting_institution"]])
 
-            try:
-                s_data = samples_json[row["collecting_lab_sample_id"]]
-                for key, values in s_data.items():
-                    if key.endswith("_R1_fastq.gz"):
-                        row["sequence_file_R1_fastq"] = key
-                        row["r1_fastq_filepath"] = values["local_folder"]
-                        row["fastq_md5"] = values["md5"]
-                    elif key.endswith("_R2_fastq.gz"):
-                        row["sequence_file_R2_fastq"] = key
-                        row["r2_fastq_filepath"] = values["local_folder"]
-                        # # WARNING:  no md5 value for R2 is deficned on schena
-                        # row["fastq_md5"] = values["md5"]
-                    elif key.endswith(".fasta"):
-                        file_path = os.path.join(values["local_folder"], key)
-                        row["consensus_sequence_filepath"] = file_path
-                        # # WARNING:  no md5 value for fasta is deficned on schena
-                        # row["fastq_md5"] = values["md5"]
-            except KeyError:
-                log.error(
-                    "There is no files for sample %s", row["collecting_lab_sample_id"]
-                )
+            """ Add Fixed information
+            """
+            row_sample.update(self.include_fixed_data())
 
-            # update isolate qith the name of the sample
+            """Add information which requires processing
+            """
+            row_sample.update(self.include_processed_data(row_sample))
+            """
             row["isolate"] = row["collecting_lab_sample_id"]
             row["host_scientific_name"] = extra_data["host_scientific_name"][
                 row["host_common_name"]
             ]
             row["sequencing_instrument_platform"] = "To change"
-            extra_metadata.append(row)
-        return extra_metadata
-
-        # def compare_sample_in_metadata(self, completed_metadata):
-        """Compare the samples defined in metadata file and the ones in the
-        sample file
-        """
-        """
-        not_found_samples = []
-        if not os.path.exists(self.sample_list_file):
-            return False
-        # get the smaples defined in json
-        with open(self.sample_list_file, "r") as fh:
-            samples = fh.read().split("\n")
-        for line_metadata in completed_metadata:
-            if line_metadata["collecting_lab_sample_id"] not in samples:
-                not_found_samples.append(line_metadata["collecting_lab_sample_id"])
-        if len(not_found_samples) > 0:
-            return not_found_samples
-        return True
-        """
+            """
+            additional_metadata.append(row_sample)
+        return additional_metadata
 
     def request_information(external_url, request):
         """Get information from external database server using Rest API
@@ -197,34 +207,13 @@ class RelecovMetadata:
         """Update information"""
         pass
 
-        # def get_geo_location_data(self, state, country):
-        """Get the geo_loc_latitude and geo_loc_longitude from state"""
-        """
-        geolocator = Nominatim(user_agent="geoapiRelecov")
-        loc = geolocator.geocode(state + "," + country)
-        return [str(loc.latitude), str(loc.longitude)]
-        """
-
-        # def update_heading_to_json(self, heading, meta_map_json):
-        """Change the heading values from the metadata file for the ones defined
-        in the json schema
-        """
-        """
-        mapped_heading = []
-        for cell in heading:
-            if cell in meta_map_json:
-                mapped_heading.append(meta_map_json[cell])
-            else:
-                mapped_heading.append(cell)
-        return mapped_heading
-        """
-
     def read_metadata_file(self):
         """Read the input metadata file, changing the metadata heading with
         their property name values defined in schema.
         Convert the date colunms value to the dd/mm/yyyy format.
         Return list of dict with data, and errors
         """
+        exc_format_num = ["Host Age", "Sample ID given for sequencing"]
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
         # removing the None columns in excel heading row
@@ -238,7 +227,7 @@ class RelecovMetadata:
             if row[2] is None:
                 continue
             for idx in range(1, len(heading)):
-                if "date" in heading[idx]:
+                if "date" in heading[idx].lower():
                     try:
                         sample_data_row[self.label_prop_dict[heading[idx]]] = row[
                             idx
@@ -253,26 +242,33 @@ class RelecovMetadata:
                             row[2] + " column " + heading[idx],
                         )
                 else:
-                    try:
-                        sample_data_row[self.label_prop_dict[heading[idx]]] = (
-                            row[idx] if row[idx] else ""
-                        )
-                    except KeyError as e:
-                        print(e)
+
+                    if isinstance(row[idx], float):
+                        if heading[idx] in exc_format_num:
+                            val = int(row[idx])
+                        else:
+                            val = str(int(row[idx]))
+                        try:
+                            sample_data_row[self.label_prop_dict[heading[idx]]] = val
+                        except TypeError as e:
+                            stderr.print("[red] Error when reading " + row[2] + e)
+                    else:
+                        try:
+                            sample_data_row[self.label_prop_dict[heading[idx]]] = (
+                                row[idx] if row[idx] else ""
+                            )
+                        except KeyError as e:
+                            stderr.print("[red] Error when reading " + row[2] + e)
             metadata_values.append(sample_data_row)
-        # import pdb; pdb.set_trace()
+
         return metadata_values, errors
 
-    def write_json_fo_file(self, completed_metadata, file_name):
+    def write_json_fo_file(self, data, file_name):
         """Write metadata to json file"""
         os.makedirs(self.output_folder, exist_ok=True)
         json_file = os.path.join(self.output_folder, file_name)
         with open(json_file, "w", encoding="utf-8") as fh:
-            fh.write(
-                json.dumps(
-                    completed_metadata, indent=4, sort_keys=True, ensure_ascii=False
-                )
-            )
+            fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
         return True
 
     def create_metadata_json(self):
@@ -305,12 +301,13 @@ class RelecovMetadata:
         """
         valid_metadata_rows, errors = self.read_metadata_file()
 
-        completed_metadata = self.add_extra_data(
+        completed_metadata = self.add_additional_data(
             valid_metadata_rows,
             lab_json_file,
             geo_loc_file,
         )
-        comp_result = self.compare_sample_in_metadata(completed_metadata)
+        # comp_result = self.compare_sample_in_metadata(completed_metadata)
+        """
         if isinstance(comp_result, list):
             missing_samples = ",".join(comp_result)
             log.error("Missing samples %s", missing_samples)
@@ -318,5 +315,7 @@ class RelecovMetadata:
             log.info("Samples in metadata matches with the ones uploaded")
         else:
             log.error("There is missing samples in metadata and/or uploaded")
-        self.write_json_fo_file(completed_metadata, "completed_metadata.json")
+        """
+        file_name = "processed_" + os.path.basename(self.metadata_file) + ".json"
+        self.write_json_fo_file(completed_metadata, file_name)
         return True

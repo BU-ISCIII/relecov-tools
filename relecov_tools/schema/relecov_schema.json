@@ -643,7 +643,8 @@
             "ontology": "GENEPIO:0100282",
             "type": "string",
             "description": "The user-defined GISAID virus name assigned to the sequence.",
-            "clasification": "Database Identifiers"
+            "clasification": "Database Identifiers",
+            "label": "GISAID Virus Name"
         },
         "collecting_institution_email": {
             "examples": [
