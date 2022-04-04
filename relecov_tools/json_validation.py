@@ -4,10 +4,10 @@ import rich.console
 import jsonschema
 from jsonschema import validate
 from jsonschema import Draft202012Validator
-
 import json
 import sys
 import os
+
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -28,7 +28,7 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
         )
     if json_schema_file is None:
         config_json = ConfigJson()
-        schema_name = config_json.get_topic_data("json_schemas", "phage_plus_schema")
+        schema_name = config_json.get_topic_data("json_schemas", "relecov_schema")
         json_schema_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
         )
@@ -43,6 +43,7 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
     if not os.path.isfile(json_data_file):
         stderr.print("[red] Json file does not exists")
         sys.exit(1)
+    json_data = relecov_tools.utils.read_json_file(json_data_file)
     with open(json_data_file, "r") as fh:
         json_data = json.load(fh)
     validated_json_data = []
