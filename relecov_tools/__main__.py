@@ -200,9 +200,17 @@ def read_metadata(metadata_file, sample_list_file, metadata_out):
 @relecov_tools_cli.command(help_priority=4)
 @click.option("-j", "--json_file", help="Json file to validate")
 @click.option("-s", "--json_schema", help="Json schema")
+@click.option(
+    "-m",
+    "--metadata",
+    type=click.Path(),
+    help="Origin file containing metadata",
+)
 @click.option("-o", "--out_folder", help="Path to save validate json file")
-def validate(json_file, json_schema, out_folder):
+def validate(json_file, json_schema, metadata, out_folder):
     """Validate json file against schema."""
+    relecov_tools.json_validation.create_invalid_metadata(metadata, json_file, out_folder)
+    import pdb; pdb.set_trace()
     (
         validated_json_data,
         invalid_json,
@@ -210,6 +218,11 @@ def validate(json_file, json_schema, out_folder):
     ) = relecov_tools.json_validation.validate_json(json_file, json_schema, out_folder)
     if len(invalid_json) > 0:
         log.error("Some of the samples in json metadata were not validated")
+        if not os.isfile(metadata):
+            log.error("Metadata file %s does not exists", metadata)
+            exit(1)
+        relecov_tools.json_validation.create_invalid_metadata(metadata, invalid_json, out_folder)
+
     else:
         log.info("All data in json were validated")
 
