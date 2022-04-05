@@ -241,7 +241,7 @@ def validate(json_file, json_schema, metadata, out_folder):
 @click.option("-o", "--output", help="File name and path to store the mapped json")
 def map(origin_schema, json_data, destination_schema, schema_file, output):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
-    new_schema = relecov_tools.conversion_schema.MappingSchema(
+    new_schema = relecov_tools.map_schema.MappingSchema(
         origin_schema, json_data, destination_schema, schema_file, output
     )
     new_schema.map_to_data_to_new_schema()
