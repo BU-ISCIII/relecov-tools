@@ -61,34 +61,39 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
 
 
 def create_invalid_metadata(metadata_file, invalid_json, out_folder):
-    """Create a new sub excel file having only the samples that were invalid
+    """Create a new sub excel file having only the samples that were invalid.
+    Samples name are checking the Sequencing sample id which are in
+    column B (index 1).
+    The rows that match the value collected from json file on tag
+    collecting_lab_sample_id are removed from excel
     """
-    invalid_metadata = ""
-    sample_id_head = "Sequencing sample id"
-    wb_inv = openpyxl.Workbook()
     sample_list = []
-
     json_data = relecov_tools.utils.read_json_file(invalid_json)
     for row in json_data:
         sample_list.append(row["collecting_lab_sample_id"])
     wb = openpyxl.load_workbook(metadata_file)
-    import pdb; pdb.set_trace()
+    exclude_sheet = ["Overview", "METADATA_LAB", "DATA VALIDATION"]
     for sheet in wb.sheetnames:
+        if sheet in exclude_sheet:
+            continue
         ws_sheet = wb[sheet]
-        ws_inv = wb_inv.create_sheet(sheet)
-        head_list = [cell.value for cell in ws_sheet[1]]
-        import pdb; pdb.set_trace()
-        try:
-            s_index = head_list.index(sample_id_head)
-        except:
+        row_to_del = []
+        # Findout where the sample index is
+        idx_sample = 2 if ws_sheet.title == "1.Database Identifiers" else 1
 
-        for row in ws_sheet.iter_rows():
-            if row[s_index].value in sample_list:
-                ws_inv.append(row)
-                import pdb; pdb.set_trace()
-        target = wb_inv.copy_worksheet(ws_inv)
-        target.title(sheet)
-        import pdb; pdb.set_trace()
+        for row in ws_sheet.iter_rows(min_row=4, max_row=ws_sheet.max_row):
+            if not row[2].value and not row[1].value:
+                if len(row_to_del) > 0:
+                    row_to_del.sort(reverse=True)
+                    for idx in row_to_del:
+                        ws_sheet.delete_rows(idx)
+                break
+            if row[0].value == "CAMPO":
+                continue
+            if str(row[idx_sample].value) not in sample_list:
+                row_to_del.append(row[0].row)
 
-
-    wb_inv.save(filename=invalid_metadata)
+    new_name = "invalid_" + os.path.basename(metadata_file)
+    m_file = os.path.join(out_folder, new_name)
+    wb.save(m_file)
+    return
