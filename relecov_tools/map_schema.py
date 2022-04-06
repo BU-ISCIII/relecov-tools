@@ -132,7 +132,9 @@ class MappingSchema:
                 # There is no exact match on ontology. Search for the parent
                 # to be implemented later
                 stderr.print(f"[red] Ontology value {e} not in phage plus schema")
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         return mapped_dict
 
     def mapping_json_data(self, mapping_schema_dict):
@@ -155,10 +157,16 @@ class MappingSchema:
         os.makedirs(self.output_folder, exist_ok=True)
         time = datetime.now().strftime("%Y_%m_%d_%H_%M")
         f_sub_name = os.path.basename(self.json_file).split(".")[0]
-        file_name = f_sub_name + "_" + time + "_" + self.destination_schema + "_mapped.json"
+        file_name = (
+            f_sub_name + "_" + time + "_" + self.destination_schema + "_mapped.json"
+        )
         json_file = os.path.join(self.output_folder, file_name)
         with open(json_file, "w", encoding="utf-8") as fh:
-            fh.write(json.dumps(mapped_json_data, indent=4, sort_keys=True, ensure_ascii=False))
+            fh.write(
+                json.dumps(
+                    mapped_json_data, indent=4, sort_keys=True, ensure_ascii=False
+                )
+            )
         return True
 
     def map_to_data_to_new_schema(self):
