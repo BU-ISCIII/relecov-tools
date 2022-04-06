@@ -8,6 +8,7 @@ import hashlib
 import logging
 from rich.console import Console
 import questionary
+import json
 
 log = logging.getLogger(__name__)
 
@@ -22,6 +23,13 @@ def file_exists(file_to_check):
     if os.path.isfile(file_to_check):
         return True
     return False
+
+
+def read_json_file(j_file):
+    """Read json file."""
+    with open(j_file, "r") as fh:
+        data = json.load(fh)
+    return data
 
 
 def get_md5_from_local_folder(local_folder):

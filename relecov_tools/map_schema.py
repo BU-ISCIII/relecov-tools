@@ -25,43 +25,46 @@ stderr = rich.console.Console(
 class MappingSchema:
     def __init__(
         self,
-        phage_plus_schema=None,
-        json_data=None,
+        relecov_schema=None,
+        json_file=None,
         destination_schema=None,
         schema_file=None,
         output=None,
     ):
         config_json = ConfigJson()
-        if phage_plus_schema is None:
-            phage_plus_schema_file = os.path.join(
+        if relecov_schema is None:
+            relecov_schema = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "schema",
-                config_json.get_topic_data("json_schemas", "phage_plus_schema"),
+                config_json.get_topic_data("json_schemas", "relecov_schema"),
             )
-            with open(phage_plus_schema_file, "r") as fh:
-                self.phage_plus_schema = json.load(fh)
         else:
-            with open(phage_plus_schema, "r") as fh:
-                json_schema = json.load(fh)
-            try:
-                Draft202012Validator.check_schema(json_schema)
-            except jsonschema.ValidationError:
+            if os.path.isfile(relecov_schema):
+                log.error("Relecov schema file %s does not exists", relecov_schema)
                 stderr.print(
-                    "[red] phage plus schema does not fulfil Draft 202012 Validation"
+                    "[red] Relecov schema " + relecov_schema + "does not exists"
                 )
-                sys.exit(1)
-            self.phage_plus_schema = json.load(fh)
-
-        if json_data is None:
-            self.json_data_file = relecov_tools.utils.prompt_path(
-                msg="Select the json which have the data to map"
+                exit(1)
+        rel_schema_json = relecov_tools.utils.read_json_file(relecov_schema)
+        try:
+            Draft202012Validator.check_schema(rel_schema_json)
+        except jsonschema.ValidationError:
+            log.error("Relecov schema does not fulfil Draft 202012 Validation ")
+            stderr.print(
+                "[red] phage plus schema does not fulfil Draft 202012 Validation"
             )
-        else:
-            self.json_data_file = json_data
-        if not os.path.isfile(self.json_data_file):
-            log.error("json data file %s does not exist ", self.json_data_file)
-            stderr.print(f"json data file {self.json_data_file} does not exist")
             sys.exit(1)
+        self.relecov_schema = rel_schema_json
+
+        if json_file is None:
+            json_file = relecov_tools.utils.prompt_path(
+                msg="Select the json file which have the data to map"
+            )
+        if not os.path.isfile(json_file):
+            log.error("json data file %s does not exist ", json_file)
+            stderr.print(f"[red] json data file {json_file} does not exist")
+            sys.exit(1)
+        self.json_data = relecov_tools.utils.read_json_file(json_file)
 
         if destination_schema is None:
             self.destination_schema = relecov_tools.utils.prompt_selection(
@@ -111,7 +114,7 @@ class MappingSchema:
             self.mapped_to_schema = json.load(fh)
 
         self.ontology = {}
-        for key, values in self.phage_plus_schema["properties"].items():
+        for key, values in self.relecov_schema["properties"].items():
             self.ontology[values["ontology"]] = key
 
     def maping_schemas_based_on_geontology(self):
@@ -131,12 +134,14 @@ class MappingSchema:
     def mapping_json_data(self, mapping_schema_dict):
         """Convert phage plus data to the requested schema"""
         mapped_data = []
-        with open(self.json_data, "r") as fh:
-            json_data = json.load(fh)
-        for data in json_data:
+
+        for data in self.json_data:
             map_sample_dict = OrderedDict()
-            for item, value in mapping_schema_dict.items:
-                map_sample_dict[item] = self.data[value]
+            for item, value in mapping_schema_dict.items():
+                try:
+                    map_sample_dict[item] = data[value]
+                except KeyError as e:
+                    print(e)
             mapped_data.append(map_sample_dict)
         return mapped_data
 
