@@ -1142,7 +1142,7 @@
       "clasification": "Submission ENA",
       "label": "First Public date"
     },
-    "last_updated_date": {
+    "last_updated": {
       "examples": [
         "e.g 2020-07-29"
       ],
@@ -1150,7 +1150,7 @@
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
-      "format": "Last Updated"
+      "label": "Last Updated"
     },
     "experiment_title": {
       "examples": [
