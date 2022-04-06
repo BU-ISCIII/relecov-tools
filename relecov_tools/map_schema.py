@@ -115,6 +115,8 @@ class MappingSchema:
 
         self.ontology = {}
         for key, values in self.relecov_schema["properties"].items():
+            if values["ontology"] == "0":
+                continue
             self.ontology[values["ontology"]] = key
         self.output_folder = output_folder
 
