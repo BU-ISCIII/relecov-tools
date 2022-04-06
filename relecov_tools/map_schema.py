@@ -122,19 +122,17 @@ class MappingSchema:
 
     def maping_schemas_based_on_geontology(self):
         """Return a dictionnary with the properties of the mapped_to_schema as key and
-        properties of phagePlusSchema as value
+        properties of Relecov Schema as value
         """
         mapped_dict = OrderedDict()
         for key, values in self.mapped_to_schema["properties"].items():
+            if values['ontology'] == "0":
+                continue
             try:
                 mapped_dict[key] = self.ontology[values["ontology"]]
             except KeyError as e:
-                # There is no exact match on ontology. Search for the parent
-                # to be implemented later
-                stderr.print(f"[red] Ontology value {e} not in phage plus schema")
-        import pdb
-
-        pdb.set_trace()
+                log.error("Invalid ontology for %s", key)
+                stderr.print(f"[red] Ontology value {e} not in relecov schema")
         return mapped_dict
 
     def mapping_json_data(self, mapping_schema_dict):
@@ -148,7 +146,6 @@ class MappingSchema:
                     map_sample_dict[item] = data[value]
                 except KeyError as e:
                     log.warning("Property %s not set in the source data", e)
-                    print(e)
             mapped_data.append(map_sample_dict)
         return mapped_data
 
