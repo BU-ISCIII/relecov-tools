@@ -17,7 +17,12 @@
     "library_source",
     "library_selection",
     "library_strategy",
-    "library_layout"
+    "library_layout",
+    "study_alias",
+    "experiment_alias",
+    "run_alias",
+    "experiment_title",
+    "study_title"
   ],
   "type": "object",
   "properties": {
