@@ -1,0 +1,512 @@
+{
+    "schema": "bioinfo_metadata",
+    "type": "object",
+    "properties": {
+        "dehosting_method": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "assembly": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "if_assembly_other": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "assembly_params": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "variant_calling": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "if_variant_calling_other": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "variant_calling_params": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "consensus_sequence_name": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "consensus_sequence_name_md5": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "consensus_sequence_filepath": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "consensus_sequence_software_name": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "if_consensus_other": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "consensus_sequence_software_version": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "consensus_criteria": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "quality_control_metrics": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "depth_of_coverage_value": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "depth_of_coverage_threshold": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "number_of_base_pairs_sequenced": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "consensus_genome_length": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "reference_genome_accession": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "bioinformatics_protocol": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "if_bioinformatic_protocol_other": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "bioinformatic_protocol_version": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "commercial/open-source/both": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "preprocessing": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "if_preprocessing_other": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "preprocessing_params": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "mapping": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "if_mapping_other": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "mapping_params": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "lineage/clade_name": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "lineage/clade_analysis_software_name": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "if_lineage_identification_other": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "lineage/clade_analysis_software_version": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "variant_designation": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "gene_name_1": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "%qc_filtered": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "%reads_host": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "%reads_virus": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "%unmapped": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "% genome _greater_10x": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "mean_depth_of_coverage_value": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "%Ns": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "Number_of_variants_(AF_greater_75%)": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "Numer_of_variants_with_effect": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        },
+        "long_table_path": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "",
+            "description": "",
+            "clasification": "",
+            "label": "",
+            "table": []
+        }
+    }
+}
