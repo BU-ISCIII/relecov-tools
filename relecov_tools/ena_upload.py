@@ -96,11 +96,11 @@ class EnaUpload:
         map_structure_json = json.load(fh)
         fh.close()
         # lista = ["study", "runs", "samples", "experiments"]
+        import pdb
+
+        pdb.set_trace()
 
         for i in map_structure_json["properties"].keys():
-            import pdb
-
-            pdb.set_trace()
 
             if "table" in i.keys() and "study" in i["table"]:
 

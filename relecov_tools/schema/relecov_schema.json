@@ -1805,7 +1805,7 @@
             "type": "string",
             "description": "",
             "clasification": "Sequencing",
-            "label": "Amplicon panel/assay"
+            "label": "Enrichment panel/assay"
         },
         "if_amplicon_protocol_if_other_especify": {
             "examples": [
@@ -1815,7 +1815,7 @@
             "type": "string",
             "description": "",
             "clasification": "Sequencing",
-            "label": "If Amplicon Protocol If Other, Especify"
+            "label": "If Enrichment panel/assay If Other, Especify"
         },
         "amplicon_version": {
             "examples": [
@@ -1825,7 +1825,7 @@
             "type": "string",
             "description": "",
             "clasification": "Sequencing",
-            "label": "Amplicon Version"
+            "label": "Enrichment panel/assay version"
         },
         "amplicon_size": {
             "examples": [
