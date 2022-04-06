@@ -406,7 +406,7 @@
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
-      "ontology": "GENEPIO:0001181          ",
+      "ontology": "GENEPIO:0001181",
       "type": "string",
       "description": "The country of origin of the sample.",
       "examples": [
