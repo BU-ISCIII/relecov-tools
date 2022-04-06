@@ -2711,6 +2711,28 @@
             "classification": "Pathogen diagnostic testing",
             "label": "Diagnostic Pcr Protocol 2"
         },
+        "analysis_date": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "date",
+            "format": "date",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Analysis date"
+        },
+        "lineage_identification_date": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "date",
+            "format": "date",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Lineage identification date"
+        },
         "diagnostic_pcr_Ct_value_2": {
             "examples": [
                 "36"
