@@ -70,7 +70,7 @@ Commands:
 #### download
 The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different available folders in the passed credentials. In addition, it checks if the files in the current folder match the files in the metadata file and also checks if there are md5sum for each file. Else, it creates one before storing in the final repository.
 
-``` 
+```
 $ relecov-tools download --help
 Usage: relecov-tools download [OPTIONS]
 
@@ -101,7 +101,7 @@ allowed_sample_extensions:
 ```
 
 #### read-metadata
-`read-metadata` command reads the excel file with laboratory metadata and processes it adding aditional needed fields.
+`read-metadata` command reads the excel file with laboratory metadata and processes it adding additional needed fields.
 
 ```
 $ relecov-tools read-metadata --help
@@ -132,6 +132,7 @@ Usage: relecov-tools validate [OPTIONS]
   Options:
     -j, --json_file TEXT    Json file to validate
     -s, --json_schema TEXT  Json schema
+    -m, --metadata PATH     Origin file containing metadata
     -o, --out_folder TEXT   Path to save validate json file
     --help                  Show this message and exit.
 

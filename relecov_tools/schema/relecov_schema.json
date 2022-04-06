@@ -2827,15 +2827,6 @@
             "clasification": "Sequencing",
             "label": "Source material"
         },
-        "nominal_length": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "clasification": "Sequencing"
-        },
         "analysis_accession": {
             "examples": [
                 ""
