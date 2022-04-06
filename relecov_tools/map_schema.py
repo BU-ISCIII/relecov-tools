@@ -126,7 +126,7 @@ class MappingSchema:
         """
         mapped_dict = OrderedDict()
         for key, values in self.mapped_to_schema["properties"].items():
-            if values['ontology'] == "0":
+            if values["ontology"] == "0":
                 continue
             try:
                 mapped_dict[key] = self.ontology[values["ontology"]]
