@@ -1999,16 +1999,6 @@
             "classification": "Sequencing",
             "label": "Library Layout"
         },
-        "library_name": {
-            "examples": [
-                "P17157_1007"
-            ],
-            "ontology": "GENEPIO_0001995",
-            "type": "string",
-            "description": "Name of the used library",
-            "classification": "Sequencing",
-            "label": "Library Name"
-        },
         "nominal_length ": {
             "examples": [
                 "350"
