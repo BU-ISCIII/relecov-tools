@@ -96,6 +96,7 @@ class RelecovMetadata:
             if city["geo_loc_city"] == data["geo_loc_city"]:
                 data["geo_loc_latitude"] = city["geo_loc_latitude"]
                 data["geo_loc_longitude"] = city["geo_loc_longitude"]
+                data["geo_loc_country"] = data["geo_loc_country"]
                 break
         return data
 
