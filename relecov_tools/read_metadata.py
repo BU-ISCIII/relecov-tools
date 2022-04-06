@@ -258,7 +258,7 @@ class RelecovMetadata:
                                 row[idx] if row[idx] else ""
                             )
                         except KeyError as e:
-                            stderr.print("[red] Error when reading " + row[2] + e)
+                            stderr.print("[red] Error when reading " + str(row[2]) + str(e))
             metadata_values.append(sample_data_row)
 
         return metadata_values, errors
