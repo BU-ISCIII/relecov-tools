@@ -316,6 +316,6 @@ class RelecovMetadata:
         else:
             log.error("There is missing samples in metadata and/or uploaded")
         """
-        file_name = "processed_" + os.path.basename(self.metadata_file) + ".json"
+        file_name = "processed_" + os.path.splitext(os.path.basename(self.metadata_file))[0] + ".json"
         self.write_json_fo_file(completed_metadata, file_name)
         return True
