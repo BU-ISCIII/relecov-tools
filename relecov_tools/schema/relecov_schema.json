@@ -23,7 +23,7 @@
             "ontology": "GENEPIO:0001123",
             "type": "string",
             "description": "The user-defined name for the sample.",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "Sample ID given by originating laboratory"
         },
         "sample_description": {
@@ -33,7 +33,7 @@
             "ontology": "GENEPIO:0001156",
             "type": "string",
             "description": "Free text description of the sample.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Sample Description"
         },
         "collecting_institution": {
@@ -71,7 +71,7 @@
             "ontology": "GENEPIO:0001398",
             "type": "string",
             "description": "a unique identifier by which each subject can be referred to, de-identified.",
-            "clasification": "Host information",
+            "classification": "Host information",
             "label": "Host Subject Id"
         },
         "geo_loc_country": {
@@ -475,7 +475,7 @@
             "examples": [
                 "Homo sapiens [NCBITaxon:9606]"
             ],
-            "clasification": "Host information",
+            "classification": "Host information",
             "label": "Host Scientific Name"
         },
         "host_disease": {
@@ -583,7 +583,7 @@
             "ontology": "GENEPIO:0001133",
             "type": "string",
             "description": "The INSDC umbrella accession number of the BioProject to which the BioSample belongs.",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "Bioproject umbrella accession ENA"
         },
         "bioproject_accession_ENA": {
@@ -593,7 +593,7 @@
             "ontology": "GENEPIO:0001136",
             "type": "string",
             "description": "The INSDC accession number of the BioProject(s) to which the BioSample belongs.",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "Bioproject accession ENA"
         },
         "biosample_accession_ENA": {
@@ -603,7 +603,7 @@
             "ontology": "GENEPIO:0001139",
             "type": "string",
             "description": "The identifier assigned to a BioSample in INSDC archives.",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "ENA Sample ID"
         },
         "sra_accession": {
@@ -613,7 +613,7 @@
             "ontology": "GENEPIO:0001142",
             "type": "string",
             "description": "The Sequence Read Archive (SRA), European Nucleotide Archive (ENA) or DDBJ Sequence Read Archive (DRA) identifier linking raw read data, methodological metadata and quality control metrics submitted to the INSDC.",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "SRA Accession"
         },
         "genBank/ENA/DDBJ_accession": {
@@ -623,7 +623,7 @@
             "ontology": "GENEPIO_0001145",
             "type": "string",
             "description": "The GenBank/ENA/DDBJ identifier assigned to the sequence in the INSDC archives.",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "GenBank/ENA/DDBJ accession"
         },
         "GISAID_accession": {
@@ -633,7 +633,7 @@
             "ontology": "GENEPIO:0001147",
             "type": "string",
             "description": "The GISAID accession number assigned to the sequence.",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "GISAID Accession"
         },
         "virus_name": {
@@ -643,7 +643,7 @@
             "ontology": "GENEPIO:0100282",
             "type": "string",
             "description": "The user-defined GISAID virus name assigned to the sequence.",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "GISAID Virus Name"
         },
         "collecting_institution_email": {
@@ -653,7 +653,7 @@
             "ontology": "OBI:0001890",
             "type": "string",
             "description": "The email address of the contact responsible for follow-up regarding the sample.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Originating Laboratory Email"
         },
         "collecting_institution_address": {
@@ -663,7 +663,7 @@
             "ontology": "GENEPIO:0001158",
             "type": "string",
             "description": "The mailing address of the agency submitting the sample.",
-            "clasification": "Originating Laboratory Address"
+            "classification": "Originating Laboratory Address"
         },
         "submitting_institution_email": {
             "examples": [
@@ -672,7 +672,7 @@
             "ontology": "GENEPIO:0001165",
             "type": "string",
             "description": "The email address of the contact responsible for follow-up regarding the sequence.",
-            "clasification": "Sample collection and processing"
+            "classification": "Sample collection and processing"
         },
         "submitting_institution_address": {
             "examples": [
@@ -681,7 +681,7 @@
             "ontology": "GENEPIO:0001167",
             "type": "string",
             "description": "The mailing address of the agency submitting the sequence.",
-            "clasification": "Sample collection and processing"
+            "classification": "Sample collection and processing"
         },
         "sample_received_date": {
             "examples": [
@@ -691,7 +691,7 @@
             "type": "string",
             "description": "The date on which the sample was received.",
             "format": "date",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Sample Received Date"
         },
         "shipping_date": {
@@ -702,7 +702,7 @@
             "type": "string",
             "description": "The date on which the sample was sent.",
             "format": "date",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Shipping Date"
         },
         "results_emission_date": {
@@ -713,7 +713,7 @@
             "type": "string",
             "description": "The date on which the results were emitted.",
             "format": "date",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Results Emission Date"
         },
         "sample_storage_conditions": {
@@ -723,7 +723,7 @@
             "ontology": "NCIT_C115535",
             "type": "string",
             "description": "The name and version of a particular protocol used for sampling.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Biological Sample Storage Condition"
         },
         "culture_collection": {
@@ -833,7 +833,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Sample ID given in the microbiology lab"
         },
         "public_health_sample_id_sivies": {
@@ -843,7 +843,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Public Health sample id (SIVIES)"
         },
         "isolate_sample_id": {
@@ -853,7 +853,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "",
+            "classification": "",
             "label": "Sample ID given if multiple rna-extraction or passages"
         },
         "geo_loc_region": {
@@ -863,7 +863,7 @@
             "ontology": "GENEPIO:0100280",
             "type": "string",
             "description": "The county/region of origin of the sample.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Province"
         },
         "geo_loc_city": {
@@ -873,7 +873,7 @@
             "ontology": "GENEPIO:0001189",
             "type": "string",
             "description": "The city of origin of the sample.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "City"
         },
         "geo_loc_latitude": {
@@ -883,7 +883,7 @@
             "ontology": "OBI:0001620",
             "type": "string",
             "description": "The latitude coordinates of the geographical location of sample collection.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Geo Loc Latitude"
         },
         "geo_loc_longitude": {
@@ -893,7 +893,7 @@
             "ontology": "OBI:0001621",
             "type": "string",
             "description": "The longitude coordinates of the geographical location of sample collection.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Geo Loc Longitude"
         },
         "anatomical_material": {
@@ -1035,7 +1035,7 @@
             "examples": [
                 "Face Mask [OBI:0002787]"
             ],
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Environmental Material"
         },
         "environmental_site": {
@@ -1125,7 +1125,7 @@
             "examples": [
                 "Swab [GENEPIO:0100027]"
             ],
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Collection Device"
         },
         "collection_method": {
@@ -1163,7 +1163,7 @@
             "examples": [
                 "Bronchoalveolar Lavage (BAL) [GENEPIO:0100032]"
             ],
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Collection Method"
         },
         "collection_protocol": {
@@ -1173,7 +1173,7 @@
             "ontology": "GENEPIO:0001243",
             "type": "string",
             "description": "The name and version of a particular protocol used for sampling.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Collection Protocol"
         },
         "specimen_processing": {
@@ -1236,7 +1236,7 @@
             "ontology": "GENEPIO:0001261",
             "type": "string",
             "description": "Number of passages.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Passage Number"
         },
         "passage_method": {
@@ -1246,7 +1246,7 @@
             "ontology": "GENEPIO:0001264",
             "type": "string",
             "description": "Description of how organism was passaged.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Passage Method"
         },
         "tax_id": {
@@ -1256,7 +1256,7 @@
             "ontology": "GENEPIO_0001724",
             "type": "string",
             "description": "The NCBITaxon identifier for the organism being sequenced.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Tax ID"
         },
         "center_name": {
@@ -1266,7 +1266,7 @@
             "ontology": "NCIT_C19983",
             "type": "string",
             "description": "The name of the institution",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Center Name"
         },
         "host_common_name": {
@@ -1593,7 +1593,7 @@
             "ontology": "GENEPIO:0001417",
             "type": "string",
             "description": "If the information is unknown or can not be shared, leave blank.",
-            "clasification": "Host information",
+            "classification": "Host information",
             "label": "Outbreak Exposure Event Location"
         },
         "additional_host_information": {
@@ -1603,7 +1603,7 @@
             "ontology": "GENEPIO_0001268",
             "type": "string",
             "description": "If the information is unknown or can not be shared, leave blank.",
-            "clasification": "Host information",
+            "classification": "Host information",
             "label": "Additional Host Information"
         },
         "host_ethnicity": {
@@ -1693,7 +1693,7 @@
             "ontology": "GENEPIO:0000079",
             "type": "number",
             "description": "If the information is unknown or can not be shared, leave blank.",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "Sample ID given for sequencing"
         },
         "passage_details": {
@@ -1706,7 +1706,7 @@
                 "number"
             ],
             "description": "If the information is unknown or can not be shared, leave blank.",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "Passage Details"
         },
         "purpose_of_sequencing_details": {
@@ -1733,7 +1733,7 @@
             "examples": [
                 "Screened for S gene target failure (S dropout)"
             ],
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Purpose Of Sequencing Details"
         },
         "sequencing_date": {
@@ -1744,7 +1744,7 @@
             "type": "string",
             "description": "The date the sample was sequenced.",
             "format": "date",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Sequencing Date"
         },
         "rna_extraction_protocol": {
@@ -1754,7 +1754,7 @@
             "ontology": "OBI_0302884",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Rna Extraction Protocol"
         },
         "library_kit": {
@@ -1764,7 +1764,7 @@
             "ontology": "GENEPIO_0000085",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Commercial All-in-one library kit"
         },
         "library_id": {
@@ -1774,7 +1774,7 @@
             "ontology": "GENEPIO:0001448",
             "type": "string",
             "description": "The user-specified identifier for the library prepared for sequencing.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "labe": "Library Id"
         },
         "enrichment_protocol": {
@@ -1784,7 +1784,7 @@
             "ontology": "EFO_0009089",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Enrichment Protocol"
         },
         "if_enrichment_protocol_is_other_specify": {
@@ -1794,7 +1794,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "If Enrichment Protocol Is Other, Specify"
         },
         "amplicon_protocol": {
@@ -1804,7 +1804,7 @@
             "ontology": "EFO_0003747",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Enrichment panel/assay"
         },
         "if_amplicon_protocol_if_other_especify": {
@@ -1814,7 +1814,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "If Enrichment panel/assay If Other, Especify"
         },
         "amplicon_version": {
@@ -1824,7 +1824,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Enrichment panel/assay version"
         },
         "amplicon_size": {
@@ -1834,7 +1834,7 @@
             "ontology": "GENEPIO:0001449",
             "type": "string",
             "description": "The length of the amplicon generated by PCR amplification.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Amplicon Size"
         },
         "was_phix_used?": {
@@ -1844,7 +1844,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Was Phix Used"
         },
         "number_of_samples_in_run": {
@@ -1854,7 +1854,7 @@
             "ontology": "KISAO_0000326",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Number Of Samples In Run"
         },
         "flowcell_kit": {
@@ -1864,7 +1864,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Flowcell Kit"
         },
         "runID": {
@@ -1874,7 +1874,7 @@
             "ontology": "NCIT_C117058",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Runid"
         },
         "sequencing_platforms": {
@@ -1884,7 +1884,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Sequencing Platforms "
         },
         "library_preparation_kit": {
@@ -1894,7 +1894,7 @@
             "ontology": "GENEPIO:0001450",
             "type": "string",
             "description": "The name of the DNA library preparation kit used to generate the library being sequenced.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Library Preparation Kit"
         },
         "flow_cell_barcode": {
@@ -1904,7 +1904,7 @@
             "ontology": "GENEPIO:0001451",
             "type": "string",
             "description": "The barcode of the flow cell used for sequencing.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Flow Cell Barcode"
         },
         "sequencing_protocol_name": {
@@ -1914,7 +1914,7 @@
             "ontology": "GENEPIO:0001453",
             "type": "string",
             "description": "The name and version number of the sequencing protocol used.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Sequencing Protocol Name"
         },
         "sequencing_protocol": {
@@ -1924,7 +1924,7 @@
             "ontology": "GENEPIO:0001454",
             "type": "string",
             "description": "The protocol used to generate the sequence.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Sequencing Protocol"
         },
         "sequencing_kit_number": {
@@ -1934,7 +1934,7 @@
             "ontology": "GENEPIO:0001455",
             "type": "string",
             "description": "The manufacturer's kit number.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Sequencing Kit Number"
         },
         "amplicon_pcr_primer_scheme": {
@@ -1944,7 +1944,7 @@
             "ontology": "GENEPIO:0001456",
             "type": "string",
             "description": "The specifications of the primers (primer sequences, binding positions, fragment size generated etc) used to generate the amplicons to be sequenced.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Amplicon Pcr Primer Scheme"
         },
         "library_selection": {
@@ -1954,7 +1954,7 @@
             "ontology": "GENPIO_0001940",
             "type": "string",
             "description": "Library capture method.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Capture method"
         },
         "library_strategy": {
@@ -1986,7 +1986,7 @@
             "ontology": "GENPIO_0001973",
             "type": "string",
             "description": "Overall sequencing strategy or approach.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Sequencing technique"
         },
         "library_layout": {
@@ -1996,7 +1996,7 @@
             "ontology": "NCIT:C175894",
             "type": "string",
             "description": "Single or paired.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Library Layout"
         },
         "library_name": {
@@ -2006,7 +2006,7 @@
             "ontology": "GENEPIO_0001995",
             "type": "string",
             "description": "Name of the used library",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Library Name"
         },
         "nominal_length ": {
@@ -2016,7 +2016,7 @@
             "ontology": "GENEPIO_0000076",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Nominal Length"
         },
         "raw_sequence_data_processing_method": {
@@ -2026,7 +2026,7 @@
             "ontology": "GENEPIO:0001458",
             "type": "string",
             "description": "The method used for raw data processing such as removing barcodes, adapter trimming, filtering etc.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Raw sequence data processin method"
         },
         "dehosting_method": {
@@ -2036,7 +2036,7 @@
             "ontology": "GENEPIO:0001459",
             "type": "string",
             "description": "The method used to remove host reads from the pathogen sequence.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Dehosting Method"
         },
         "personal_protective_equipment": {
@@ -2046,7 +2046,7 @@
             "ontology": "NCIT:C173748",
             "type": "string",
             "description": "Use of personal protective equipment, such as gloves, gowns, during any type of exposure.",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Personal protective equipment"
         },
         "assembly": {
@@ -2056,7 +2056,7 @@
             "ontology": "NCIT_C63548",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Assembly"
         },
         "if_assembly_other": {
@@ -2066,7 +2066,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "If assembly Is Other, Specify"
         },
         "assembly_params": {
@@ -2076,7 +2076,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Assambly params"
         },
         "variant_calling": {
@@ -2086,7 +2086,7 @@
             "ontology": "operation_3227",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Variant Calling"
         },
         "if_variant_calling_other": {
@@ -2096,7 +2096,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "If variant calling Is Other, Specify"
         },
         "variant_calling_params": {
@@ -2106,7 +2106,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Variant Calling params"
         },
         "consensus_sequence_name": {
@@ -2134,7 +2134,7 @@
             "ontology": "GENEPIO:0001462",
             "type": "string",
             "description": "The filepath of the consesnsus sequence file.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Consensus sequence filepath"
         },
         "consensus_sequence_software_name": {
@@ -2144,7 +2144,7 @@
             "ontology": "GENEPIO:0001463",
             "type": "string",
             "description": "The name of software used to generate the consensus sequence.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Consensus sequence software name"
         },
         "if_consensus_other": {
@@ -2154,7 +2154,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The version of the software used to generate the consensus sequence.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "If consensus Is Other, Specify"
         },
         "consensus_sequence_software_version": {
@@ -2164,7 +2164,7 @@
             "ontology": "GENEPIO:0001469",
             "type": "string",
             "description": "The version of the software used to generate the consensus sequence.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Consensus sequence software version"
         },
         "consensus_criteria": {
@@ -2174,7 +2174,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Consensus criteria"
         },
         "quality_control_metrics": {
@@ -2184,7 +2184,7 @@
             "ontology": "data_3914",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Quality control metrics "
         },
         "breadth_of_coverage_value": {
@@ -2194,7 +2194,7 @@
             "ontology": "GENEPIO:0001472",
             "type": "string",
             "description": "The percentage of the reference genome covered by the sequenced data, to a prescribed depth.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Breadth of coverage value"
         },
         "depth_of_coverage_value": {
@@ -2204,7 +2204,7 @@
             "ontology": "GENEPIO:0001474",
             "type": "string",
             "description": "The average number of reads representing a given nucleotide in the reconstructed sequence.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Depth of coverage value "
         },
         "depth_of_coverage_threshold": {
@@ -2214,7 +2214,7 @@
             "ontology": "GENEPIO:0001475",
             "type": "string",
             "description": "The threshold used as a cut-off for the depth of coverage.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Depth of coverage threshold"
         },
         "sequence_file_R1_fastq": {
@@ -2224,7 +2224,7 @@
             "ontology": "GENEPIO:0001476",
             "type": "string",
             "description": "The user-specified filename of the r1 FASTQ file.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Sequence file R1 fastq"
         },
         "sequence_file_R2_fastq": {
@@ -2234,7 +2234,7 @@
             "ontology": "GENEPIO:0001477",
             "type": "string",
             "description": "The user-specified filename of the r2 FASTQ file.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Sequence file R2 fastq"
         },
         "r1_fastq_filepath": {
@@ -2244,7 +2244,7 @@
             "ontology": "GENEPIO:0001478",
             "type": "string",
             "description": "The filepath of the r1 FASTQ file.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Filepath R1 fastq"
         },
         "r2_fastq_filepath": {
@@ -2254,7 +2254,7 @@
             "ontology": "GENEPIO:0001479",
             "type": "string",
             "description": "The filepath of the r2 FASTQ file.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Filepath R2 fastq"
         },
         "fast5_filename": {
@@ -2264,7 +2264,7 @@
             "ontology": "GENEPIO:0001480",
             "type": "string",
             "description": "The user-specified filename of the FAST5 file.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Filename fast5"
         },
         "fast5_filepath": {
@@ -2274,7 +2274,7 @@
             "ontology": "GENEPIO:0001481",
             "type": "string",
             "description": "The filepath of the FAST5 file.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Filepath fast5"
         },
         "number_of_base_pairs_sequenced": {
@@ -2284,7 +2284,7 @@
             "ontology": "GENEPIO:0001482",
             "type": "string",
             "description": "The number of total base pairs generated by the sequencing process.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Number of base pairs sequenced "
         },
         "consensus_genome_length": {
@@ -2294,7 +2294,7 @@
             "ontology": "GENEPIO:0001483",
             "type": "string",
             "description": "Size of the assembled genome described as the number of base pairs.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Consensus genome length"
         },
         "ns_per_100_kbp": {
@@ -2304,7 +2304,7 @@
             "ontology": "GENEPIO:0001484",
             "type": "string",
             "description": "The number of N symbols present in the consensus fasta sequence, per 100kbp of sequence.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Ns per 100 kbp"
         },
         "reference_genome_accession": {
@@ -2314,7 +2314,7 @@
             "ontology": "GENEPIO:0001485",
             "type": "string",
             "description": "A persistent, unique identifier of a genome database entry.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Reference genome accession"
         },
         "bioinformatics_protocol": {
@@ -2324,7 +2324,7 @@
             "ontology": "GENEPIO:0001489",
             "type": "string",
             "description": "The name  of the bioinformatics protocol used.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Bioinformatics protocol"
         },
         "if_bioinformatic_protocol_is_other_specify": {
@@ -2334,7 +2334,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The name  of the bioinformatics protocol used.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "If bioinformatic protocol Is Other, Specify"
         },
         "bioinformatic_protocol_version": {
@@ -2344,7 +2344,7 @@
             "ontology": "NCIT:C93490",
             "type": "string",
             "description": "The version number of the bioinformatics protocol used.",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "bioinformatics protocol version"
         },
         "commercial/open-source/both": {
@@ -2354,7 +2354,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Commercial/Open-source/both"
         },
         "sample_plan_name": {
@@ -2373,7 +2373,7 @@
             "ontology": "MS_1002386",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Preprocessing"
         },
         "if_preprocessing_other": {
@@ -2383,7 +2383,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "If preprocessing Is Other, Specify"
         },
         "preprocessing_params": {
@@ -2393,7 +2393,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Preprocessing params"
         },
         "mapping": {
@@ -2403,7 +2403,7 @@
             "ontology": "topic:0102",
             "type": "string",
             "description": "",
-            "clasification": "Lineage and Variant information",
+            "classification": "Lineage and Variant information",
             "label": "Mapping"
         },
         "if_mapping_other": {
@@ -2413,7 +2413,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Lineage and Variant information",
+            "classification": "Lineage and Variant information",
             "label": "If mapping Is Other, Specify"
         },
         "mapping_params": {
@@ -2423,7 +2423,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Lineage and Variant information",
+            "classification": "Lineage and Variant information",
             "label": "Mapping params"
         },
         "lineage/clade_name": {
@@ -2433,7 +2433,7 @@
             "ontology": "GENEPIO:0001500",
             "type": "string",
             "description": "The name of the lineage or clade.",
-            "clasification": "Lineage and Variant information",
+            "classification": "Lineage and Variant information",
             "label": "Lineage/clade name"
         },
         "lineage/clade_analysis_software_name": {
@@ -2443,7 +2443,7 @@
             "ontology": "GENEPIO:0001501",
             "type": "string",
             "description": "The name of the software used to determine the lineage/clade.",
-            "clasification": "Lineage and Variant information",
+            "classification": "Lineage and Variant information",
             "label": "lineage/clade analysis software name"
         },
         "if_lineage_identification_other": {
@@ -2453,7 +2453,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The name of the software used to determine the lineage/clade.",
-            "clasification": "Lineage and Variant information",
+            "classification": "Lineage and Variant information",
             "label": "If lineage identification Is Other, Specify"
         },
         "lineage/clade_analysis_software_version": {
@@ -2463,7 +2463,7 @@
             "ontology": "GENEPIO:0001502",
             "type": "string",
             "description": "The version of the software used to determine the lineage/clade.",
-            "clasification": "Lineage and Variant information",
+            "classification": "Lineage and Variant information",
             "label": "Lineage/clade analysis software version"
         },
         "variant_designation": {
@@ -2488,7 +2488,7 @@
             "ontology": "GENEPIO:0001504",
             "type": "string",
             "description": "The evidence used to make the variant determination.",
-            "clasification": "Lineage and Variant information",
+            "classification": "Lineage and Variant information",
             "label": "Variant evidence"
         },
         "gene_name_1": {
@@ -2548,7 +2548,7 @@
             "ontology": "CIDO_0020274",
             "type": "string",
             "description": "",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "Protocol SARS-CoV-2 detection"
         },
         "%qc_filtered": {
@@ -2558,7 +2558,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "%qc filtered"
         },
         "%reads_host": {
@@ -2568,7 +2568,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "%reads host"
         },
         "%reads_virus": {
@@ -2578,7 +2578,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "%reads virus"
         },
         "%unmapped": {
@@ -2588,7 +2588,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "%unmapped"
         },
         "%genome _greater_10x": {
@@ -2598,7 +2598,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "% genome  greater 10x"
         },
         "mean_depth_of_coverage_value": {
@@ -2608,7 +2608,7 @@
             "ontology": "NCIT:C167285",
             "type": "string",
             "description": "",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "mean depth of coverage value"
         },
         "%Ns": {
@@ -2618,7 +2618,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "%Ns"
         },
         "Number_of_variants_(AF_greater_75%)": {
@@ -2628,7 +2628,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "Number of variants (AF greater 75%)"
         },
         "Numer_of_variants_with_effect": {
@@ -2638,7 +2638,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "Numer of variants with effect"
         },
         "diagnostic_pcr_protocol_1": {
@@ -2648,7 +2648,7 @@
             "ontology": "GENEPIO:0001508",
             "type": "string",
             "description": "The name and version number of the protocol used for diagnostic marker amplification.",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "Diagnostic Pcr Protocol 1"
         },
         "diagnostic_pcr_Ct_value_1": {
@@ -2658,7 +2658,7 @@
             "ontology": "GENEPIO:0001509",
             "type": "string",
             "description": "The Ct value result from a diagnostic SARS-CoV-2 RT-PCR test.",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "Diagnostic Pcr Ct Value 1"
         },
         "gene_name_2": {
@@ -2718,7 +2718,7 @@
             "ontology": "GENEPIO:0001511",
             "type": "string",
             "description": "The name and version number of the protocol used for diagnostic marker amplification.",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "Diagnostic Pcr Protocol 2"
         },
         "diagnostic_pcr_Ct_value_2": {
@@ -2728,7 +2728,7 @@
             "ontology": "GENEPIO:0001512",
             "type": "string",
             "description": "The cycle threshold (CT) value result from a diagnostic SARS-CoV-2 RT-PCR test.",
-            "clasification": "Pathogen diagnostic testing",
+            "classification": "Pathogen diagnostic testing",
             "label": "Diagnostic Pcr Ct Value-2"
         },
         "analysis_author": {
@@ -2738,7 +2738,7 @@
             "ontology": "NCIT:C42781",
             "type": "string",
             "description": "",
-            "clasification": "Contributor Acknowledgement",
+            "classification": "Contributor Acknowledgement",
             "label": "Analysis Authors"
         },
         "author_submitter": {
@@ -2748,7 +2748,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Contributor Acknowledgement",
+            "classification": "Contributor Acknowledgement",
             "label": "Author Submitter"
         },
         "gisaid_id": {
@@ -2758,7 +2758,7 @@
             "ontology": "NCIT:C54269",
             "type": "string",
             "description": "",
-            "clasification": "enter your GISAID-Username",
+            "classification": "enter your GISAID-Username",
             "label": "GISAID id"
         },
         "authors": {
@@ -2768,7 +2768,7 @@
             "ontology": "GENEPIO:0001517",
             "type": "string",
             "description": "",
-            "clasification": "Contributor Acknowledgement",
+            "classification": "Contributor Acknowledgement",
             "label": "Authors"
         },
         "common_name": {
@@ -2778,7 +2778,7 @@
             "ontology": "NCIT:C164471",
             "type": "string",
             "description": "The common name of the organism.",
-            "clasification": "Sample collection and processing"
+            "classification": "Sample collection and processing"
         },
         "collector_name": {
             "examples": [
@@ -2787,7 +2787,7 @@
             "ontology": "NCIT:C164471",
             "type": "string",
             "description": "Name of the person who collected the specimen",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Sample collector name",
             "table": "sample"
         },
@@ -2824,7 +2824,7 @@
             "ontology": "GENEPIO_0001965",
             "type": "string",
             "description": "Molecule type used to make the library.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Source material"
         },
         "nominal_length": {
@@ -2834,7 +2834,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "clasification": "Sequencing"
+            "classification": "Sequencing"
         },
         "analysis_accession": {
             "examples": [
@@ -2843,7 +2843,7 @@
             "ontology": "GENEPIO_0001145",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Analysis Accession"
         },
         "study_accession": {
@@ -2853,7 +2853,7 @@
             "ontology": "GENEPIO_0001136",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Study accession"
         },
         "secondary_study_accession": {
@@ -2863,7 +2863,7 @@
             "ontology": "BU_ISCIII:012",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Secondary study accession"
         },
         "sample_accession": {
@@ -2873,7 +2873,7 @@
             "ontology": "GENEPIO_0001139",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Sample accession"
         },
         "secondary_sample_accession": {
@@ -2883,7 +2883,7 @@
             "ontology": "BU_ISCIII:014",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Secondary sample accession"
         },
         "experiment_accession": {
@@ -2893,7 +2893,7 @@
             "ontology": "BU_ISCIII:015",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Experiment Accession"
         },
         "run_accession": {
@@ -2903,7 +2903,7 @@
             "ontology": "BU_ISCIII:016",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Run Accession"
         },
         "submission_accession": {
@@ -2913,7 +2913,7 @@
             "ontology": "BU_ISCIII:017",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Submission Accession"
         },
         "read_count": {
@@ -2923,7 +2923,7 @@
             "ontology": "STATO_0000064",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Read count"
         },
         "read_length": {
@@ -2933,7 +2933,7 @@
             "ontology": "STATO_0000064",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Read length"
         },
         "base_count": {
@@ -2943,7 +2943,7 @@
             "ontology": "UO_0000244",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Base count"
         },
         "first_public": {
@@ -2953,7 +2953,7 @@
             "ontology": "NCIT_C142711",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "First Public date"
         },
         "last_updated": {
@@ -2963,7 +2963,7 @@
             "ontology": "OMIABIS_0001005",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "format": "date",
             "label": "Last Updated"
         },
@@ -2974,7 +2974,7 @@
             "ontology": "ORNASEQ_0000004",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Experiment title"
         },
         "study_title": {
@@ -2984,7 +2984,7 @@
             "ontology": "OPMI_0000380",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Study title"
         },
         "study_alias": {
@@ -2994,7 +2994,7 @@
             "ontology": "SIO_001066",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Study alias"
         },
         "experiment_alias": {
@@ -3004,7 +3004,7 @@
             "ontology": "NCIT_C42790",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Experiment alias"
         },
         "run_alias": {
@@ -3014,7 +3014,7 @@
             "ontology": "NCIT_C47911",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Run Alias"
         },
         "fastq_bytes": {
@@ -3024,7 +3024,7 @@
             "ontology": "NCIT_C48047",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Fastq bytes"
         },
         "fastq_md5_r1": {
@@ -3034,7 +3034,7 @@
             "ontology": "MS_1000568",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Fastq md5 r1"
         },
         "fastq_md5_r2": {
@@ -3044,7 +3044,7 @@
             "ontology": "MS_1000568",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Fastq md5 r2"
         },
         "fastq_ftp": {
@@ -3054,7 +3054,7 @@
             "ontology": "PRIDE_0000469",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Fastq ftp"
         },
         "fastq_aspera": {
@@ -3064,7 +3064,7 @@
             "ontology": "BU_ISCIII:032",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Fastq aspera"
         },
         "fastq_galaxy": {
@@ -3074,7 +3074,7 @@
             "ontology": "ENVO_01000807",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Fastq galaxy"
         },
         "submitted_bytes": {
@@ -3084,7 +3084,7 @@
             "ontology": "NCIT_C172872",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Submitted bytes "
         },
         "submitted_md5": {
@@ -3094,7 +3094,7 @@
             "ontology": "BU_ISCIII:035",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Submitted md5"
         },
         "submitted_ftp": {
@@ -3104,7 +3104,7 @@
             "ontology": "BU_ISCIII:036",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Submitted ftp"
         },
         "submitted_aspera": {
@@ -3114,7 +3114,7 @@
             "ontology": "BU_ISCIII:037",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Submitted aspera"
         },
         "submitted_galaxy": {
@@ -3124,7 +3124,7 @@
             "ontology": "BU_ISCIII:038",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Submitted Galaxy"
         },
         "submitted_format": {
@@ -3134,7 +3134,7 @@
             "ontology": "BU_ISCIII:039",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Submitted Format"
         },
         "sra_bytes": {
@@ -3144,7 +3144,7 @@
             "ontology": "BU_ISCIII:040",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "SRA bytes"
         },
         "sra_md5": {
@@ -3154,7 +3154,7 @@
             "ontology": "BU_ISCIII:041",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "SRA md5"
         },
         "sra_ftp": {
@@ -3164,7 +3164,7 @@
             "ontology": "BU_ISCIII:042",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "SRA ftp"
         },
         "sra_aspera": {
@@ -3174,7 +3174,7 @@
             "ontology": "BU_ISCIII:043",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "SRA aspera"
         },
         "sra_galaxy": {
@@ -3184,7 +3184,7 @@
             "ontology": "BU_ISCIII:044",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "SRA galaxy"
         },
         "broker_name": {
@@ -3194,7 +3194,7 @@
             "ontology": "BU_ISCIII:045",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Broker Name"
         },
         "nominal_sdev": {
@@ -3204,7 +3204,7 @@
             "ontology": "STATO_0000237",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Nominal sdev"
         },
         "first_created_date": {
@@ -3215,7 +3215,7 @@
             "type": "string",
             "format": "date",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "First created date"
         },
         "type": {
@@ -3225,7 +3225,7 @@
             "ontology": "NCIT:C25284",
             "type": "string",
             "description": "default must remain 'betacoronavirus'",
-            "clasification": "Database Identifiers"
+            "classification": "Database Identifiers"
         }
     }
 }
