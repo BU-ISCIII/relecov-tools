@@ -258,7 +258,9 @@ class RelecovMetadata:
                                 row[idx] if row[idx] else ""
                             )
                         except KeyError as e:
-                            stderr.print("[red] Error when reading " + str(row[2]) + str(e))
+                            stderr.print(
+                                "[red] Error when reading " + str(row[2]) + str(e)
+                            )
             metadata_values.append(sample_data_row)
 
         return metadata_values, errors
@@ -316,6 +318,10 @@ class RelecovMetadata:
         else:
             log.error("There is missing samples in metadata and/or uploaded")
         """
-        file_name = "processed_" + os.path.splitext(os.path.basename(self.metadata_file))[0] + ".json"
+        file_name = (
+            "processed_"
+            + os.path.splitext(os.path.basename(self.metadata_file))[0]
+            + ".json"
+        )
         self.write_json_fo_file(completed_metadata, file_name)
         return True
