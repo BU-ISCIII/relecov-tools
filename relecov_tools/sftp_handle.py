@@ -34,7 +34,9 @@ class SftpHandle:
         self.sftp_user = user
         self.sftp_passwd = passwd
         if conf_file is None:
-            self.sftp_server = config_json.get_topic_data("sftp_connection", "sftp_server")
+            self.sftp_server = config_json.get_topic_data(
+                "sftp_connection", "sftp_server"
+            )
             self.sftp_port = config_json.get_topic_data("sftp_connection", "sftp_port")
             self.storage_local_folder = config_json.get_configuration(
                 "storage_local_folder"
@@ -302,7 +304,9 @@ class SftpHandle:
                 if s_name not in sample_file_list:
                     sample_file_list[s_name] = {}
                 if row[index_fastq_r1] is not None:
-                    sample_file_list[s_name]["sequence_file_R1_fastq"] = row[index_fastq_r1]
+                    sample_file_list[s_name]["sequence_file_R1_fastq"] = row[
+                        index_fastq_r1
+                    ]
                 else:
                     log.error(
                         "Fastq_R1 not defined in Metadata file for sample %s", s_name
@@ -310,7 +314,9 @@ class SftpHandle:
                     stderr.print("[red] No fastq R1 file for sample " + s_name)
                     return False
                 if row[index_fastq_r2] is not None:
-                    sample_file_list[s_name]["sequence_file_R2_fastq"] = row[index_fastq_r2]
+                    sample_file_list[s_name]["sequence_file_R2_fastq"] = row[
+                        index_fastq_r2
+                    ]
         return sample_file_list
 
     def validate_download_files(self, sample_file_list, local_folder):

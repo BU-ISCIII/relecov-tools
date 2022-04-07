@@ -161,7 +161,9 @@ class RelecovMetadata:
         for row_sample in metadata:
             """Include sample data from sample json"""
             try:
-                for key, value in samples_json[row_sample["collecting_lab_sample_id"]].items():
+                for key, value in samples_json[
+                    row_sample["collecting_lab_sample_id"]
+                ].items():
                     row_sample[key] = value
             except KeyError:
                 pass

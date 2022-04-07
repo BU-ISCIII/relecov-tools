@@ -151,13 +151,19 @@ class MappingSchema:
 
     def additional_formating(self, mapped_json_data):
         """Update data like MD5 to split in two fields, one for R1 file and
-            second for R2
+        second for R2
         """
         if self.destination_schema == "ENA":
             for idx in range(len(self.json_data)):
-                import pdb; pdb.set_trace()
-                mapped_json_data[idx]["fastq_md5_r1"] = self.json_data[idx]["fastq_md5_r1"]
-                mapped_json_data[idx]["fastq_md5_r2"] = self.json_data[idx]["fastq_md5_r2"]
+                import pdb
+
+                pdb.set_trace()
+                mapped_json_data[idx]["fastq_md5_r1"] = self.json_data[idx][
+                    "fastq_md5_r1"
+                ]
+                mapped_json_data[idx]["fastq_md5_r2"] = self.json_data[idx][
+                    "fastq_md5_r2"
+                ]
 
         return mapped_json_data
 
