@@ -34,8 +34,8 @@ class SftpHandle:
         self.sftp_user = user
         self.sftp_passwd = passwd
         if conf_file is None:
-            self.server = config_json.get_topic_data("sftp_connection", "sftp_server")
-            self.port = config_json.get_topic_data("sftp_connection", "sftp_port")
+            self.sftp_server = config_json.get_topic_data("sftp_connection", "sftp_server")
+            self.sftp_port = config_json.get_topic_data("sftp_connection", "sftp_port")
             self.storage_local_folder = config_json.get_configuration(
                 "storage_local_folder"
             )
@@ -243,8 +243,15 @@ class SftpHandle:
             for f_type, f_name in values.items():
                 if not f_name.endswith(tuple(self.allowed_sample_ext)):
                     stderr.print("[red] " + f_name + " has a not valid extension")
-                data[s_name]["local_folder"] = md5_data[f_name][0]
-                data[s_name][f_type + "_md5"] = md5_data[f_name][1]
+                if "_R1_" in f_name:
+                    data[s_name]["r1_fastq_filepath"] = md5_data[f_name][0]
+                    data[s_name]["fastq_r1_md5"] = md5_data[f_name][1]
+                elif "_R2_" in f_name:
+                    data[s_name]["r2_fastq_filepath"] = md5_data[f_name][0]
+                    data[s_name]["fastq_r2_md5"] = md5_data[f_name][1]
+                else:
+                    # reserved for future develoment
+                    pass
         with open(sample_data_path, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
 
@@ -288,18 +295,22 @@ class SftpHandle:
                 index_fastq_r2 = col.column - 1
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             if row[2] is not None:
-                if row[2] not in sample_file_list:
-                    sample_file_list[row[2]] = {}
+                try:
+                    s_name = str(int(row[2]))
+                except ValueError:
+                    s_name = str(row[2])
+                if s_name not in sample_file_list:
+                    sample_file_list[s_name] = {}
                 if row[index_fastq_r1] is not None:
-                    sample_file_list[row[2]]["fastq_r1"] = row[index_fastq_r1]
+                    sample_file_list[s_name]["sequence_file_R1_fastq"] = row[index_fastq_r1]
                 else:
                     log.error(
-                        "Fastq_R1 not defined in Metadata file for sample %s", row[2]
+                        "Fastq_R1 not defined in Metadata file for sample %s", s_name
                     )
-                    stderr.print("[red] No fastq R1 file for sample " + row[2])
+                    stderr.print("[red] No fastq R1 file for sample " + s_name)
                     return False
                 if row[index_fastq_r2] is not None:
-                    sample_file_list[row[2]]["fastq_r2"] = row[index_fastq_r2]
+                    sample_file_list[s_name]["sequence_file_R2_fastq"] = row[index_fastq_r2]
         return sample_file_list
 
     def validate_download_files(self, sample_file_list, local_folder):
