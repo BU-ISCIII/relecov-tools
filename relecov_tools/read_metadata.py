@@ -160,11 +160,11 @@ class RelecovMetadata:
 
         for row_sample in metadata:
             """Include sample data from sample json"""
-            for row_sample_data in samples_json:
-                if row_sample_data == row_sample:
-                    for key, value in row_sample_data.items():
-                        row_sample[key] = value
-
+            try:
+                for key, value in samples_json[row_sample["collecting_lab_sample_id"]].items():
+                    row_sample[key] = value
+            except KeyError:
+                pass
             """ Fetch the information related to the laboratory.
                 Info is stored in lab_data, to prevent to call get_laboratory_data
                 each time for each sample that belongs to the same lab
