@@ -149,6 +149,18 @@ class MappingSchema:
             mapped_data.append(map_sample_dict)
         return mapped_data
 
+    def additional_formating(self, mapped_json_data):
+        """Update data like MD5 to split in two fields, one for R1 file and
+            second for R2
+        """
+        if self.destination_schema == "ENA":
+            for idx in range(len(self.json_data)):
+                import pdb; pdb.set_trace()
+                mapped_json_data[idx]["fastq_md5_r1"] = self.json_data[idx]["fastq_md5_r1"]
+                mapped_json_data[idx]["fastq_md5_r2"] = self.json_data[idx]["fastq_md5_r2"]
+
+        return mapped_json_data
+
     def write_json_fo_file(self, mapped_json_data):
         """Write metadata to json file"""
         os.makedirs(self.output_folder, exist_ok=True)
@@ -170,5 +182,6 @@ class MappingSchema:
         """Mapping the json data from phage plus schema to the requested one"""
         mapping_schema_dict = self.maping_schemas_based_on_geontology()
         mapped_json_data = self.mapping_json_data(mapping_schema_dict)
-        self.write_json_fo_file(mapped_json_data)
+        updated_json_data = self.additional_formating(mapped_json_data)
+        self.write_json_fo_file(updated_json_data)
         return
