@@ -53,7 +53,7 @@
       "examples": [
         "John Smith"
       ],
-      "ontology": "NCIT:C164471",
+      "ontology": "GENEPIO:0001153",
       "type": "string",
       "description": "Name of the person who collected the specimen",
       "clasification": "Sample collection and processing",
