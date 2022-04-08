@@ -7,7 +7,6 @@
     "isolate",
     "host_scientific_name",
     "host_common_name",
-    "host_subject_id",
     "instrument_model",
     "file_name",
     "tax_id",
