@@ -1,4 +1,5 @@
 relecov-tools -l /tmp/logs.log  download -u usuario_test -p U[9[Gpyu3.
+relecov-tools -l /tmp/logs.log  download -f relecov_tools/test/sftp_config.yaml
 relecov-tools read-metadata -m relecov_tools/example_data/METADATA_LAB_TEST.xlsx -s relecov_tools/example_data/samples_data_COD_test_01_20220408.json -o /tmp
 relecov-tools validate -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -m relecov_tools/example_data/METADATA_LAB_TEST.xlsx -o /tmp
 relecov-tools map -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -o /tmp
