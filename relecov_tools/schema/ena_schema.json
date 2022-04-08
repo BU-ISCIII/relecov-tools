@@ -746,18 +746,45 @@
         "experiments"
       ]
     },
-    "file_name": {
-      "examples": [
-        "ABC123_S1_L001_R1_001.fastq.gz"
-      ],
-      "ontology": "GENEPIO:0001476",
-      "type": "string",
-      "description": "The user-specified filename of the r1 FASTQ file.",
-      "clasification": "Bioinformatics and QC metrics",
-      "label": "Sequence file R1 fastq",
-      "table": [
-        "runs"
-      ]
+    "sequence_file_R1_fastq": {
+        "examples": [
+            "ABC123_S1_L001_R1_001.fastq.gz"
+        ],
+        "ontology": "GENEPIO:0001476",
+        "type": "string",
+        "description": "The user-specified filename of the r1 FASTQ file.",
+        "clasification": "Bioinformatics and QC metrics",
+        "label": "Sequence file R1 fastq"
+    },
+    "sequence_file_R2_fastq": {
+        "examples": [
+            "ABC123_S1_L001_R2_001.fastq.gz"
+        ],
+        "ontology": "GENEPIO:0001477",
+        "type": "string",
+        "description": "The user-specified filename of the r2 FASTQ file.",
+        "clasification": "Bioinformatics and QC metrics",
+        "label": "Sequence file R2 fastq"
+    },
+    "r1_fastq_filepath": {
+        "examples": [
+            "/User/Documents/RespLab/Data/"
+        ],
+        "ontology": "GENEPIO:0001478",
+        "type": "string",
+        "description": "The filepath of the r1 FASTQ file.",
+        "clasification": "Bioinformatics and QC metrics",
+        "label": "Filepath R1 fastq"
+    },
+    "r2_fastq_filepath": {
+        "examples": [
+            "/User/Documents/RespLab/Data/"
+        ],
+        "ontology": "GENEPIO:0001479",
+        "type": "string",
+        "description": "The filepath of the r2 FASTQ file.",
+        "clasification": "Bioinformatics and QC metrics",
+        "label": "Filepath R2 fastq"
     },
     "file_type": {
       "examples": [
