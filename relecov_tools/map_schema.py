@@ -155,14 +155,11 @@ class MappingSchema:
         """
         if self.destination_schema == "ENA":
             for idx in range(len(self.json_data)):
-                import pdb
-
-                pdb.set_trace()
-                mapped_json_data[idx]["fastq_md5_r1"] = self.json_data[idx][
-                    "fastq_md5_r1"
+                mapped_json_data[idx]["fastq_r1_md5"] = self.json_data[idx][
+                    "fastq_r1_md5"
                 ]
-                mapped_json_data[idx]["fastq_md5_r2"] = self.json_data[idx][
-                    "fastq_md5_r2"
+                mapped_json_data[idx]["fastq_r2_md5"] = self.json_data[idx][
+                    "fastq_r2_md5"
                 ]
 
         return mapped_json_data
