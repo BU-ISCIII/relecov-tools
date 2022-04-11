@@ -2733,10 +2733,10 @@
         },
         "analysis_date": {
             "examples": [
-                ""
+                 "e.g 2020-08-07"
             ],
             "ontology": "0",
-            "type": "date",
+            "type": "string",
             "format": "date",
             "description": "",
             "classification": "Bioinformatics and QC metrics",
@@ -2747,7 +2747,7 @@
                 ""
             ],
             "ontology": "0",
-            "type": "date",
+            "type": "string",
             "format": "date",
             "description": "",
             "classification": "Bioinformatics and QC metrics",
@@ -2858,15 +2858,6 @@
             "description": "Molecule type used to make the library.",
             "classification": "Sequencing",
             "label": "Source material"
-        },
-        "nominal_length": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Sequencing"
         },
         "analysis_accession": {
             "examples": [
