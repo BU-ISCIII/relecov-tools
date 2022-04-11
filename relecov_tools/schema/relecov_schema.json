@@ -2713,10 +2713,10 @@
         },
         "analysis_date": {
             "examples": [
-                ""
+                 "e.g 2020-08-07"
             ],
             "ontology": "0",
-            "type": "date",
+            "type": "string",
             "format": "date",
             "description": "",
             "classification": "Bioinformatics and QC metrics",
@@ -2727,7 +2727,7 @@
                 ""
             ],
             "ontology": "0",
-            "type": "date",
+            "type": "string",
             "format": "date",
             "description": "",
             "classification": "Bioinformatics and QC metrics",
