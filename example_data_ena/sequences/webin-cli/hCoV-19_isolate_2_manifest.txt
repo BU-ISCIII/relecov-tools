@@ -1,0 +1,13 @@
+STUDY   PRJEB#####
+SAMPLE  ERS#######
+RUN_REF ERR#######
+ASSEMBLYNAME    hCoV-19_isolate_2
+ASSEMBLY_TYPE   COVID-19 outbreak
+COVERAGE        1000
+PROGRAM	ARTIC fieldbioinformatics (minimap2/nanopolish) 1.1.3 (nanopolish 0.13.2)
+PLATFORM        ILLUMINA
+MINGAPLENGTH	3
+MOLECULETYPE	genomic RNA
+DESCRIPTION	example sequence #2 for workshop
+FASTA       hCoV-19_isolate_2.fasta.gz
+CHROMOSOME_LIST	hCoV-19_isolate_2_chrm_list.txt.gz	

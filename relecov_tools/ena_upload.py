@@ -3,7 +3,7 @@ import logging
 import rich.console
 import json
 
-# import pandas as pd
+import pandas as pd
 import sys
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
@@ -95,40 +95,50 @@ class EnaUpload:
         fh = open(map_file)
         map_structure_json = json.load(fh)
         fh.close()
+
+        esquema = self.source_json_file
+        fh_esquema = open(esquema)
+        esquema_json = json.load(fh_esquema)
+        fh_esquema.close()
         # lista = ["study", "runs", "samples", "experiments"]
+
+        llaves = esquema_json.keys()
         import pdb
 
         pdb.set_trace()
 
-        for i in map_structure_json["properties"].keys():
-
-            if "table" in i.keys() and "study" in i["table"]:
-
-                print(i["table"])
-
-        """
-        for xml_file in lista:
-            if self.project is not None and xml_file in self.project:
-                pass
-            elif config_json.get_configuration(xml_file):
-                df = pd.DataFrame.from_dict(
-                    config_json.get_configuration(xml_file), orient="index"
-                )
-
-            else:
-                data = []
-                for chunk in self.json_data:
-                    xml_dict = {}
-                    for key, value in chunk.items():
-                        if key in map_structure_json[xml_file]:
-                            xml_dict[map_structure_json[xml_file][key]] = value
-                    data.append(xml_dict)
-                    if xml_file in map_structure_json["one_loop_in_mapping"]:
-                        break
-            df = ena_upload.check_columns(df, xml_file, self.action, self.dev, False)
-            schema_dataframe[xml_file] = df
-        return schema_dataframe
-        """
+        df = pd.DataFrame.from_dict(esquema_json, orient="index")
+        df_transposed = df.T
+        df_study = df_transposed[["study_alias", "study_title", "study_type"]]
+        df_samples = df_transposed[
+            [
+                "sample_name",
+                "tax_id",
+                "sample_description",
+                "collection_date",
+                "geographic_location_(country_and/or_sea)",
+                "host_common_name",
+                "host_gender",
+                "host_scientific_name",
+                "isolate",
+            ]
+        ]
+        df_runs = df_transposed[
+            ["experiment_alias", "sequence_file_R1_fastq", "sequence_file_R2_fastq"]
+        ]
+        df_experiments = df_transposed[
+            [
+                "experiment_alias",
+                "study_title",
+                "sample_name",
+                "library_strategy",
+                "library_source",
+                "library_selection",
+                "library_layout",
+                "instrument_platform",
+                "instrument_model",
+            ]
+        ]
 
     def upload(self):
         """Create the required files and upload to ENA"""
