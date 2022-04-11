@@ -96,6 +96,7 @@ class RelecovMetadata:
             if city["geo_loc_city"] == data["geo_loc_city"]:
                 data["geo_loc_latitude"] = city["geo_loc_latitude"]
                 data["geo_loc_longitude"] = city["geo_loc_longitude"]
+                data["geo_loc_country"] = data["geo_loc_country"]
                 break
         return data
 
@@ -106,6 +107,8 @@ class RelecovMetadata:
             "type": "betacoronavirus",
             "tax_id": "2697049",
             "organism": "Severe acute respiratory syndrome coronavirus 2",
+            "common_name": "PEPITO",
+            "sample_description" : "Sample for surveillance",
         }
         fixed_data.update(self.configuration.get_configuration("ENA_configuration"))
         return fixed_data
@@ -159,11 +162,13 @@ class RelecovMetadata:
 
         for row_sample in metadata:
             """Include sample data from sample json"""
-            for row_sample_data in samples_json:
-                if row_sample_data == row_sample:
-                    for key, value in row_sample_data.items():
-                        row_sample[key] = value
-
+            try:
+                for key, value in samples_json[
+                    row_sample["collecting_lab_sample_id"]
+                ].items():
+                    row_sample[key] = value
+            except KeyError:
+                pass
             """ Fetch the information related to the laboratory.
                 Info is stored in lab_data, to prevent to call get_laboratory_data
                 each time for each sample that belongs to the same lab
@@ -258,7 +263,9 @@ class RelecovMetadata:
                                 row[idx] if row[idx] else ""
                             )
                         except KeyError as e:
-                            stderr.print("[red] Error when reading " + row[2] + e)
+                            stderr.print(
+                                "[red] Error when reading " + str(row[2]) + str(e)
+                            )
             metadata_values.append(sample_data_row)
 
         return metadata_values, errors
@@ -316,6 +323,10 @@ class RelecovMetadata:
         else:
             log.error("There is missing samples in metadata and/or uploaded")
         """
-        file_name = "processed_" + os.path.basename(self.metadata_file) + ".json"
+        file_name = (
+            "processed_"
+            + os.path.splitext(os.path.basename(self.metadata_file))[0]
+            + ".json"
+        )
         self.write_json_fo_file(completed_metadata, file_name)
         return True

@@ -7,7 +7,6 @@
     "isolate",
     "host_scientific_name",
     "host_common_name",
-    "host_subject_id",
     "instrument_model",
     "file_name",
     "tax_id",
@@ -17,7 +16,12 @@
     "library_source",
     "library_selection",
     "library_strategy",
-    "library_layout"
+    "library_layout",
+    "study_alias",
+    "experiment_alias",
+    "run_alias",
+    "experiment_title",
+    "study_title"
   ],
   "type": "object",
   "properties": {
@@ -49,7 +53,7 @@
       "examples": [
         "John Smith"
       ],
-      "ontology": "NCIT:C164471",
+      "ontology": "GENEPIO:0001153",
       "type": "string",
       "description": "Name of the person who collected the specimen",
       "clasification": "Sample collection and processing",
@@ -401,7 +405,7 @@
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
-      "ontology": "GENEPIO:0001181          ",
+      "ontology": "GENEPIO:0001181",
       "type": "string",
       "description": "The country of origin of the sample.",
       "examples": [
@@ -741,18 +745,45 @@
         "experiments"
       ]
     },
-    "file_name": {
-      "examples": [
-        "ABC123_S1_L001_R1_001.fastq.gz"
-      ],
-      "ontology": "GENEPIO:0001476",
-      "type": "string",
-      "description": "The user-specified filename of the r1 FASTQ file.",
-      "clasification": "Bioinformatics and QC metrics",
-      "label": "Sequence file R1 fastq",
-      "table": [
-        "runs"
-      ]
+    "sequence_file_R1_fastq": {
+        "examples": [
+            "ABC123_S1_L001_R1_001.fastq.gz"
+        ],
+        "ontology": "GENEPIO:0001476",
+        "type": "string",
+        "description": "The user-specified filename of the r1 FASTQ file.",
+        "clasification": "Bioinformatics and QC metrics",
+        "label": "Sequence file R1 fastq"
+    },
+    "sequence_file_R2_fastq": {
+        "examples": [
+            "ABC123_S1_L001_R2_001.fastq.gz"
+        ],
+        "ontology": "GENEPIO:0001477",
+        "type": "string",
+        "description": "The user-specified filename of the r2 FASTQ file.",
+        "clasification": "Bioinformatics and QC metrics",
+        "label": "Sequence file R2 fastq"
+    },
+    "r1_fastq_filepath": {
+        "examples": [
+            "/User/Documents/RespLab/Data/"
+        ],
+        "ontology": "GENEPIO:0001478",
+        "type": "string",
+        "description": "The filepath of the r1 FASTQ file.",
+        "clasification": "Bioinformatics and QC metrics",
+        "label": "Filepath R1 fastq"
+    },
+    "r2_fastq_filepath": {
+        "examples": [
+            "/User/Documents/RespLab/Data/"
+        ],
+        "ontology": "GENEPIO:0001479",
+        "type": "string",
+        "description": "The filepath of the r2 FASTQ file.",
+        "clasification": "Bioinformatics and QC metrics",
+        "label": "Filepath R2 fastq"
     },
     "file_type": {
       "examples": [
@@ -767,11 +798,24 @@
         "runs"
       ]
     },
-    "file_checksum": {
+    "fastq_md5_r1": {
       "examples": [
         "3e69af1f875fab020aed82f5edbc1f03"
       ],
-      "ontology": "0",
+      "ontology": "MS_1000568",
+      "type": "string",
+      "description": "",
+      "clasification": "Bioinformatics and QC metrics",
+      "label": "file checksum",
+      "table": [
+        "runs"
+      ]
+    },
+    "fastq_md5_r2": {
+      "examples": [
+        "3e69af1f875fab020aed82f5edbc1f03"
+      ],
+      "ontology": "MS_1000568",
       "type": "string",
       "description": "",
       "clasification": "Bioinformatics and QC metrics",
@@ -1124,7 +1168,7 @@
       "clasification": "Submission ENA",
       "label": "First Public date"
     },
-    "last_updated_date": {
+    "last_updated": {
       "examples": [
         "e.g 2020-07-29"
       ],
@@ -1132,13 +1176,13 @@
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
-      "format": "Last Updated"
+      "label": "Last Updated"
     },
     "experiment_title": {
       "examples": [
         "experiment_title_1"
       ],
-      "ontology": "0",
+      "ontology": "ORNASEQ_0000004",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1177,7 +1221,7 @@
       "examples": [
         ""
       ],
-      "ontology": "0",
+      "ontology": "OPMI_0000380",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1228,7 +1272,7 @@
       "examples": [
         "experiment_alias_7a"
       ],
-      "ontology": "0",
+      "ontology": "NCIT_C42790",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
