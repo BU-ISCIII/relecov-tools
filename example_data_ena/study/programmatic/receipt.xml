@@ -1,0 +1,13 @@
+ 
+ curl -u Webin-60330:W2b3nENA%2021 -F "SUBMISSION=@submission.xml" -F "PROJECT=@project.xml" "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/"
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="receipt.xsl"?>
+<RECEIPT receiptDate="2022-03-16T11:41:27.226Z" submissionFile="submission.xml" success="true">
+     <PROJECT accession="PRJEB51674" alias="workshop_project" status="PRIVATE" holdUntilDate="2024-03-16Z">
+          <EXT_ID accession="ERP136324" type="study"/>
+     </PROJECT>
+     <SUBMISSION accession="ERA10111364" alias="SUBMISSION-16-03-2022-11:41:27:078"/>
+     <MESSAGES>
+          <INFO>This submission is a TEST submission and will be discarded within 24 hours</INFO>
+     </MESSAGES>
+     <ACTIONS>ADD</ACTIONS>

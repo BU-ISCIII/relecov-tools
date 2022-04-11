@@ -1,0 +1,13 @@
+STUDY	PRJEB### or ERP###
+SAMPLE	SAMEA#### or ERS####
+NAME	SARS-CoV-2 sample 2 reads
+PLATFORM	ILLUMINA
+INSTRUMENT	Illumina NovaSeq 6000
+INSERT_SIZE	100
+LIBRARY_NAME	SARS-CoV-2 library 2
+LIBRARY_SOURCE	VIRAL RNA
+LIBRARY_SELECTION	RT-PCR
+LIBRARY_STRATEGY	AMPLICON
+DESCRIPTION	Amplicons were cleaned-up with AMPure XP beads (Beckman Coulter) with a 1:1 ratio and amplicon concentrations were quantified with the Qubit Fluorometric Quantitation system (Life Technologies)
+FASTQ	SARS-CoV-2-Sample2_1.fastq.gz
+FASTQ	SARS-CoV-2-Sample2_2.fastq.gz

@@ -846,16 +846,6 @@
             "classification": "Sample collection and processing",
             "label": "Public Health sample id (SIVIES)"
         },
-        "isolate_sample_id": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "",
-            "label": "Sample ID given if multiple rna-extraction or passages"
-        },
         "geo_loc_region": {
             "examples": [
                 "Derbyshire"
@@ -2207,6 +2197,16 @@
             "classification": "Bioinformatics and QC metrics",
             "label": "Depth of coverage threshold"
         },
+        "file_type": {
+            "examples": [
+                ""
+            ],
+            "ontology": "",
+            "type": "string",
+            "description": "",
+            "classification": "",
+            "label": ""
+        },
         "sequence_file_R1_fastq": {
             "examples": [
                 "ABC123_S1_L001_R1_001.fastq.gz"
@@ -2416,7 +2416,7 @@
             "classification": "Lineage and Variant information",
             "label": "Mapping params"
         },
-        "lineage/clade_name": {
+        "lineage_name": {
             "examples": [
                 "B.1.1.7"
             ],
@@ -2426,7 +2426,7 @@
             "classification": "Lineage and Variant information",
             "label": "Lineage/clade name"
         },
-        "lineage/clade_analysis_software_name": {
+        "lineage_analysis_software_name": {
             "examples": [
                 "Pangolin"
             ],
@@ -2446,7 +2446,7 @@
             "classification": "Lineage and Variant information",
             "label": "If lineage identification Is Other, Specify"
         },
-        "lineage/clade_analysis_software_version": {
+        "lineage_analysis_software_version": {
             "examples": [
                 "2.1.10"
             ],
@@ -2455,6 +2455,26 @@
             "description": "The version of the software used to determine the lineage/clade.",
             "classification": "Lineage and Variant information",
             "label": "Lineage/clade analysis software version"
+        },
+        "design_description": {
+            "examples": [
+                ""
+            ],
+            "ontology": "NCIT:C147139",
+            "type": "string",
+            "description": "",
+            "classification": "",
+            "label": ""
+        },
+        "isolate_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "NCIT:C53471",
+            "type": "string",
+            "description": "",
+            "classification": "",
+            "label": ""
         },
         "variant_designation": {
             "Enums": [
@@ -2531,7 +2551,7 @@
             "classification": "Pathogen diagnostic testing",
             "label": "Gene Name 1"
         },
-        "Protocol_SARS-CoV-2_detection": {
+        "protocol_SARS-CoV-2_detection": {
             "examples": [
                 ""
             ],
@@ -2541,7 +2561,7 @@
             "classification": "Pathogen diagnostic testing",
             "label": "Protocol SARS-CoV-2 detection"
         },
-        "%qc_filtered": {
+        "per_qc_filtered": {
             "examples": [
                 ""
             ],
@@ -2551,7 +2571,7 @@
             "classification": "Pathogen diagnostic testing",
             "label": "%qc filtered"
         },
-        "%reads_host": {
+        "per_reads_host": {
             "examples": [
                 ""
             ],
@@ -2561,7 +2581,7 @@
             "classification": "Pathogen diagnostic testing",
             "label": "%reads host"
         },
-        "%reads_virus": {
+        "per_reads_virus": {
             "examples": [
                 ""
             ],
@@ -2571,7 +2591,7 @@
             "classification": "Pathogen diagnostic testing",
             "label": "%reads virus"
         },
-        "%unmapped": {
+        "per_unmapped": {
             "examples": [
                 ""
             ],
@@ -2581,7 +2601,7 @@
             "classification": "Pathogen diagnostic testing",
             "label": "%unmapped"
         },
-        "%genome _greater_10x": {
+        "per_genome _greater_10x": {
             "examples": [
                 ""
             ],
@@ -2601,7 +2621,7 @@
             "classification": "Pathogen diagnostic testing",
             "label": "mean depth of coverage value"
         },
-        "%Ns": {
+        "per_Ns": {
             "examples": [
                 ""
             ],
@@ -2611,7 +2631,7 @@
             "classification": "Pathogen diagnostic testing",
             "label": "%Ns"
         },
-        "Number_of_variants_(AF_greater_75%)": {
+        "Number_of_variants_AF_greater_75percent": {
             "examples": [
                 ""
             ],
@@ -2839,7 +2859,6 @@
             "classification": "Sequencing",
             "label": "Source material"
         },
-<<<<<<< HEAD
         "nominal_length": {
             "examples": [
                 ""
@@ -2849,8 +2868,6 @@
             "description": "",
             "classification": "Sequencing"
         },
-=======
->>>>>>> 9c936c3849ca0ab49bfbae14d04d81d56726156c
         "analysis_accession": {
             "examples": [
                 ""
