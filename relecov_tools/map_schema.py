@@ -29,7 +29,7 @@ class MappingSchema:
         json_file=None,
         destination_schema=None,
         schema_file=None,
-        output=None,
+        output_folder=None,
     ):
         config_json = ConfigJson()
         if relecov_schema is None:
@@ -65,7 +65,7 @@ class MappingSchema:
             stderr.print(f"[red] json data file {json_file} does not exist")
             sys.exit(1)
         self.json_data = relecov_tools.utils.read_json_file(json_file)
-
+        self.json_file = json_file
         if destination_schema is None:
             self.destination_schema = relecov_tools.utils.prompt_selection(
                 msg="Select ENA, GISAID for already defined schemas or other for custom",
@@ -115,20 +115,24 @@ class MappingSchema:
 
         self.ontology = {}
         for key, values in self.relecov_schema["properties"].items():
+            if values["ontology"] == "0":
+                continue
             self.ontology[values["ontology"]] = key
+        self.output_folder = output_folder
 
     def maping_schemas_based_on_geontology(self):
         """Return a dictionnary with the properties of the mapped_to_schema as key and
-        properties of phagePlusSchema as value
+        properties of Relecov Schema as value
         """
         mapped_dict = OrderedDict()
         for key, values in self.mapped_to_schema["properties"].items():
+            if values["ontology"] == "0":
+                continue
             try:
                 mapped_dict[key] = self.ontology[values["ontology"]]
             except KeyError as e:
-                # There is no exact match on ontology. Search for the parent
-                # to be implemented later
-                stderr.print(f"[red] Ontology value {e} not in phage plus schema")
+                log.error("Invalid ontology for %s", key)
+                stderr.print(f"[red] Ontology value {e} not in relecov schema")
         return mapped_dict
 
     def mapping_json_data(self, mapping_schema_dict):
@@ -141,23 +145,46 @@ class MappingSchema:
                 try:
                     map_sample_dict[item] = data[value]
                 except KeyError as e:
-                    print(e)
+                    log.warning("Property %s not set in the source data", e)
             mapped_data.append(map_sample_dict)
         return mapped_data
+
+    def additional_formating(self, mapped_json_data):
+        """Update data like MD5 to split in two fields, one for R1 file and
+        second for R2
+        """
+        if self.destination_schema == "ENA":
+            for idx in range(len(self.json_data)):
+                mapped_json_data[idx]["fastq_r1_md5"] = self.json_data[idx][
+                    "fastq_r1_md5"
+                ]
+                mapped_json_data[idx]["fastq_r2_md5"] = self.json_data[idx][
+                    "fastq_r2_md5"
+                ]
+
+        return mapped_json_data
 
     def write_json_fo_file(self, mapped_json_data):
         """Write metadata to json file"""
         os.makedirs(self.output_folder, exist_ok=True)
         time = datetime.now().strftime("%Y_%m_%d_%H_%M")
-        f_sub_name = os.path.basename(self.json_data).split(".")[0]
-        file_name = f_sub_name + "_" + time + "_ena_mapped.json"
+        f_sub_name = os.path.basename(self.json_file).split(".")[0]
+        file_name = (
+            f_sub_name + "_" + time + "_" + self.destination_schema + "_mapped.json"
+        )
         json_file = os.path.join(self.output_folder, file_name)
-        with open(json_file, "w") as fh:
-            fh.write(json.dumps(mapped_json_data))
+        with open(json_file, "w", encoding="utf-8") as fh:
+            fh.write(
+                json.dumps(
+                    mapped_json_data, indent=4, sort_keys=True, ensure_ascii=False
+                )
+            )
         return True
 
     def map_to_data_to_new_schema(self):
         """Mapping the json data from phage plus schema to the requested one"""
         mapping_schema_dict = self.maping_schemas_based_on_geontology()
         mapped_json_data = self.mapping_json_data(mapping_schema_dict)
-        self.write_json_fo_file(mapped_json_data)
+        updated_json_data = self.additional_formating(mapped_json_data)
+        self.write_json_fo_file(updated_json_data)
+        return
