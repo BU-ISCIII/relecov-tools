@@ -7,6 +7,7 @@ import pandas as pd
 import sys
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
+from ena_upload.ena_upload import extract_targets
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -102,10 +103,7 @@ class EnaUpload:
         fh_esquema.close()
         # lista = ["study", "runs", "samples", "experiments"]
 
-        llaves = esquema_json.keys()
-        import pdb
-
-        pdb.set_trace()
+        # llaves = esquema_json.keys()
 
         df = pd.DataFrame.from_dict(esquema_json, orient="index")
         df_transposed = df.T
@@ -139,6 +137,12 @@ class EnaUpload:
                 "instrument_model",
             ]
         ]
+
+        extract_targets(self.action, df_study)
+
+        import pdb
+
+        pdb.set_trace()
 
     def upload(self):
         """Create the required files and upload to ENA"""
