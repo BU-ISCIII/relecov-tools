@@ -30,7 +30,8 @@
             "server": "http://relecov-iskylims.isciiides.es/",
             "url": "wetlab/api/",
             "store_samples": "createSampleData",
-            "get_project_fields": "sampleProjectFields",
+            "url_project_fields": "sampleProjectFields",
+            "project_name" = "Relecov",
             "token": ""
             },
         "relecov": {
