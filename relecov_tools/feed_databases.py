@@ -29,6 +29,7 @@ class FeedDatabases:
     ):
         self.config_json = ConfigJson()
         if json_file is None:
+            self.config_json = ConfigJson()
             json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file which have the data to map"
             )
@@ -53,12 +54,13 @@ class FeedDatabases:
         if relecov_url:
             split = relecov_url.split("/")
             self.relecov_server = split[0] + "/"
-            self.relecov_url = "/".join(split[1:]) + "/"
+            self.relecov_url = "/".join(split[1:])
 
         self.iskylims_rest_api = RestApi(self.iskylims_server, self.iskylims_url)
         self.relecov_rest_api = RestApi(self.relecov_server, self.relecov_url)
 
     def fetch_sample_project_fields(self):
+        import pdb; pdb.set_trace()
         s_project = self.iskylims_rest_api.get_request(self.iskylims_settings["url_project_fields"], "project", self.iskylims_settings["project_name"])
         if not s_project:
             return False
