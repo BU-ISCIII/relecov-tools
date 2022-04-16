@@ -27,16 +27,16 @@
     },
     "external_url":{
         "iskylims": {
-            "server": "http://relecov-iskylims.isciiides.es/",
-            "url": "wetlab/api/",
+            "server": "http://relecov-iskylims.isciiides.es",
+            "url": "/wetlab/api/",
             "store_samples": "createSampleData",
             "url_project_fields": "sampleProjectFields",
-            "project_name" = "Relecov",
+            "project_name" : "Relecov",
             "token": ""
             },
         "relecov": {
-            "server": "http://relecov-platform.isciiides.es/",
-            "url": "api/",
+            "server": "http://relecov-platform.isciiides.es",
+            "url": "/api/",
             "store_samples": "storeData",
             "token": ""
             }
