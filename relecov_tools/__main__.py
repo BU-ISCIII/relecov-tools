@@ -14,6 +14,7 @@ import relecov_tools.sftp_handle
 import relecov_tools.ena_upload
 import relecov_tools.json_validation
 import relecov_tools.map_schema
+import relecov_tools.feed_databases
 
 log = logging.getLogger()
 
