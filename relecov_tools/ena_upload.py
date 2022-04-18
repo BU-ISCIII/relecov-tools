@@ -138,7 +138,7 @@ class EnaUpload:
             ]
         ]
 
-        extract_targets(self.action, df_study)
+        targets = extract_targets(self.action, df_study)
 
         import pdb
 
