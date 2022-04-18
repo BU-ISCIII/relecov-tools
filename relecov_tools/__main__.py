@@ -291,12 +291,13 @@ def launch(user):
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-j", "--json", help="data in json format")
+@click.option("-s", "--schema", help="json schema if relecov is not used")
 @click.option("-i", "--iskylims", help="url for sending request to iSkyLIMs")
 @click.option("-r", "--relecov", help="url for sending request to Relecov Platform")
-def update_db(user, password, json, iskylims, relecov):
+def update_db(user, password, json, schema, iskylims, relecov):
     """feed database with metadata jsons"""
     feed_databases = relecov_tools.feed_databases.FeedDatabases(
-        user, password, json, iskylims, relecov
+        user, password, json, schema, iskylims, relecov
     )
     feed_databases.store_data()
 

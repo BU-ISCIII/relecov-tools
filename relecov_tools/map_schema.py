@@ -50,9 +50,7 @@ class MappingSchema:
             Draft202012Validator.check_schema(rel_schema_json)
         except jsonschema.ValidationError:
             log.error("Relecov schema does not fulfil Draft 202012 Validation ")
-            stderr.print(
-                "[red] phage plus schema does not fulfil Draft 202012 Validation"
-            )
+            stderr.print("[red] Relecov schema does not fulfil Draft 202012 Validation")
             sys.exit(1)
         self.relecov_schema = rel_schema_json
 
