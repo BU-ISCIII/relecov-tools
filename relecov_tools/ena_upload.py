@@ -1,3 +1,4 @@
+from bdb import set_trace
 import os
 import logging
 import rich.console
@@ -8,6 +9,7 @@ import sys
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from ena_upload.ena_upload import extract_targets
+from ena_upload.ena_upload import check_filenames
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -108,6 +110,7 @@ class EnaUpload:
         df = pd.DataFrame.from_dict(esquema_json, orient="index")
         df_transposed = df.T
         df_study = df_transposed[["study_alias", "study_title", "study_type"]]
+        df_study["status"] = self.action
         df_samples = df_transposed[
             [
                 "sample_name",
@@ -121,9 +124,11 @@ class EnaUpload:
                 "isolate",
             ]
         ]
+        df_samples["status"] = self.action
         df_runs = df_transposed[
             ["experiment_alias", "sequence_file_R1_fastq", "sequence_file_R2_fastq"]
         ]
+        df_runs["status"] = self.action
         df_experiments = df_transposed[
             [
                 "experiment_alias",
@@ -137,19 +142,33 @@ class EnaUpload:
                 "instrument_model",
             ]
         ]
+        df_experiments["status"] = self.action
 
-        targets = extract_targets(self.action, df_study)
+        schema_dataframe = {}
+        schema_dataframe["study"] = df_study
+        schema_dataframe["samples"] = df_samples
+        schema_dataframe["runs"] = df_runs
+        schema_dataframe["experiments"] = df_experiments
 
-        import pdb
+        schema_targets = extract_targets(self.action, schema_dataframe)
+        if not schema_targets:
+            sys.exit(
+                f"There is no table submitted having at least one row with {self.action} as action in the status column."
+            )
 
-        pdb.set_trace()
+        if self.action == "add":
+            if "run" in schema_targets:
+                # a dictionary of filename:file_path
+                df = schema_targets["run"]
+                file_paths = {}
+                if self.source_json:
+                    for path in self.source_json:
+                        file_paths[os.path.basename(path)] = os.path.abspath(path)
+                # check if file names identical between command line and table
+                # if not, system exits
+                check_filenames(file_paths, df_runs)
 
     def upload(self):
         """Create the required files and upload to ENA"""
         self.convert_input_json_to_ena()
         self.create_structure_to_ena()
-
-        # df_study = pd.DataFrame.from_dict(data["study"])
-        # df_samples = pd.DataFrame.from_dict(data["samples"])
-        # df_runs = pd.DataFrame.from_dict(data["runs"])
-        # df_experiments = pd.DataFrame.from_dict(data["experiments"])
