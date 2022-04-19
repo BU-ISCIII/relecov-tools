@@ -2096,6 +2096,7 @@
             "examples": [
                 "ncov123assembly3"
             ],
+            "classification": "Bioinformatics and QC metrics",
             "label": "Consensus sequence name"
         },
         "consensus_sequence_name_md5": {
@@ -2105,6 +2106,7 @@
             "examples": [
                 "ncov123assembly3"
             ],
+            "classification": "Bioinformatics and QC metrics",
             "label": "Consensus sequence name md5"
         },
         "consensus_sequence_filepath": {
@@ -2167,16 +2169,6 @@
             "classification": "Bioinformatics and QC metrics",
             "label": "Quality control metrics "
         },
-        "breadth_of_coverage_value": {
-            "examples": [
-                "95%"
-            ],
-            "ontology": "GENEPIO:0001472",
-            "type": "string",
-            "description": "The percentage of the reference genome covered by the sequenced data, to a prescribed depth.",
-            "classification": "Bioinformatics and QC metrics",
-            "label": "Breadth of coverage value"
-        },
         "depth_of_coverage_value": {
             "examples": [
                 "400x"
@@ -2214,7 +2206,7 @@
             "ontology": "GENEPIO:0001476",
             "type": "string",
             "description": "The user-specified filename of the r1 FASTQ file.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "",
             "label": "Sequence file R1 fastq"
         },
         "sequence_file_R2_fastq": {
@@ -2224,7 +2216,7 @@
             "ontology": "GENEPIO:0001477",
             "type": "string",
             "description": "The user-specified filename of the r2 FASTQ file.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "",
             "label": "Sequence file R2 fastq"
         },
         "r1_fastq_filepath": {
@@ -2234,7 +2226,7 @@
             "ontology": "GENEPIO:0001478",
             "type": "string",
             "description": "The filepath of the r1 FASTQ file.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "",
             "label": "Filepath R1 fastq"
         },
         "r2_fastq_filepath": {
@@ -2244,7 +2236,7 @@
             "ontology": "GENEPIO:0001479",
             "type": "string",
             "description": "The filepath of the r2 FASTQ file.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "",
             "label": "Filepath R2 fastq"
         },
         "fast5_filename": {
@@ -2254,7 +2246,7 @@
             "ontology": "GENEPIO:0001480",
             "type": "string",
             "description": "The user-specified filename of the FAST5 file.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "",
             "label": "Filename fast5"
         },
         "fast5_filepath": {
@@ -2264,7 +2256,7 @@
             "ontology": "GENEPIO:0001481",
             "type": "string",
             "description": "The filepath of the FAST5 file.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "",
             "label": "Filepath fast5"
         },
         "number_of_base_pairs_sequenced": {
@@ -2393,7 +2385,7 @@
             "ontology": "topic:0102",
             "type": "string",
             "description": "",
-            "classification": "Lineage and Variant information",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Mapping"
         },
         "if_mapping_other": {
@@ -2403,7 +2395,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Lineage and Variant information",
+            "classification": "Bioinformatics and QC metrics",
             "label": "If mapping Is Other, Specify"
         },
         "mapping_params": {
@@ -2413,7 +2405,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Lineage and Variant information",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Mapping params"
         },
         "lineage_name": {
@@ -2423,7 +2415,7 @@
             "ontology": "GENEPIO:0001500",
             "type": "string",
             "description": "The name of the lineage or clade.",
-            "classification": "Lineage and Variant information",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Lineage/clade name"
         },
         "lineage_analysis_software_name": {
@@ -2433,7 +2425,7 @@
             "ontology": "GENEPIO:0001501",
             "type": "string",
             "description": "The name of the software used to determine the lineage/clade.",
-            "classification": "Lineage and Variant information",
+            "classification": "Bioinformatics and QC metrics",
             "label": "lineage/clade analysis software name"
         },
         "if_lineage_identification_other": {
@@ -2443,7 +2435,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The name of the software used to determine the lineage/clade.",
-            "classification": "Lineage and Variant information",
+            "classification": "Bioinformatics and QC metrics",
             "label": "If lineage identification Is Other, Specify"
         },
         "lineage_analysis_software_version": {
@@ -2453,7 +2445,7 @@
             "ontology": "GENEPIO:0001502",
             "type": "string",
             "description": "The version of the software used to determine the lineage/clade.",
-            "classification": "Lineage and Variant information",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Lineage/clade analysis software version"
         },
         "design_description": {
@@ -2488,18 +2480,8 @@
             "examples": [
                 "Variant of Concern (VOC) [GENEPIO:0100083]"
             ],
-            "classification": "Lineage and Variant information",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Variant designation"
-        },
-        "variant_evidence": {
-            "examples": [
-                "lineage-defining mutations: ORF1ab (K1655N), Spike (K417N, E484K, N501Y, D614G, A701V), N (T205I), E (P71L)"
-            ],
-            "ontology": "GENEPIO:0001504",
-            "type": "string",
-            "description": "The evidence used to make the variant determination.",
-            "classification": "Lineage and Variant information",
-            "label": "Variant evidence"
         },
         "gene_name_1": {
             "Enums": [
@@ -2548,18 +2530,8 @@
             "examples": [
                 "E gene (orf4) [GENEPIO:0100151]"
             ],
-            "classification": "Pathogen diagnostic testing",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Gene Name 1"
-        },
-        "protocol_SARS-CoV-2_detection": {
-            "examples": [
-                ""
-            ],
-            "ontology": "CIDO_0020274",
-            "type": "string",
-            "description": "",
-            "classification": "Pathogen diagnostic testing",
-            "label": "Protocol SARS-CoV-2 detection"
         },
         "per_qc_filtered": {
             "examples": [
@@ -2568,7 +2540,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Pathogen diagnostic testing",
+            "classification": "Bioinformatics and QC metrics",
             "label": "%qc filtered"
         },
         "per_reads_host": {
@@ -2578,7 +2550,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Pathogen diagnostic testing",
+            "classification": "Bioinformatics and QC metrics",
             "label": "%reads host"
         },
         "per_reads_virus": {
@@ -2588,7 +2560,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Pathogen diagnostic testing",
+            "classification": "Bioinformatics and QC metrics",
             "label": "%reads virus"
         },
         "per_unmapped": {
@@ -2598,7 +2570,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Pathogen diagnostic testing",
+            "classification": "Bioinformatics and QC metrics",
             "label": "%unmapped"
         },
         "per_genome _greater_10x": {
@@ -2608,7 +2580,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Pathogen diagnostic testing",
+            "classification": "Bioinformatics and QC metrics",
             "label": "% genome  greater 10x"
         },
         "mean_depth_of_coverage_value": {
@@ -2618,7 +2590,7 @@
             "ontology": "NCIT:C167285",
             "type": "string",
             "description": "",
-            "classification": "Pathogen diagnostic testing",
+            "classification": "Bioinformatics and QC metrics",
             "label": "mean depth of coverage value"
         },
         "per_Ns": {
@@ -2628,28 +2600,28 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Pathogen diagnostic testing",
+            "classification": "Bioinformatics and QC metrics",
             "label": "%Ns"
         },
-        "Number_of_variants_AF_greater_75percent": {
+        "number_of_variants_AF_greater_75percent": {
             "examples": [
                 ""
             ],
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Pathogen diagnostic testing",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Number of variants (AF greater 75%)"
         },
-        "Numer_of_variants_with_effect": {
+        "number_of_variants_with_effect": {
             "examples": [
                 ""
             ],
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Pathogen diagnostic testing",
-            "label": "Numer of variants with effect"
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Number of variants with effect"
         },
         "diagnostic_pcr_protocol_1": {
             "examples": [
@@ -2733,7 +2705,7 @@
         },
         "analysis_date": {
             "examples": [
-                 "e.g 2020-08-07"
+                "e.g 2020-08-07"
             ],
             "ontology": "0",
             "type": "string",
