@@ -152,9 +152,9 @@ class EnaUpload:
 
         schema_targets = extract_targets(self.action, schema_dataframe)
         if not schema_targets:
-            sys.exit(
-                f"There is no table submitted having at least one row with {self.action} as action in the status column."
-            )
+           stderr.print(f"[red] There is no table submitted having at least one row with {self.action} as action in the status column.")
+            sys.exit(1)
+            
 
         if self.action == "add":
             if "run" in schema_targets:
