@@ -24,5 +24,35 @@
         "run_alias": "",
         "experiment_title": "Example project for ENA submission RELECOV",
         "study_title": "RELECOV Spanish Network for genomics surveillance"
+    },
+    "external_url":{
+        "iskylims": {
+            "server": "http://relecov-iskylims.isciiides.es",
+            "url": "/wetlab/api/",
+            "store_samples": "createSampleData",
+            "url_project_fields": "sampleProjectFields",
+            "project_name" : "Relecov",
+            "token": ""
+            },
+        "relecov": {
+            "server": "http://relecov-platform.isciiides.es",
+            "url": "/api/",
+            "store_samples": "storeData",
+            "token": ""
+            }
+    },
+    "iskylims_sample_fields": [
+        ["patientCore", "collector_name"],
+        ["sampleName", "collecting_lab_sample_id"],
+        ["labRequest","collecting_institution"],
+        ["sampleType", "anatomical_material"],
+        ["species", "host_common_name"],
+        ["sampleEntryDate", "sample_received_date"],
+        ["sampleCollectionDate", "sample_collection_date"]
+    ],
+    "iskylims_fixed_values": {
+        "sampleProject": "Relecov",
+        "onlyRecorded": "Yes",
+        "sampleLocation": "Not defined"
     }
 }

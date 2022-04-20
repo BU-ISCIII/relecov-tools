@@ -14,6 +14,7 @@ import relecov_tools.sftp_handle
 import relecov_tools.ena_upload
 import relecov_tools.json_validation
 import relecov_tools.map_schema
+import relecov_tools.feed_databases
 
 log = logging.getLogger()
 
@@ -287,10 +288,18 @@ def launch(user):
 
 
 @relecov_tools_cli.command(help_priority=9)
+@click.option("-u", "--user", help="user name for login")
+@click.option("-p", "--password", help="password for the user to login")
 @click.option("-j", "--json", help="data in json format")
-def update_db(user):
+@click.option("-s", "--schema", help="json schema if relecov is not used")
+@click.option("-i", "--iskylims", help="url for sending request to iSkyLIMs")
+@click.option("-r", "--relecov", help="url for sending request to Relecov Platform")
+def update_db(user, password, json, schema, iskylims, relecov):
     """feed database with metadata jsons"""
-    pass
+    feed_databases = relecov_tools.feed_databases.FeedDatabases(
+        user, password, json, schema, iskylims, relecov
+    )
+    feed_databases.store_data()
 
 
 if __name__ == "__main__":
