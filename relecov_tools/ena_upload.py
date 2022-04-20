@@ -10,6 +10,10 @@ import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from ena_upload.ena_upload import extract_targets
 from ena_upload.ena_upload import check_filenames
+from ena_upload.ena_upload import check_file_checksum
+from ena_upload.ena_upload import get_md5
+from ena_upload.ena_upload import get_taxon_id
+from ena_upload.ena_upload import get_scientific_name
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -103,14 +107,11 @@ class EnaUpload:
         fh_esquema = open(esquema)
         esquema_json = json.load(fh_esquema)
         fh_esquema.close()
-        # lista = ["study", "runs", "samples", "experiments"]
-
-        # llaves = esquema_json.keys()
 
         df = pd.DataFrame.from_dict(esquema_json, orient="index")
         df_transposed = df.T
         df_study = df_transposed[["study_alias", "study_title", "study_type"]]
-        df_study["status"] = self.action
+        df_study.insert(3, "status", self.action)
         df_samples = df_transposed[
             [
                 "sample_name",
@@ -124,11 +125,11 @@ class EnaUpload:
                 "isolate",
             ]
         ]
-        df_samples["status"] = self.action
+        df_samples.insert(3, "status", self.action)
         df_runs = df_transposed[
             ["experiment_alias", "sequence_file_R1_fastq", "sequence_file_R2_fastq"]
         ]
-        df_runs["status"] = self.action
+        df_runs.insert(3, "status", self.action)
         df_experiments = df_transposed[
             [
                 "experiment_alias",
@@ -142,7 +143,7 @@ class EnaUpload:
                 "instrument_model",
             ]
         ]
-        df_experiments["status"] = self.action
+        df_experiments.insert(3, "status", self.action)
 
         schema_dataframe = {}
         schema_dataframe["study"] = df_study
@@ -151,12 +152,20 @@ class EnaUpload:
         schema_dataframe["experiments"] = df_experiments
 
         schema_targets = extract_targets(self.action, schema_dataframe)
-        if not schema_targets:
-           stderr.print(f"[red] There is no table submitted having at least one row with {self.action} as action in the status column.")
-            sys.exit(1)
-            
+        import pdb
 
-        if self.action == "add":
+        pdb.set_trace()
+
+        if not schema_targets:
+            stderr.print(
+                f"[red] There is no table submitted having at least one row with {self.action} as action in the status column."
+            )
+            sys.exit(1)
+
+        if self.action == "ADD":
+            # when adding run object
+            # update schema_targets wit md5 hash
+            # submit data
             if "run" in schema_targets:
                 # a dictionary of filename:file_path
                 df = schema_targets["run"]
@@ -168,7 +177,66 @@ class EnaUpload:
                 # if not, system exits
                 check_filenames(file_paths, df_runs)
 
-    def upload(self):
-        """Create the required files and upload to ENA"""
-        self.convert_input_json_to_ena()
-        self.create_structure_to_ena()
+
+"""    
+            # generate MD5 sum if not supplied in table
+            if file_paths and not check_file_checksum(df):
+                print("No valid checksums found, generate now...", end=" ")
+                file_md5 = {filename: get_md5(path) for filename, path
+                        in file_paths.items()}
+
+                # update schema_targets wih md5 hash
+                md5 = df['file_name'].apply(lambda x: file_md5[x]).values
+                # SettingWithCopyWarning causes false positive
+                # e.g at df.loc[:, 'file_checksum'] = md5
+                pd.options.mode.chained_assignment = None
+                df.loc[:, 'file_checksum'] = md5
+                print("done.")
+            elif check_file_checksum(df):
+            print("Valid checksums found", end=" ")
+            else:
+            sys.exit("No valid checksums found and no files given to generate checksum from. Please list the files using the --data option or specify the checksums in the run-table when the data is uploaded separately.")
+
+            schema_targets['run'] = df
+
+            # submit data to webin ftp server
+            if args.no_data_upload:
+                print(
+                    "No files will be uploaded, remove `--no_data_upload' argument to perform upload.")
+            elif draft:
+                print(
+                    "No files will be uploaded, remove `--draft' argument to perform upload.")
+            else:
+                submit_data(file_paths, password, webin_id)
+
+        # when adding sample
+        # update schema_targets with taxon ids or scientific names
+        if 'sample' in schema_targets:
+            df = schema_targets['sample']
+            print('Retrieving taxon IDs and scientific names if needed')
+            for index, row in df.iterrows():
+                if pd.notna(row['scientific_name']) and pd.isna(row['taxon_id']):
+                    # retrieve taxon id using scientific name
+                    taxonID = get_taxon_id(row['scientific_name'])
+                    df.loc[index, 'taxon_id'] = taxonID
+                elif pd.notna(row['taxon_id']) and pd.isna(row['scientific_name']):
+                    # retrieve scientific name using taxon id
+                    scientificName = get_scientific_name(row['taxon_id'])
+                    df.loc[index, 'scientific_name'] = scientificName
+                elif pd.isna(row['taxon_id']) and pd.isna(row['scientific_name']):
+                    sys.exit(
+                        f"No taxon_id or scientific_name was given with sample {row['alias']}.")
+            print('Taxon IDs and scientific names are retrieved')
+            schema_targets['sample'] = df
+
+    # ? need to add a place holder for setting up
+    base_path = os.path.abspath(os.path.dirname(__file__))
+    template_path = os.path.join(base_path, 'templates'
+
+    """
+
+
+def upload(self):
+    """Create the required files and upload to ENA"""
+    self.convert_input_json_to_ena()
+    self.create_structure_to_ena()
