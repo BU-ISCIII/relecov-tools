@@ -6,6 +6,7 @@ import json
 
 import pandas as pd
 import sys
+import os
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from ena_upload.ena_upload import extract_targets
@@ -110,7 +111,7 @@ class EnaUpload:
         """Convert json to dataframe required by ena-upload-cli package"""
         # schema_dataframe = {}
 
-        config_json = ConfigJson()
+        # config_json = ConfigJson()
 
         """
         map_to_upload = config_json.get_topic_data("json_schemas", "ena_schema")
