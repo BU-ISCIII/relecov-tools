@@ -1,15 +1,22 @@
-from bdb import set_trace
-import os
+# from pdb import set_trace
+# import python3 get-pip.py
 import logging
 import rich.console
 import json
 
 import pandas as pd
 import sys
+import os
 import relecov_tools.utils
-from relecov_tools.config_json import ConfigJson
+
+# from relecov_tools.config_json import ConfigJson
 from ena_upload.ena_upload import extract_targets
 from ena_upload.ena_upload import check_filenames
+from ena_upload.ena_upload import check_file_checksum
+from ena_upload.ena_upload import get_md5
+
+# from ena_upload.ena_upload import get_taxon_id
+# from ena_upload.ena_upload import get_scientific_name
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -30,6 +37,7 @@ class EnaUpload:
         customized_project=None,
         action=None,
         output_path=None,
+        filename=None,
     ):
         if user is None:
             self.user = relecov_tools.utils.prompt_text(
@@ -79,6 +87,22 @@ class EnaUpload:
             sys.exit(1)
         with open(self.source_json_file, "r") as fh:
             self.json_data = json.loads(fh.read())
+        # check if data is given when adding a 'run' table
+
+        if filename is None:
+            self.filename = relecov_tools.utils.prompt_path(
+                msg="Oops, requires data for submitting RUN object"
+            )
+        else:
+            self.filename = filename
+        """
+        else:
+            # validate if given data is file
+            for path in filename:
+                if not os.path.isfile(path):
+                    msg = f"Oops, the file {path} does not exist"
+                    log.error(msg)
+        """
 
     def convert_input_json_to_ena(self):
         """Split the input ena json, in samples and runs json"""
@@ -88,8 +112,9 @@ class EnaUpload:
         """Convert json to dataframe required by ena-upload-cli package"""
         # schema_dataframe = {}
 
-        config_json = ConfigJson()
+        # config_json = ConfigJson()
 
+        """
         map_to_upload = config_json.get_topic_data("json_schemas", "ena_schema")
 
         map_file = os.path.join(
@@ -98,19 +123,17 @@ class EnaUpload:
         fh = open(map_file)
         map_structure_json = json.load(fh)
         fh.close()
+        """
 
         esquema = self.source_json_file
         fh_esquema = open(esquema)
         esquema_json = json.load(fh_esquema)
         fh_esquema.close()
-        # lista = ["study", "runs", "samples", "experiments"]
 
-        # llaves = esquema_json.keys()
-
-        df = pd.DataFrame.from_dict(esquema_json, orient="index")
-        df_transposed = df.T
+        df_schemas = pd.DataFrame.from_dict(esquema_json, orient="index")
+        df_transposed = df_schemas.T
         df_study = df_transposed[["study_alias", "study_title", "study_type"]]
-        df_study["status"] = self.action
+        df_study.insert(3, "status", self.action)
         df_samples = df_transposed[
             [
                 "sample_name",
@@ -124,11 +147,11 @@ class EnaUpload:
                 "isolate",
             ]
         ]
-        df_samples["status"] = self.action
-        df_runs = df_transposed[
-            ["experiment_alias", "sequence_file_R1_fastq", "sequence_file_R2_fastq"]
+        df_samples.insert(3, "status", self.action)
+        df_run = df_transposed[
+            ["experiment_alias", "file_name", "sequence_file_R2_fastq"]
         ]
-        df_runs["status"] = self.action
+        df_run.insert(3, "status", self.action)
         df_experiments = df_transposed[
             [
                 "experiment_alias",
@@ -142,31 +165,54 @@ class EnaUpload:
                 "instrument_model",
             ]
         ]
-        df_experiments["status"] = self.action
+        df_experiments.insert(3, "status", self.action)
 
         schema_dataframe = {}
         schema_dataframe["study"] = df_study
         schema_dataframe["samples"] = df_samples
-        schema_dataframe["runs"] = df_runs
+        schema_dataframe["run"] = df_run
         schema_dataframe["experiments"] = df_experiments
 
         schema_targets = extract_targets(self.action, schema_dataframe)
+        """
         if not schema_targets:
-           stderr.print(f"[red] There is no table submitted having at least one row with {self.action} as action in the status column.")
+            stderr.print(
+                f"[red] There is no table submitted having at least one row with {self.action} as action in the status column."
+            )
             sys.exit(1)
-            
+        """
 
-        if self.action == "add":
+        if self.action == "ADD" or self.action == "add":
+            # when adding run object
+            # update schema_targets wit md5 hash
+            # submit data
             if "run" in schema_targets:
                 # a dictionary of filename:file_path
                 df = schema_targets["run"]
                 file_paths = {}
-                if self.source_json:
-                    for path in self.source_json:
+                if self.filename:
+                    for path in self.source_json_file:
                         file_paths[os.path.basename(path)] = os.path.abspath(path)
                 # check if file names identical between command line and table
                 # if not, system exits
-                check_filenames(file_paths, df_runs)
+                check_filenames(file_paths, df_run)
+                # generate MD5 sum if not supplied in table
+                if file_paths and not check_file_checksum(df):
+                    print("No valid checksums found, generate now...", end=" ")
+                    file_md5 = {
+                        filename: get_md5(path) for filename, path in file_paths.items()
+                    }
+                    df_experiments.insert(1, "status", self.action)
+                    import pdb
+
+                    pdb.set_trace()
+                    # update schema_targets wih md5 hash
+                    md5 = df["file_name"].apply(lambda x: file_md5[x]).values
+                    # SettingWithCopyWarning causes false positive
+                    # e.g at df.loc[:, 'file_checksum'] = md5
+                    pd.options.mode.chained_assignment = None
+                    df.loc[:, "file_checksum"] = md5
+                    print("done.")
 
     def upload(self):
         """Create the required files and upload to ENA"""

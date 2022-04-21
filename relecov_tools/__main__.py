@@ -254,6 +254,7 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-e", "--ena_json", help="where the validated json is")
 @click.option("-s", "--study", help="study/project name to include in xml files")
+@click.option("-f", "--filename", help="data for submitting RUN objec")
 @click.option(
     "-a",
     "--action",
@@ -262,10 +263,10 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
 )
 @click.option("--dev/--production", default=True)
 @click.option("-o", "--output_path", help="output folder for the xml generated files")
-def upload_to_ena(user, password, ena_json, dev, study, action, output_path):
+def upload_to_ena(user, password, ena_json, dev, study, action, output_path, filename):
     """parsed data to create xml files to upload to ena"""
     upload_ena = relecov_tools.ena_upload.EnaUpload(
-        user, password, ena_json, dev, study, action, output_path
+        user, password, ena_json, dev, study, action, output_path, filename
     )
     upload_ena.upload()
 
