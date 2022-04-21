@@ -1,5 +1,3 @@
-# from pdb import set_trace
-# import python3 get-pip.py
 import logging
 import rich.console
 import json
@@ -9,14 +7,12 @@ import sys
 import os
 import relecov_tools.utils
 
-# from relecov_tools.config_json import ConfigJson
-from ena_upload.ena_upload import extract_targets
-from ena_upload.ena_upload import check_filenames
-from ena_upload.ena_upload import check_file_checksum
-from ena_upload.ena_upload import get_md5
 
-# from ena_upload.ena_upload import get_taxon_id
-# from ena_upload.ena_upload import get_scientific_name
+from ena_upload.ena_upload import extract_targets
+from ena_upload.ena_upload import submit_data
+from ena_upload.ena_upload import run_construct
+from ena_upload.ena_upload import construct_submission
+
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -32,12 +28,12 @@ class EnaUpload:
         self,
         user=None,
         passwd=None,
+        center = None,
         source_json=None,
         dev=None,
         customized_project=None,
         action=None,
         output_path=None,
-        filename=None,
     ):
         if user is None:
             self.user = relecov_tools.utils.prompt_text(
@@ -51,6 +47,12 @@ class EnaUpload:
             )
         else:
             self.passwd = passwd
+        if center is None:
+            self.center = relecov_tools.utils.prompt_text(
+            msg="Enter your center name"
+            )
+        else:
+            self.center = center
         if source_json is None:
             self.source_json_file = relecov_tools.utils.prompt_path(
                 msg="Select the ENA json file to upload"
@@ -89,21 +91,6 @@ class EnaUpload:
             self.json_data = json.loads(fh.read())
         # check if data is given when adding a 'run' table
 
-        if filename is None:
-            self.filename = relecov_tools.utils.prompt_path(
-                msg="Oops, requires data for submitting RUN object"
-            )
-        else:
-            self.filename = filename
-        """
-        else:
-            # validate if given data is file
-            for path in filename:
-                if not os.path.isfile(path):
-                    msg = f"Oops, the file {path} does not exist"
-                    log.error(msg)
-        """
-
     def convert_input_json_to_ena(self):
         """Split the input ena json, in samples and runs json"""
         pass
@@ -113,17 +100,6 @@ class EnaUpload:
         # schema_dataframe = {}
 
         # config_json = ConfigJson()
-
-        """
-        map_to_upload = config_json.get_topic_data("json_schemas", "ena_schema")
-
-        map_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "schema", map_to_upload
-        )
-        fh = open(map_file)
-        map_structure_json = json.load(fh)
-        fh.close()
-        """
 
         esquema = self.source_json_file
         fh_esquema = open(esquema)
@@ -149,9 +125,16 @@ class EnaUpload:
         ]
         df_samples.insert(3, "status", self.action)
         df_run = df_transposed[
-            ["experiment_alias", "file_name", "sequence_file_R2_fastq"]
+            [
+                "experiment_alias",
+                "sequence_file_R1_fastq",
+                "sequence_file_R2_fastq",
+                "r1_fastq_filepath",
+                "r2_fastq_filepath",
+            ]
         ]
         df_run.insert(3, "status", self.action)
+
         df_experiments = df_transposed[
             [
                 "experiment_alias",
@@ -174,47 +157,60 @@ class EnaUpload:
         schema_dataframe["experiments"] = df_experiments
 
         schema_targets = extract_targets(self.action, schema_dataframe)
-        """
-        if not schema_targets:
-            stderr.print(
-                f"[red] There is no table submitted having at least one row with {self.action} as action in the status column."
-            )
-            sys.exit(1)
-        """
 
         if self.action == "ADD" or self.action == "add":
-            # when adding run object
-            # update schema_targets wit md5 hash
-            # submit data
-            if "run" in schema_targets:
-                # a dictionary of filename:file_path
-                df = schema_targets["run"]
-                file_paths = {}
-                if self.filename:
-                    for path in self.source_json_file:
-                        file_paths[os.path.basename(path)] = os.path.abspath(path)
-                # check if file names identical between command line and table
-                # if not, system exits
-                check_filenames(file_paths, df_run)
-                # generate MD5 sum if not supplied in table
-                if file_paths and not check_file_checksum(df):
-                    print("No valid checksums found, generate now...", end=" ")
-                    file_md5 = {
-                        filename: get_md5(path) for filename, path in file_paths.items()
-                    }
-                    df_experiments.insert(1, "status", self.action)
-                    import pdb
+            file_paths = {}
 
-                    pdb.set_trace()
-                    # update schema_targets wih md5 hash
-                    md5 = df["file_name"].apply(lambda x: file_md5[x]).values
-                    # SettingWithCopyWarning causes false positive
-                    # e.g at df.loc[:, 'file_checksum'] = md5
-                    pd.options.mode.chained_assignment = None
-                    df.loc[:, "file_checksum"] = md5
-                    print("done.")
+            for path in df_run["r1_fastq_filepath"]:
+                file_paths[os.path.basename(path)] = os.path.abspath(path)
+            import pdb
+
+            pdb.set_trace()
+
+            # submit data to webin ftp server
+            if self.dev == "dev":
+                print(
+                    "No files will be uploaded, remove `--no_data_upload' argument to perform upload."
+                )
+            else:
+                submit_data(file_paths,  self.passwd, self.user)
+
+            # when ADD/MODIFY,
+            # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
+            # schema_xmls record XMLs for all these schema and following 'submission'
+            tool = "ena-upload-cli"
+            checklist = "ERC000033"
+            schema_xmls = run_construct(
+                template_path, schema_targets, center, checklist, tool
+            )
+
+            submission_xml = construct_submission(
+                template_path, action, schema_xmls, center, checklist, tool
+            )
 
     def upload(self):
         """Create the required files and upload to ENA"""
         self.convert_input_json_to_ena()
         self.create_structure_to_ena()
+
+
+"""
+def check_filenames(file_paths, run_df):
+ 
+    Compare data filenames from command line and from RUN table.
+    :param file_paths: a dictionary of filename string and file_path string
+    :param df: dataframe built from RUN table
+
+
+    cmd_input = file_paths.keys()
+    table_input = run_df['file_name'].values
+
+    # symmetric difference between two sets
+    difference = set(cmd_input) ^ set(table_input)
+
+    if difference:
+        msg = f"different file names between command line and RUN table: {difference}"
+        sys.exit(msg)
+
+
+"""
