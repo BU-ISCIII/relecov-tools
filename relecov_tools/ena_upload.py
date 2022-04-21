@@ -6,6 +6,7 @@ import pandas as pd
 import sys
 import os
 import relecov_tools.utils
+from relecov_tools.config_json import ConfigJson
 
 
 from ena_upload.ena_upload import extract_targets
@@ -28,7 +29,7 @@ class EnaUpload:
         self,
         user=None,
         passwd=None,
-        center = None,
+        center=None,
         source_json=None,
         dev=None,
         customized_project=None,
@@ -48,9 +49,7 @@ class EnaUpload:
         else:
             self.passwd = passwd
         if center is None:
-            self.center = relecov_tools.utils.prompt_text(
-            msg="Enter your center name"
-            )
+            self.center = relecov_tools.utils.prompt_text(msg="Enter your center name")
         else:
             self.center = center
         if source_json is None:
@@ -163,54 +162,40 @@ class EnaUpload:
 
             for path in df_run["r1_fastq_filepath"]:
                 file_paths[os.path.basename(path)] = os.path.abspath(path)
-            import pdb
-
-            pdb.set_trace()
 
             # submit data to webin ftp server
-            if self.dev == "dev":
+            if self.dev:
                 print(
                     "No files will be uploaded, remove `--no_data_upload' argument to perform upload."
                 )
+
             else:
-                submit_data(file_paths,  self.passwd, self.user)
+
+                submit_data(file_paths, self.passwd, self.user)
 
             # when ADD/MODIFY,
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
             # schema_xmls record XMLs for all these schema and following 'submission'
-            tool = "ena-upload-cli"
-            checklist = "ERC000033"
+
+            # No me está funcionando con el absolute path
+            # base_path = os.path.abspath(os.path.dirname(__file__))
+            base_path = os.getcwd()
+            template_path = os.path.join(base_path, "relecov_tools", "templates")
+            config_json = ConfigJson()
+            tool = config_json.get_configuration("tool")
+            checklist = config_json.get_configuration("checklist")
+            import pdb
+
+            pdb.set_trace()
             schema_xmls = run_construct(
-                template_path, schema_targets, center, checklist, tool
+                template_path, schema_targets, self.center, checklist, tool
             )
 
             submission_xml = construct_submission(
-                template_path, action, schema_xmls, center, checklist, tool
+                template_path, self.action, schema_xmls, self.center, checklist, tool
             )
 
     def upload(self):
         """Create the required files and upload to ENA"""
         self.convert_input_json_to_ena()
         self.create_structure_to_ena()
-
-
-"""
-def check_filenames(file_paths, run_df):
- 
-    Compare data filenames from command line and from RUN table.
-    :param file_paths: a dictionary of filename string and file_path string
-    :param df: dataframe built from RUN table
-
-
-    cmd_input = file_paths.keys()
-    table_input = run_df['file_name'].values
-
-    # symmetric difference between two sets
-    difference = set(cmd_input) ^ set(table_input)
-
-    if difference:
-        msg = f"different file names between command line and RUN table: {difference}"
-        sys.exit(msg)
-
-
-"""
