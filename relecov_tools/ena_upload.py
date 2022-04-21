@@ -1,5 +1,5 @@
-from bdb import set_trace
-import os
+#from pdb import set_trace
+import python3 get-pip.py
 import logging
 import rich.console
 import json
@@ -12,8 +12,8 @@ from ena_upload.ena_upload import extract_targets
 from ena_upload.ena_upload import check_filenames
 from ena_upload.ena_upload import check_file_checksum
 from ena_upload.ena_upload import get_md5
-from ena_upload.ena_upload import get_taxon_id
-from ena_upload.ena_upload import get_scientific_name
+# from ena_upload.ena_upload import get_taxon_id
+# from ena_upload.ena_upload import get_scientific_name
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -111,6 +111,7 @@ class EnaUpload:
 
         config_json = ConfigJson()
 
+        """
         map_to_upload = config_json.get_topic_data("json_schemas", "ena_schema")
 
         map_file = os.path.join(
@@ -119,6 +120,7 @@ class EnaUpload:
         fh = open(map_file)
         map_structure_json = json.load(fh)
         fh.close()
+        """
 
         esquema = self.source_json_file
         fh_esquema = open(esquema)
@@ -213,3 +215,8 @@ class EnaUpload:
         """Create the required files and upload to ENA"""
         self.convert_input_json_to_ena()
         self.create_structure_to_ena()
+
+    
+
+
+
