@@ -1,5 +1,5 @@
-#from pdb import set_trace
-import python3 get-pip.py
+# from pdb import set_trace
+# import python3 get-pip.py
 import logging
 import rich.console
 import json
@@ -12,6 +12,7 @@ from ena_upload.ena_upload import extract_targets
 from ena_upload.ena_upload import check_filenames
 from ena_upload.ena_upload import check_file_checksum
 from ena_upload.ena_upload import get_md5
+
 # from ena_upload.ena_upload import get_taxon_id
 # from ena_upload.ena_upload import get_scientific_name
 
@@ -215,8 +216,3 @@ class EnaUpload:
         """Create the required files and upload to ENA"""
         self.convert_input_json_to_ena()
         self.create_structure_to_ena()
-
-    
-
-
-
