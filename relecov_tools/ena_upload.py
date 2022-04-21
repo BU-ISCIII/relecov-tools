@@ -178,9 +178,8 @@ class EnaUpload:
             # schema_xmls record XMLs for all these schema and following 'submission'
 
             # No me está funcionando con el absolute path
-            # base_path = os.path.abspath(os.path.dirname(__file__))
-            base_path = os.getcwd()
-            template_path = os.path.join(base_path, "relecov_tools", "templates")
+            base_path = os.path.abspath(os.path.dirname(__file__))
+            template_path = os.path.join(base_path, "templates")
             config_json = ConfigJson()
             tool = config_json.get_configuration("tool")
             checklist = config_json.get_configuration("checklist")
