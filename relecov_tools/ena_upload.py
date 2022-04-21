@@ -13,6 +13,9 @@ from ena_upload.ena_upload import extract_targets
 from ena_upload.ena_upload import submit_data
 from ena_upload.ena_upload import run_construct
 from ena_upload.ena_upload import construct_submission
+import site
+
+template_path = os.path.join(site.getsitepackages()[0], "ena_upload", "templates")
 
 
 log = logging.getLogger(__name__)
@@ -178,10 +181,12 @@ class EnaUpload:
             # schema_xmls record XMLs for all these schema and following 'submission'
 
             # No me está funcionando con el absolute path
-            base_path = os.path.abspath(os.path.dirname(__file__))
-            template_path = os.path.join(base_path, "templates")
+            # base_path = os.path.abspath(os.path.dirname(__file__))
+            # base_path = "miniconda3/envs/relecov/lib/python3.1/site-packages/ena_upload"
+            # template_path = os.path.join(base_path, "templates")
             config_json = ConfigJson()
-            tool = config_json.get_configuration("tool")
+            # tool = config_json.get_topic_data("tool")
+            tool = {"tool_name": "ena-upload-cli", "tool_version": "1.0"}
             checklist = config_json.get_configuration("checklist")
             import pdb
 

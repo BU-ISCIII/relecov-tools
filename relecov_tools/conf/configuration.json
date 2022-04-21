@@ -76,6 +76,9 @@
         "onlyRecorded": "Yes",
         "sampleLocation": "Not defined"
     },
-    "tool": "ena-upload-cli",
+    "tool": {
+        "tool_name": "ena-upload-cli",
+        "tool_version": "1.0"
+    },
     "checklist": "ERC000033"
 }
