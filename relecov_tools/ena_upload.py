@@ -8,7 +8,8 @@ import pandas as pd
 import sys
 import os
 import relecov_tools.utils
-from relecov_tools.config_json import ConfigJson
+
+# from relecov_tools.config_json import ConfigJson
 from ena_upload.ena_upload import extract_targets
 from ena_upload.ena_upload import check_filenames
 from ena_upload.ena_upload import check_file_checksum
