@@ -68,9 +68,10 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
     collecting_lab_sample_id are removed from excel
     """
     sample_list = []
-    json_data = relecov_tools.utils.read_json_file(invalid_json)
-    for row in json_data:
-        sample_list.append(row["collecting_lab_sample_id"])
+    # import pdb; pdb.set_trace()
+    # json_data = relecov_tools.utils.read_json_file(invalid_json)
+    for row in invalid_json:
+        sample_list.append(str(row["collecting_lab_sample_id"]))
     wb = openpyxl.load_workbook(metadata_file)
     ws_sheet = wb["METADATA_LAB"]
     row_to_del = []
@@ -84,7 +85,7 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
                 for idx in row_to_del:
                     ws_sheet.delete_rows(idx)
             break
-
+        import pdb; pdb.set_trace()
         if str(row[2].value) not in sample_list:
             row_to_del.append(row[0].row)
 
