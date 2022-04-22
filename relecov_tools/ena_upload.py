@@ -13,6 +13,10 @@ from ena_upload.ena_upload import extract_targets
 from ena_upload.ena_upload import submit_data
 from ena_upload.ena_upload import run_construct
 from ena_upload.ena_upload import construct_submission
+from ena_upload.ena_upload import send_schemas
+from ena_upload.ena_upload import process_receipt
+from ena_upload.ena_upload import update_table
+from ena_upload.ena_upload import save_update
 import site
 
 template_path = os.path.join(site.getsitepackages()[0], "ena_upload", "templates")
@@ -91,7 +95,6 @@ class EnaUpload:
             sys.exit(1)
         with open(self.source_json_file, "r") as fh:
             self.json_data = json.loads(fh.read())
-        # check if data is given when adding a 'run' table
 
     def convert_input_json_to_ena(self):
         """Split the input ena json, in samples and runs json"""
@@ -99,9 +102,6 @@ class EnaUpload:
 
     def create_structure_to_ena(self):
         """Convert json to dataframe required by ena-upload-cli package"""
-        # schema_dataframe = {}
-
-        # config_json = ConfigJson()
 
         esquema = self.source_json_file
         fh_esquema = open(esquema)
@@ -110,21 +110,33 @@ class EnaUpload:
 
         df_schemas = pd.DataFrame.from_dict(esquema_json, orient="index")
         df_transposed = df_schemas.T
-        df_study = df_transposed[["study_alias", "study_title", "study_type"]]
+        df_study = df_transposed[
+            ["study_alias", "study_title", "study_type", "study_abstract"]
+        ]
+        df_study.rename(columns={"study_alias": "alias"}, inplace=True)
+        df_study.rename(columns={"study_title": "title"}, inplace=True)
         df_study.insert(3, "status", self.action)
         df_samples = df_transposed[
             [
                 "sample_name",
-                "tax_id",
+                "sample_title",
+                "taxon_id",
                 "sample_description",
-                "collection_date",
-                "geographic_location_(country_and/or_sea)",
-                "host_common_name",
-                "host_gender",
-                "host_scientific_name",
+                "collection date",
+                "geographic location (country and/or sea)",
+                "host common name",
+                "host scientific name",
+                "host subject id",
+                "host health state",
+                "host sex",
+                "scientific_name",
+                "collector name",
+                "collecting institution",
                 "isolate",
             ]
         ]
+        df_samples.rename(columns={"sample_name": "alias"}, inplace=True)
+        df_samples.rename(columns={"sample_title": "title"}, inplace=True)
         df_samples.insert(3, "status", self.action)
         df_run = df_transposed[
             [
@@ -133,30 +145,40 @@ class EnaUpload:
                 "sequence_file_R2_fastq",
                 "r1_fastq_filepath",
                 "r2_fastq_filepath",
+                "file_type",
+                "file_checksum",
             ]
         ]
         df_run.insert(3, "status", self.action)
+        df_run.insert(4, "alias", df_run["experiment_alias"])
+        df_run.insert(4, "file_name", df_run["sequence_file_R1_fastq"])
 
         df_experiments = df_transposed[
             [
                 "experiment_alias",
                 "study_title",
+                "study_alias",
+                "design_description",
                 "sample_name",
+                "library_name",
                 "library_strategy",
                 "library_source",
                 "library_selection",
                 "library_layout",
-                "instrument_platform",
+                "platform",
                 "instrument_model",
             ]
         ]
         df_experiments.insert(3, "status", self.action)
+        df_experiments.insert(4, "alias", df_experiments["experiment_alias"])
+        df_experiments.rename(columns={"study_title": "title"}, inplace=True)
+        df_experiments.rename(columns={"sample_name": "sample_alias"}, inplace=True)
 
         schema_dataframe = {}
         schema_dataframe["study"] = df_study
-        schema_dataframe["samples"] = df_samples
+        schema_dataframe["sample"] = df_samples
         schema_dataframe["run"] = df_run
-        schema_dataframe["experiments"] = df_experiments
+        schema_dataframe["experiment"] = df_experiments
 
         schema_targets = extract_targets(self.action, schema_dataframe)
 
@@ -168,29 +190,23 @@ class EnaUpload:
 
             # submit data to webin ftp server
             if self.dev:
-                print(
+                log.error(
                     "No files will be uploaded, remove `--no_data_upload' argument to perform upload."
                 )
-
             else:
 
                 submit_data(file_paths, self.passwd, self.user)
-
             # when ADD/MODIFY,
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
             # schema_xmls record XMLs for all these schema and following 'submission'
-
-            # No me está funcionando con el absolute path
-            # base_path = os.path.abspath(os.path.dirname(__file__))
-            # base_path = "miniconda3/envs/relecov/lib/python3.1/site-packages/ena_upload"
-            # template_path = os.path.join(base_path, "templates")
             config_json = ConfigJson()
-            # tool = config_json.get_topic_data("tool")
-            tool = {"tool_name": "ena-upload-cli", "tool_version": "1.0"}
-            checklist = config_json.get_configuration("checklist")
             import pdb
 
             pdb.set_trace()
+            tool = config_json.get_configuration("tool")
+            # tool = {"tool_name": "ena-upload-cli", "tool_version": "1.0"}
+            checklist = config_json.get_configuration("checklist")
+
             schema_xmls = run_construct(
                 template_path, schema_targets, self.center, checklist, tool
             )
@@ -198,6 +214,33 @@ class EnaUpload:
             submission_xml = construct_submission(
                 template_path, self.action, schema_xmls, self.center, checklist, tool
             )
+            import pdb
+
+            pdb.set_trace()
+            if self.dev:
+                url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
+            else:
+                url = "https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
+
+            print(f"\nSubmitting XMLs to ENA server: {url}")
+            receipt = send_schemas(schema_xmls, url, self.passwd, self.user).text
+            print("Printing receipt to ./receipt.xml")
+
+            with open("receipt.xml", "w") as fw:
+                fw.write(receipt)
+            try:
+                schema_update = process_receipt(receipt.encode("utf-8"), self.action)
+            except ValueError:
+                log.error("There was an ERROR during submission:")
+                sys.exit(receipt)
+
+            if self.action in ["ADD", "MODIFY"] or self.action in ["add", "modify"]:
+                schema_dataframe = update_table(
+                    schema_dataframe, schema_targets, schema_update
+                )
+
+            # save updates in new tables
+            # save_update(schema_tables, schema_dataframe)
 
     def upload(self):
         """Create the required files and upload to ENA"""
