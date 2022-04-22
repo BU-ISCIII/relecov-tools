@@ -85,7 +85,7 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
                 for idx in row_to_del:
                     ws_sheet.delete_rows(idx)
             break
-        import pdb; pdb.set_trace()
+
         if str(row[2].value) not in sample_list:
             row_to_del.append(row[0].row)
 
