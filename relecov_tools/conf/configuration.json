@@ -16,43 +16,69 @@
         "fasta"
     ],
     "laboratory_data": "laboratory_address.json",
-    "geo_location_data" : "geo_loc_cities.json",
+    "geo_location_data": "geo_loc_cities.json",
     "ENA_configuration": {
         "study_alias": "RELECOV",
-        "design_description":"Design Description",
+        "design_description": "Design Description",
         "experiment_alias": "",
         "run_alias": "",
         "experiment_title": "Example project for ENA submission RELECOV",
         "study_title": "RELECOV Spanish Network for genomics surveillance"
     },
-    "external_url":{
+    "external_url": {
         "iskylims": {
             "server": "http://relecov-iskylims.isciiides.es",
             "url": "/wetlab/api/",
             "store_samples": "createSampleData",
             "url_project_fields": "sampleProjectFields",
-            "project_name" : "Relecov",
+            "project_name": "Relecov",
             "token": ""
-            },
+        },
         "relecov": {
             "server": "http://relecov-platform.isciiides.es",
             "url": "/api/",
             "store_samples": "storeData",
             "token": ""
-            }
+        }
     },
     "iskylims_sample_fields": [
-        ["patientCore", "collector_name"],
-        ["sampleName", "collecting_lab_sample_id"],
-        ["labRequest","collecting_institution"],
-        ["sampleType", "anatomical_material"],
-        ["species", "host_common_name"],
-        ["sampleEntryDate", "sample_received_date"],
-        ["sampleCollectionDate", "sample_collection_date"]
+        [
+            "patientCore",
+            "collector_name"
+        ],
+        [
+            "sampleName",
+            "collecting_lab_sample_id"
+        ],
+        [
+            "labRequest",
+            "collecting_institution"
+        ],
+        [
+            "sampleType",
+            "anatomical_material"
+        ],
+        [
+            "species",
+            "host_common_name"
+        ],
+        [
+            "sampleEntryDate",
+            "sample_received_date"
+        ],
+        [
+            "sampleCollectionDate",
+            "sample_collection_date"
+        ]
     ],
     "iskylims_fixed_values": {
         "sampleProject": "Relecov",
         "onlyRecorded": "Yes",
         "sampleLocation": "Not defined"
-    }
+    },
+    "tool": {
+        "tool_name": "ena-upload-cli",
+        "tool_version": "0.5.3"
+    },
+    "checklist": "ERC000033"
 }
