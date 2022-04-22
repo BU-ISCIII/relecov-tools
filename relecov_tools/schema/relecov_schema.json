@@ -8,7 +8,7 @@
         "geo_loc_country",
         "geo_loc_state",
         "organism",
-        "isolate",
+        "isolate_sample_id",
         "host_scientific_name",
         "host_disease",
         "sequencing_instrument_model",
@@ -2466,7 +2466,7 @@
             "type": "string",
             "description": "",
             "classification": "",
-            "label": ""
+            "label": "Sample ID given if multiple rna-extraction or passages"
         },
         "variant_designation": {
             "Enums": [
