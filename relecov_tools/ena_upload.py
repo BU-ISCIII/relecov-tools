@@ -16,7 +16,8 @@ from ena_upload.ena_upload import construct_submission
 from ena_upload.ena_upload import send_schemas
 from ena_upload.ena_upload import process_receipt
 from ena_upload.ena_upload import update_table
-from ena_upload.ena_upload import save_update
+
+# from ena_upload.ena_upload import save_update
 import site
 
 template_path = os.path.join(site.getsitepackages()[0], "ena_upload", "templates")
@@ -211,7 +212,8 @@ class EnaUpload:
                 template_path, schema_targets, self.center, checklist, tool
             )
 
-            submission_xml = construct_submission(
+            # submission_xml = construct_submission(template_path, self.action, schema_xmls, self.center, checklist, tool)
+            construct_submission(
                 template_path, self.action, schema_xmls, self.center, checklist, tool
             )
             import pdb

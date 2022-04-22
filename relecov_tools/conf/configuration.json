@@ -78,7 +78,7 @@
     },
     "tool": {
         "tool_name": "ena-upload-cli",
-        "tool_version": "1.0"
+        "tool_version": "0.5.3"
     },
     "checklist": "ERC000033"
 }
