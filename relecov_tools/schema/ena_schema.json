@@ -116,7 +116,7 @@
       "examples": [
         "design_description_1"
       ],
-      "ontology": "0",
+      "ontology": "NCIT:C147139",
       "type": "string",
       "description": "",
       "clasification": "",
@@ -621,7 +621,7 @@
         "sample"
       ]
     },
-    "host_gender": {
+    "host_sex": {
       "Enums": [
         "Female [NCIT:C46110]",
         "Male [NCIT:C46109]",
