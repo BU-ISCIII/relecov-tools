@@ -235,7 +235,7 @@ def validate(json_file, json_schema, metadata, out_folder):
 @click.option(
     "-d",
     "--destination_schema",
-    type=click.Choice(["ENA", "GSAID", "other"], case_sensitive=True),
+    type=click.Choice(["ENA", "GISAID", "other"], case_sensitive=True),
     help="schema to be mapped",
 )
 @click.option("-f", "--schema_file", help="file with the custom schema")
