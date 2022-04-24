@@ -103,7 +103,7 @@ class MappingSchema:
             self.schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "schema",
-                config_json.get_item("json_schemas", "gisaid_schema"),
+                config_json.get_topic_data("json_schemas", "gisaid_schema"),
             )
         else:
             stderr.print("[red] Invalid option for mapping to schena")
