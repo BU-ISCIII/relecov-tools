@@ -26,6 +26,9 @@
         "study_title": "RELECOV Spanish Network for genomics surveillance",
         "study_type" : ""
     },
+    "GISATD_configuration": {
+        "submitter" : "GISAID_ID"
+    },
     "external_url": {
         "iskylims": {
             "server": "http://relecov-iskylims.isciiides.es",
