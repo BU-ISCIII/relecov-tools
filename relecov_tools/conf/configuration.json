@@ -23,7 +23,8 @@
         "experiment_alias": "",
         "run_alias": "",
         "experiment_title": "Example project for ENA submission RELECOV",
-        "study_title": "RELECOV Spanish Network for genomics surveillance"
+        "study_title": "RELECOV Spanish Network for genomics surveillance",
+        "study_type" : ""
     },
     "external_url": {
         "iskylims": {
