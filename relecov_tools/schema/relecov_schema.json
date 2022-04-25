@@ -1757,6 +1757,19 @@
             "classification": "Sequencing",
             "label": "Commercial All-in-one library kit"
         },
+        "library_name": {
+            "examples": [
+                "e.g PAIRED"
+            ],
+            "ontology": "GENEPIO_0001995",
+            "type": "string",
+            "description": "The submitter's name for this library.",
+            "clasification": "Sequencing",
+            "label": "Library Name",
+            "table": [
+                "experiments"
+            ]
+        },
         "library_id": {
             "examples": [
                 "XYZ_123345"
