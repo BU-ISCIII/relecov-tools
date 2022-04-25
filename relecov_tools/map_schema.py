@@ -103,7 +103,7 @@ class MappingSchema:
             self.schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "schema",
-                config_json.get_item("json_schemas", "gisaid_schema"),
+                config_json.get_topic_data("json_schemas", "gisaid_schema"),
             )
         else:
             stderr.print("[red] Invalid option for mapping to schena")
@@ -159,6 +159,27 @@ class MappingSchema:
                 mapped_json_data[idx]["fastq_r2_md5"] = self.json_data[idx][
                     "fastq_r2_md5"
                 ]
+                mapped_json_data[idx]["r1_fastq_filepath"] = (
+                    self.json_data[idx]["r1_fastq_filepath"]
+                    + self.json_data[idx]["sequence_file_R1_fastq"]
+                )
+                mapped_json_data[idx]["r2_fastq_filepath"] = (
+                    self.json_data[idx]["r2_fastq_filepath"]
+                    + self.json_data[idx]["sequence_file_R2_fastq"]
+                )
+                mapped_json_data[idx]["collecting_institution"] = self.json_data[idx][
+                    "collecting_institution"
+                ]
+                mapped_json_data[idx]["collector_name"] = self.json_data[idx][
+                    "collector_name"
+                ]
+                mapped_json_data[idx]["library_name"] = self.json_data[idx][
+                    "collecting_lab_sample_id"
+                ]
+                mapped_json_data[idx]["sample_title"] = self.json_data[idx][
+                    "collecting_lab_sample_id"
+                ]
+                mapped_json_data[idx]["file_type"] = "fastq"
 
         return mapped_json_data
 

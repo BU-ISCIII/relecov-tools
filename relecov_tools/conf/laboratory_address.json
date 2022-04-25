@@ -1,134 +1,178 @@
 [
     {
         "collecting_institution": "Microbiología HUC San Cecilio",
-        "geo_loc_country" : "Spain",
+        "collecting_institution_address": "Av. del Conocimiento S/N,",
+        "collecting_institution_email": "fegarcia@ugr.es",
         "geo_loc_state": "Andalucia",
-        "geo_loc_city": "Granada"
+        "geo_loc_city": "Granada",
+        "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Microbiología. Hospital Universitario Virgen del Rocio",
-        "geo_loc_country" : "Spain",
+        "collecting_institution_address": "Avenida Manuel Siurot s/n",
+        "collecting_institution_email": "josea.lepe.sspa@juntadeandalucia.es",
         "geo_loc_state": "Andalucia",
-        "geo_loc_city": "Sevilla"
+        "geo_loc_city": "Sevilla",
+        "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Hospital Clínico Universitario Lozano Blesa",
-        "geo_loc_country" : "Spain",
+        "collecting_institution_address": "S. Juan Bosco, 15",
+        "collecting_institution_email": "rbenito@salud.aragon.es",
         "geo_loc_state": "Aragon",
-        "geo_loc_city": "Zaragoza"
+        "geo_loc_city": "Zaragoza",
+        "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Hospital Universitario Miguel Servet",
-        "geo_loc_country" : "Spain",
+        "collecting_institution_address": "P.º Isabel la Católica, 1-3",
+        "collecting_institution_email": "rbenito@salud.aragon.es",
         "geo_loc_state": "Aragon",
-        "geo_loc_city": "Zaragoza"
+        "geo_loc_city": "Zaragoza",
+        "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Centro de Investigación Biomédica de Aragón",
-        "geo_loc_country" : "Spain",
+        "collecting_institution_address": "Avenida San Juan Bosco 13",
+        "collecting_institution_email": "mhpstrunk.iacs@aragon.es",
         "geo_loc_state": "Aragon",
-        "geo_loc_city": "Zaragoza"
+        "geo_loc_city": "Zaragoza",
+        "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Hospital Universitario Central de Asturias",
-        "geo_loc_country" : "Spain",
+        "collecting_institution_address": " Av. Roma, s/n,",
+        "collecting_institution_email": "santiago.melon@sespa.es",
         "geo_loc_state": "Asturias",
-        "geo_loc_city": "Oviedo"
+        "geo_loc_city": "Oviedo",
+        "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Servicio de Microbiologia HU Son Espases",
-        "geo_loc_country" : "Spain",
+        "collecting_institution_address": " Ctra. Valldemossa 79",
+        "collecting_institution_email": "antonio.oliver@ssib.es",
         "geo_loc_state": "Baleares",
-        "geo_loc_city": "Palma de Mallorca"
+        "geo_loc_city": "Palma de Mallorca",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Hospital Universitario Ntra. Sra de Candelaria",
+        "collecting_institution_address": "Carretera del Rosario 145",
+        "collecting_institution_email": "Not available",
+        "geo_loc_state": "Canarias",
+        "geo_loc_city": "Santa Cruz de Tenerife",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Hospital Universitario de Gran Canaria",
+        "collecting_institution_address": "Bco. de la Ballena s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Canarias",
+        "geo_loc_city": "Las Palmas",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Hospital Universitario Marqués de Valdecilla",
+        "collecting_institution_address": "Av. Valdecilla s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cantabria",
+        "geo_loc_city": "Santander",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Hospital General Universitario de Ciudad Real.",
+        "collecting_institution_address": "Calle Obispo Rafael Torija s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_city": "Ciudad Real",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Hospital Virgen de la Salud",
+        "collecting_institution_address": "Calle Barber 30",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_city": "Toledo",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Hospital General Universitario de Albacete",
+        "collecting_institution_address": "Calle Hermanos Falcó 37",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_city": "Albacete",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)",
+        "collecting_institution_address": "Paseo de Belen 19",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla y León",
+        "geo_loc_city": "Valladolid",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Hospital Universitari Vall d’Hebron",
+        "collecting_institution_address": " Passeig de la Vall d’Hebron, 119-129",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_city": "Barcelona",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Hospital Universitari Germans Trias i Pujol",
+        "collecting_institution_address": " Crta del Canyet s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_city": "Barcelona",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Hospital Clínic de Barcelona",
+        "collecting_institution_address": "C/Villarroel 170",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_city": "Barcelona",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Hospital Universitari Bellvitge",
+        "collecting_institution_address": "Carrer Feixa Llarga s/n ",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_city": "Barcelona",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": ""
+        "collecting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII",
+        "collecting_institution_address": "c/ Dr. Mallafrè Guasch, 4,",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_city": "Tarragona",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
+        "collecting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "collecting_institution_address": "",
+        "collecting_institution_email": "",
         "geo_loc_state": "",
-        "geo_loc_city": ""
+        "geo_loc_city": "",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
+        "collecting_institution": "Banc de Sang i Teixits Catalunya",
+        "collecting_institution_address": "",
         "geo_loc_country" : "Spain",
         "geo_loc_state": "",
-        "geo_loc_city": ""
+        "geo_loc_city": "",
+        "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "",
-        "geo_loc_country" : "Spain",
+        "collecting_institution": "Unitat de Genòmica i Medicina Personalitzada - Hospital Dr. Josep Trueta",
+        "collecting_institution_address": "",
+        "collecting_institution_email": "",
         "geo_loc_state": "",
-        "geo_loc_city": ""
+        "geo_loc_city": "",
+        "geo_loc_country": "Spain"
     }
 ]

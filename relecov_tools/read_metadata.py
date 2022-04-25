@@ -119,7 +119,7 @@ class RelecovMetadata:
         p_data = {
             "host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]},
             "collecting_lab_sample_id": [
-                "isolate",
+                "isolate_sample_id",
                 metadata["collecting_lab_sample_id"],
             ],
         }
@@ -248,7 +248,7 @@ class RelecovMetadata:
                         )
                 else:
 
-                    if isinstance(row[idx], float):
+                    if isinstance(row[idx], float) or isinstance(row[idx], int):
                         if heading[idx] in exc_format_num:
                             val = int(row[idx])
                         else:

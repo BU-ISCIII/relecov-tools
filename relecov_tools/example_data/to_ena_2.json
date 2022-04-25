@@ -15,7 +15,7 @@
     "host sex": "Mujer",
     "host scientific name": "Homo Sapiens",
     "instrument_model": "Illumina MiSeq",
-    "platform": "Illumina",
+    "instrument_platform": "Illumina",
     "isolate": "1197860",
     "isolation source host-associated": "Nasopharynx aspirate",
     "isolation source non-host-associated": "Other",
