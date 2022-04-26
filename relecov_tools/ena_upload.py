@@ -1,4 +1,6 @@
 import logging
+from tkinter.tix import CheckList
+from numpy import empty
 import rich.console
 import json
 
@@ -7,7 +9,7 @@ import sys
 import os
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
-
+from lxml import etree
 
 from ena_upload.ena_upload import extract_targets
 from ena_upload.ena_upload import submit_data
@@ -114,6 +116,9 @@ class EnaUpload:
         df_study = df_transposed[
             ["study_alias", "study_title", "study_type", "study_abstract"]
         ]
+        # df_study.columns.values[0] = "alias"
+        # df_study.columns.values[1] = "title"
+
         df_study.rename(columns={"study_alias": "alias"}, inplace=True)
         df_study.rename(columns={"study_title": "title"}, inplace=True)
         df_study.insert(3, "status", self.action)
@@ -136,9 +141,16 @@ class EnaUpload:
                 "isolate",
             ]
         ]
+        # df_samples.columns.values[0] = "alias"
+        # df_samples.columns.values[1] = "title"
+
         df_samples.rename(columns={"sample_name": "alias"}, inplace=True)
         df_samples.rename(columns={"sample_title": "title"}, inplace=True)
         df_samples.insert(3, "status", self.action)
+        config_json = ConfigJson()
+        checklist = config_json.get_configuration("checklist")
+        df_samples.insert(4, "ENA_CHECKLIST", checklist)
+
         df_run = df_transposed[
             [
                 "experiment_alias",
@@ -172,60 +184,56 @@ class EnaUpload:
         ]
         df_experiments.insert(3, "status", self.action)
         df_experiments.insert(4, "alias", df_experiments["experiment_alias"])
+
+        # df_experiments.columns.values[0] = "title"
+        # df_experiments.columns.values[1] = "sample_alias"
+
         df_experiments.rename(columns={"study_title": "title"}, inplace=True)
         df_experiments.rename(columns={"sample_name": "sample_alias"}, inplace=True)
 
+        ena_config = config_json.get_configuration("ENA_configuration")
         schema_dataframe = {}
-        schema_dataframe["study"] = df_study
         schema_dataframe["sample"] = df_samples
         schema_dataframe["run"] = df_run
         schema_dataframe["experiment"] = df_experiments
-
         schema_targets = extract_targets(self.action, schema_dataframe)
 
-        if self.action == "ADD" or self.action == "add":
+        if ena_config["study_id"] is not None:
+            schema_dataframe["study"] = df_study
+
+        if self.action == "ADD" or self.action == "add" or self.action == "modify":
             file_paths = {}
 
             for path in df_run["r1_fastq_filepath"]:
                 file_paths[os.path.basename(path)] = os.path.abspath(path)
 
             # submit data to webin ftp server
-            if self.dev:
-                log.error(
-                    "No files will be uploaded, remove `--no_data_upload' argument to perform upload."
-                )
-            else:
+            submit_data(file_paths, self.passwd, self.user)
 
-                submit_data(file_paths, self.passwd, self.user)
             # when ADD/MODIFY,
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
             # schema_xmls record XMLs for all these schema and following 'submission'
-            config_json = ConfigJson()
-            import pdb
 
-            pdb.set_trace()
             tool = config_json.get_configuration("tool")
-            # tool = {"tool_name": "ena-upload-cli", "tool_version": "1.0"}
-            checklist = config_json.get_configuration("checklist")
 
+            print(checklist)
             schema_xmls = run_construct(
                 template_path, schema_targets, self.center, checklist, tool
             )
 
             # submission_xml = construct_submission(template_path, self.action, schema_xmls, self.center, checklist, tool)
-            construct_submission(
+            submission_xml = construct_submission(
                 template_path, self.action, schema_xmls, self.center, checklist, tool
             )
-            import pdb
+            schema_xmls["submission"] = submission_xml
 
-            pdb.set_trace()
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
             else:
                 url = "https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
 
             print(f"\nSubmitting XMLs to ENA server: {url}")
-            receipt = send_schemas(schema_xmls, url, self.passwd, self.user).text
+            receipt = send_schemas(schema_xmls, url, self.user, self.passwd).text
             print("Printing receipt to ./receipt.xml")
 
             with open("receipt.xml", "w") as fw:
