@@ -1,5 +1,6 @@
 import logging
 from tkinter.tix import CheckList
+from numpy import empty
 import rich.console
 import json
 
@@ -176,13 +177,24 @@ class EnaUpload:
         df_experiments.rename(columns={"study_title": "title"}, inplace=True)
         df_experiments.rename(columns={"sample_name": "sample_alias"}, inplace=True)
 
-        schema_dataframe = {}
-        schema_dataframe["study"] = df_study
-        schema_dataframe["sample"] = df_samples
-        schema_dataframe["run"] = df_run
-        schema_dataframe["experiment"] = df_experiments
+        config_json = ConfigJson()
+        ena_config = config_json.get_configuration("ENA_configuration")
 
-        schema_targets = extract_targets(self.action, schema_dataframe)
+        if ena_config["study_id"] is empty:
+            schema_dataframe = {}
+            schema_dataframe["study"] = df_study
+            schema_dataframe["sample"] = df_samples
+            schema_dataframe["run"] = df_run
+            schema_dataframe["experiment"] = df_experiments
+
+            schema_targets = extract_targets(self.action, schema_dataframe)
+        else:
+            schema_dataframe = {}
+            schema_dataframe["sample"] = df_samples
+            schema_dataframe["run"] = df_run
+            schema_dataframe["experiment"] = df_experiments
+
+            schema_targets = extract_targets(self.action, schema_dataframe)
 
         if self.action == "ADD" or self.action == "add":
             file_paths = {}
@@ -196,7 +208,6 @@ class EnaUpload:
             # when ADD/MODIFY,
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
             # schema_xmls record XMLs for all these schema and following 'submission'
-            config_json = ConfigJson()
 
             tool = config_json.get_configuration("tool")
             checklist = "ERC000011"
