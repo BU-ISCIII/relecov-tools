@@ -116,6 +116,9 @@ class EnaUpload:
         df_study = df_transposed[
             ["study_alias", "study_title", "study_type", "study_abstract"]
         ]
+        # df_study.columns.values[0] = "alias"
+        # df_study.columns.values[1] = "title"
+
         df_study.rename(columns={"study_alias": "alias"}, inplace=True)
         df_study.rename(columns={"study_title": "title"}, inplace=True)
         df_study.insert(3, "status", self.action)
@@ -138,9 +141,16 @@ class EnaUpload:
                 "isolate",
             ]
         ]
+        # df_samples.columns.values[0] = "alias"
+        # df_samples.columns.values[1] = "title"
+
         df_samples.rename(columns={"sample_name": "alias"}, inplace=True)
         df_samples.rename(columns={"sample_title": "title"}, inplace=True)
         df_samples.insert(3, "status", self.action)
+        config_json = ConfigJson()
+        checklist = config_json.get_configuration("checklist")
+        df_samples.insert(4, "ENA_CHECKLIST", checklist)
+
         df_run = df_transposed[
             [
                 "experiment_alias",
@@ -174,29 +184,24 @@ class EnaUpload:
         ]
         df_experiments.insert(3, "status", self.action)
         df_experiments.insert(4, "alias", df_experiments["experiment_alias"])
+
+        # df_experiments.columns.values[0] = "title"
+        # df_experiments.columns.values[1] = "sample_alias"
+
         df_experiments.rename(columns={"study_title": "title"}, inplace=True)
         df_experiments.rename(columns={"sample_name": "sample_alias"}, inplace=True)
 
-        config_json = ConfigJson()
         ena_config = config_json.get_configuration("ENA_configuration")
+        schema_dataframe = {}
+        schema_dataframe["sample"] = df_samples
+        schema_dataframe["run"] = df_run
+        schema_dataframe["experiment"] = df_experiments
+        schema_targets = extract_targets(self.action, schema_dataframe)
 
-        if ena_config["study_id"] is empty:
-            schema_dataframe = {}
+        if ena_config["study_id"] is not None:
             schema_dataframe["study"] = df_study
-            schema_dataframe["sample"] = df_samples
-            schema_dataframe["run"] = df_run
-            schema_dataframe["experiment"] = df_experiments
 
-            schema_targets = extract_targets(self.action, schema_dataframe)
-        else:
-            schema_dataframe = {}
-            schema_dataframe["sample"] = df_samples
-            schema_dataframe["run"] = df_run
-            schema_dataframe["experiment"] = df_experiments
-
-            schema_targets = extract_targets(self.action, schema_dataframe)
-
-        if self.action == "ADD" or self.action == "add":
+        if self.action == "ADD" or self.action == "add" or self.action == "modify":
             file_paths = {}
 
             for path in df_run["r1_fastq_filepath"]:
@@ -210,18 +215,17 @@ class EnaUpload:
             # schema_xmls record XMLs for all these schema and following 'submission'
 
             tool = config_json.get_configuration("tool")
-            checklist = "ERC000011"
-            # checklist = config_json.get_configuration("checklist")
+
             print(checklist)
             schema_xmls = run_construct(
                 template_path, schema_targets, self.center, checklist, tool
             )
-            print(schema_xmls)
 
             # submission_xml = construct_submission(template_path, self.action, schema_xmls, self.center, checklist, tool)
-            construct_submission(
+            submission_xml = construct_submission(
                 template_path, self.action, schema_xmls, self.center, checklist, tool
             )
+            schema_xmls["submission"] = submission_xml
 
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
