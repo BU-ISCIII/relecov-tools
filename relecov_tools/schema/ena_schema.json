@@ -8,7 +8,7 @@
     "host_scientific_name",
     "host_common_name",
     "instrument_model",
-    "tax_id",
+    "taxon_id",
     "scientific_name",
     "common_name",
     "sample_description",
@@ -732,7 +732,7 @@
         "experiments"
       ]
     },
-    "instrument_platform": {
+    "platform": {
       "examples": [
         "MinIon"
       ],
@@ -823,7 +823,7 @@
         "runs"
       ]
     },
-    "tax_id": {
+    "taxon_id": {
       "examples": [
         "probably 2697049 in all cases"
       ],
