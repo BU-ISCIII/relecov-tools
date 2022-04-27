@@ -236,7 +236,7 @@ class RelecovMetadata:
                     try:
                         sample_data_row[self.label_prop_dict[heading[idx]]] = row[
                             idx
-                        ].strftime("%Y/%m/%d")
+                        ].strftime("%Y-%m-%d")
                     except AttributeError:
                         if row[2] not in errors:
                             errors[row[2]] = {}
