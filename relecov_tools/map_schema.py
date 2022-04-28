@@ -187,7 +187,7 @@ class MappingSchema:
                     "library_kit"
                 ]
                 mapped_json_data[idx]["sample_name"] = self.json_data[idx][
-                    "sample_title"
+                    "collecting_lab_sample_id"
                 ]
                 mapped_json_data[idx]["study_type"] = self.json_data[idx][
                     "purpose_of_sampling"
