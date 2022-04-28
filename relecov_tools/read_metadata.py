@@ -124,7 +124,7 @@ class RelecovMetadata:
 
     def include_fields_already_set(self, row_sample):
         processed_data = {}
-        processed_data["collector_name"] = row_sample['author_submitter']
+        processed_data["collector_name"] = row_sample["author_submitter"]
 
         return processed_data
 
