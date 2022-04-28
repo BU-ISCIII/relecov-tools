@@ -100,6 +100,7 @@ class RelecovMetadata:
                 for key, value in lab.items():
                     data[key] = value
                 break
+
         for city in geo_loc_json:
             if city["geo_loc_city"] == data["geo_loc_city"]:
                 data["geo_loc_latitude"] = city["geo_loc_latitude"]
@@ -226,7 +227,7 @@ class RelecovMetadata:
         Convert the date colunms value to the dd/mm/yyyy format.
         Return list of dict with data, and errors
         """
-        exc_format_num = ["Host Age", "Sample ID given for sequencing"]
+        exc_format_num = ["Sample ID given for sequencing"]
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
         # removing the None columns in excel heading row
