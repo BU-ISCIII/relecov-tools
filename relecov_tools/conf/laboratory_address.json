@@ -1,5 +1,13 @@
 [
     {
+        "collecting_institution": "Instituto de Salud Carlos III ",
+        "collecting_institution_address": "Crta. Pozuelo Majadahonda S/N,",
+        "collecting_institution_email": "info@isciii.es",
+        "geo_loc_state": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain"
+    },
+    {
         "collecting_institution": "Microbiología HUC San Cecilio",
         "collecting_institution_address": "Av. del Conocimiento S/N,",
         "collecting_institution_email": "fegarcia@ugr.es",
