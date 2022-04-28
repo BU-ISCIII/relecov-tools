@@ -182,5 +182,21 @@
         "geo_loc_state": "",
         "geo_loc_city": "",
         "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "HU Virgen de la Arrixaca",
+        "collecting_institution_address": "Ctra. Madrid-Cartagena, s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Murcia",
+        "geo_loc_city": "Murcia",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "HU de Donostia",
+        "collecting_institution_address": "Begiristain Doktorea Pasealekua, s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "País Vasco",
+        "geo_loc_city": "Donostia",
+        "geo_loc_country": "Spain"
     }
 ]
