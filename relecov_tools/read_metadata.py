@@ -87,6 +87,14 @@ class RelecovMetadata:
     def get_laboratory_data(self, lab_json, geo_loc_json, lab_name):
         """Fetch the laboratory location  and return a dictionary"""
         data = {}
+        if lab_name == "":
+            data["geo_loc_city"] = ""
+            data["geo_loc_latitude"] = ""
+            data["geo_loc_longitude"] = ""
+            data["geo_loc_country"] = ""
+            stderr.print("[red] Empty Originating Laboratory.")
+            log.error("Found empti Originating Laboratory")
+            return data
         for lab in lab_json:
             if lab_name == lab["collecting_institution"]:
                 for key, value in lab.items():
