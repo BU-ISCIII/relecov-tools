@@ -119,8 +119,8 @@ class EnaUpload:
         # df_study.columns.values[0] = "alias"
         # df_study.columns.values[1] = "title"
 
-        df_study.rename(columns={"study_alias": "alias"}, inplace=True)
-        df_study.rename(columns={"study_title": "title"}, inplace=True)
+        df_study = df_study.rename(columns={"study_alias": "alias"})
+        df_study = df_study.rename(columns={"study_title": "title"})
         df_study.insert(3, "status", self.action)
         df_samples = df_transposed[
             [
@@ -144,8 +144,8 @@ class EnaUpload:
         # df_samples.columns.values[0] = "alias"
         # df_samples.columns.values[1] = "title"
 
-        df_samples.rename(columns={"sample_name": "alias"}, inplace=True)
-        df_samples.rename(columns={"sample_title": "title"}, inplace=True)
+        df_samples = df_samples.rename(columns={"sample_name": "alias"})
+        df_samples = df_samples.rename(columns={"sample_title": "title"})
         df_samples.insert(3, "status", self.action)
         config_json = ConfigJson()
         checklist = config_json.get_configuration("checklist")
@@ -188,8 +188,8 @@ class EnaUpload:
         # df_experiments.columns.values[0] = "title"
         # df_experiments.columns.values[1] = "sample_alias"
 
-        df_experiments.rename(columns={"study_title": "title"}, inplace=True)
-        df_experiments.rename(columns={"sample_name": "sample_alias"}, inplace=True)
+        df_experiments = df_experiments.rename(columns={"study_title": "title"})
+        df_experiments = df_experiments.rename(columns={"sample_name": "sample_alias"})
 
         ena_config = config_json.get_configuration("ENA_configuration")
         schema_dataframe = {}
@@ -201,14 +201,15 @@ class EnaUpload:
         if ena_config["study_id"] is not None:
             schema_dataframe["study"] = df_study
 
-        if self.action == "ADD" or self.action == "add" or self.action == "modify":
+        if self.action == "ADD" or self.action == "add":
             file_paths = {}
 
             for path in df_run["r1_fastq_filepath"]:
                 file_paths[os.path.basename(path)] = os.path.abspath(path)
 
             # submit data to webin ftp server
-            submit_data(file_paths, self.passwd, self.user)
+            chec = submit_data(file_paths, self.passwd, self.user)
+            print(chec)
 
             # when ADD/MODIFY,
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
