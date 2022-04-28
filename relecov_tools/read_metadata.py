@@ -122,6 +122,12 @@ class RelecovMetadata:
         fixed_data.update(self.configuration.get_configuration("ENA_configuration"))
         return fixed_data
 
+    def include_fields_already_set(self, row_sample):
+        processed_data = {}
+        processed_data["collector_name"] = row_sample['author_submitter']
+
+        return processed_data
+
     def include_processed_data(self, metadata):
         """Include the data that requires to be processed to set the value"""
         new_data = {}
@@ -196,6 +202,9 @@ class RelecovMetadata:
             """
             row_sample.update(self.include_fixed_data())
 
+            """ Add fields that are already in other fields
+            """
+            row_sample.update(self.include_fields_already_set(row_sample))
             """Add information which requires processing
             """
             row_sample.update(self.include_processed_data(row_sample))
