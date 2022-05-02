@@ -63,11 +63,14 @@ class RestApi:
                     req.status_code,
                 )
                 stderr.print(
-                    f"[red] Unable to post data. Received error {req.status_code}"
+                    f"[red] Unable to post data because  {req.text}"
+                )
+                stderr.print(
+                    f"[red] Received error {req.status_code}"
                 )
                 # sys.exit(1)
                 return {"ERROR": req.status_code}
-            return {"Success": req.data}
+            return {"Success": req.text}
         except requests.ConnectionError:
             log.error("Unable to open connection towards %s", self.server)
             stderr.print("[red] Unable to open connection towards ", self.server)

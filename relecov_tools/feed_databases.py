@@ -166,7 +166,11 @@ class FeedDatabases:
                     log.error("Found %s when mapping data for sending to iSkyLIMS")
                     stderr.print(f"[red]  {e} not found in mapping")
                     sys.exit(1)
-            iskylims_data["project"] = self.iskylims_settings["project_name"]
+            # add fxxed valuurs before sending request
+            iskylims_data["patientCore"] = ""
+            iskylims_data["sampleLocation"] = ""
+            iskylims_data["onlyRecorded"] = "Yes"
+            iskylims_data["sampleProject"] = self.iskylims_settings["project_name"]
             result = self.iskylims_rest_api.post_request(
                 json.dumps(iskylims_data),
                 {"user": self.user, "pass": self.passwd},
@@ -190,15 +194,13 @@ class FeedDatabases:
                         stderr.print("[red] Unable to sent the request to iSkyLIMS")
                         sys.exit(1)
                 else:
-                    log.error("Unable to sent the request to iSkyLIMS")
+                    log.error("Request to iSkyLIMS was not accepted")
                     stderr.print(
                         f"[red] Error {result['ERROR']} when sending request to iSkyLIMS "
                     )
                     sys.exit(1)
-            import pdb
 
-            pdb.set_trace()
-            log.info("stored data in iskylims %s", sample["sampleName"])
+            log.info("stored data in iskylims for sample %s", iskylims_data["sampleName"])
             # send request to releco-latform
             relecov_data = {}
             for label, value in sample.items():
