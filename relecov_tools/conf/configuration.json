@@ -46,44 +46,32 @@
             "token": ""
         }
     },
-    "iskylims_sample_fields": [
-        [
-            "patientCore",
-            "collector_name"
-        ],
-        [
-            "sampleName",
-            "collecting_lab_sample_id"
-        ],
-        [
-            "labRequest",
-            "collecting_institution"
-        ],
-        [
-            "sampleType",
-            "anatomical_material"
-        ],
-        [
-            "species",
-            "host_common_name"
-        ],
-        [
-            "sampleEntryDate",
-            "sample_received_date"
-        ],
-        [
-            "sampleCollectionDate",
-            "sample_collection_date"
-        ]
-    ],
+    "iskylims_sample_fields": {
+        "patientCore": "collector_name",
+        "sampleName": "collecting_lab_sample_id",
+        "labRequest": "collecting_institution",
+        "sampleType": "anatomical_material",
+        "species": "host_common_name",
+        "sampleEntryDate": "sample_received_date",
+        "sampleCollectionDate": "sample_collection_date"
+    },
     "iskylims_fixed_values": {
         "sampleProject": "Relecov",
         "onlyRecorded": "Yes",
         "sampleLocation": "Not defined"
     },
+    "relecov_metadata":[
+        "collecting_lab_sample_id",
+        "sequencing_sample_id",
+        "biosample_accession_ENA",
+        "virus_name",
+        "gisaid_id",
+        "sequencing_date"
+    ],
     "tool": {
         "tool_name": "ena-upload-cli",
         "tool_version": "0.5.3"
     },
     "checklist": "ERC000033"
+
 }
