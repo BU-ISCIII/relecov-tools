@@ -51,25 +51,24 @@ class RestApi:
             log.error("Unable to open connection towards %s", self.server)
             return False
 
-    def post_request(self, data, credentials):
+    def post_request(self, data, credentials, url):
         if isinstance(credentials, dict):
             auth = (credentials["user"], credentials["pass"])
+        url_http = str(self.request_url + url)
         try:
-            req = requests.post(
-                self.request_url, data=data, headers=self.headers, auth=auth
-            )
+            req = requests.post(url_http, data=data, headers=self.headers, auth=auth)
             if req.status_code != 201:
                 log.error(
-                    "Unable to store parameters. Received error code %s",
+                    "Unable to post parameters. Received error code %s",
                     req.status_code,
                 )
                 stderr.print(
-                    "[red] Unable to store data. Received error ", req.status_code
+                    f"[red] Unable to post data. Received error {req.status_code}"
                 )
-                sys.exit(1)
-            return True
+                # sys.exit(1)
+                return {"ERROR": req.status_code}
+            return {"Success": req.data}
         except requests.ConnectionError:
             log.error("Unable to open connection towards %s", self.server)
             stderr.print("[red] Unable to open connection towards ", self.server)
             return {"ERROR": "Server not available"}
-        return {"Success": "Data are store in requested server"}
