@@ -87,11 +87,20 @@ class RelecovMetadata:
     def get_laboratory_data(self, lab_json, geo_loc_json, lab_name):
         """Fetch the laboratory location  and return a dictionary"""
         data = {}
+        if lab_name == "":
+            data["geo_loc_city"] = ""
+            data["geo_loc_latitude"] = ""
+            data["geo_loc_longitude"] = ""
+            data["geo_loc_country"] = ""
+            stderr.print("[red] Empty Originating Laboratory.")
+            log.error("Found empti Originating Laboratory")
+            return data
         for lab in lab_json:
             if lab_name == lab["collecting_institution"]:
                 for key, value in lab.items():
                     data[key] = value
                 break
+
         for city in geo_loc_json:
             if city["geo_loc_city"] == data["geo_loc_city"]:
                 data["geo_loc_latitude"] = city["geo_loc_latitude"]
@@ -112,6 +121,12 @@ class RelecovMetadata:
         }
         fixed_data.update(self.configuration.get_configuration("ENA_configuration"))
         return fixed_data
+
+    def include_fields_already_set(self, row_sample):
+        processed_data = {}
+        processed_data["collector_name"] = row_sample["author_submitter"]
+
+        return processed_data
 
     def include_processed_data(self, metadata):
         """Include the data that requires to be processed to set the value"""
@@ -187,6 +202,9 @@ class RelecovMetadata:
             """
             row_sample.update(self.include_fixed_data())
 
+            """ Add fields that are already in other fields
+            """
+            row_sample.update(self.include_fields_already_set(row_sample))
             """Add information which requires processing
             """
             row_sample.update(self.include_processed_data(row_sample))
@@ -218,7 +236,7 @@ class RelecovMetadata:
         Convert the date colunms value to the dd/mm/yyyy format.
         Return list of dict with data, and errors
         """
-        exc_format_num = ["Host Age", "Sample ID given for sequencing"]
+        exc_format_num = ["Sample ID given for sequencing"]
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
         # removing the None columns in excel heading row
@@ -236,7 +254,7 @@ class RelecovMetadata:
                     try:
                         sample_data_row[self.label_prop_dict[heading[idx]]] = row[
                             idx
-                        ].strftime("%Y/%m/%d")
+                        ].strftime("%Y-%m-%d")
                     except AttributeError:
                         if row[2] not in errors:
                             errors[row[2]] = {}

@@ -1,6 +1,4 @@
 import logging
-from tkinter.tix import CheckList
-from numpy import empty
 import rich.console
 import json
 
@@ -9,7 +7,6 @@ import sys
 import os
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
-from lxml import etree
 
 from ena_upload.ena_upload import extract_targets
 from ena_upload.ena_upload import submit_data

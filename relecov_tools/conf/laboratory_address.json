@@ -1,5 +1,13 @@
 [
     {
+        "collecting_institution": "Instituto de Salud Carlos III ",
+        "collecting_institution_address": "Crta. Pozuelo Majadahonda S/N,",
+        "collecting_institution_email": "info@isciii.es",
+        "geo_loc_state": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain"
+    },
+    {
         "collecting_institution": "Microbiología HUC San Cecilio",
         "collecting_institution_address": "Av. del Conocimiento S/N,",
         "collecting_institution_email": "fegarcia@ugr.es",
@@ -153,26 +161,57 @@
     },
     {
         "collecting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
-        "collecting_institution_address": "",
+        "collecting_institution_address": "Carrer de la Selva, 10",
         "collecting_institution_email": "",
-        "geo_loc_state": "",
-        "geo_loc_city": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Banc de Sang i Teixits Catalunya",
-        "collecting_institution_address": "",
-        "geo_loc_country" : "Spain",
-        "geo_loc_state": "",
-        "geo_loc_city": "",
+        "collecting_institution_address": "Passeig del Taulat, 116",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Unitat de Genòmica i Medicina Personalitzada - Hospital Dr. Josep Trueta",
-        "collecting_institution_address": "",
+        "collecting_institution_address": "Avinguda de França, S/N,",
         "collecting_institution_email": "",
-        "geo_loc_state": "",
-        "geo_loc_city": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_city": "Girona",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "Hospital Universitario de Ceuta",
+        "collecting_institution_address": "Colmenar s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Ceuta",
+        "geo_loc_city": "Ceuta",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "Hospital de Mostoles",
+        "collecting_institution_address": "C. Dr. Luis Montes, S/N ",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "HU Virgen de la Arrixaca",
+        "collecting_institution_address": "Ctra. Madrid-Cartagena, s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Murcia",
+        "geo_loc_city": "Murcia",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "HU de Donostia",
+        "collecting_institution_address": "Begiristain Doktorea Pasealekua, s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "País Vasco",
+        "geo_loc_city": "Donostia",
         "geo_loc_country": "Spain"
     }
 ]

@@ -2,6 +2,7 @@
 import sys
 import os
 import jsonschema
+import json
 import logging
 import rich.console
 from jsonschema import Draft202012Validator
@@ -106,10 +107,9 @@ class FeedDatabases:
         map_list = {}  # key is the label,  value the property
         for prop, values in self.schema["properties"].items():
             try:
-                self.label_prop_dict[values["label"]] = prop
+                label_prop_dict[values["label"]] = prop
             except KeyError:
                 continue
-
         for field in s_project_fields:
             try:
                 map_list[field] = label_prop_dict[field]
@@ -142,7 +142,8 @@ class FeedDatabases:
                 "[red] Unable to fetch data. Received error ", s_project["ERROR"]
             )
             sys.exit(1)
-        s_project_fields = list(s_project.values())
+        s_project_fields = [x["sampleProjectFieldName"] for x in s_project["DATA"]]
+
         sample_fields["iskylims_s_fields"].update(
             self.mapping_sample_project_fields(s_project_fields)
         )
@@ -153,27 +154,61 @@ class FeedDatabases:
         """Split the information in the input json to populate iSkyLIMS and
         Relecov platform
         """
-        for sample in self.json_file:
+        for sample in self.json_data:
             iskylims_data = {}
-            for label, value in sample_fields["iskylims_s_fields"]:
-                iskylims_data[label] = sample[value]
+            for label, value in sample_fields["iskylims_s_fields"].items():
+                try:
+                    iskylims_data[label] = sample[value]
+                except KeyError as e:
+                    import pdb
+
+                    pdb.set_trace()
+                    log.error("Found %s when mapping data for sending to iSkyLIMS")
+                    stderr.print(f"[red]  {e} not found in mapping")
+                    sys.exit(1)
+            # add fxxed valuurs before sending request
+            iskylims_data["patientCore"] = ""
+            iskylims_data["sampleLocation"] = ""
+            iskylims_data["onlyRecorded"] = "Yes"
+            iskylims_data["sampleProject"] = self.iskylims_settings["project_name"]
             result = self.iskylims_rest_api.post_request(
-                iskylims_data, {"user": self.user, "passwd": self.passwd}
+                json.dumps(iskylims_data),
+                {"user": self.user, "pass": self.passwd},
+                self.iskylims_settings["store_samples"],
             )
             if "ERROR" in result:
-                for i in range(10):
-                    # wait 5 sec before resending the request
-                    time.sleep(5)
-                    result = self.iskylims_rest_api.post_request(
-                        iskylims_data, {"user": self.user, "passwd": self.passwd}
+                if result["ERROR"] == "Server not available":
+                    # retry to connect to server
+                    for i in range(10):
+                        # wait 5 sec before resending the request
+                        time.sleep(5)
+                        result = self.iskylims_rest_api.post_request(
+                            iskylims_data,
+                            {"user": self.user, "passwd": self.passwd},
+                            self.iskylims_settings["store_samples"],
+                        )
+                        if "ERROR" not in result:
+                            break
+                    if i == 9 and "ERROR" in result:
+                        log.error("Unable to sent the request to iSkyLIMS")
+                        stderr.print("[red] Unable to sent the request to iSkyLIMS")
+                        sys.exit(1)
+                else:
+                    log.error("Request to iSkyLIMS was not accepted")
+                    stderr.print(
+                        f"[red] Error {result['ERROR']} when sending request to iSkyLIMS "
                     )
-                    if "ERROR" not in result:
-                        break
-                if i == 9 and "ERROR" in result:
-                    log.error("Unable to sent the request to iSlyLIMS")
-                    stderr.print("[red] Unable to sent the request to iSlyLIMS")
                     sys.exit(1)
-            log.info("stored data in iskylims %s", sample["sampleName"])
+
+            log.info("stored data in iskylims for sample %s", iskylims_data["sampleName"])
+            # send request to releco-latform
+            relecov_data = {}
+            for label, value in sample.items():
+                if label not in sample_fields["iskylims_s_fields"]:
+                    relecov_data[label] = sample[value]
+            result = self.relecov_rest_api.post_request(
+                relecov_data, {"user": self.user, "passwd": self.passwd}
+            )
         return
 
     def store_data(self):

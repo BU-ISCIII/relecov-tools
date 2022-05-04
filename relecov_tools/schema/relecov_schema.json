@@ -744,18 +744,10 @@
         },
         "host_age": {
             "ontology": "GENEPIO:0001392",
-            "anyOf": [
-                {
-                    "type": "integer"
-                },
-                {
-                    "pattern": "\\d+-\\d+",
-                    "type": "string"
-                }
-            ],
+            "type": "string",
             "description": "Age of host at the time of sampling.",
             "examples": [
-                79
+                "79"
             ],
             "label": "Host Age"
         },
@@ -912,7 +904,7 @@
             "classification": "Sample collection and processing",
             "label": "Specimen source"
         },
-        "anatomical_part": {
+        "anatomical_material": {
             "Enums": [
                 "Anus [UBERON:0001245]",
                 "Duodenum [UBERON:0002114]",
@@ -3233,7 +3225,8 @@
             "ontology": "NCIT:C25284",
             "type": "string",
             "description": "default must remain 'betacoronavirus'",
-            "classification": "Database Identifiers"
+            "classification": "Database Identifiers",
+            "label": "Type"
         }
     }
 }
