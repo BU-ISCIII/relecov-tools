@@ -5,3 +5,4 @@ relecov-tools validate -j relecov_tools/example_data/processed_METADATA_LAB_TEST
 relecov-tools map -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -d ENA -o /tmp
 relecov-tools map -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -d GISAID -o /tmp
 relecov-tools update-db -i http://iskylims.isciiides.es/wetlab/api -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json
+relecov-tools update-db -i http://localhost:8001/wetlab/api -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json -u admin -p Apple@123

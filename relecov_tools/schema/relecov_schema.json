@@ -43,6 +43,7 @@
             "ontology": "GENEPIO:0001153",
             "type": "string",
             "description": "The name of the agency that collected the original sample.",
+            "classification": "Sample collection and processing",
             "label": "Originating Laboratory"
         },
         "submitting_institution": {
@@ -52,6 +53,7 @@
             "ontology": "GENEPIO:0001159",
             "type": "string",
             "description": "The name of the agency that generated the sequence.",
+            "classification": "Sample collection and processing",
             "label": "Submitting Institution"
         },
         "sample_collection_date": {
@@ -62,6 +64,7 @@
             "type": "string",
             "description": "The date on which the sample was collected.",
             "format": "date",
+            "classification": "Sample collection and processing",
             "label": "Sample Collection Date"
         },
         "host_subject_id": {
@@ -152,7 +155,7 @@
                 "Eswatini [GAZ:00001099]",
                 "Ethiopia [GAZ:00000567]",
                 "Europa Island [GAZ:00005811]",
-                "Falkland Islands (Islas Malvinas) [GAZ:00001412]",
+                "Falkland Islands [GAZ:00001412]",
                 "Faroe Islands [GAZ:00059206]",
                 "Fiji [GAZ:00006891]",
                 "Finland [GAZ:00002937]",
@@ -399,6 +402,7 @@
             "type": "string",
             "description": "The date on which the symptoms began or were first noted.",
             "format": "date",
+            "classification": "Host information",
             "label": "Symptom onset date"
         },
         "host_health_state": {
@@ -420,6 +424,7 @@
             "examples": [
                 "Asymptomatic [NCIT:C3833]"
             ],
+            "classification": "Host information",
             "label": "Host health state"
         },
         "host_health_status_details": {
@@ -443,6 +448,7 @@
             "examples": [
                 "Hospitalized (ICU) [GENEPIO:0100046]"
             ],
+            "classification": "Host information",
             "label": "Host health status details"
         },
         "host_scientific_name": {
@@ -493,7 +499,8 @@
             "examples": [
                 "COVID-19 [MONDO:0100096]"
             ],
-            "host_disease": "Host disease"
+            "classification": "Host information",
+            "label": "Host disease"
         },
         "sequencing_instrument_model": {
             "Enums": [
@@ -565,6 +572,7 @@
             "ontology": "GENEPIO_0000071",
             "type": "string",
             "description": "The model of the sequencing instrument used.",
+            "classification": "Sequencing",
             "label": "Sequencing Instrument Platform"
         },
         "submitting_lab_sequence_id": {
@@ -574,6 +582,7 @@
             "ontology": "0",
             "type": "string",
             "description": "Sample ID given by the submitting laboratory",
+            "classification": "Sequencing",
             "label": "Sample ID given by the submitting laboratory"
         },
         "bioproject_umbrella_accession_ENA": {
@@ -663,7 +672,8 @@
             "ontology": "GENEPIO:0001158",
             "type": "string",
             "description": "The mailing address of the agency submitting the sample.",
-            "classification": "Originating Laboratory Address"
+            "classification": "Sample collection and processing",
+            "label": "Originating Laboratory Address"
         },
         "submitting_institution_email": {
             "examples": [
@@ -672,7 +682,8 @@
             "ontology": "GENEPIO:0001165",
             "type": "string",
             "description": "The email address of the contact responsible for follow-up regarding the sequence.",
-            "classification": "Sample collection and processing"
+            "classification": "Sample collection and processing",
+            "label": "Submitting Institution Email"
         },
         "submitting_institution_address": {
             "examples": [
@@ -681,7 +692,8 @@
             "ontology": "GENEPIO:0001167",
             "type": "string",
             "description": "The mailing address of the agency submitting the sequence.",
-            "classification": "Sample collection and processing"
+            "classification": "Sample collection and processing",
+            "label": "Submitting Institution Address"
         },
         "sample_received_date": {
             "examples": [
@@ -733,6 +745,7 @@
             "examples": [
                 "/culture_collection=\"ATCC:26370\""
             ],
+            "classification": "Sample collection and processing",
             "label": "Culture collection"
         },
         "treatment": {
@@ -740,6 +753,7 @@
             "type": "string",
             "description": "Include drug name, dosage",
             "examples": [],
+            "classification": "Sample collection and processing",
             "label": "Treatment"
         },
         "host_age": {
@@ -1756,7 +1770,7 @@
             "ontology": "GENEPIO_0001995",
             "type": "string",
             "description": "The submitter's name for this library.",
-            "clasification": "Sequencing",
+            "classification": "Sequencing",
             "label": "Library Name",
             "table": [
                 "experiments"

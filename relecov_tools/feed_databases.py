@@ -201,11 +201,12 @@ class FeedDatabases:
                     sys.exit(1)
 
             log.info("stored data in iskylims for sample %s", iskylims_data["sampleName"])
-            # send request to releco-latform
+            # send request to releco-platform
             relecov_data = {}
             for label, value in sample.items():
                 if label not in sample_fields["iskylims_s_fields"]:
-                    relecov_data[label] = sample[value]
+                    relecov_data[label] = value
+            import pdb; pdb.set_trace()
             result = self.relecov_rest_api.post_request(
                 relecov_data, {"user": self.user, "passwd": self.passwd}
             )
