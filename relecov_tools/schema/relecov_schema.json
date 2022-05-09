@@ -2305,7 +2305,7 @@
         },
         "sequence_file_R2_fastq": {
             "examples": [
-                "ABC123_S1_L001_R2_001.fastq.gz"
+                "ABC123_S1_L001_R2_002.fastq.gz"
             ],
             "ontology": "GENEPIO:0001477",
             "type": "string",
