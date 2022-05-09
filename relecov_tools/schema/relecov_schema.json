@@ -2174,7 +2174,7 @@
             "ontology": "",
             "type": "string",
             "description": "",
-            "classification": "",
+            "classification": "Bioinformatics and QC metrics",
             "label": ""
         },
         "sequence_file_R1_fastq": {
@@ -2184,7 +2184,7 @@
             "ontology": "GENEPIO:0001476",
             "type": "string",
             "description": "The user-specified filename of the r1 FASTQ file.",
-            "classification": "",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Sequence file R1 fastq"
         },
         "sequence_file_R2_fastq": {
@@ -2194,7 +2194,7 @@
             "ontology": "GENEPIO:0001477",
             "type": "string",
             "description": "The user-specified filename of the r2 FASTQ file.",
-            "classification": "",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Sequence file R2 fastq"
         },
         "r1_fastq_filepath": {
@@ -2204,7 +2204,7 @@
             "ontology": "GENEPIO:0001478",
             "type": "string",
             "description": "The filepath of the r1 FASTQ file.",
-            "classification": "",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Filepath R1 fastq"
         },
         "r2_fastq_filepath": {
@@ -2214,7 +2214,7 @@
             "ontology": "GENEPIO:0001479",
             "type": "string",
             "description": "The filepath of the r2 FASTQ file.",
-            "classification": "",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Filepath R2 fastq"
         },
         "fast5_filename": {
@@ -2224,7 +2224,7 @@
             "ontology": "GENEPIO:0001480",
             "type": "string",
             "description": "The user-specified filename of the FAST5 file.",
-            "classification": "",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Filename fast5"
         },
         "fast5_filepath": {
@@ -2234,7 +2234,7 @@
             "ontology": "GENEPIO:0001481",
             "type": "string",
             "description": "The filepath of the FAST5 file.",
-            "classification": "",
+            "classification": "Bioinformatics and QC metrics",
             "label": "Filepath fast5"
         },
         "number_of_base_pairs_sequenced": {
@@ -2433,7 +2433,7 @@
             "ontology": "NCIT:C147139",
             "type": "string",
             "description": "",
-            "classification": "",
+            "classification": "Bioinformatics and QC metrics",
             "label": ""
         },
         "isolate_sample_id": {
@@ -2443,7 +2443,7 @@
             "ontology": "NCIT:C53471",
             "type": "string",
             "description": "",
-            "classification": "",
+            "classification": "Database Identifiers",
             "label": "Sample ID given if multiple rna-extraction or passages"
         },
         "variant_designation": {
