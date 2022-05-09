@@ -4,498 +4,438 @@
     "properties": {
         "dehosting_method": {
             "examples": [
-                ""
+                "Nanostripper"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001459",
+            "type": "string",
+            "description": "The method used to remove host reads from the pathogen sequence.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Dehosting Method"
         },
         "assembly": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "NCIT_C63548",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Assembly"
         },
         "if_assembly_other": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "If assembly Is Other, Specify"
         },
         "assembly_params": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Assambly params"
         },
         "variant_calling": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "operation_3227",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Variant Calling"
         },
         "if_variant_calling_other": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "If variant calling Is Other, Specify"
         },
         "variant_calling_params": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Variant Calling params"
         },
         "consensus_sequence_name": {
+            "ontology": "GENEPIO:0001460",
+            "type": "string",
+            "description": "The name of the consensus sequence.",
             "examples": [
-                ""
+                "ncov123assembly3"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Consensus sequence name"
         },
         "consensus_sequence_name_md5": {
+            "ontology": "NMR:1000568",
+            "type": "string",
+            "description": "The name of the consensus sequence.",
             "examples": [
-                ""
+                "ncov123assembly3"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Consensus sequence name md5"
         },
         "consensus_sequence_filepath": {
             "examples": [
-                ""
+                "/User/Documents/RespLab/Data/ncov123assembly.fasta"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001462",
+            "type": "string",
+            "description": "The filepath of the consesnsus sequence file.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Consensus sequence filepath"
         },
         "consensus_sequence_software_name": {
             "examples": [
-                ""
+                "Ivar"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001463",
+            "type": "string",
+            "description": "The name of software used to generate the consensus sequence.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Consensus sequence software name"
         },
         "if_consensus_other": {
             "examples": [
-                ""
+                "1.3"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "0",
+            "type": "string",
+            "description": "The version of the software used to generate the consensus sequence.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "If consensus Is Other, Specify"
         },
         "consensus_sequence_software_version": {
             "examples": [
-                ""
+                "1.3"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001469",
+            "type": "string",
+            "description": "The version of the software used to generate the consensus sequence.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Consensus sequence software version"
         },
         "consensus_criteria": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
-        },
-        "quality_control_metrics": {
-            "examples": [
-                ""
-            ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
-        },
-        "depth_of_coverage_value": {
-            "examples": [
-                ""
-            ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Consensus criteria"
         },
         "depth_of_coverage_threshold": {
             "examples": [
-                ""
+                "100x"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001475",
+            "type": "string",
+            "description": "The threshold used as a cut-off for the depth of coverage.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Depth of coverage threshold"
         },
         "number_of_base_pairs_sequenced": {
             "examples": [
-                ""
+                "387566"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001482",
+            "type": "string",
+            "description": "The number of total base pairs generated by the sequencing process.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Number of base pairs sequenced "
         },
         "consensus_genome_length": {
             "examples": [
-                ""
+                "38677"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001483",
+            "type": "string",
+            "description": "Size of the assembled genome described as the number of base pairs.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Consensus genome length"
+        },
+        "ns_per_100_kbp": {
+            "examples": [
+                "300"
+            ],
+            "ontology": "GENEPIO:0001484",
+            "type": "string",
+            "description": "The number of N symbols present in the consensus fasta sequence, per 100kbp of sequence.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Ns per 100 kbp"
         },
         "reference_genome_accession": {
             "examples": [
-                ""
+                "NC_045512.2"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001485",
+            "type": "string",
+            "description": "A persistent, unique identifier of a genome database entry.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Reference genome accession"
         },
         "bioinformatics_protocol": {
             "examples": [
-                ""
+                "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001489",
+            "type": "string",
+            "description": "The name  of the bioinformatics protocol used.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Bioinformatics protocol"
         },
-        "if_bioinformatic_protocol_other": {
+        "if_bioinformatic_protocol_is_other_specify": {
             "examples": [
-                ""
+                "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "0",
+            "type": "string",
+            "description": "The name  of the bioinformatics protocol used.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "If bioinformatic protocol Is Other, Specify"
         },
         "bioinformatic_protocol_version": {
             "examples": [
-                ""
+                "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "NCIT:C93490",
+            "type": "string",
+            "description": "The version number of the bioinformatics protocol used.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "bioinformatics protocol version"
         },
         "commercial/open-source/both": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Commercial/Open-source/both"
         },
         "preprocessing": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "MS_1002386",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Preprocessing"
         },
         "if_preprocessing_other": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "If preprocessing Is Other, Specify"
         },
         "preprocessing_params": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Preprocessing params"
         },
         "mapping": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "topic:0102",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Mapping"
         },
         "if_mapping_other": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "If mapping Is Other, Specify"
         },
         "mapping_params": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Mapping params"
         },
-        "lineage/clade_name": {
+        "lineage_name": {
             "examples": [
-                ""
+                "B.1.1.7"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001500",
+            "type": "string",
+            "description": "The name of the lineage or clade.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Lineage/clade name"
         },
-        "lineage/clade_analysis_software_name": {
+        "lineage_analysis_software_name": {
             "examples": [
-                ""
+                "Pangolin"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001501",
+            "type": "string",
+            "description": "The name of the software used to determine the lineage/clade.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "lineage/clade analysis software name"
         },
         "if_lineage_identification_other": {
             "examples": [
-                ""
+                "Other than Pangolin"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "0",
+            "type": "string",
+            "description": "The name of the software used to determine the lineage/clade.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "If lineage identification Is Other, Specify"
         },
-        "lineage/clade_analysis_software_version": {
+        "lineage_analysis_software_version": {
             "examples": [
-                ""
+                "2.1.10"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the software used to determine the lineage/clade.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Lineage/clade analysis software version"
         },
         "variant_designation": {
-            "examples": [
-                ""
+            "Enums": [
+                "Variant of Interest (VOI) [GENEPIO:0100082]",
+                "Variant of Concern (VOC) [GENEPIO:0100083]",
+                "Variant Under Monitoring (VUM) [GENEPIO:0100279]"
             ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "ontology": "GENEPIO:0001503",
+            "type": "string",
+            "description": "The variant classification of the lineage/clade i.e. variant, variant of concern.",
+            "examples": [
+                "Variant of Concern (VOC) [GENEPIO:0100083]"
+            ],
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Variant designation"
         },
-        "gene_name_1": {
+        "per_qc_filtered": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "%qc filtered"
         },
-        "%qc_filtered": {
+        "per_reads_host": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "%reads host"
         },
-        "%reads_host": {
+        "per_reads_virus": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "%reads virus"
         },
-        "%reads_virus": {
+        "per_unmapped": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "%unmapped"
         },
-        "%unmapped": {
+        "per_genome _greater_10x": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "% genome  greater 10x"
         },
-        "% genome _greater_10x": {
+        "median_depth_of_coverage_value": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "NCIT:C167285",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "mean depth of coverage value"
         },
-        "mean_depth_of_coverage_value": {
+        "per_Ns": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "%Ns"
         },
-        "%Ns": {
+        "number_of_variants_AF_greater_75percent": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Number of variants (AF greater 75%)"
         },
-        "Number_of_variants_(AF_greater_75%)": {
+        "number_of_variants_with_effect": {
             "examples": [
                 ""
             ],
-            "ontology": "",
-            "type": "",
+            "ontology": "0",
+            "type": "string",
             "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
-        },
-        "Numer_of_variants_with_effect": {
-            "examples": [
-                ""
-            ],
-            "ontology": "",
-            "type": "",
-            "description": "",
-            "clasification": "",
-            "label": "",
-            "table": []
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Number of variants with effect"
         },
         "long_table_path": {
             "examples": [

@@ -918,47 +918,6 @@
             "classification": "Sample collection and processing",
             "label": "Specimen source"
         },
-        "anatomical_material": {
-            "Enums": [
-                "Anus [UBERON:0001245]",
-                "Duodenum [UBERON:0002114]",
-                "Eye [UBERON:0000970]",
-                "Intestine [UBERON:0000160]",
-                "Lower respiratory tract [UBERON:0001558]",
-                "Bronchus [UBERON:0002185]",
-                "Lung [UBERON:0002048]",
-                "Bronchiole [UBERON:0002186]",
-                "Alveolar sac [UBERON:0002169]",
-                "Pleural sac [UBERON:0009778]",
-                "Pleural cavity [UBERON:0002402]",
-                "Trachea [UBERON:0003126]",
-                "Rectum [UBERON:0001052]",
-                "Skin [UBERON:0001003]",
-                "Stomach [UBERON:0000945]",
-                "Upper respiratory tract [UBERON:0001557]",
-                "Anterior Nares [UBERON:2001427]",
-                "Esophagus [UBERON:0001043]",
-                "Ethmoid sinus [UBERON:0002453]",
-                "Nasal Cavity [UBERON:0001707]",
-                "Middle Nasal Turbinate [UBERON:0005921]",
-                "Inferior Nasal Turbinate [UBERON:0005922]",
-                "Nasopharynx (NP) [UBERON:0001728]",
-                "Oropharynx (OP) [UBERON:0001729]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001211",
-            "type": "string",
-            "description": "An anatomical part of an organism e.g. oropharynx. ",
-            "examples": [
-                "Nasopharynx (NP) [UBERON:0001728]"
-            ],
-            "classification": "Sample collection and processing",
-            "label": "Specimen source"
-        },
         "body_product": {
             "Enums": [
                 "Breast Milk [UBERON:0001913]",
@@ -2602,7 +2561,7 @@
             "classification": "Bioinformatics and QC metrics",
             "label": "% genome  greater 10x"
         },
-        "mean_depth_of_coverage_value": {
+        "median_depth_of_coverage_value": {
             "examples": [
                 ""
             ],
