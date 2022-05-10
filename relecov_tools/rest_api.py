@@ -62,12 +62,8 @@ class RestApi:
                     "Unable to post parameters. Received error code %s",
                     req.status_code,
                 )
-                stderr.print(
-                    f"[red] Unable to post data because  {req.text}"
-                )
-                stderr.print(
-                    f"[red] Received error {req.status_code}"
-                )
+                stderr.print(f"[red] Unable to post data because  {req.text}")
+                stderr.print(f"[red] Received error {req.status_code}")
                 # sys.exit(1)
                 return {"ERROR": req.status_code}
             return {"Success": req.text}
