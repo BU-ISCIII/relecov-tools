@@ -25,7 +25,7 @@ stderr = rich.console.Console(
 
 
 class BioinfoMetadata:
-    def __init__(self, metadata_file=None, output_folder=None):
+    def __init__(self, metadata_file=None, input_folder=None, output_folder=None):
         if metadata_file is None:
             self.metadata_file = relecov_tools.utils.prompt_path(
                 msg="Select the excel file which contains metadata"
@@ -34,7 +34,9 @@ class BioinfoMetadata:
             self.metadata_file = metadata_file
         if not os.path.exists(self.metadata_file):
             log.error("Metadata file %s does not exist ", self.metadata_file)
-            stderr.print("[red] Metadata file " + self.meta_file + " does not exist")
+            stderr.print(
+                "[red] Metadata file " + self.metadata_file + " does not exist"
+            )
             sys.exit(1)
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
