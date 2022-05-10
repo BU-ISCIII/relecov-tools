@@ -304,7 +304,7 @@ def update_db(user, password, json, schema, iskylims, relecov):
     feed_databases.store_data()
 
 
-# metadata bioinformatics
+# read metadata bioinformatics
 @relecov_tools_cli.command(help_priority=3)
 @click.option(
     "-m",
@@ -312,19 +312,20 @@ def update_db(user, password, json, schema, iskylims, relecov):
     type=click.Path(),
     help="file containing metadata",
 )
+@click.option("-i", "--input-folder", type=click.Path(), help="Path to input files")
 @click.option(
     "-o", "--metadata-out", type=click.Path(), help="Path to save output  metadata file"
 )
-def bioinfo_metadata(metadata_file, metadata_out):
+def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
 
     new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        metadata_file, metadata_out
+        metadata_file, input_folder, metadata_out
     )
-    bioinfo_json = new_bioinfo_metadata.create_metadata_json()
-    return bioinfo_json
+
+    new_bioinfo_metadata.bioinfo_parse(metadata_file)
 
 
 if __name__ == "__main__":
