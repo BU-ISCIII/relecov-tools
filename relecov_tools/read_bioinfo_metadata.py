@@ -2,11 +2,9 @@
 # from itertools import islice
 
 # from geopy.geocoders import Nominatim
-import json
+# import json
 import logging
 from turtle import pd
-import pandas as pd
-from requests import head
 import rich.console
 from itertools import islice
 
@@ -75,6 +73,7 @@ class BioinfoMetadata:
             bioinfo_dict = {}
             bioinfo_dict["sample_name"] = sample_name
             bioinfo_dict["fastq_r1"] = fastq_r1
+            bioinfo_dict["fastq_r1"] = fastq_r2
             bioinfo_dict["dehosting_method_software_name"] = relecov_bioinfo_metadata[
                 "dehosting_method_software_name"
             ]  # software_versions.yml
