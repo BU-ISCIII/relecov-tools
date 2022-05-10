@@ -15,6 +15,7 @@ import relecov_tools.ena_upload
 import relecov_tools.json_validation
 import relecov_tools.map_schema
 import relecov_tools.feed_databases
+import relecov_tools.bioinfo_metadata
 
 log = logging.getLogger()
 
@@ -301,6 +302,28 @@ def update_db(user, password, json, schema, iskylims, relecov):
         user, password, json, schema, iskylims, relecov
     )
     feed_databases.store_data()
+
+
+# metadata bioinformatics
+@relecov_tools_cli.command(help_priority=3)
+@click.option(
+    "-m",
+    "--metadata_file",
+    type=click.Path(),
+    help="file containing metadata",
+)
+@click.option(
+    "-o", "--metadata-out", type=click.Path(), help="Path to save output  metadata file"
+)
+def bioinfo_metadata(metadata_file, metadata_out):
+    """
+    Create the json compliant  from the Bioinfo Metadata.
+    """
+    new_metadata = relecov_tools.bioinfo_metadata.BioinfoMetadata(
+        metadata_file, metadata_out
+    )
+    bioinfo_json = new_metadata.create_metadata_json()
+    return bioinfo_json
 
 
 if __name__ == "__main__":
