@@ -4,7 +4,8 @@
 # from geopy.geocoders import Nominatim
 # import json
 import logging
-from turtle import pd
+
+# from turtle import pd
 import rich.console
 from itertools import islice
 
