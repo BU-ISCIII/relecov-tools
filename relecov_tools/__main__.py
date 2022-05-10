@@ -329,9 +329,3 @@ def bioinfo_metadata(metadata_file, metadata_out):
 
 if __name__ == "__main__":
     run_relecov_tools()
-
-
-def read_metadata(metadata_file, sample_list_file, metadata_out):
-    """
-    Create the json compliant to the relecov schema from the Metadata file.
-    """
