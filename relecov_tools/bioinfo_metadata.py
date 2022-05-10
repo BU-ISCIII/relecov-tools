@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from itertools import islice
+# from itertools import islice
 
 # from geopy.geocoders import Nominatim
 import json
@@ -11,7 +11,8 @@ import openpyxl
 import os
 import sys
 import relecov_tools.utils
-from relecov_tools.config_json import ConfigJson
+
+# from relecov_tools.config_json import ConfigJson
 import relecov_tools.json_schema
 
 log = logging.getLogger(__name__)
