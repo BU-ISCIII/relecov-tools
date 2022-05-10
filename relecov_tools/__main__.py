@@ -9,13 +9,13 @@ import rich.logging
 import rich.traceback
 
 import relecov_tools.utils
-import relecov_tools.read_metadata
+import relecov_tools.read_lab_metadata
 import relecov_tools.sftp_handle
 import relecov_tools.ena_upload
 import relecov_tools.json_validation
 import relecov_tools.map_schema
 import relecov_tools.feed_databases
-import relecov_tools.bioinfo_metadata
+import relecov_tools.read_bioinfo_metadata
 
 log = logging.getLogger()
 
@@ -187,11 +187,11 @@ def download(user, password, conf_file):
 @click.option(
     "-o", "--metadata-out", type=click.Path(), help="Path to save output  metadata file"
 )
-def read_metadata(metadata_file, sample_list_file, metadata_out):
+def read_lab_metadata(metadata_file, sample_list_file, metadata_out):
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
-    new_metadata = relecov_tools.read_metadata.RelecovMetadata(
+    new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(
         metadata_file, sample_list_file, metadata_out
     )
     relecov_json = new_metadata.create_metadata_json()
@@ -304,7 +304,7 @@ def update_db(user, password, json, schema, iskylims, relecov):
     feed_databases.store_data()
 
 
-# metadata bioinformatics
+# read metadata bioinformatics
 @relecov_tools_cli.command(help_priority=3)
 @click.option(
     "-m",
@@ -312,19 +312,20 @@ def update_db(user, password, json, schema, iskylims, relecov):
     type=click.Path(),
     help="file containing metadata",
 )
+@click.option("-i", "--input-folder", type=click.Path(), help="Path to input files")
 @click.option(
     "-o", "--metadata-out", type=click.Path(), help="Path to save output  metadata file"
 )
-def bioinfo_metadata(metadata_file, metadata_out):
+def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
 
-    new_bioinfo_metadata = relecov_tools.bioinfo_metadata.BioinfoMetadata(
-        metadata_file, metadata_out
+    new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
+        metadata_file, input_folder, metadata_out
     )
-    bioinfo_json = new_bioinfo_metadata.create_metadata_json()
-    return bioinfo_json
+
+    new_bioinfo_metadata.bioinfo_parse(metadata_file)
 
 
 if __name__ == "__main__":
