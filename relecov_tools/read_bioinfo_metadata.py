@@ -4,7 +4,8 @@
 # from geopy.geocoders import Nominatim
 # import json
 import logging
-import yaml
+
+# import yaml
 
 # from turtle import pd
 import rich.console
@@ -111,10 +112,10 @@ class BioinfoMetadata:
 
             bioinfo_dict["if_consensus_other"] = None
             """
-            "dehosting_method": "", RENAMED to dehosting_software_name y dehosting_software_version
+            "dehosting_method": "" RENAMED to dehosting_software_name y dehosting_software_version, 
             "if_assembly_other": "",
             "assembly_params": "", 
-            "variant_calling": "", RENAMED to variant_calling_software_name y variant_calling_software_version
+            "variant_calling": "" RENAMED to variant_calling_software_name y variant_calling_software_version,
             "if_variant_calling_other": "",
             "variant_calling_params": "", 
             "consensus_sequence_name": "",
@@ -155,14 +156,11 @@ class BioinfoMetadata:
             "number_of_variants_with_effect": "",
             "long_table_path": ""
             """
-            """
-            path_software_version = os.path.join(
-            self.input_folder, "software_versions.yml"
-            )
-            with open(path_software_version) as file:
-                software_list = yaml.load(file, Loader=yaml.FullLoader)
 
-            """
+            # path_software_version = os.path.join(
+            # self.input_folder, "software_versions.yml")
+            # with open(path_software_version) as file:
+            # software_list = yaml.load(file, Loader=yaml.FullLoader)
 
             print(bioinfo_dict)
             import pdb
