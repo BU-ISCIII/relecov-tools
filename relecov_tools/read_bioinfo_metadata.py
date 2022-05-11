@@ -73,96 +73,43 @@ class BioinfoMetadata:
             sample_name = row[5]
             fastq_r1 = row[47]
             fastq_r2 = row[48]
+
             bioinfo_dict = {}
             bioinfo_dict["sample_name"] = sample_name
             bioinfo_dict["fastq_r1"] = fastq_r1
-            bioinfo_dict["fastq_r1"] = fastq_r2
-            bioinfo_dict["dehosting_method_software_name"] = relecov_bioinfo_metadata[
-                "dehosting_method_software_name"
-            ]  # software_versions.yml software_list["KRAKEN2_KRAKEN2"].keys(0)
-            bioinfo_dict[
-                "dehosting_method_software_version"
-            ] = relecov_bioinfo_metadata[
-                "dehosting_method_software_version"
-            ]  # software_versions.yml software_list["KRAKEN2_KRAKEN2"].values(0)
-            bioinfo_dict["assembly"] = None
-            bioinfo_dict["if_assembly_other"] = None
-            bioinfo_dict["assembly_params"] = None
-            bioinfo_dict["variant_calling_software_name"] = relecov_bioinfo_metadata[
-                "variant_calling_software_name"
-            ]  # software_versions.yml software_list["IVAR_VARIANTS"].keys(0)
-            bioinfo_dict["variant_calling_software_version"] = relecov_bioinfo_metadata[
-                "variant_calling_software_version"  # software_versions.yml software_list["IVAR_VARIANTS"].values(0)
-            ]
-            bioinfo_dict["variant_calling_params"] = relecov_bioinfo_metadata[
-                "variant_calling_params"
-            ]
-            # bioinfo_dict["consensus_sequence_name"]=
-            # bioinfo_dict["consensus_sequence_name_md5"]=
-            bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
+            bioinfo_dict["fastq_r2"] = fastq_r2
+        for key in relecov_bioinfo_metadata.keys():
+            bioinfo_dict[key] = relecov_bioinfo_metadata[key]
+        bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
+        bioinfo_dict["long_table_path"] = self.input_folder
+        """
+        # "dehosting_method_software_version" # NO HARCODED
+        # "variant_calling_software_version" # NO HARCODED
+        # "consensus_sequence_software_version" # NO HARCODED
+        # "bioinformatics_protocol_software_version" # NO HARCODED
+        # "preprocessing_software_version"# NO HARCODED
+        # "mapping_software_version" # NO HARCODED
+        # "lineage_analysis_software_version"
+        # "lineage_name": "" mapping_illumina
+        # "number_of_base_pairs_sequenced": "", # Input reads summary_variants_metrics_mqc.csv  * 2 * read length
+        # "consensus_genome_length": "", script que cuente el numero de nucleotidos tamaño del fasta
+        # "ns_per_100_kbp": "", summary_variants_metrics_mqc.csv
+        # "reference_genome_accession": "",
+        # bioinfo_dict["consensus_sequence_name"]=
+        # bioinfo_dict["consensus_sequence_name_md5"]=
+        # "variant_designation": "", pangolin csv parseo
+        # "per_qc_filtered": "", tabla stats
+        # "per_reads_host": "", tabla stats
+        # "per_reads_virus": "", tabla stats
+        # "per_unmapped": "", tabla stats
+        # "per_genome _greater_10x": "",  tabla stats
+        # "median_depth_of_coverage_value": "", tabla stats
+        # "per_Ns": "", tabla stats
+        # "number_of_variants_AF_greater_75percent": "", tabla stats
+        # "number_of_variants_with_effect": "", tabla stats
+        bioinfo_dict["long_table_path"] = self.input_folder
+        """
+        print(bioinfo_dict)
+        import pdb
 
-            bioinfo_dict["consensus_sequence_software_name"] = relecov_bioinfo_metadata[
-                "consensus_sequence_software_name"
-            ]  # software_versions.yml software_list["BCFTOOLS_CONSENSUS"].keys(0)
-            bioinfo_dict[
-                "consensus_sequence_software_version"
-            ] = relecov_bioinfo_metadata[
-                "consensus_sequence_software_version"  # software_versions.yml software_list["BCFTOOLS_CONSENSUS"].values(0)
-            ]
-
-            bioinfo_dict["if_consensus_other"] = None
-            """
-            "dehosting_method": "" RENAMED to dehosting_software_name y dehosting_software_version,
-            "if_assembly_other": "",
-            "assembly_params": "",
-            "variant_calling": "" RENAMED to variant_calling_software_name y variant_calling_software_version,
-            "if_variant_calling_other": "",
-            "variant_calling_params": "",
-            "consensus_sequence_name": "",
-            "consensus_sequence_name_md5": "",
-            "consensus_sequence_filepath": "",
-            "consensus_sequence_software_name": "",
-            "if_consensus_other": "",
-            "consensus_sequence_software_version": "",
-            "consensus_criteria": "", RENAMED to consensus_params
-            "depth_of_coverage_threshold": "",
-            "number_of_base_pairs_sequenced": "",
-            "consensus_genome_length": "",
-            "ns_per_100_kbp": "",
-            "reference_genome_accession": "",
-            "bioinformatics_protocol": "",
-            "if_bioinformatic_protocol_is_other_specify": "",
-            "bioinformatic_protocol_version": "",
-            "commercial/open-source/both": "",
-            "preprocessing": "",
-            "if_preprocessing_other": "",
-            "preprocessing_params": "",
-            "mapping": "",
-            "if_mapping_other": "",
-            "mapping_params": "",
-            "lineage_name": "",
-            "lineage_analysis_software_name": "",
-            "if_lineage_identification_other": "",
-            "lineage_analysis_software_version": "",
-            "variant_designation": "",
-            "per_qc_filtered": "",
-            "per_reads_host": "",
-            "per_reads_virus": "",
-            "per_unmapped": "",
-            "per_genome _greater_10x": "",
-            "median_depth_of_coverage_value": "",
-            "per_Ns": "",
-            "number_of_variants_AF_greater_75percent": "",
-            "number_of_variants_with_effect": "",
-            "long_table_path": ""
-            """
-
-            # path_software_version = os.path.join(
-            # self.input_folder, "software_versions.yml")
-            # with open(path_software_version) as file:
-            # software_list = yaml.load(file, Loader=yaml.FullLoader)
-
-            print(bioinfo_dict)
-            import pdb
-
-            pdb.set_trace()
+        pdb.set_trace()
