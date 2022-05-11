@@ -48,7 +48,7 @@ class BioinfoMetadata:
                 msg="Select the input folder"
             )
         else:
-            self.output_folder = output_folder
+            self.input_folder = output_folder
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
