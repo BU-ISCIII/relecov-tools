@@ -22,7 +22,12 @@ class RestApi:
         self.headers = {"content-type": "application/json"}
 
     def get_request(self, request_info, parameter, value, safe=True):
-        url_http = str(self.request_url + request_info + "?" + parameter + "=" + value)
+        if parameter == "" or parameter is None:
+            url_http = str(self.request_url + request_info)
+        else:
+            url_http = str(
+                self.request_url + request_info + "?" + parameter + "=" + value
+            )
         try:
             req = requests.get(url_http, headers=self.headers)
             if req.status_code != 200:
