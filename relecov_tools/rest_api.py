@@ -39,7 +39,6 @@ class RestApi:
                     stderr.print(
                         "[red] Unable to fetch data. Received error ", req.status_code
                     )
-                    sys.exit(1)
                 return {"ERROR": req.status_code}
             return {"DATA": json.loads(req.text)}
         except requests.ConnectionError:
@@ -69,7 +68,6 @@ class RestApi:
                 )
                 stderr.print(f"[red] Unable to post data because  {req.text}")
                 stderr.print(f"[red] Received error {req.status_code}")
-                # sys.exit(1)
                 return {"ERROR": req.status_code}
             return {"Success": req.text}
         except requests.ConnectionError:
