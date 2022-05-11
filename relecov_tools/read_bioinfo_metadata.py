@@ -80,6 +80,8 @@ class BioinfoMetadata:
             bioinfo_dict["fastq_r2"] = fastq_r2
         for key in relecov_bioinfo_metadata.keys():
             bioinfo_dict[key] = relecov_bioinfo_metadata[key]
+        bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
+        bioinfo_dict["long_table_path"] = self.input_folder
         """
         # "dehosting_method_software_version" # NO HARCODED
         # "variant_calling_software_version" # NO HARCODED
