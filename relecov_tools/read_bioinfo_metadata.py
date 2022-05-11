@@ -112,12 +112,12 @@ class BioinfoMetadata:
 
             bioinfo_dict["if_consensus_other"] = None
             """
-            "dehosting_method": "" RENAMED to dehosting_software_name y dehosting_software_version, 
+            "dehosting_method": "" RENAMED to dehosting_software_name y dehosting_software_version,
             "if_assembly_other": "",
-            "assembly_params": "", 
+            "assembly_params": "",
             "variant_calling": "" RENAMED to variant_calling_software_name y variant_calling_software_version,
             "if_variant_calling_other": "",
-            "variant_calling_params": "", 
+            "variant_calling_params": "",
             "consensus_sequence_name": "",
             "consensus_sequence_name_md5": "",
             "consensus_sequence_filepath": "",
