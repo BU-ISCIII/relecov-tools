@@ -76,41 +76,111 @@ class BioinfoMetadata:
             bioinfo_dict = {}
             bioinfo_dict["sample_name"] = sample_name
             bioinfo_dict["fastq_r1"] = fastq_r1
-            bioinfo_dict["fastq_r1"] = fastq_r2
+            bioinfo_dict["fastq_r2"] = fastq_r2
             bioinfo_dict["dehosting_method_software_name"] = relecov_bioinfo_metadata[
                 "dehosting_method_software_name"
-            ]  # software_versions.yml software_list["KRAKEN2_KRAKEN2"].keys(0)
+            ]
             bioinfo_dict[
                 "dehosting_method_software_version"
-            ] = relecov_bioinfo_metadata[
-                "dehosting_method_software_version"
-            ]  # software_versions.yml software_list["KRAKEN2_KRAKEN2"].values(0)
-            bioinfo_dict["assembly"] = None
-            bioinfo_dict["if_assembly_other"] = None
-            bioinfo_dict["assembly_params"] = None
+            ] = relecov_bioinfo_metadata["dehosting_method_software_version"]
+            bioinfo_dict["assembly"] = relecov_bioinfo_metadata["assembly"]
+            bioinfo_dict["if_assembly_other"] = relecov_bioinfo_metadata[
+                "if_assembly_other"
+            ]
+            bioinfo_dict["assembly_params"] = relecov_bioinfo_metadata[
+                "assembly_params"
+            ]
             bioinfo_dict["variant_calling_software_name"] = relecov_bioinfo_metadata[
                 "variant_calling_software_name"
-            ]  # software_versions.yml software_list["IVAR_VARIANTS"].keys(0)
+            ]
             bioinfo_dict["variant_calling_software_version"] = relecov_bioinfo_metadata[
-                "variant_calling_software_version"  # software_versions.yml software_list["IVAR_VARIANTS"].values(0)
+                "variant_calling_software_version"
             ]
             bioinfo_dict["variant_calling_params"] = relecov_bioinfo_metadata[
                 "variant_calling_params"
             ]
             # bioinfo_dict["consensus_sequence_name"]=
             # bioinfo_dict["consensus_sequence_name_md5"]=
+
             bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
 
             bioinfo_dict["consensus_sequence_software_name"] = relecov_bioinfo_metadata[
                 "consensus_sequence_software_name"
-            ]  # software_versions.yml software_list["BCFTOOLS_CONSENSUS"].keys(0)
+            ]
             bioinfo_dict[
                 "consensus_sequence_software_version"
-            ] = relecov_bioinfo_metadata[
-                "consensus_sequence_software_version"  # software_versions.yml software_list["BCFTOOLS_CONSENSUS"].values(0)
+            ] = relecov_bioinfo_metadata["consensus_sequence_software_version"]
+            bioinfo_dict["if_consensus_other"] = relecov_bioinfo_metadata[
+                "if_consensur_other"
             ]
-
-            bioinfo_dict["if_consensus_other"] = None
+            bioinfo_dict["consensus_params"] = relecov_bioinfo_metadata[
+                "consensus_params"
+            ]
+            bioinfo_dict["depth_of_coverage_threshold"] = relecov_bioinfo_metadata[
+                "depth_of_coverage_threshold"
+            ]
+            bioinfo_dict["depth_of_coverage_threshold"] = relecov_bioinfo_metadata[
+                "depth_of_coverage_threshold"
+            ]
+            # "number_of_base_pairs_sequenced": "",
+            # "consensus_genome_length": "",
+            # "ns_per_100_kbp": "",
+            # "reference_genome_accession": "",
+            bioinfo_dict[
+                "bioinformatics_protocol_software_name"
+            ] = relecov_bioinfo_metadata["bioinformatics_protocol_software_name"]
+            bioinfo_dict[
+                "bioinformatics_protocol_software_version"
+            ] = relecov_bioinfo_metadata["bioinformatics_protocol_software_version"]
+            bioinfo_dict[
+                "if_bioinformatic_protocol_is_other_specify"
+            ] = relecov_bioinfo_metadata["if_bioinformatic_protocol_is_other_specify"]
+            bioinfo_dict["commercial_open_source_both"] = relecov_bioinfo_metadata[
+                "commercial_open_source_both"
+            ]
+            bioinfo_dict["preprocessing_software_name"] = relecov_bioinfo_metadata[
+                "preprocessing_software_name"
+            ]
+            bioinfo_dict["preprocessing_software_version"] = relecov_bioinfo_metadata[
+                "preprocessing_software_version"
+            ]
+            bioinfo_dict["if_preprocessing_other"] = relecov_bioinfo_metadata[
+                "if_preprocessing_other"
+            ]
+            bioinfo_dict["preprocessing_params"] = relecov_bioinfo_metadata[
+                "preprocessing_params"
+            ]
+            bioinfo_dict["mapping_software_name"] = relecov_bioinfo_metadata[
+                "mapping_software_name"
+            ]
+            bioinfo_dict["mapping_software_version"] = relecov_bioinfo_metadata[
+                "mapping_software_version"
+            ]
+            bioinfo_dict["if_mapping_other"] = relecov_bioinfo_metadata[
+                "if_mapping_other"
+            ]
+            bioinfo_dict["mapping_params"] = relecov_bioinfo_metadata["mapping_params"]
+            # "lineage_name": ""
+            bioinfo_dict["lineage_analysis_software_name"] = relecov_bioinfo_metadata[
+                "lineage_analysis_software_name"
+            ]
+            bioinfo_dict[
+                "lineage_analysis_software_version"
+            ] = relecov_bioinfo_metadata["lineage_analysis_software_version"]
+            bioinfo_dict["if_lineage_identification_other"] = relecov_bioinfo_metadata[
+                "if_lineage_identification_other"
+            ]
+            # "variant_designation": "",
+            # "per_qc_filtered": "",
+            # "per_reads_host": "",
+            # "per_reads_virus": "",
+            # "per_unmapped": "",
+            # "per_genome _greater_10x": "",
+            # "median_depth_of_coverage_value": "",
+            # "per_Ns": "",
+            # "number_of_variants_AF_greater_75percent": "",
+            # "number_of_variants_with_effect": "",
+            bioinfo_dict["long_table_path"] = self.input_folder
             """
             "dehosting_method": "" RENAMED to dehosting_software_name y dehosting_software_version,
             "if_assembly_other": "",
@@ -130,14 +200,14 @@ class BioinfoMetadata:
             "consensus_genome_length": "",
             "ns_per_100_kbp": "",
             "reference_genome_accession": "",
-            "bioinformatics_protocol": "",
+            "bioinformatics_protocol": "", RENAMED to "bioinformatics_protocol_software_name" 
             "if_bioinformatic_protocol_is_other_specify": "",
-            "bioinformatic_protocol_version": "",
-            "commercial/open-source/both": "",
-            "preprocessing": "",
+            "bioinformatic_protocol_version": "", RENAMED to "bioinformatics_protocol_software_version"
+            "commercial/open-source/both": "", RENAMED to "commercial_open_source_both"
+            "preprocessing": "", RENAMED to  "preprocessing_software_name" y "preprocessing_software_version"
             "if_preprocessing_other": "",
             "preprocessing_params": "",
-            "mapping": "",
+            "mapping": "", RENAMED to "mapping_software_name"  y ""mapping_software_version"
             "if_mapping_other": "",
             "mapping_params": "",
             "lineage_name": "",

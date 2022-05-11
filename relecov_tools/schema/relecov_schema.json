@@ -2083,7 +2083,7 @@
             "label": "Raw sequence data processin method",
             "fill_mode": "batch"
         },
-        "dehosting_method": {
+        "dehosting_software_name": {
             "examples": [
                 "Nanostripper"
             ],
@@ -2092,6 +2092,17 @@
             "description": "The method used to remove host reads from the pathogen sequence.",
             "classification": "Bioinformatics and QC metrics",
             "label": "Dehosting Method",
+            "fill_mode": "batch"
+        },
+        "dehosting_software_version": {
+            "examples": [
+                "2.4.1"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The method version used to remove host reads from the pathogen sequence.",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Dehosting Method Version",
             "fill_mode": "batch"
         },
         "personal_protective_equipment": {
@@ -2138,7 +2149,7 @@
             "label": "Assambly params",
             "fill_mode": "batch"
         },
-        "variant_calling": {
+        "variant_calling_software_name": {
             "examples": [
                 ""
             ],
@@ -2147,6 +2158,17 @@
             "description": "",
             "classification": "Bioinformatics and QC metrics",
             "label": "Variant Calling",
+            "fill_mode": "batch"
+        },
+        "variant_calling_software_version": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Variant Calling Version",
             "fill_mode": "batch"
         },
         "if_variant_calling_other": {
@@ -2237,7 +2259,7 @@
             "label": "Consensus sequence software version",
             "fill_mode": "batch"
         },
-        "consensus_criteria": {
+        "consensus_params": {
             "examples": [
                 ""
             ],
@@ -2245,7 +2267,7 @@
             "type": "string",
             "description": "",
             "classification": "Bioinformatics and QC metrics",
-            "label": "Consensus criteria",
+            "label": "Consensus Params",
             "fill_mode": "batch"
         },
         "quality_control_metrics": {
@@ -2402,7 +2424,7 @@
             "label": "Reference genome accession",
             "fill_mode": "batch"
         },
-        "bioinformatics_protocol": {
+        "bioinformatics_protocol_software_name": {
             "examples": [
                 "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
             ],
@@ -2424,7 +2446,7 @@
             "label": "If bioinformatic protocol Is Other, Specify",
             "fill_mode": "batch"
         },
-        "bioinformatic_protocol_version": {
+        "bioinformatics_protocol_software_version": {
             "examples": [
                 "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
             ],
@@ -2435,7 +2457,7 @@
             "label": "bioinformatics protocol version",
             "fill_mode": "batch"
         },
-        "commercial/open-source/both": {
+        "commercial_open_source_both": {
             "examples": [
                 ""
             ],
@@ -2456,7 +2478,7 @@
             "label": "Sample plan name",
             "fill_mode": "batch"
         },
-        "preprocessing": {
+        "preprocessing_software_name": {
             "examples": [
                 ""
             ],
@@ -2465,6 +2487,17 @@
             "description": "",
             "classification": "Bioinformatics and QC metrics",
             "label": "Preprocessing",
+            "fill_mode": "batch"
+        },
+        "preprocessing_software_version": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Preprocessing Version",
             "fill_mode": "batch"
         },
         "if_preprocessing_other": {
@@ -2489,7 +2522,7 @@
             "label": "Preprocessing params",
             "fill_mode": "batch"
         },
-        "mapping": {
+        "mapping_software_name": {
             "examples": [
                 ""
             ],
@@ -2498,6 +2531,17 @@
             "description": "",
             "classification": "Bioinformatics and QC metrics",
             "label": "Mapping",
+            "fill_mode": "batch"
+        },
+        "mapping_software_version": {
+            "examples": [
+                ""
+            ],
+            "ontology": "topic:0102",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics",
+            "label": "Mapping Version",
             "fill_mode": "batch"
         },
         "if_mapping_other": {
