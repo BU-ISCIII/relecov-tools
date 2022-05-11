@@ -123,7 +123,6 @@ class BioinfoMetadata:
             "consensus_sequence_software_name": "",
             "if_consensus_other": "",
             "consensus_sequence_software_version": "",
-
             "consensus_criteria": "", RENAMED to consensus_params
             "depth_of_coverage_threshold": "",
             "number_of_base_pairs_sequenced": "",
@@ -155,13 +154,15 @@ class BioinfoMetadata:
             "number_of_variants_AF_greater_75percent": "",
             "number_of_variants_with_effect": "",
             "long_table_path": ""
-
+            """
             """
             path_software_version = os.path.join(
-                self.input_folder, "software_versions.yml"
+            self.input_folder, "software_versions.yml"
             )
             with open(path_software_version) as file:
                 software_list = yaml.load(file, Loader=yaml.FullLoader)
+
+            """
 
             print(bioinfo_dict)
             import pdb
