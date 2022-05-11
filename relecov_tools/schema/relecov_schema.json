@@ -2537,7 +2537,7 @@
             "examples": [
                 ""
             ],
-            "ontology": "topic:0102",
+            "ontology": "0",
             "type": "string",
             "description": "",
             "classification": "Bioinformatics and QC metrics",

@@ -181,56 +181,6 @@ class BioinfoMetadata:
             # "number_of_variants_AF_greater_75percent": "",
             # "number_of_variants_with_effect": "",
             bioinfo_dict["long_table_path"] = self.input_folder
-            """
-            "dehosting_method": "" RENAMED to dehosting_software_name y dehosting_software_version,
-            "if_assembly_other": "",
-            "assembly_params": "",
-            "variant_calling": "" RENAMED to variant_calling_software_name y variant_calling_software_version,
-            "if_variant_calling_other": "",
-            "variant_calling_params": "",
-            "consensus_sequence_name": "",
-            "consensus_sequence_name_md5": "",
-            "consensus_sequence_filepath": "",
-            "consensus_sequence_software_name": "",
-            "if_consensus_other": "",
-            "consensus_sequence_software_version": "",
-            "consensus_criteria": "", RENAMED to consensus_params
-            "depth_of_coverage_threshold": "",
-            "number_of_base_pairs_sequenced": "",
-            "consensus_genome_length": "",
-            "ns_per_100_kbp": "",
-            "reference_genome_accession": "",
-            "bioinformatics_protocol": "", RENAMED to "bioinformatics_protocol_software_name" 
-            "if_bioinformatic_protocol_is_other_specify": "",
-            "bioinformatic_protocol_version": "", RENAMED to "bioinformatics_protocol_software_version"
-            "commercial/open-source/both": "", RENAMED to "commercial_open_source_both"
-            "preprocessing": "", RENAMED to  "preprocessing_software_name" y "preprocessing_software_version"
-            "if_preprocessing_other": "",
-            "preprocessing_params": "",
-            "mapping": "", RENAMED to "mapping_software_name"  y ""mapping_software_version"
-            "if_mapping_other": "",
-            "mapping_params": "",
-            "lineage_name": "",
-            "lineage_analysis_software_name": "",
-            "if_lineage_identification_other": "",
-            "lineage_analysis_software_version": "",
-            "variant_designation": "",
-            "per_qc_filtered": "",
-            "per_reads_host": "",
-            "per_reads_virus": "",
-            "per_unmapped": "",
-            "per_genome _greater_10x": "",
-            "median_depth_of_coverage_value": "",
-            "per_Ns": "",
-            "number_of_variants_AF_greater_75percent": "",
-            "number_of_variants_with_effect": "",
-            "long_table_path": ""
-            """
-
-            # path_software_version = os.path.join(
-            # self.input_folder, "software_versions.yml")
-            # with open(path_software_version) as file:
-            # software_list = yaml.load(file, Loader=yaml.FullLoader)
 
             print(bioinfo_dict)
             import pdb
