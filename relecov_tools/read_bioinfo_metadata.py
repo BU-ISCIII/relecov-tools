@@ -1,22 +1,16 @@
 #!/usr/bin/env python
 # from itertools import islice
 
-# from geopy.geocoders import Nominatim
-# import json
+
 from importlib.resources import path
 import logging
-import glob
-from operator import contains
-import pathlib
 
-# import yaml
 
-# from turtle import pd
 import rich.console
 from itertools import islice
 import pandas as pd
 
-# from openpyxl import Workbook
+
 import openpyxl
 import os
 import sys
@@ -87,7 +81,6 @@ class BioinfoMetadata:
         variants_long_table = pd.read_csv(variants_long_table_path, sep=",")
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             # row = ws_metadata_lab[5]
-
             sample_name = row[5]
             fastq_r1 = row[47]
             fastq_r2 = row[48]
@@ -132,38 +125,20 @@ class BioinfoMetadata:
             bioinfo_dict["consensus_sequence_name"] = str(sample_name).join(
                 ".consensus.fa"
             )
-
-            """
-            
-            # 
-            # files_in_dir = os.listdir()
-            sample_files = sorted(
-                pathlib.Path(self.input_folder).glob(str(sample_name) + "*")
-            )
-
-            for i in sample_files:
-                if i.endswith(".consensus.fa"):
-                    bioinfo_dict["consensus_sequence_name"] = i
-                if "R1" in i and i.endswith(".md5"):
-                    bioinfo_dict["consensus_sequence_name_md5"] = i
-            """
             c = +1
             import pdb
 
             pdb.set_trace()
 
-            """                                                                                                                         
-             f = open(path_illumina_tab, "r")
-            lines = f.readlines()
-            lineages = []
-            lineage_index = lines[0].index("Lineage")
-            for line in range(1, len(lines)):
-               
-                line_split = lines.split("\t")
-                lineages.append(line_split[lineage_index])
-            """
-
-        """
+        """                                                                                                                         
+            f = open(path_illumina_tab, "r")
+        lines = f.readlines()
+        lineages = []
+        lineage_index = lines[0].index("Lineage")
+        for line in range(1, len(lines)):
+            
+            line_split = lines.split("\t")
+            lineages.append(line_split[lineage_index])
         # "dehosting_method_software_version" # NO HARCODED
         # "variant_calling_software_version" # NO HARCODED
         # "consensus_sequence_software_version" # NO HARCODED
