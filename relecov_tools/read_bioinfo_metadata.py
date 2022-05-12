@@ -2,7 +2,7 @@
 # from itertools import islice
 
 
-from importlib.resources import path
+# from importlib.resources import path
 import logging
 
 
@@ -129,16 +129,14 @@ class BioinfoMetadata:
             import pdb
 
             pdb.set_trace()
-
         """                                                                                                                         
-            f = open(path_illumina_tab, "r")
+        f = open(path_illumina_tab, "r")
         lines = f.readlines()
         lineages = []
         lineage_index = lines[0].index("Lineage")
-        for line in range(1, len(lines)):
-            
-            line_split = lines.split("\t")
-            lineages.append(line_split[lineage_index])
+        for line in range(1, len(lines))
+        line_split = lines.split("\t")
+        lineages.append(line_split[lineage_index])
         # "dehosting_method_software_version" # NO HARCODED
         # "variant_calling_software_version" # NO HARCODED
         # "consensus_sequence_software_version" # NO HARCODED
