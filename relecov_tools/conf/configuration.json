@@ -97,6 +97,18 @@
         "lineage_analysis_software_version": "4.0.6",
         "if_lineage_identification_other": "None"
     },
+    "mapping_illumina_tab_field_list": [
+        "Lineage",
+        "Variantsinconsensusx10",
+        "Coverage>10x(%)",
+        "%readshost",
+        "%readsvirus",
+        "%unmapedreads",
+        "%Ns10x",
+        "medianDPcoveragevirus",
+        "Variantsinconsensusx10",
+        "MissenseVariants"
+    ],
     "tool": {
         "tool_name": "ena-upload-cli",
         "tool_version": "0.5.3"

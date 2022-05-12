@@ -129,9 +129,13 @@ class BioinfoMetadata:
             # FALTA "consensus_genome_length": "", script que cuente el numero de nucleotidos tamaño del fasta
             # fields from variants_long_table.csv
             bioinfo_dict["reference_genome_accession"] = variants_long_table["CHROM"][c]
+            bioinfo_dict["consensus_sequence_name"] = str(sample_name).join(
+                ".consensus.fa"
+            )
+
             """
             
-            # bioinfo_dict["consensus_sequence_name"] = str(sample_name)s.join(".consensus.fa")
+            # 
             # files_in_dir = os.listdir()
             sample_files = sorted(
                 pathlib.Path(self.input_folder).glob(str(sample_name) + "*")
@@ -166,14 +170,6 @@ class BioinfoMetadata:
         # "bioinformatics_protocol_software_version" # NO HARCODED
         # "preprocessing_software_version"# NO HARCODED
         # "mapping_software_version" # NO HARCODED
-        # "lineage_name": "" mapping_illumina
-        # "number_of_base_pairs_sequenced": "", # Input reads summary_variants_metrics_mqc.csv  * 2 * read length
-        # "consensus_genome_length": "", script que cuente el numero de nucleotidos tamaño del fasta
-        # "ns_per_100_kbp": "", summary_variants_metrics_mqc.csv
-        # "reference_genome_accession": "",
         # bioinfo_dict["consensus_sequence_name"]=
         # bioinfo_dict["consensus_sequence_name_md5"]=
-        
-       
-        bioinfo_dict["long_table_path"] = self.input_folder
         """
