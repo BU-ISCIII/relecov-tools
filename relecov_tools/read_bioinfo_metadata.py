@@ -3,6 +3,7 @@
 
 # from geopy.geocoders import Nominatim
 # import json
+from importlib.resources import path
 import logging
 
 # import yaml
@@ -10,6 +11,7 @@ import logging
 # from turtle import pd
 import rich.console
 from itertools import islice
+import pandas as pd
 
 # from openpyxl import Workbook
 import openpyxl
@@ -67,21 +69,51 @@ class BioinfoMetadata:
         relecov_bioinfo_metadata = config_json.get_configuration(
             "relecov_bioinfo_metadata"
         )
-
+        c = 0
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             # row = ws_metadata_lab[5]
+
             sample_name = row[5]
             fastq_r1 = row[47]
             fastq_r2 = row[48]
-
             bioinfo_dict = {}
             bioinfo_dict["sample_name"] = sample_name
             bioinfo_dict["fastq_r1"] = fastq_r1
             bioinfo_dict["fastq_r2"] = fastq_r2
-        for key in relecov_bioinfo_metadata.keys():
-            bioinfo_dict[key] = relecov_bioinfo_metadata[key]
-        bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
-        bioinfo_dict["long_table_path"] = self.input_folder
+            for key in relecov_bioinfo_metadata.keys():
+                bioinfo_dict[key] = relecov_bioinfo_metadata[key]
+            bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
+            bioinfo_dict["long_table_path"] = self.input_folder
+            path_mapping_illumina_tab = os.path.join(
+                self.input_folder, "mapping_illumina.tab"
+            )
+            mapping_illumina_tab = pd.read_csv(path_mapping_illumina_tab, sep="\t")
+            bioinfo_dict["linage_name"] = mapping_illumina_tab["Lineage"][c]
+            summary_variants_metrics_path = os.path.join(
+                self.input_folder, "summary_variants_metrics_mqc.csv"
+            )
+            summary_variants_metrics = pd.read_csv(
+                summary_variants_metrics_path, sep=","
+            )
+            bioinfo_dict["number_of_base_pairs_sequenced"] = (
+                summary_variants_metrics["# Input reads"][c] * 2
+            )  # REVISAR SI ES ASÍ CON SARA
+
+            c = +1
+            import pdb
+
+            pdb.set_trace()
+            """
+             f = open(path_illumina_tab, "r")
+            lines = f.readlines()
+            lineages = []
+            lineage_index = lines[0].index("Lineage")
+            for line in range(1, len(lines)):
+               
+                line_split = lines.split("\t")
+                lineages.append(line_split[lineage_index])
+            """
+
         """
         # "dehosting_method_software_version" # NO HARCODED
         # "variant_calling_software_version" # NO HARCODED
@@ -89,7 +121,6 @@ class BioinfoMetadata:
         # "bioinformatics_protocol_software_version" # NO HARCODED
         # "preprocessing_software_version"# NO HARCODED
         # "mapping_software_version" # NO HARCODED
-        # "lineage_analysis_software_version"
         # "lineage_name": "" mapping_illumina
         # "number_of_base_pairs_sequenced": "", # Input reads summary_variants_metrics_mqc.csv  * 2 * read length
         # "consensus_genome_length": "", script que cuente el numero de nucleotidos tamaño del fasta
@@ -109,7 +140,3 @@ class BioinfoMetadata:
         # "number_of_variants_with_effect": "", tabla stats
         bioinfo_dict["long_table_path"] = self.input_folder
         """
-        print(bioinfo_dict)
-        import pdb
-
-        pdb.set_trace()
