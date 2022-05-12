@@ -5,6 +5,9 @@
 # import json
 from importlib.resources import path
 import logging
+import glob
+from operator import contains
+import pathlib
 
 # import yaml
 
@@ -70,6 +73,18 @@ class BioinfoMetadata:
             "relecov_bioinfo_metadata"
         )
         c = 0
+        mapping_illumina_tab_path = os.path.join(
+            self.input_folder, "mapping_illumina.tab"
+        )
+        summary_variants_metrics_path = os.path.join(
+            self.input_folder, "summary_variants_metrics_mqc.csv"
+        )
+        variants_long_table_path = os.path.join(
+            self.input_folder, "variants_long_table.csv"
+        )
+        mapping_illumina_tab = pd.read_csv(mapping_illumina_tab_path, sep="\t")
+        summary_variants_metrics = pd.read_csv(summary_variants_metrics_path, sep=",")
+        variants_long_table = pd.read_csv(variants_long_table_path, sep=",")
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             # row = ws_metadata_lab[5]
 
@@ -80,30 +95,60 @@ class BioinfoMetadata:
             bioinfo_dict["sample_name"] = sample_name
             bioinfo_dict["fastq_r1"] = fastq_r1
             bioinfo_dict["fastq_r2"] = fastq_r2
+            # inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict
             for key in relecov_bioinfo_metadata.keys():
                 bioinfo_dict[key] = relecov_bioinfo_metadata[key]
             bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
             bioinfo_dict["long_table_path"] = self.input_folder
-            path_mapping_illumina_tab = os.path.join(
-                self.input_folder, "mapping_illumina.tab"
-            )
-            mapping_illumina_tab = pd.read_csv(path_mapping_illumina_tab, sep="\t")
+            # fields from mapping_illumina.tab
             bioinfo_dict["linage_name"] = mapping_illumina_tab["Lineage"][c]
-            summary_variants_metrics_path = os.path.join(
-                self.input_folder, "summary_variants_metrics_mqc.csv"
-            )
-            summary_variants_metrics = pd.read_csv(
-                summary_variants_metrics_path, sep=","
-            )
+            bioinfo_dict["variant_designation"] = mapping_illumina_tab[
+                "Variantsinconsensusx10"
+            ][c]
+            bioinfo_dict["per_qc_filtered"] = mapping_illumina_tab["Coverage>10x(%)"][c]
+            # bioinfo_dict["per_reads_host"] = mapping_illumina_tab["%readshost"][c]
+            # bioinfo_dict["per_reads_virus"] = mapping_illumina_tab["%readsvirus"][c]
+            # bioinfo_dict["per_unmapped"] = mapping_illumina_tab["%unmapedreads"][c]
+            bioinfo_dict["per_Ns"] = mapping_illumina_tab["%Ns10x"][c]
+            bioinfo_dict["median_depth_of_coverage_value"] = mapping_illumina_tab[
+                "medianDPcoveragevirus"
+            ][c]
+            bioinfo_dict[
+                "number_of_variants_AF_greater_75percent"
+            ] = mapping_illumina_tab["Variantsinconsensusx10"][c]
+            bioinfo_dict["number_of_variants_with_effect"] = mapping_illumina_tab[
+                "MissenseVariants"
+            ][c]
+            # fields from summary_variants_metrics_mqc.csv
             bioinfo_dict["number_of_base_pairs_sequenced"] = (
                 summary_variants_metrics["# Input reads"][c] * 2
             )  # REVISAR SI ES ASÍ CON SARA
+            bioinfo_dict["ns_per_100_kbp"] = summary_variants_metrics[
+                "# Ns per 100kb consensus"
+            ][c]
+            # FALTA "consensus_genome_length": "", script que cuente el numero de nucleotidos tamaño del fasta
+            # fields from variants_long_table.csv
+            bioinfo_dict["reference_genome_accession"] = variants_long_table["CHROM"][c]
+            """
+            
+            # bioinfo_dict["consensus_sequence_name"] = str(sample_name)s.join(".consensus.fa")
+            # files_in_dir = os.listdir()
+            sample_files = sorted(
+                pathlib.Path(self.input_folder).glob(str(sample_name) + "*")
+            )
 
+            for i in sample_files:
+                if i.endswith(".consensus.fa"):
+                    bioinfo_dict["consensus_sequence_name"] = i
+                if "R1" in i and i.endswith(".md5"):
+                    bioinfo_dict["consensus_sequence_name_md5"] = i
+            """
             c = +1
             import pdb
 
             pdb.set_trace()
-            """
+
+            """                                                                                                                         
              f = open(path_illumina_tab, "r")
             lines = f.readlines()
             lineages = []
@@ -128,15 +173,7 @@ class BioinfoMetadata:
         # "reference_genome_accession": "",
         # bioinfo_dict["consensus_sequence_name"]=
         # bioinfo_dict["consensus_sequence_name_md5"]=
-        # "variant_designation": "", pangolin csv parseo
-        # "per_qc_filtered": "", tabla stats
-        # "per_reads_host": "", tabla stats
-        # "per_reads_virus": "", tabla stats
-        # "per_unmapped": "", tabla stats
-        # "per_genome _greater_10x": "",  tabla stats
-        # "median_depth_of_coverage_value": "", tabla stats
-        # "per_Ns": "", tabla stats
-        # "number_of_variants_AF_greater_75percent": "", tabla stats
-        # "number_of_variants_with_effect": "", tabla stats
+        
+       
         bioinfo_dict["long_table_path"] = self.input_folder
         """
