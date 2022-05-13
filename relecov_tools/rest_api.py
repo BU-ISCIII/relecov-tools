@@ -2,7 +2,6 @@
 import logging
 import json
 import requests
-import sys
 import rich.console
 import relecov_tools.utils
 
@@ -55,12 +54,20 @@ class RestApi:
             log.error("Unable to open connection towards %s", self.server)
             return False
 
-    def post_request(self, data, credentials, url):
+    def post_request(self, data, credentials, url, file=None):
         if isinstance(credentials, dict):
             auth = (credentials["user"], credentials["pass"])
         url_http = str(self.request_url + url)
         try:
-            req = requests.post(url_http, data=data, headers=self.headers, auth=auth)
+            if file:
+                files = {"upload_file": open(file, "rb")}
+                req = requests.post(
+                    url_http, files=files, data=data, headers=self.headers, auth=auth
+                )
+            else:
+                req = requests.post(
+                    url_http, data=data, headers=self.headers, auth=auth
+                )
             if req.status_code != 201:
                 log.error(
                     "Unable to post parameters. Received error code %s",
@@ -71,6 +78,6 @@ class RestApi:
                 return {"ERROR": req.status_code}
             return {"Success": req.text}
         except requests.ConnectionError:
-            log.error("Unable to open connection towards %s", self.server)
-            stderr.print("[red] Unable to open connection towards ", self.server)
+            log.error("Unable to open connection towards %s", self.request_url)
+            stderr.print("[red] Unable to open connection towards ", self.request_url)
             return {"ERROR": "Server not available"}

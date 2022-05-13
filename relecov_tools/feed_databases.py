@@ -160,9 +160,6 @@ class FeedDatabases:
                 try:
                     iskylims_data[label] = sample[value]
                 except KeyError as e:
-                    import pdb
-
-                    pdb.set_trace()
                     log.error("Found %s when mapping data for sending to iSkyLIMS")
                     stderr.print(f"[red]  {e} not found in mapping")
                     sys.exit(1)
@@ -183,8 +180,8 @@ class FeedDatabases:
                         # wait 5 sec before resending the request
                         time.sleep(5)
                         result = self.iskylims_rest_api.post_request(
-                            iskylims_data,
-                            {"user": self.user, "passwd": self.passwd},
+                            json.dumps(iskylims_data),
+                            {"user": self.user, "pass": self.passwd},
                             self.iskylims_settings["store_samples"],
                         )
                         if "ERROR" not in result:
@@ -210,7 +207,9 @@ class FeedDatabases:
                     relecov_data[label] = value
 
             result = self.relecov_rest_api.post_request(
-                relecov_data, {"user": self.user, "passwd": self.passwd}
+                json.dumps(iskylims_data),
+                {"user": self.user, "pass": self.passwd},
+                self.relecov_settings["store_samples"],
             )
         return
 
