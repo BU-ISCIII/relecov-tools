@@ -797,6 +797,7 @@
             "examples": [
                 "79"
             ],
+            "classification": "Host information",
             "label": "Host Age",
             "fill_mode": "sample"
         },
@@ -816,6 +817,7 @@
             "examples": [
                 "years [UO:0000036]"
             ],
+            "classification": "Host information",
             "label": "Host Age unit",
             "fill_mode": "batch"
         },
@@ -844,6 +846,7 @@
             "examples": [
                 "50 - 59 [GENEPIO:0100054]"
             ],
+            "classification": "Host information",
             "label": "Host Age Bin",
             "fill_mode": "batch"
         },
@@ -867,6 +870,7 @@
             "examples": [
                 "Male [NCIT:C46109]"
             ],
+            "classification": "Host information",
             "label": "Host Gender",
             "fill_mode": "sample"
         },
@@ -1095,6 +1099,7 @@
             "examples": [
                 "Yes [NCIT:C49488]"
             ],
+            "classification": "Sample collection and processing",
             "label": "Sample collected in quarantine",
             "fill_mode": "batch"
         },
@@ -1598,6 +1603,7 @@
             "examples": [
                 "South Africa [GAZ:00001094]"
             ],
+            "classification": "Host Information",
             "label": "Host residence country",
             "fill_mode": "batch"
         },
@@ -1630,6 +1636,7 @@
             "examples": [
                 "Indigenous, European"
             ],
+            "classification": "Host Information",
             "label": "Host ethnicity",
             "fill_mode": "batch"
         },
@@ -1816,7 +1823,7 @@
             "type": "string",
             "description": "The user-specified identifier for the library prepared for sequencing.",
             "classification": "Sequencing",
-            "labe": "Library Id",
+            "label": "Library Id",
             "fill_mode": "batch"
         },
         "enrichment_protocol": {
@@ -2925,6 +2932,7 @@
             "type": "string",
             "description": "The common name of the organism.",
             "classification": "Sample collection and processing",
+            "label":"Common name",
             "fill_mode": "batch"
         },
         "collector_name": {
