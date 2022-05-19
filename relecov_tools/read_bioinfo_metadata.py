@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 # from itertools import islice
 
-# from geopy.geocoders import Nominatim
-# import json
+
+# from importlib.resources import path
 import logging
 
-# import yaml
 
-# from turtle import pd
 import rich.console
 from itertools import islice
+import pandas as pd
 
-# from openpyxl import Workbook
+
 import openpyxl
 import os
 import sys
@@ -67,7 +66,19 @@ class BioinfoMetadata:
         relecov_bioinfo_metadata = config_json.get_configuration(
             "relecov_bioinfo_metadata"
         )
-
+        c = 0
+        mapping_illumina_tab_path = os.path.join(
+            self.input_folder, "mapping_illumina.tab"
+        )
+        summary_variants_metrics_path = os.path.join(
+            self.input_folder, "summary_variants_metrics_mqc.csv"
+        )
+        variants_long_table_path = os.path.join(
+            self.input_folder, "variants_long_table.csv"
+        )
+        mapping_illumina_tab = pd.read_csv(mapping_illumina_tab_path, sep="\t")
+        summary_variants_metrics = pd.read_csv(summary_variants_metrics_path, sep=",")
+        variants_long_table = pd.read_csv(variants_long_table_path, sep=",")
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             # row = ws_metadata_lab[5]
             sample_name = row[5]
@@ -76,93 +87,62 @@ class BioinfoMetadata:
             bioinfo_dict = {}
             bioinfo_dict["sample_name"] = sample_name
             bioinfo_dict["fastq_r1"] = fastq_r1
-            bioinfo_dict["fastq_r1"] = fastq_r2
-            bioinfo_dict["dehosting_method_software_name"] = relecov_bioinfo_metadata[
-                "dehosting_method_software_name"
-            ]  # software_versions.yml software_list["KRAKEN2_KRAKEN2"].keys(0)
-            bioinfo_dict[
-                "dehosting_method_software_version"
-            ] = relecov_bioinfo_metadata[
-                "dehosting_method_software_version"
-            ]  # software_versions.yml software_list["KRAKEN2_KRAKEN2"].values(0)
-            bioinfo_dict["assembly"] = None
-            bioinfo_dict["if_assembly_other"] = None
-            bioinfo_dict["assembly_params"] = None
-            bioinfo_dict["variant_calling_software_name"] = relecov_bioinfo_metadata[
-                "variant_calling_software_name"
-            ]  # software_versions.yml software_list["IVAR_VARIANTS"].keys(0)
-            bioinfo_dict["variant_calling_software_version"] = relecov_bioinfo_metadata[
-                "variant_calling_software_version"  # software_versions.yml software_list["IVAR_VARIANTS"].values(0)
-            ]
-            bioinfo_dict["variant_calling_params"] = relecov_bioinfo_metadata[
-                "variant_calling_params"
-            ]
-            # bioinfo_dict["consensus_sequence_name"]=
-            # bioinfo_dict["consensus_sequence_name_md5"]=
+            bioinfo_dict["fastq_r2"] = fastq_r2
+            # inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict
+            for key in relecov_bioinfo_metadata.keys():
+                bioinfo_dict[key] = relecov_bioinfo_metadata[key]
             bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
-
-            bioinfo_dict["consensus_sequence_software_name"] = relecov_bioinfo_metadata[
-                "consensus_sequence_software_name"
-            ]  # software_versions.yml software_list["BCFTOOLS_CONSENSUS"].keys(0)
+            bioinfo_dict["long_table_path"] = self.input_folder
+            # fields from mapping_illumina.tab
+            bioinfo_dict["linage_name"] = mapping_illumina_tab["Lineage"][c]
+            bioinfo_dict["variant_designation"] = mapping_illumina_tab[
+                "Variantsinconsensusx10"
+            ][c]
+            bioinfo_dict["per_qc_filtered"] = mapping_illumina_tab["Coverage>10x(%)"][c]
+            # bioinfo_dict["per_reads_host"] = mapping_illumina_tab["%readshost"][c]
+            # bioinfo_dict["per_reads_virus"] = mapping_illumina_tab["%readsvirus"][c]
+            # bioinfo_dict["per_unmapped"] = mapping_illumina_tab["%unmapedreads"][c]
+            bioinfo_dict["per_Ns"] = mapping_illumina_tab["%Ns10x"][c]
+            bioinfo_dict["median_depth_of_coverage_value"] = mapping_illumina_tab[
+                "medianDPcoveragevirus"
+            ][c]
             bioinfo_dict[
-                "consensus_sequence_software_version"
-            ] = relecov_bioinfo_metadata[
-                "consensus_sequence_software_version"  # software_versions.yml software_list["BCFTOOLS_CONSENSUS"].values(0)
-            ]
-
-            bioinfo_dict["if_consensus_other"] = None
-            """
-            "dehosting_method": "" RENAMED to dehosting_software_name y dehosting_software_version,
-            "if_assembly_other": "",
-            "assembly_params": "",
-            "variant_calling": "" RENAMED to variant_calling_software_name y variant_calling_software_version,
-            "if_variant_calling_other": "",
-            "variant_calling_params": "",
-            "consensus_sequence_name": "",
-            "consensus_sequence_name_md5": "",
-            "consensus_sequence_filepath": "",
-            "consensus_sequence_software_name": "",
-            "if_consensus_other": "",
-            "consensus_sequence_software_version": "",
-            "consensus_criteria": "", RENAMED to consensus_params
-            "depth_of_coverage_threshold": "",
-            "number_of_base_pairs_sequenced": "",
-            "consensus_genome_length": "",
-            "ns_per_100_kbp": "",
-            "reference_genome_accession": "",
-            "bioinformatics_protocol": "",
-            "if_bioinformatic_protocol_is_other_specify": "",
-            "bioinformatic_protocol_version": "",
-            "commercial/open-source/both": "",
-            "preprocessing": "",
-            "if_preprocessing_other": "",
-            "preprocessing_params": "",
-            "mapping": "",
-            "if_mapping_other": "",
-            "mapping_params": "",
-            "lineage_name": "",
-            "lineage_analysis_software_name": "",
-            "if_lineage_identification_other": "",
-            "lineage_analysis_software_version": "",
-            "variant_designation": "",
-            "per_qc_filtered": "",
-            "per_reads_host": "",
-            "per_reads_virus": "",
-            "per_unmapped": "",
-            "per_genome _greater_10x": "",
-            "median_depth_of_coverage_value": "",
-            "per_Ns": "",
-            "number_of_variants_AF_greater_75percent": "",
-            "number_of_variants_with_effect": "",
-            "long_table_path": ""
-            """
-
-            # path_software_version = os.path.join(
-            # self.input_folder, "software_versions.yml")
-            # with open(path_software_version) as file:
-            # software_list = yaml.load(file, Loader=yaml.FullLoader)
-
-            print(bioinfo_dict)
+                "number_of_variants_AF_greater_75percent"
+            ] = mapping_illumina_tab["Variantsinconsensusx10"][c]
+            bioinfo_dict["number_of_variants_with_effect"] = mapping_illumina_tab[
+                "MissenseVariants"
+            ][c]
+            # fields from summary_variants_metrics_mqc.csv
+            bioinfo_dict["number_of_base_pairs_sequenced"] = (
+                summary_variants_metrics["# Input reads"][c] * 2
+            )  # REVISAR SI ES ASÍ CON SARA
+            bioinfo_dict["ns_per_100_kbp"] = summary_variants_metrics[
+                "# Ns per 100kb consensus"
+            ][c]
+            # FALTA "consensus_genome_length": "", script que cuente el numero de nucleotidos tamaño del fasta
+            # fields from variants_long_table.csv
+            bioinfo_dict["reference_genome_accession"] = variants_long_table["CHROM"][c]
+            bioinfo_dict["consensus_sequence_name"] = str(sample_name).join(
+                ".consensus.fa"
+            )
+            c = +1
             import pdb
 
             pdb.set_trace()
+        """
+        f = open(path_illumina_tab, "r")
+        lines = f.readlines()
+        lineages = []
+        lineage_index = lines[0].index("Lineage")
+        for line in range(1, len(lines))
+        line_split = lines.split("\t")
+        lineages.append(line_split[lineage_index])
+        # "dehosting_method_software_version" # NO HARCODED
+        # "variant_calling_software_version" # NO HARCODED
+        # "consensus_sequence_software_version" # NO HARCODED
+        # "bioinformatics_protocol_software_version" # NO HARCODED
+        # "preprocessing_software_version"# NO HARCODED
+        # "mapping_software_version" # NO HARCODED
+        # bioinfo_dict["consensus_sequence_name"]=
+        # bioinfo_dict["consensus_sequence_name_md5"]=
+        """
