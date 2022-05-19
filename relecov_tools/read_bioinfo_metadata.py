@@ -158,10 +158,12 @@ class BioinfoMetadata:
             bioinfo_dict["mapping_software_version"] = software_versions[
                 "BOWTIE2_ALIGN"
             ].values()
+            bioinfo_dict[""]
+
             bioinfo_list[c] = bioinfo_dict
             c = +1
 
             output_path = os.join(self.output_folder, "bioinfo_metadata.json")
 
             with open(output_path, "w") as jsonFile:
-                json.dump(bioinfo_dict, jsonFile)
+                json.dump(bioinfo_list, jsonFile)
