@@ -2,10 +2,8 @@
 # from itertools import islice
 
 
-# from importlib.resources import path
 import logging
-
-# from wsgiref.simple_server import software_version
+import json
 
 
 import rich.console
@@ -107,6 +105,7 @@ class BioinfoMetadata:
         self.mapping_illumina_tab_field_list = config_json.get_configuration(
             "mapping_illumina_tab_field_list"
         )
+        bioinfo_list = []
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             # row = ws_metadata_lab[5]
             sample_name = row[5]
@@ -159,5 +158,10 @@ class BioinfoMetadata:
             bioinfo_dict["mapping_software_version"] = software_versions[
                 "BOWTIE2_ALIGN"
             ].values()
-
+            bioinfo_list[c] = bioinfo_dict
             c = +1
+
+            output_path = os.join(self.output_folder, "bioinfo_metadata.json")
+
+            with open(output_path, "w") as jsonFile:
+                json.dump(bioinfo_dict, jsonFile)
