@@ -97,17 +97,24 @@
         "lineage_analysis_software_version": "4.0.6",
         "if_lineage_identification_other": "None"
     },
-    "mapping_illumina_tab_field_list": [
-        "Lineage",
-        "Variantsinconsensusx10",
-        "Coverage>10x(%)",
-        "%readshost",
-        "%readsvirus",
-        "%unmapedreads",
-        "%Ns10x",
-        "medianDPcoveragevirus",
-        "Variantsinconsensusx10",
-        "MissenseVariants"
+    "mapping_illumina_tab_field_list": {
+        "lineage_name": "Lineage",
+        "variant_designation": "Variantsinconsensusx10",
+        "per_qc_filtered": "Coverage>10x(%)",
+        "per_reads_host": "%readshost",
+        "per_reads_virus": "%readsvirus",
+        "per_unmapped": "%unmapedreads",
+        "per_Ns": "%Ns10x",
+        "median_depth_of_coverage_value": "medianDPcoveragevirus",
+        "number_of_variants_AF_greater_75percent": "Variantsinconsensusx10",
+        "number_of_variants_with_effect": "MissenseVariants"
+    },
+    "files_read_bioinfo_metadata": [
+        "mapping_illumina.tab",
+        "summary_variants_metrics_mqc.csv",
+        "variants_long_table.csv",
+        "consensus_genome_length.csv",
+        "software_versions.yml"
     ],
     "tool": {
         "tool_name": "ena-upload-cli",
