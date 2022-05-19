@@ -4,7 +4,8 @@
 
 # from importlib.resources import path
 import logging
-from wsgiref.simple_server import software_version
+
+# from wsgiref.simple_server import software_version
 
 
 import rich.console
