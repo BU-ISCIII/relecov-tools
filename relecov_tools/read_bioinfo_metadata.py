@@ -112,7 +112,7 @@ class BioinfoMetadata:
             fastq_r1 = row[47]
             fastq_r2 = row[48]
             bioinfo_dict = {}
-            bioinfo_dict["sample_name"] = sample_name
+            bioinfo_dict["sample_name"] = str(sample_name)
             bioinfo_dict["fastq_r1"] = fastq_r1
             bioinfo_dict["fastq_r2"] = fastq_r2
             # inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict
@@ -126,17 +126,25 @@ class BioinfoMetadata:
                     self.mapping_illumina_tab_field_list[key]
                 ][c]
             # fields from summary_variants_metrics_mqc.csv
-            bioinfo_dict["number_of_base_pairs_sequenced"] = (
-                summary_variants_metrics["# Input reads"][c] * 2
+            bioinfo_dict["number_of_base_pairs_sequenced"] = int(
+                (summary_variants_metrics["# Input reads"][c] * 2)
             )
-            bioinfo_dict["ns_per_100_kbp"] = summary_variants_metrics[
-                "# Ns per 100kb consensus"
-            ][c]
+            bioinfo_dict["ns_per_100_kbp"] = int(
+                summary_variants_metrics["# Ns per 100kb consensus"][c]
+            )
             # fields from variants_long_table.csv
             bioinfo_dict["reference_genome_accession"] = variants_long_table["CHROM"][c]
-            bioinfo_dict["consensus_genome_length"] = consensus_genome_length.iloc[c, 0]
-            bioinfo_dict["consensus_sequence_name"] = md5_info.iloc[c, 0][0:32]
-            bioinfo_dict["consensus_sequence_name_md5"] = md5_info.iloc[c, 0][34:60]
+            bioinfo_dict["consensus_genome_length"] = int(
+                consensus_genome_length.iloc[c, 0]
+            )
+            bioinfo_dict["consensus_sequence_R1_name"] = md5_info.iloc[c * 2, 0][34:60]
+            bioinfo_dict["consensus_sequence_R2_name"] = md5_info.iloc[c * 2 + 1, 0][
+                34:60
+            ]
+            bioinfo_dict["consensus_sequence_R1_md5"] = md5_info.iloc[c * 2, 0][0:32]
+            bioinfo_dict["consensus_sequence__R2_md5"] = md5_info.iloc[c * 2 + 1, 0][
+                0:32
+            ]
 
             bioinfo_dict["dehosting_method_software_version"] = list(
                 software_versions["KRAKEN2_KRAKEN2"].values()
@@ -158,12 +166,17 @@ class BioinfoMetadata:
             bioinfo_dict["mapping_software_version"] = software_versions[
                 "BOWTIE2_ALIGN"
             ].values()
-            bioinfo_dict[""]
-
-            bioinfo_list[c] = bioinfo_dict
+            bioinfo_list.append(bioinfo_dict)
             c = +1
 
-            output_path = os.join(self.output_folder, "bioinfo_metadata.json")
+            import pdb
 
-            with open(output_path, "w") as jsonFile:
-                json.dump(bioinfo_list, jsonFile)
+            pdb.set_trace()
+
+        json_file = "bioinfo_metadata.json"
+        output_path = os.path.join(self.output_folder, json_file)
+
+        with open(output_path, "w", encoding="utf-8") as fh:
+            fh.write(
+                json.dumps(bioinfo_list, indent=4, sort_keys=True, ensure_ascii=False)
+            )
