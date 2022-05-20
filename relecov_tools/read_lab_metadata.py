@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 from itertools import islice
 
-# from geopy.geocoders import Nominatim
 import json
 import logging
 import rich.console
 
-# from openpyxl import Workbook
 import openpyxl
 import os
 import sys
