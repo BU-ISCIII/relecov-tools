@@ -1,8 +1,10 @@
 relecov-tools -l /tmp/logs.log  download -u usuario_test -p U[9[Gpyu3.
 relecov-tools -l /tmp/logs.log  download -f relecov_tools/test/sftp_config.yaml
-relecov-tools read-metadata -m relecov_tools/example_data/METADATA_LAB_TEST.xlsx -s relecov_tools/example_data/samples_data_COD_test_01_20220422.json -o /tmp
+relecov-tools read-lab-metadata -m relecov_tools/example_data/METADATA_LAB_TEST.xlsx -s relecov_tools/example_data/samples_data_COD_test_01_20220422.json -o /tmp
 relecov-tools validate -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -m relecov_tools/example_data/METADATA_LAB_TEST.xlsx -o /tmp
 relecov-tools map -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -d ENA -o /tmp
 relecov-tools map -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -d GISAID -o /tmp
 relecov-tools update-db -i http://iskylims.isciiides.es/wetlab/api -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json
 relecov-tools update-db -i http://localhost:8001/wetlab/api -r http://localhost:8000/api -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json -u admin -p Apple@123
+relecov-tools read-bioinfo-metadata -m /data/UCCT_Relecov/COD-2100-MAD-CNM/20220208/lab_metadata_20220208.xlsx -i /data/UCCT_Relecov/COD-2100-MAD-CNM/20220208/ -o /data/UCCT_Relecov/COD-2100-MAD-CNM/20220208/
+relecov-tools upload-to-ena -u Webin-60330 -p W2b3nENA%2021 -e /home/erika.kvalem/Documents/Relecov/relecov-tools/relecov_tools/example_data/to_ena_2.json -o /home/erika.kvalem/Documents/Relecov/relecov-tools/relecov_tools/test -a add -c ISCIII
