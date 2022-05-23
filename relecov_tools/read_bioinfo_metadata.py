@@ -124,9 +124,9 @@ class BioinfoMetadata:
             bioinfo_dict["long_table_path"] = self.input_folder
             # fields from mapping_illumina.tab
             for key in self.mapping_illumina_tab_field_list.keys():
-                bioinfo_dict[key] = mapping_illumina_tab[
-                    self.mapping_illumina_tab_field_list[key]
-                ][c]
+                bioinfo_dict[key] = str(
+                    mapping_illumina_tab[self.mapping_illumina_tab_field_list[key]][c]
+                )
             # fields from summary_variants_metrics_mqc.csv
             bioinfo_dict["number_of_base_pairs_sequenced"] = str(
                 (summary_variants_metrics["# Input reads"][c] * 2)
@@ -135,41 +135,46 @@ class BioinfoMetadata:
                 summary_variants_metrics["# Ns per 100kb consensus"][c]
             )
             # fields from variants_long_table.csv
-            bioinfo_dict["reference_genome_accession"] = variants_long_table["CHROM"][c]
+            bioinfo_dict["reference_genome_accession"] = str(
+                variants_long_table["CHROM"][c]
+            )
             bioinfo_dict["consensus_genome_length"] = str(
                 consensus_genome_length.iloc[c, 0]
             )
-            bioinfo_dict["consensus_sequence_R1_name"] = md5_info.iloc[c * 2, 0][34:60]
-            bioinfo_dict["consensus_sequence_R2_name"] = md5_info.iloc[c * 2 + 1, 0][
-                34:60
-            ]
-            bioinfo_dict["consensus_sequence_R1_md5"] = md5_info.iloc[c * 2, 0][0:32]
-            bioinfo_dict["consensus_sequence__R2_md5"] = md5_info.iloc[c * 2 + 1, 0][
-                0:32
-            ]
+            bioinfo_dict["consensus_sequence_R1_name"] = str(
+                md5_info.iloc[c * 2, 0][34:60]
+            )
+            bioinfo_dict["consensus_sequence_R2_name"] = str(
+                md5_info.iloc[c * 2 + 1, 0][34:60]
+            )
+            bioinfo_dict["consensus_sequence_R1_md5"] = str(
+                md5_info.iloc[c * 2, 0][0:32]
+            )
+            bioinfo_dict["consensus_sequence__R2_md5"] = str(
+                md5_info.iloc[c * 2 + 1, 0][0:32]
+            )
 
-            bioinfo_dict["dehosting_method_software_version"] = list(
-                software_versions["KRAKEN2_KRAKEN2"].values()
-            )[0]
-            bioinfo_dict["variant_calling_software_version"] = list(
-                software_versions["IVAR_VARIANTS"].values()
-            )[0]
-            bioinfo_dict["consensus_sequence_software_version"] = list(
-                software_versions["BCFTOOLS_CONSENSUS"].values()
-            )[0]
+            bioinfo_dict["dehosting_method_software_version"] = str(
+                list(software_versions["KRAKEN2_KRAKEN2"].values())[0]
+            )
+            bioinfo_dict["variant_calling_software_version"] = str(
+                list(software_versions["IVAR_VARIANTS"].values())[0]
+            )
+            bioinfo_dict["consensus_sequence_software_version"] = str(
+                list(software_versions["BCFTOOLS_CONSENSUS"].values())[0]
+            )
 
-            bioinfo_dict[
-                "bioinformatics_protocol_software_version"
-            ] = software_versions["Workflow"]["nf-core/viralrecon"]
+            bioinfo_dict["bioinformatics_protocol_software_version"] = str(
+                software_versions["Workflow"]["nf-core/viralrecon"]
+            )
 
-            bioinfo_dict["preprocessing_software_version"] = list(
-                software_versions["FASTP"].values()
-            )[0]
-            bioinfo_dict["mapping_software_version"] = list(
-                software_versions["BOWTIE2_ALIGN"].values()
-            )[0]
-            # bioinfo_list[str(sample_name)].append(bioinfo_dict)
-            # bioinfo_list.append(bioinfo_dict)
+            bioinfo_dict["preprocessing_software_version"] = str(
+                list(software_versions["FASTP"].values())[0]
+            )
+            bioinfo_dict["mapping_software_version"] = str(
+                list(software_versions["BOWTIE2_ALIGN"].values())[0]
+            )
+
             bioinfo_list[str(sample_name)] = bioinfo_dict
             c = +1
 
