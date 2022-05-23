@@ -169,10 +169,6 @@ class BioinfoMetadata:
             bioinfo_list.append(bioinfo_dict)
             c = +1
 
-            import pdb
-
-            pdb.set_trace()
-
         json_file = "bioinfo_metadata.json"
         output_path = os.path.join(self.output_folder, json_file)
 
