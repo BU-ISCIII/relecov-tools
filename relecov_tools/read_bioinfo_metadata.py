@@ -47,7 +47,7 @@ class BioinfoMetadata:
                 msg="Select the input folder"
             )
         else:
-            self.input_folder = output_folder
+            self.input_folder = input_folder
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
@@ -105,10 +105,12 @@ class BioinfoMetadata:
         self.mapping_illumina_tab_field_list = config_json.get_configuration(
             "mapping_illumina_tab_field_list"
         )
-        bioinfo_list = []
+        bioinfo_list = {}
+
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             # row = ws_metadata_lab[5]
             sample_name = row[5]
+
             fastq_r1 = row[47]
             fastq_r2 = row[48]
             bioinfo_dict = {}
@@ -126,15 +128,15 @@ class BioinfoMetadata:
                     self.mapping_illumina_tab_field_list[key]
                 ][c]
             # fields from summary_variants_metrics_mqc.csv
-            bioinfo_dict["number_of_base_pairs_sequenced"] = int(
+            bioinfo_dict["number_of_base_pairs_sequenced"] = str(
                 (summary_variants_metrics["# Input reads"][c] * 2)
             )
-            bioinfo_dict["ns_per_100_kbp"] = int(
+            bioinfo_dict["ns_per_100_kbp"] = str(
                 summary_variants_metrics["# Ns per 100kb consensus"][c]
             )
             # fields from variants_long_table.csv
             bioinfo_dict["reference_genome_accession"] = variants_long_table["CHROM"][c]
-            bioinfo_dict["consensus_genome_length"] = int(
+            bioinfo_dict["consensus_genome_length"] = str(
                 consensus_genome_length.iloc[c, 0]
             )
             bioinfo_dict["consensus_sequence_R1_name"] = md5_info.iloc[c * 2, 0][34:60]
@@ -148,13 +150,13 @@ class BioinfoMetadata:
 
             bioinfo_dict["dehosting_method_software_version"] = list(
                 software_versions["KRAKEN2_KRAKEN2"].values()
-            )
+            )[0]
             bioinfo_dict["variant_calling_software_version"] = list(
                 software_versions["IVAR_VARIANTS"].values()
-            )
+            )[0]
             bioinfo_dict["consensus_sequence_software_version"] = list(
                 software_versions["BCFTOOLS_CONSENSUS"].values()
-            )
+            )[0]
 
             bioinfo_dict[
                 "bioinformatics_protocol_software_version"
@@ -162,15 +164,21 @@ class BioinfoMetadata:
 
             bioinfo_dict["preprocessing_software_version"] = list(
                 software_versions["FASTP"].values()
-            )
-            bioinfo_dict["mapping_software_version"] = software_versions[
-                "BOWTIE2_ALIGN"
-            ].values()
-            bioinfo_list.append(bioinfo_dict)
+            )[0]
+            bioinfo_dict["mapping_software_version"] = list(
+                software_versions["BOWTIE2_ALIGN"].values()
+            )[0]
+            # bioinfo_list[str(sample_name)].append(bioinfo_dict)
+            # bioinfo_list.append(bioinfo_dict)
+            bioinfo_list[str(sample_name)] = bioinfo_dict
             c = +1
 
         json_file = "bioinfo_metadata.json"
         output_path = os.path.join(self.output_folder, json_file)
+
+        import pdb
+
+        pdb.set_trace()
 
         with open(output_path, "w", encoding="utf-8") as fh:
             fh.write(
