@@ -86,9 +86,10 @@ class BioinfoMetadata:
         software_versions_path = os.path.join(
             self.input_folder, "software_versions.yml"
         )
+        self.md5_file_name = config_json.get_configuration("md5_file_name")
         md5_info_path = os.path.join(
             self.input_folder,
-            "md5sum_MiSeq_GEN_267_20220208_ICasas.md5",  # como hacer esto general para los servicios
+            self.md5_file_name,  # como hacer esto general para los servicios
         )
 
         mapping_illumina_tab = pd.read_csv(mapping_illumina_tab_path, sep="\t")
@@ -123,10 +124,13 @@ class BioinfoMetadata:
             bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
             bioinfo_dict["long_table_path"] = self.input_folder
             # fields from mapping_illumina.tab
+
             for key in self.mapping_illumina_tab_field_list.keys():
+
                 bioinfo_dict[key] = str(
                     mapping_illumina_tab[self.mapping_illumina_tab_field_list[key]][c]
                 )
+
             # fields from summary_variants_metrics_mqc.csv
             bioinfo_dict["number_of_base_pairs_sequenced"] = str(
                 (summary_variants_metrics["# Input reads"][c] * 2)
@@ -176,14 +180,10 @@ class BioinfoMetadata:
             )
 
             bioinfo_list[str(sample_name)] = bioinfo_dict
-            c = +1
+            c = c + 1
 
         json_file = "bioinfo_metadata.json"
         output_path = os.path.join(self.output_folder, json_file)
-
-        import pdb
-
-        pdb.set_trace()
 
         with open(output_path, "w", encoding="utf-8") as fh:
             fh.write(
