@@ -1496,8 +1496,6 @@
             "label": "Ns per 100 kbp",
             "fill_mode": "batch"
         },
-<<<<<<< HEAD
-=======
         "reference_genome_accession": {
             "examples": [
                 "NC_045512.2"
@@ -1509,7 +1507,6 @@
             "label": "Reference genome accession",
             "fill_mode": "batch"
         },
->>>>>>> 9d13b1cfaeb342bdc1b234b294fa7835845035ab
         "bioinformatics_protocol_software_name": {
             "examples": [
                 "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
@@ -1563,21 +1560,6 @@
             "description": "",
             "classification": "Bioinformatics and QC metrics",
             "label": "Preprocessing",
-            "fill_mode": "batch"
-        },
-<<<<<<< HEAD
-        "preprocessing_software_version": {
-=======
-        "preprocessing_software_name": {
->>>>>>> 9d13b1cfaeb342bdc1b234b294fa7835845035ab
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics",
-            "label": "Preprocessing Version",
             "fill_mode": "batch"
         },
         "preprocessing_software_version": {
@@ -2027,7 +2009,7 @@
             "type": "string",
             "description": "The common name of the organism.",
             "classification": "Sample collection and processing",
-            "label":"Common name",
+            "label": "Common name",
             "fill_mode": "batch"
         },
         "collector_name": {
