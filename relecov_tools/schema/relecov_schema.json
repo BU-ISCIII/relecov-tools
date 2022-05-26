@@ -2010,7 +2010,7 @@
             "type": "string",
             "description": "The common name of the organism.",
             "classification": "Sample collection and processing",
-            "label":"Common name",
+            "label": "Common name",
             "fill_mode": "batch"
         },
         "collector_name": {
