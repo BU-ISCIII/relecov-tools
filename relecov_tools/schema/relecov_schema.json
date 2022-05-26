@@ -964,6 +964,7 @@
             "examples": [
                 "Diagnostic Testing [GENEPIO:0100002]"
             ],
+            "classification": "Sample collection and processing",
             "label": "Purpose of sampling",
             "fill_mode": "batch"
         },
