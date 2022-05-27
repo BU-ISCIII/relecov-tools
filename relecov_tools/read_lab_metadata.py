@@ -180,6 +180,7 @@ class RelecovMetadata:
                 for key, value in samples_json[
                     row_sample["collecting_lab_sample_id"]
                 ].items():
+
                     row_sample[key] = value
             except KeyError:
                 pass
