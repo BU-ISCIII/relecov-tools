@@ -240,7 +240,6 @@ class SftpHandle:
             stderr.print("[red] Unable to copy Metadata file")
             return False
         data = copy.deepcopy(file_list)
-
         for s_name, values in file_list.items():
             for f_type, f_name in values.items():
                 if not f_name.endswith(tuple(self.allowed_sample_ext)):
@@ -252,7 +251,6 @@ class SftpHandle:
                     data[s_name]["r2_fastq_filepath"] = md5_data[f_name][0]
                     data[s_name]["fastq_r2_md5"] = md5_data[f_name][1]
                 else:
-                    # reserved for future develoment
                     pass
         with open(sample_data_path, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
@@ -298,11 +296,13 @@ class SftpHandle:
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             if row[2] is not None:
                 try:
-                    s_name = str(int(row[2]))
-                except ValueError:
                     s_name = str(row[2])
+                except ValueError as e:
+                    stderr.print("[red] Unable to convert to string. ", e)
                 if s_name not in sample_file_list:
                     sample_file_list[s_name] = {}
+                else:
+                    print("Found duplicated sample ", s_name)
                 if row[index_fastq_r1] is not None:
                     sample_file_list[s_name]["sequence_file_R1_fastq"] = row[
                         index_fastq_r1

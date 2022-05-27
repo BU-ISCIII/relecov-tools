@@ -180,8 +180,11 @@ class RelecovMetadata:
                     row_sample["collecting_lab_sample_id"]
                 ].items():
                     row_sample[key] = value
-            except KeyError:
-                pass
+            except KeyError as e:
+                stderr.print(
+                    "[red] ERROR  MD5 information not found in sample json. ", e
+                )
+
             """ Fetch the information related to the laboratory.
                 Info is stored in lab_data, to prevent to call get_laboratory_data
                 each time for each sample that belongs to the same lab
