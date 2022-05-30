@@ -1647,7 +1647,7 @@
             "ontology": "GENEPIO:0001500",
             "type": "string",
             "description": "The name of the lineage or clade.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Lineage fields",
             "label": "Lineage/clade name",
             "fill_mode": "batch"
         },
@@ -1658,7 +1658,7 @@
             "ontology": "GENEPIO:0001501",
             "type": "string",
             "description": "The name of the software used to determine the lineage/clade.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Lineage fields",
             "label": "lineage/clade analysis software name",
             "fill_mode": "batch"
         },
@@ -1669,7 +1669,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The name of the software used to determine the lineage/clade.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Lineage fields",
             "label": "If lineage identification Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1680,7 +1680,7 @@
             "ontology": "GENEPIO:0001502",
             "type": "string",
             "description": "The version of the software used to determine the lineage/clade.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Lineage fields",
             "label": "Lineage/clade analysis software version",
             "fill_mode": "batch"
         },
@@ -1943,7 +1943,7 @@
             "type": "string",
             "format": "date",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Lineage fields",
             "label": "Lineage identification date",
             "fill_mode": "batch"
         },

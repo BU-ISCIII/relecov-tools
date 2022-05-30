@@ -94,6 +94,7 @@ class RelecovMetadata:
             log.error("Found empti Originating Laboratory")
             return data
         for lab in lab_json:
+
             if lab_name == lab["collecting_institution"]:
                 for key, value in lab.items():
                     data[key] = value
@@ -179,6 +180,7 @@ class RelecovMetadata:
                 for key, value in samples_json[
                     row_sample["collecting_lab_sample_id"]
                 ].items():
+
                     row_sample[key] = value
             except KeyError as e:
                 stderr.print(

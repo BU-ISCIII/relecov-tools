@@ -153,6 +153,7 @@ class MappingSchema:
         """
         if self.destination_schema == "ENA":
             for idx in range(len(self.json_data)):
+
                 mapped_json_data[idx]["fastq_r1_md5"] = self.json_data[idx][
                     "fastq_r1_md5"
                 ]
@@ -190,7 +191,7 @@ class MappingSchema:
                     "collecting_lab_sample_id"
                 ]
                 mapped_json_data[idx]["study_type"] = self.json_data[idx][
-                    "purpose_of_sampling"
+                    "purpose_sampling"
                 ]
                 mapped_json_data[idx]["study_abstract"] = self.json_data[idx][
                     "study_title"

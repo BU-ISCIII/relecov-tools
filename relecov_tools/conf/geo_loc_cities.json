@@ -370,6 +370,11 @@
         "geo_loc_longitude": "-5.3000"
     },
     {
+        "geo_loc_city": "Ciudad de Melilla",
+        "geo_loc_latitude": "35.2919",
+        "geo_loc_longitude": "-2.93848"
+    },
+    {
         "geo_loc_city": "Torrente",
         "geo_loc_latitude": "39.4365",
         "geo_loc_longitude": "-0.4679"
