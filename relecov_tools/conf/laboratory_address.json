@@ -221,5 +221,13 @@
         "geo_loc_state": "País Vasco",
         "geo_loc_city": "Donostia",
         "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "Hospital Comarcal de Melilla",
+        "collecting_institution_address": "C. Remonta, 2",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Melilla",
+        "geo_loc_city": "Melilla",
+        "geo_loc_country": "Spain"
     }
 ]
