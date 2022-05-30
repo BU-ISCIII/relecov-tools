@@ -16,6 +16,7 @@ import relecov_tools.json_validation
 import relecov_tools.map_schema
 import relecov_tools.feed_databases
 import relecov_tools.read_bioinfo_metadata
+import relecov_tools.long_table_parse
 
 log = logging.getLogger()
 
@@ -305,7 +306,7 @@ def update_db(user, password, json, schema, iskylims, relecov):
 
 
 # read metadata bioinformatics
-@relecov_tools_cli.command(help_priority=3)
+@relecov_tools_cli.command(help_priority=10)
 @click.option(
     "-m",
     "--metadata_file",
@@ -326,6 +327,24 @@ def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
     )
 
     new_bioinfo_metadata.bioinfo_parse(metadata_file)
+
+
+# read metadata bioinformatics
+@relecov_tools_cli.command(help_priority=11)
+@click.option(
+    "-l",
+    "--longtable_file",
+    type=click.Path(),
+    help="file containing long table ",
+)
+@click.option(
+    "-o", "--output", type=click.Path(), help="Path to save json output")
+def long_table_parse(longtable_file, output):
+    """Create Json file from long table """
+    new_json_parse = relecov_tools.long_table_parse.LongTableParse(
+        longtable_file, output
+    )
+    new_json_parse.parsing_csv()
 
 
 if __name__ == "__main__":
