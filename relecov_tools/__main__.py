@@ -337,10 +337,9 @@ def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
     type=click.Path(),
     help="file containing long table ",
 )
-@click.option(
-    "-o", "--output", type=click.Path(), help="Path to save json output")
+@click.option("-o", "--output", type=click.Path(), help="Path to save json output")
 def long_table_parse(longtable_file, output):
-    """Create Json file from long table """
+    """Create Json file from long table"""
     new_json_parse = relecov_tools.long_table_parse.LongTableParse(
         longtable_file, output
     )
