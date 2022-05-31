@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
-from relecov_tools.rest_api import RestApi
+
+# from relecov_tools.rest_api import RestApi
 
 
 class LongTableParse:
