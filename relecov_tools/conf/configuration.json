@@ -32,11 +32,13 @@
     },
     "external_url": {
         "iskylims": {
-            "server": "http://relecov-iskylims.isciiides.es",
+            "server": "http://relecov-iskylims.isciiides.es:8001",
             "url": "/wetlab/api/",
             "store_samples": "createSampleData",
             "url_project_fields": "sampleProjectFields",
-            "project_name": "Relecov",
+            "url_sample_fields": "samplefields",
+            "param_sample_project": "project",
+            "project_name": "relecov",
             "token": ""
         },
         "relecov": {
@@ -46,15 +48,8 @@
             "token": ""
         }
     },
-    "iskylims_sample_fields": {
-        "sampleName": "collecting_lab_sample_id",
-        "labRequest": "collecting_institution",
-        "sampleType": "anatomical_material",
-        "species": "host_common_name",
-        "sampleEntryDate": "sample_received_date",
-        "collectionSampleDate": "sample_collection_date"
-    },
     "iskylims_fixed_values": {
+        "patient": "",
         "sampleProject": "Relecov",
         "onlyRecorded": "Yes",
         "sampleLocation": "Not defined"
