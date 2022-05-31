@@ -14,17 +14,18 @@ class LongTableParse:
         if os.path.exists(output_dir):
             date_now = datetime.now()
             file_name = "long_table_JSON_" + str(date_now) + ".txt"
-            os.path.join(output_dir, file_name)
-
-            with open(file_name, "xt") as file:
+            complete_path = os.path.join(output_dir, file_name)
+            with open(complete_path, "xt") as file:
                 file.write(generated_JSON)
+
         else:
             print("Sorry the directory we're looking for... doesn't exist")
             exit()
 
     def parsing_csv(self):
-        list_of_dictionaries = []
+
         try:
+            list_of_dictionaries = []
             with open(self.file_path) as fh:
                 lines = fh.readlines()
 
