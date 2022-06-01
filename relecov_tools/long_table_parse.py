@@ -100,84 +100,51 @@ class LongTableParse:
         for heading in self.long_table_heading:
             dict_index_of_heading[heading] = self.long_table_heading.index(heading)
 
+        for heading_csv in headings_from_csv:
+            if heading_csv not in dict_index_of_heading:
+                print("incorrect Format, fields don't match")
+                sys.exit(1)
+
         if len(self.long_table_heading) is len(headings_from_csv):
             for line in lines[1:]:
                 data_dict_from_long_table = {}
-            data_list = line.strip().split(",")
+                data_list = line.strip().split(",")
 
-            data_dict_from_long_table["Chromosome"] = {"chromosome": data_list[1]}
+                data_dict_from_long_table["Chromosome"] = {"chromosome": data_list[1]}
 
-            data_dict_from_long_table["Position"] = {
-                "pos": data_list[2],
-                "nucleotide": data_list[4],
-            }
+                data_dict_from_long_table["Position"] = {
+                    "pos": data_list[2],
+                    "nucleotide": data_list[4],
+                }
 
-            data_dict_from_long_table["Filter"] = {"filter": data_list[5]}
+                data_dict_from_long_table["Filter"] = {"filter": data_list[5]}
 
-            data_dict_from_long_table["VariantInSample"] = {
-                "dp": data_list[6],
-                "ref_dp": data_list[7],
-                "alt_dp": data_list[8],
-                "af": data_list[9],
-            }
+                data_dict_from_long_table["VariantInSample"] = {
+                    "dp": data_list[6],
+                    "ref_dp": data_list[7],
+                    "alt_dp": data_list[8],
+                    "af": data_list[9],
+                }
 
-            data_dict_from_long_table["Gene"] = {"gene": data_list[10]}
+                data_dict_from_long_table["Gene"] = {"gene": data_list[10]}
 
-            data_dict_from_long_table["Effect"] = {
-                "effect": data_list[11],
-                "hgvs_c": data_list[12],
-                "hgvs_p": data_list[13],
-                "hgvs_p_1_letter": data_list[14],
-            }
+                data_dict_from_long_table["Effect"] = {
+                    "effect": data_list[11],
+                    "hgvs_c": data_list[12],
+                    "hgvs_p": data_list[13],
+                    "hgvs_p_1_letter": data_list[14],
+                }
 
-            data_dict_from_long_table["Variant"] = {"ref": data_list[3]}
+                data_dict_from_long_table["Variant"] = {"ref": data_list[3]}
 
-            data_dict_from_long_table["Sample"] = {"sample": data_list[0]}
+                data_dict_from_long_table["Sample"] = {"sample": data_list[0]}
 
-            list_of_dictionaries.append(data_dict_from_long_table)
+                list_of_dictionaries.append(data_dict_from_long_table)
 
             return json.dumps(list_of_dictionaries, indent=4)
         else:
-            print("Incorrect format")
+            print("Incorrect format, the headers do not have the same number of fields")
             sys.exit(1)
-        """
-        for line in lines[1:]:
-            data_dict_from_long_table = {}
-            data_list = line.strip().split(",")
-
-            data_dict_from_long_table["Chromosome"] = {"chromosome": data_list[1]}
-
-            data_dict_from_long_table["Position"] = {
-                "pos": data_list[2],
-                "nucleotide": data_list[4],
-            }
-
-            data_dict_from_long_table["Filter"] = {"filter": data_list[5]}
-
-            data_dict_from_long_table["VariantInSample"] = {
-                "dp": data_list[6],
-                "ref_dp": data_list[7],
-                "alt_dp": data_list[8],
-                "af": data_list[9],
-            }
-
-            data_dict_from_long_table["Gene"] = {"gene": data_list[10]}
-
-            data_dict_from_long_table["Effect"] = {
-                "effect": data_list[11],
-                "hgvs_c": data_list[12],
-                "hgvs_p": data_list[13],
-                "hgvs_p_1_letter": data_list[14],
-            }
-
-            data_dict_from_long_table["Variant"] = {"ref": data_list[3]}
-
-            data_dict_from_long_table["Sample"] = {"sample": data_list[0]}
-
-            list_of_dictionaries.append(data_dict_from_long_table)
-
-            return json.dumps(list_of_dictionaries, indent=4)
-        """
 
     def parsing_csv(self):
         generated_json = self.parse_a_list_of_dictionaries()
