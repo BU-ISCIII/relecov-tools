@@ -1,3 +1,28 @@
+"""
+=============================================================
+HEADER
+=============================================================
+INSTITUTION: BU-ISCIII
+AUTHOR: Luis D. Aranda Lillo
+MAIL: laranda@isciii.es
+VERSION: 0
+CREATED: 31-5-2022
+REVISED: 31-5-2022
+REVISED BY: Luis Chapado
+DESCRIPTION:
+
+    Parse a csv file and save the results in a file
+
+REQUIREMENTS:
+    -Python
+
+TO DO:
+
+================================================================
+END_OF_HEADER
+================================================================
+"""
+
 from datetime import datetime
 import json
 import os.path
