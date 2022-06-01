@@ -121,5 +121,12 @@
         "tool_version": "0.5.3"
     },
     "md5_file_name": "md5sum_MiSeq_GEN_267_20220208_ICasas_removed_samples.md5",
-    "checklist": "ERC000033"
+    "checklist": "ERC000033",
+    "long_table_heading": [
+        "SAMPLE", "CHROM", "POS", "REF",
+        "ALT", "FILTER", "DP", "REF_DP", "ALT_DP",
+        "AF", "GENE", "EFFECT", "HGVS_C", "HGVS_P",
+        "HGVS_P_1LETTER", "CALLER", "LINEAGE"
+
+    ]
 }
