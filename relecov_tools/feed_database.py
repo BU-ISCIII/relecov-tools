@@ -266,4 +266,6 @@ class FeedDatabase:
                 )
             else:
                 pass
+        else:
+            pass
         self.update_database(map_fields)
