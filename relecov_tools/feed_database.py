@@ -251,9 +251,7 @@ class FeedDatabase:
                     )
                     sys.exit(1)
 
-            log.info(
-                "stored data in iskylims for sample %s", chunk["sampleName"]
-            )
+            log.info("stored data in iskylims for sample %s", chunk["sampleName"])
         return
 
     def store_data(self):
