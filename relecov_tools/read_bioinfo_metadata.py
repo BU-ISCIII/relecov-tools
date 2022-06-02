@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # from itertools import islice
 
-
-from bdb import set_trace
 import logging
 import json
 
