@@ -1196,7 +1196,7 @@
             "ontology": "GENEPIO:0001459",
             "type": "string",
             "description": "The method used to remove host reads from the pathogen sequence.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Dehosting Method",
             "fill_mode": "batch"
         },
@@ -1207,7 +1207,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The method version used to remove host reads from the pathogen sequence.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Dehosting Method Version",
             "fill_mode": "batch"
         },
@@ -1218,7 +1218,7 @@
             "ontology": "NCIT_C63548",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Assembly",
             "fill_mode": "batch"
         },
@@ -1229,7 +1229,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "If assembly Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1240,7 +1240,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Assambly params",
             "fill_mode": "batch"
         },
@@ -1251,7 +1251,7 @@
             "ontology": "operation_3227",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Variants",
             "label": "Variant Calling",
             "fill_mode": "batch"
         },
@@ -1262,7 +1262,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Variants",
             "label": "Variant Calling Version",
             "fill_mode": "batch"
         },
@@ -1273,7 +1273,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Variants",
             "label": "If variant calling Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1284,7 +1284,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Variants",
             "label": "Variant Calling params",
             "fill_mode": "batch"
         },
@@ -1295,7 +1295,7 @@
             "examples": [
                 "ncov123assembly3"
             ],
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Consensus sequence name",
             "fill_mode": "batch"
         },
@@ -1306,7 +1306,7 @@
             "examples": [
                 "ncov123assembly3"
             ],
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Consensus sequence name md5",
             "fill_mode": "batch"
         },
@@ -1317,7 +1317,7 @@
             "ontology": "GENEPIO:0001462",
             "type": "string",
             "description": "The filepath of the consesnsus sequence file.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Consensus sequence filepath",
             "fill_mode": "batch"
         },
@@ -1328,7 +1328,7 @@
             "ontology": "GENEPIO:0001463",
             "type": "string",
             "description": "The name of software used to generate the consensus sequence.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Consensus sequence software name",
             "fill_mode": "batch"
         },
@@ -1339,7 +1339,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The version of the software used to generate the consensus sequence.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "If consensus Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1350,7 +1350,7 @@
             "ontology": "GENEPIO:0001469",
             "type": "string",
             "description": "The version of the software used to generate the consensus sequence.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Consensus sequence software version",
             "fill_mode": "batch"
         },
@@ -1361,7 +1361,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Consensus Params",
             "fill_mode": "batch"
         },
@@ -1515,7 +1515,7 @@
             "ontology": "GENEPIO:0001489",
             "type": "string",
             "description": "The name  of the bioinformatics protocol used.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Bioinformatics protocol",
             "fill_mode": "batch"
         },
@@ -1526,7 +1526,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The name  of the bioinformatics protocol used.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "If bioinformatic protocol Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1537,7 +1537,7 @@
             "ontology": "NCIT:C93490",
             "type": "string",
             "description": "The version number of the bioinformatics protocol used.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "bioinformatics protocol version",
             "fill_mode": "batch"
         },
@@ -1548,7 +1548,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Commercial/Open-source/both",
             "fill_mode": "batch"
         },
@@ -1559,7 +1559,7 @@
             "ontology": "MS_1002386",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Preprocessing",
             "fill_mode": "batch"
         },
@@ -1570,7 +1570,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Preprocessing Version",
             "fill_mode": "batch"
         },
@@ -1581,7 +1581,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "If preprocessing Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1592,7 +1592,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Preprocessing params",
             "fill_mode": "batch"
         },
@@ -1603,7 +1603,7 @@
             "ontology": "topic:0102",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Mapping",
             "fill_mode": "batch"
         },
@@ -1614,7 +1614,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Mapping Version",
             "fill_mode": "batch"
         },
@@ -1625,7 +1625,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "If mapping Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1636,7 +1636,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Analysis",
             "label": "Mapping params",
             "fill_mode": "batch"
         },
@@ -1707,7 +1707,7 @@
             "examples": [
                 "Variant of Concern (VOC) [GENEPIO:0100083]"
             ],
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Variants",
             "label": "Variant designation",
             "fill_mode": "batch"
         },
@@ -1846,7 +1846,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Variants",
             "label": "Number of variants (AF greater 75%)",
             "fill_mode": "batch"
         },
@@ -1857,7 +1857,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatic Variants",
             "label": "Number of variants with effect",
             "fill_mode": "batch"
         },
