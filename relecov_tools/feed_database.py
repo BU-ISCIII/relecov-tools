@@ -234,7 +234,7 @@ class FeedDatabase:
                         # wait 5 sec before resending the request
                         time.sleep(5)
                         result = self.iskylims_rest_api.post_request(
-                            json.dumps(iskylims_data),
+                            json.dumps(chunk),
                             {"user": self.user, "pass": self.passwd},
                             self.iskylims_settings["store_samples"],
                         )
@@ -252,18 +252,7 @@ class FeedDatabase:
                     sys.exit(1)
 
             log.info(
-                "stored data in iskylims for sample %s", iskylims_data["sampleName"]
-            )
-            # send request to releco-platform
-            relecov_data = {}
-            for label, value in sample.items():
-                if label not in sample_fields["iskylims_s_fields"]:
-                    relecov_data[label] = value
-
-            result = self.relecov_rest_api.post_request(
-                json.dumps(iskylims_data),
-                {"user": self.user, "pass": self.passwd},
-                self.relecov_settings["store_samples"],
+                "stored data in iskylims for sample %s", chunk["sampleName"]
             )
         return
 
