@@ -32,11 +32,13 @@
     },
     "external_url": {
         "iskylims": {
-            "server": "http://relecov-iskylims.isciiides.es",
+            "server": "http://relecov-iskylims.isciiides.es:",
             "url": "/wetlab/api/",
             "store_samples": "createSampleData",
             "url_project_fields": "sampleProjectFields",
-            "project_name": "Relecov",
+            "url_sample_fields": "samplefields",
+            "param_sample_project": "project",
+            "project_name": "relecov",
             "token": ""
         },
         "relecov": {
@@ -46,15 +48,8 @@
             "token": ""
         }
     },
-    "iskylims_sample_fields": {
-        "sampleName": "collecting_lab_sample_id",
-        "labRequest": "collecting_institution",
-        "sampleType": "anatomical_material",
-        "species": "host_common_name",
-        "sampleEntryDate": "sample_received_date",
-        "collectionSampleDate": "sample_collection_date"
-    },
     "iskylims_fixed_values": {
+        "patientCore": "",
         "sampleProject": "Relecov",
         "onlyRecorded": "Yes",
         "sampleLocation": "Not defined"
@@ -120,6 +115,19 @@
         "tool_name": "ena-upload-cli",
         "tool_version": "0.5.3"
     },
+<<<<<<< HEAD
     "md5_file_name": "md5sum_MiSeq_GEN_267_20220208_ICasas.md5",
     "checklist": "ERC000033"
 }
+=======
+    "md5_file_name": "md5sum_MiSeq_GEN_267_20220208_ICasas_removed_samples.md5",
+    "checklist": "ERC000033",
+    "long_table_heading": [
+        "SAMPLE", "CHROM", "POS", "REF",
+        "ALT", "FILTER", "DP", "REF_DP", "ALT_DP",
+        "AF", "GENE", "EFFECT", "HGVS_C", "HGVS_P",
+        "HGVS_P_1LETTER", "CALLER", "LINEAGE"
+
+    ]
+}
+>>>>>>> 82754d6fcd1927a7202635005b4822e1bffba4c2
