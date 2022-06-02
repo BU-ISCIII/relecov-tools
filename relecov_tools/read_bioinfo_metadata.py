@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # from itertools import islice
 
-
 import logging
 import json
 
@@ -142,6 +141,7 @@ class BioinfoMetadata:
             bioinfo_dict["reference_genome_accession"] = str(
                 variants_long_table["CHROM"][c]
             )
+
             bioinfo_dict["consensus_genome_length"] = str(
                 consensus_genome_length.iloc[c, 0]
             )
