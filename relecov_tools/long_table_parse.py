@@ -90,7 +90,7 @@ class LongTableParse:
                 lines = fh.readlines()
 
         except FileNotFoundError:
-            print("The file we're looking for... doesn't exist")
+            stderr.print("[red]The file we're looking for... doesn't exist")
             sys.exit(1)
 
         list_of_dictionaries = []
@@ -100,12 +100,23 @@ class LongTableParse:
         for heading in self.long_table_heading:
             dict_index_of_heading[heading] = self.long_table_heading.index(heading)
 
+        # check if the headers of both files are the same
         for heading_csv in headings_from_csv:
             if heading_csv not in dict_index_of_heading:
-                print("incorrect Format, fields don't match")
+                stderr.print("[red]Incorrect Format, fields don't match")
                 sys.exit(1)
 
+        # check if both files contain the same number of fields
         if len(self.long_table_heading) is len(headings_from_csv):
+
+            # check if the headers of both files have the same order
+            for idx in range(len(self.long_table_heading)):
+                if self.long_table_heading[idx] != headings_from_csv[idx]:
+                    stderr.print(
+                        "[red]Incorrect Format, fields don't have the same order"
+                    )
+                    sys.exit(1)
+
             for line in lines[1:]:
                 data_dict_from_long_table = {}
                 data_list = line.strip().split(",")
@@ -143,7 +154,9 @@ class LongTableParse:
 
             return json.dumps(list_of_dictionaries, indent=4)
         else:
-            print("Incorrect format, the headers do not have the same number of fields")
+            print(
+                "[red]Incorrect format, the headers do not have the same number of fields"
+            )
             sys.exit(1)
 
     def parsing_csv(self):
