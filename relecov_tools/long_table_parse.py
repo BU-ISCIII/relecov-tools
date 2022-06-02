@@ -106,17 +106,77 @@ class LongTableParse:
                 stderr.print("[red]Incorrect Format, fields don't match")
                 sys.exit(1)
 
+        dict_aux = {}
         # check if both files contain the same number of fields
         if len(self.long_table_heading) is len(headings_from_csv):
 
             # check if the headers of both files have the same order
             for idx in range(len(self.long_table_heading)):
                 if self.long_table_heading[idx] != headings_from_csv[idx]:
-                    stderr.print(
-                        "[red]Incorrect Format, fields don't have the same order"
-                    )
-                    sys.exit(1)
 
+                    for heading in headings_from_csv:
+                        dict_aux[heading] = headings_from_csv.index(heading)
+
+            print(dict_index_of_heading)
+            print(dict_aux)
+            dict_index_of_heading.clear()
+            dict_index_of_heading = dict_aux
+            print(dict_index_of_heading)
+            """
+            stderr.print(
+                "[red]Incorrect Format, fields don't have the same order"
+            )
+            sys.exit(1)
+            """
+
+            for line in lines[1:]:
+                data_dict_from_long_table = {}
+                data_list = line.strip().split(",")
+
+                data_dict_from_long_table["Chromosome"] = {
+                    "chromosome": data_list[dict_index_of_heading["CHROM"]]
+                }
+
+                data_dict_from_long_table["Position"] = {
+                    "pos": data_list[dict_index_of_heading["POS"]],
+                    "nucleotide": data_list[dict_index_of_heading["ALT"]],
+                }
+
+                data_dict_from_long_table["Filter"] = {
+                    "filter": data_list[dict_index_of_heading["FILTER"]]
+                }
+
+                data_dict_from_long_table["VariantInSample"] = {
+                    "dp": data_list[dict_index_of_heading["DP"]],
+                    "ref_dp": data_list[dict_index_of_heading["REF_DP"]],
+                    "alt_dp": data_list[dict_index_of_heading["ALT_DP"]],
+                    "af": data_list[dict_index_of_heading["AF"]],
+                }
+
+                data_dict_from_long_table["Gene"] = {
+                    "gene": data_list[dict_index_of_heading["GENE"]]
+                }
+
+                data_dict_from_long_table["Effect"] = {
+                    "effect": data_list[dict_index_of_heading["EFFECT"]],
+                    "hgvs_c": data_list[dict_index_of_heading["HGVS_C"]],
+                    "hgvs_p": data_list[dict_index_of_heading["HGVS_P"]],
+                    "hgvs_p_1_letter": data_list[
+                        dict_index_of_heading["HGVS_P_1LETTER"]
+                    ],
+                }
+
+                data_dict_from_long_table["Variant"] = {
+                    "ref": data_list[dict_index_of_heading["REF"]]
+                }
+
+                data_dict_from_long_table["Sample"] = {
+                    "sample": data_list[dict_index_of_heading["SAMPLE"]]
+                }
+
+                list_of_dictionaries.append(data_dict_from_long_table)
+
+            """
             for line in lines[1:]:
                 data_dict_from_long_table = {}
                 data_list = line.strip().split(",")
@@ -151,7 +211,7 @@ class LongTableParse:
                 data_dict_from_long_table["Sample"] = {"sample": data_list[0]}
 
                 list_of_dictionaries.append(data_dict_from_long_table)
-
+            """
             return json.dumps(list_of_dictionaries, indent=4)
         else:
             print(
