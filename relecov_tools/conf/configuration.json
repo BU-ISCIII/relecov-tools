@@ -32,7 +32,7 @@
     },
     "external_url": {
         "iskylims": {
-            "server": "http://relecov-iskylims.isciiides.es:8001",
+            "server": "http://relecov-iskylims.isciiides.es:",
             "url": "/wetlab/api/",
             "store_samples": "createSampleData",
             "url_project_fields": "sampleProjectFields",
