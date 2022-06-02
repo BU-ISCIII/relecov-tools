@@ -49,7 +49,7 @@
         }
     },
     "iskylims_fixed_values": {
-        "patient": "",
+        "patientCore": "",
         "sampleProject": "Relecov",
         "onlyRecorded": "Yes",
         "sampleLocation": "Not defined"

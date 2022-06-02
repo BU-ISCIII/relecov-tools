@@ -39,9 +39,7 @@ class FeedDatabase:
             )
         self.user = user
         if passwd is None:
-            passwd = relecov_tools.utils.prompt_text(
-                msg="Enter credential password"
-            )
+            passwd = relecov_tools.utils.prompt_text(msg="Enter credential password")
         self.passwd = passwd
         self.config_json = ConfigJson()
         if json_file is None:
@@ -94,9 +92,7 @@ class FeedDatabase:
             )
         except KeyError:
             log.error("Unable to get parameters for dataserver")
-            stderr.print(
-                f"[red] Unable to fetch parameters data for {database_server}"
-            )
+            stderr.print(f"[red] Unable to fetch parameters data for {database_server}")
             sys.exit(1)
         self.database_server = self.database_settings["server"]
         self.database_url = self.database_settings["url"]
@@ -138,20 +134,23 @@ class FeedDatabase:
         s_fields = list(sample_fields.keys())
         for row in self.json_data:
             s_dict = {}
-            for key, value in row.items:
+
+            for key, value in row.items():
                 if key in s_project_fields:
                     s_dict[key] = value
                 elif key in s_fields:
-                    s_dict[sample_list[key]] = value
+                    s_dict[sample_fields[key]] = value
                 else:
-                    import pdb; pdb.set_trace()
+                    print("not key in iSkyLIMS", key)
             # include the fix value
             if self.server_type == "iskylims":
-                for prop, val in self.config_json["iskylims_fixed_values"].items():
+                fixed_value = self.config_json.get_configuration(
+                    "iskylims_fixed_values"
+                )
+                for prop, val in fixed_value.items():
                     s_dict[prop] = val
             sample_list.append(s_dict)
 
-        import pdb; pdb.set_trace()
         return sample_list
 
     def get_fields_sample(self):
@@ -169,13 +168,12 @@ class FeedDatabase:
             sample_fields_raw = self.database_rest_api.get_request(sample_url, "", "")
         except AttributeError:
             log.error("Unable to connect to server %s", self.database_server)
-            stderr.print(
-                f"[red] Unable to connect to server {self.database_server}"
-            )
+            stderr.print(f"[red] Unable to connect to server {self.database_server}")
             sys.exit(1)
         if "ERROR" in sample_fields_raw:
             log.error(
-                "Unable to get parameters. Received error code %s", sample_fields_raw["ERROR"]
+                "Unable to get parameters. Received error code %s",
+                sample_fields_raw["ERROR"],
             )
             stderr.print(
                 f"[red] Unable to fetch data. Received error {sample_fields_raw['ERROR']}"
@@ -188,21 +186,26 @@ class FeedDatabase:
                     property = ontology_dict[values["ontology"]]
                     # sample_fields has a key the label in metadata and value
                     # the field name for sample
-                    sample_fields[property] = key
+                    sample_fields[property] = values["field_name"]
                 except KeyError as e:
                     stderr.print(f"[red]Error in map ontology {e}")
             else:
                 # for the ones that do no have ontologuy label is the sample field
                 # and the value is empty
-                sample_fields[key] = ""
+                # sample_fields[key] = ""
+                print(values["field_name"])
+
         # fetch label for sample Project
         s_project_url = self.database_settings["url_project_fields"]
         param = self.database_settings["param_sample_project"]
         p_name = self.database_settings["project_name"]
-        s_project_fields_raw = self.database_rest_api.get_request(s_project_url, param, p_name)
+        s_project_fields_raw = self.database_rest_api.get_request(
+            s_project_url, param, p_name
+        )
         if "ERROR" in s_project_fields_raw:
             log.error(
-                "Unable to get parameters. Received error code %s", s_project_fields_raw["ERROR"]
+                "Unable to get parameters. Received error code %s",
+                s_project_fields_raw["ERROR"],
             )
             stderr.print(
                 f"[red] Unable to fetch data. Received error {s_project_fields_raw['ERROR']}"
@@ -219,28 +222,11 @@ class FeedDatabase:
     def update_database(self, field_values):
         """Send the request to update database"""
         for chunk in field_values:
-            pass
-        for sample in self.json_data:
-            iskylims_data = {}
-            for label, value in sample_fields["iskylims_s_fields"].items():
-                try:
-                    iskylims_data[label] = sample[value]
-                except KeyError as e:
-                    log.error("Found %s when mapping data for sending to iSkyLIMS")
-                    stderr.print(f"[red]  {e} not found in mapping")
-                    sys.exit(1)
-            # add fxxed valuurs before sending request
-            iskylims_data["patientCore"] = ""
-            iskylims_data["sampleLocation"] = ""
-            iskylims_data["onlyRecorded"] = "Yes"
-            iskylims_data["sampleProject"] = self.iskylims_settings["project_name"]
-            import pdb; pdb.set_trace()
-            result = self.iskylims_rest_api.post_request(
-                json.dumps(iskylims_data),
+            result = self.database_rest_api.post_request(
+                json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
-                self.iskylims_settings["store_samples"],
+                self.database_settings["store_samples"],
             )
-            import pdb; pdb.set_trace()
             if "ERROR" in result:
                 if result["ERROR"] == "Server not available":
                     # retry to connect to server
@@ -288,7 +274,9 @@ class FeedDatabase:
         if self.type_of_info == "sample":
             if self.server_type == "iskylims":
                 sample_fields, s_project_fields = self.get_fields_sample()
-                map_fields = self.map_sample_fields_values(sample_fields, s_project_fields)
+                map_fields = self.map_sample_fields_values(
+                    sample_fields, s_project_fields
+                )
             else:
                 pass
-        self.update_databases(map_fields)
+        self.update_database(map_fields)
