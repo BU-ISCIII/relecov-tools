@@ -1986,8 +1986,8 @@
             ],
             "ontology": "NCIT:C54269",
             "type": "string",
-            "description": "",
-            "classification": "enter your GISAID-Username",
+            "description": "enter your GISAID-Username",
+            "classification": "Database Identifiers",
             "label": "GISAID id",
             "fill_mode": "sample"
         },
