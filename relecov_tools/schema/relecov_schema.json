@@ -1196,7 +1196,7 @@
             "ontology": "GENEPIO:0001459",
             "type": "string",
             "description": "The method used to remove host reads from the pathogen sequence.",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Dehosting Method",
             "fill_mode": "batch"
         },
@@ -1207,7 +1207,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The method version used to remove host reads from the pathogen sequence.",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Dehosting Method Version",
             "fill_mode": "batch"
         },
@@ -1218,7 +1218,7 @@
             "ontology": "NCIT_C63548",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Assembly",
             "fill_mode": "batch"
         },
@@ -1229,7 +1229,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "If assembly Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1240,7 +1240,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Assambly params",
             "fill_mode": "batch"
         },
@@ -1295,7 +1295,7 @@
             "examples": [
                 "ncov123assembly3"
             ],
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Consensus sequence name",
             "fill_mode": "batch"
         },
@@ -1306,7 +1306,7 @@
             "examples": [
                 "ncov123assembly3"
             ],
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Consensus sequence name md5",
             "fill_mode": "batch"
         },
@@ -1317,7 +1317,7 @@
             "ontology": "GENEPIO:0001462",
             "type": "string",
             "description": "The filepath of the consesnsus sequence file.",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Consensus sequence filepath",
             "fill_mode": "batch"
         },
@@ -1328,7 +1328,7 @@
             "ontology": "GENEPIO:0001463",
             "type": "string",
             "description": "The name of software used to generate the consensus sequence.",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Consensus sequence software name",
             "fill_mode": "batch"
         },
@@ -1339,7 +1339,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The version of the software used to generate the consensus sequence.",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "If consensus Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1350,7 +1350,7 @@
             "ontology": "GENEPIO:0001469",
             "type": "string",
             "description": "The version of the software used to generate the consensus sequence.",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Consensus sequence software version",
             "fill_mode": "batch"
         },
@@ -1361,7 +1361,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Consensus Params",
             "fill_mode": "batch"
         },
@@ -1372,7 +1372,7 @@
             "ontology": "data_3914",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Quality control metrics ",
             "fill_mode": "batch"
         },
@@ -1383,7 +1383,7 @@
             "ontology": "GENEPIO:0001474",
             "type": "string",
             "description": "The average number of reads representing a given nucleotide in the reconstructed sequence.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Depth of coverage value ",
             "fill_mode": "batch"
         },
@@ -1394,7 +1394,7 @@
             "ontology": "GENEPIO:0001475",
             "type": "string",
             "description": "The threshold used as a cut-off for the depth of coverage.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Depth of coverage threshold",
             "fill_mode": "batch"
         },
@@ -1471,7 +1471,7 @@
             "ontology": "GENEPIO:0001482",
             "type": "string",
             "description": "The number of total base pairs generated by the sequencing process.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Number of base pairs sequenced ",
             "fill_mode": "batch"
         },
@@ -1482,7 +1482,7 @@
             "ontology": "GENEPIO:0001483",
             "type": "string",
             "description": "Size of the assembled genome described as the number of base pairs.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Consensus genome length",
             "fill_mode": "batch"
         },
@@ -1493,7 +1493,7 @@
             "ontology": "GENEPIO:0001484",
             "type": "string",
             "description": "The number of N symbols present in the consensus fasta sequence, per 100kbp of sequence.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Ns per 100 kbp",
             "fill_mode": "batch"
         },
@@ -1504,7 +1504,7 @@
             "ontology": "GENEPIO:0001485",
             "type": "string",
             "description": "A persistent, unique identifier of a genome database entry.",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Reference genome accession",
             "fill_mode": "batch"
         },
@@ -1515,7 +1515,7 @@
             "ontology": "GENEPIO:0001489",
             "type": "string",
             "description": "The name  of the bioinformatics protocol used.",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Bioinformatics protocol",
             "fill_mode": "batch"
         },
@@ -1526,7 +1526,7 @@
             "ontology": "0",
             "type": "string",
             "description": "The name  of the bioinformatics protocol used.",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "If bioinformatic protocol Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1537,7 +1537,7 @@
             "ontology": "NCIT:C93490",
             "type": "string",
             "description": "The version number of the bioinformatics protocol used.",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "bioinformatics protocol version",
             "fill_mode": "batch"
         },
@@ -1548,7 +1548,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Commercial/Open-source/both",
             "fill_mode": "batch"
         },
@@ -1559,7 +1559,7 @@
             "ontology": "MS_1002386",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Preprocessing",
             "fill_mode": "batch"
         },
@@ -1570,7 +1570,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Preprocessing Version",
             "fill_mode": "batch"
         },
@@ -1581,7 +1581,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "If preprocessing Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1592,7 +1592,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Preprocessing params",
             "fill_mode": "batch"
         },
@@ -1603,7 +1603,7 @@
             "ontology": "topic:0102",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Mapping",
             "fill_mode": "batch"
         },
@@ -1614,7 +1614,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Mapping Version",
             "fill_mode": "batch"
         },
@@ -1625,7 +1625,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "If mapping Is Other, Specify",
             "fill_mode": "batch"
         },
@@ -1636,7 +1636,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatic Analysis",
+            "classification": "Bioinformatic Analysis fields",
             "label": "Mapping params",
             "fill_mode": "batch"
         },
@@ -1758,7 +1758,7 @@
             "examples": [
                 "E gene (orf4) [GENEPIO:0100151]"
             ],
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Gene Name 1",
             "fill_mode": "batch"
         },
@@ -1769,7 +1769,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "%qc filtered",
             "fill_mode": "batch"
         },
@@ -1780,7 +1780,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "%reads host",
             "fill_mode": "batch"
         },
@@ -1791,7 +1791,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "%reads virus",
             "fill_mode": "batch"
         },
@@ -1802,7 +1802,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "%unmapped",
             "fill_mode": "batch"
         },
@@ -1813,7 +1813,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "% genome  greater 10x",
             "fill_mode": "batch"
         },
@@ -1824,7 +1824,7 @@
             "ontology": "NCIT:C167285",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "mean depth of coverage value",
             "fill_mode": "batch"
         },
@@ -1835,7 +1835,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "%Ns",
             "fill_mode": "batch"
         },
@@ -1931,7 +1931,7 @@
             "type": "string",
             "format": "date",
             "description": "",
-            "classification": "Bioinformatics and QC metrics",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Analysis date",
             "fill_mode": "batch"
         },
