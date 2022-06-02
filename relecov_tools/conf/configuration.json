@@ -115,6 +115,11 @@
         "tool_name": "ena-upload-cli",
         "tool_version": "0.5.3"
     },
+<<<<<<< HEAD
+    "md5_file_name": "md5sum_MiSeq_GEN_267_20220208_ICasas.md5",
+    "checklist": "ERC000033"
+}
+=======
     "md5_file_name": "md5sum_MiSeq_GEN_267_20220208_ICasas_removed_samples.md5",
     "checklist": "ERC000033",
     "long_table_heading": [
@@ -125,3 +130,4 @@
 
     ]
 }
+>>>>>>> 82754d6fcd1927a7202635005b4822e1bffba4c2
