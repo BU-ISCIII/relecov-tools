@@ -276,14 +276,9 @@ def launch(user):
 @click.option(
     "-t",
     "--type",
-    type=click.Choice(
-        [
-            "sample",
-            "analysis"
-        ]
-    ),
+    type=click.Choice(["sample", "analysis"]),
     multiple=False,
-    help="Select the type of information to upload to database"
+    help="Select the type of information to upload to database",
 )
 @click.option(
     "-d",
@@ -295,7 +290,7 @@ def launch(user):
         ]
     ),
     multiple=False,
-    help="name of the server which information is defined in config file"
+    help="name of the server which information is defined in config file",
 )
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
