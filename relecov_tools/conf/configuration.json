@@ -64,28 +64,22 @@
     ],
     "relecov_bioinfo_metadata": {
         "dehosting_method_software_name": "KRAKEN2_KRAKEN2",
-        "dehosting_method_software_version": "2.1.2",
         "assembly": "None",
         "if_assembly_other": "None",
         "assembly_params": "None",
         "variant_calling_software_name": "IVAR_VARIANTS",
-        "variant_calling_software_version": "1.3.1",
         "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20 -m 10",
         "consensus_sequence_software_name": "BCFTOOLS_CONSENSUS",
-        "consensus_sequence_software_version": "1.14",
         "if_consensur_other": "None",
         "consensus_params": "-p vcf -f",
         "depth_of_coverage_threshold": ">10x",
         "bioinformatics_protocol_software_name": "nf-core/viralrecon",
-        "bioinformatics_protocol_software_version": "2.4.1",
         "if_bioinformatic_protocol_is_other_specify": "None",
         "commercial_open_source_both": "open-source",
         "preprocessing_software_name": "FASTP",
-        "preprocessing_software_version": "0.23.2",
         "if_preprocessing_other": "None",
         "preprocessing_params": "--cut_front --cut_tail --trim_poly_x --cut_mean_quality 30 --qualified_quality_phred 30 --unqualified_percent_limit 10 --length_required 50",
         "mapping_software_name": "BOWTIE2_ALIGN",
-        "mapping_software_version": "2.4.4",
         "if_mapping_other": "None",
         "mapping_params": "--seed 1",
         "lineage_analysis_software_name": "pangolin",
@@ -115,19 +109,25 @@
         "tool_name": "ena-upload-cli",
         "tool_version": "0.5.3"
     },
-<<<<<<< HEAD
     "md5_file_name": "md5sum_MiSeq_GEN_267_20220208_ICasas.md5",
-    "checklist": "ERC000033"
-}
-=======
-    "md5_file_name": "md5sum_MiSeq_GEN_267_20220208_ICasas_removed_samples.md5",
     "checklist": "ERC000033",
     "long_table_heading": [
-        "SAMPLE", "CHROM", "POS", "REF",
-        "ALT", "FILTER", "DP", "REF_DP", "ALT_DP",
-        "AF", "GENE", "EFFECT", "HGVS_C", "HGVS_P",
-        "HGVS_P_1LETTER", "CALLER", "LINEAGE"
-
+        "SAMPLE",
+        "CHROM",
+        "POS",
+        "REF",
+        "ALT",
+        "FILTER",
+        "DP",
+        "REF_DP",
+        "ALT_DP",
+        "AF",
+        "GENE",
+        "EFFECT",
+        "HGVS_C",
+        "HGVS_P",
+        "HGVS_P_1LETTER",
+        "CALLER",
+        "LINEAGE"
     ]
 }
->>>>>>> 82754d6fcd1927a7202635005b4822e1bffba4c2
