@@ -182,8 +182,8 @@ class BioinfoMetadata:
             bioinfo_dict["mapping_software_version"] = str(
                 list(software_versions["BOWTIE2_ALIGN"].values())[0]
             )
-            bioinfo_dict["pangolin_software_version"] = str(
-                list(pangolin_version_software["lineage_analysis_software_version"].values())[0]
+            bioinfo_dict["lineage_analysis_software_version"] = str(
+                pangolin_version_software.iloc[c, 0]
             )
 
             bioinfo_list[str(sample_name)] = bioinfo_dict
