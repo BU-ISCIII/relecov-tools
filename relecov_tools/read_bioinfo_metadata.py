@@ -101,6 +101,7 @@ class BioinfoMetadata:
             consensus_genome_length_path, header=None, sep=","
         )
         md5_info = pd.read_csv(md5_info_path, header=None, sep=",")
+        pangolin_version_software = pd.read_csv(pangolin_versions_path, header=None, sep="\t")
 
         with open(software_versions_path) as file:
             software_versions = yaml.load(file, Loader=yaml.FullLoader)
