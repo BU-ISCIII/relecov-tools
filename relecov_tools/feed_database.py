@@ -96,26 +96,7 @@ class FeedDatabase:
             sys.exit(1)
         self.database_server = self.database_settings["server"]
         self.database_url = self.database_settings["url"]
-        """
-        self.iskylims_server = self.iskylims_settings["server"]
-        self.iskylims_url = self.iskylims_settings["url"]
-        if iskylims_url:
-            split = iskylims_url.split("/")
-            self.iskylims_server = split[0] + "/"
-            self.iskylims_url = "/".join(split[1:]) + "/"
 
-        self.relecov_settings = self.config_json.get_topic_data(
-            "external_url", "relecov"
-        )
-        self.relecov_server = self.relecov_settings["server"]
-        self.relecov_url = self.relecov_settings["url"]
-        if relecov_url:
-            split = relecov_url.split("/")
-            self.relecov_server = split[0] + "/"
-            self.relecov_url = "/".join(split[1:])
-
-        self.iskylims_rest_api = RestApi(self.iskylims_server, self.iskylims_url)
-        """
         self.database_rest_api = RestApi(self.database_server, self.database_url)
 
     def get_schema_ontology_values(self):
@@ -126,7 +107,7 @@ class FeedDatabase:
                 ontology_dict[values["ontology"]] = prop
         return ontology_dict
 
-    def map_sample_fields_values(self, sample_fields, s_project_fields):
+    def map_iskylims_sample_fields_values(self, sample_fields, s_project_fields):
         """Map the values to the properties send to dtabasee
         in json schema based on label
         """
@@ -153,7 +134,7 @@ class FeedDatabase:
 
         return sample_list
 
-    def get_fields_sample(self):
+    def get_iskylims_fields_sample(self):
         """2 requests are sent to iSkyLIMS. One for getting the sample fields
         These fields are mapped using the ontology.
         The second request is for getting the sample project fields. These are
@@ -214,10 +195,21 @@ class FeedDatabase:
         for field in s_project_fields_raw["DATA"]:
             s_project_fields.append(field["sampleProjectFieldName"])
 
-        sample_fields["relecov_fields"] = self.config_json.get_configuration(
-            "relecov_fields"
-        )
         return [sample_fields, s_project_fields]
+
+    def map_relecov_sample_data(self):
+        """Select the values from self.json_data"""
+        field_values = []
+        r_fields = self.config_json.get_configuration("relecov_sample_metadata")
+        for row in self.json_data:
+            s_dict = {}
+            for r_field in r_fields:
+                if r_field in row:
+                    s_dict[r_field] = row[r_field]
+                else:
+                    s_dict[r_field] = None
+            field_values.append(s_dict)
+        return field_values
 
     def update_database(self, field_values):
         """Send the request to update database"""
@@ -260,12 +252,12 @@ class FeedDatabase:
         """
         if self.type_of_info == "sample":
             if self.server_type == "iskylims":
-                sample_fields, s_project_fields = self.get_fields_sample()
-                map_fields = self.map_sample_fields_values(
+                sample_fields, s_project_fields = self.get_iskylims_fields_sample()
+                map_fields = self.map_iskylims_sample_fields_values(
                     sample_fields, s_project_fields
                 )
             else:
-                pass
+                map_fields = self.map_relecov_sample_data()
         else:
             pass
         self.update_database(map_fields)
