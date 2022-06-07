@@ -85,6 +85,9 @@ class BioinfoMetadata:
         software_versions_path = os.path.join(
             self.input_folder, "software_versions.yml"
         )
+        pangolin_versions_path = os.path.join(
+            self.input_folder, "pangolin_version.csv"
+        )
         self.md5_file_name = config_json.get_configuration("md5_file_name")
         md5_info_path = os.path.join(
             self.input_folder,
