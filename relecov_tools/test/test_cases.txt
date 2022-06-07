@@ -4,7 +4,6 @@ relecov-tools read-lab-metadata -m relecov_tools/example_data/METADATA_LAB_TEST.
 relecov-tools validate -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -m relecov_tools/example_data/METADATA_LAB_TEST.xlsx -o /tmp
 relecov-tools map -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -d ENA -o /tmp
 relecov-tools map -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -d GISAID -o /tmp
-relecov-tools update-db -i http://iskylims.isciiides.es/wetlab/api -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json
-relecov-tools update-db -i http://localhost:8001/wetlab/api -r http://localhost:8000/api -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json -u admin -p Apple@123
+relecov-tools update-db -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json
 relecov-tools read-bioinfo-metadata -m relecov_tools/example_data/lab_metadata_20220208.xlsx -i /relecov_tools/example_data -o relecov_tools/example_data
-relecov-tools upload-to-ena -u XXXXXXXX -p XXXXXXXXX -e relecov_tools/example_data/to_ena_2.json -o relecov_tools/test -a add -c ISCIII
+relecov-tools upload-to-ena -e relecov_tools/example_data/to_ena_2.json -o relecov_tools/test -a add -c ISCIII

@@ -32,7 +32,7 @@
     },
     "external_url": {
         "iskylims": {
-            "server": "http://relecov-iskylims.isciiides.es:",
+            "server": "http://relecov-iskylims.isciiides.es",
             "url": "/wetlab/api/",
             "store_samples": "createSampleData",
             "url_project_fields": "sampleProjectFields",
@@ -54,13 +54,13 @@
         "onlyRecorded": "Yes",
         "sampleLocation": "Not defined"
     },
-    "relecov_metadata": [
-        "collecting_lab_sample_id",
-        "sequencing_sample_id",
-        "biosample_accession_ENA",
-        "virus_name",
-        "gisaid_id",
-        "sequencing_date"
+    "relecov_sample_metadata": [
+        "bioproject_accession_ENA" , "bioproject_umbrella_accession_ENA",
+        "biosample_accession_ENA", "GenBank_ENA_DDBJ_accession",
+        "GISAID_accession", "gisaid_id", "host_specimen_voucher",
+        "isolate_sample_id", "microbiology_lab_sample_id",
+        "sequencing_sample_id", "SRA_accession", "submitting_lab_sample_id",
+        "virus_name"
     ],
     "relecov_bioinfo_metadata": {
         "dehosting_method_software_name": "KRAKEN2_KRAKEN2",
