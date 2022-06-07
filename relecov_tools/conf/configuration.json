@@ -83,7 +83,6 @@
         "if_mapping_other": "None",
         "mapping_params": "--seed 1",
         "lineage_analysis_software_name": "pangolin",
-        "lineage_analysis_software_version": "4.0.6",
         "if_lineage_identification_other": "None"
     },
     "mapping_illumina_tab_field_list": {
