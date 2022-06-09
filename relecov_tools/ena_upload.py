@@ -1,4 +1,5 @@
 import logging
+import pdb
 import rich.console
 import json
 
@@ -108,8 +109,10 @@ class EnaUpload:
         esquema_json = json.load(fh_esquema)
         fh_esquema.close()
 
-        df_schemas = pd.DataFrame.from_dict(esquema_json, orient="index")
-        df_transposed = df_schemas.T
+        df_schemas = pd.DataFrame(esquema_json)
+
+        # df_transposed = df_schemas.T
+        df_transposed = df_schemas
         df_study = df_transposed[
             ["study_alias", "study_title", "study_type", "study_abstract"]
         ]
@@ -124,17 +127,14 @@ class EnaUpload:
                 "sample_name",
                 "sample_title",
                 "taxon_id",
-                "sample_description",
-                "collection date",
-                "geographic location (country and/or sea)",
-                "host common name",
-                "host scientific name",
-                "host subject id",
-                "host health state",
-                "host sex",
+                "collection_date",
+                "geographic_location_(country_and/or_sea)",
+                "host_common_name",
+                "host_scientific_name",
+                "host_sex",
                 "scientific_name",
-                "collector name",
-                "collecting institution",
+                "collector_name",
+                "collecting_institution",
                 "isolate",
             ]
         ]
@@ -156,7 +156,8 @@ class EnaUpload:
                 "r1_fastq_filepath",
                 "r2_fastq_filepath",
                 "file_type",
-                "file_checksum",
+                "fastq_r1_md5",
+                "fastq_r2_md5",
             ]
         ]
         df_run.insert(3, "status", self.action)
@@ -168,14 +169,12 @@ class EnaUpload:
                 "experiment_alias",
                 "study_title",
                 "study_alias",
-                "design_description",
                 "sample_name",
                 "library_name",
                 "library_strategy",
                 "library_source",
                 "library_selection",
                 "library_layout",
-                "platform",
                 "instrument_model",
             ]
         ]
@@ -205,6 +204,7 @@ class EnaUpload:
                 file_paths[os.path.basename(path)] = os.path.abspath(path)
 
             # submit data to webin ftp server
+
             chec = submit_data(file_paths, self.passwd, self.user)
             print(chec)
 
