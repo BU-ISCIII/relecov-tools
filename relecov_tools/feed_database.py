@@ -242,8 +242,15 @@ class FeedDatabase:
                         f"[red] Error {result['ERROR']} when sending request to iSkyLIMS "
                     )
                     sys.exit(1)
-
-            log.info("stored data in iskylims for sample %s", chunk["sampleName"])
+            if "sampleName" in chunk:
+                log.info("stored data in iskylims for sample %s", chunk["sampleName"])
+            elif "sequencing_sample_id" in chunk:
+                log.info(
+                    "stored data in relecov for sample %s",
+                    chunk["sequencing_sample_id"],
+                )
+            else:
+                log.info("stored data in relecov")
         return
 
     def store_data(self):

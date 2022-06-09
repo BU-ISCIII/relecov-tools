@@ -44,7 +44,7 @@
         "relecov": {
             "server": "http://relecov-platform.isciiides.es",
             "url": "/api/",
-            "store_samples": "storeData",
+            "store_samples": "createSampleData",
             "token": ""
         }
     },
