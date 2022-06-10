@@ -1,7 +1,8 @@
 import logging
 import rich.console
 import json
-import paramiko
+
+# import paramiko
 import pandas as pd
 import sys
 import os
@@ -205,6 +206,7 @@ class EnaUpload:
             # submit data to webin ftp server
 
             chec = submit_data(file_paths, self.passwd, self.user)
+            print(chec)
 
             # when ADD/MODIFY,
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
