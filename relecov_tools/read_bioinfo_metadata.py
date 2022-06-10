@@ -158,7 +158,7 @@ class BioinfoMetadata:
             bioinfo_dict["consensus_sequence_R1_md5"] = str(
                 md5_info.iloc[c * 2, 0][0:32]
             )
-            bioinfo_dict["consensus_sequence__R2_md5"] = str(
+            bioinfo_dict["consensus_sequence_R2_md5"] = str(
                 md5_info.iloc[c * 2 + 1, 0][0:32]
             )
 

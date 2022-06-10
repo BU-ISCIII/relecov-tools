@@ -1,7 +1,7 @@
 import logging
 import rich.console
 import json
-
+import paramiko
 import pandas as pd
 import sys
 import os
@@ -204,8 +204,46 @@ class EnaUpload:
 
             # submit data to webin ftp server
 
-            chec = submit_data(file_paths, self.passwd, self.user)
-            print(chec)
+            # chec = submit_data(file_paths, self.passwd, self.user)
+            sftp_server = "webin2.ebi.ac.uk"
+            sftp_port = 21
+
+            def open_connection(self, file_paths):
+                """Establish sftp connection"""
+                self.client = paramiko.SSHClient()
+                self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                self.client.connect(
+                    hostname=sftp_server,
+                    port=sftp_port,
+                    username=self.user,
+                    password=self.passwd,
+                    allow_agent=False,
+                    look_for_keys=False,
+                )
+                try:
+                    self.client = self.client.open_sftp()
+
+                    return True
+                except paramiko.SSHException as e:
+                    log.error("Invalid Username/Password for %s:", e)
+                    return False
+
+            for filename, path in file_paths.items():
+                print(f"uploading {path}")
+                try:
+                    filename = "/" + filename
+                    self.client.put(path, filename)
+                except BaseException as err:
+                    print(f"ERROR: {err}")
+                    print(
+                        "ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000."
+                    )
+                    raise
+
+            def close_connection(self):
+                """Closes SFTP connection"""
+                self.client.close()
+                return True
 
             # when ADD/MODIFY,
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'

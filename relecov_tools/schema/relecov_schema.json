@@ -1420,6 +1420,17 @@
             "label": "Depth of coverage value ",
             "fill_mode": "batch"
         },
+        "sample_name": {
+            "examples": [
+                "234546"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Files info",
+            "label": "Sample Name",
+            "fill_mode": "batch"
+        },
         "depth_of_coverage_threshold": {
             "examples": [
                 "100x"
@@ -1431,7 +1442,7 @@
             "label": "Depth of coverage threshold",
             "fill_mode": "batch"
         },
-        "sequence_file_R1_fastq": {
+        "fastq_r1": {
             "examples": [
                 "ABC123_S1_L001_R1_001.fastq.gz"
             ],
@@ -1442,7 +1453,7 @@
             "label": "Sequence file R1 fastq",
             "fill_mode": "sample"
         },
-        "sequence_file_R2_fastq": {
+        "fastq_r2": {
             "examples": [
                 "ABC123_S1_L001_R2_002.fastq.gz"
             ],
