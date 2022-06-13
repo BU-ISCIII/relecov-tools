@@ -6,6 +6,7 @@ import json
 import pandas as pd
 import sys
 import os
+import ftplib
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -113,6 +114,7 @@ class EnaUpload:
 
         # df_transposed = df_schemas.T
         df_transposed = df_schemas
+
         df_study = df_transposed[
             ["study_alias", "study_title", "study_type", "study_abstract"]
         ]
@@ -151,8 +153,6 @@ class EnaUpload:
         df_run = df_transposed[
             [
                 "experiment_alias",
-                "sequence_file_R1_fastq",
-                "sequence_file_R2_fastq",
                 "r1_fastq_filepath",
                 "r2_fastq_filepath",
                 "file_type",
@@ -160,9 +160,15 @@ class EnaUpload:
                 "fastq_r2_md5",
             ]
         ]
+        df_run.insert(
+            1, "sequence_file_R1_fastq", df_transposed["r1_fastq_filepath"][0][31:57]
+        )
+        df_run.insert(
+            2, "sequence_file_R2_fastq", df_transposed["r2_fastq_filepath"][0][31:57]
+        )
         df_run.insert(3, "status", self.action)
         df_run.insert(4, "alias", df_run["experiment_alias"])
-        df_run.insert(4, "file_name", df_run["sequence_file_R1_fastq"])
+        df_run.insert(5, "file_name", df_run["sequence_file_R1_fastq"])
 
         df_experiments = df_transposed[
             [
@@ -205,8 +211,25 @@ class EnaUpload:
 
             # submit data to webin ftp server
 
-            chec = submit_data(file_paths, self.passwd, self.user)
-            print(chec)
+            session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
+            for filename, path in file_paths.items():
+                print("Uploading" + path)
+                try:
+
+                    file = open(file_paths, "rb")  # file to send
+                    g = session.storbinary(f"STOR {file_paths.name}", file)
+                    print(g)  # send the file
+                    file.close()  # close file and FTP
+                    g2 = session.quit()
+                    print(g2)
+                except BaseException as err:
+                    print(f"ERROR: {err}")
+                    print(
+                        "ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000."
+                    )
+
+            # chec = submit_data(file_paths, self.passwd, self.user)
+            # print(chec)
 
             # when ADD/MODIFY,
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
@@ -214,7 +237,6 @@ class EnaUpload:
 
             tool = config_json.get_configuration("tool")
 
-            print(checklist)
             schema_xmls = run_construct(
                 template_path, schema_targets, self.center, checklist, tool
             )
