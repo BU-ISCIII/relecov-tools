@@ -11,7 +11,8 @@ import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
 from ena_upload.ena_upload import extract_targets
-from ena_upload.ena_upload import submit_data
+
+# from ena_upload.ena_upload import submit_data
 from ena_upload.ena_upload import run_construct
 from ena_upload.ena_upload import construct_submission
 from ena_upload.ena_upload import send_schemas
