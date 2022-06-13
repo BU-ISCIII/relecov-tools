@@ -210,7 +210,7 @@ class EnaUpload:
                 file_paths[os.path.basename(path)] = os.path.abspath(path)
 
             # submit data to webin ftp server
-
+            # def ftp_connect(self):
             session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
             for filename, path in file_paths.items():
                 print("Uploading" + path)
@@ -227,6 +227,8 @@ class EnaUpload:
                     print(
                         "ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000."
                     )
+            # l = ftp_connect(self)
+            # print(l)
 
             # chec = submit_data(file_paths, self.passwd, self.user)
             # print(chec)
