@@ -8,6 +8,7 @@ import rich.console
 import openpyxl
 import os
 import sys
+import re
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 import relecov_tools.json_schema
@@ -81,6 +82,16 @@ class RelecovMetadata:
         with open(j_file, "r") as fh:
             data = json.load(fh)
         return data
+
+    def get_experiment_run_alias(self, row_data):
+        exp_alias = "NOT_FOUND"
+        run_alias = "NOT_FOUND.fastq.gz"
+        if "fastq_r1" in row_data:
+            match = re.search(r"(.+)_R1_.*", row_data["fastq_r1"])
+            if match:
+                exp_alias = match.group(1)
+                run_alias = match.group(1) + ".fastq.gz"
+        return exp_alias, run_alias
 
     def get_laboratory_data(self, lab_json, geo_loc_json, lab_name):
         """Fetch the laboratory location  and return a dictionary"""
@@ -159,8 +170,12 @@ class RelecovMetadata:
             if metadata["sequencing_instrument_model"] in values:
                 new_data["sequencing_instrument_platform"] = key
                 break
-        return new_data
 
+        return new_data
+        """
+                "experiment_alias": "",
+                "run_alias": "",
+        """
     def add_additional_data(self, metadata, lab_json_file, geo_loc_file):
         """Add the additional information that must be included in final metadata
         metadata Origin metadata
@@ -173,7 +188,7 @@ class RelecovMetadata:
         lab_json = self.read_json_file(lab_json_file)
         geo_loc_json = self.read_json_file(geo_loc_file)
         samples_json = self.read_json_file(self.sample_list_file)
-
+        exp_alias, run_alias = self.get_experiment_run_alias(metadata[0])
         for row_sample in metadata:
             """Include sample data from sample json"""
             try:
@@ -218,7 +233,11 @@ class RelecovMetadata:
             ]
             row["sequencing_instrument_platform"] = "To change"
             """
+            # Add experiment_alias and run_alias
+            row_sample["experiment_alias"] = exp_alias
+            row_sample["run_alias"] = run_alias
             additional_metadata.append(row_sample)
+
         return additional_metadata
 
     def request_information(external_url, request):
