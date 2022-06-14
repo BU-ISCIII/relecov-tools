@@ -172,10 +172,7 @@ class RelecovMetadata:
                 break
 
         return new_data
-        """
-                "experiment_alias": "",
-                "run_alias": "",
-        """
+
     def add_additional_data(self, metadata, lab_json_file, geo_loc_file):
         """Add the additional information that must be included in final metadata
         metadata Origin metadata
