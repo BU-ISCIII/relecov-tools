@@ -75,7 +75,7 @@ class FeedDatabase:
         if type_of_info is None:
             type_of_info = relecov_tools.utils.prompt_selection(
                 "Select:",
-                ["sample", "analysis"],
+                ["sample", "analysis", "longtable"],
             )
         self.type_of_info = type_of_info
 
@@ -211,13 +211,13 @@ class FeedDatabase:
             field_values.append(s_dict)
         return field_values
 
-    def update_database(self, field_values):
+    def update_database(self, field_values, post_url):
         """Send the request to update database"""
         for chunk in field_values:
             result = self.database_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
-                self.database_settings["store_samples"],
+                self.database_settings[post_url],
             )
             if "ERROR" in result:
                 if result["ERROR"] == "Server not available":
@@ -228,7 +228,7 @@ class FeedDatabase:
                         result = self.iskylims_rest_api.post_request(
                             json.dumps(chunk),
                             {"user": self.user, "pass": self.passwd},
-                            self.iskylims_settings["store_samples"],
+                            self.iskylims_settings[post_url],
                         )
                         if "ERROR" not in result:
                             break
@@ -265,6 +265,12 @@ class FeedDatabase:
                 )
             else:
                 map_fields = self.map_relecov_sample_data()
+            post_url = "store_samples"
+        elif self.type_of_info == "analysis":
+            post_url = "analysis"
+        elif self.type_of_info == "longtable":
+            post_url = "long_table"
         else:
-            pass
-        self.update_database(map_fields)
+            stderr.print("[red] Invalid type to upload to database")
+            sys.exit(1)
+        self.update_database(map_fields, post_url)

@@ -323,7 +323,7 @@ def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
         metadata_file, input_folder, metadata_out
     )
 
-    new_bioinfo_metadata.bioinfo_parse(metadata_file)
+    new_bioinfo_metadata.bioinfo_parse()
 
 
 # read metadata bioinformatics
@@ -332,7 +332,7 @@ def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
     "-l",
     "--longtable_file",
     type=click.Path(),
-    help="file containing long table ",
+    help="file containing variant long table ",
 )
 @click.option("-o", "--output", type=click.Path(), help="Path to save json output")
 def long_table_parse(longtable_file, output):
