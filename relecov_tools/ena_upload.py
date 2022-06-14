@@ -201,7 +201,9 @@ class EnaUpload:
         ]
         df_experiments.insert(3, "status", self.action)
         df_experiments.insert(4, "alias", df_experiments["experiment_alias"])
-
+        df_experiments.insert(5, "design_description", "")
+        df_experiments.insert(5, "insert_size", 150)
+        df_experiments.insert(5, "platform", "ILLUMINA")
         df_experiments = df_experiments.rename(columns={"study_title": "title"})
         df_experiments = df_experiments.rename(columns={"sample_name": "sample_alias"})
 
@@ -223,7 +225,7 @@ class EnaUpload:
 
             # submit data to webin ftp server
             # def ftp_connect(self):
-
+            """
             session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
             for filename, path in file_paths.items():
 
@@ -240,6 +242,7 @@ class EnaUpload:
                     # print("ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000.")
 
             g2 = session.quit()
+            """
             # print(g2)
             # l = ftp_connect(self)
             # print(l)
