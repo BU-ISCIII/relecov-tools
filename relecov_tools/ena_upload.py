@@ -1,5 +1,6 @@
 import logging
-from pyparsing import col
+
+# from pyparsing import col
 import rich.console
 import json
 
@@ -7,7 +8,8 @@ import json
 import pandas as pd
 import sys
 import os
-import ftplib
+
+# import ftplib
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
