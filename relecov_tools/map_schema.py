@@ -197,6 +197,9 @@ class MappingSchema:
                 mapped_json_data[idx]["study_abstract"] = self.json_data[idx][
                     "study_title"
                 ]
+                mapped_json_data[idx]["sample_description"] = self.json_data[idx][
+                    "sequence_file_R1_fastq"
+                ]
 
         return mapped_json_data
 

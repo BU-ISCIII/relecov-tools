@@ -1,4 +1,6 @@
 import logging
+
+# from pyparsing import col
 import rich.console
 import json
 
@@ -6,7 +8,8 @@ import json
 import pandas as pd
 import sys
 import os
-import ftplib
+
+# import ftplib
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -113,19 +116,14 @@ class EnaUpload:
 
         df_schemas = pd.DataFrame(esquema_json)
 
-        # df_transposed = df_schemas.T
-        df_transposed = df_schemas
-
-        df_study = df_transposed[
+        df_study = df_schemas[
             ["study_alias", "study_title", "study_type", "study_abstract"]
         ]
-        # df_study.columns.values[0] = "alias"
-        # df_study.columns.values[1] = "title"
 
         df_study = df_study.rename(columns={"study_alias": "alias"})
         df_study = df_study.rename(columns={"study_title": "title"})
         df_study.insert(3, "status", self.action)
-        df_samples = df_transposed[
+        df_samples = df_schemas[
             [
                 "sample_name",
                 "sample_title",
@@ -141,17 +139,34 @@ class EnaUpload:
                 "isolate",
             ]
         ]
-        # df_samples.columns.values[0] = "alias"
-        # df_samples.columns.values[1] = "title"
 
         df_samples = df_samples.rename(columns={"sample_name": "alias"})
         df_samples = df_samples.rename(columns={"sample_title": "title"})
+        df_samples = df_samples.rename(
+            columns={
+                "geographic_location_(country_and/or_sea)": "geographic location (country and/or sea)"
+            }
+        )
+        df_samples = df_samples.rename(columns={"collection_date": "collection date"})
+        df_samples = df_samples.rename(columns={"host_common_name": "host common name"})
+        df_samples = df_samples.rename(columns={"host_common_name": "host common name"})
+        df_samples = df_samples.rename(columns={"host_sex": "host sex"})
+        df_samples = df_samples.rename(
+            columns={"host_scientific_name": "host scientific name"}
+        )
+        df_samples = df_samples.rename(columns={"collector_name": "collector name"})
+        df_samples = df_samples.rename(
+            columns={"collecting_institution": "collecting institution"}
+        )
         df_samples.insert(3, "status", self.action)
+        df_samples.insert(3, "host subject id", "")
+        df_samples.insert(3, "host health state", "")
         config_json = ConfigJson()
         checklist = config_json.get_configuration("checklist")
         df_samples.insert(4, "ENA_CHECKLIST", checklist)
+        df_samples.insert(5, "sample_description", "")
 
-        df_run = df_transposed[
+        df_run = df_schemas[
             [
                 "experiment_alias",
                 "r1_fastq_filepath",
@@ -162,16 +177,17 @@ class EnaUpload:
             ]
         ]
         df_run.insert(
-            1, "sequence_file_R1_fastq", df_transposed["r1_fastq_filepath"][0][31:57]
+            1, "sequence_file_R1_fastq", df_schemas["r1_fastq_filepath"][0][31:57]
         )
         df_run.insert(
-            2, "sequence_file_R2_fastq", df_transposed["r2_fastq_filepath"][0][31:57]
+            2, "sequence_file_R2_fastq", df_schemas["r2_fastq_filepath"][0][31:57]
         )
         df_run.insert(3, "status", self.action)
+        df_run = df_run.rename(columns={"fastq_r1_md5": "file_checksum"})
         df_run.insert(4, "alias", df_run["experiment_alias"])
         df_run.insert(5, "file_name", df_run["sequence_file_R1_fastq"])
 
-        df_experiments = df_transposed[
+        df_experiments = df_schemas[
             [
                 "experiment_alias",
                 "study_title",
@@ -187,10 +203,9 @@ class EnaUpload:
         ]
         df_experiments.insert(3, "status", self.action)
         df_experiments.insert(4, "alias", df_experiments["experiment_alias"])
-
-        # df_experiments.columns.values[0] = "title"
-        # df_experiments.columns.values[1] = "sample_alias"
-
+        df_experiments.insert(5, "design_description", "")
+        df_experiments.insert(5, "insert_size", 150)
+        df_experiments.insert(5, "platform", "ILLUMINA")
         df_experiments = df_experiments.rename(columns={"study_title": "title"})
         df_experiments = df_experiments.rename(columns={"sample_name": "sample_alias"})
 
@@ -212,23 +227,25 @@ class EnaUpload:
 
             # submit data to webin ftp server
             # def ftp_connect(self):
+            """
             session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
             for filename, path in file_paths.items():
-                print("Uploading" + path)
-                try:
 
-                    file = open(file_paths, "rb")  # file to send
-                    g = session.storbinary(f"STOR {file_paths.name}", file)
+                print("Uploading path " + path + " and filename: " + filename)
+
+                try:
+                    file = open(path, "rb")  # file to send
+                    g = session.storbinary(f"STOR {filename}", file)
                     print(g)  # send the file
                     file.close()  # close file and FTP
-                    g2 = session.quit()
-                    print(g2)
                 except BaseException as err:
-                    print(f"ERROR: {err}")
-                    print(
-                        "ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000."
-                    )
 
+                    print(f"ERROR: {err}")
+                    # print("ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000.")
+
+            g2 = session.quit()
+            """
+            # print(g2)
             # l = ftp_connect(self)
             # print(l)
 

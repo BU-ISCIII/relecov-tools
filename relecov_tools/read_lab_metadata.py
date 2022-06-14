@@ -115,7 +115,7 @@ class RelecovMetadata:
             "type": "betacoronavirus",
             "tax_id": "2697049",
             "organism": "Severe acute respiratory syndrome coronavirus 2",
-            "common_name": "PEPITO",
+            "common_name": "Severe acute respiratory syndrome",
             "sample_description": "Sample for surveillance",
         }
         fixed_data.update(self.configuration.get_configuration("ENA_configuration"))
