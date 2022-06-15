@@ -204,7 +204,7 @@ class EnaUpload:
         df_experiments.insert(3, "status", self.action)
         df_experiments.insert(4, "alias", df_experiments["experiment_alias"])
         df_experiments.insert(5, "design_description", "")
-        df_experiments.insert(5, "insert_size", 150)
+        df_experiments.insert(5, "insert_size", 0)
         df_experiments.insert(5, "platform", "ILLUMINA")
         df_experiments = df_experiments.rename(columns={"study_title": "title"})
         df_experiments = df_experiments.rename(columns={"sample_name": "sample_alias"})
