@@ -1,6 +1,6 @@
 import logging
 
-from pyparsing import col
+# from pyparsing import col
 import rich.console
 import json
 
@@ -277,7 +277,7 @@ class EnaUpload:
                 file_paths[os.path.basename(path)] = os.path.abspath(path)
 
             # submit data to webin ftp server
-            """
+
             session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
             for filename, path in file_paths.items():
 
@@ -294,7 +294,7 @@ class EnaUpload:
                     # print("ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000.")
 
             g2 = session.quit()
-            """
+
             # THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
             # chec = submit_data(file_paths, self.passwd, self.user)
             # print(chec)
