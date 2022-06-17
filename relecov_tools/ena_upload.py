@@ -130,7 +130,6 @@ class EnaUpload:
         df_study = df_study.rename(columns={"study_alias": "alias"})
         df_study = df_study.rename(columns={"study_title": "title"})
         df_study.insert(3, "status", self.action)
-
         # df_study
         """
         alias                                              title    study_type status                                     study_abstract
@@ -179,7 +178,6 @@ class EnaUpload:
         checklist = config_json.get_configuration("checklist")
         df_samples.insert(4, "ENA_CHECKLIST", checklist)
         df_samples.insert(5, "sample_description", "")
-
         # df_samples
         """
         alias      title taxon_id host health state  ...                                  scientific_name     collector name           collecting institution    isolate
@@ -187,7 +185,6 @@ class EnaUpload:
 1   212163777  212163777  2697049                    ...  Severe acute respiratory syndrome coronavirus 2   Inmaculada Casas     Hospital Clínic de Barcelona  212163777
 2   212153091  212153091  2697049                    ...  Severe acute respiratory syndrome coronavirus 2   Inmaculada Casas     Hospital Clínic de Barcelona  212153091
         """
-
         df_run = df_schemas[
             [
                 "experiment_alias",
@@ -212,8 +209,24 @@ class EnaUpload:
 
         df_run.insert(3, "status", self.action)
         df_run = df_run.rename(columns={"fastq_r1_md5": "file_checksum"})
-        df_run.insert(4, "alias", df_run["experiment_alias"])
+
+        for i in range(len(df_run)):
+            df_run.loc[i, "alias"] = (
+                str(df_run.loc[i, "sequence_file_R1_fastq"])
+                + "_"
+                + str(df_run.loc[i, "sequence_file_R2_fastq"])
+            )
+            df_run.loc[i, "experiment_alias"] = (
+                str(df_run.loc[i, "sequence_file_R1_fastq"])
+                + "_"
+                + str(df_run.loc[i, "sequence_file_R2_fastq"])
+            )
+
         df_run.insert(5, "file_name", df_run["sequence_file_R1_fastq"])
+        df_run2 = df_run.copy()
+        df_run2["file_name"] = df_run["sequence_file_R2_fastq"]
+        df_run_final = pd.concat([df_run, df_run2])
+        df_run_final.reset_index()
 
         # df_run
         """
@@ -223,6 +236,7 @@ class EnaUpload:
 2        214821_S12   214823_S1_R1_001.fastq.gz   214823_S1_R2_001.fastq.gz  ...     fastq  c16bdbfc03c354496fcfb2c107e3cbf6  4d9b80b977a75bf7e2a4282ca910d94a
 
         """
+
         df_experiments = df_schemas[
             [
                 "experiment_alias",
@@ -263,7 +277,7 @@ class EnaUpload:
         ena_config = config_json.get_configuration("ENA_configuration")
         schema_dataframe = {}
         schema_dataframe["sample"] = df_samples
-        schema_dataframe["run"] = df_run
+        schema_dataframe["run"] = df_run_final
         schema_dataframe["experiment"] = df_experiments
         schema_targets = extract_targets(self.action, schema_dataframe)
 
@@ -272,13 +286,19 @@ class EnaUpload:
 
         if self.action == "ADD" or self.action == "add":
             file_paths = {}
+            file_paths_r2 = {}
 
-            for path in df_run["r1_fastq_filepath"]:
+            for path in df_schemas["r1_fastq_filepath"]:
                 file_paths[os.path.basename(path)] = os.path.abspath(path)
 
-            # submit data to webin ftp server
+            for path in df_schemas["r2_fastq_filepath"]:
+                file_paths_r2[os.path.basename(path)] = os.path.abspath(path)
 
+            file_paths.update(file_paths_r2)
+
+            # submit data to webin ftp server
             session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
+
             for filename, path in file_paths.items():
 
                 print("Uploading path " + path + " and filename: " + filename)
