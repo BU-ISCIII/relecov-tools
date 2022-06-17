@@ -323,7 +323,7 @@ def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
         metadata_file, input_folder, metadata_out
     )
 
-    new_bioinfo_metadata.bioinfo_parse()
+    new_bioinfo_metadata.bioinfo_parse(metadata_file)
 
 
 # read metadata bioinformatics
