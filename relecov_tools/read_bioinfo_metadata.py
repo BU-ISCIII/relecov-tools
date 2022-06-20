@@ -196,7 +196,15 @@ class BioinfoMetadata:
             c_time = os.path.getctime(variants_long_table_path)
             dt_c = datetime.datetime.fromtimestamp(c_time)
             bioinfo_dict["analysis_date"] = str(dt_c)
+            bioinfo_dict["lineage_identification_date"] = str(dt_c)
 
+            """
+            IDEA 
+            pango_time = os.path.getctime(
+                self.input_folder + "/" + str(sample_name) + ".pangolin.csv"
+            )
+            dt_pango = datetime.datetime.fromtimestamp(pango_time)
+            """
             bioinfo_list[str(sample_name)] = bioinfo_dict
             c = c + 1
 

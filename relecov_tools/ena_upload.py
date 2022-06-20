@@ -77,6 +77,7 @@ class EnaUpload:
             )
         else:
             self.dev = dev
+
         if customized_project is None:
             self.customized_project = None
         else:
@@ -153,7 +154,7 @@ class EnaUpload:
             ]
         ]
 
-        df_samples = df_samples.rename(columns={"sample_name": "alias"})
+        df_samples = df_samples.rename(columns={"sample_name": "01" + "alias"})
         df_samples = df_samples.rename(columns={"sample_title": "title"})
         df_samples = df_samples.rename(
             columns={
@@ -297,6 +298,7 @@ class EnaUpload:
             file_paths.update(file_paths_r2)
 
             # submit data to webin ftp server
+
             session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
 
             for filename, path in file_paths.items():
