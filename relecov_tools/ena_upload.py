@@ -154,7 +154,7 @@ class EnaUpload:
             ]
         ]
 
-        df_samples = df_samples.rename(columns={"sample_name": "01" + "alias"})
+        df_samples = df_samples.rename(columns={"sample_name": "alias"})
         df_samples = df_samples.rename(columns={"sample_title": "title"})
         df_samples = df_samples.rename(
             columns={
