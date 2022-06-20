@@ -3,6 +3,8 @@
 
 import logging
 import json
+import datetime
+import os
 
 
 import rich.console
@@ -142,6 +144,10 @@ class BioinfoMetadata:
             bioinfo_dict["ns_per_100_kbp"] = str(
                 summary_variants_metrics["# Ns per 100kb consensus"][c]
             )
+            bioinfo_dict["qc_filtered"] = str(
+                summary_variants_metrics["# Trimmed reads (fastp)"][c]
+            )
+
             # fields from variants_long_table.csv
             bioinfo_dict["reference_genome_accession"] = str(
                 variants_long_table["CHROM"][c]
@@ -186,6 +192,10 @@ class BioinfoMetadata:
             bioinfo_dict["lineage_analysis_software_version"] = str(
                 pangolin_version_software.iloc[c]
             )
+
+            c_time = os.path.getctime(variants_long_table_path)
+            dt_c = datetime.datetime.fromtimestamp(c_time)
+            bioinfo_dict["analysis_date"] = str(dt_c)
 
             bioinfo_list[str(sample_name)] = bioinfo_dict
             c = c + 1
