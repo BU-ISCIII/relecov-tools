@@ -1427,7 +1427,7 @@
             "ontology": "0",
             "type": "string",
             "description": "",
-            "classification": "Files info",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Sample Name",
             "fill_mode": "batch"
         },
@@ -1449,7 +1449,7 @@
             "ontology": "GENEPIO:0001476",
             "type": "string",
             "description": "The user-specified filename of the r1 FASTQ file.",
-            "classification": "Files info",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Sequence file R1 fastq",
             "fill_mode": "sample"
         },
@@ -1460,7 +1460,7 @@
             "ontology": "GENEPIO:0001477",
             "type": "string",
             "description": "The user-specified filename of the r2 FASTQ file.",
-            "classification": "Files info",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Sequence file R2 fastq",
             "fill_mode": "sample"
         },
@@ -1802,7 +1802,7 @@
             "examples": [
                 "E gene (orf4) [GENEPIO:0100151]"
             ],
-            "classification": "Bioinformatics and QC metrics fields",
+            "classification": "Pathogen diagnostic testing",
             "label": "Gene Name 1",
             "fill_mode": "batch"
         },
