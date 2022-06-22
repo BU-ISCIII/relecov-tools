@@ -21,6 +21,7 @@ import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 import relecov_tools.json_schema
 
+
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
@@ -125,11 +126,13 @@ class BioinfoMetadata:
             bioinfo_dict["sample_name"] = str(sample_name)
             bioinfo_dict["fastq_r1"] = fastq_r1
             bioinfo_dict["fastq_r2"] = fastq_r2
+
             # inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict
             for key in relecov_bioinfo_metadata.keys():
                 bioinfo_dict[key] = relecov_bioinfo_metadata[key]
             bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
             bioinfo_dict["long_table_path"] = self.input_folder
+
             # fields from mapping_illumina.tab
 
             for key in self.mapping_illumina_tab_field_list.keys():
