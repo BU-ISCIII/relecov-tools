@@ -95,12 +95,12 @@
     "mapping_illumina_tab_field_list": {
         "lineage_name": "Lineage",
         "variant_designation": "Variantsinconsensusx10",
-        "per_qc_filtered": "Coverage>10x(%)",
+        "per_genome_greater_10x": "Coverage>10x(%)",
         "per_reads_host": "%readshost",
         "per_reads_virus": "%readsvirus",
         "per_unmapped": "%unmapedreads",
         "per_Ns": "%Ns10x",
-        "median_depth_of_coverage_value": "medianDPcoveragevirus",
+        "depth_of_coverage_value": "medianDPcoveragevirus",
         "number_of_variants_AF_greater_75percent": "Variantsinconsensusx10",
         "number_of_variants_with_effect": "MissenseVariants"
     },
