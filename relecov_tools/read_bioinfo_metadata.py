@@ -4,7 +4,8 @@
 import logging
 import json
 import datetime
-import os
+
+# import os
 
 
 import rich.console
@@ -199,7 +200,7 @@ class BioinfoMetadata:
             bioinfo_dict["lineage_identification_date"] = str(dt_c)
 
             """
-            IDEA 
+            IDEA
             pango_time = os.path.getctime(
                 self.input_folder + "/" + str(sample_name) + ".pangolin.csv"
             )
