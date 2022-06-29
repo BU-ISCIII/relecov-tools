@@ -222,7 +222,7 @@
             "clasification": "Bioinformatics and QC metrics",
             "label": "Depth of coverage value "
         },
-        "fasta_filename": {
+        "covv_fasta_filename": {
             "examples": [
                 ""
             ],
