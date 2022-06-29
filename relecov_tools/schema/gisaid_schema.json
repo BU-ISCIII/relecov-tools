@@ -1,22 +1,24 @@
 {
     "schema": "GISAID#",
     "required": [
-        "type",
-        "virus_name",
+        "covv_type",
+        "covv_virus_name",
         "submitter",
-        "originating_lab",
-        "collecting_address",
-        "collection_date",
-        "location",
-        "host",
-        "patient_age",
-        "gender",
-        "sequencing_technology",
-        "fasta_filename"
+        "covv_passage",
+        "covv_orig_lab",
+        "covv_orig_lab_addr",
+        "covv_collection_date",
+        "covv_location",
+        "covv_host",
+        "covv_patient_age",
+        "covv_gender",
+        "covv_seq_technology",
+        "covv_subm_lab",
+        "covv_subm_lab_addr"
     ],
     "type": "object",
     "properties": {
-        "type": {
+        "covv_type": {
             "examples": [
                 "betacoronavirus"
             ],
@@ -35,7 +37,7 @@
             "clasification": "Database Identifiers",
             "label": "Collecting Sample id"
         },
-        "virus_name": {
+        "covv_virus_name": {
             "examples": [
                 "hCoV-19/Canada/prov_rona_99/2020"
             ],
@@ -55,7 +57,7 @@
             "clasification": "enter your GISAID-Username",
             "label": "GISAID Id"
         },
-        "originating_lab": {
+        "covv_orig_lab": {
             "examples": [
                 "Public Health Agency of Canada"
             ],
@@ -64,7 +66,7 @@
             "description": "The name of the agency that collected the original sample.",
             "label": "Originating Laboratory"
         },
-        "collecting_address": {
+        "covv_orig_lab_addr": {
             "examples": [
                 "655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"
             ],
@@ -74,7 +76,7 @@
             "clasification": "Sample collection and processing",
             "label": "Originating Laboratory Address"
         },
-        "submitting_address": {
+        "covv_subm_lab_addr": {
             "examples": [
                 "123 Sunnybrooke St, Toronto, Ontario, M4P 1L6, Canada"
             ],
@@ -84,7 +86,7 @@
             "clasification": "Sample collection and processing",
             "label": "Submitting Institution Address"
         },
-        "collection_date": {
+        "covv_collection_date": {
             "examples": [
                 "3/19/2020"
             ],
@@ -95,7 +97,7 @@
             "classification": "Sample collection and processing",
             "label": "Sample Collection Date"
         },
-        "location": {
+        "covv_location": {
             "examples": [
                 "e.g. Europe / Germany / Bavaria / Munich"
             ],
@@ -105,7 +107,7 @@
             "clasification": "Sample collection and processing",
             "label": "Geo Loc Autonomic Country"
         },
-        "host": {
+        "covv_host": {
             "examples": [
                 "e.g. Human, Environment, Canine, Manis javanica, Rhinolophus affinis, etc"
             ],
@@ -115,7 +117,7 @@
             "clasification": "Host information",
             "label": "Host Scientific Name"
         },
-        "patient_age": {
+        "covv_patient_age": {
             "ontology": "GENEPIO:0001392",
             "anyOf": [
                 {
@@ -158,7 +160,7 @@
             "classification": "Sample collection and processing",
             "label": "Organism Substance"
         },
-        "Assembly method": {
+        "covv_assembly_method": {
             "examples": [
                 "Ivar"
             ],
@@ -168,7 +170,7 @@
             "clasification": "Bioinformatics and QC metrics",
             "label": "Consensus sequence software name"
         },
-        "gender": {
+        "covv_gender": {
             "Enums": [
                 "Female [NCIT:C46110]",
                 "Male [NCIT:C46109]",
@@ -190,7 +192,7 @@
             "description": "The gender of the host at the time of sample collection.",
             "clasification": "Host information"
         },
-        "sequencing_technology": {
+        "covv_seq_technology": {
             "examples": [
                 "e.g. Illumina Miseq, Sanger, Nanopore MinION, Ion Torrent, etc."
             ],
@@ -200,7 +202,7 @@
             "classification": "Sequencing",
             "label": "Sequencing Instrument Model"
         },
-        "authors": {
+        "covv_authors": {
             "examples": [
                 ""
             ],
@@ -210,7 +212,7 @@
             "clasification": "Contributor Acknowledgement",
             "label": "Authors"
         },
-        "coverage": {
+        "covv_coverage": {
             "examples": [
                 "400x"
             ],
@@ -220,7 +222,7 @@
             "clasification": "Bioinformatics and QC metrics",
             "label": "Depth of coverage value "
         },
-        "fasta_filename": {
+        "covv_fasta_filename": {
             "examples": [
                 ""
             ],
@@ -239,7 +241,7 @@
             "clasification": "Host information",
             "label": "Additional Host Information"
         },
-        "Last vaccinated": {
+        "covv_last_vaccinated": {
             "examples": [
                 "e.g. 04/09/2021"
             ],
@@ -249,7 +251,7 @@
             "format": "date",
             "clasification": "Host information"
         },
-        "outbreak": {
+        "covv_outbreak": {
             "examples": [
                 "Date, Location e.g. type of gathering, Family cluster, etc."
             ],
@@ -259,7 +261,7 @@
             "clasification": "Host information",
             "label": "Outbreak Exposure Event Location"
         },
-        "Sampling Strategy": {
+        "covv_sampling_strategy": {
             "examples": [
                 "e.g. Sentinel surveillance (ILI), Sentinel surveillance (ARI), Sentinel surveillance (SARI), Non-sentinel-surveillance (hospital), Non-sentinel-surveillance (GP network), Longitudinal sampling on same patient(s), S gene dropout"
             ],
@@ -278,7 +280,7 @@
             "description": "Sample ID given by the submitting laboratory",
             "clasification": "Database Identifiers"
         },
-        "submitting_lab": {
+        "covv_subm_lab": {
             "examples": [
                 "Centers for Disease Control and Prevention"
             ],
@@ -286,6 +288,15 @@
             "type": "string",
             "description": "The name of the agency that generated the sequence.",
             "label": "Submitting Institution"
+        },
+        "covv_passage": {
+            "examples": [
+                "Original", "Vero"
+            ],
+            "ontology": "GENEPIO:0100039",
+            "type": "string",
+            "description": "The process of growing a virus in serial iterations(original/vero)",
+            "label": "Virus passage"
         }
     }
 }
