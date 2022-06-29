@@ -20,6 +20,8 @@ class Homogeneizer:
         # Check name of the file attribute of the object
         # Check schema with all centres and find their json
         # associate centre and json with object
+        # raise error when in doubt
+        # must check on schema/institution_schemas
         pass
         return
 
@@ -27,7 +29,6 @@ class Homogeneizer:
         """Read the metadata file"""
         # check possible extensions
         # load with pandas
-
         pass
         return
 
