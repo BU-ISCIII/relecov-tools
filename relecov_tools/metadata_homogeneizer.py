@@ -5,16 +5,16 @@ import sys
 import json
 import pandas as pd
 
-# functions
 
 def check_extension(instring, extensions):
     for extension in extensions:
         if instring.endswith(extension):
             return True
-        
 
-# Homogeneizer object
+
 class Homogeneizer:
+    """Homogeneizer object"""
+
     def __init__(filename, self):
         self.filename = filename
         self.dictionary = None
@@ -38,18 +38,18 @@ class Homogeneizer:
 
         detected = []
         institution_dict = json.load(path_to_institution_json)
-        
+
         for key in institution_dict.keys():
             if key in self.filename:
                 detected.append(institution_dict[key])
-        
+
         if len(set(detected)) != 1:
-            print("some problems arised!!!") # change this to an elegant form
-            sys.exit() # maybe check which ones are being mixed or when none is being found
+            print("some problems arised!!!")  # change this to an elegant form
+            sys.exit()  # maybe check which ones are being mixed or when none is being found
         else:
-            print("works fine") # delete this after testing
-            self.dictionary = detected[0] # first item, they are all equal
-        
+            print("works fine")  # delete this after testing
+            self.dictionary = detected[0]  # first item, they are all equal
+
         return
 
     def load_dataframe(self):
@@ -76,7 +76,7 @@ class Homogeneizer:
 
     def load_dictionary(self):
         """Load the corresponding dictionary"""
-        
+
         path_to_tools = ""
         dict_path = path_to_tools + "/schema/institution_schemas" + self.filename
         self.dictionary = json.load(dict_path)
@@ -84,6 +84,7 @@ class Homogeneizer:
 
     def translate_dataframe(self):
         """Use the corresponding dictionary to translate the df"""
+        # if dictionary is "none" or similar, do nothing
         pass
         return
 
@@ -92,4 +93,3 @@ class Homogeneizer:
 
         pass
         return
-
