@@ -11,6 +11,10 @@ def check_extension(instring, extensions):
         if instring.endswith(extension):
             return True
 
+def open_json(json_path):
+    with open(json_path) as file:
+        json_dict = json.load(file)
+    return json_dict
 
 class Homogeneizer:
     """Homogeneizer object"""
@@ -20,9 +24,8 @@ class Homogeneizer:
         self.dictionary = None
         self.centre = None
         self.dataframe = None
-        self.translated_dataframe = None
-
-        pass
+        header_path = ""
+        self.translated_dataframe = pd.DataFrame(columns=open_json(header_path)["new_table_headers"])
         return
 
     def associate_dict(self):
@@ -37,7 +40,7 @@ class Homogeneizer:
         path_to_institution_json = ""
 
         detected = []
-        institution_dict = json.load(path_to_institution_json)
+        institution_dict = open_json(path_to_institution_json)
 
         for key in institution_dict.keys():
             if key in self.filename:
@@ -79,13 +82,19 @@ class Homogeneizer:
 
         path_to_tools = ""
         dict_path = path_to_tools + "/schema/institution_schemas" + self.filename
-        self.dictionary = json.load(dict_path)
+        self.dictionary = open_json(dict_path)
         return
 
     def translate_dataframe(self):
         """Use the corresponding dictionary to translate the df"""
         # if dictionary is "none" or similar, do nothing
-        pass
+
+        for key, value in self.dictionary["equivalence"].items():
+            self.translate_dataframe[key] = self.dataframe[value]
+
+        for key, value in self.dictionary["constants"].items():
+            self.translate_dataframe[key] = value
+        
         return
 
     def verify_translated_dataframe(self):
