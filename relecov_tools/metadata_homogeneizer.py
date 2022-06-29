@@ -3,7 +3,6 @@
 # Imports
 import sys
 import json
-from tkinter.ttk import Separator
 import pandas as pd
 
 # functions
@@ -38,7 +37,7 @@ class Homogeneizer:
         path_to_institution_json = ""
 
         detected = []
-        institution_dict = json.load(path_to_json)
+        institution_dict = json.load(path_to_institution_json)
         
         for key in institution_dict.keys():
             if key in self.filename:
