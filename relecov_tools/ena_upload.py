@@ -207,7 +207,9 @@ class EnaUpload:
             df_run.loc[i, "sequence_file_R2_fastq"] = df_schemas.loc[
                 i, "sequence_file_R2_fastq"
             ]
+        import pdb
 
+        pdb.set_trace()
         df_run.insert(3, "status", self.action)
         df_run = df_run.rename(columns={"fastq_r1_md5": "file_checksum"})
 
