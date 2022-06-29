@@ -1,24 +1,26 @@
 #!/usr/bin/env python
 
 # Imports
-import os
+# import os
 import sys
 import json
 import pandas as pd
 
 
 def check_extension(instring, extensions):
-    """Given a file as a string and a list of possible extensions, 
+    """Given a file as a string and a list of possible extensions,
     returns true if the extension can be found in the file"""
     for extension in extensions:
         if instring.endswith(extension):
             return True
+
 
 def open_json(json_path):
     """Load the json file"""
     with open(json_path) as file:
         json_dict = json.load(file)
     return json_dict
+
 
 class Homogeneizer:
     """Homogeneizer object"""
@@ -33,7 +35,9 @@ class Homogeneizer:
         # Header path can be found in conf/configuration.json
 
         header_path = ""
-        self.translated_dataframe = pd.DataFrame(columns=open_json(header_path)["new_table_headers"])
+        self.translated_dataframe = pd.DataFrame(
+            columns=open_json(header_path)["new_table_headers"]
+        )
         return
 
     def associate_dict(self):
@@ -102,7 +106,7 @@ class Homogeneizer:
 
         for key, value in self.dictionary["constants"].items():
             self.translate_dataframe[key] = value
-        
+
         return
 
     def verify_translated_dataframe(self):
