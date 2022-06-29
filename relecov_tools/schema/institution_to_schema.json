@@ -1,5 +1,5 @@
 {
-    "ITER" : "1.json",
-    "0001" : "1.json",
+    "ITER" : "HUNSC-ITER.json",
+    "HUNSC-ITER" : "HUNSC-ITER.json",
     "ISCIII" : "ISCIII.json"
 }
