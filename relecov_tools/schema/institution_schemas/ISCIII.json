@@ -1,0 +1,19 @@
+{
+    "equivalence": 
+        {"Public Health sample id": "Código SiViEs",
+        "Sample ID given by originating laboratory": "Ref Hospital",
+        "Sample ID given by the submitting laboratory": "ID CNM",
+        "Sample ID given in the microbiology lab": "ID VI-VRP",
+        "Sample ID given if multiple rna-extraction or passages": "ID VI-VRP",
+        "Sample ID given for sequencing": "ID VI-VRP",
+        "GISAID id": "ID GISAID",
+        "Originating Laboratory": "Hospital",
+        "Sample Collection Date": "Fecha de toma ",
+        "Sample Received Date": "Fecha recepción",
+        "Host Age": "Grupo edad",
+        "Diagnostic Pcr Ct Value 1": "PCR genE",
+        "Sequencing Date": "Fecha de secuenciación",
+        "Rna Extraction Protocol": ""},
+   "constants": {},
+   "outer": {}
+}
