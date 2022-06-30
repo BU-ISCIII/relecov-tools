@@ -10,10 +10,15 @@
         "Host Age": "Patient age",
         "Host Gender": "Gender",
         "Library Preparation Kit": "Assembly method",
+        "Enrichment panel/assay": "Enrichment panel/assay",
+        "Enrichment panel/assay version": "Enrichment panel/assay version",
         "Sequencing Instrument Model": "Sequencing technology",
+        "Diagnostic Pcr Ct Value 1": "Diagnostic Pcr Ct Value 1",
         "Analysis Authors": "Authors",
         "Author Submitter": "Submitter",
-        "Authors": "Authors"
+        "Authors": "Authors",
+        "Sequence file R1 fastq": "FASTQ R1",
+        "Sequence file R2 fastq": "FASTQ R2"
     },
     "constants": {
         "Public Health sample id (SIVIES)": "NA",
@@ -32,9 +37,8 @@
         "Sequencing Date": "NA",
         "Rna Extraction Protocol": "NA",
         "Commercial All-in-one library kit": "NA",
-        "Enrichment Protocol": "NA",
+        "Enrichment Protocol": "Amplicon",
         "If Enrichment Protocol. If Other,Specify": "NA",
-        "Enrichment panel/assay": "NA",
         "If Enrichment panel/assay. If Other, Specify": "NA",
         "Enrichment panel/assay version": "NA",
         "Number Of Samples In Run": "NA",
@@ -45,11 +49,8 @@
         "Sequencing technique": "NA",
         "Library Layout": "NA",
         "Gene Name 1": "NA",
-        "Diagnostic Pcr Ct Value 1": "NA",
         "Gene Name 2": "NA",
-        "Diagnostic Pcr Ct Value-2": "NA",
-        "Sequence file R1 fastq": "NA",
-        "Sequence file R2 fastq": "NA"
+        "Diagnostic Pcr Ct Value-2": "NA"
     },
     "outer": {}
 }
