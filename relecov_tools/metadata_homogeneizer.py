@@ -25,16 +25,17 @@ def open_json(json_path):
 class Homogeneizer:
     """Homogeneizer object"""
 
-    def __init__(filename, self):
+    def __init__(self, filename):
         self.filename = filename
-        self.dictionary = None
+        self.dictionary_path = None
+        self.dicionary = None
         self.centre = None
         self.dataframe = None
 
         # To Do: replace string with local file system for testing
         # Header path can be found in conf/configuration.json
 
-        header_path = ""
+        header_path = "Schemas/configuration.json"
         self.translated_dataframe = pd.DataFrame(
             columns=open_json(header_path)["new_table_headers"]
         )
@@ -49,22 +50,29 @@ class Homogeneizer:
         # raise error when in doubt
         # must check on schema/institution_schemas
 
-        path_to_institution_json = ""
+        path_to_institution_json = "Schemas/institution_to_schema.json"
 
         detected = []
         institution_dict = open_json(path_to_institution_json)
 
         for key in institution_dict.keys():
             # cap insensitive
-            if key.lower() in self.filename.lower():
+            if key.lower() in self.filename.split("/")[-1].lower():
                 detected.append(institution_dict[key])
 
-        if len(set(detected)) != 1:
+        if len(set(detected)) == 0:
+            print(
+                f"No file could be found matching with the '{self.filename}' filename given."
+            )
+
+        elif len(set(detected)) > 1:
             print("some problems arised!!!")  # change this to an elegant form
             sys.exit()  # maybe check which ones are being mixed or when none is being found
         else:
-            print("works fine")  # delete this after testing
-            self.dictionary = detected[0]  # first item, they are all equal
+            self.dictionary_path = detected[0]  # first item, they are all equal
+            print(
+                f"JSON file found successfully: {self.dictionary_path}"
+            )  # delete this after testing
 
         return
 
@@ -86,6 +94,10 @@ class Homogeneizer:
             self.dataframe = pd.read_csv(self.filename, sep=",", header=0)
         elif check_extension(self.filename, tsv_extensions):
             self.dataframe = pd.read_csv(self.filename, sep="\t", header=0)
+        else:
+            print(
+                f"The extension of the file '{self.filename}' could not be identified. My bad there."
+            )
 
         return
 
@@ -94,7 +106,7 @@ class Homogeneizer:
 
         # To Do: replace string with local file system for testing
         path_to_tools = ""
-        dict_path = path_to_tools + "/schema/institution_schemas" + self.filename
+        dict_path = path_to_tools + "Schemas/" + self.dictionary_path
         self.dictionary = open_json(dict_path)
         return
 
@@ -103,15 +115,38 @@ class Homogeneizer:
         # if dictionary is "none" or similar, do nothing
 
         for key, value in self.dictionary["equivalence"].items():
-            self.translate_dataframe[key] = self.dataframe[value]
+            if len(value) == 0:
+                print(
+                    f"Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'"
+                )
+            elif value in self.dataframe.columns:
+                self.translated_dataframe[key] = self.dataframe[value]
+            else:
+                print(
+                    f"Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found."
+                )
 
         for key, value in self.dictionary["constants"].items():
-            self.translate_dataframe[key] = value
+            if key in self.translated_dataframe.columns:
+                self.translated_dataframe[key] = value
+            else:
+                print(
+                    f"Value '{key}' in the '{self.dictionary_path}' schema not found in the resulting dataframe"
+                )
 
         return
 
     def verify_translated_dataframe(self):
         """Checks if the dataframe holds all the needed values for the relecov tools suite"""
 
+        if self.dataframe.shape[0] != self.translated_dataframe.shape[0]:
+            print("Different number of rows after translation")
+        else:
+            print("Number of rows: OK")
+
+        pass
+        return
+
+    def export_translated_dataframe(self):
         pass
         return
