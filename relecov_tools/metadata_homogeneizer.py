@@ -5,14 +5,33 @@
 import sys
 import json
 import pandas as pd
+import logging
 
+log = logging.getLogger(__name__)
 
-def check_extension(instring, extensions):
+def check_extension_and_read(instring):
     """Given a file as a string and a list of possible extensions,
     returns true if the extension can be found in the file"""
-    for extension in extensions:
-        if instring.endswith(extension):
-            return True
+
+    excel_extensions = [".xlsx", ".xls", ".xlsm", ".xlsb"]
+    odf_extension = [".odf"]
+    csv_extensions = [".csv"]
+    tsv_extensions = [".tsv"]
+
+    ext = os.path.splittext(instring)[1] # File extension
+
+    if ext in excel_extensions:
+        return pd.read_excel(instring, header=0)
+    elif ext in odf_extension:
+        return pd.read_excel(instring, engine="odf", header=0)
+    elif ext in csv_extensions:
+        return pd.read_csv(instring, sep=",", header=0)
+    elif ext in tsv_extensions:
+        return pd.read_csv(instring, sep="\t", header=0)
+    else:
+        print ("The extension of the file '{instring}' could not be identified. My bad there.)"
+        sys.exit(1)
+    return
 
 
 def open_json(json_path):
@@ -35,7 +54,8 @@ class Homogeneizer:
         # To Do: replace string with local file system for testing
         # Header path can be found in conf/configuration.json
 
-        header_path = "Schemas/configuration.json"
+        header_path = "conf/configuration.json"
+        # To Do: error handling
         self.translated_dataframe = pd.DataFrame(
             columns=open_json(header_path)["new_table_headers"]
         )
@@ -50,10 +70,15 @@ class Homogeneizer:
         # raise error when in doubt
         # must check on schema/institution_schemas
 
-        path_to_institution_json = "Schemas/institution_to_schema.json"
+        path_to_institution_json = "schemas/institution_to_schema.json"
 
         detected = []
-        institution_dict = open_json(path_to_institution_json)
+
+        try:
+            institution_dict = open_json(path_to_institution_json)
+        except Exception as e:
+            log.error("Json file does not exist %s", e)
+            sys.exit(1)
 
         for key in institution_dict.keys():
             # cap insensitive
@@ -61,10 +86,7 @@ class Homogeneizer:
                 detected.append(institution_dict[key])
 
         if len(set(detected)) == 0:
-            print(
-                f"No file could be found matching with the '{self.filename}' filename given."
-            )
-
+            print(f"No file could be found matching with the '{self.filename}' filename given.")
         elif len(set(detected)) > 1:
             print("some problems arised!!!")  # change this to an elegant form
             sys.exit()  # maybe check which ones are being mixed or when none is being found
@@ -79,26 +101,8 @@ class Homogeneizer:
     def load_dataframe(self):
         """Detect possible extensions for the metadata file
         Open it into a dataframe"""
-
-        excel_extensions = [".xlsx", ".xls", ".xlsm", ".xlsb"]
-        odf_extension = [".odf"]
-        csv_extensions = [".csv"]
-        tsv_extensions = [".tsv"]
-
-        if check_extension(self.filename, excel_extensions):
-            self.dataframe = pd.read_excel(self.filename, header=0)
-        elif check_extension(self.filename, odf_extension):
-            # Needs a special package
-            self.dataframe = pd.read_excel(self.filename, engine="odf", header=0)
-        elif check_extension(self.filename, csv_extensions):
-            self.dataframe = pd.read_csv(self.filename, sep=",", header=0)
-        elif check_extension(self.filename, tsv_extensions):
-            self.dataframe = pd.read_csv(self.filename, sep="\t", header=0)
-        else:
-            print(
-                f"The extension of the file '{self.filename}' could not be identified. My bad there."
-            )
-
+        
+        self.dataframe = check_extension_and_read(self.filename)
         return
 
     def load_dictionary(self):
@@ -107,7 +111,11 @@ class Homogeneizer:
         # To Do: replace string with local file system for testing
         path_to_tools = ""
         dict_path = path_to_tools + "Schemas/" + self.dictionary_path
-        self.dictionary = open_json(dict_path)
+        try:
+            self.dictionary = open_json(dict_path)
+        except Exception as e:
+            log.error("Json file does not exist %s", e)
+            sys.exit(1)
         return
 
     def translate_dataframe(self):
@@ -115,24 +123,20 @@ class Homogeneizer:
         # if dictionary is "none" or similar, do nothing
 
         for key, value in self.dictionary["equivalence"].items():
-            if len(value) == 0:
-                print(
-                    f"Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'"
-                )
-            elif value in self.dataframe.columns:
-                self.translated_dataframe[key] = self.dataframe[value]
-            else:
-                print(
-                    f"Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found."
-                )
+            try:
+                if value: # If value is empty
+                    try: # To revise
+                        self.translated_dataframe[key] = self.dataframe[value]
+                    except Exception as e:
+                        log.error("Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found. %s", e)
+            except Exception as e:
+                log.error("Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'. %s", e)
 
         for key, value in self.dictionary["constants"].items():
-            if key in self.translated_dataframe.columns:
+            try: # To revise
                 self.translated_dataframe[key] = value
-            else:
-                print(
-                    f"Value '{key}' in the '{self.dictionary_path}' schema not found in the resulting dataframe"
-                )
+            except Exception as e:
+                log.error("Value '{key}' in the '{self.dictionary_path}' schema not found in the resulting dataframe. %s", e)
 
         return
 
