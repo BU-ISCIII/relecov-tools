@@ -55,7 +55,7 @@ class Homogeneizer:
         institution_dict = open_json(path_to_institution_json)
 
         for key in institution_dict.keys():
-            if key in self.filename:
+            if key.lower() in self.filename.lower():
                 detected.append(institution_dict[key])
 
         if len(set(detected)) != 1:
