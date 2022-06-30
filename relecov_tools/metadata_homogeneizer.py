@@ -64,6 +64,9 @@ def identify_load_dataframe(filename):
         print(f"The extension of the file '{filename}' could not be identified.")
         return None
 
+    # remove spaces before and after
+    df.columns = df.columns.str.strip()
+
     return df
 
 
@@ -96,9 +99,9 @@ class Homogeneizer:
 
         # Check name of the file attribute of the object
         # Check schema with all centres and find their json
-        # associate centre and json with object
-        # raise error when in doubt
-        # must check on schema/institution_schemas
+        # Associate centre and json with object
+        # Raise error when in doubt
+        # Must check on schema/institution_schemas
 
         config_json = ConfigJson(
             json_file=os.path.join(
@@ -162,7 +165,7 @@ class Homogeneizer:
                     f"Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'"
                 )
             elif value in self.dataframe.columns:
-                self.translated_dataframe[key] = self.dataframe[value]
+                self.translated_dataframe[key] = self.dataframe[value.strip()]
             else:
                 print(
                     f"Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found."
@@ -177,8 +180,12 @@ class Homogeneizer:
                 )
 
         # Nightmare
-        for key, value in self.dictionary["outer"].items():
+        
+        if len(self.dictionary["outer"]) == 0:
             pass
+        else:
+            for key, value in self.dictionary["outer"].items():
+                value["filename"]
 
         return
 
