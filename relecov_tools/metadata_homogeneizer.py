@@ -1,10 +1,22 @@
 #!/usr/bin/env python
 
 # Imports
-# import os
+import os
 import sys
 import json
+import logging
 import pandas as pd
+import rich.console
+import relecov_tools.utils
+from relecov_tools.config_json import ConfigJson
+
+log = logging.getLogger(__name__)
+stderr = rich.console.Console(
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=relecov_tools.utils.rich_force_colors(),
+)
 
 
 def check_extension(instring, extensions):
@@ -34,11 +46,9 @@ class Homogeneizer:
 
         # To Do: replace string with local file system for testing
         # Header path can be found in conf/configuration.json
-
-        header_path = "Schemas/configuration.json"
-        self.translated_dataframe = pd.DataFrame(
-            columns=open_json(header_path)["new_table_headers"]
-        )
+        config_json = ConfigJson()
+        self.header = config_json.get_configuration("new_table_headers")
+        self.translated_dataframe = pd.DataFrame(columns=self.header)
         return
 
     def associate_dict(self):
@@ -50,10 +60,11 @@ class Homogeneizer:
         # raise error when in doubt
         # must check on schema/institution_schemas
 
-        path_to_institution_json = "Schemas/institution_to_schema.json"
+        config_json = ConfigJson(json_file=os.path.join(os.path.dirname(__file__), "schema", "institution_to_schema.json"))
+        institution_dict = config_json.json_data
+        # path_to_institution_json = "Schemas/institution_to_schema.json"
 
         detected = []
-        institution_dict = open_json(path_to_institution_json)
 
         for key in institution_dict.keys():
             # cap insensitive
@@ -66,7 +77,8 @@ class Homogeneizer:
             )
 
         elif len(set(detected)) > 1:
-            print("some problems arised!!!")  # change this to an elegant form
+            print("The following matches were identified:")
+            print(*set(detected), sep="\n")  # change this to an elegant form
             sys.exit()  # maybe check which ones are being mixed or when none is being found
         else:
             self.dictionary_path = detected[0]  # first item, they are all equal
@@ -105,8 +117,10 @@ class Homogeneizer:
         """Load the corresponding dictionary"""
 
         # To Do: replace string with local file system for testing
+        config_json = ConfigJson(json_file=os.path.join(os.path.dirname(__file__), "schema", "institution_to_schema.json"))
+        institution_dict = config_json.json_data
         path_to_tools = ""
-        dict_path = path_to_tools + "Schemas/" + self.dictionary_path
+        dict_path = os.join()path_to_tools + "schema/" + self.dictionary_path
         self.dictionary = open_json(dict_path)
         return
 
@@ -134,6 +148,10 @@ class Homogeneizer:
                     f"Value '{key}' in the '{self.dictionary_path}' schema not found in the resulting dataframe"
                 )
 
+        # Nightmare
+        for key, value in self.dictionary["outer"].items():
+            pass
+
         return
 
     def verify_translated_dataframe(self):
@@ -144,9 +162,21 @@ class Homogeneizer:
         else:
             print("Number of rows: OK")
 
-        pass
+        # search for missing values
+        missing_values = list(set(self.header) - set(self.translated_dataframe.columns))
+        if len(missing_values) > 0:
+            print("Found the following missing values during translated table validation:")
+            print(*missing_values, sep="\n")
+
+        # search for extra values
+        extra_values = list(set(self.translated_dataframe.columns) - set(self.header))
+        if len(extra_values) > 0:
+            print("Found the following extra values during translated table validation:")
+            print(*extra_values, sep="\n")
+
         return
 
     def export_translated_dataframe(self):
+        # 
         pass
         return
