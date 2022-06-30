@@ -1,6 +1,6 @@
 {
-    "equivalence": 
-        {"Sample ID given by originating laboratory": "Sample ID given by originating laboratory",
+    "equivalence": {
+        "Sample ID given by originating laboratory": "Sample ID given by originating laboratory",
         "Sample ID given by the submitting laboratory": "Sample ID given by the submitting laboratory",
         "Originating Laboratory": "Originating lab",
         "Submitting Institution": "Submitting lab",
@@ -12,11 +12,12 @@
         "Sequencing Instrument Model": "Sequencing technology",
         "Analysis Authors": "Authors",
         "Author Submitter": "Submitter",
-        "Authors": "Authors"},
-    "constants": 
-        {"Biological Sample Storage Condition": "-80ºC",
+        "Authors": "Authors"
+    },
+    "constants": {
+        "Biological Sample Storage Condition": "-80ºC",
         "Collection Device": "Swab",
-        "Source material": "VIRAL RNA"},
-    "empty": [],
+        "Source material": "VIRAL RNA"
+    },
     "outer": {}
 }
