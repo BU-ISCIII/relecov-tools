@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 # Imports
 import os
 import sys
@@ -18,7 +17,6 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
-
 def check_extension(instring):
     """Given a file as a string and a list of possible extensions,
     returns the type of file extension can be found in the file"""
@@ -28,15 +26,13 @@ def check_extension(instring):
         "excel": [".xlsx", ".xls", ".xlsm", ".xlsb"],
         "odf": [".odf"],
         "csv": [".csv"],
-        "tsv": [".tsv"],
-        "json": [".json"],
+        "tsv": [".tsv"]
     }
 
     for extension, termination_list in extensions.items():
         for termination in termination_list:
             if instring.endswith(termination):
                 return extension
-
 
 def identify_load_dataframe(filename):
     """Detect possible extensions for the metadata file
@@ -70,13 +66,6 @@ def identify_load_dataframe(filename):
     return df
 
 
-def open_json(json_path):
-    """Load the json file"""
-    with open(json_path) as file:
-        json_dict = json.load(file)
-    return json_dict
-
-
 class Homogeneizer:
     """Homogeneizer object"""
 
@@ -86,9 +75,7 @@ class Homogeneizer:
         self.dicionary = None
         self.centre = None
         self.dataframe = None
-
-        # To Do: replace string with local file system for testing
-        # Header path can be found in conf/configuration.json
+        
         config_json = ConfigJson()
         self.header = config_json.get_configuration("new_table_headers")
         self.translated_dataframe = pd.DataFrame(columns=self.header)
@@ -102,36 +89,32 @@ class Homogeneizer:
         # Associate centre and json with object
         # Raise error when in doubt
         # Must check on schema/institution_schemas
-
-        config_json = ConfigJson(
-            json_file=os.path.join(
-                os.path.dirname(__file__), "schema", "institution_to_schema.json"
-            )
-        )
-        institution_dict = config_json.json_data
-        # path_to_institution_json = "Schemas/institution_to_schema.json"
-
-        detected = []
-
-        for key in institution_dict.keys():
-            # cap insensitive
-            if key.lower() in self.filename.split("/")[-1].lower():
-                detected.append(institution_dict[key])
-
-        if len(set(detected)) == 0:
-            print(
-                f"No file could be found matching with the '{self.filename}' filename given."
-            )
-
-        elif len(set(detected)) > 1:
-            print("The following matches were identified:")
-            print(*set(detected), sep="\n")  # change this to an elegant form
-            sys.exit()  # maybe check which ones are being mixed or when none is being found
-        else:
-            self.dictionary_path = detected[0]  # first item, they are all equal
-            print(
-                f"JSON file found successfully: {self.dictionary_path}"
-            )  # delete this after testing
+        
+        try:
+          config_json = ConfigJson(json_file=os.path.join(os.path.dirname(__file__), "schema", "institution_to_schema.json"))
+          institution_dict = config_json.json_data
+          detected = {}
+          
+          for key in institution_dict.keys():
+              # cap insensitive
+              if key.lower() in self.filename.split("/")[-1].lower():
+                  detected[key] = institution_dict[key]
+                  
+              if len(set(detected.values())) == 0:
+                  stderr.print(f"[red]No institution pattern could be found in the '{self.filename}' filename given.")
+                  sys.exit(1)
+              elif len(set(detected.values())) > 1:
+                  repeated = ",".join(list(set(detected.values)))
+                  stderr.print(f"[red]The following matches were identified in the '{self.filename}' filename given: {repeated}")
+                  sys.exit(1)
+                  
+              else:
+                  self.dictionary_path = detected[0]  # first item, they are all equal
+                  stderr.print(f"[green]JSON file found successfully: {self.dictionary_path}")
+            
+        except FileNotFoundError as e:
+          log.error(f"JSON file relating institutions and its JSON file could not be found or does not exist.")
+          sys.exit(1)
 
         return
 
@@ -139,20 +122,18 @@ class Homogeneizer:
         """Detect possible extensions for the metadata file and
         open it into a dataframe"""
         self.dataframe = identify_load_dataframe(self.filename)
-
         return
 
     def load_dictionary(self):
         """Load the corresponding dictionary"""
 
         # To Do: replace string with local file system for testing
-        config_json = ConfigJson(
-            json_file=os.path.join(
-                os.path.dirname(__file__), "schema", self.dictionary_path
-            )
-        )
-        self.dictionary = config_json.json_data
-
+        try:
+          config_json = ConfigJson(json_file=os.path.join(os.path.dirname(__file__), "schema", self.dictionary_path))
+          self.dictionary = config_json.json_data
+        except FileNotFoundError as e:
+          log.error(f"JSON file {self.dictionary_path} could not be found or does not exist.")
+          sys.exit(1)
         return
 
     def translate_dataframe(self):
@@ -160,27 +141,27 @@ class Homogeneizer:
         # if dictionary is "none" or similar, do nothing
 
         for key, value in self.dictionary["equivalence"].items():
-            if len(value) == 0:
-                print(
-                    f"Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'"
-                )
-            elif value in self.dataframe.columns:
+        try:
+          if len(value) == 0:
+            stderr.print(f"Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'")
+            sys.exit(1)
+          elif value in self.dataframe.columns:
                 self.translated_dataframe[key] = self.dataframe[value.strip()]
-            else:
-                print(
-                    f"Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found."
-                )
-
-        for key, value in self.dictionary["constants"].items():
-            if key in self.translated_dataframe.columns:
+          else:
+              stderr.print(f"Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found.")
+         
+         for key, value in self.dictionary["constants"].items():
+            try: # To revise
                 self.translated_dataframe[key] = value
-            else:
-                print(
-                    f"Value '{key}' in the '{self.dictionary_path}' schema not found in the resulting dataframe"
-                )
+            except Exception as e:
+                log.error("Value '{key}' in the '{self.dictionary_path}' schema not found in the resulting dataframe. %s", e)
+
+        except Exception as e:
+          log.error("Found empty equivalence in the '{self.dictionary_path}' schema: '{key}')
+          
+
 
         # Nightmare
-
         if len(self.dictionary["outer"]) == 0:
             pass
         else:
