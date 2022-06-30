@@ -9,12 +9,12 @@ import pandas as pd
 import sys
 import os
 
-import ftplib
+#import ftplib
 import relecov_tools.utils
-from relecov_tools.config_json import ConfigJson
+#from relecov_tools.config_json import ConfigJson
 
 
-import site
+#import site
 
 
 log = logging.getLogger(__name__)
@@ -49,24 +49,12 @@ class GisaidUpload:
             )
         else:
             self.passwd = passwd
-        if center is None:
-            self.center = relecov_tools.utils.prompt_text(
-                msg="Enter your center name")
-        else:
-            self.center = center
         if source_json is None:
             self.source_json_file = relecov_tools.utils.prompt_path(
                 msg="Select the ENA json file to upload"
             )
         else:
             self.source_json_file = source_json
-        if dev is None:
-            self.dev = relecov_tools.utils.prompt_yn_question(
-                msg="Do you want to test upload data?"
-            )
-        else:
-            self.dev = dev
-
         if customized_project is None:
             self.customized_project = None
         else:
@@ -103,24 +91,21 @@ class GisaidUpload:
         """Split the input ena json, in samples and runs json"""
         pass
 
-    #######################################
-    ## Metadatos
+    # Metadatos
+
     def metadata_to_csv(self):
-	    data= relecov_utils.tools.read_json_file(self.metadata)
-	    df_data= pd.DataFrame(data)
-	    df_data.to_csv("meta_gisaid.csv")
-	
-	    
-    ## Sequences
+        data = relecov_tools.utils.read_json_file(self.metadata)
+        df_data = pd.DataFrame(data)
+        df_data.to_csv("meta_gisaid.csv")
+
+    # Sequences
     # Unificar en multifasta
     # Cambiar headers/id
-    
-    
-    ## Upload
-    # Subir con cli3
-    
 
-    def upload(self):
-        """Create the required files and upload to ENA"""
-        self.convert_input_json_to_ena()
-        self.create_structure_to_ena()
+    # Upload
+    # Subir con cli3
+
+    # def upload(self):
+        #"""Create the required files and upload to ENA"""
+        # self.convert_input_json_to_ena()
+        # self.create_structure_to_ena()
