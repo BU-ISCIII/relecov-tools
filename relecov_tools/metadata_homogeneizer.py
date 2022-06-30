@@ -98,15 +98,15 @@ class Homogeneizer:
           for key in institution_dict.keys():
               # cap insensitive
               if key.lower() in self.filename.split("/")[-1].lower():
-                  detected[key] = institution_dict[key]
+                detected[key] = institution_dict[key]
                   
               if len(set(detected.values())) == 0:
-                  stderr.print(f"[red]No institution pattern could be found in the '{self.filename}' filename given.")
-                  sys.exit(1)
+                stderr.print(f"[red]No institution pattern could be found in the '{self.filename}' filename given.")
+                sys.exit(1)
               elif len(set(detected.values())) > 1:
-                  repeated = ",".join(list(set(detected.values)))
-                  stderr.print(f"[red]The following matches were identified in the '{self.filename}' filename given: {repeated}")
-                  sys.exit(1)
+                repeated = ",".join(list(set(detected.values)))
+                stderr.print(f"[red]The following matches were identified in the '{self.filename}' filename given: {repeated}")
+                sys.exit(1)
                   
               else:
                   self.dictionary_path = detected[0]  # first item, they are all equal
@@ -140,27 +140,25 @@ class Homogeneizer:
         """Use the corresponding dictionary to translate the df"""
         # if dictionary is "none" or similar, do nothing
 
-        for key, value in self.dictionary["equivalence"].items():
-        try:
-          if len(value) == 0:
-            stderr.print(f"Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'")
-            sys.exit(1)
-          elif value in self.dataframe.columns:
-                self.translated_dataframe[key] = self.dataframe[value.strip()]
-          else:
-              stderr.print(f"Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found.")
-         
-         for key, value in self.dictionary["constants"].items():
-            try: # To revise
+        try: # not sure if a try is the best here, gotta check
+            for key, value in self.dictionary["equivalence"].items():
+                if len(value) == 0:
+                    log.error(f"Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'")
+                    stderr.print(f"[red]Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'")
+                    sys.exit(1)
+                elif value in self.dataframe.columns:
+                    self.translated_dataframe[key] = self.dataframe[value.strip()]
+                else:
+                    log.error(f"Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found in the input dataframe.")
+                    stderr.print(f"[red]Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found in the input dataframe.")
+                    sys.exit(1)
+                    
+            for key, value in self.dictionary["constants"].items():
                 self.translated_dataframe[key] = value
-            except Exception as e:
-                log.error("Value '{key}' in the '{self.dictionary_path}' schema not found in the resulting dataframe. %s", e)
 
         except Exception as e:
-          log.error("Found empty equivalence in the '{self.dictionary_path}' schema: '{key}')
+            log.error("Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'")
           
-
-
         # Nightmare
         if len(self.dictionary["outer"]) == 0:
             pass
@@ -200,6 +198,6 @@ class Homogeneizer:
         # expected only one dot per file
         filename, extension = self.filename.split(".")
         self.translated_dataframe.to_excel(
-            excel_writer=str(filename + "_modified." + extension)
+            excel_writer= filename + "_modified." + extension
         )
         return
