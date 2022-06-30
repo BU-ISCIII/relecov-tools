@@ -1,15 +1,25 @@
 #!/usr/bin/env python
 
 # Imports
+# import os
 import sys
 import json
 import pandas as pd
 
 
 def check_extension(instring, extensions):
+    """Given a file as a string and a list of possible extensions,
+    returns true if the extension can be found in the file"""
     for extension in extensions:
         if instring.endswith(extension):
             return True
+
+
+def open_json(json_path):
+    """Load the json file"""
+    with open(json_path) as file:
+        json_dict = json.load(file)
+    return json_dict
 
 
 class Homogeneizer:
@@ -20,9 +30,14 @@ class Homogeneizer:
         self.dictionary = None
         self.centre = None
         self.dataframe = None
-        self.translated_dataframe = None
 
-        pass
+        # To Do: replace string with local file system for testing
+        # Header path can be found in conf/configuration.json
+
+        header_path = ""
+        self.translated_dataframe = pd.DataFrame(
+            columns=open_json(header_path)["new_table_headers"]
+        )
         return
 
     def associate_dict(self):
@@ -37,10 +52,11 @@ class Homogeneizer:
         path_to_institution_json = ""
 
         detected = []
-        institution_dict = json.load(path_to_institution_json)
+        institution_dict = open_json(path_to_institution_json)
 
         for key in institution_dict.keys():
-            if key in self.filename:
+            # cap insensitive
+            if key.lower() in self.filename.lower():
                 detected.append(institution_dict[key])
 
         if len(set(detected)) != 1:
@@ -53,9 +69,8 @@ class Homogeneizer:
         return
 
     def load_dataframe(self):
-        """Read the metadata file"""
-        # check possible extensions
-        # load with pandas
+        """Detect possible extensions for the metadata file
+        Open it into a dataframe"""
 
         excel_extensions = [".xlsx", ".xls", ".xlsm", ".xlsb"]
         odf_extension = [".odf"]
@@ -77,15 +92,22 @@ class Homogeneizer:
     def load_dictionary(self):
         """Load the corresponding dictionary"""
 
+        # To Do: replace string with local file system for testing
         path_to_tools = ""
         dict_path = path_to_tools + "/schema/institution_schemas" + self.filename
-        self.dictionary = json.load(dict_path)
+        self.dictionary = open_json(dict_path)
         return
 
     def translate_dataframe(self):
         """Use the corresponding dictionary to translate the df"""
         # if dictionary is "none" or similar, do nothing
-        pass
+
+        for key, value in self.dictionary["equivalence"].items():
+            self.translate_dataframe[key] = self.dataframe[value]
+
+        for key, value in self.dictionary["constants"].items():
+            self.translate_dataframe[key] = value
+
         return
 
     def verify_translated_dataframe(self):

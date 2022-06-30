@@ -1,6 +1,6 @@
 {
-    "equivalence": 
-        {"Public Health sample id": "Código SiViEs",
+    "equivalence": {
+        "Public Health sample id": "Código SiViEs",
         "Sample ID given by originating laboratory": "Ref Hospital",
         "Sample ID given by the submitting laboratory": "ID CNM",
         "Sample ID given in the microbiology lab": "ID VI-VRP",
@@ -13,7 +13,8 @@
         "Host Age": "Grupo edad",
         "Diagnostic Pcr Ct Value 1": "PCR genE",
         "Sequencing Date": "Fecha de secuenciación",
-        "Rna Extraction Protocol": ""},
-   "constants": {},
-   "outer": {}
+        "Rna Extraction Protocol": ""
+    },
+    "constants": {},
+    "outer": {}
 }
