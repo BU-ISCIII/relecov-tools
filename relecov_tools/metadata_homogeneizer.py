@@ -216,6 +216,8 @@ class Homogeneizer:
         return
 
     def export_translated_dataframe(self):
-        #
+        # expected only one dot per file
+        filename, extension = self.filename.split(".")
+        self.translated_dataframe.to_excel(excel_writer=str(filename + "_modified." + extension))
         pass
         return
