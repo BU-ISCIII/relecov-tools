@@ -18,7 +18,6 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
-
 def check_extension(instring):
     """Given a file as a string and a list of possible extensions,
     returns the type of file extension can be found in the file"""
@@ -37,6 +36,34 @@ def check_extension(instring):
             if instring.endswith(termination):
                 return extension
 
+def identify_load_dataframe(filename):
+    """Detect possible extensions for the metadata file
+    Open it into a dataframe"""
+
+    if check_extension(filename) == "excel":
+        df = pd.read_excel(filename, header=0)
+
+    elif check_extension(filename) == "odf":
+        # Needs a special package
+        df = pd.read_excel(filename, engine="odf", header=0)
+
+    elif check_extension(filename) == "csv":
+        df = pd.read_csv(filename, sep=",", header=0)
+
+    elif check_extension(filename) == "tsv":
+        df = pd.read_csv(filename, sep="\t", header=0)
+
+    elif check_extension(filename) == "json":
+        config_json = ConfigJson(filename="")
+        pass
+
+    else:
+        print(
+            f"The extension of the file '{filename}' could not be identified."
+        )
+        return None
+
+    return df
 
 def open_json(json_path):
     """Load the json file"""
@@ -102,21 +129,7 @@ class Homogeneizer:
     def load_dataframe(self):
         """Detect possible extensions for the metadata file
         Open it into a dataframe"""
-
-
-        if check_extension(self.filename, excel_extensions):
-            self.dataframe = pd.read_excel(self.filename, header=0)
-        elif check_extension(self.filename, odf_extension):
-            # Needs a special package
-            self.dataframe = pd.read_excel(self.filename, engine="odf", header=0)
-        elif check_extension(self.filename, csv_extensions):
-            self.dataframe = pd.read_csv(self.filename, sep=",", header=0)
-        elif check_extension(self.filename, tsv_extensions):
-            self.dataframe = pd.read_csv(self.filename, sep="\t", header=0)
-        else:
-            print(
-                f"The extension of the file '{self.filename}' could not be identified. My bad there."
-            )
+        self.dataframe = identify_load_dataframe(self.filename)
 
         return
 
