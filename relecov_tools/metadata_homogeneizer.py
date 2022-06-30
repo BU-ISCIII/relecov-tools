@@ -180,7 +180,7 @@ class Homogeneizer:
                 )
 
         # Nightmare
-        
+
         if len(self.dictionary["outer"]) == 0:
             pass
         else:
@@ -218,5 +218,7 @@ class Homogeneizer:
     def export_translated_dataframe(self):
         # expected only one dot per file
         filename, extension = self.filename.split(".")
-        self.translated_dataframe.to_excel(excel_writer=str(filename + "_modified." + extension))
+        self.translated_dataframe.to_excel(
+            excel_writer=str(filename + "_modified." + extension)
+        )
         return
