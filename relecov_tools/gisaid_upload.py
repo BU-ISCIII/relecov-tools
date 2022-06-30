@@ -11,6 +11,7 @@ import os
 
 # import ftplib
 import relecov_tools.utils
+
 # from relecov_tools.config_json import ConfigJson
 
 
@@ -79,10 +80,8 @@ class GisaidUpload:
         else:
             self.metadata = metadata
         if not os.path.isfile(self.source_json_file):
-            log.error("json data file %s does not exist ",
-                      self.source_json_file)
-            stderr.print(
-                f"[red]json data file {self.source_json_file} does not exist")
+            log.error("json data file %s does not exist ", self.source_json_file)
+            stderr.print(f"[red]json data file {self.source_json_file} does not exist")
             sys.exit(1)
         with open(self.source_json_file, "r") as fh:
             self.json_data = json.loads(fh.read())
@@ -106,6 +105,6 @@ class GisaidUpload:
     # Subir con cli3
 
     # def upload(self):
-        # """Create the required files and upload to ENA"""
-        # self.convert_input_json_to_ena()
-        # self.create_structure_to_ena()
+    # """Create the required files and upload to ENA"""
+    # self.convert_input_json_to_ena()
+    # self.create_structure_to_ena()
