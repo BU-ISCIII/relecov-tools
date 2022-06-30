@@ -53,9 +53,10 @@ def identify_load_dataframe(filename):
     elif check_extension(filename) == "tsv":
         df = pd.read_csv(filename, sep="\t", header=0)
 
+    # not real sure how to do this
     elif check_extension(filename) == "json":
-        config_json = ConfigJson(filename="")
         pass
+        # config_json = ConfigJson(filename="")
 
     else:
         print(
@@ -127,8 +128,8 @@ class Homogeneizer:
         return
 
     def load_dataframe(self):
-        """Detect possible extensions for the metadata file
-        Open it into a dataframe"""
+        """Detect possible extensions for the metadata file and
+           open it into a dataframe"""
         self.dataframe = identify_load_dataframe(self.filename)
 
         return
