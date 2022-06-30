@@ -13,9 +13,10 @@
         "Host Age": "Grupo edad",
         "Diagnostic Pcr Ct Value 1": "PCR genE",
         "Sequencing Date": "Fecha de secuenciación",
-        "Rna Extraction Protocol": ""
+
     },
     "constants": {
+        "Rna Extraction Protocol": "",
         "ENA Sample ID": "",
         "GISAID Virus Name": "",
         "GISAID id": "",
