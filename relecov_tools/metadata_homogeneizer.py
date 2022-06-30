@@ -57,7 +57,6 @@ class Homogeneizer:
 
         for key in institution_dict.keys():
             # cap insensitive
-            print(self.filename.split("/")[-1].lower())
             if key.lower() in self.filename.split("/")[-1].lower():
                 detected.append(institution_dict[key])
 
@@ -95,6 +94,8 @@ class Homogeneizer:
             self.dataframe = pd.read_csv(self.filename, sep=",", header=0)
         elif check_extension(self.filename, tsv_extensions):
             self.dataframe = pd.read_csv(self.filename, sep="\t", header=0)
+        else:
+            print(f"The extension of the file '{self.filename}' could not be identified. My bad there.")
 
         return
 
@@ -127,7 +128,7 @@ class Homogeneizer:
             if key in self.translated_dataframe.columns:
                 self.translated_dataframe[key] = value
             else:
-                print(f"Value '{key}' in schema not found in the resulting dataframe")
+                print(f"Value '{key}' in the '{self.dictionary_path}' schema not found in the resulting dataframe")
 
         return
 
@@ -137,7 +138,9 @@ class Homogeneizer:
         if self.dataframe.shape[0] != self.translated_dataframe.shape[0]:
             print("Different number of rows after translation")
         else:
-            print("Same number of rows after translation")
+            print("Number of rows: OK")
+        
+        if 
 
         pass
         return
