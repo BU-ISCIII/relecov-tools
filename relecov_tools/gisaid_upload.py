@@ -9,12 +9,12 @@ import pandas as pd
 import sys
 import os
 
-#import ftplib
+# import ftplib
 import relecov_tools.utils
-#from relecov_tools.config_json import ConfigJson
+# from relecov_tools.config_json import ConfigJson
 
 
-#import site
+# import site
 
 
 log = logging.getLogger(__name__)
@@ -106,6 +106,6 @@ class GisaidUpload:
     # Subir con cli3
 
     # def upload(self):
-        #"""Create the required files and upload to ENA"""
+        # """Create the required files and upload to ENA"""
         # self.convert_input_json_to_ena()
         # self.create_structure_to_ena()
