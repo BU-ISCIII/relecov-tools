@@ -72,6 +72,14 @@
         "geo_loc_country": "Spain"
     },
     {
+        "collecting_institution": "Instituto Tecnológico y de Energías Renovables",
+        "collecting_institution_address": "Polígono Industrial de Granadilla, s/n",
+        "collecting_institution_email": "genomica@iter.es",
+        "geo_loc_state": "Canarias",
+        "geo_loc_city": "Santa Cruz de Tenerife",
+        "geo_loc_country": "Spain"
+    },
+    {
         "collecting_institution": "Hospital Universitario de Gran Canaria",
         "collecting_institution_address": "Bco. de la Ballena s/n",
         "collecting_institution_email": "",
