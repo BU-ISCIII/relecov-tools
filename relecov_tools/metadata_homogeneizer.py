@@ -139,8 +139,6 @@ class Homogeneizer:
             print("Different number of rows after translation")
         else:
             print("Number of rows: OK")
-        
-        if 
 
         pass
         return
