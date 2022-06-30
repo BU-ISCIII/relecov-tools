@@ -95,7 +95,9 @@ class Homogeneizer:
         elif check_extension(self.filename, tsv_extensions):
             self.dataframe = pd.read_csv(self.filename, sep="\t", header=0)
         else:
-            print(f"The extension of the file '{self.filename}' could not be identified. My bad there.")
+            print(
+                f"The extension of the file '{self.filename}' could not be identified. My bad there."
+            )
 
         return
 
@@ -128,7 +130,9 @@ class Homogeneizer:
             if key in self.translated_dataframe.columns:
                 self.translated_dataframe[key] = value
             else:
-                print(f"Value '{key}' in the '{self.dictionary_path}' schema not found in the resulting dataframe")
+                print(
+                    f"Value '{key}' in the '{self.dictionary_path}' schema not found in the resulting dataframe"
+                )
 
         return
 
