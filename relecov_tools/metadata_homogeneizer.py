@@ -19,12 +19,23 @@ stderr = rich.console.Console(
 )
 
 
-def check_extension(instring, extensions):
+def check_extension(instring):
     """Given a file as a string and a list of possible extensions,
-    returns true if the extension can be found in the file"""
-    for extension in extensions:
-        if instring.endswith(extension):
-            return True
+    returns the type of file extension can be found in the file"""
+
+    # hard-coded extensions
+    extensions = {
+        "excel" : [".xlsx", ".xls", ".xlsm", ".xlsb"],
+        "odf" : [".odf"],
+        "csv" : [".csv"],
+        "tsv" : [".tsv"],
+        "json" : [".json"]
+    }
+
+    for extension, termination_list in extensions.items():
+        for termination in termination_list:
+            if instring.endswith(termination):
+                return extension
 
 
 def open_json(json_path):
@@ -92,10 +103,6 @@ class Homogeneizer:
         """Detect possible extensions for the metadata file
         Open it into a dataframe"""
 
-        excel_extensions = [".xlsx", ".xls", ".xlsm", ".xlsb"]
-        odf_extension = [".odf"]
-        csv_extensions = [".csv"]
-        tsv_extensions = [".tsv"]
 
         if check_extension(self.filename, excel_extensions):
             self.dataframe = pd.read_excel(self.filename, header=0)
@@ -117,11 +124,9 @@ class Homogeneizer:
         """Load the corresponding dictionary"""
 
         # To Do: replace string with local file system for testing
-        config_json = ConfigJson(json_file=os.path.join(os.path.dirname(__file__), "schema", "institution_to_schema.json"))
-        institution_dict = config_json.json_data
-        path_to_tools = ""
-        dict_path = os.join()path_to_tools + "schema/" + self.dictionary_path
-        self.dictionary = open_json(dict_path)
+        config_json = ConfigJson(json_file=os.path.join(os.path.dirname(__file__), "schema", self.dictionary_path))
+        self.dictionary = config_json.json_data
+        
         return
 
     def translate_dataframe(self):
