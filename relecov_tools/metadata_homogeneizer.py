@@ -14,6 +14,7 @@ def check_extension(instring, extensions):
         if instring.endswith(extension):
             return True
 
+
 def open_json(json_path):
     """Load the json file"""
     with open(json_path) as file:
@@ -61,14 +62,18 @@ class Homogeneizer:
                 detected.append(institution_dict[key])
 
         if len(set(detected)) == 0:
-            print(f"No file could be found matching with the '{self.filename}' filename given.")
-            
+            print(
+                f"No file could be found matching with the '{self.filename}' filename given."
+            )
+
         elif len(set(detected)) > 1:
             print("some problems arised!!!")  # change this to an elegant form
             sys.exit()  # maybe check which ones are being mixed or when none is being found
         else:
             self.dictionary_path = detected[0]  # first item, they are all equal
-            print(f"JSON file found successfully: {self.dictionary_path}")  # delete this after testing
+            print(
+                f"JSON file found successfully: {self.dictionary_path}"
+            )  # delete this after testing
 
         return
 
@@ -108,33 +113,35 @@ class Homogeneizer:
 
         for key, value in self.dictionary["equivalence"].items():
             if len(value) == 0:
-                print(f"Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'")
+                print(
+                    f"Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'"
+                )
             elif value in self.dataframe.columns:
                 self.translated_dataframe[key] = self.dataframe[value]
             else:
-                print(f"Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found.")
+                print(
+                    f"Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found."
+                )
 
         for key, value in self.dictionary["constants"].items():
             if key in self.translated_dataframe.columns:
                 self.translated_dataframe[key] = value
             else:
                 print(f"Value '{key}' in schema not found in the resulting dataframe")
-            
 
         return
 
     def verify_translated_dataframe(self):
         """Checks if the dataframe holds all the needed values for the relecov tools suite"""
-        
+
         if self.dataframe.shape[0] != self.translated_dataframe.shape[0]:
             print("Different number of rows after translation")
         else:
             print("Same number of rows after translation")
-        
+
         pass
         return
 
-    def export_translated_dataframe(self):        
+    def export_translated_dataframe(self):
         pass
         return
-    
