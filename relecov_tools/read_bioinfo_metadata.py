@@ -92,8 +92,15 @@ class BioinfoMetadata:
             "files_read_bioinfo_metadata"
         )
         self.md5_file_name = config_json.get_configuration("md5_file_name")
+        self.mapping_illumina_tab_field_list = config_json.get_configuration(
+            "mapping_illumina_tab_field_list"
+        )
 
-        return self.files_read_bioinfo_metadata, self.md5_file_name
+        return (
+            self.files_read_bioinfo_metadata,
+            self.md5_file_name,
+            self.mapping_illumina_tab_field_list,
+        )
 
     def bioinfo_parse(self, file_name):
         """Fetch the metadata file folder  Directory to fetch metadata file
@@ -117,15 +124,16 @@ class BioinfoMetadata:
             pangolin_versions_path,
         ) = self.get_input_files(self)
 
-        self.files_read_bioinfo_metadata, self.md5_file_name = self.get_config_info(
-            self
-        )
+        (
+            self.files_read_bioinfo_metadata,
+            self.md5_file_name,
+            self.mapping_illumina_tab_field_list,
+        ) = self.get_config_info(self)
 
         md5_info_path = os.path.join(
             self.input_folder,
             self.md5_file_name,  # como hacer esto general para los servicios
         )
-
         mapping_illumina_tab = pd.read_csv(mapping_illumina_tab_path, sep="\t")
         summary_variants_metrics = pd.read_csv(summary_variants_metrics_path, sep=",")
         variants_long_table = pd.read_csv(variants_long_table_path, sep=",")
