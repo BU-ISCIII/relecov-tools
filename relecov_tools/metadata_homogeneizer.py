@@ -115,3 +115,7 @@ class Homogeneizer:
 
         pass
         return
+
+    def export_translated_dataframe(self):
+        pass
+        return
