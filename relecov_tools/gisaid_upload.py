@@ -48,23 +48,6 @@ class GisaidUpload:
             )
         else:
             self.passwd = passwd
-        if source_json is None:
-            self.source_json_file = relecov_tools.utils.prompt_path(
-                msg="Select the ENA json file to upload"
-            )
-        else:
-            self.source_json_file = source_json
-        if customized_project is None:
-            self.customized_project = None
-        else:
-            self.customized_project = customized_project
-        if action is None:
-            self.action = relecov_tools.utils.prompt_selection(
-                msg="Select the action to upload to ENA",
-                choices=["add", "modify", "cancel", "release"],
-            )
-        else:
-            self.action = action.upper()
         if output_path is None:
             self.output_path = relecov_tools.utils.prompt_path(
                 msg="Select the folder to store the xml files"
@@ -100,24 +83,26 @@ class GisaidUpload:
     # Unificar en multifasta
     def create_multifasta(self):
         """Create multifasta from single fastas"""
-        os.system("cat %s/*.fasta > %s/multifasta.fasta" %(self.fasta_path, self.output_path))
-        multifasta = "%s/multifasta.fasta" %self.output_path
+        os.system(
+            "cat %s/*.fasta > %s/multifasta.fasta" % (self.fasta_path, self.output_path)
+        )
+        multifasta = "%s/multifasta.fasta" % self.output_path
         return multifasta
-        
+
     # Cambiar headers/id
     def change_headers(self, multifasta):
         """Transform multifasta ids/headers to GISAID format"""
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
         virus_name = [name["covv_virus_name"] for name in data]
-        with open (multifasta) as old_fasta, with open ("%s/multifasta_gisaid.fasta" %self.output_path, "w") as new_fasta:
+        with open(multifasta) as old_fasta, open(
+            "%s/multifasta_gisaid.fasta" % self.output_path, "w"
+        ) as new_fasta:
             records = SeqIO.parse(old_fasta, "fasta")
             for record in records:
                 for name in virus_name:
-                    if record.id == name.split("/").[-2]:
+                    if record.id == name.split("/")[-2]:
                         record.id = name
             SeqIO.write(record, new_fasta, "fasta")
-                        
-        
 
     # Upload
     # Subir con cli3
