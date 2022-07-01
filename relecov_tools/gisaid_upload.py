@@ -76,7 +76,8 @@ class GisaidUpload:
             self.metadata = relecov_tools.utils.prompt_path(
                 msg="Select metadata json file"
             )
-        else:
+        else:relecov_tools/gisaid_upload.py
+
             self.metadata = metadata
         if not os.path.isfile(self.source_json_file):
             log.error("json data file %s does not exist ", self.source_json_file)
@@ -95,16 +96,13 @@ class GisaidUpload:
         data = relecov_tools.utils.read_json_file(self.metadata)
         df_data = pd.DataFrame(data)
         df_data.to_csv("meta_gisaid.csv")
+    
 
-    # Sequences
-    # Unificar en multifasta
-    # Cambiar headers/id
-
-    # Upload
-    # Subir con cli3
-
+    # generar template con cli3 
     # ADD TOKEN WARNING and file token  .authtoken
     # add bash from cli3
+
+    
 
     os.system(
         "cli3 upload --database EpiCoV --token ./gisaid.authtoken --metadata gisaid_template.csv  --fasta multi.fasta --frameshift (OPTIONAL, default: catch_all) --failed --proxy --log"
@@ -112,12 +110,12 @@ class GisaidUpload:
     """
     cli3 upload
     --database EpiCoV
-    --token ./gisaid.authtoken 
-    --metadata gisaid_template.csv  
-    --fasta multi.fasta 
-    --frameshift (OPTIONAL, default: catch_all) 
+    --token ./gisaid.authtoken
+    --metadata gisaid_template.csv
+    --fasta multi.fasta
+    --frameshift (OPTIONAL, default: catch_all)
     --failed default creates file failed.out where the failed records will be
-    --proxy 
+    --proxy
     --log default creates file failed.out where the log will be )
     """
     # def upload(self):
