@@ -29,7 +29,8 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
         )
     if json_schema_file is None:
         config_json = ConfigJson()
-        schema_name = config_json.get_topic_data("json_schemas", "relecov_schema")
+        schema_name = config_json.get_topic_data(
+            "json_schemas", "relecov_schema")
         json_schema_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
         )
@@ -39,7 +40,8 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
     try:
         Draft202012Validator.check_schema(json_schema)
     except jsonschema.ValidationError:
-        stderr.print("[red] Json schema does not fulfil Draft 202012 Validation")
+        stderr.print(
+            "[red] Json schema does not fulfil Draft 202012 Validation")
         sys.exit(1)
     if not os.path.isfile(json_data_file):
         stderr.print("[red] Json file does not exists")
@@ -57,7 +59,8 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
         except jsonschema.ValidationError as e:
             log.error("Invalid sample data %s", e)
             invalid_json.append(item_row)
-    logging.handl
+    # Enviar los errores por correo
+    # logging.handlers.SMTPHandler(mailhost=("smtp.gmail.com", 465), fromaddr=correo_isciii, toaddrs=correo_usuario, subject="Validation errors", credentials=(usurario,contraseña), secure=None, timeout=1.0)
     return validated_json_data, invalid_json, errors
 
 
