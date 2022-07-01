@@ -106,7 +106,9 @@ class Homogeneizer:
                     detected[key] = institution_dict[key]
 
             if len(set(detected.values())) == 0:
-                log.error(f"No institution pattern could be found in the '{self.filename}' filename given.")
+                log.error(
+                    f"No institution pattern could be found in the '{self.filename}' filename given."
+                )
                 stderr.print(
                     f"[red]No institution pattern could be found in the '{self.filename}' filename given."
                 )
@@ -114,7 +116,9 @@ class Homogeneizer:
 
             elif len(set(detected.values())) > 1:
                 repeated = ", ".join(list(set(detected.values)))
-                log.error(f"The following matches were identified in the '{self.filename}' filename given: {repeated    }'")
+                log.error(
+                    f"The following matches were identified in the '{self.filename}' filename given: {repeated    }'"
+                )
                 stderr.print(
                     f"[red]The following matches were identified in the '{self.filename}' filename given: {repeated}"
                 )
@@ -130,7 +134,9 @@ class Homogeneizer:
             log.error(
                 "JSON file relating institutions and their JSON file could not be found or does not exist."
             )
-            stderr.print(f"[red]JSON file relating institutions and their JSON file could not be found or does not exist.")
+            stderr.print(
+                "[red]JSON file relating institutions and their JSON file could not be found or does not exist."
+            )
             sys.exit(1)
 
         return
@@ -156,7 +162,9 @@ class Homogeneizer:
             log.error(
                 f"JSON file {self.dictionary_path} could not be found or does not exist in the schema directory."
             )
-            stderr.print(f"[red]JSON file {self.dictionary_path} could not be found or does not exist in the schema directory.")
+            stderr.print(
+                f"[red]JSON file {self.dictionary_path} could not be found or does not exist in the schema directory."
+            )
             sys.exit(1)
         return
 
@@ -209,24 +217,32 @@ class Homogeneizer:
             log.error("Different number of rows after translation")
             sys.exit(1)
         else:
-            stderr.print(f"[green]Number of rows: OK")
+            stderr.print("[green]Number of rows: OK")
 
         # search for missing values
         missing_values = list(set(self.header) - set(self.translated_dataframe.columns))
         if len(missing_values) > 0:
             msg = ", ".join(missing_values)
-            log.error(f"Found the following missing values during translated table validation: {msg}")
-            stderr.print(f"[red]Found the following missing values during translated table validation: {msg}")
+            log.error(
+                f"Found the following missing values during translated table validation: {msg}"
+            )
+            stderr.print(
+                f"[red]Found the following missing values during translated table validation: {msg}"
+            )
         else:
-            stderr.print(f"[green]No missing values in the translated table")
+            stderr.print("[green]No missing values in the translated table")
         # search for extra values
         extra_values = list(set(self.translated_dataframe.columns) - set(self.header))
         if len(extra_values) > 0:
             msg = ", ".join(extra_values)
-            log.error(f"Found the following extra values during translated table validation: {msg}")
-            stderr.print(f"[red]Found the following extra values during translated table validation: {msg}")
+            log.error(
+                f"Found the following extra values during translated table validation: {msg}"
+            )
+            stderr.print(
+                f"[red]Found the following extra values during translated table validation: {msg}"
+            )
         else:
-            stderr.print(f"[green]No extra values in the translated values")
+            stderr.print("[green]No extra values in the translated values")
         return
 
     def export_translated_dataframe(self):
