@@ -59,12 +59,10 @@ class GisaidUpload:
         else:
             self.gisaid_json = gisaid_json
         if fasta_path is None:
-            self.fasta_path = relecov_tools.utils.prompt_path(
-                msg="Select metadata json file"
-            )
-        else:relecov_tools/gisaid_upload.py
-
-            self.metadata = metadata
+            self.fasta_path = relecov_tools.utils.prompt_path(msg="Select path")
+        else:
+            # relecov_tools/gisaid_upload.py
+            self.metadata = fasta_path
         if not os.path.isfile(self.source_json_file):
             log.error("json data file %s does not exist ", self.source_json_file)
             stderr.print(f"[red]json data file {self.source_json_file} does not exist")
@@ -83,15 +81,13 @@ class GisaidUpload:
         data = relecov_tools.utils.read_json_file(self.metadata)
         df_data = pd.DataFrame(data)
         df_data.to_csv("meta_gisaid.csv")
-    
 
-    # generar template con cli3 
+    # generar template con cli3
     # ADD TOKEN WARNING and file token  .authtoken
     # add bash from cli3
 
-    
-
-    os.system("cli3 upload --database EpiCoV --token ./gisaid.authtoken --metadata gisaid_template.csv  --fasta multi.fasta --frameshift (OPTIONAL, default: catch_all) --failed --proxy --log"
+    os.system(
+        "cli3 upload --database EpiCoV --token ./gisaid.authtoken --metadata gisaid_template.csv  --fasta multi.fasta --frameshift (OPTIONAL, default: catch_all) --failed --proxy --log"
     )
     """
     cli3 upload
