@@ -82,13 +82,11 @@ class GisaidUpload:
     def create_multifasta(self):
         """Create multifasta from single fastas"""
         os.system(
-            "cat %s/*.fasta > %s/multifasta.fasta" % (
-                self.fasta_path, self.output_path)
+            "cat %s/*.fasta > %s/multifasta.fasta" % (self.fasta_path, self.output_path)
         )
         multifasta = "%s/multifasta.fasta" % self.output_path
         return multifasta
 
-    # Cambiar headers/id
     def change_headers(self, multifasta):
         """Transform multifasta ids/headers to GISAID format"""
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
