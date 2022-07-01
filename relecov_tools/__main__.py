@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import logging
+import re
 
 # from rich.prompt import Confirm
 import click
@@ -252,12 +253,30 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
     upload_ena.upload()
 
 
+# upload to GISAID
 @relecov_tools_cli.command(help_priority=7)
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-e", "--gisaid_json", help="where the validated json is")
-@click.option("-o", "--output_path", help="output folder for the xml generated files")
-def upload_to_gisaid(user, password, gisaid_json, output_path):
+@click.option(
+    "-i", "--input_path", help="the path where the fasta or multifasta are located"
+)
+@click.option("-o", "--output_path", help="output folder for log")
+@click.option(
+    "-x",
+    "--proxy_config",
+    help="introduce your proxy credentials as: username:password@proxy:port",
+    required=False,
+)
+@click.option(
+    "--single",
+    is_flag=True,
+    default=False,
+    help="Default input is a multifasta.",
+)
+def upload_to_gisaid(
+    user, password, gisaid_json, input_path, output_path, proxy_config
+):
     """parsed data to create files to upload to gisaid"""
     pass
 
