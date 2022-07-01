@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os
 import logging
-import re
+
+# import re
 
 # from rich.prompt import Confirm
 import click
@@ -259,7 +260,9 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-e", "--gisaid_json", help="where the validated json is")
 @click.option(
-    "-i", "--input_path", help="the path where the fasta or multifasta are located"
+    "-i",
+    "--input_path",
+    help="the path where the fasta or multifasta, gisaid_mapped.json and the token file are located",
 )
 @click.option("-o", "--output_path", help="output folder for log")
 @click.option(
