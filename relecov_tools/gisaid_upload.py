@@ -62,8 +62,7 @@ class GisaidUpload:
             self.fasta_path = relecov_tools.utils.prompt_path(msg="Select path")
         else:
             # relecov_tools/gisaid_upload.py
-            self.fasta_path = fasta_path)
-
+            self.fasta_path = fasta_path
 
         if not os.path.isfile(self.source_json_file):
             log.error("json data file %s does not exist ", self.source_json_file)
