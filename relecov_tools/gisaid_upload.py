@@ -52,11 +52,11 @@ class GisaidUpload:
                 msg="Select the GISAID json file to upload"
             )
         else:
-            self.source_json_file = source_json
+            self.source_json_file = self.source_json
         if self.customized_project is None:
             self.customized_project = None
         else:
-            self.customized_project = customized_project
+            self.customized_project = self.customized_project
         if output_path is None:
             self.output_path = relecov_tools.utils.prompt_path(
                 msg="Select the folder to store the log files"
@@ -112,13 +112,13 @@ class GisaidUpload:
                         record.id = name
             SeqIO.write(record, new_fasta, "fasta")
 
-
-    # Upload
-    # Subir con cli3
-    # Token
-    # Opción de configurar proxy
-
-    # def upload(self):
-    # """Create the required files and upload to ENA"""
-    # self.convert_input_json_to_ena()
-    # self.create_structure_to_ena()
+    """" 
+    Upload
+    Subir con cli3
+    Token
+    Opción de configurar proxy
+    def upload(self):
+    Create the required files and upload to ENA
+    self.convert_input_json_to_ena()
+    self.create_structure_to_ena()
+    """
