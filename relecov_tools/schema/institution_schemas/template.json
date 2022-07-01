@@ -1,0 +1,15 @@
+{
+    "equivalence": {
+        "Final_term": "Initial term"
+    },
+    "constants": {
+        "Final_term": "Constant value"
+        },
+    "outer": {
+        "final term" : {
+            "filename":"filename",
+            "sheet" : "in case of excel format, state sheet",
+            "column" : "name of the column where the needed value is",
+            "samplename_col" : "name of the column containing the samplenames"}
+            }
+}
