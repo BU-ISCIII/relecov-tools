@@ -62,13 +62,15 @@ class GisaidUpload:
             self.fasta_path = relecov_tools.utils.prompt_path(msg="Select path")
         else:
             # relecov_tools/gisaid_upload.py
-            self.metadata = fasta_path
+            self.fasta_path = fasta_path)
+
+
         if not os.path.isfile(self.source_json_file):
             log.error("json data file %s does not exist ", self.source_json_file)
             stderr.print(f"[red]json data file {self.source_json_file} does not exist")
             sys.exit(1)
-        with open(self.source_json_file, "r") as fh:
-            self.json_data = json.loads(fh.read())
+            with open(self.source_json_file, "r") as fh:
+                self.json_data = json.loads(fh.read())
 
     def convert_input_json_to_ena(self):
         """Split the input ena json, in samples and runs json"""
