@@ -103,6 +103,23 @@ class GisaidUpload:
     # Upload
     # Subir con cli3
 
+    # ADD TOKEN WARNING and file token  .authtoken
+    # add bash from cli3
+
+    os.system(
+        "cli3 upload --database EpiCoV --token ./gisaid.authtoken --metadata gisaid_template.csv  --fasta multi.fasta --frameshift (OPTIONAL, default: catch_all) --failed --proxy --log"
+    )
+    """
+    cli3 upload
+    --database EpiCoV
+    --token ./gisaid.authtoken 
+    --metadata gisaid_template.csv  
+    --fasta multi.fasta 
+    --frameshift (OPTIONAL, default: catch_all) 
+    --failed default creates file failed.out where the failed records will be
+    --proxy 
+    --log default creates file failed.out where the log will be )
+    """
     # def upload(self):
     # """Create the required files and upload to ENA"""
     # self.convert_input_json_to_ena()
