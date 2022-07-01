@@ -113,7 +113,7 @@ class Homogeneizer:
                     f"[red]No institution pattern could be found in the '{self.filename}' filename given."
                 )
                 sys.exit(1)
-                
+
             elif len(set(detected.values())) > 1:
                 repeated = ", ".join(list(set(detected.values)))
                 log.error(
@@ -207,8 +207,12 @@ class Homogeneizer:
         else:
             for key, value in self.dictionary["outer"].items():
                 if len(value) == 0:
-                    log.error(f"Found empty outer in the '{self.dictionary_path}' schema: '{key}'")
-                    stderr.print(f"[red]Found empty outer in the '{self.dictionary_path}' schema: '{key}'")
+                    log.error(
+                        f"Found empty outer in the '{self.dictionary_path}' schema: '{key}'"
+                    )
+                    stderr.print(
+                        f"[red]Found empty outer in the '{self.dictionary_path}' schema: '{key}'"
+                    )
                     sys.exit(1)
                 else:
                     outer_filename = value["filename"]
@@ -218,42 +222,72 @@ class Homogeneizer:
 
                     outer_dataframe = None
                     outer_translated_dataframe = None
-                    #outer_dataframe = identify_load_dataframe(outer_filename)
+                    # outer_dataframe = identify_load_dataframe(outer_filename)
 
                     if check_extension(outer_filename) == "excel":
                         if len(outer_sheet) == 0:
-                            log.error(f"There is missing information, sheet name must be provided.")
-                            stderr.print(f"[red]There is missing information, sheet name must be provided.")
+                            log.error(
+                                "There is missing information, sheet name must be provided."
+                            )
+                            stderr.print(
+                                "[red]There is missing information, sheet name must be provided."
+                            )
                             sys.exit(1)
                         else:
-                            outer_dataframe = pd.read_excel(outer_filename, header=0, sheet_name = outer_sheet)
-                    elif check_extension(filename) == "odf":
+                            outer_dataframe = pd.read_excel(
+                                outer_filename, header=0, sheet_name=outer_sheet
+                            )
+                    elif check_extension(outer_filename) == "odf":
                         if len(outer_sheet) == 0:
-                            log.error(f"There is missing information, sheet name must be provided.")
-                            stderr.print(f"[red]There is missing information, sheet name must be provided.")
+                            log.error(
+                                "There is missing information, sheet name must be provided."
+                            )
+                            stderr.print(
+                                "[red]There is missing information, sheet name must be provided."
+                            )
                             sys.exit(1)
                         else:
-                            outer_dataframe = pd.read_excel(outer_filename, engine="odf", header=0)
-                    elif check_extension(filename) == "csv":
+                            outer_dataframe = pd.read_excel(
+                                outer_filename, engine="odf", header=0
+                            )
+                    elif check_extension(outer_filename) == "csv":
                         outer_dataframe = pd.read_csv(outer_filename, sep=",", header=0)
-                    elif check_extension(filename) == "tsv":
-                        outer_dataframe = pd.read_csv(outer_filename, sep="\t", header=0)
+                    elif check_extension(outer_filename) == "tsv":
+                        outer_dataframe = pd.read_csv(
+                            outer_filename, sep="\t", header=0
+                        )
 
                     if len(outer_column) == 0:
-                        log.error(f"There is missing information, column name must be provided.")
-                        stderr.print(f"[red]There is missing information, column name must be provided.")
+                        log.error(
+                            "There is missing information, column name must be provided."
+                        )
+                        stderr.print(
+                            "[red]There is missing information, column name must be provided."
+                        )
                         sys.exit(1)
                     else:
-                        outer_translated_dataframe[key] = outer_dataframe[outer_column.strip()]
-                    
+                        outer_translated_dataframe[key] = outer_dataframe[
+                            outer_column.strip()
+                        ]
+
                     if len(outer_samplename_col) == 0:
-                        log.error(f"There is missing information, samplename_col must be provided.")
-                        stderr.print(f"[red]There is missing information, samplename_col must be provided.")
+                        log.error(
+                            "There is missing information, samplename_col must be provided."
+                        )
+                        stderr.print(
+                            "[red]There is missing information, samplename_col must be provided."
+                        )
                         sys.exit(1)
                     else:
                         # Review left_on key (this key must be present in translated data_frame)
-                        outer_translated_dataframe[outer_samplename_col] = outer_dataframe[outer_samplename_col.strip()]
-                        translated_dataframe.merge(outer_translated_dataframe, left_on="Sample ID given by originating laboratory", right_on=outer_samplename_col])
+                        outer_translated_dataframe[
+                            outer_samplename_col
+                        ] = outer_dataframe[outer_samplename_col.strip()]
+                        self.translated_dataframe.merge(
+                            outer_translated_dataframe,
+                            left_on="Sample ID given by originating laboratory",
+                            right_on=outer_samplename_col,
+                        )
         return
 
     def verify_translated_dataframe(self):
