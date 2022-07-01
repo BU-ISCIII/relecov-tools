@@ -57,6 +57,7 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
         except jsonschema.ValidationError as e:
             log.error("Invalid sample data %s", e)
             invalid_json.append(item_row)
+    logging.handl
     return validated_json_data, invalid_json, errors
 
 
@@ -88,7 +89,7 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
 
         if str(row[2].value) not in sample_list:
             row_to_del.append(row[0].row)
-            
+
     os.makedirs(out_folder, exist_ok=True)
     new_name = "invalid_" + os.path.basename(metadata_file)
     m_file = os.path.join(out_folder, new_name)
