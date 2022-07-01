@@ -2,10 +2,8 @@ import logging
 
 # from pyparsing import col
 import rich.console
-import json
 
 import pandas as pd
-import sys
 import os
 
 # import ftplib
@@ -84,7 +82,8 @@ class GisaidUpload:
     def create_multifasta(self):
         """Create multifasta from single fastas"""
         os.system(
-            "cat %s/*.fasta > %s/multifasta.fasta" % (self.fasta_path, self.output_path)
+            "cat %s/*.fasta > %s/multifasta.fasta" % (
+                self.fasta_path, self.output_path)
         )
         multifasta = "%s/multifasta.fasta" % self.output_path
         return multifasta
