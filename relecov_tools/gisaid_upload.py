@@ -139,7 +139,7 @@ class GisaidUpload:
                         record.id = name
             SeqIO.write(record, new_fasta, "fasta")
 
-    """" 
+    """"
     Upload
     Subir con cli3
     Token
