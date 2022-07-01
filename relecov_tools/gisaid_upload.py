@@ -40,20 +40,20 @@ class GisaidUpload:
             )
         else:
             self.user = user
-        #Add proxy settings: username:password@proxy:port (optional)
+        # Add proxy settings: username:password@proxy:port (optional)
         if passwd is None:
             self.passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password to GISAID"
             )
         else:
             self.passwd = passwd
-        if source_json is None:
+        if self.source_json is None:
             self.source_json_file = relecov_tools.utils.prompt_path(
                 msg="Select the GISAID json file to upload"
             )
         else:
             self.source_json_file = source_json
-        if customized_project is None:
+        if self.customized_project is None:
             self.customized_project = None
         else:
             self.customized_project = customized_project
