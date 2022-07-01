@@ -105,28 +105,37 @@ class Homogeneizer:
                 if key.lower() in self.filename.split("/")[-1].lower():
                     detected[key] = institution_dict[key]
 
-                # Creemos que este bloque ifelse iría fuera del for
-                if len(set(detected.values())) == 0:
-                    stderr.print(
-                        f"[red]No institution pattern could be found in the '{self.filename}' filename given."
-                    )
-                    sys.exit(1)
-                elif len(set(detected.values())) > 1:
-                    repeated = ",".join(list(set(detected.values)))
-                    stderr.print(
-                        f"[red]The following matches were identified in the '{self.filename}' filename given: {repeated}"
-                    )
-                    sys.exit(1)
+            if len(set(detected.values())) == 0:
+                log.error(
+                    f"No institution pattern could be found in the '{self.filename}' filename given."
+                )
+                stderr.print(
+                    f"[red]No institution pattern could be found in the '{self.filename}' filename given."
+                )
+                sys.exit(1)
+                
+            elif len(set(detected.values())) > 1:
+                repeated = ", ".join(list(set(detected.values)))
+                log.error(
+                    f"The following matches were identified in the '{self.filename}' filename given: {repeated    }'"
+                )
+                stderr.print(
+                    f"[red]The following matches were identified in the '{self.filename}' filename given: {repeated}"
+                )
+                sys.exit(1)
 
-                else:
-                    self.dictionary_path = detected[0]  # first item, they are all equal
-                    stderr.print(
-                        f"[green]JSON file found successfully: {self.dictionary_path}"
-                    )
+            else:
+                self.dictionary_path = detected[0]  # first item, they are all equal
+                stderr.print(
+                    f"[green]JSON file found successfully: {self.dictionary_path}"
+                )
 
         except FileNotFoundError:
             log.error(
                 "JSON file relating institutions and their JSON file could not be found or does not exist."
+            )
+            stderr.print(
+                "[red]JSON file relating institutions and their JSON file could not be found or does not exist."
             )
             sys.exit(1)
 
@@ -151,7 +160,10 @@ class Homogeneizer:
             self.dictionary = config_json.json_data
         except FileNotFoundError:
             log.error(
-                f"JSON file {self.dictionary_path} could not be found or does not exist."
+                f"JSON file {self.dictionary_path} could not be found or does not exist in the schema directory."
+            )
+            stderr.print(
+                f"[red]JSON file {self.dictionary_path} could not be found or does not exist in the schema directory."
             )
             sys.exit(1)
         return
@@ -248,26 +260,35 @@ class Homogeneizer:
         """Checks if the dataframe holds all the needed values for the relecov tools suite"""
 
         if self.dataframe.shape[0] != self.translated_dataframe.shape[0]:
-            print("Different number of rows after translation")
+            log.error("Different number of rows after translation")
+            sys.exit(1)
         else:
-            print("Number of rows: OK")
+            stderr.print("[green]Number of rows: OK")
 
         # search for missing values
         missing_values = list(set(self.header) - set(self.translated_dataframe.columns))
         if len(missing_values) > 0:
-            print(
-                "Found the following missing values during translated table validation:"
+            msg = ", ".join(missing_values)
+            log.error(
+                f"Found the following missing values during translated table validation: {msg}"
             )
-            print(*missing_values, sep="\n")
-
+            stderr.print(
+                f"[red]Found the following missing values during translated table validation: {msg}"
+            )
+        else:
+            stderr.print("[green]No missing values in the translated table")
         # search for extra values
         extra_values = list(set(self.translated_dataframe.columns) - set(self.header))
         if len(extra_values) > 0:
-            print(
-                "Found the following extra values during translated table validation:"
+            msg = ", ".join(extra_values)
+            log.error(
+                f"Found the following extra values during translated table validation: {msg}"
             )
-            print(*extra_values, sep="\n")
-
+            stderr.print(
+                f"[red]Found the following extra values during translated table validation: {msg}"
+            )
+        else:
+            stderr.print("[green]No extra values in the translated values")
         return
 
     def export_translated_dataframe(self):
