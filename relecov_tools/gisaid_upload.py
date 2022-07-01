@@ -39,19 +39,20 @@ class GisaidUpload:
     ):
         if user is None:
             self.user = relecov_tools.utils.prompt_text(
-                msg="Enter your username defined in ENA"
+                msg="Enter your username defined in GISAID"
             )
         else:
             self.user = user
+        #Add proxy settings: username:password@proxy:port (optional)
         if passwd is None:
             self.passwd = relecov_tools.utils.prompt_password(
-                msg="Enter your password to ENA"
+                msg="Enter your password to GISAID"
             )
         else:
             self.passwd = passwd
         if source_json is None:
             self.source_json_file = relecov_tools.utils.prompt_path(
-                msg="Select the ENA json file to upload"
+                msg="Select the GISAID json file to upload"
             )
         else:
             self.source_json_file = source_json
@@ -59,16 +60,9 @@ class GisaidUpload:
             self.customized_project = None
         else:
             self.customized_project = customized_project
-        if action is None:
-            self.action = relecov_tools.utils.prompt_selection(
-                msg="Select the action to upload to ENA",
-                choices=["add", "modify", "cancel", "release"],
-            )
-        else:
-            self.action = action.upper()
         if output_path is None:
             self.output_path = relecov_tools.utils.prompt_path(
-                msg="Select the folder to store the xml files"
+                msg="Select the folder to store the log files"
             )
         else:
             self.output_path = output_path
@@ -100,8 +94,11 @@ class GisaidUpload:
     # Unificar en multifasta
     # Cambiar headers/id
 
+
     # Upload
     # Subir con cli3
+    # Token
+    # Opción de configurar proxy
 
     # def upload(self):
     # """Create the required files and upload to ENA"""
