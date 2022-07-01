@@ -1,0 +1,8 @@
+This module will upload fastq.gz and metadata associated to ENA 
+This module input: 
+- e processed_metadata_mapped_ENA.json
+- u ENA Webin user
+- p ENA Webin passsword (if special charcters add % in front of the special character)
+- c center name (e.g Instituto de Salud Carlos III)
+- o output folder where accession xml files will begenerated 
+--dev (This option for development server TESTS) 
