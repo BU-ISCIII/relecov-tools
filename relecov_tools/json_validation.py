@@ -57,7 +57,8 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
         except jsonschema.ValidationError as e:
             log.error("Invalid sample data %s", e)
             invalid_json.append(item_row)
-    logging.handl
+    # Enviar los errores por correo
+    # logging.handlers.SMTPHandler(mailhost=("smtp.gmail.com", 465), fromaddr=correo_isciii, toaddrs=correo_usuario, subject="Validation errors", credentials=(usurario,contraseña), secure=None, timeout=1.0)
     return validated_json_data, invalid_json, errors
 
 
