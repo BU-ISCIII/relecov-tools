@@ -115,7 +115,9 @@ class GisaidUpload:
         "Transform metadata json to csv"
         data = relecov_tools.utils.read_json_file(self.metadata)
         df_data = pd.DataFrame(data)
-        df_data.to_csv("meta_gisaid.csv")
+        df_data.to_csv("%s/meta_gisaid.csv" % self.output_path)
+        metagisaid = "%s/meta_gisaid.csv" % self.output_path
+        return metagisaid
 
     # generar template con cli3
     # ADD TOKEN WARNING and file token  .authtoken
@@ -167,8 +169,14 @@ class GisaidUpload:
         
     def cli3_upload(self):
         """Upload to GISAID"""
-        os.system(
+        if proxy_config is None:
+            os.system(
             "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s
+            )
+        else:
+            os.system(
+            "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s --proxy %s" % (self.token, self.output_path + "/
+            )
     
     """    
     def gisaid_upload(self):
