@@ -38,6 +38,7 @@ class GisaidUpload:
         fasta_path=None,
         output_path=None,
         frameshift=None,
+        proxy_config=None,
     ):
         if token is None: # borrar comentario: solo si no existe el token necesita user, passwd y client_id
             print(
@@ -99,6 +100,10 @@ class GisaidUpload:
             )
         else:
             self.frameshift = frameshift
+        if proxy_config is None:
+            print("Proxy configuration is not set") # borrar comentario: esta mensaje no me convence
+        else:
+            self.proxy_config = proxy_config
 
     def convert_input_json_to_ena(self):
         """Split the input ena json, in samples and runs json"""
@@ -159,6 +164,11 @@ class GisaidUpload:
         os.system(
             "cli3 authenticate --username %s --password %s --client_id %s" % (self.user, self.passw, self.client_id)
         ) 
+        
+    def cli3_upload(self):
+        """Upload to GISAID"""
+        os.system(
+            "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s
     
     """    
     def gisaid_upload(self):
