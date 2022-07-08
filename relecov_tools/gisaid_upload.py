@@ -33,6 +33,7 @@ class GisaidUpload:
         user=None,
         passwd=None,
         client_id=None,
+        token=None,
         gisaid_json=None,
         fasta_path=None,
         output_path=None,
@@ -52,10 +53,16 @@ class GisaidUpload:
             self.passwd = passwd
         if client_id is None:
             self.client_id = relecov_tools.utils.prompt_password(
-                msg="Enter your client_id to GISAID. Email clisupport@gisaid.org to request client-ID."
+                msg="Enter your client_id to GISAID. Email clisupport@gisaid.org to request client-ID"
             )
         else:
-            self.passwd = passwd
+            self.client_id = client_id
+        if token is None:
+            self.token = relecov_tools.utils.prompt_password(
+                msg="Enter path to your authenticate token"
+            )
+        else:
+            self.token = token
         if self.source_json is None:
             self.source_json_file = relecov_tools.utils.prompt_path(
                 msg="Select the GISAID json file to upload"
