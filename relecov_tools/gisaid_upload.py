@@ -37,10 +37,11 @@ class GisaidUpload:
         gisaid_json=None,
         fasta_path=None,
         output_path=None,
+        frameshift=None,
     ):
         if token is None: # borrar comentario: solo si no existe el token necesita user, passwd y client_id
-            self.token = relecov_tools.utils.prompt_password(
-                msg="Token is not introduced, creating a new one..."
+            print(
+                "Token is not introduced, creating a new one..."
             )
             if user is None:
                 self.user = relecov_tools.utils.prompt_text(
@@ -63,8 +64,6 @@ class GisaidUpload:
                 self.client_id = client_id       
         else:
             self.token = token
-       
-        
         if self.gisaid_json is None:
             self.gisaid_json = relecov_tools.utils.prompt_path(
                 msg="Select the GISAID json file to upload"
@@ -93,6 +92,13 @@ class GisaidUpload:
             sys.exit(1)
             with open(self.source_json_file, "r") as fh:
                 self.json_data = json.loads(fh.read())
+        if frameshift is None:
+            self.frameshift = relecov_tools.utils.prompt_selection(
+                msg="Select frameshift notification",
+                choices="catch_all, catch_novel, catch_none"
+            )
+        else:
+            self.frameshift = frameshift
 
     def convert_input_json_to_ena(self):
         """Split the input ena json, in samples and runs json"""
@@ -148,11 +154,21 @@ class GisaidUpload:
                         record.id = name
             SeqIO.write(record, new_fasta, "fasta")
             
-    def cli3_authenticate(self):
+    def cli3_auth(self):
         """Create authenticate token"""
         os.system(
             "cli3 authenticate --username %s --password %s --client_id %s" % (self.user, self.passw, self.client_id)
         ) 
+    
+    """    
+    def gisaid_upload(self):
+        ""Upload to GISAID""
+        self.metadata_to_csv()
+        self.create_multifasta()
+        self.change_headers()
+        if token is None:
+            self.cli3_auth()
+    """    
         
 
     """"
