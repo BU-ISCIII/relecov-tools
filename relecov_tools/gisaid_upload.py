@@ -196,7 +196,7 @@ class GisaidUpload:
                 )
             )
 
-    """    
+    """
     def gisaid_upload(self):
         ""Upload to GISAID""
         self.create_multifasta()
