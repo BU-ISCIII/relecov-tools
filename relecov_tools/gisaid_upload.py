@@ -160,6 +160,8 @@ class GisaidUpload:
                     if record.id == name.split("/")[-2]:
                         record.id = name
             SeqIO.write(record, new_fasta, "fasta")
+        fastagisaid = "%s/multifasta_gisaid.fasta" % self.output_path
+        return fastagisaid
             
     def cli3_auth(self):
         """Create authenticate token"""
@@ -175,7 +177,7 @@ class GisaidUpload:
             )
         else:
             os.system(
-            "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s --proxy %s" % (self.token, self.output_path + "/
+            "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s --proxy %s" % (self.token, metagisaid, 
             )
     
     """    
