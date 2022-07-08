@@ -32,6 +32,7 @@ class GisaidUpload:
         self,
         user=None,
         passwd=None,
+        client_id=None,
         gisaid_json=None,
         fasta_path=None,
         output_path=None,
@@ -46,6 +47,12 @@ class GisaidUpload:
         if passwd is None:
             self.passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password to GISAID"
+            )
+        else:
+            self.passwd = passwd
+        if client_id is None:
+            self.client_id = relecov_tools.utils.prompt_password(
+                msg="Enter your client_id to GISAID. Email clisupport@gisaid.org to request client-ID."
             )
         else:
             self.passwd = passwd
@@ -115,8 +122,7 @@ class GisaidUpload:
     --log default creates file failed.out where the log will be )
     """
 
-    # Sequences
-    # Unificar en multifasta
+
     def create_multifasta(self):
         """Create multifasta from single fastas"""
         os.system(
@@ -138,6 +144,13 @@ class GisaidUpload:
                     if record.id == name.split("/")[-2]:
                         record.id = name
             SeqIO.write(record, new_fasta, "fasta")
+            
+    def cli3_authenticate(self):
+        """Create authenticate token"""
+        os.system(
+            "cli3 authenticate --username %s --password %s --client_id %s" % (self.user, self.passw, self.client_id)
+        ) 
+        
 
     """"
     Upload
