@@ -38,38 +38,40 @@ class GisaidUpload:
         fasta_path=None,
         output_path=None,
     ):
-        if user is None:
-            self.user = relecov_tools.utils.prompt_text(
-                msg="Enter your username defined in GISAID"
-            )
-        else:
-            self.user = user
-        # Add proxy settings: username:password@proxy:port (optional)
-        if passwd is None:
-            self.passwd = relecov_tools.utils.prompt_password(
-                msg="Enter your password to GISAID"
-            )
-        else:
-            self.passwd = passwd
-        if client_id is None:
-            self.client_id = relecov_tools.utils.prompt_password(
-                msg="Enter your client_id to GISAID. Email clisupport@gisaid.org to request client-ID"
-            )
-        else:
-            self.client_id = client_id
-        if token is None:
+        if token is None: # borrar comentario: solo si no existe el token necesita user, passwd y client_id
             self.token = relecov_tools.utils.prompt_password(
-                msg="Enter path to your authenticate token"
+                msg="Token is not introduced, creating a new one..."
             )
+            if user is None:
+                self.user = relecov_tools.utils.prompt_text(
+                    msg="Enter your username defined in GISAID"
+                )
+            else:
+                self.user = user
+            # Add proxy settings: username:password@proxy:port (optional)
+            if passwd is None:
+                self.passwd = relecov_tools.utils.prompt_password(
+                    msg="Enter your password to GISAID"
+                )
+            else:
+                self.passwd = passwd
+            if client_id is None:
+                self.client_id = relecov_tools.utils.prompt_password(
+                    msg="Enter your client_id to GISAID. Email clisupport@gisaid.org to request client-ID"
+                )
+            else:
+                self.client_id = client_id       
         else:
             self.token = token
-        if self.source_json is None:
-            self.source_json_file = relecov_tools.utils.prompt_path(
+       
+        
+        if self.gisaid_json is None:
+            self.gisaid_json = relecov_tools.utils.prompt_path(
                 msg="Select the GISAID json file to upload"
             )
         else:
-            self.source_json_file = self.source_json
-        if self.customized_project is None:
+            self.gisaid_json = self.gisaid_json
+        if self.customized_project is None: #borrar comentario: esta parte no la entiendo, no la toco
             self.customized_project = None
         else:
             self.customized_project = self.customized_project
@@ -79,12 +81,6 @@ class GisaidUpload:
             )
         else:
             self.output_path = output_path
-        if gisaid_json is None:
-            self.gisaid_json = relecov_tools.utils.prompt_path(
-                msg="Select metadata json file"
-            )
-        else:
-            self.gisaid_json = gisaid_json
         if fasta_path is None:
             self.fasta_path = relecov_tools.utils.prompt_path(msg="Select path")
         else:
