@@ -40,10 +40,10 @@ class GisaidUpload:
         frameshift=None,
         proxy_config=None,
     ):
-        if token is None: # borrar comentario: solo si no existe el token necesita user, passwd y client_id
-            print(
-                "Token is not introduced, creating a new one..."
-            )
+        if (
+            token is None
+        ):  # borrar comentario: solo si no existe el token necesita user, passwd y client_id
+            print("Token is not introduced, creating a new one...")
             if user is None:
                 self.user = relecov_tools.utils.prompt_text(
                     msg="Enter your username defined in GISAID"
@@ -59,10 +59,10 @@ class GisaidUpload:
                 self.passwd = passwd
             if client_id is None:
                 self.client_id = relecov_tools.utils.prompt_password(
-                    msg="Enter your client_id to GISAID. Email clisupport@gisaid.org to request client-ID"
+                    msg="Enter your client-ID to GISAID. Email clisupport@gisaid.org to request client-ID"
                 )
             else:
-                self.client_id = client_id       
+                self.client_id = client_id
         else:
             self.token = token
         if self.gisaid_json is None:
@@ -71,7 +71,9 @@ class GisaidUpload:
             )
         else:
             self.gisaid_json = self.gisaid_json
-        if self.customized_project is None: #borrar comentario: esta parte no la entiendo, no la toco
+        if (
+            self.customized_project is None
+        ):  # borrar comentario: esta parte no la entiendo, no la toco
             self.customized_project = None
         else:
             self.customized_project = self.customized_project
@@ -96,12 +98,13 @@ class GisaidUpload:
         if frameshift is None:
             self.frameshift = relecov_tools.utils.prompt_selection(
                 msg="Select frameshift notification",
-                choices="catch_all, catch_novel, catch_none"
+                choices="catch_all, catch_novel, catch_none",
             )
         else:
             self.frameshift = frameshift
         if proxy_config is None:
-            print("Proxy configuration is not set") # borrar comentario: esta mensaje no me convence
+            # borrar comentario: este mensaje no me convence
+            print("Proxy configuration is not set")
         else:
             self.proxy_config = proxy_config
 
@@ -138,7 +141,6 @@ class GisaidUpload:
     --log default creates file failed.out where the log will be )
     """
 
-
     def create_multifasta(self):
         """Create multifasta from single fastas"""
         os.system(
@@ -162,35 +164,46 @@ class GisaidUpload:
             SeqIO.write(record, new_fasta, "fasta")
         fastagisaid = "%s/multifasta_gisaid.fasta" % self.output_path
         return fastagisaid
-            
+
     def cli3_auth(self):
         """Create authenticate token"""
         os.system(
-            "cli3 authenticate --username %s --password %s --client_id %s" % (self.user, self.passw, self.client_id)
-        ) 
-        
+            "cli3 authenticate --username %s --password %s --client_id %s"
+            % (self.user, self.passwd, self.client_id)
+        )
+
     def cli3_upload(self):
         """Upload to GISAID"""
-        if proxy_config is None:
+        if self.proxy_config is None:
             os.system(
-            "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s" % (self.token, metagisaid, fastagisaid, self.frameshift)
+                "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s"
+                % (
+                    self.token,
+                    self.metadata_to_csv(),
+                    self.change_headers(),
+                    self.frameshift,
+                )
             )
         else:
             os.system(
-            "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s --proxy %s" % (self.token, metagisaid, fastagisaid, self.frameshift, self.proxy_config)
+                "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s --proxy %s"
+                % (
+                    self.token,
+                    self.metadata_to_csv(),
+                    self.change_headers(),
+                    self.frameshift,
+                    self.proxy_config,
+                )
             )
-    
+
     """    
     def gisaid_upload(self):
         ""Upload to GISAID""
-        self.metadata_to_csv()
         self.create_multifasta()
-        self.change_headers()
         if token is None:
             self.cli3_auth()
         self.cli3_upload()
-    """    
-        
+    """
 
     """"
     Upload
