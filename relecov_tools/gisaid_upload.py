@@ -173,11 +173,11 @@ class GisaidUpload:
         """Upload to GISAID"""
         if proxy_config is None:
             os.system(
-            "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s
+            "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s" % (self.token, metagisaid, fastagisaid, self.frameshift)
             )
         else:
             os.system(
-            "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s --proxy %s" % (self.token, metagisaid, 
+            "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s --proxy %s" % (self.token, metagisaid, fastagisaid, self.frameshift, self.proxy_config)
             )
     
     """    
@@ -188,6 +188,7 @@ class GisaidUpload:
         self.change_headers()
         if token is None:
             self.cli3_auth()
+        self.cli3_upload()
     """    
         
 
