@@ -153,7 +153,6 @@ class MappingSchema:
         """
         if self.destination_schema == "ENA":
             for idx in range(len(self.json_data)):
-
                 mapped_json_data[idx]["fastq_r1_md5"] = self.json_data[idx][
                     "fastq_r1_md5"
                 ]
@@ -162,10 +161,12 @@ class MappingSchema:
                 ]
                 mapped_json_data[idx]["r1_fastq_filepath"] = (
                     self.json_data[idx]["r1_fastq_filepath"]
+                    + "/"
                     + self.json_data[idx]["sequence_file_R1_fastq"]
                 )
                 mapped_json_data[idx]["r2_fastq_filepath"] = (
                     self.json_data[idx]["r2_fastq_filepath"]
+                    + "/"
                     + self.json_data[idx]["sequence_file_R2_fastq"]
                 )
                 mapped_json_data[idx]["collecting_institution"] = self.json_data[idx][
@@ -196,6 +197,12 @@ class MappingSchema:
                 mapped_json_data[idx]["study_abstract"] = self.json_data[idx][
                     "study_title"
                 ]
+                mapped_json_data[idx]["sample_description"] = self.json_data[idx][
+                    "sequence_file_R1_fastq"
+                ]
+                mapped_json_data[idx][
+                    "sequencing_instrument_platform"
+                ] = self.json_data[idx]["sequencing_instrument_platform"]
 
         return mapped_json_data
 

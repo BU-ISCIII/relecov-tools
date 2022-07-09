@@ -2,6 +2,8 @@
 import os
 import logging
 
+# import re
+
 # from rich.prompt import Confirm
 import click
 import rich.console
@@ -14,7 +16,7 @@ import relecov_tools.sftp_handle
 import relecov_tools.ena_upload
 import relecov_tools.json_validation
 import relecov_tools.map_schema
-import relecov_tools.feed_databases
+import relecov_tools.feed_database
 import relecov_tools.read_bioinfo_metadata
 import relecov_tools.long_table_parse
 
@@ -129,28 +131,6 @@ def relecov_tools_cli(verbose, log_file):
         log.addHandler(log_fh)
 
 
-# @relecov_tools_cli.command(help_priority=1)
-# @click.argument("keywords", required=False, nargs=-1, metavar="<filter keywords>")
-# @click.option(
-#    "-s",
-#    "--sort",
-#    type=click.Choice(["release", "pulled", "name", "stars"]),
-#    default="release",
-#    help="How to sort listed pipelines",
-# )
-# @click.option("--json", is_flag=True, default=False, help="Print full output as JSON")
-# @click.option(
-#    "--show-archived", is_flag=True, default=False, help="Print archived workflows"
-# )
-# def list(keywords, sort, json, show_archived):
-#    """
-#    List available bu-isciii workflows used for relecov.
-#    Checks the web for a list of nf-core pipelines with their latest releases.
-#    Shows which nf-core pipelines you have pulled locally and whether they are up to date.
-#    """
-#    pass
-
-
 # sftp
 @relecov_tools_cli.command(help_priority=2)
 @click.option("-u", "--user", help="User name for login to sftp server")
@@ -263,26 +243,48 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
     type=click.Choice(["add", "modify", "cancel", "release"], case_sensitive=False),
     help="select one of the available options",
 )
-@click.option("--dev/--production", default=True)
+@click.option("--dev", is_flag=True, default=False)
 @click.option("-o", "--output_path", help="output folder for the xml generated files")
 def upload_to_ena(user, password, center, ena_json, dev, study, action, output_path):
     """parsed data to create xml files to upload to ena"""
+
     upload_ena = relecov_tools.ena_upload.EnaUpload(
         user, password, center, ena_json, dev, study, action, output_path
     )
     upload_ena.upload()
 
 
+# upload to GISAID
 @relecov_tools_cli.command(help_priority=7)
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-e", "--gisaid_json", help="where the validated json is")
-@click.option("-o", "--output_path", help="output folder for the xml generated files")
-def upload_to_gisaid(user, password, gisaid_json, output_path):
+@click.option(
+    "-i",
+    "--input_path",
+    help="the path where the fasta or multifasta, gisaid_mapped.json and the token file are located",
+)
+@click.option("-o", "--output_path", help="output folder for log")
+@click.option(
+    "-x",
+    "--proxy_config",
+    help="introduce your proxy credentials as: username:password@proxy:port",
+    required=False,
+)
+@click.option(
+    "--single",
+    is_flag=True,
+    default=False,
+    help="Default input is a multifasta.",
+)
+def upload_to_gisaid(
+    user, password, gisaid_json, input_path, output_path, proxy_config
+):
     """parsed data to create files to upload to gisaid"""
     pass
 
 
+# launch
 @relecov_tools_cli.command(help_priority=8)
 @click.option("-u", "--user", help="user name for connecting to the server")
 def launch(user):
@@ -290,19 +292,37 @@ def launch(user):
     pass
 
 
+# update_db
 @relecov_tools_cli.command(help_priority=9)
-@click.option("-u", "--user", help="user name for login")
-@click.option("-p", "--password", help="password for the user to login")
 @click.option("-j", "--json", help="data in json format")
 @click.option("-s", "--schema", help="json schema if relecov is not used")
-@click.option("-i", "--iskylims", help="url for sending request to iSkyLIMs")
-@click.option("-r", "--relecov", help="url for sending request to Relecov Platform")
-def update_db(user, password, json, schema, iskylims, relecov):
-    """feed database with metadata jsons"""
-    feed_databases = relecov_tools.feed_databases.FeedDatabases(
-        user, password, json, schema, iskylims, relecov
+@click.option(
+    "-t",
+    "--type",
+    type=click.Choice(["sample", "analysis"]),
+    multiple=False,
+    help="Select the type of information to upload to database",
+)
+@click.option(
+    "-d",
+    "databaseServer",
+    type=click.Choice(
+        [
+            "iskylims",
+            "relecov",
+        ]
+    ),
+    multiple=False,
+    help="name of the server which information is defined in config file",
+)
+@click.option("-u", "--user", help="user name for login")
+@click.option("-p", "--password", help="password for the user to login")
+def update_db(user, password, json, schema, type, databaseServer):
+    """feed database with json"""
+    feed_database = relecov_tools.feed_database.FeedDatabase(
+        user, password, json, schema, type, databaseServer
     )
-    feed_databases.store_data()
+    feed_database.store_data()
 
 
 # read metadata bioinformatics
@@ -335,7 +355,7 @@ def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
     "-l",
     "--longtable_file",
     type=click.Path(),
-    help="file containing long table ",
+    help="file containing variant long table ",
 )
 @click.option("-o", "--output", type=click.Path(), help="Path to save json output")
 def long_table_parse(longtable_file, output):

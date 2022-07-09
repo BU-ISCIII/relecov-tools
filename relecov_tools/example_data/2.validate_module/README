@@ -1,0 +1,6 @@
+This module will validate the processed_metadata_lab_XXXX.json (output of the read_lab_metadata)  against the metadata_lab_XXXXX_xlsx 
+For this module the input is: 
+- processed_metadata_lab_XXXX.json
+- metadata_lab_XXXXX_xlsx 
+- output folder where the validation errors will be created 
+

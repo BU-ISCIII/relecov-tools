@@ -1,0 +1,22 @@
+{
+    "equivalence": {
+        "Final_term": "Initial term"
+    },
+    "constants": {
+        "Final_term": "Constant value"
+    },
+    "outer": {
+        "final term 1": {
+            "filename":"filename",
+            "sheet" : "in case of excel format, state sheet",
+            "column" : "name of the column where the needed value is",
+            "samplename_col" : "name of the column containing the samplenames"
+        },
+        "final term 2" : {
+            "filename":"filename 2",
+            "sheet" : "in case of excel format, state sheet 2",
+            "column" : "name of the column where the needed value is 2",
+            "samplename_col" : "name of the column containing the samplenames 2"
+        }
+    }
+}

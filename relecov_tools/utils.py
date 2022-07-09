@@ -53,8 +53,7 @@ def get_md5_from_local_folder(local_folder):
 
 def calculate_md5(file_name):
     """Calculate the md5 value for the file name"""
-    block_size = 2**20
-    return hashlib.md5(open(file_name, "rb").read(block_size)).hexdigest()
+    return hashlib.md5(open(file_name, "rb").read()).hexdigest()
 
 
 def write_md5_file(file_name, md5_value):
