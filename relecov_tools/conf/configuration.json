@@ -44,6 +44,12 @@
             "url": "/api/",
             "store_samples": "storeData",
             "token": ""
+        },
+        "relecov_local": {
+            "server": "http://127.0.0.1:8000",
+            "url": "/api/",
+            "store_samples": "createSampleData",
+            "token": ""
         }
     },
     "iskylims_sample_fields": {

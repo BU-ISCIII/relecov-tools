@@ -103,13 +103,13 @@ class LongTableParse:
         # check if the headers of both files are the same
         for heading_csv in headings_from_csv:
             if heading_csv not in dict_index_of_heading:
-                stderr.print("[red]Incorrect Format, fields don't match")
+                stderr.print(f"[red]Incorrect Format {heading_csv}, fields don't match")
                 sys.exit(1)
 
         dict_aux = {}
         # check if both files contain the same number of fields
         if len(self.long_table_heading) is len(headings_from_csv):
-
+            """
             # check if the headers of both files have the same order
             for idx in range(len(self.long_table_heading)):
                 if self.long_table_heading[idx] != headings_from_csv[idx]:
@@ -122,6 +122,7 @@ class LongTableParse:
             dict_index_of_heading.clear()
             dict_index_of_heading = dict_aux
             print(dict_index_of_heading)
+            """
             """
             stderr.print(
                 "[red]Incorrect Format, fields don't have the same order"
@@ -221,4 +222,5 @@ class LongTableParse:
 
     def parsing_csv(self):
         generated_json = self.parse_a_list_of_dictionaries()
-        self.saving_file(generated_JSON=generated_json)
+        self.saving_file(generated_json)
+        return
