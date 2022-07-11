@@ -215,13 +215,11 @@ class FeedDatabase:
     def map_relecov_bioinfo_data(self):
         # Select the values from self.json_data
         field_values = []
-        r_fields = self.config_json.get_configuration(
-            "relecov_bioinfo_metadata_96_samples"
-        )
+
         for row in self.json_data:
             s_dict = {}
             for r_field in self.json_data[row]:
-                if r_field in r_fields:
+                if r_field in self.json_data[row]:
                     s_dict[r_field] = self.json_data[row][r_field]
                     if r_field == "sample_name":
                         s_dict[r_field] = row
