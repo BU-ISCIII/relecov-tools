@@ -1398,17 +1398,6 @@
             "label": "Consensus Params",
             "fill_mode": "batch"
         },
-        "quality_control_metrics": {
-            "examples": [
-                ""
-            ],
-            "ontology": "data_3914",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "Quality control metrics ",
-            "fill_mode": "batch"
-        },
         "depth_of_coverage_value": {
             "examples": [
                 "400x"
@@ -1806,7 +1795,7 @@
             "label": "Gene Name 1",
             "fill_mode": "batch"
         },
-        "per_qc_filtered": {
+        "qc_filtered": {
             "examples": [
                 ""
             ],

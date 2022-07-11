@@ -3,6 +3,9 @@
 
 import logging
 import json
+import datetime
+
+# import os
 
 
 import rich.console
@@ -55,22 +58,7 @@ class BioinfoMetadata:
         else:
             self.output_folder = output_folder
 
-    def bioinfo_parse(self, file_name):
-        """Fetch the metadata file folder  Directory to fetch metadata file
-        file_name   metadata file name
-        """
-
-        wb_file = openpyxl.load_workbook(file_name, data_only=True)
-        ws_metadata_lab = wb_file["METADATA_LAB"]
-        config_json = ConfigJson()
-        relecov_bioinfo_metadata = config_json.get_configuration(
-            "relecov_bioinfo_metadata"
-        )
-        c = 0
-        self.files_read_bioinfo_metadata = config_json.get_configuration(
-            "files_read_bioinfo_metadata"
-        )
-
+    def get_input_files(self):
         mapping_illumina_tab_path = os.path.join(
             self.input_folder, "mapping_illumina.tab"
         )
@@ -87,12 +75,65 @@ class BioinfoMetadata:
             self.input_folder, "software_versions.yml"
         )
         pangolin_versions_path = os.path.join(self.input_folder, "pangolin_version.csv")
+
+        return (
+            mapping_illumina_tab_path,
+            summary_variants_metrics_path,
+            variants_long_table_path,
+            consensus_genome_length_path,
+            software_versions_path,
+            pangolin_versions_path,
+        )
+
+    def get_config_info(self):
+        config_json = ConfigJson()
+
+        self.files_read_bioinfo_metadata = config_json.get_configuration(
+            "files_read_bioinfo_metadata"
+        )
         self.md5_file_name = config_json.get_configuration("md5_file_name")
+        self.mapping_illumina_tab_field_list = config_json.get_configuration(
+            "mapping_illumina_tab_field_list"
+        )
+
+        return (
+            self.files_read_bioinfo_metadata,
+            self.md5_file_name,
+            self.mapping_illumina_tab_field_list,
+        )
+
+    def bioinfo_parse(self, file_name):
+        """Fetch the metadata file folder  Directory to fetch metadata file
+        file_name
+        """
+
+        wb_file = openpyxl.load_workbook(file_name, data_only=True)
+        ws_metadata_lab = wb_file["METADATA_LAB"]
+        c = 0
+        config_json = ConfigJson()
+        relecov_bioinfo_metadata = config_json.get_configuration(
+            "relecov_bioinfo_metadata"
+        )
+
+        (
+            mapping_illumina_tab_path,
+            summary_variants_metrics_path,
+            variants_long_table_path,
+            consensus_genome_length_path,
+            software_versions_path,
+            pangolin_versions_path,
+        ) = self.get_input_files(self)
+
+        (
+            self.files_read_bioinfo_metadata,
+            self.md5_file_name,
+            self.mapping_illumina_tab_field_list,
+        ) = self.get_config_info(self)
+
         md5_info_path = os.path.join(
             self.input_folder,
             self.md5_file_name,  # como hacer esto general para los servicios
         )
-
         mapping_illumina_tab = pd.read_csv(mapping_illumina_tab_path, sep="\t")
         summary_variants_metrics = pd.read_csv(summary_variants_metrics_path, sep=",")
         variants_long_table = pd.read_csv(variants_long_table_path, sep=",")
@@ -145,6 +186,10 @@ class BioinfoMetadata:
             bioinfo_dict["ns_per_100_kbp"] = str(
                 summary_variants_metrics["# Ns per 100kb consensus"][c]
             )
+            bioinfo_dict["qc_filtered"] = str(
+                summary_variants_metrics["# Trimmed reads (fastp)"][c]
+            )
+
             # fields from variants_long_table.csv
             bioinfo_dict["reference_genome_accession"] = str(
                 variants_long_table["CHROM"][c]
@@ -190,6 +235,18 @@ class BioinfoMetadata:
                 pangolin_version_software.iloc[c]
             )
 
+            c_time = os.path.getctime(variants_long_table_path)
+            dt_c = datetime.datetime.fromtimestamp(c_time)
+            bioinfo_dict["analysis_date"] = str(dt_c)
+            bioinfo_dict["lineage_identification_date"] = str(dt_c)
+
+            """
+            IDEA
+            pango_time = os.path.getctime(
+                self.input_folder + "/" + str(sample_name) + ".pangolin.csv"
+            )
+            dt_pango = datetime.datetime.fromtimestamp(pango_time)
+            """
             bioinfo_list[str(sample_name)] = bioinfo_dict
             c = c + 1
 

@@ -2,6 +2,8 @@
 import os
 import logging
 
+# import re
+
 # from rich.prompt import Confirm
 import click
 import rich.console
@@ -241,22 +243,43 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
     type=click.Choice(["add", "modify", "cancel", "release"], case_sensitive=False),
     help="select one of the available options",
 )
-@click.option("--dev/--production", default=True)
+@click.option("--dev", is_flag=True, default=False)
 @click.option("-o", "--output_path", help="output folder for the xml generated files")
 def upload_to_ena(user, password, center, ena_json, dev, study, action, output_path):
     """parsed data to create xml files to upload to ena"""
+
     upload_ena = relecov_tools.ena_upload.EnaUpload(
         user, password, center, ena_json, dev, study, action, output_path
     )
     upload_ena.upload()
 
 
+# upload to GISAID
 @relecov_tools_cli.command(help_priority=7)
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-e", "--gisaid_json", help="where the validated json is")
-@click.option("-o", "--output_path", help="output folder for the xml generated files")
-def upload_to_gisaid(user, password, gisaid_json, output_path):
+@click.option(
+    "-i",
+    "--input_path",
+    help="the path where the fasta or multifasta, gisaid_mapped.json and the token file are located",
+)
+@click.option("-o", "--output_path", help="output folder for log")
+@click.option(
+    "-x",
+    "--proxy_config",
+    help="introduce your proxy credentials as: username:password@proxy:port",
+    required=False,
+)
+@click.option(
+    "--single",
+    is_flag=True,
+    default=False,
+    help="Default input is a multifasta.",
+)
+def upload_to_gisaid(
+    user, password, gisaid_json, input_path, output_path, proxy_config
+):
     """parsed data to create files to upload to gisaid"""
     pass
 
