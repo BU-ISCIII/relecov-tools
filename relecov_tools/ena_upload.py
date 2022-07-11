@@ -347,9 +347,10 @@ class EnaUpload:
 
             print(f"\nSubmitting XMLs to ENA server: {url}")
             receipt = send_schemas(schema_xmls, url, self.user, self.passwd).text
-            print("Printing receipt to ./receipt.xml")
+            receipt_dir= os.path.join(self.output_path, "receipt.xml")
+            print(f"Printing receipt to {receipt_dir}")
 
-            with open("receipt.xml", "w") as fw:
+            with open(f"{receipt_dir}", "w") as fw:
                 fw.write(receipt)
             try:
                 schema_update = process_receipt(receipt.encode("utf-8"), self.action)
