@@ -347,6 +347,8 @@ class EnaUpload:
 
             print(f"\nSubmitting XMLs to ENA server: {url}")
             receipt = send_schemas(schema_xmls, url, self.user, self.passwd).text
+            if not os.path.exists(self.output_path):
+                os.mkdir(self.output_path)
             receipt_dir= os.path.join(self.output_path, "receipt.xml")
             print(f"Printing receipt to {receipt_dir}")
 
