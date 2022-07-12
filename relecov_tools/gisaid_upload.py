@@ -32,30 +32,48 @@ class GisaidUpload:
         self,
         user=None,
         passwd=None,
+        client_id=None,
+        token=None,
         gisaid_json=None,
         fasta_path=None,
         output_path=None,
+        frameshift=None,
+        proxy_config=None,
     ):
-        if user is None:
-            self.user = relecov_tools.utils.prompt_text(
-                msg="Enter your username defined in GISAID"
-            )
+        if (
+            token is None
+        ):  # borrar comentario: solo si no existe el token necesita user, passwd y client_id
+            print("Token is not introduced, creating a new one...")
+            if user is None:
+                self.user = relecov_tools.utils.prompt_text(
+                    msg="Enter your username defined in GISAID"
+                )
+            else:
+                self.user = user
+            # Add proxy settings: username:password@proxy:port (optional)
+            if passwd is None:
+                self.passwd = relecov_tools.utils.prompt_password(
+                    msg="Enter your password to GISAID"
+                )
+            else:
+                self.passwd = passwd
+            if client_id is None:
+                self.client_id = relecov_tools.utils.prompt_password(
+                    msg="Enter your client-ID to GISAID. Email clisupport@gisaid.org to request client-ID"
+                )
+            else:
+                self.client_id = client_id
         else:
-            self.user = user
-        # Add proxy settings: username:password@proxy:port (optional)
-        if passwd is None:
-            self.passwd = relecov_tools.utils.prompt_password(
-                msg="Enter your password to GISAID"
-            )
-        else:
-            self.passwd = passwd
-        if self.source_json is None:
-            self.source_json_file = relecov_tools.utils.prompt_path(
+            self.token = token
+        if self.gisaid_json is None:
+            self.gisaid_json = relecov_tools.utils.prompt_path(
                 msg="Select the GISAID json file to upload"
             )
         else:
-            self.source_json_file = self.source_json
-        if self.customized_project is None:
+            self.gisaid_json = self.gisaid_json
+        if (
+            self.customized_project is None
+        ):  # borrar comentario: esta parte no la entiendo, no la toco
             self.customized_project = None
         else:
             self.customized_project = self.customized_project
@@ -65,12 +83,6 @@ class GisaidUpload:
             )
         else:
             self.output_path = output_path
-        if gisaid_json is None:
-            self.gisaid_json = relecov_tools.utils.prompt_path(
-                msg="Select metadata json file"
-            )
-        else:
-            self.gisaid_json = gisaid_json
         if fasta_path is None:
             self.fasta_path = relecov_tools.utils.prompt_path(msg="Select path")
         else:
@@ -83,6 +95,18 @@ class GisaidUpload:
             sys.exit(1)
             with open(self.source_json_file, "r") as fh:
                 self.json_data = json.loads(fh.read())
+        if frameshift is None:
+            self.frameshift = relecov_tools.utils.prompt_selection(
+                msg="Select frameshift notification",
+                choices="catch_all, catch_novel, catch_none",
+            )
+        else:
+            self.frameshift = frameshift
+        if proxy_config is None:
+            # borrar comentario: este mensaje no me convence
+            print("Proxy configuration is not set")
+        else:
+            self.proxy_config = proxy_config
 
     def convert_input_json_to_ena(self):
         """Split the input ena json, in samples and runs json"""
@@ -94,7 +118,9 @@ class GisaidUpload:
         "Transform metadata json to csv"
         data = relecov_tools.utils.read_json_file(self.metadata)
         df_data = pd.DataFrame(data)
-        df_data.to_csv("meta_gisaid.csv")
+        df_data.to_csv("%s/meta_gisaid.csv" % self.output_path)
+        metagisaid = "%s/meta_gisaid.csv" % self.output_path
+        return metagisaid
 
     # generar template con cli3
     # ADD TOKEN WARNING and file token  .authtoken
@@ -115,8 +141,6 @@ class GisaidUpload:
     --log default creates file failed.out where the log will be )
     """
 
-    # Sequences
-    # Unificar en multifasta
     def create_multifasta(self):
         """Create multifasta from single fastas"""
         os.system(
@@ -138,6 +162,48 @@ class GisaidUpload:
                     if record.id == name.split("/")[-2]:
                         record.id = name
             SeqIO.write(record, new_fasta, "fasta")
+        fastagisaid = "%s/multifasta_gisaid.fasta" % self.output_path
+        return fastagisaid
+
+    def cli3_auth(self):
+        """Create authenticate token"""
+        os.system(
+            "cli3 authenticate --username %s --password %s --client_id %s"
+            % (self.user, self.passwd, self.client_id)
+        )
+
+    def cli3_upload(self):
+        """Upload to GISAID"""
+        if self.proxy_config is None:
+            os.system(
+                "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s"
+                % (
+                    self.token,
+                    self.metadata_to_csv(),
+                    self.change_headers(),
+                    self.frameshift,
+                )
+            )
+        else:
+            os.system(
+                "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s --proxy %s"
+                % (
+                    self.token,
+                    self.metadata_to_csv(),
+                    self.change_headers(),
+                    self.frameshift,
+                    self.proxy_config,
+                )
+            )
+
+    """
+    def gisaid_upload(self):
+        ""Upload to GISAID""
+        self.create_multifasta()
+        if token is None:
+            self.cli3_auth()
+        self.cli3_upload()
+    """
 
     """"
     Upload

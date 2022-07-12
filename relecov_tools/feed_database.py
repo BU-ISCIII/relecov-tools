@@ -201,6 +201,7 @@ class FeedDatabase:
         """Select the values from self.json_data"""
         field_values = []
         r_fields = self.config_json.get_configuration("relecov_sample_metadata")
+
         for row in self.json_data:
             s_dict = {}
             for r_field in r_fields:
@@ -211,9 +212,27 @@ class FeedDatabase:
             field_values.append(s_dict)
         return field_values
 
+    def map_relecov_bioinfo_data(self):
+        # Select the values from self.json_data
+        field_values = []
+
+        for row in self.json_data:
+            s_dict = {}
+            for r_field in self.json_data[row]:
+                if r_field in self.json_data[row]:
+                    s_dict[r_field] = self.json_data[row][r_field]
+                    if r_field == "sample_name":
+                        s_dict[r_field] = row
+                else:
+                    s_dict[r_field] = None
+            field_values.append(s_dict)
+
+        return field_values
+
     def update_database(self, field_values, post_url):
         """Send the request to update database"""
         for chunk in field_values:
+            # print(chunk)
             result = self.database_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
@@ -257,6 +276,7 @@ class FeedDatabase:
         """Collect data from json file and split them to store data in iSkyLIMS
         amd in Relecov Platform
         """
+        map_fields = {}  #
         if self.type_of_info == "sample":
             if self.server_type == "iskylims":
                 sample_fields, s_project_fields = self.get_iskylims_fields_sample()
@@ -278,18 +298,10 @@ class FeedDatabase:
                 map_fields = self.map_iskylims_sample_fields_values(
                     sample_fields, s_project_fields
                 )
-                post_url = "analysis"
-                print("analysis")
-                map_fields = self.map_relecov_bioinfo_data()
                 """
             elif self.server_type == "relecov_local":
                 print("relecov_local")
-                sample_fields, s_project_fields = self.get_iskylims_fields_sample()
-                map_fields = self.map_iskylims_sample_fields_values(
-                    sample_fields, s_project_fields
-                )
                 post_url = "analysis"
-                print("analysis")
                 map_fields = self.map_relecov_bioinfo_data()
 
         elif self.type_of_info == "longtable":
