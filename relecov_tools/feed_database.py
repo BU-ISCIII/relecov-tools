@@ -82,7 +82,7 @@ class FeedDatabase:
         if database_server is None:
             database_server = relecov_tools.utils.prompt_selection(
                 "Select:",
-                ["iskylims", "relecov"],
+                ["iskylims", "relecov", "relecov_local"],
             )
         self.server_type = database_server
         # Get database settings
@@ -264,10 +264,34 @@ class FeedDatabase:
                     sample_fields, s_project_fields
                 )
             else:
+                # sample_fields, s_project_fields = self.get_iskylims_fields_sample()
                 map_fields = self.map_relecov_sample_data()
             post_url = "store_samples"
+
         elif self.type_of_info == "analysis":
-            post_url = "analysis"
+            if self.server_type == "relecov":
+                print("relecov")
+                post_url = "analysis"
+                map_fields = self.map_relecov_bioinfo_data()
+                """
+                sample_fields, s_project_fields = self.get_iskylims_fields_sample()
+                map_fields = self.map_iskylims_sample_fields_values(
+                    sample_fields, s_project_fields
+                )
+                post_url = "analysis"
+                print("analysis")
+                map_fields = self.map_relecov_bioinfo_data()
+                """
+            elif self.server_type == "relecov_local":
+                print("relecov_local")
+                sample_fields, s_project_fields = self.get_iskylims_fields_sample()
+                map_fields = self.map_iskylims_sample_fields_values(
+                    sample_fields, s_project_fields
+                )
+                post_url = "analysis"
+                print("analysis")
+                map_fields = self.map_relecov_bioinfo_data()
+
         elif self.type_of_info == "longtable":
             post_url = "long_table"
         else:
