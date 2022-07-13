@@ -1850,17 +1850,6 @@
             "label": "% genome  greater 10x",
             "fill_mode": "batch"
         },
-        "median_depth_of_coverage_value": {
-            "examples": [
-                ""
-            ],
-            "ontology": "NCIT:C167285",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "mean depth of coverage value",
-            "fill_mode": "batch"
-        },
         "per_Ns": {
             "examples": [
                 ""
