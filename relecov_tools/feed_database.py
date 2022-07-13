@@ -253,7 +253,9 @@ class FeedDatabase:
                             break
                     if i == 9 and "ERROR" in result:
                         log.error("Unable to sent the request to remote server")
-                        stderr.print("[red] Unable to sent the request to remote server")
+                        stderr.print(
+                            "[red] Unable to sent the request to remote server"
+                        )
                         sys.exit(1)
                 else:
                     log.error("Request to %s was not accepted", self.database_server)
