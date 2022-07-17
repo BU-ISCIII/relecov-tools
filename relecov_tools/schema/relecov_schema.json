@@ -973,7 +973,7 @@
                 ""
             ],
             "ontology": "GENEPIO:0000079",
-            "type": "number",
+            "type": "string",
             "description": "If the information is unknown or can not be shared, leave blank.",
             "classification": "Database Identifiers",
             "label": "Sample ID given for sequencing",
