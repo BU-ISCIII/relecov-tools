@@ -21,6 +21,8 @@ from ena_upload.ena_upload import construct_submission
 from ena_upload.ena_upload import send_schemas
 from ena_upload.ena_upload import process_receipt
 from ena_upload.ena_upload import update_table
+from ena_upload.ena_upload import make_update
+from ena_upload.ena_upload import process_receipt
 
 # from ena_upload.ena_upload import save_update
 import site
@@ -361,6 +363,29 @@ class EnaUpload:
                 schema_dataframe = update_table(
                     schema_dataframe, schema_targets, schema_update
                 )
+        if self.action == "MODIFY" or self.action == "modify":
+            process_receipt(receipt, self.action)
+            receiptDate = receipt_root.get("receiptDate")
+            schema_update = {}  # schema as key, dataframe as value
+            study_update = receipt_root.findall("STUDY")
+            sample_update = receipt_root.findall("SAMPLE")
+            experiment_update = receipt_root.findall("EXPERIMENT")
+            run_update = receipt_root.findall("RUN")
+
+            if study_update:
+                schema_update["study"] = make_update(study_update, "study")
+
+            if sample_update:
+                schema_update["sample"] = make_update(sample_update, "sample")
+
+            if experiment_update:
+                schema_update["experiment"] = make_update(
+                    experiment_update, "experiment"
+                )
+
+            if run_update:
+                schema_update["run"] = make_update(run_update, "run")
+            return schema_update
 
     def upload(self):
         """Create the required files and upload to ENA"""
