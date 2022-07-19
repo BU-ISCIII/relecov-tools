@@ -169,7 +169,7 @@ class GisaidUpload:
                 % (
                     self.token,
                     self.metadata_to_csv(),
-                    self.change_headers(),
+                    self.change_headers(self.create_multifasta()),
                     self.frameshift,
                 )
             )
