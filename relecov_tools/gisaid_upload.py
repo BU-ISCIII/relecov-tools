@@ -150,8 +150,8 @@ class GisaidUpload:
                 for name in virus_name:
                     if record.id == name.split("/")[-2]:
                         record.id = name
-            SeqIO.write(record, new_fasta, "fasta")
-        fastagisaid = "%s/multifasta_gisaid.fasta" % self.output_path
+                        SeqIO.write(record, new_fasta, "fasta")
+        fastagisaid = multi_gis_path
         return fastagisaid
 
     def cli3_auth(self):
