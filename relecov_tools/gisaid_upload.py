@@ -79,13 +79,15 @@ class GisaidUpload:
         else:
             self.output_path = output_path
         if fasta_path is None:
-            self.fasta_path = relecov_tools.utils.prompt_path(msg="Select path to fasta file/s")
+            self.fasta_path = relecov_tools.utils.prompt_path(
+                msg="Select path to fasta file/s"
+            )
         else:
             self.fasta_path = fasta_path
         if frameshift is None:
             self.frameshift = relecov_tools.utils.prompt_selection(
                 msg="Select frameshift notification",
-                choices=["catch_all", "catch_novel", "catch_none"]
+                choices=["catch_all", "catch_novel", "catch_none"],
             )
         else:
             self.frameshift = frameshift
@@ -111,7 +113,7 @@ class GisaidUpload:
     # generar template con cli3
     # ADD TOKEN WARNING and file token  .authtoken
     # add bash from cli3
-"""
+    """
     os.system(
         "cli3 upload --database EpiCoV --token ./gisaid.authtoken --metadata gisaid_template.csv  --fasta multi.fasta --frameshift (OPTIONAL, default: catch_all) --failed --proxy --log"
     )
@@ -124,8 +126,9 @@ class GisaidUpload:
     --failed default creates file failed.out where the failed records will be
     --proxy
     --log default creates file failed.out where the log will be )
-    
-"""
+
+    """
+
     def create_multifasta(self):
         """Create multifasta from single fastas (if --single)"""
         if self.single:
@@ -141,10 +144,10 @@ class GisaidUpload:
         """Transform multifasta ids/headers to GISAID format"""
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
         virus_name = [name["covv_virus_name"] for name in data]
-        multi_gis_path = os.path.join(self.output_path, "processed_multifasta_gisaid.fasta")
-        with open(multifasta) as old_fasta, open(
-            multi_gis_path, "a"
-        ) as new_fasta:
+        multi_gis_path = os.path.join(
+            self.output_path, "processed_multifasta_gisaid.fasta"
+        )
+        with open(multifasta) as old_fasta, open(multi_gis_path, "a") as new_fasta:
             records = SeqIO.parse(old_fasta, "fasta")
             for record in records:
                 for name in virus_name:
@@ -185,13 +188,11 @@ class GisaidUpload:
                 )
             )
 
-
     def gisaid_upload(self):
         """Upload to GISAID"""
-        if token is None:
+        if self.token is None:
             self.cli3_auth()
         self.cli3_upload()
-
 
     """"
     Upload
