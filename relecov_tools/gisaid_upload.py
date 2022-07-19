@@ -44,6 +44,7 @@ class GisaidUpload:
         if (
             token is None
         ):  # borrar comentario: solo si no existe el token necesita user, passwd y client_id
+            self.token = None
             print("Token is not introduced, creating a new one...")
             if user is None:
                 self.user = relecov_tools.utils.prompt_text(
@@ -51,7 +52,6 @@ class GisaidUpload:
                 )
             else:
                 self.user = user
-            # Add proxy settings: username:password@proxy:port (optional)
             if passwd is None:
                 self.passwd = relecov_tools.utils.prompt_password(
                     msg="Enter your password to GISAID"
@@ -66,18 +66,12 @@ class GisaidUpload:
                 self.client_id = client_id
         else:
             self.token = token
-        if self.gisaid_json is None:
+        if gisaid_json is None:
             self.gisaid_json = relecov_tools.utils.prompt_path(
                 msg="Select the GISAID json file to upload"
             )
         else:
             self.gisaid_json = self.gisaid_json
-        if (
-            self.customized_project is None
-        ):  # borrar comentario: esta parte no la entiendo, no la toco
-            self.customized_project = None
-        else:
-            self.customized_project = self.customized_project
         if output_path is None:
             self.output_path = relecov_tools.utils.prompt_path(
                 msg="Select the folder to store the log files"
@@ -85,24 +79,17 @@ class GisaidUpload:
         else:
             self.output_path = output_path
         if fasta_path is None:
-            self.fasta_path = relecov_tools.utils.prompt_path(msg="Select path")
+            self.fasta_path = relecov_tools.utils.prompt_path(msg="Select path to fasta file/s")
         else:
-            # relecov_tools/gisaid_upload.py
             self.fasta_path = fasta_path
-
-        if not os.path.isfile(self.source_json_file):
-            log.error("json data file %s does not exist ", self.source_json_file)
-            stderr.print(f"[red]json data file {self.source_json_file} does not exist")
-            sys.exit(1)
-            with open(self.source_json_file, "r") as fh:
-                self.json_data = json.loads(fh.read())
         if frameshift is None:
             self.frameshift = relecov_tools.utils.prompt_selection(
                 msg="Select frameshift notification",
-                choices="catch_all, catch_novel, catch_none",
+                choices=["catch_all", "catch_novel", "catch_none"]
             )
         else:
             self.frameshift = frameshift
+        # Add proxy settings: username:password@proxy:port (optional)
         if proxy_config is None:
             # borrar comentario: este mensaje no me convence
             print("Proxy configuration is not set")
