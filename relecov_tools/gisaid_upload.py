@@ -185,14 +185,13 @@ class GisaidUpload:
                 )
             )
 
-    """
+
     def gisaid_upload(self):
-        ""Upload to GISAID""
-        self.create_multifasta()
+        """Upload to GISAID"""
         if token is None:
             self.cli3_auth()
         self.cli3_upload()
-    """
+
 
     """"
     Upload
