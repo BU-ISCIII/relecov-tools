@@ -104,7 +104,7 @@ class GisaidUpload:
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
         df_data = pd.DataFrame(data)
         df_data_path = os.path.join(self.output_path, "meta_gisaid.csv")
-        df_data.to_csv(df_data_path)
+        df_data.to_csv(df_data_path, index=False)
         metagisaid = df_data_path
         return metagisaid
 
