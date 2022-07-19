@@ -141,8 +141,9 @@ class GisaidUpload:
         """Transform multifasta ids/headers to GISAID format"""
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
         virus_name = [name["covv_virus_name"] for name in data]
+        multi_gis_path = os.path.join(self.output_path, "processed_multifasta_gisaid.fasta")
         with open(multifasta) as old_fasta, open(
-            "%s/multifasta_gisaid.fasta" % self.output_path, "w"
+            multi_gis_path, "a"
         ) as new_fasta:
             records = SeqIO.parse(old_fasta, "fasta")
             for record in records:
