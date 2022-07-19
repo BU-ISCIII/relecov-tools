@@ -101,20 +101,20 @@ class GisaidUpload:
 
     def metadata_to_csv(self):
         "Transform metadata json to csv"
-        data = relecov_tools.utils.read_json_file(self.metadata)
+        data = relecov_tools.utils.read_json_file(self.gisaid_json)
         df_data = pd.DataFrame(data)
-        df_data.to_csv("%s/meta_gisaid.csv" % self.output_path)
-        metagisaid = "%s/meta_gisaid.csv" % self.output_path
+        df_data_path = os.path.join(self.output_path, "meta_gisaid.csv")
+        df_data.to_csv(df_data_path)
+        metagisaid = df_data_path
         return metagisaid
 
     # generar template con cli3
     # ADD TOKEN WARNING and file token  .authtoken
     # add bash from cli3
-
+"""
     os.system(
         "cli3 upload --database EpiCoV --token ./gisaid.authtoken --metadata gisaid_template.csv  --fasta multi.fasta --frameshift (OPTIONAL, default: catch_all) --failed --proxy --log"
     )
-    """
     cli3 upload
     --database EpiCoV
     --token ./gisaid.authtoken
@@ -124,8 +124,8 @@ class GisaidUpload:
     --failed default creates file failed.out where the failed records will be
     --proxy
     --log default creates file failed.out where the log will be )
-    """
-
+    
+"""
     def create_multifasta(self):
         """Create multifasta from single fastas"""
         os.system(
