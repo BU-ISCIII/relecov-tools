@@ -97,10 +97,6 @@ class GisaidUpload:
             self.proxy_config = proxy_config
         self.single = single
 
-    def convert_input_json_to_ena(self):
-        """Split the input ena json, in samples and runs json"""
-        pass
-
     # Metadatos
 
     def metadata_to_csv(self):
