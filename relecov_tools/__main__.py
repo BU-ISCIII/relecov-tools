@@ -281,10 +281,13 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
     help="Default input is a multifasta.",
 )
 def upload_to_gisaid(
-    user, password, gisaid_json, input_path, output_path, proxy_config
+    user, password, client_id, token, gisaid_json, input_path, output_path, frameshift, proxy_config, single
 ):
     """parsed data to create files to upload to gisaid"""
-    pass
+    upload_gisaid = relecov_tools.gisaid_upload.GisaidUpload(
+        user, password, client_id, token, gisaid_json, input_path, output_path, frameshift, proxy_config, single
+    )
+    upload_gisaid.gisaid_upload()    
 
 
 # launch
