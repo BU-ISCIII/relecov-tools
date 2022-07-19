@@ -39,6 +39,7 @@ class GisaidUpload:
         output_path=None,
         frameshift=None,
         proxy_config=None,
+        single=False,
     ):
         if (
             token is None
@@ -107,6 +108,7 @@ class GisaidUpload:
             print("Proxy configuration is not set")
         else:
             self.proxy_config = proxy_config
+        self.single = single
 
     def convert_input_json_to_ena(self):
         """Split the input ena json, in samples and runs json"""
