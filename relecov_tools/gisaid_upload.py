@@ -127,11 +127,14 @@ class GisaidUpload:
     
 """
     def create_multifasta(self):
-        """Create multifasta from single fastas"""
-        os.system(
-            "cat %s/*.fasta > %s/multifasta.fasta" % (self.fasta_path, self.output_path)
-        )
-        multifasta = "%s/multifasta.fasta" % self.output_path
+        """Create multifasta from single fastas (if --single)"""
+        if self.single:
+            os.system(
+                "cat %s > %s/multifasta.fasta" % (self.fasta_path, self.output_path)
+            )
+            multifasta = "%s/multifasta.fasta" % self.output_path
+        else:
+            multifasta = self.fasta_path
         return multifasta
 
     def change_headers(self, multifasta):
