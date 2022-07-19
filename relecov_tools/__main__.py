@@ -258,13 +258,16 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
 @relecov_tools_cli.command(help_priority=7)
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
-@click.option("-e", "--gisaid_json", help="where the validated json is")
+@click.option("-c", "--client_id", help="client-ID provided by clisupport@gisaid.org")
+@click.option("-t", "--token", help="path to athentication token")
+@click.option("-e", "--gisaid_json", help="patch validated json mapped to GISAID")
 @click.option(
     "-i",
     "--input_path",
-    help="the path where the fasta or multifasta, gisaid_mapped.json and the token file are located",
+    help="path to fasta or multifasta file",
 )
 @click.option("-o", "--output_path", help="output folder for log")
+@click.option("-f", "--frameshift", type=click.Choice(["catch_all", "catch_none", "catch_novel"], case_sensitive=False), help="frameshift notification")
 @click.option(
     "-x",
     "--proxy_config",
