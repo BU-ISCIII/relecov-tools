@@ -1,5 +1,5 @@
-{  
-    "new_table_headers" : [
+{
+    "metadata_lab_heading" : [
     "Public Health sample id (SIVIES)",
     "Sample ID given by originating laboratory",
     "Sample ID given by the submitting laboratory",
@@ -125,16 +125,7 @@
             "analysis": "bioinfoData",
             "long_table": "longtableData",
             "token": ""
-        },
-        "relecov_local": {
-            "server": "http://127.0.0.1:8000",
-            "url": "/api/",
-            "store_samples": "createSampleData",
-            "analysis": "bioinfoData",
-            "long_table": "longtableData",
-            "token": ""
         }
-
     },
     "iskylims_fixed_values": {
         "patientCore": "",
@@ -223,5 +214,9 @@
         "HGVS_P_1LETTER",
         "CALLER",
         "LINEAGE"
-    ]
+    ],
+    "mapping_file":{
+        "ISCIII": "ISCIII.json",
+        "HUGTiP": "HUGTiP.json"
+    }
 }

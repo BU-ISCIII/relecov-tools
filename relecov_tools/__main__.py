@@ -19,6 +19,7 @@ import relecov_tools.map_schema
 import relecov_tools.feed_database
 import relecov_tools.read_bioinfo_metadata
 import relecov_tools.long_table_parse
+import relecov_tools.metadata_homogeneizer
 
 log = logging.getLogger()
 
@@ -393,6 +394,29 @@ def long_table_parse(longtable_file, output):
         longtable_file, output
     )
     new_json_parse.parsing_csv()
+
+
+# read metadata bioinformatics
+@relecov_tools_cli.command(help_priority=12)
+@click.option(
+    "-l",
+    "--lab_metadata",
+    type=click.Path(),
+    help="file containing laboratory METADATA ",
+)
+@click.option(
+    "-i",
+    "--institution",
+    type=click.Choice(["isciii", "hugtip", "hunsc-iter"], case_sensitive=False),
+    help="select one of the available institution options",
+)
+@click.option("-o", "--output", type=click.Path(), help="Path to save json output")
+def metadata_homogeneizer(lab_metadata, institution, output):
+    """Parse institution metadata lab to the one used in relecov"""
+    new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
+        lab_metadata, institution, output
+    )
+    new_parse.converting_metadata()
 
 
 if __name__ == "__main__":
