@@ -232,6 +232,7 @@ class EnaUpload:
         df_run.insert(5, "file_name", df_run["sequence_file_R1_fastq"])
         df_run2 = df_run.copy()
         df_run2["file_name"] = df_run["sequence_file_R2_fastq"]
+        df_run2["file_checksum"] = df_run["fastq_r2_md5"]
         df_run_final = pd.concat([df_run, df_run2])
         df_run_final.reset_index()
 
