@@ -6,6 +6,8 @@ import json
 
 
 import pandas as pd
+
+
 import sys
 import os
 
@@ -22,8 +24,13 @@ from ena_upload.ena_upload import send_schemas
 from ena_upload.ena_upload import process_receipt
 from ena_upload.ena_upload import update_table
 
+# from ena_upload.ena_upload import make_update
+# from ena_upload.ena_upload import process_receipt
+
 # from ena_upload.ena_upload import save_update
 import site
+
+pd.options.mode.chained_assignment = None
 
 template_path = os.path.join(site.getsitepackages()[0], "ena_upload", "templates")
 
@@ -207,9 +214,7 @@ class EnaUpload:
             df_run.loc[i, "sequence_file_R2_fastq"] = df_schemas.loc[
                 i, "sequence_file_R2_fastq"
             ]
-        import pdb
 
-        pdb.set_trace()
         df_run.insert(3, "status", self.action)
         df_run = df_run.rename(columns={"fastq_r1_md5": "file_checksum"})
 
@@ -287,7 +292,12 @@ class EnaUpload:
         if ena_config["study_id"] is not None:
             schema_dataframe["study"] = df_study
 
-        if self.action == "ADD" or self.action == "add":
+        if (
+            self.action == "ADD"
+            or self.action == "add"
+            or self.action == "MODIFY"
+            or self.action == "modify"
+        ):
             file_paths = {}
             file_paths_r2 = {}
 
@@ -299,26 +309,27 @@ class EnaUpload:
 
             file_paths.update(file_paths_r2)
 
-            # submit data to webin ftp server
+            # submit data to webin ftp server. It should only upload fastq files in case the action is ADD.
+            # When the action is MODIFY rthe fastq are already submitted.
+            if self.action == "ADD" or self.action == "add":
+                session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
 
-            session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
+                for filename, path in file_paths.items():
 
-            for filename, path in file_paths.items():
+                    print("Uploading path " + path + " and filename: " + filename)
 
-                print("Uploading path " + path + " and filename: " + filename)
+                    try:
+                        file = open(path, "rb")  # file to send
+                        g = session.storbinary(f"STOR {filename}", file)
+                        print(g)  # send the file
+                        file.close()  # close file and FTP
+                    except BaseException as err:
 
-                try:
-                    file = open(path, "rb")  # file to send
-                    g = session.storbinary(f"STOR {filename}", file)
-                    print(g)  # send the file
-                    file.close()  # close file and FTP
-                except BaseException as err:
+                        print(f"ERROR: {err}")
+                        # print("ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000.")
 
-                    print(f"ERROR: {err}")
-                    # print("ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000.")
-
-            g2 = session.quit()
-            print(g2)
+                g2 = session.quit()
+                print(g2)
 
             # THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
             # chec = submit_data(file_paths, self.passwd, self.user)
@@ -338,6 +349,9 @@ class EnaUpload:
             submission_xml = construct_submission(
                 template_path, self.action, schema_xmls, self.center, checklist, tool
             )
+            submission_xml = construct_submission(
+                template_path, self.action, schema_xmls, self.center, checklist, tool
+            )
             schema_xmls["submission"] = submission_xml
 
             if self.dev:
@@ -346,8 +360,8 @@ class EnaUpload:
                 url = "https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
 
             print(f"\nSubmitting XMLs to ENA server: {url}")
+
             receipt = send_schemas(schema_xmls, url, self.user, self.passwd).text
-            print("Printing receipt to ./receipt.xml")
 
             with open("receipt.xml", "w") as fw:
                 fw.write(receipt)
@@ -361,6 +375,32 @@ class EnaUpload:
                 schema_dataframe = update_table(
                     schema_dataframe, schema_targets, schema_update
                 )
+
+        """
+        if self.action == "MODIFY" or self.action == "modify":
+            process_receipt(receipt, self.action)
+            receiptDate = receipt_root.get("receiptDate")
+            schema_update = {}  # schema as key, dataframe as value
+            study_update = receipt_root.findall("STUDY")
+            sample_update = receipt_root.findall("SAMPLE")
+            experiment_update = receipt_root.findall("EXPERIMENT")
+            run_update = receipt_root.findall("RUN")
+
+            if study_update:
+                schema_update["study"] = make_update(study_update, "study")
+
+            if sample_update:
+                schema_update["sample"] = make_update(sample_update, "sample")
+
+            if experiment_update:
+                schema_update["experiment"] = make_update(
+                    experiment_update, "experiment"
+                )
+
+            if run_update:
+                schema_update["run"] = make_update(run_update, "run")
+            return schema_update
+        """
 
     def upload(self):
         """Create the required files and upload to ENA"""
