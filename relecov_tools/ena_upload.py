@@ -1,4 +1,3 @@
-from bdb import set_trace
 import logging
 
 # from pyparsing import col
@@ -8,7 +7,7 @@ import json
 
 import pandas as pd
 
-pd.options.mode.chained_assignment = None
+
 import sys
 import os
 
@@ -30,6 +29,8 @@ from ena_upload.ena_upload import update_table
 
 # from ena_upload.ena_upload import save_update
 import site
+
+pd.options.mode.chained_assignment = None
 
 template_path = os.path.join(site.getsitepackages()[0], "ena_upload", "templates")
 
@@ -374,7 +375,7 @@ class EnaUpload:
                 schema_dataframe = update_table(
                     schema_dataframe, schema_targets, schema_update
                 )
-        
+
         """
         if self.action == "MODIFY" or self.action == "modify":
             process_receipt(receipt, self.action)
