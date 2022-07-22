@@ -1,6 +1,6 @@
 [
     {
-        "collecting_institution": "Instituto de Salud Carlos III ",
+        "collecting_institution": "Instituto de Salud Carlos III",
         "collecting_institution_address": "Crta. Pozuelo Majadahonda S/N,",
         "collecting_institution_email": "info@isciii.es",
         "geo_loc_state": "Madrid",
@@ -160,6 +160,22 @@
         "geo_loc_country": "Spain"
     },
     {
+        "collecting_institution": "Hospital Público Santa Bárbara",
+        "collecting_institution_address": "C. Obispo Rafael Torija, s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_city": "Ciudad Real",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "Hospital Virgen de la Luz",
+        "collecting_institution_address": "Hermandad de Donantes de Sangre, 1",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_city": "Cuenca",
+        "geo_loc_country": "Spain"
+    },
+    {
         "collecting_institution": "Hospital Universitario de Guadalajara",
         "collecting_institution_address": "C. Donante de Sangre, S/N",
         "collecting_institution_email": "",
@@ -178,6 +194,14 @@
     {
         "collecting_institution": "Hospital General Nuestra Sra. del Prado",
         "collecting_institution_address": "CTRA. MADRID, Av. Extremadura, KM 114",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_city": "Toledo",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "Consejería de Sanidad",
+        "collecting_institution_address": "Avda. de Francia, 4.",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla la Mancha",
         "geo_loc_city": "Toledo",
@@ -295,6 +319,13 @@
         "geo_loc_country": "Spain"
     },
     {
+        "collecting_institution": "Laboratorio Echevarne Sant Cugat del Vallès",
+        "collecting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_city": "Barcelona",
+        "geo_loc_country": "Spain"
+    },
+    {
         "collecting_institution": "Unitat de Genòmica i Medicina Personalitzada - Hospital Dr. Josep Trueta",
         "collecting_institution_address": "Avinguda de França, S/N,",
         "collecting_institution_email": "",
@@ -335,6 +366,14 @@
         "geo_loc_country": "Spain"
     },
     {
+        "collecting_institution": "Hospital Clínico San Carlos",
+        "collecting_institution_address": "Calle del Prof Martín Lagos",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain"
+    },
+    {
         "collecting_institution": "Centro Militar de Veterinaria de la Defensa",
         "collecting_institution_address": "C. Darío Gazapo 3",
         "collecting_institution_email": "",
@@ -353,6 +392,22 @@
     {
         "collecting_institution": "Hospital Universitario de Getafe",
         "collecting_institution_address": "Carr. Madrid - Toledo, Km 12,500, Getafe",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "Presidencia de Gobierno",
+        "collecting_institution_address": "",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "Ministerio de Sanidad, Servicios Sociales e Igualdad",
+        "collecting_institution_address": "",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
         "geo_loc_city": "Madrid",
@@ -452,14 +507,6 @@
         "collecting_institution_email": "",
         "geo_loc_state": "Extremadura",
         "geo_loc_city": "Caceres",
-        "geo_loc_country": "Spain"
-    },
-    {
-        "collecting_institution": "Sergas - Gerencia de Atención Primaria Pontevedra Sur",
-        "collecting_institution_address": "Av. das Camelias, 109, Vigo",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Galicia",
-        "geo_loc_city": "Pontevedra",
         "geo_loc_country": "Spain"
     },
     {

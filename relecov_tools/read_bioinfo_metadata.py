@@ -5,9 +5,6 @@ import logging
 import json
 import datetime
 
-# import os
-
-
 import rich.console
 from itertools import islice
 import pandas as pd
@@ -17,7 +14,6 @@ import openpyxl
 import os
 import sys
 import relecov_tools.utils
-
 from relecov_tools.config_json import ConfigJson
 import relecov_tools.json_schema
 
