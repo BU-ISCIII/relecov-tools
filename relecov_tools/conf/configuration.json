@@ -146,7 +146,9 @@
         "sequencing_sample_id",
         "SRA_accession",
         "submitting_lab_sample_id",
-        "virus_name"
+        "virus_name",
+        "author_submitter",
+        "authors"
     ],
     "relecov_bioinfo_metadata": {
         "dehosting_method_software_name": "KRAKEN2_KRAKEN2",
