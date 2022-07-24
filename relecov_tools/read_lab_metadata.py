@@ -215,6 +215,29 @@ class RelecovMetadata:
             else:
                 row_sample.update(lab_data[row_sample["collecting_institution"]])
 
+            """ Fetch emai and address for submitting_institution
+            """
+            row_sample["submitting_institution"] = row_sample[
+                "submitting_institution"
+            ].strip()
+            if row_sample["submitting_institution"] not in lab_json:
+                l_data = self.get_laboratory_data(
+                    lab_json, geo_loc_json, row_sample["submitting_institution"]
+                )
+                # row_sample.update(l_data)
+                lab_data[row_sample["submitting_institution"]] = l_data
+            sub_data = {}
+
+            sub_data["submitting_institution_email"] = lab_data[
+                row_sample["submitting_institution"]
+            ]["collecting_institution_email"]
+            sub_data["submitting_institution_address"] = lab_data[
+                row_sample["submitting_institution"]
+            ]["collecting_institution_address"]
+            # else:
+            #    sub_data = {"collecting_institution_email" : "", "collecting_institution_address": ""}
+            row_sample.update(sub_data)
+            # import pdb; pdb.set_trace()
             """ Add Fixed information
             """
             row_sample.update(self.include_fixed_data())
