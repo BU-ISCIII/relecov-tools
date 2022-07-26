@@ -102,7 +102,7 @@ class RelecovMetadata:
             data["geo_loc_longitude"] = ""
             data["geo_loc_country"] = ""
             stderr.print("[red] Empty Originating Laboratory.")
-            log.error("Found empti Originating Laboratory")
+            log.error("Found empty Originating Laboratory")
             return data
         for lab in lab_json:
             if lab_name == lab["collecting_institution"]:
@@ -112,7 +112,7 @@ class RelecovMetadata:
 
         for city in geo_loc_json:
             try:
-                if city["geo_loc_city"] == data["geo_loc_city"]:
+                if city["geo_loc_city"] == lab["geo_loc_city"]:
                     data["geo_loc_latitude"] = city["geo_loc_latitude"]
                     data["geo_loc_longitude"] = city["geo_loc_longitude"]
                     data["geo_loc_country"] = data["geo_loc_country"]
@@ -192,7 +192,8 @@ class RelecovMetadata:
             """Include sample data from sample json"""
             try:
                 for key, value in samples_json[
-                    row_sample["sequencing_sample_id"]
+                    row_sample["microbiology_lab_sample_id"]
+                    # row_sample["sequencing_sample_id"]
                 ].items():
 
                     row_sample[key] = value
@@ -322,6 +323,7 @@ class RelecovMetadata:
                         try:
                             sample_data_row[self.label_prop_dict[heading[idx]]] = val
                         except TypeError as e:
+                            import pdb; pdb.set_trace()
                             stderr.print("[red] Error when reading " + row[2] + e)
                     else:
                         try:
@@ -329,6 +331,7 @@ class RelecovMetadata:
                                 row[idx] if row[idx] else ""
                             )
                         except KeyError as e:
+                            import pdb; pdb.set_trace()
                             stderr.print(
                                 "[red] Error when reading " + str(row[2]) + str(e)
                             )
