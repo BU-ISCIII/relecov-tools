@@ -105,18 +105,20 @@ class RelecovMetadata:
             log.error("Found empti Originating Laboratory")
             return data
         for lab in lab_json:
-
             if lab_name == lab["collecting_institution"]:
                 for key, value in lab.items():
                     data[key] = value
                 break
 
         for city in geo_loc_json:
-            if city["geo_loc_city"] == data["geo_loc_city"]:
-                data["geo_loc_latitude"] = city["geo_loc_latitude"]
-                data["geo_loc_longitude"] = city["geo_loc_longitude"]
-                data["geo_loc_country"] = data["geo_loc_country"]
-                break
+            try:
+                if city["geo_loc_city"] == data["geo_loc_city"]:
+                    data["geo_loc_latitude"] = city["geo_loc_latitude"]
+                    data["geo_loc_longitude"] = city["geo_loc_longitude"]
+                    data["geo_loc_country"] = data["geo_loc_country"]
+                    break
+            except KeyError as e:
+                print(e)
         return data
 
     def include_fixed_data(self):
@@ -190,13 +192,13 @@ class RelecovMetadata:
             """Include sample data from sample json"""
             try:
                 for key, value in samples_json[
-                    row_sample["collecting_lab_sample_id"]
+                    row_sample["sequencing_sample_id"]
                 ].items():
 
                     row_sample[key] = value
             except KeyError as e:
                 stderr.print(
-                    "[red] ERROR  MD5 information not found in sample json. ", e
+                    "[red] ERROR  fastq information not found in sample json. ", e
                 )
 
             """ Fetch the information related to the laboratory.
@@ -255,7 +257,7 @@ class RelecovMetadata:
         Convert the date colunms value to the dd/mm/yyyy format.
         Return list of dict with data, and errors
         """
-        exc_format_num = ["Sample ID given for sequencing"]
+        # exc_format_num = ["Sample ID given for sequencing"]
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
         # removing the None columns in excel heading row
@@ -275,21 +277,25 @@ class RelecovMetadata:
                             idx
                         ].strftime("%Y-%m-%d")
                     except AttributeError:
-                        if row[2] not in errors:
-                            errors[row[2]] = {}
-                        errors[row[2]][heading[idx]] = "Invalid date format"
-                        log.error("Invalid date format in sample %s", row[2])
-                        stderr.print(
-                            "[red] Invalid date format in sample",
-                            row[2] + " column " + heading[idx],
-                        )
+                        # check if date is in string format
+                        str_date = re.search(r"(\d{4}-\d{2}-\d{2}).*", row[idx])
+                        if str_date:
+                            sample_data_row[
+                                self.label_prop_dict[heading[idx]]
+                            ] = str_date.group(1)
+                        else:
+                            if row[2] not in errors:
+                                errors[row[2]] = {}
+                            errors[row[2]][heading[idx]] = "Invalid date format"
+                            log.error("Invalid date format in sample %s", row[2])
+                            stderr.print(
+                                "[red] Invalid date format in sample",
+                                row[2] + " column " + heading[idx],
+                            )
                 else:
 
                     if isinstance(row[idx], float) or isinstance(row[idx], int):
-                        if heading[idx] in exc_format_num:
-                            val = int(row[idx])
-                        else:
-                            val = str(int(row[idx]))
+                        val = str(int(row[idx]))
                         try:
                             sample_data_row[self.label_prop_dict[heading[idx]]] = val
                         except TypeError as e:

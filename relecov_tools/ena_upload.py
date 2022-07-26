@@ -215,7 +215,6 @@ class EnaUpload:
             df_run.loc[i, "sequence_file_R2_fastq"] = df_schemas.loc[
                 i, "sequence_file_R2_fastq"
             ]
-
         df_run.insert(3, "status", self.action)
         df_run = df_run.rename(columns={"fastq_r1_md5": "file_checksum"})
 
@@ -377,8 +376,12 @@ class EnaUpload:
             print(f"\nSubmitting XMLs to ENA server: {url}")
 
             receipt = send_schemas(schema_xmls, url, self.user, self.passwd).text
+            if not os.path.exists(self.output_path):
+                os.mkdir(self.output_path)
+            receipt_dir = os.path.join(self.output_path, "receipt.xml")
+            print(f"Printing receipt to {receipt_dir}")
 
-            with open("receipt.xml", "w") as fw:
+            with open(f"{receipt_dir}", "w") as fw:
                 fw.write(receipt)
             try:
                 schema_update = process_receipt(receipt.encode("utf-8"), self.action)
