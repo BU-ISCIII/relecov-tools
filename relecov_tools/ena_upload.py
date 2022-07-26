@@ -366,9 +366,7 @@ class EnaUpload:
                 # print(files.attrib["checksum"])
 
             tree.write(schema_xmls["run"])
-            import pdb
 
-            pdb.set_trace()
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
             else:
