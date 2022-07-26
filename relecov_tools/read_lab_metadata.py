@@ -238,7 +238,7 @@ class RelecovMetadata:
             # else:
             #    sub_data = {"collecting_institution_email" : "", "collecting_institution_address": ""}
             row_sample.update(sub_data)
-            # import pdb; pdb.set_trace()
+
             """ Add Fixed information
             """
             row_sample.update(self.include_fixed_data())
@@ -323,7 +323,6 @@ class RelecovMetadata:
                         try:
                             sample_data_row[self.label_prop_dict[heading[idx]]] = val
                         except TypeError as e:
-                            import pdb; pdb.set_trace()
                             stderr.print("[red] Error when reading " + row[2] + e)
                     else:
                         try:
@@ -331,7 +330,6 @@ class RelecovMetadata:
                                 row[idx] if row[idx] else ""
                             )
                         except KeyError as e:
-                            import pdb; pdb.set_trace()
                             stderr.print(
                                 "[red] Error when reading " + str(row[2]) + str(e)
                             )
