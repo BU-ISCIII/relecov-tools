@@ -149,8 +149,7 @@
         "r2_fastq_filepath",
         "sequencing_sample_id",
         "submitting_lab_sample_id",
-        "virus_name",
-
+        "virus_name"
     ],
     "relecov_bioinfo_metadata": {
         "dehosting_method_software_name": "KRAKEN2_KRAKEN2",
