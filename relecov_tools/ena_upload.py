@@ -1,6 +1,7 @@
 import logging
 
 # from pyparsing import col
+import xml.etree.ElementTree as ET
 import rich.console
 import json
 
@@ -282,6 +283,7 @@ class EnaUpload:
 2        214821_S12  RELECOV Spanish Network for genomics surveillance     RELECOV  ...         PAIRED   Illumina MiSeq  214823_S1_R1_001.fastq.gz_214823_S1_R2_001.fas...
 
         """
+
         ena_config = config_json.get_configuration("ENA_configuration")
         schema_dataframe = {}
         schema_dataframe["sample"] = df_samples
@@ -349,11 +351,24 @@ class EnaUpload:
             submission_xml = construct_submission(
                 template_path, self.action, schema_xmls, self.center, checklist, tool
             )
-            submission_xml = construct_submission(
-                template_path, self.action, schema_xmls, self.center, checklist, tool
-            )
             schema_xmls["submission"] = submission_xml
 
+            tree = ET.parse(schema_xmls["run"])
+            root = tree.getroot()
+            for files in root.iter("FILE"):
+                if "R2" in files.attrib["filename"]:
+                    # print(files.attrib["filename"])
+                    H = df_run_final.loc[
+                        df_run_final["sequence_file_R2_fastq"]
+                        == files.attrib["filename"]
+                    ].values[0][9]
+                    files.set("checksum", H)
+                # print(files.attrib["checksum"])
+
+            tree.write(schema_xmls["run"])
+            import pdb
+
+            pdb.set_trace()
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
             else:
@@ -379,32 +394,6 @@ class EnaUpload:
                 schema_dataframe = update_table(
                     schema_dataframe, schema_targets, schema_update
                 )
-
-        """
-        if self.action == "MODIFY" or self.action == "modify":
-            process_receipt(receipt, self.action)
-            receiptDate = receipt_root.get("receiptDate")
-            schema_update = {}  # schema as key, dataframe as value
-            study_update = receipt_root.findall("STUDY")
-            sample_update = receipt_root.findall("SAMPLE")
-            experiment_update = receipt_root.findall("EXPERIMENT")
-            run_update = receipt_root.findall("RUN")
-
-            if study_update:
-                schema_update["study"] = make_update(study_update, "study")
-
-            if sample_update:
-                schema_update["sample"] = make_update(sample_update, "sample")
-
-            if experiment_update:
-                schema_update["experiment"] = make_update(
-                    experiment_update, "experiment"
-                )
-
-            if run_update:
-                schema_update["run"] = make_update(run_update, "run")
-            return schema_update
-        """
 
     def upload(self):
         """Create the required files and upload to ENA"""
