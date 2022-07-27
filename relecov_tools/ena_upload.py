@@ -363,8 +363,7 @@ class EnaUpload:
                         == files.attrib["filename"]
                     ].values[0][9]
                     files.set("checksum", H)
-                # print(files.attrib["checksum"])
-
+                    # print(files.attrib["checksum"])
             tree.write(schema_xmls["run"])
 
             if self.dev:
