@@ -106,7 +106,7 @@ class MetadataHomogeneizer:
         sheet = book.active
         for row in data:
             sheet.append(row)
-
+        sheet.title = "METADATA_LAB"
         book.save(f_name)
         return
 
