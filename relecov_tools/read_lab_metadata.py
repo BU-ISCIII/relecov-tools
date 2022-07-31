@@ -358,6 +358,7 @@ class RelecovMetadata:
         phage_plus_schema = relecov_tools.schema_json.PhagePlusSchema(schema_json)
         properties_in_schema = phage_plus_schema.get_schema_properties()
         """
+
         geo_loc_json = config_json.get_configuration("geo_location_data")
         geo_loc_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "conf", geo_loc_json
