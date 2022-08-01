@@ -84,13 +84,16 @@ class RelecovMetadata:
         return data
 
     def get_experiment_run_alias(self, row_data):
-        exp_alias = "NOT_FOUND"
-        run_alias = "NOT_FOUND.fastq.gz"
+
         if "fastq_r1" in row_data:
-            match = re.search(r"(.+)_R1_.*", row_data["fastq_r1"])
+            match = re.search(r"(\w+)_R1.*", row_data["fastq_r1"])
             if match:
                 exp_alias = match.group(1)
                 run_alias = match.group(1) + ".fastq.gz"
+        else:
+            log.error("fastq_r1 field does not exists ")
+            stderr.print("[red] Exiting because there is not fastq_r1 field ")
+            sys.exit(1)
         return exp_alias, run_alias
 
     def get_laboratory_data(self, lab_json, geo_loc_json, lab_name):
@@ -188,6 +191,9 @@ class RelecovMetadata:
         geo_loc_json = self.read_json_file(geo_loc_file)
         samples_json = self.read_json_file(self.sample_list_file)
         exp_alias, run_alias = self.get_experiment_run_alias(metadata[0])
+        import pdb
+
+        pdb.set_trace()
         for row_sample in metadata:
             """Include sample data from sample json"""
             try:
@@ -375,6 +381,10 @@ class RelecovMetadata:
         meta_map_json = self.read_json_file(meta_map_json_file)
         """
         valid_metadata_rows, errors = self.read_metadata_file()
+        if len(errors) > 0:
+            stderr.print("[red] Stopped executing because the errors found")
+            sys.exit(1)
+        # Continue by adding extra information
 
         completed_metadata = self.add_additional_data(
             valid_metadata_rows,
