@@ -191,9 +191,6 @@ class RelecovMetadata:
         geo_loc_json = self.read_json_file(geo_loc_file)
         samples_json = self.read_json_file(self.sample_list_file)
         exp_alias, run_alias = self.get_experiment_run_alias(metadata[0])
-        import pdb
-
-        pdb.set_trace()
         for row_sample in metadata:
             """Include sample data from sample json"""
             try:
