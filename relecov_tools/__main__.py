@@ -19,6 +19,7 @@ import relecov_tools.map_schema
 import relecov_tools.feed_database
 import relecov_tools.read_bioinfo_metadata
 import relecov_tools.long_table_parse
+import relecov_tools.metadata_homogeneizer
 
 log = logging.getLogger()
 
@@ -258,13 +259,21 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
 @relecov_tools_cli.command(help_priority=7)
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
-@click.option("-e", "--gisaid_json", help="where the validated json is")
+@click.option("-c", "--client_id", help="client-ID provided by clisupport@gisaid.org")
+@click.option("-t", "--token", help="path to athentication token")
+@click.option("-e", "--gisaid_json", help="patch validated json mapped to GISAID")
 @click.option(
     "-i",
     "--input_path",
-    help="the path where the fasta or multifasta, gisaid_mapped.json and the token file are located",
+    help="path to fasta or multifasta file",
 )
 @click.option("-o", "--output_path", help="output folder for log")
+@click.option(
+    "-f",
+    "--frameshift",
+    type=click.Choice(["catch_all", "catch_none", "catch_novel"], case_sensitive=False),
+    help="frameshift notification",
+)
 @click.option(
     "-x",
     "--proxy_config",
@@ -278,10 +287,31 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
     help="Default input is a multifasta.",
 )
 def upload_to_gisaid(
-    user, password, gisaid_json, input_path, output_path, proxy_config
+    user,
+    password,
+    client_id,
+    token,
+    gisaid_json,
+    input_path,
+    output_path,
+    frameshift,
+    proxy_config,
+    single,
 ):
     """parsed data to create files to upload to gisaid"""
-    pass
+    upload_gisaid = relecov_tools.gisaid_upload.GisaidUpload(
+        user,
+        password,
+        client_id,
+        token,
+        gisaid_json,
+        input_path,
+        output_path,
+        frameshift,
+        proxy_config,
+        single,
+    )
+    upload_gisaid.gisaid_upload()
 
 
 # launch
@@ -364,6 +394,29 @@ def long_table_parse(longtable_file, output):
         longtable_file, output
     )
     new_json_parse.parsing_csv()
+
+
+# read metadata bioinformatics
+@relecov_tools_cli.command(help_priority=12)
+@click.option(
+    "-l",
+    "--lab_metadata",
+    type=click.Path(),
+    help="file containing laboratory METADATA ",
+)
+@click.option(
+    "-i",
+    "--institution",
+    type=click.Choice(["isciii", "hugtip", "hunsc-iter"], case_sensitive=False),
+    help="select one of the available institution options",
+)
+@click.option("-o", "--output", type=click.Path(), help="Path to save json output")
+def metadata_homogeneizer(lab_metadata, institution, output):
+    """Parse institution metadata lab to the one used in relecov"""
+    new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
+        lab_metadata, institution, output
+    )
+    new_parse.converting_metadata()
 
 
 if __name__ == "__main__":

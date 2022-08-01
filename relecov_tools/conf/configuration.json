@@ -1,5 +1,5 @@
-{  
-    "new_table_headers" : [
+{
+    "metadata_lab_heading" : [
     "Public Health sample id (SIVIES)",
     "Sample ID given by originating laboratory",
     "Sample ID given by the submitting laboratory",
@@ -14,7 +14,7 @@
     "Sample Collection Date",
     "Sample Received Date",
     "Purpose of sampling",
-    "Biological Sample Storage Condition ",
+    "Biological Sample Storage Condition",
     "Specimen source",
     "Environmental Material",
     "Environmental System",
@@ -125,16 +125,7 @@
             "analysis": "bioinfoData",
             "long_table": "longtableData",
             "token": ""
-        },
-        "relecov_local": {
-            "server": "http://127.0.0.1:8000",
-            "url": "/api/",
-            "store_samples": "createSampleData",
-            "analysis": "bioinfoData",
-            "long_table": "longtableData",
-            "token": ""
         }
-
     },
     "iskylims_fixed_values": {
         "patientCore": "",
@@ -143,17 +134,20 @@
         "sampleLocation": "Not defined"
     },
     "relecov_sample_metadata": [
+        "author_submitter",
+        "authors",
         "bioproject_accession_ENA",
         "bioproject_umbrella_accession_ENA",
         "biosample_accession_ENA",
+        "fastq_r1_md5",
+        "fastq_r2_md5",
         "GenBank_ENA_DDBJ_accession",
         "GISAID_accession",
         "gisaid_id",
-        "host_specimen_voucher",
-        "isolate_sample_id",
         "microbiology_lab_sample_id",
+        "r1_fastq_filepath",
+        "r2_fastq_filepath",
         "sequencing_sample_id",
-        "SRA_accession",
         "submitting_lab_sample_id",
         "virus_name"
     ],
@@ -223,5 +217,9 @@
         "HGVS_P_1LETTER",
         "CALLER",
         "LINEAGE"
-    ]
+    ],
+    "mapping_file":{
+        "ISCIII": "ISCIII.json",
+        "HUGTiP": "HUGTiP.json"
+    }
 }
