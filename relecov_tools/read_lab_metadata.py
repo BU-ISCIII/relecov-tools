@@ -112,7 +112,6 @@ class RelecovMetadata:
                 for key, value in lab.items():
                     data[key] = value
                 break
-
         for city in geo_loc_json:
             try:
                 if city["geo_loc_city"] == lab["geo_loc_city"]:
