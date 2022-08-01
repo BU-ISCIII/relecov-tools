@@ -3,6 +3,7 @@ from itertools import islice
 
 import json
 import logging
+from turtle import heading
 import rich.console
 
 import openpyxl
@@ -258,8 +259,10 @@ class RelecovMetadata:
         exc_format_num = ["Sample ID given for sequencing"]
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
+
         # removing the None columns in excel heading row
         heading = [i.value.strip() for i in ws_metadata_lab[4] if i.value]
+
         # heading = self.update_heading_to_json(heading_without_none, meta_map_json)
         metadata_values = []
         errors = {}
@@ -279,10 +282,12 @@ class RelecovMetadata:
                             errors[row[2]] = {}
                         errors[row[2]][heading[idx]] = "Invalid date format"
                         log.error("Invalid date format in sample %s", row[2])
+
                         stderr.print(
                             "[red] Invalid date format in sample",
-                            row[2] + " column " + heading[idx],
+                            str(row[2]) + " column " + heading[idx],
                         )
+
                 else:
 
                     if isinstance(row[idx], float) or isinstance(row[idx], int):

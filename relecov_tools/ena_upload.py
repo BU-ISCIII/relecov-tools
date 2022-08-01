@@ -290,6 +290,9 @@ class EnaUpload:
         schema_dataframe["run"] = df_run_final
         schema_dataframe["experiment"] = df_experiments
         schema_targets = extract_targets(self.action, schema_dataframe)
+        import pdb
+
+        pdb.set_trace()
 
         if ena_config["study_id"] is not None:
             schema_dataframe["study"] = df_study
