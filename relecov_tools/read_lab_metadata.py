@@ -84,7 +84,7 @@ class RelecovMetadata:
         return data
 
     def get_experiment_run_alias(self, row_data):
-
+        """Get the experiment_alias a run_alias from the first fastq_r1"""
         if "fastq_r1" in row_data:
             match = re.search(r"(\w+)_R1.*", row_data["fastq_r1"])
             if match:
