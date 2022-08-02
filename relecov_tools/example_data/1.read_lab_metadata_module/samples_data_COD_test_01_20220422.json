@@ -1,0 +1,82 @@
+{
+    "1197663": {
+        "fastq_r1_md5": "83043c429b0ab94375236cf7f51860f0",
+        "fastq_r2_md5": "c00859a1f83e2364cca953fb25da3cf2",
+        "r1_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "r2_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "sequence_file_R1_fastq": "ABC123_S1_L001_R1_008.fastq.gz",
+        "sequence_file_R2_fastq": "ABC123_S1_L001_R2_008.fastq.gz"
+    },
+    "1197677": {
+        "fastq_r1_md5": "b0a13671031ef5aa7e0e6559a925a688",
+        "fastq_r2_md5": "8c420a603c81823e68436003825b1e1f",
+        "r1_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "r2_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "sequence_file_R1_fastq": "ABC123_S1_L001_R1_005.fastq.gz",
+        "sequence_file_R2_fastq": "ABC123_S1_L001_R2_005.fastq.gz"
+    },
+    "1197678": {
+        "fastq_r1_md5": "13e01498a0526303f5e32f3eef077b5a",
+        "fastq_r2_md5": "61d1f52e84237320d97fd7fc2da56116",
+        "r1_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "r2_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "sequence_file_R1_fastq": "ABC123_S1_L001_R1_006.fastq.gz",
+        "sequence_file_R2_fastq": "ABC123_S1_L001_R2_006.fastq.gz"
+    },
+    "1197685": {
+        "fastq_r1_md5": "a86f4fa0c92d76df34fd000a29d1cdd3",
+        "fastq_r2_md5": "8c4309dc00d725496c48bee6da0e4bbf",
+        "r1_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "r2_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "sequence_file_R1_fastq": "ABC123_S1_L001_R1_0010.fastq.gz",
+        "sequence_file_R2_fastq": "ABC123_S1_L001_R2_0010.fastq.gz"
+    },
+    "1197689": {
+        "fastq_r1_md5": "bc720a024263a518f6a6cd9301b308ac",
+        "fastq_r2_md5": "6bf6d95b59c950691effcaf8a0e83068",
+        "r1_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "r2_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "sequence_file_R1_fastq": "ABC123_S1_L001_R1_009.fastq.gz",
+        "sequence_file_R2_fastq": "ABC123_S1_L001_R2_009.fastq.gz"
+    },
+    "1197737": {
+        "fastq_r1_md5": "f5b60a93b39a0b98781efb434d577a57",
+        "fastq_r2_md5": "e19f883b4e05045895f990c2296009a8",
+        "r1_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "r2_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "sequence_file_R1_fastq": "ABC123_S1_L001_R1_007.fastq.gz",
+        "sequence_file_R2_fastq": "ABC123_S1_L001_R2_007.fastq.gz"
+    },
+    "1197767": {
+        "fastq_r1_md5": "c78fcb585a0f44734ce8c2aebf3eff33",
+        "fastq_r2_md5": "8361d5a6b50279fbc8c93226ecc3568a",
+        "r1_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "r2_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "sequence_file_R1_fastq": "ABC123_S1_L001_R1_003.fastq.gz",
+        "sequence_file_R2_fastq": "ABC123_S1_L001_R2_003.fastq.gz"
+    },
+    "1197824": {
+        "fastq_r1_md5": "9a460a812086516536c1a1023ab5f7fe",
+        "fastq_r2_md5": "41cd79b8a167d85eb06309207fd120cf",
+        "r1_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "r2_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "sequence_file_R1_fastq": "ABC123_S1_L001_R1_002.fastq.gz",
+        "sequence_file_R2_fastq": "ABC123_S1_L001_R2_002.fastq.gz"
+    },
+    "1197860": {
+        "fastq_r1_md5": "f2facbd1d6c7e0972074ced31ccbfd8e",
+        "fastq_r2_md5": "fd9948be8da7a38b0f80659dfc21aeea",
+        "r1_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "r2_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "sequence_file_R1_fastq": "ABC123_S1_L001_R1_001.fastq.gz",
+        "sequence_file_R2_fastq": "ABC123_S1_L001_R2_001.fastq.gz"
+    },
+    "8328199": {
+        "fastq_r1_md5": "aa557fc40d3a9e16f470ac595fb5eb3e",
+        "fastq_r2_md5": "a2dd5e08b75815dab892e392cb8468fc",
+        "r1_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "r2_fastq_filepath": "/tmp/relecov/COD_test_01/20220422",
+        "sequence_file_R1_fastq": "ABC123_S1_L001_R1_004.fastq.gz",
+        "sequence_file_R2_fastq": "ABC123_S1_L001_R2_004.fastq.gz"
+    }
+}

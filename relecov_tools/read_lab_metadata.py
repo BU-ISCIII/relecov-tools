@@ -85,13 +85,16 @@ class RelecovMetadata:
         return data
 
     def get_experiment_run_alias(self, row_data):
-        exp_alias = "NOT_FOUND"
-        run_alias = "NOT_FOUND.fastq.gz"
+        """Get the experiment_alias a run_alias from the first fastq_r1"""
         if "fastq_r1" in row_data:
-            match = re.search(r"(.+)_R1_.*", row_data["fastq_r1"])
+            match = re.search(r"(\w+)_R1.*", row_data["fastq_r1"])
             if match:
                 exp_alias = match.group(1)
                 run_alias = match.group(1) + ".fastq.gz"
+        else:
+            log.error("fastq_r1 field does not exists ")
+            stderr.print("[red] Exiting because there is not fastq_r1 field ")
+            sys.exit(1)
         return exp_alias, run_alias
 
     def get_laboratory_data(self, lab_json, geo_loc_json, lab_name):
@@ -363,6 +366,7 @@ class RelecovMetadata:
         phage_plus_schema = relecov_tools.schema_json.PhagePlusSchema(schema_json)
         properties_in_schema = phage_plus_schema.get_schema_properties()
         """
+
         geo_loc_json = config_json.get_configuration("geo_location_data")
         geo_loc_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "conf", geo_loc_json
@@ -379,6 +383,10 @@ class RelecovMetadata:
         meta_map_json = self.read_json_file(meta_map_json_file)
         """
         valid_metadata_rows, errors = self.read_metadata_file()
+        if len(errors) > 0:
+            stderr.print("[red] Stopped executing because the errors found")
+            sys.exit(1)
+        # Continue by adding extra information
 
         completed_metadata = self.add_additional_data(
             valid_metadata_rows,
