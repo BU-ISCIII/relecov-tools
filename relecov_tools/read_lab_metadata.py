@@ -156,6 +156,7 @@ class RelecovMetadata:
                 "Illumina iSeq 100",
                 "Illumina MiSeq",
                 "Illumina NextSeq550",
+                "Illumina NextSeq",
                 "Illumina NovaSeq 6000",
             ],
             "MinION": ["Oxford Nanopore"],
@@ -171,6 +172,7 @@ class RelecovMetadata:
         """New fields that required processing from other field """
         for key, values in seq_inst_plat.items():
             if metadata["sequencing_instrument_model"] in values:
+
                 new_data["sequencing_instrument_platform"] = key
                 break
 
@@ -303,19 +305,8 @@ class RelecovMetadata:
                         sample_data_row[self.label_prop_dict[heading[idx]]] = row[
                             idx
                         ].strftime("%Y-%m-%d")
+
                     except AttributeError:
-<<<<<<< HEAD
-                        if row[2] not in errors:
-                            errors[row[2]] = {}
-                        errors[row[2]][heading[idx]] = "Invalid date format"
-                        log.error("Invalid date format in sample %s", row[2])
-
-                        stderr.print(
-                            "[red] Invalid date format in sample",
-                            str(row[2]) + " column " + heading[idx],
-                        )
-
-=======
                         # check if date is in string format
                         str_date = re.search(r"(\d{4}-\d{2}-\d{2}).*", row[idx])
                         if str_date:
@@ -331,7 +322,6 @@ class RelecovMetadata:
                                 "[red] Invalid date format in sample",
                                 row[2] + " column " + heading[idx],
                             )
->>>>>>> 765c35610c6254218ef184a747395352e3e96f8f
                 else:
 
                     if isinstance(row[idx], float) or isinstance(row[idx], int):
