@@ -3,7 +3,8 @@ from itertools import islice
 
 import json
 import logging
-from turtle import heading
+
+# from turtle import heading
 import rich.console
 
 import openpyxl
