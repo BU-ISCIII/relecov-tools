@@ -159,6 +159,9 @@ class EnaUpload:
                 "collector_name",
                 "collecting_institution",
                 "isolate",
+                "host subject id",
+                "host health state",
+                "sample_description",
             ]
         ]
 
@@ -181,12 +184,12 @@ class EnaUpload:
             columns={"collecting_institution": "collecting institution"}
         )
         df_samples.insert(3, "status", self.action)
-        df_samples.insert(3, "host subject id", "")
-        df_samples.insert(3, "host health state", "")
+        # df_samples.insert(3, "host subject id", df_schemas["host subject id"])
+        # df_samples.insert(3, "host health state", df_schemas["host health state"])
         config_json = ConfigJson()
         checklist = config_json.get_configuration("checklist")
         df_samples.insert(4, "ENA_CHECKLIST", checklist)
-        df_samples.insert(5, "sample_description", "")
+        # df_samples.insert(5, "sample_description", df_schemas["sample_description"])
         # df_samples
         """
         alias      title taxon_id host health state  ...                                  scientific_name     collector name           collecting institution    isolate
@@ -258,6 +261,9 @@ class EnaUpload:
                 "library_selection",
                 "library_layout",
                 "instrument_model",
+                "design_description",
+                "insert_size",
+                "sequencing_instrument_platform",
             ]
         ]
 
@@ -269,9 +275,13 @@ class EnaUpload:
                 + "_"
                 + str(df_run.loc[i, "sequence_file_R2_fastq"])
             )
-        df_experiments.insert(5, "design_description", "")
-        df_experiments.insert(5, "insert_size", 0)
-        df_experiments.insert(5, "platform", "ILLUMINA")
+        # df_experiments.insert(5, "design_description", df_schemas["design_description"])
+        # df_experiments.insert(5, "insert_size", df_schemas["insert_size"])
+        # df_experiments.insert(5, "platform", df_schemas["sequencing_instrument_platform"])
+
+        df_experiments = df_experiments.rename(
+            columns={"sequencing_instrument_platform": "platform"}
+        )
         df_experiments = df_experiments.rename(columns={"study_title": "title"})
         df_experiments = df_experiments.rename(columns={"sample_name": "sample_alias"})
 
@@ -283,16 +293,12 @@ class EnaUpload:
 2        214821_S12  RELECOV Spanish Network for genomics surveillance     RELECOV  ...         PAIRED   Illumina MiSeq  214823_S1_R1_001.fastq.gz_214823_S1_R2_001.fas...
 
         """
-
         ena_config = config_json.get_configuration("ENA_configuration")
         schema_dataframe = {}
         schema_dataframe["sample"] = df_samples
         schema_dataframe["run"] = df_run_final
         schema_dataframe["experiment"] = df_experiments
         schema_targets = extract_targets(self.action, schema_dataframe)
-        import pdb
-
-        pdb.set_trace()
 
         if ena_config["study_id"] is not None:
             schema_dataframe["study"] = df_study
@@ -345,7 +351,9 @@ class EnaUpload:
             # schema_xmls record XMLs for all these schema and following 'submission'
 
             tool = config_json.get_configuration("tool")
+            import pdb
 
+            pdb.set_trace()
             schema_xmls = run_construct(
                 template_path, schema_targets, self.center, checklist, tool
             )
@@ -358,6 +366,7 @@ class EnaUpload:
 
             tree = ET.parse(schema_xmls["run"])
             root = tree.getroot()
+
             for files in root.iter("FILE"):
                 if "R2" in files.attrib["filename"]:
                     # print(files.attrib["filename"])
