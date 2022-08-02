@@ -17,7 +17,6 @@ import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 import relecov_tools.json_schema
 
-
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
@@ -54,7 +53,22 @@ class BioinfoMetadata:
         else:
             self.output_folder = output_folder
 
-    def get_input_files(self):
+    def bioinfo_parse(self, file_name):
+        """Fetch the metadata file folder  Directory to fetch metadata file
+        file_name   metadata file name
+        """
+
+        wb_file = openpyxl.load_workbook(file_name, data_only=True)
+        ws_metadata_lab = wb_file["METADATA_LAB"]
+        config_json = ConfigJson()
+        relecov_bioinfo_metadata = config_json.get_configuration(
+            "relecov_bioinfo_metadata"
+        )
+        c = 0
+        self.files_read_bioinfo_metadata = config_json.get_configuration(
+            "files_read_bioinfo_metadata"
+        )
+
         mapping_illumina_tab_path = os.path.join(
             self.input_folder, "mapping_illumina.tab"
         )
@@ -71,65 +85,12 @@ class BioinfoMetadata:
             self.input_folder, "software_versions.yml"
         )
         pangolin_versions_path = os.path.join(self.input_folder, "pangolin_version.csv")
-
-        return (
-            mapping_illumina_tab_path,
-            summary_variants_metrics_path,
-            variants_long_table_path,
-            consensus_genome_length_path,
-            software_versions_path,
-            pangolin_versions_path,
-        )
-
-    def get_config_info(self):
-        config_json = ConfigJson()
-
-        self.files_read_bioinfo_metadata = config_json.get_configuration(
-            "files_read_bioinfo_metadata"
-        )
         self.md5_file_name = config_json.get_configuration("md5_file_name")
-        self.mapping_illumina_tab_field_list = config_json.get_configuration(
-            "mapping_illumina_tab_field_list"
-        )
-
-        return (
-            self.files_read_bioinfo_metadata,
-            self.md5_file_name,
-            self.mapping_illumina_tab_field_list,
-        )
-
-    def bioinfo_parse(self, file_name):
-        """Fetch the metadata file folder  Directory to fetch metadata file
-        file_name
-        """
-
-        wb_file = openpyxl.load_workbook(file_name, data_only=True)
-        ws_metadata_lab = wb_file["METADATA_LAB"]
-        c = 0
-        config_json = ConfigJson()
-        relecov_bioinfo_metadata = config_json.get_configuration(
-            "relecov_bioinfo_metadata"
-        )
-
-        (
-            mapping_illumina_tab_path,
-            summary_variants_metrics_path,
-            variants_long_table_path,
-            consensus_genome_length_path,
-            software_versions_path,
-            pangolin_versions_path,
-        ) = self.get_input_files(self)
-
-        (
-            self.files_read_bioinfo_metadata,
-            self.md5_file_name,
-            self.mapping_illumina_tab_field_list,
-        ) = self.get_config_info(self)
-
         md5_info_path = os.path.join(
             self.input_folder,
             self.md5_file_name,  # como hacer esto general para los servicios
         )
+
         mapping_illumina_tab = pd.read_csv(mapping_illumina_tab_path, sep="\t")
         summary_variants_metrics = pd.read_csv(summary_variants_metrics_path, sep=",")
         variants_long_table = pd.read_csv(variants_long_table_path, sep=",")
@@ -160,13 +121,11 @@ class BioinfoMetadata:
             bioinfo_dict["sample_name"] = str(sample_name)
             bioinfo_dict["fastq_r1"] = fastq_r1
             bioinfo_dict["fastq_r2"] = fastq_r2
-
             # inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict
             for key in relecov_bioinfo_metadata.keys():
                 bioinfo_dict[key] = relecov_bioinfo_metadata[key]
             bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
             bioinfo_dict["long_table_path"] = self.input_folder
-
             # fields from mapping_illumina.tab
 
             for key in self.mapping_illumina_tab_field_list.keys():

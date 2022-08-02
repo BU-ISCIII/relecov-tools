@@ -290,6 +290,9 @@ class EnaUpload:
         schema_dataframe["run"] = df_run_final
         schema_dataframe["experiment"] = df_experiments
         schema_targets = extract_targets(self.action, schema_dataframe)
+        import pdb
+
+        pdb.set_trace()
 
         if ena_config["study_id"] is not None:
             schema_dataframe["study"] = df_study
@@ -363,12 +366,9 @@ class EnaUpload:
                         == files.attrib["filename"]
                     ].values[0][9]
                     files.set("checksum", H)
-                # print(files.attrib["checksum"])
-
+                    # print(files.attrib["checksum"])
             tree.write(schema_xmls["run"])
-            import pdb
 
-            pdb.set_trace()
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
             else:

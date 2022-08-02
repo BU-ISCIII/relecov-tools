@@ -3,6 +3,8 @@ from itertools import islice
 
 import json
 import logging
+
+# from turtle import heading
 import rich.console
 
 import openpyxl
@@ -158,6 +160,7 @@ class RelecovMetadata:
                 "Illumina iSeq 100",
                 "Illumina MiSeq",
                 "Illumina NextSeq550",
+                "Illumina NextSeq",
                 "Illumina NovaSeq 6000",
             ],
             "MinION": ["Oxford Nanopore"],
@@ -173,6 +176,7 @@ class RelecovMetadata:
         """New fields that required processing from other field """
         for key, values in seq_inst_plat.items():
             if metadata["sequencing_instrument_model"] in values:
+
                 new_data["sequencing_instrument_platform"] = key
                 break
 
@@ -287,8 +291,10 @@ class RelecovMetadata:
         # exc_format_num = ["Sample ID given for sequencing"]
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
+
         # removing the None columns in excel heading row
         heading = [i.value.strip() for i in ws_metadata_lab[4] if i.value]
+
         # heading = self.update_heading_to_json(heading_without_none, meta_map_json)
         metadata_values = []
         errors = {}
