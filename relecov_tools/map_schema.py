@@ -179,7 +179,7 @@ class MappingSchema:
                     "collecting_lab_sample_id"
                 ]
                 mapped_json_data[idx]["sample_title"] = self.json_data[idx][
-                    "collecting_lab_sample_id"
+                    "sequencing_sample_id"
                 ]
                 mapped_json_data[idx]["file_type"] = "fastq"
                 mapped_json_data[idx]["collector_name"] = self.json_data[idx][
