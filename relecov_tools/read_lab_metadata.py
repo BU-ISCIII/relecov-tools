@@ -305,7 +305,6 @@ class RelecovMetadata:
                         sample_data_row[self.label_prop_dict[heading[idx]]] = row[
                             idx
                         ].strftime("%Y-%m-%d")
-
                     except AttributeError:
                         # check if date is in string format
                         str_date = re.search(r"(\d{4}-\d{2}-\d{2}).*", row[idx])
