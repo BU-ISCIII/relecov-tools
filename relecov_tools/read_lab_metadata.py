@@ -152,7 +152,7 @@ class RelecovMetadata:
             "host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]},
             "collecting_lab_sample_id": [
                 "isolate_sample_id",
-                metadata["collecting_lab_sample_id"],
+                metadata["sequencing_sample_id"],
             ],
         }
         seq_inst_plat = {
