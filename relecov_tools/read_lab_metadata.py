@@ -139,14 +139,14 @@ class RelecovMetadata:
             "host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]},
             "collecting_lab_sample_id": [
                 "isolate_sample_id",
-                metadata["collecting_lab_sample_id"],
+                metadata["sequencing_sample_id"],
             ],
         }
         seq_inst_plat = {
             "Illumina": [
                 "Illumina iSeq 100",
                 "Illumina MiSeq",
-                "Illumina NextSeq550",
+                "Illumina NextSeq 550",
                 "Illumina NextSeq",
                 "Illumina NovaSeq 6000",
             ],
