@@ -414,6 +414,14 @@
         "geo_loc_country": "Spain"
     },
     {
+        "collecting_institution": "MINISTERIO DE SANIDAD, POLITICA SOCIAL E IGUALDAD",
+        "collecting_institution_address": "P.º del Prado, 18",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain"
+    },
+    {
         "collecting_institution": "HU Virgen de la Arrixaca",
         "collecting_institution_address": "Ctra. Madrid-Cartagena, s/n",
         "collecting_institution_email": "",
@@ -518,7 +526,7 @@
         "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "Hospital Lucus Augusti",
+        "collecting_institution": "Hospital Universitario Lucus Augusti",
         "collecting_institution_address": " Rúa Dr. Ulises Romero, 1",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
