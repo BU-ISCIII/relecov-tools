@@ -70,7 +70,7 @@ class BioinfoMetadata:
         )
 
         mapping_illumina_tab_path = os.path.join(
-            self.input_folder, "mapping_illumina.tab"
+            self.input_folder, "mapping_illumina.csv"
         )
         summary_variants_metrics_path = os.path.join(
             self.input_folder, "summary_variants_metrics_mqc.csv"
@@ -91,16 +91,23 @@ class BioinfoMetadata:
             self.md5_file_name,  # como hacer esto general para los servicios
         )
 
-        mapping_illumina_tab = pd.read_csv(mapping_illumina_tab_path, sep="\t")
-        summary_variants_metrics = pd.read_csv(summary_variants_metrics_path, sep=",")
-        variants_long_table = pd.read_csv(variants_long_table_path, sep=",")
+        mapping_illumina_tab = pd.read_csv(
+            mapping_illumina_tab_path, sep=",", encoding="utf-8"
+        )
+        summary_variants_metrics = pd.read_csv(
+            summary_variants_metrics_path, sep=",", encoding="utf-8"
+        )
+        variants_long_table = pd.read_csv(
+            variants_long_table_path, sep=",", encoding="utf-8"
+        )
         consensus_genome_length = pd.read_csv(
-            consensus_genome_length_path, header=None, sep=","
+            consensus_genome_length_path, header=None, sep=",", encoding="utf-8"
         )
-        md5_info = pd.read_csv(md5_info_path, header=None, sep=",")
+        md5_info = pd.read_csv(md5_info_path, header=None, sep=",", encoding="utf-8")
         pangolin_version_table = pd.read_csv(
-            pangolin_versions_path, header=None, sep="\t"
+            pangolin_versions_path, header=None, sep=",", encoding="utf-8"
         )
+
         pangolin_version_software = pangolin_version_table[1]
 
         with open(software_versions_path) as file:
@@ -135,6 +142,9 @@ class BioinfoMetadata:
                 )
 
             # fields from summary_variants_metrics_mqc.csv
+            import pdb
+
+            pdb.set_trace()
             bioinfo_dict["number_of_base_pairs_sequenced"] = str(
                 (summary_variants_metrics["# Input reads"][c] * 2)
             )
