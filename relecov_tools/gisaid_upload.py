@@ -104,14 +104,14 @@ class GisaidUpload:
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
         df_data = pd.DataFrame(data)
         df_data.insert(4, "covv_passage", "Original")
-        
+
         config_json = ConfigJson()
         fields = config_json.get_configuration("gisaid_csv_headers")
         col_df = list(df_data.columns)
         for field in fields:
             if field not in col_df:
                 df_data.insert(4, field, "")
-        
+
         config_lab_json = ConfigJson()
         lab_json_conf = config_lab_json.get_configuration("laboratory_data")
         lab_json_file = os.path.join(
@@ -120,17 +120,25 @@ class GisaidUpload:
         lab_json = relecov_tools.utils.read_json_file(lab_json_file)
         for i in lab_json:
             if i["collecting_institution"] == df_data["covv_subm_lab_addr"][0]:
-                df_data.insert(4, "covv_subm_lab_addr", i["collecting_institution_address"])
-                
+                df_data.insert(
+                    4, "covv_subm_lab_addr", i["collecting_institution_address"]
+                )
+
         df_data.loc[df_data["covv_gender"] == "", "covv_gender"] = "unknown"
         df_data.loc[df_data["covv_patient_age"] == "", "covv_patient_age"] = "unknown"
         df_data.loc[df_data["covv_authors"] == "", "covv_authors"] = "unknown"
-        df_data.loc[df_data["covv_subm_lab_addr"] == "", "covv_subm_lab_addr"] = "unknown"
+        df_data.loc[
+            df_data["covv_subm_lab_addr"] == "", "covv_subm_lab_addr"
+        ] = "unknown"
         df_data.loc[df_data["covv_subm_lab"] == "", "covv_subm_lab"] = "unknown"
-        df_data.loc[df_data["covv_orig_lab_addr"] == "", "covv_orig_lab_addr"] = "unknown"
+        df_data.loc[
+            df_data["covv_orig_lab_addr"] == "", "covv_orig_lab_addr"
+        ] = "unknown"
         df_data.loc[df_data["covv_orig_lab"] == "", "covv_orig_lab_addr"] = "unknown"
-        df_data.loc[df_data["covv_patient_status"] == "", "covv_patient_status"] = "unknown"
-        
+        df_data.loc[
+            df_data["covv_patient_status"] == "", "covv_patient_status"
+        ] = "unknown"
+
         df_data_path = os.path.join(self.output_path, "meta_gisaid.csv")
         df_data.to_csv(df_data_path, index=False)
         metagisaid = df_data_path
@@ -179,7 +187,7 @@ class GisaidUpload:
                 for name in virus_name:
                     if name.split("/")[-2].split("-")[-1] in record.id:
                         record.id = name
-                        record.description name
+                        record.description = name
                         SeqIO.write(record, new_fasta, "fasta")
         fastagisaid = multi_gis_path
         return fastagisaid
