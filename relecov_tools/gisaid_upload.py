@@ -177,8 +177,9 @@ class GisaidUpload:
             records = SeqIO.parse(old_fasta, "fasta")
             for record in records:
                 for name in virus_name:
-                    if record.id == name.split("/")[-2]:
+                    if name.split("/")[-2].split("-")[-1] in record.id:
                         record.id = name
+                        record.description name
                         SeqIO.write(record, new_fasta, "fasta")
         fastagisaid = multi_gis_path
         return fastagisaid
