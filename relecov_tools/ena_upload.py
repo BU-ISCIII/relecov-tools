@@ -352,9 +352,7 @@ class EnaUpload:
             # schema_xmls record XMLs for all these schema and following 'submission'
 
             tool = config_json.get_configuration("tool")
-            import pdb
 
-            pdb.set_trace()
             schema_xmls = run_construct(
                 template_path, schema_targets, self.center, checklist, tool
             )
@@ -378,6 +376,20 @@ class EnaUpload:
                     files.set("checksum", H)
                     # print(files.attrib["checksum"])
             tree.write(schema_xmls["run"])
+
+            tree = ET.parse(schema_xmls["sample"])
+            root = tree.getroot()
+
+            for files in root.iter("SAMPLE_ATTRIBUTES"):
+                tag = ET.SubElement(files, "TAG")
+                tag.text = str("ENA-CHECKLIST")
+                tag = ET.SubElement(files, "VALUE")
+                tag.text = str("ERC000033")
+
+            tree.write(schema_xmls["sample"])
+            import pdb
+
+            pdb.set_trace()
 
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"

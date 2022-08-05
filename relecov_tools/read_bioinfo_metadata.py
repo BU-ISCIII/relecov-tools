@@ -105,8 +105,9 @@ class BioinfoMetadata:
         )
         md5_info = pd.read_csv(md5_info_path, header=None, sep=",", encoding="utf-8")
         pangolin_version_table = pd.read_csv(
-            pangolin_versions_path, header=None, sep="\t", encoding="utf-8"
+            pangolin_versions_path, header=None, sep=",", encoding="utf-8"
         )
+
         pangolin_version_software = pangolin_version_table[1]
 
         with open(software_versions_path) as file:
@@ -141,6 +142,9 @@ class BioinfoMetadata:
                 )
 
             # fields from summary_variants_metrics_mqc.csv
+            import pdb
+
+            pdb.set_trace()
             bioinfo_dict["number_of_base_pairs_sequenced"] = str(
                 (summary_variants_metrics["# Input reads"][c] * 2)
             )
