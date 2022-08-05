@@ -4,7 +4,6 @@
         "covv_type",
         "covv_virus_name",
         "submitter",
-        "covv_passage",
         "covv_orig_lab",
         "covv_orig_lab_addr",
         "covv_collection_date",
@@ -14,7 +13,8 @@
         "covv_gender",
         "covv_seq_technology",
         "covv_subm_lab",
-        "covv_subm_lab_addr"
+        "covv_subm_lab_addr",
+        "covv_authors"
     ],
     "type": "object",
     "properties": {
@@ -134,7 +134,7 @@
             ],
             "label": "Host Age"
         },
-        "specimen_source": {
+        "covv_specimen": {
             "Enums": [
                 "Blood [UBERON:0000178]",
                 "Fluid [UBERON:0006314]",
@@ -289,14 +289,16 @@
             "description": "The name of the agency that generated the sequence.",
             "label": "Submitting Institution"
         },
-        "covv_passage": {
+        "covv_subm_sample_id": {
             "examples": [
-                "Original", "Vero"
+                "prov_rona_99"
             ],
-            "ontology": "GENEPIO:0100039",
+            "ontology": "GENEPIO:0001123",
             "type": "string",
-            "description": "The process of growing a virus in serial iterations(original/vero)",
-            "label": "Virus passage"
+            "description": "The user-defined name for the sample.",
+            "classification": "Database Identifiers",
+            "label": "Sample ID given by originating laboratory",
+            "fill_mode": "sample"
         }
     }
 }
