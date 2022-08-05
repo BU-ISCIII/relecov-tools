@@ -119,10 +119,10 @@ class GisaidUpload:
         )
         lab_json = relecov_tools.utils.read_json_file(lab_json_file)
         for i in lab_json:
-            if i["collecting_institution"] == df_data["covv_subm_lab_addr"][0]:
-                df_data.insert(
-                    4, "covv_subm_lab_addr", i["collecting_institution_address"]
-                )
+            if i["collecting_institution"] == df_data["covv_subm_lab"][0]:
+                df_data.loc[
+                    df_data["covv_subm_lab_addr"] == "", "covv_subm_lab_addr"
+                ] = i["collecting_institution_address"]
 
         df_data.loc[df_data["covv_gender"] == "", "covv_gender"] = "unknown"
         df_data.loc[df_data["covv_patient_age"] == "", "covv_patient_age"] = "unknown"
