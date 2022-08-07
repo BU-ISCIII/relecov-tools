@@ -124,17 +124,15 @@ class MetadataHomogeneizer:
         return add_data
 
     def handling_additional_files(self, additional_data):
-        add_data = []
-
         for additional_file in self.additional_files:
             f_name = additional_file["file_name"]
             stderr.print("[blue] Start processing additional file " + f_name)
             if f_name.endswith(".json"):
                 data = relecov_tools.utils.read_json_file(f_name)
             elif f_name.endswith(".tsv"):
-                pass
+                data = relecov_tools.utils.read_csv_file_return_dict(f_name, "\t")
             elif f_name.endswith(".csv"):
-                pass
+                data = relecov_tools.utils.read_csv_file_return_dict(f_name, ",")
             else:
                 log.error("Additional file extension %s is not supported ", f_name)
                 stderr.print(
@@ -150,6 +148,8 @@ class MetadataHomogeneizer:
                 try:
                     item_data = data[s_value]
                 except KeyError:
+                    pass
+                    """
                     log.error(
                         "Additional file %s does not have the information for %s ",
                         f_name,
@@ -162,6 +162,7 @@ class MetadataHomogeneizer:
                         + str(s_value)
                     )
                     continue
+                    """
                     # sys.exit(1)
 
                 for m_idx in range(len(additional_file["metadata_field"])):
@@ -172,11 +173,48 @@ class MetadataHomogeneizer:
                         )
                     except ValueError as e:
                         log.error("Field %s does not exist in Metadata ", e)
-                        stderr.print("[red] Field " + e + " does not exists")
+                        stderr.print(f"[red] Field {e} does not exist")
                         sys.exit(1)
-                    row[meta_idx] = item_data[additional_file["file_field"][m_idx]]
+
+                    if additional_file["req_process"] == "None":
+                        row[meta_idx] = item_data[additional_file["file_field"][m_idx]]
+                    else:
+
+                        if "condition" in additional_file["req_process"]:
+                            for key, value in additional_file["req_process"][
+                                "condition"
+                            ].items():
+                                if (
+                                    key
+                                    in item_data[
+                                        additional_file["file_field"][m_idx]
+                                    ].lower()
+                                ):
+                                    row[meta_idx] = value
+                                    break
+                        elif "replace" in additional_file["req_process"]:
+                            row[meta_idx] = row[meta_idx].strip()
+                            try:
+                                row[meta_idx] = data[row[meta_idx]][
+                                    additional_file["file_field"][m_idx]
+                                ]
+                            except KeyError as e:
+                                log.error("Value  %s does not exist ", e)
+                                stderr.print(f"[red] Value {e} does not exist")
+                                sys.exit(1)
+                        else:
+                            log.error(
+                                "Processed method %s is not implemented yet",
+                                additional_data["req_process"].key(),
+                            )
+                            stderr.print(
+                                f"[red] Processed method {additional_data['req_process'].key()} is not implemented yet"
+                            )
+                            sys.exit(1)
                 # add_data.append(row)
-        return add_data
+            # import pdb; pdb.set_trace()
+        stderr.print("[green] Succesful processing of additional file ")
+        return additional_data
 
     def write_to_excel_file(self, data, f_name):
         book = openpyxl.Workbook()
