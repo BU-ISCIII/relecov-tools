@@ -35,23 +35,40 @@
         "Authors": "A. Monzón; F. Casas; I. Jiménez; M. Camarero; P. Zaballos; ROMAN SOTO; S. Cuesta, I.; S. Iglesias-Caballero; S. Pozo; S. Varona; SERGIO; Sandonís; V. Vázquez-Morón"
     },
     "required_files": {
+        "org_lab_file": {
+            "file_name": "laboratory_mapping_list.tsv",
+            "metadata_field": ["Originating Laboratory"],
+            "file_field": ["mapped_org_lab"],
+            "req_process":{
+                "replace":{
+                }
+            }
+        },
+        "sequencer_file": {
+            "file_name": "samples_run_services.tsv",
+            "metadata_field": ["Sequencing Instrument Model"],
+            "file_field": ["run_name"],
+            "req_process":{
+                "condition":{
+                    "nextseq": "Illumina NextSeq",
+                    "next_seq": "Illumina NextSeq",
+                    "miseq": "Illumina MiSeq",
+                    "miseaq": "Illumina MiSeq",
+                    "novaseq": "Illumina NovaSeq"
+                }
+            }
+        },
+        "run_id_file": {
+            "file_name": "samples_run_services.tsv",
+            "metadata_field": ["Runid"],
+            "file_field": ["run_name"],
+            "req_process":"None"
+        },
         "sample_file": {
             "file_name": "sample_data.json",
             "metadata_field":["Sequence file R1 fastq", "Sequence file R2 fastq"],
             "file_field":["sequence_file_R1_fastq", "sequence_file_R2_fastq"],
-            "processed":"None"
-        },
-        "artic_version_file": {
-            "file_name": "artic_version.csv",
-            "metadata_field": [],
-            "file_field": [],
-            "processed":"None"
-        },
-        "run_services_file": {
-            "file_name": "samples_run_services.tsv",
-            "metadata_field": [],
-            "file_field": [],
-            "processed":"None"
+            "req_process":"None"
         }
     }
 }
