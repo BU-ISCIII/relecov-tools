@@ -20,7 +20,9 @@ stderr = rich.console.Console(
 class MetadataHomogeneizer:
     """MetadataHomogeneizer object"""
 
-    def __init__(self, lab_metadata=None, institution=None, output_folder=None):
+    def __init__(
+        self, lab_metadata=None, institution=None, directory=None, output_folder=None
+    ):
         self.config_json = ConfigJson()
         self.heading = self.config_json.get_configuration("metadata_lab_heading")
         if lab_metadata is None:
@@ -46,7 +48,27 @@ class MetadataHomogeneizer:
             "institution_schemas",
             self.config_json.get_topic_data("mapping_file", self.institution),
         )
+        if directory is None:
+            directory = relecov_tools.utils.prompt_path(
+                msg="Select the directory which contains additional files for metadata"
+            )
+        if not os.path.exists(directory):
+            log.error("Folder for additional files %s does not exist ", directory)
+            stderr.print(
+                "[red] Folder for additional files " + directory + " does not exist"
+            )
+            sys.exit(1)
         self.mapping_json_data = relecov_tools.utils.read_json_file(mapping_json_file)
+        self.additional_files = []
+        if len(self.mapping_json_data["required_files"]) > 0:
+            for key, values in self.mapping_json_data["required_files"].items():
+                f_path = os.path.join(directory, values["file_name"])
+                if not os.path.isfile(f_path):
+                    log.error("Additional file %s does not exist ", f_path)
+                    stderr.print("[red] Additional file " + f_path + " does not exist")
+                    sys.exit(1)
+                values["file_name"] = f_path
+                self.additional_files.append(values)
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
@@ -101,6 +123,61 @@ class MetadataHomogeneizer:
             add_data.append(new_row_data)
         return add_data
 
+    def handling_additional_files(self, additional_data):
+        add_data = []
+
+        for additional_file in self.additional_files:
+            f_name = additional_file["file_name"]
+            stderr.print("[blue] Start processing additional file " + f_name)
+            if f_name.endswith(".json"):
+                data = relecov_tools.utils.read_json_file(f_name)
+            elif f_name.endswith(".tsv"):
+                pass
+            elif f_name.endswith(".csv"):
+                pass
+            else:
+                log.error("Additional file extension %s is not supported ", f_name)
+                stderr.print(
+                    "[red] Additional file extension " + f_name + " is not supported"
+                )
+                sys.exit(1)
+            sample_idx = self.heading.index("Sample ID given for sequencing")
+            for row in additional_data[1:]:
+                # new_row_data = []
+
+                s_value = str(row[sample_idx])
+
+                try:
+                    item_data = data[s_value]
+                except KeyError:
+                    log.error(
+                        "Additional file %s does not have the information for %s ",
+                        f_name,
+                        s_value,
+                    )
+                    stderr.print(
+                        "[red] Additional file "
+                        + f_name
+                        + " does not have information for "
+                        + str(s_value)
+                    )
+                    continue
+                    # sys.exit(1)
+
+                for m_idx in range(len(additional_file["metadata_field"])):
+
+                    try:
+                        meta_idx = self.heading.index(
+                            additional_file["metadata_field"][m_idx]
+                        )
+                    except ValueError as e:
+                        log.error("Field %s does not exist in Metadata ", e)
+                        stderr.print("[red] Field " + e + " does not exists")
+                        sys.exit(1)
+                    row[meta_idx] = item_data[additional_file["file_field"][m_idx]]
+                # add_data.append(row)
+        return add_data
+
     def write_to_excel_file(self, data, f_name):
         book = openpyxl.Workbook()
         sheet = book.active
@@ -111,9 +188,15 @@ class MetadataHomogeneizer:
         return
 
     def converting_metadata(self):
+        stderr.print("[blue] Reading the metadata file to convert")
         ws_data = self.read_metadata_file()
         mapped_data = self.mapping_metadata(ws_data)
-        converted_data = self.additional_fields(mapped_data)
+        stderr.print("[green] Successful conversion mapping to ISCIII metadata")
+        stderr.print("[blue] Adding fixed information")
+        additional_data = self.additional_fields(mapped_data)
+        # Fetch the additional files and include the information in metadata
+        stderr.print("[blue] reading and mapping de information that cames in files")
+        converted_data = self.handling_additional_files(additional_data)
         f_name = os.path.join(self.output_folder, "converted_metadata_lab.xlsx")
         self.write_to_excel_file(converted_data, f_name)
         return
