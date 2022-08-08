@@ -98,7 +98,10 @@ class BioinfoMetadata:
             summary_variants_metrics_path, sep=",", encoding="utf-8"
         )
         variants_long_table = pd.read_csv(
-            variants_long_table_path, sep=",", encoding="utf-8"
+            variants_long_table_path,
+            sep=",",
+            encoding="utf-8",
+            dtype={"SAMPLE": "string"},
         )
         consensus_genome_length = pd.read_csv(
             consensus_genome_length_path, header=None, sep=",", encoding="utf-8"
@@ -142,19 +145,16 @@ class BioinfoMetadata:
                 )
 
             # fields from summary_variants_metrics_mqc.csv
-            import pdb
-
-            pdb.set_trace()
             bioinfo_dict["number_of_base_pairs_sequenced"] = str(
                 (summary_variants_metrics["# Input reads"][c] * 2)
             )
+
             bioinfo_dict["ns_per_100_kbp"] = str(
                 summary_variants_metrics["# Ns per 100kb consensus"][c]
             )
             bioinfo_dict["qc_filtered"] = str(
                 summary_variants_metrics["# Trimmed reads (fastp)"][c]
             )
-
             # fields from variants_long_table.csv
             bioinfo_dict["reference_genome_accession"] = str(
                 variants_long_table["CHROM"][c]
@@ -174,7 +174,6 @@ class BioinfoMetadata:
             bioinfo_dict["consensus_sequence_R2_md5"] = str(
                 md5_info.iloc[c * 2 + 1, 0][0:32]
             )
-
             bioinfo_dict["dehosting_method_software_version"] = str(
                 list(software_versions["KRAKEN2_KRAKEN2"].values())[0]
             )
