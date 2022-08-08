@@ -9,3 +9,4 @@ paramiko>=2.10.1
 pyyaml
 openpyxl
 ena-upload-cli
+bio==1.4.0 

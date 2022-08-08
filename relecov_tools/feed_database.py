@@ -62,7 +62,7 @@ class FeedDatabase:
         else:
             if os.path.isfile(schema):
                 log.error("Relecov schema file %s does not exists", schema)
-                stderr.print("[red] Relecov schema " + schema + "does not exists")
+                stderr.print(f"[red] Relecov schema  {schema} does not exists")
                 sys.exit(1)
         rel_schema_json = relecov_tools.utils.read_json_file(schema)
         try:
