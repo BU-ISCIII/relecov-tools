@@ -12,7 +12,7 @@ import pandas as pd
 import sys
 import os
 
-# import ftplib
+import ftplib
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -322,7 +322,7 @@ class EnaUpload:
 
             # submit data to webin ftp server. It should only upload fastq files in case the action is ADD.
             # When the action is MODIFY rthe fastq are already submitted.
-            """
+
             if self.action == "ADD" or self.action == "add":
                 session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
 
@@ -342,7 +342,7 @@ class EnaUpload:
 
                 g2 = session.quit()
                 print(g2)
-            """
+
             # THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
             # chec = submit_data(file_paths, self.passwd, self.user)
             # print(chec)
@@ -381,15 +381,13 @@ class EnaUpload:
             root = tree.getroot()
 
             for files in root.iter("SAMPLE_ATTRIBUTES"):
-                tag = ET.SubElement(files, "TAG")
-                tag.text = str("ENA-CHECKLIST")
-                tag = ET.SubElement(files, "VALUE")
-                tag.text = str("ERC000033")
+                tag = ET.SubElement(files, "SAMPLE_ATTRIBUTE")
+                tag_2 = ET.SubElement(tag, "TAG")
+                tag_2.text = str("ENA-CHECKLIST")
+                tag_2 = ET.SubElement(tag, "VALUE")
+                tag_2.text = str("ERC000033")
 
             tree.write(schema_xmls["sample"])
-            import pdb
-
-            pdb.set_trace()
 
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
