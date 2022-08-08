@@ -215,7 +215,26 @@ class MappingSchema:
                     "nextseq"
                     in self.json_data[idx]["sequencing_instrument_model"].lower()
                 ):
-                    mapped_json_data[idx]["instrument_model"] = "NextSeq 500"
+                    if (
+                        "500"
+                        in self.json_data[idx]["sequencing_instrument_model"].lower()
+                    ):
+                        mapped_json_data[idx]["instrument_model"] = "NextSeq 500"
+                    if (
+                        "1000"
+                        in self.json_data[idx]["sequencing_instrument_model"].lower()
+                    ):
+                        mapped_json_data[idx]["instrument_model"] = "NextSeq 1000"
+                    if (
+                        "2000"
+                        in self.json_data[idx]["sequencing_instrument_model"].lower()
+                    ):
+                        mapped_json_data[idx]["instrument_model"] = "NextSeq 2000"
+                    if (
+                        "550"
+                        in self.json_data[idx]["sequencing_instrument_model"].lower()
+                    ):
+                        mapped_json_data[idx]["instrument_model"] = "NextSeq 550"
 
                 mapped_json_data[idx]["host subject id"] = ""
                 mapped_json_data[idx]["host health state"] = ""
