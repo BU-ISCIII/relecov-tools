@@ -20,6 +20,7 @@ import relecov_tools.feed_database
 import relecov_tools.read_bioinfo_metadata
 import relecov_tools.long_table_parse
 import relecov_tools.metadata_homogeneizer
+import relecov_tools.gisaid_upload
 
 log = logging.getLogger()
 
@@ -58,9 +59,9 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "0.0.1"
+    __version__ = "0.0.4"
     stderr.print(
-        "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
+        "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
 
     # Lanch the click cli
@@ -410,11 +411,17 @@ def long_table_parse(longtable_file, output):
     type=click.Choice(["isciii", "hugtip", "hunsc-iter"], case_sensitive=False),
     help="select one of the available institution options",
 )
+@click.option(
+    "-d",
+    "--directory",
+    type=click.Path(),
+    help="Folder where are located the additional files",
+)
 @click.option("-o", "--output", type=click.Path(), help="Path to save json output")
-def metadata_homogeneizer(lab_metadata, institution, output):
+def metadata_homogeneizer(lab_metadata, institution, directory, output):
     """Parse institution metadata lab to the one used in relecov"""
     new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
-        lab_metadata, institution, output
+        lab_metadata, institution, directory, output
     )
     new_parse.converting_metadata()
 
