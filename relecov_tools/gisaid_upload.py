@@ -205,7 +205,7 @@ class GisaidUpload:
     def cli3_upload(self):
         """Upload to GISAID"""
         if self.proxy_config is None:
-            print(
+            os.system(
                 "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s"
                 % (
                     self.token,
@@ -215,7 +215,7 @@ class GisaidUpload:
                 )
             )
         else:
-            print(
+            os.system(
                 "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s --proxy %s"
                 % (
                     self.token,
