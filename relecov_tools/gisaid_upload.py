@@ -98,9 +98,27 @@ class GisaidUpload:
         self.single = single
 
     # Metadatos
+    
+    def complete_mand_fields(self, dataframe):
+        """Complete mandatory empty fields with 'unknown'"""
+        dataframe.loc[dataframe["covv_gender"] == "", "covv_gender"] = "unknown"
+        dataframe.loc[dataframe["covv_patient_age"] == "", "covv_patient_age"] = "unknown"
+        dataframe.loc[dataframe["covv_authors"] == "", "covv_authors"] = "unknown"
+        dataframe.loc[
+            dataframe["covv_subm_lab_addr"] == "", "covv_subm_lab_addr"
+        ] = "unknown"
+        dataframe.loc[dataframe["covv_subm_lab"] == "", "covv_subm_lab"] = "unknown"
+        dataframe.loc[
+            dataframe["covv_orig_lab_addr"] == "", "covv_orig_lab_addr"
+        ] = "unknown"
+        dataframe.loc[dataframe["covv_orig_lab"] == "", "covv_orig_lab"] = "unknown"
+        dataframe.loc[
+            dataframe["covv_patient_status"] == "", "covv_patient_status"
+        ] = "unknown"
+        return dataframe
 
     def metadata_to_csv(self):
-        "Transform metadata json to csv"
+        """Transform metadata json to csv"""
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
         df_data = pd.DataFrame(data)
         df_data.insert(4, "covv_passage", "Original")
@@ -120,27 +138,12 @@ class GisaidUpload:
         lab_json = relecov_tools.utils.read_json_file(lab_json_file)
         for lab in lab_json:
             for i in range(len(df_data)):
-                if lab["collecting_institution"] == df_data["covv_subm_lab"][i]:
+                if lab["collecting_institution"] == df_data["covv_orig_lab"][i]:
                     df_data["covv_location"][i] = " / ".join (["Europe", lab["geo_loc_country"], lab["geo_loc_state"], lab["geo_loc_city"]]) 
 
-
-        df_data.loc[df_data["covv_gender"] == "", "covv_gender"] = "unknown"
-        df_data.loc[df_data["covv_patient_age"] == "", "covv_patient_age"] = "unknown"
-        df_data.loc[df_data["covv_authors"] == "", "covv_authors"] = "unknown"
-        df_data.loc[
-            df_data["covv_subm_lab_addr"] == "", "covv_subm_lab_addr"
-        ] = "unknown"
-        df_data.loc[df_data["covv_subm_lab"] == "", "covv_subm_lab"] = "unknown"
-        df_data.loc[
-            df_data["covv_orig_lab_addr"] == "", "covv_orig_lab_addr"
-        ] = "unknown"
-        df_data.loc[df_data["covv_orig_lab"] == "", "covv_orig_lab"] = "unknown"
-        df_data.loc[
-            df_data["covv_patient_status"] == "", "covv_patient_status"
-        ] = "unknown"
-
+        df_data_comp= self.complete_mand_fields(df_data)
         df_data_path = os.path.join(self.output_path, "meta_gisaid.csv")
-        df_data.to_csv(df_data_path, index=False)
+        df_data_comp.to_csv(df_data_path, index=False)
         metagisaid = df_data_path
         return metagisaid
 
