@@ -118,11 +118,11 @@ class GisaidUpload:
             os.path.dirname(os.path.realpath(__file__)), "conf", lab_json_conf
         )
         lab_json = relecov_tools.utils.read_json_file(lab_json_file)
-        for i in lab_json:
-            if i["collecting_institution"] == df_data["covv_subm_lab"][0]:
-                df_data.loc[
-                    df_data["covv_subm_lab_addr"] == "", "covv_subm_lab_addr"
-                ] = i["collecting_institution_address"]
+        for lab in lab_json:
+            for i in range(len(df_data)):
+                if lab["collecting_institution"] == df_data["covv_subm_lab"][i]:
+                    df_data["covv_location"][i] = " / ".join (["Europe", lab["geo_loc_country"], lab["geo_loc_state"], lab["geo_loc_city"]]) 
+
 
         df_data.loc[df_data["covv_gender"] == "", "covv_gender"] = "unknown"
         df_data.loc[df_data["covv_patient_age"] == "", "covv_patient_age"] = "unknown"
@@ -134,7 +134,7 @@ class GisaidUpload:
         df_data.loc[
             df_data["covv_orig_lab_addr"] == "", "covv_orig_lab_addr"
         ] = "unknown"
-        df_data.loc[df_data["covv_orig_lab"] == "", "covv_orig_lab_addr"] = "unknown"
+        df_data.loc[df_data["covv_orig_lab"] == "", "covv_orig_lab"] = "unknown"
         df_data.loc[
             df_data["covv_patient_status"] == "", "covv_patient_status"
         ] = "unknown"
@@ -202,7 +202,7 @@ class GisaidUpload:
     def cli3_upload(self):
         """Upload to GISAID"""
         if self.proxy_config is None:
-            os.system(
+            print(
                 "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s"
                 % (
                     self.token,
@@ -212,7 +212,7 @@ class GisaidUpload:
                 )
             )
         else:
-            os.system(
+            print(
                 "cli3 upload --token %s --metadata %s --fasta %s --frameshift %s --proxy %s"
                 % (
                     self.token,
