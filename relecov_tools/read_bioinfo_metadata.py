@@ -98,7 +98,10 @@ class BioinfoMetadata:
             summary_variants_metrics_path, sep=",", encoding="utf-8"
         )
         variants_long_table = pd.read_csv(
-            variants_long_table_path, sep=",", encoding="utf-8", dtype={"SAMPLE": "string"}
+            variants_long_table_path,
+            sep=",",
+            encoding="utf-8",
+            dtype={"SAMPLE": "string"},
         )
         consensus_genome_length = pd.read_csv(
             consensus_genome_length_path, header=None, sep=",", encoding="utf-8"
@@ -152,9 +155,7 @@ class BioinfoMetadata:
             bioinfo_dict["qc_filtered"] = str(
                 summary_variants_metrics["# Trimmed reads (fastp)"][c]
             )
-
             # fields from variants_long_table.csv
-            
             bioinfo_dict["reference_genome_accession"] = str(
                 variants_long_table["CHROM"][c]
             )
