@@ -106,7 +106,8 @@ class BioinfoMetadata:
         consensus_genome_length = pd.read_csv(
             consensus_genome_length_path, header=None, sep=",", encoding="utf-8"
         )
-        md5_info = pd.read_csv(md5_info_path, header=None, sep="\t", encoding="utf-8")
+        md5_info = pd.read_csv(md5_info_path, header=None, sep=",", encoding="utf-8")
+        df_md5 = md5_info.rename(columns={0: 'hash', 1: 'fastq'})
         pangolin_version_table = pd.read_csv(
             pangolin_versions_path, header=None, sep=",", encoding="utf-8"
         )
@@ -123,7 +124,7 @@ class BioinfoMetadata:
 
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             # row = ws_metadata_lab[5]
-            sample_name = row[5]
+            sample_name = row[6]
 
             fastq_r1 = row[47]
             fastq_r2 = row[48]
@@ -131,6 +132,7 @@ class BioinfoMetadata:
             bioinfo_dict["sample_name"] = str(sample_name)
             bioinfo_dict["fastq_r1"] = fastq_r1
             bioinfo_dict["fastq_r2"] = fastq_r2
+
             # inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict
             for key in relecov_bioinfo_metadata.keys():
                 bioinfo_dict[key] = relecov_bioinfo_metadata[key]
@@ -162,18 +164,10 @@ class BioinfoMetadata:
             bioinfo_dict["consensus_genome_length"] = str(
                 consensus_genome_length.iloc[c, 0]
             )
-            bioinfo_dict["consensus_sequence_R1_name"] = str(
-                md5_info.iloc[c, 1]
-            )
-            bioinfo_dict["consensus_sequence_R2_name"] = str(
-                md5_info.iloc[c + 1, 1]
-            )
-            bioinfo_dict["consensus_sequence_R1_md5"] = str(
-                md5_info.iloc[c, 0]
-            )
-            bioinfo_dict["consensus_sequence_R2_md5"] = str(
-                md5_info.iloc[c + 1, 0]
-            )
+            bioinfo_dict["consensus_sequence_R1_name"] = str(df_md5["fastq"][c])
+            bioinfo_dict["consensus_sequence_R2_name"] = str(df_md5["fastq"][c + 1])
+            bioinfo_dict["consensus_sequence_R1_md5"] = str(df_md5["hash"][c])
+            bioinfo_dict["consensus_sequence_R2_md5"] = str(df_md5["hash"][c + 1])
             bioinfo_dict["dehosting_method_software_version"] = str(
                 list(software_versions["KRAKEN2_KRAKEN2"].values())[0]
             )
