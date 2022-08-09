@@ -106,7 +106,7 @@ class BioinfoMetadata:
         consensus_genome_length = pd.read_csv(
             consensus_genome_length_path, header=None, sep=",", encoding="utf-8"
         )
-        md5_info = pd.read_csv(md5_info_path, header=None, sep=",", encoding="utf-8")
+        md5_info = pd.read_csv(md5_info_path, header=None, sep="\t", encoding="utf-8")
         pangolin_version_table = pd.read_csv(
             pangolin_versions_path, header=None, sep=",", encoding="utf-8"
         )
