@@ -107,7 +107,7 @@ class BioinfoMetadata:
             consensus_genome_length_path, header=None, sep=",", encoding="utf-8"
         )
         md5_info = pd.read_csv(md5_info_path, header=None, sep=",", encoding="utf-8")
-        df_md5 = md5_info.rename(columns={0: 'hash', 1: 'fastq'})
+        df_md5 = md5_info.rename(columns={0: "hash", 1: "fastq"})
         pangolin_version_table = pd.read_csv(
             pangolin_versions_path, header=None, sep=",", encoding="utf-8"
         )
