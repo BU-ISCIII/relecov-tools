@@ -135,44 +135,61 @@ class BioinfoMetadata:
             bioinfo_dict["long_table_path"] = self.input_folder
             # fields from mapping_illumina.tab
 
+            mapping_illumina_tab_sample = mapping_illumina_tab.loc[
+                mapping_illumina_tab["sample"] == bioinfo_dict["sample_name"]
+            ]
+
             for key in self.mapping_illumina_tab_field_list.keys():
 
                 bioinfo_dict[key] = str(
-                    mapping_illumina_tab[self.mapping_illumina_tab_field_list[key]][c]
+                    mapping_illumina_tab_sample.loc[
+                        mapping_illumina_tab["sample"] == bioinfo_dict["sample_name"]
+                    ][self.mapping_illumina_tab_field_list[key]].values[0]
                 )
 
             # fields from summary_variants_metrics_mqc.csv
-            import pdb
 
-            pdb.set_trace()
             bioinfo_dict["number_of_base_pairs_sequenced"] = str(
-                (summary_variants_metrics["# Input reads"][c] * 2)
+                summary_variants_metrics.loc[
+                    summary_variants_metrics["Sample"] == bioinfo_dict["sample_name"]
+                ]["# Input reads"].values[0]
+                * 2
             )
+
             bioinfo_dict["ns_per_100_kbp"] = str(
-                summary_variants_metrics["# Ns per 100kb consensus"][c]
+                summary_variants_metrics.loc[
+                    summary_variants_metrics["Sample"] == bioinfo_dict["sample_name"]
+                ]["# Ns per 100kb consensus"].values[0]
             )
+
             bioinfo_dict["qc_filtered"] = str(
-                summary_variants_metrics["# Trimmed reads (fastp)"][c]
+                summary_variants_metrics.loc[
+                    summary_variants_metrics["Sample"] == bioinfo_dict["sample_name"]
+                ]["# Trimmed reads (fastp)"].values[0]
             )
 
             # fields from variants_long_table.csv
-            bioinfo_dict["reference_genome_accession"] = str(
-                variants_long_table["CHROM"][c]
-            )
-            bioinfo_dict["consensus_genome_length"] = str(
-                consensus_genome_length.iloc[c, 0]
-            )
+
+            chrom = variants_long_table.loc[
+                variants_long_table["SAMPLE"] == bioinfo_dict["sample_name"]
+            ]["CHROM"]
+            import pdb
+
+            pdb.set_trace()
+            bioinfo_dict["reference_genome_accession"] = str(chrom)
+            # bioinfo_dict["consensus_genome_length"] = str(consensus_genome_length.iloc[c, 0])
+            bioinfo_dict["consensus_genome_length"] = "TEMPORARY VALUE"
             bioinfo_dict["consensus_sequence_R1_name"] = str(
-                md5_info.iloc[c * 2, 0][34:60]
+                md5_info.loc[md5_info[0] == bioinfo_dict["sample_name"]].values[0, 2]
             )
             bioinfo_dict["consensus_sequence_R2_name"] = str(
-                md5_info.iloc[c * 2 + 1, 0][34:60]
+                md5_info.loc[md5_info[0] == bioinfo_dict["sample_name"]].values[1, 2]
             )
             bioinfo_dict["consensus_sequence_R1_md5"] = str(
-                md5_info.iloc[c * 2, 0][0:32]
+                md5_info.loc[md5_info[0] == bioinfo_dict["sample_name"]].values[0, 2]
             )
             bioinfo_dict["consensus_sequence_R2_md5"] = str(
-                md5_info.iloc[c * 2 + 1, 0][0:32]
+                md5_info.loc[md5_info[0] == bioinfo_dict["sample_name"]].values[1, 1]
             )
 
             bioinfo_dict["dehosting_method_software_version"] = str(
