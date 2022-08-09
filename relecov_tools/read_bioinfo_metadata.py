@@ -98,7 +98,10 @@ class BioinfoMetadata:
             summary_variants_metrics_path, sep=",", encoding="utf-8"
         )
         variants_long_table = pd.read_csv(
-            variants_long_table_path, sep=",", encoding="utf-8"
+            variants_long_table_path,
+            sep=",",
+            encoding="utf-8",
+            dtype={"SAMPLE": "string"},
         )
         consensus_genome_length = pd.read_csv(
             consensus_genome_length_path, header=None, sep=",", encoding="utf-8"
@@ -167,7 +170,6 @@ class BioinfoMetadata:
                     summary_variants_metrics["Sample"] == bioinfo_dict["sample_name"]
                 ]["# Trimmed reads (fastp)"].values[0]
             )
-
             # fields from variants_long_table.csv
 
             chrom = variants_long_table.loc[
@@ -191,7 +193,6 @@ class BioinfoMetadata:
             bioinfo_dict["consensus_sequence_R2_md5"] = str(
                 md5_info.loc[md5_info[0] == bioinfo_dict["sample_name"]].values[1, 1]
             )
-
             bioinfo_dict["dehosting_method_software_version"] = str(
                 list(software_versions["KRAKEN2_KRAKEN2"].values())[0]
             )
