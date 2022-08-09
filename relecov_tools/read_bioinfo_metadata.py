@@ -163,16 +163,16 @@ class BioinfoMetadata:
                 consensus_genome_length.iloc[c, 0]
             )
             bioinfo_dict["consensus_sequence_R1_name"] = str(
-                md5_info.iloc[c * 2, 0][34:60]
+                md5_info.iloc[c, 1]
             )
             bioinfo_dict["consensus_sequence_R2_name"] = str(
-                md5_info.iloc[c * 2 + 1, 0][34:60]
+                md5_info.iloc[c + 1, 1]
             )
             bioinfo_dict["consensus_sequence_R1_md5"] = str(
-                md5_info.iloc[c * 2, 0][0:32]
+                md5_info.iloc[c, 0]
             )
             bioinfo_dict["consensus_sequence_R2_md5"] = str(
-                md5_info.iloc[c * 2 + 1, 0][0:32]
+                md5_info.iloc[c + 1, 0]
             )
             bioinfo_dict["dehosting_method_software_version"] = str(
                 list(software_versions["KRAKEN2_KRAKEN2"].values())[0]
