@@ -4,6 +4,7 @@
 import logging
 import json
 import datetime
+import re
 
 import rich.console
 from itertools import islice
@@ -27,7 +28,13 @@ stderr = rich.console.Console(
 
 
 class BioinfoMetadata:
-    def __init__(self, metadata_file=None, input_folder=None, output_folder=None):
+    def __init__(
+        self,
+        metadata_file=None,
+        input_folder=None,
+        output_folder=None,
+        mapping_illumina=None,
+    ):
         if metadata_file is None:
             self.metadata_file = relecov_tools.utils.prompt_path(
                 msg="Select the excel file which contains metadata"
@@ -52,6 +59,12 @@ class BioinfoMetadata:
             )
         else:
             self.output_folder = output_folder
+        if mapping_illumina is None:
+            self.mapping_illumina = relecov_tools.utils.prompt_path(
+                msg="Select the mapping illumina file"
+            )
+        else:
+            self.mapping_illumina = mapping_illumina
 
     def bioinfo_parse(self, file_name):
         """Fetch the metadata file folder  Directory to fetch metadata file
@@ -70,8 +83,9 @@ class BioinfoMetadata:
         )
 
         mapping_illumina_tab_path = os.path.join(
-            self.input_folder, "mapping_illumina.csv"
+            self.input_folder, self.mapping_illumina
         )
+
         summary_variants_metrics_path = os.path.join(
             self.input_folder, "summary_variants_metrics_mqc.csv"
         )
@@ -108,10 +122,8 @@ class BioinfoMetadata:
         )
         md5_info = pd.read_csv(md5_info_path, header=None, sep=",", encoding="utf-8")
         pangolin_version_table = pd.read_csv(
-            pangolin_versions_path, header=None, sep=",", encoding="utf-8"
+            pangolin_versions_path, header=None, sep="\t", encoding="utf-8"
         )
-
-        pangolin_version_software = pangolin_version_table[1]
 
         with open(software_versions_path) as file:
             software_versions = yaml.load(file, Loader=yaml.FullLoader)
@@ -147,9 +159,11 @@ class BioinfoMetadata:
             config_keys = list(self.mapping_illumina_tab_field_list.keys())
 
             for i in config_keys:
-                bioinfo_dict[i] = mapping_illumina_tab_sample[
-                    self.mapping_illumina_tab_field_list[i]
-                ].values[0]
+                bioinfo_dict[i] = str(
+                    mapping_illumina_tab_sample[
+                        self.mapping_illumina_tab_field_list[i]
+                    ].values[0]
+                )
 
             # fields from summary_variants_metrics_mqc.csv
 
@@ -179,11 +193,18 @@ class BioinfoMetadata:
             )
             # fields from variants_long_table.csv
 
-            chrom = variants_long_table.loc[
-                variants_long_table["SAMPLE"].str.contains(bioinfo_dict["sample_name"])
-            ]["CHROM"]
+            if os.path.isfile(
+                self.input_folder + bioinfo_dict["sample_name"] + ".consensus.fa"
+            ):
+                chrom = variants_long_table.loc[
+                    variants_long_table["SAMPLE"].str.contains(
+                        bioinfo_dict["sample_name"]
+                    )
+                ]["CHROM"]
+                bioinfo_dict["reference_genome_accession"] = str(chrom.values[0])
+            else:
+                bioinfo_dict["reference_genome_accession"] = "NC_045512.2"
 
-            bioinfo_dict["reference_genome_accession"] = chrom.values[0]
             # fields from consensus_genome_length
             cons_array = consensus_genome_length.loc[
                 consensus_genome_length[0].str.contains(bioinfo_dict["sample_name"])
@@ -198,7 +219,7 @@ class BioinfoMetadata:
             bioinfo_dict["consensus_sequence_R1_name"] = str(
                 md5_info.loc[
                     md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[0, 2]
+                ].values[0, 1]
             )
             bioinfo_dict["consensus_sequence_R2_name"] = str(
                 md5_info.loc[
@@ -237,22 +258,41 @@ class BioinfoMetadata:
                 list(software_versions["BOWTIE2_ALIGN"].values())[0]
             )
             # files from pangolin.csv file
+
             bioinfo_dict["lineage_analysis_software_version"] = str(
-                pangolin_version_software.iloc[c]
+                pangolin_version_table.loc[
+                    pangolin_version_table[0].str.contains(bioinfo_dict["sample_name"])
+                ].values[0][1]
             )
-
-            c_time = os.path.getctime(variants_long_table_path)
-            dt_c = datetime.datetime.fromtimestamp(c_time)
-            bioinfo_dict["analysis_date"] = str(dt_c)
-            bioinfo_dict["lineage_identification_date"] = str(dt_c)
+            bioinfo_dict["variant_designation"] = str(
+                pangolin_version_table.loc[
+                    pangolin_version_table[0].str.contains(bioinfo_dict["sample_name"])
+                ].values[0][2]
+            )
+            """
+            last_modified = os.path.getctime(variants_long_table_path)
+            last_modified_date = datetime.datetime.fromtimestamp(last_modified)
+            bioinfo_dict["analysis_date"] = str(last_modified_date)
 
             """
-            IDEA
-            pango_time = os.path.getctime(
-                self.input_folder + "/" + str(sample_name) + ".pangolin.csv"
+
+            string = re.split("(\d+)", self.mapping_illumina)[1]
+            year, month, day = int(string[:4]), int(string[4:6]), int(string[6:-1])
+            x = datetime.datetime(year, month, day)
+            bioinfo_dict["analysis_date"] = x.strftime("%b %d %Y %H:%M:%S")
+
+            pango_file_path = (
+                self.input_folder + bioinfo_dict["sample_name"] + ".pangolin.csv"
             )
-            dt_pango = datetime.datetime.fromtimestamp(pango_time)
-            """
+            if os.path.isfile(pango_file_path):
+                pango_last_modified = os.path.getctime(pango_file_path)
+                pango_last_modified_date = datetime.datetime.fromtimestamp(
+                    pango_last_modified
+                )
+                bioinfo_dict["lineage_identification_date"] = str(
+                    pango_last_modified_date
+                )
+
             bioinfo_list[str(sample_name)] = bioinfo_dict
             c = c + 1
 
