@@ -275,7 +275,7 @@ class BioinfoMetadata:
             bioinfo_dict["analysis_date"] = str(last_modified_date)
 
             """
-
+            # get the date from pangolin files
             string = re.split("(\d+)", self.mapping_illumina)[1]
             year, month, day = int(string[:4]), int(string[4:6]), int(string[6:-1])
             x = datetime.datetime(year, month, day)
