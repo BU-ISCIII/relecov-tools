@@ -1861,7 +1861,7 @@
             "label": "%Ns",
             "fill_mode": "batch"
         },
-        "number_of_variants_AF_greater_75percent": {
+        "number_of_variants_in_consensus": {
             "examples": [
                 ""
             ],
