@@ -104,7 +104,7 @@ class BioinfoMetadata:
             dtype={"SAMPLE": "string"},
         )
         consensus_genome_length = pd.read_csv(
-            consensus_genome_length_path, header=None, sep=",", encoding="utf-8"
+            consensus_genome_length_path, header=None, sep="\t", encoding="utf-8"
         )
         md5_info = pd.read_csv(md5_info_path, header=None, sep=",", encoding="utf-8")
         pangolin_version_table = pd.read_csv(
@@ -124,6 +124,7 @@ class BioinfoMetadata:
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             # row = ws_metadata_lab[5]
             sample_name = row[5]
+            print(sample_name)
 
             fastq_r1 = row[47]
             fastq_r2 = row[48]
@@ -138,61 +139,83 @@ class BioinfoMetadata:
             bioinfo_dict["long_table_path"] = self.input_folder
             # fields from mapping_illumina.tab
 
-            mapping_illumina_tab_sample = mapping_illumina_tab.loc[
-                mapping_illumina_tab["sample"] == bioinfo_dict["sample_name"]
+            mapping_illumina_tab_sample = mapping_illumina_tab[
+                mapping_illumina_tab["sample"].str.contains(bioinfo_dict["sample_name"])
             ]
 
-            for key in self.mapping_illumina_tab_field_list.keys():
+            # for key in self.mapping_illumina_tab_field_list.keys():
+            config_keys = list(self.mapping_illumina_tab_field_list.keys())
 
-                bioinfo_dict[key] = str(
-                    mapping_illumina_tab_sample.loc[
-                        mapping_illumina_tab["sample"] == bioinfo_dict["sample_name"]
-                    ][self.mapping_illumina_tab_field_list[key]].values[0]
-                )
+            for i in config_keys:
+                bioinfo_dict[i] = mapping_illumina_tab_sample[
+                    self.mapping_illumina_tab_field_list[i]
+                ].values[0]
 
             # fields from summary_variants_metrics_mqc.csv
 
             bioinfo_dict["number_of_base_pairs_sequenced"] = str(
                 summary_variants_metrics.loc[
-                    summary_variants_metrics["Sample"] == bioinfo_dict["sample_name"]
+                    summary_variants_metrics["Sample"].str.contains(
+                        bioinfo_dict["sample_name"]
+                    )
                 ]["# Input reads"].values[0]
                 * 2
             )
 
             bioinfo_dict["ns_per_100_kbp"] = str(
                 summary_variants_metrics.loc[
-                    summary_variants_metrics["Sample"] == bioinfo_dict["sample_name"]
+                    summary_variants_metrics["Sample"].str.contains(
+                        bioinfo_dict["sample_name"]
+                    )
                 ]["# Ns per 100kb consensus"].values[0]
             )
 
             bioinfo_dict["qc_filtered"] = str(
                 summary_variants_metrics.loc[
-                    summary_variants_metrics["Sample"] == bioinfo_dict["sample_name"]
+                    summary_variants_metrics["Sample"].str.contains(
+                        bioinfo_dict["sample_name"]
+                    )
                 ]["# Trimmed reads (fastp)"].values[0]
             )
             # fields from variants_long_table.csv
 
             chrom = variants_long_table.loc[
-                variants_long_table["SAMPLE"] == bioinfo_dict["sample_name"]
+                variants_long_table["SAMPLE"].str.contains(bioinfo_dict["sample_name"])
             ]["CHROM"]
-            import pdb
 
-            pdb.set_trace()
-            bioinfo_dict["reference_genome_accession"] = str(chrom)
-            # bioinfo_dict["consensus_genome_length"] = str(consensus_genome_length.iloc[c, 0])
-            bioinfo_dict["consensus_genome_length"] = "TEMPORARY VALUE"
+            bioinfo_dict["reference_genome_accession"] = chrom.values[0]
+            # fields from consensus_genome_length
+            cons_array = consensus_genome_length.loc[
+                consensus_genome_length[0].str.contains(bioinfo_dict["sample_name"])
+            ]
+            if len(cons_array) > 1:
+                for i in cons_array:
+                    if cons_array.values[i, 1] != 0:
+                        bioinfo_dict["consensus_genome_length"] = str(
+                            cons_array.values[i, 1]
+                        )
+            # fields from md5 file
             bioinfo_dict["consensus_sequence_R1_name"] = str(
-                md5_info.loc[md5_info[0] == bioinfo_dict["sample_name"]].values[0, 2]
+                md5_info.loc[
+                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
+                ].values[0, 2]
             )
             bioinfo_dict["consensus_sequence_R2_name"] = str(
-                md5_info.loc[md5_info[0] == bioinfo_dict["sample_name"]].values[1, 2]
+                md5_info.loc[
+                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
+                ].values[1, 2]
             )
             bioinfo_dict["consensus_sequence_R1_md5"] = str(
-                md5_info.loc[md5_info[0] == bioinfo_dict["sample_name"]].values[0, 2]
+                md5_info.loc[
+                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
+                ].values[0, 2]
             )
             bioinfo_dict["consensus_sequence_R2_md5"] = str(
-                md5_info.loc[md5_info[0] == bioinfo_dict["sample_name"]].values[1, 1]
+                md5_info.loc[
+                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
+                ].values[1, 1]
             )
+            # fields from software version file
             bioinfo_dict["dehosting_method_software_version"] = str(
                 list(software_versions["KRAKEN2_KRAKEN2"].values())[0]
             )
@@ -213,7 +236,7 @@ class BioinfoMetadata:
             bioinfo_dict["mapping_software_version"] = str(
                 list(software_versions["BOWTIE2_ALIGN"].values())[0]
             )
-
+            # files from pangolin.csv file
             bioinfo_dict["lineage_analysis_software_version"] = str(
                 pangolin_version_software.iloc[c]
             )
