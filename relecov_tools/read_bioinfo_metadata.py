@@ -172,7 +172,8 @@ class BioinfoMetadata:
                     summary_variants_metrics["Sample"].str.contains(
                         bioinfo_dict["sample_name"]
                     )
-                ]["# Input reads"].values[0] * 2
+                ]["# Input reads"].values[0]
+                * 2
             )
 
             bioinfo_dict["ns_per_100_kbp"] = str(
