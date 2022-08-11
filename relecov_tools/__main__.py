@@ -137,14 +137,18 @@ def relecov_tools_cli(verbose, log_file):
 @relecov_tools_cli.command(help_priority=2)
 @click.option("-u", "--user", help="User name for login to sftp server")
 @click.option("-p", "--password", help="password for the user to login")
+@click.option("-r_u", "--user_relecov", help="User name for updating data to relecov")
+@click.option("-p_r", "--password_relecov", help="password for relecov user")
 @click.option(
     "-f",
     "--conf_file",
     help="Configuration file (no params file)",
 )
-def download(user, password, conf_file):
+def download(user, password, conf_file, user_relecov, password_relecov):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file)
+    sftp_connection = relecov_tools.sftp_handle.SftpHandle(
+        user, password, conf_file, user_relecov, password_relecov
+    )
     sftp_connection.download()
 
 
@@ -406,12 +410,6 @@ def long_table_parse(longtable_file, output):
 # read metadata bioinformatics
 @relecov_tools_cli.command(help_priority=12)
 @click.option(
-    "-l",
-    "--lab_metadata",
-    type=click.Path(),
-    help="file containing laboratory METADATA ",
-)
-@click.option(
     "-i",
     "--institution",
     type=click.Choice(["isciii", "hugtip", "hunsc-iter"], case_sensitive=False),
@@ -424,10 +422,10 @@ def long_table_parse(longtable_file, output):
     help="Folder where are located the additional files",
 )
 @click.option("-o", "--output", type=click.Path(), help="Path to save json output")
-def metadata_homogeneizer(lab_metadata, institution, directory, output):
+def metadata_homogeneizer(institution, directory, output):
     """Parse institution metadata lab to the one used in relecov"""
     new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
-        lab_metadata, institution, directory, output
+        institution, directory, output
     )
     new_parse.converting_metadata()
 
