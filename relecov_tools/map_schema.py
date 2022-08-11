@@ -236,7 +236,7 @@ class MappingSchema:
                     ):
                         mapped_json_data[idx]["instrument_model"] = "NextSeq 550"
 
-                mapped_json_data[idx]["host subject id"] = ""
+                # mapped_json_data[idx]["host subject id"] = ""
                 mapped_json_data[idx]["host health state"] = "unknown"
                 mapped_json_data[idx]["sample_description"] = ""
                 mapped_json_data[idx]["design_description"] = ""
