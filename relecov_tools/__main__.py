@@ -372,13 +372,19 @@ def update_db(user, password, json, schema, type, databaseServer):
 @click.option(
     "-o", "--metadata-out", type=click.Path(), help="Path to save output  metadata file"
 )
-def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
+@click.option(
+    "-p",
+    "--mapping-illumina",
+    type=click.Path(),
+    help="Name of the mapping_illumina file",
+)
+def read_bioinfo_metadata(metadata_file, input_folder, metadata_out, mapping_illumina):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
 
     new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        metadata_file, input_folder, metadata_out
+        metadata_file, input_folder, metadata_out, mapping_illumina
     )
 
     new_bioinfo_metadata.bioinfo_parse(metadata_file)
