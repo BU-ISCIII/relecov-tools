@@ -219,7 +219,7 @@ class BioinfoMetadata:
             bioinfo_dict["consensus_sequence_R1_name"] = str(
                 md5_info.loc[
                     md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[0, 1]
+                ].values[0, 2]
             )
             bioinfo_dict["consensus_sequence_R2_name"] = str(
                 md5_info.loc[
@@ -229,13 +229,14 @@ class BioinfoMetadata:
             bioinfo_dict["consensus_sequence_R1_md5"] = str(
                 md5_info.loc[
                     md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[0, 2]
+                ].values[0, 1]
             )
             bioinfo_dict["consensus_sequence_R2_md5"] = str(
                 md5_info.loc[
                     md5_info[0].str.contains(bioinfo_dict["sample_name"])
                 ].values[1, 1]
             )
+
             # fields from software version file
             bioinfo_dict["dehosting_method_software_version"] = str(
                 list(software_versions["KRAKEN2_KRAKEN2"].values())[0]
