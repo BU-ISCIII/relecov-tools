@@ -20,21 +20,10 @@ stderr = rich.console.Console(
 class MetadataHomogeneizer:
     """MetadataHomogeneizer object"""
 
-    def __init__(
-        self, lab_metadata=None, institution=None, directory=None, output_folder=None
-    ):
+    def __init__(self, institution=None, directory=None, output_folder=None):
         self.config_json = ConfigJson()
         self.heading = self.config_json.get_configuration("metadata_lab_heading")
-        if lab_metadata is None:
-            self.lab_metadata = relecov_tools.utils.prompt_path(
-                msg="Select the file which contains metadata"
-            )
-        else:
-            self.lab_metadata = lab_metadata
-        if not os.path.exists(self.lab_metadata):
-            log.error("Metadata file %s does not exist ", self.lab_metadata)
-            stderr.print("[red] Metadata file " + self.lab_metadata + " does not exist")
-            sys.exit(1)
+
         if institution is None:
             self.institution = relecov_tools.utils.prompt_selection(
                 msg="Select the available mapping institution",
@@ -59,9 +48,45 @@ class MetadataHomogeneizer:
             )
             sys.exit(1)
         self.mapping_json_data = relecov_tools.utils.read_json_file(mapping_json_file)
+
+        try:
+            lab_metadata = self.mapping_json_data["required_files"]["meta_file"][
+                "file_name"
+            ]
+        except KeyError:
+            log.error("Metadata File is not defined in schema")
+            stderr.print("[red] Metadata File is not defined in schema")
+            sys.exit(1)
+        metadata_path = os.path.join(directory, lab_metadata)
+        if not os.path.isfile(metadata_path):
+            log.error("Metadata File %s does not exists", metadata_path)
+            stderr.print("[red] Metadata File " + metadata_path + "does not exists")
+            sys.exit(1)
+        self.lab_metadata = metadata_path
+        # Check if python file is defined
+        function_file = self.mapping_json_data["pyhon_file"]
+        if function_file == "":
+            self.function_file = None
+        else:
+            self.function_file = os.path.join(
+                os.path.dirname(__file__), "institution_scripts", function_file
+            )
+            if not os.path.isfile(self.function_file):
+                log.error("File with functions %s does not exist ", self.function_file)
+                stderr.print(
+                    "[red] File with functions "
+                    + self.function_file
+                    + " does not exist"
+                )
+                sys.exit(1)
         self.additional_files = []
-        if len(self.mapping_json_data["required_files"]) > 0:
+        if len(self.mapping_json_data["required_files"]) > 1:
             for key, values in self.mapping_json_data["required_files"].items():
+                if key == "meta_file":
+                    continue
+                if values["file_name"] == "":
+                    self.additional_files.append(values)
+                    continue
                 f_path = os.path.join(directory, values["file_name"])
                 if not os.path.isfile(f_path):
                     log.error("Additional file %s does not exist ", f_path)
@@ -96,7 +121,9 @@ class MetadataHomogeneizer:
         return ws_data
 
     def mapping_metadata(self, ws_data):
-        map_fields = self.mapping_json_data["mapped_fields"]
+        map_fields = self.mapping_json_data["required_files"]["meta_file"][
+            "mapped_fields"
+        ]
         map_data = []
         for row in ws_data:
             row_data = {}
@@ -109,7 +136,9 @@ class MetadataHomogeneizer:
 
     def additional_fields(self, mapped_data):
         add_data = [self.heading]
-        fixed_fields = self.mapping_json_data["fixed_fields"]
+        fixed_fields = self.mapping_json_data["required_files"]["meta_file"][
+            "fixed_fields"
+        ]
         for row in mapped_data:
             new_row_data = []
             for field in self.heading:
@@ -124,95 +153,76 @@ class MetadataHomogeneizer:
         return add_data
 
     def handling_additional_files(self, additional_data):
+
         for additional_file in self.additional_files:
-            f_name = additional_file["file_name"]
-            stderr.print("[blue] Start processing additional file " + f_name)
-            if f_name.endswith(".json"):
-                data = relecov_tools.utils.read_json_file(f_name)
-            elif f_name.endswith(".tsv"):
-                data = relecov_tools.utils.read_csv_file_return_dict(f_name, "\t")
-            elif f_name.endswith(".csv"):
-                data = relecov_tools.utils.read_csv_file_return_dict(f_name, ",")
-            else:
-                log.error("Additional file extension %s is not supported ", f_name)
-                stderr.print(
-                    "[red] Additional file extension " + f_name + " is not supported"
-                )
-                sys.exit(1)
-            sample_idx = self.heading.index("Sample ID given for sequencing")
-            for row in additional_data[1:]:
-                # new_row_data = []
-
-                s_value = str(row[sample_idx])
-
-                try:
-                    item_data = data[s_value]
-                except KeyError:
-                    pass
-                    """
-                    log.error(
-                        "Additional file %s does not have the information for %s ",
-                        f_name,
-                        s_value,
-                    )
+            if additional_file["file_name"] != "":
+                f_name = additional_file["file_name"]
+                stderr.print("[blue] Start processing additional file " + f_name)
+                if f_name.endswith(".json"):
+                    data = relecov_tools.utils.read_json_file(f_name)
+                elif f_name.endswith(".tsv"):
+                    data = relecov_tools.utils.read_csv_file_return_dict(f_name, "\t")
+                elif f_name.endswith(".csv"):
+                    data = relecov_tools.utils.read_csv_file_return_dict(f_name, ",")
+                else:
+                    log.error("Additional file extension %s is not supported ", f_name)
                     stderr.print(
-                        "[red] Additional file "
+                        "[red] Additional file extension "
                         + f_name
-                        + " does not have information for "
-                        + str(s_value)
+                        + " is not supported"
                     )
-                    continue
-                    """
-                    # sys.exit(1)
+                    sys.exit(1)
+                sample_idx = self.heading.index("Sample ID given for sequencing")
+            else:
+                data = ""
 
-                for m_idx in range(len(additional_file["metadata_field"])):
-
+            if additional_file["function"] == "None":
+                for row in additional_data[1:]:
+                    # new_row_data = []
+                    s_value = str(row[sample_idx])
                     try:
-                        meta_idx = self.heading.index(
-                            additional_file["metadata_field"][m_idx]
+                        item_data = data[s_value]
+                    except KeyError:
+                        pass
+                        """
+                        log.error(
+                            "Additional file %s does not have the information for %s ",
+                            f_name,
+                            s_value,
                         )
-                    except ValueError as e:
-                        log.error("Field %s does not exist in Metadata ", e)
-                        stderr.print(f"[red] Field {e} does not exist")
-                        sys.exit(1)
-
-                    if additional_file["req_process"] == "None":
-                        row[meta_idx] = item_data[additional_file["file_field"][m_idx]]
-                    else:
-
-                        if "condition" in additional_file["req_process"]:
-                            for key, value in additional_file["req_process"][
-                                "condition"
-                            ].items():
-                                if (
-                                    key
-                                    in item_data[
-                                        additional_file["file_field"][m_idx]
-                                    ].lower()
-                                ):
-                                    row[meta_idx] = value
-                                    break
-                        elif "replace" in additional_file["req_process"]:
-                            row[meta_idx] = row[meta_idx].strip()
-                            try:
-                                row[meta_idx] = data[row[meta_idx]][
-                                    additional_file["file_field"][m_idx]
-                                ]
-                            except KeyError as e:
-                                log.error("Value  %s does not exist ", e)
-                                stderr.print(f"[red] Value {e} does not exist")
-                                sys.exit(1)
-                        else:
-                            log.error(
-                                "Processed method %s is not implemented yet",
-                                additional_data["req_process"].key(),
-                            )
-                            stderr.print(
-                                f"[red] Processed method {additional_data['req_process'].key()} is not implemented yet"
-                            )
+                        stderr.print(
+                            "[red] Additional file "
+                            + f_name
+                            + " does not have information for "
+                            + str(s_value)
+                        )
+                        continue
+                        """
+                        # sys.exit(1)
+                    for m_field, f_field in additional_file["mapped_fields"].items():
+                        try:
+                            meta_idx = self.heading.index(m_field)
+                        except ValueError as e:
+                            log.error("Field %s does not exist in Metadata ", e)
+                            stderr.print(f"[red] Field {e} does not exist")
                             sys.exit(1)
-                # add_data.append(row)
-            # import pdb; pdb.set_trace()
+                        row[meta_idx] = item_data[f_field]
+
+                # import pdb; pdb.set_trace()
+            else:
+                func_name = additional_file["function"]
+                stderr.print("[yellow] Start processing function " + func_name)
+                exec(
+                    "from relecov_tools.institution_scripts."
+                    + self.institution
+                    + " import "
+                    + func_name
+                )
+                eval(
+                    func_name
+                    + "(additional_data, data, additional_file['mapped_fields'], self.heading)"
+                )
+
         stderr.print("[green] Succesful processing of additional file ")
         return additional_data
 
