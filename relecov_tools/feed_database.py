@@ -238,6 +238,7 @@ class FeedDatabase:
                 {"user": self.user, "pass": self.passwd},
                 self.database_settings[post_url],
             )
+            
             if "ERROR" in result:
                 if result["ERROR"] == "Server not available":
                     # retry to connect to server
@@ -291,17 +292,18 @@ class FeedDatabase:
                 print("relecov")
                 post_url = "analysis"
                 map_fields = self.map_relecov_bioinfo_data()
-                """
-                sample_fields, s_project_fields = self.get_iskylims_fields_sample()
-                map_fields = self.map_iskylims_sample_fields_values(
-                    sample_fields, s_project_fields
-                )
-                """
+            
+            
+            # sample_fields, s_project_fields = self.get_iskylims_fields_sample()
+            # map_fields = self.map_iskylims_sample_fields_values(
+            #    sample_fields, s_project_fields
+            # )
+            
             elif self.server_type == "relecov_local":
                 print("relecov_local")
                 post_url = "analysis"
                 map_fields = self.map_relecov_bioinfo_data()
-
+            post_url = "analysis"
         elif self.type_of_info == "longtable":
             post_url = "long_table"
         else:
