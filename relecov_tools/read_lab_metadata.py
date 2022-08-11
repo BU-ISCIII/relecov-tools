@@ -3,6 +3,8 @@ from itertools import islice
 
 import json
 import logging
+
+# from turtle import heading
 import rich.console
 
 import openpyxl
@@ -83,16 +85,6 @@ class RelecovMetadata:
             data = json.load(fh)
         return data
 
-    def get_experiment_run_alias(self, row_data):
-        exp_alias = "NOT_FOUND"
-        run_alias = "NOT_FOUND.fastq.gz"
-        if "fastq_r1" in row_data:
-            match = re.search(r"(.+)_R1_.*", row_data["fastq_r1"])
-            if match:
-                exp_alias = match.group(1)
-                run_alias = match.group(1) + ".fastq.gz"
-        return exp_alias, run_alias
-
     def get_laboratory_data(self, lab_json, geo_loc_json, lab_name):
         """Fetch the laboratory location  and return a dictionary"""
         data = {}
@@ -102,21 +94,23 @@ class RelecovMetadata:
             data["geo_loc_longitude"] = ""
             data["geo_loc_country"] = ""
             stderr.print("[red] Empty Originating Laboratory.")
-            log.error("Found empti Originating Laboratory")
+            log.error("Found empty Originating Laboratory")
             return data
         for lab in lab_json:
-
             if lab_name == lab["collecting_institution"]:
                 for key, value in lab.items():
                     data[key] = value
                 break
 
         for city in geo_loc_json:
-            if city["geo_loc_city"] == data["geo_loc_city"]:
-                data["geo_loc_latitude"] = city["geo_loc_latitude"]
-                data["geo_loc_longitude"] = city["geo_loc_longitude"]
-                data["geo_loc_country"] = data["geo_loc_country"]
-                break
+            try:
+                if city["geo_loc_city"] == lab["geo_loc_city"]:
+                    data["geo_loc_latitude"] = city["geo_loc_latitude"]
+                    data["geo_loc_longitude"] = city["geo_loc_longitude"]
+                    data["geo_loc_country"] = data["geo_loc_country"]
+                    break
+            except KeyError as e:
+                print(e)
         return data
 
     def include_fixed_data(self):
@@ -145,14 +139,15 @@ class RelecovMetadata:
             "host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]},
             "collecting_lab_sample_id": [
                 "isolate_sample_id",
-                metadata["collecting_lab_sample_id"],
+                metadata["sequencing_sample_id"],
             ],
         }
         seq_inst_plat = {
             "Illumina": [
                 "Illumina iSeq 100",
                 "Illumina MiSeq",
-                "Illumina NextSeq550",
+                "Illumina NextSeq 550",
+                "Illumina NextSeq",
                 "Illumina NovaSeq 6000",
             ],
             "MinION": ["Oxford Nanopore"],
@@ -168,6 +163,7 @@ class RelecovMetadata:
         """New fields that required processing from other field """
         for key, values in seq_inst_plat.items():
             if metadata["sequencing_instrument_model"] in values:
+
                 new_data["sequencing_instrument_platform"] = key
                 break
 
@@ -185,18 +181,18 @@ class RelecovMetadata:
         lab_json = self.read_json_file(lab_json_file)
         geo_loc_json = self.read_json_file(geo_loc_file)
         samples_json = self.read_json_file(self.sample_list_file)
-        exp_alias, run_alias = self.get_experiment_run_alias(metadata[0])
         for row_sample in metadata:
             """Include sample data from sample json"""
             try:
                 for key, value in samples_json[
-                    row_sample["collecting_lab_sample_id"]
+                    row_sample["microbiology_lab_sample_id"]
+                    # row_sample["sequencing_sample_id"]
                 ].items():
 
                     row_sample[key] = value
             except KeyError as e:
                 stderr.print(
-                    "[red] ERROR  MD5 information not found in sample json. ", e
+                    "[red] ERROR  fastq information not found in sample json. ", e
                 )
 
             """ Fetch the information related to the laboratory.
@@ -212,6 +208,29 @@ class RelecovMetadata:
                 lab_data[row_sample["collecting_institution"]] = l_data
             else:
                 row_sample.update(lab_data[row_sample["collecting_institution"]])
+
+            """ Fetch email and address for submitting_institution
+            """
+            row_sample["submitting_institution"] = row_sample[
+                "submitting_institution"
+            ].strip()
+            if row_sample["submitting_institution"] not in lab_json:
+                l_data = self.get_laboratory_data(
+                    lab_json, geo_loc_json, row_sample["submitting_institution"]
+                )
+                # row_sample.update(l_data)
+                lab_data[row_sample["submitting_institution"]] = l_data
+            sub_data = {}
+
+            sub_data["submitting_institution_email"] = lab_data[
+                row_sample["submitting_institution"]
+            ]["collecting_institution_email"]
+            sub_data["submitting_institution_address"] = lab_data[
+                row_sample["submitting_institution"]
+            ]["collecting_institution_address"]
+            # else:
+            #    sub_data = {"collecting_institution_email" : "", "collecting_institution_address": ""}
+            row_sample.update(sub_data)
 
             """ Add Fixed information
             """
@@ -231,8 +250,12 @@ class RelecovMetadata:
             row["sequencing_instrument_platform"] = "To change"
             """
             # Add experiment_alias and run_alias
-            row_sample["experiment_alias"] = exp_alias
-            row_sample["run_alias"] = run_alias
+            row_sample["experiment_alias"] = str(
+                row_sample["fastq_r1"] + "_" + row_sample["fastq_r2"]
+            )
+            row_sample["run_alias"] = str(
+                row_sample["fastq_r1"] + "_" + row_sample["fastq_r2"]
+            )
             additional_metadata.append(row_sample)
 
         return additional_metadata
@@ -255,11 +278,13 @@ class RelecovMetadata:
         Convert the date colunms value to the dd/mm/yyyy format.
         Return list of dict with data, and errors
         """
-        exc_format_num = ["Sample ID given for sequencing"]
+        # exc_format_num = ["Sample ID given for sequencing"]
         wb_file = openpyxl.load_workbook(self.metadata_file, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
+
         # removing the None columns in excel heading row
         heading = [i.value.strip() for i in ws_metadata_lab[4] if i.value]
+
         # heading = self.update_heading_to_json(heading_without_none, meta_map_json)
         metadata_values = []
         errors = {}
@@ -275,21 +300,25 @@ class RelecovMetadata:
                             idx
                         ].strftime("%Y-%m-%d")
                     except AttributeError:
-                        if row[2] not in errors:
-                            errors[row[2]] = {}
-                        errors[row[2]][heading[idx]] = "Invalid date format"
-                        log.error("Invalid date format in sample %s", row[2])
-                        stderr.print(
-                            "[red] Invalid date format in sample",
-                            row[2] + " column " + heading[idx],
-                        )
+                        # check if date is in string format
+                        str_date = re.search(r"(\d{4}-\d{2}-\d{2}).*", row[idx])
+                        if str_date:
+                            sample_data_row[
+                                self.label_prop_dict[heading[idx]]
+                            ] = str_date.group(1)
+                        else:
+                            if row[2] not in errors:
+                                errors[row[2]] = {}
+                            errors[row[2]][heading[idx]] = "Invalid date format"
+                            log.error("Invalid date format in sample %s", row[2])
+                            stderr.print(
+                                "[red] Invalid date format in sample",
+                                row[2] + " column " + heading[idx],
+                            )
                 else:
 
                     if isinstance(row[idx], float) or isinstance(row[idx], int):
-                        if heading[idx] in exc_format_num:
-                            val = int(row[idx])
-                        else:
-                            val = str(int(row[idx]))
+                        val = str(int(row[idx]))
                         try:
                             sample_data_row[self.label_prop_dict[heading[idx]]] = val
                         except TypeError as e:
@@ -328,6 +357,7 @@ class RelecovMetadata:
         phage_plus_schema = relecov_tools.schema_json.PhagePlusSchema(schema_json)
         properties_in_schema = phage_plus_schema.get_schema_properties()
         """
+
         geo_loc_json = config_json.get_configuration("geo_location_data")
         geo_loc_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "conf", geo_loc_json
@@ -344,6 +374,10 @@ class RelecovMetadata:
         meta_map_json = self.read_json_file(meta_map_json_file)
         """
         valid_metadata_rows, errors = self.read_metadata_file()
+        if len(errors) > 0:
+            stderr.print("[red] Stopped executing because the errors found")
+            sys.exit(1)
+        # Continue by adding extra information
 
         completed_metadata = self.add_additional_data(
             valid_metadata_rows,

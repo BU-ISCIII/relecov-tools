@@ -550,7 +550,7 @@
         "geo_loc_longitude": "-3.5167"
     },
     {
-        "geo_loc_city": "Ávila",
+        "geo_loc_city": "Avila",
         "geo_loc_latitude": "40.6500",
         "geo_loc_longitude": "-4.6833"
     },
@@ -12218,5 +12218,10 @@
         "geo_loc_city": "Soria",
         "geo_loc_latitude": "41.7667",
         "geo_loc_longitude": "-2.4667"
+    },
+    {
+        "geo_loc_city": "Caceres",
+        "geo_loc_latitude": "39.4752671",
+        "geo_loc_longitude": "-6.3722951"
     }
 ]

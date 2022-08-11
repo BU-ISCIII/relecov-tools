@@ -1,58 +1,92 @@
 {
-    "equivalence": {
-        "Public Health sample id (SIVIES)": "Código SiViEs",
-        "Sample ID given by originating laboratory": "Ref Hospital",
-        "Sample ID given by the submitting laboratory": "ID CNM",
-        "Sample ID given in the microbiology lab": "ID VI-VRP",
-        "Sample ID given if multiple rna-extraction or passages": "ID VI-VRP",
-        "Sample ID given for sequencing": "ID VI-VRP",
-        "GISAID id": "ID GISAID",
-        "Originating Laboratory": "Hospital",
-        "Sample Collection Date": "Fecha de toma ",
-        "Sample Received Date": "Fecha recepción",
-        "Host Age": "Grupo edad",
-        "Diagnostic Pcr Ct Value 1": "PCR genE",
-        "Sequencing Date": "Fecha de secuenciación"
-
-    },
-    "constants": {
-        "Biological Sample Storage Condition": "-80 C",
-        "Rna Extraction Protocol": "RT-PCR",
-        "ENA Sample ID": "",
-        "GISAID Virus Name": "",
-        "GISAID id": "",
-        "Submitting Institution": "",
-        "Purpose of sampling": "Surveillance",
-        "Specimen source": "Nasopharyngeal exudate",
-        "Environmental Material": "",
-        "Environmental System": "Swab",
-        "Collection Device": "",
-        "Host": "Human",
-        "Host Gender": "",
-        "Commercial All-in-one library kit": "",
-        "Library Preparation Kit": "Illumina DNA Prep",
-        "Enrichment Protocol": "Amplicon",
-        "If Enrichment Protocol. If Other,Specify": "",
-        "Enrichment panel/assay": "ARTIC",
-        "If Enrichment panel/assay. If Other, Specify": "",
-        "Enrichment panel/assay version": "",
-        "Number Of Samples In Run": "",
-        "Runid": "",
-        "Sequencing Instrument Model": "",
-        "Flowcell Kit": "",
-        "Source material": "Viral RNA",
-        "Capture method": "PCR",
-        "Sequencing technique": "Amplicon",
-        "Library Layout": "Paired",
-        "Gene Name 1": "ORF E",
-        "Diagnostic Pcr Ct Value 1": "",
-        "Gene Name 2": "",
-        "Diagnostic Pcr Ct Value-2": "",
-        "Analysis Authors": "",
-        "Author Submitter": "A. Monzón; F. Casas; I. Jiménez; M. Camarero; P. Zaballos; ROMAN SOTO; S. Cuesta, I.; S. Iglesias-Caballero; S. Pozo; S. Varona; SERGIO; Sandonís; V. Vázquez-Morón",
-        "Authors": "",
-        "Sequence file R1 fastq": "",
-        "Sequence file R2 fastq": ""
+    "pyhon_file": "ISCIII.py",
+    "required_files": {
+        "meta_file": {
+            "file_name": "new_lab_metadata2022_07_20_13_35_38.xlsx",
+            "mapped_fields": {
+                "Public Health sample id (SIVIES)": "Código SiViEs",
+                "Sample ID given by originating laboratory": "Ref Hospital",
+                "Sample ID given by the submitting laboratory": "ID CNM",
+                "Sample ID given in the microbiology lab": "ID VI-VRP",
+                "Sample ID given if multiple rna-extraction or passages": "ID VI-VRP",
+                "Sample ID given for sequencing": "ID VI-VRP",
+                "GISAID id": "ID GISAID",
+                "Originating Laboratory": "Hospital",
+                "Sample Collection Date": "Fecha de toma",
+                "Sample Received Date": "Fecha recepción",
+                "Host Age": "Edad (años)",
+                "Host Gender": "Sexo",
+                "Diagnostic Pcr Ct Value 1": "PCR genE"
+            },
+            "fixed_fields": {
+                "Submitting Institution": "Instituto de Salud Carlos III",
+                "Biological Sample Storage Condition": "-80 C",
+                "Rna Extraction Protocol": "RT-PCR",
+                "Purpose of sampling": "Surveillance",
+                "Specimen source": "Nasopharyngeal exudate",
+                "Environmental System": "Swab",
+                "Host": "Human",
+                "Library Preparation Kit": "Illumina DNA Prep",
+                "Enrichment Protocol": "Amplicon",
+                "Enrichment panel/assay": "ARTIC",
+                "Source material": "Viral RNA",
+                "Capture method": "PCR",
+                "Sequencing technique": "Amplicon",
+                "Library Layout": "Paired",
+                "Gene Name 1": "ORF E",
+                "Diagnostic Pcr Ct Value 1": "",
+                "Authors": ""
+            },
+            "function" : "None"
         },
-    "outer": {}
+        "sample_file": {
+            "file_name": "sample_data.json",
+            "mapped_fields": {
+                "Sequence file R1 fastq": "sequence_file_R1_fastq",
+                "Sequence file R2 fastq": "sequence_file_R2_fastq"
+            },
+            "mapped_key": "Sample ID given for sequencing",
+            "function":"None"
+        },
+        "run_id_file": {
+            "file_name": "samples_run_services.tsv",
+            "mapped_fields":{
+                "Runid": "run_name"
+            },
+            "mapped_key": "Sample ID given for sequencing",
+            "function":"None"
+        },
+        "org_lab_file": {
+            "file_name": "laboratory_mapping_list.tsv",
+            "mapped_fields":{
+                "Originating Laboratory": "mapped_org_lab"
+            },
+            "mapped_key": "",
+            "function": "replace_originating_lab"
+        },
+        "sequencer_file": {
+            "file_name": "samples_run_services.tsv",
+            "mapped_fields":{
+                "Sequencing Instrument Model": "run_name"
+            },
+            "mapped_key": "",
+            "function": "added_seq_inst_model"
+        },
+        "host_gender_file": {
+            "file_name": "",
+            "mapped_fields":{
+                "Host Gender": ""
+            },
+            "mapped_key": "",
+            "function": "translate_gender_to_english"
+        },
+        "authors_file": {
+            "file_name": "gisaid_authors.tsv",
+            "mapped_fields":{
+                "Authors": "authors"
+            },
+            "mapped_key": "GISAID id",
+            "function": "None"
+        }
+    }
 }

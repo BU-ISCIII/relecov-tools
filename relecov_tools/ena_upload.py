@@ -1,11 +1,14 @@
 import logging
 
 # from pyparsing import col
+import xml.etree.ElementTree as ET
 import rich.console
 import json
 
 
 import pandas as pd
+
+
 import sys
 import os
 
@@ -22,8 +25,13 @@ from ena_upload.ena_upload import send_schemas
 from ena_upload.ena_upload import process_receipt
 from ena_upload.ena_upload import update_table
 
+# from ena_upload.ena_upload import make_update
+# from ena_upload.ena_upload import process_receipt
+
 # from ena_upload.ena_upload import save_update
 import site
+
+pd.options.mode.chained_assignment = None
 
 template_path = os.path.join(site.getsitepackages()[0], "ena_upload", "templates")
 
@@ -151,6 +159,9 @@ class EnaUpload:
                 "collector_name",
                 "collecting_institution",
                 "isolate",
+                "host subject id",
+                "host health state",
+                "sample_description",
             ]
         ]
 
@@ -173,12 +184,12 @@ class EnaUpload:
             columns={"collecting_institution": "collecting institution"}
         )
         df_samples.insert(3, "status", self.action)
-        df_samples.insert(3, "host subject id", "")
-        df_samples.insert(3, "host health state", "")
+        # df_samples.insert(3, "host subject id", df_schemas["host subject id"])
+        # df_samples.insert(3, "host health state", df_schemas["host health state"])
         config_json = ConfigJson()
         checklist = config_json.get_configuration("checklist")
         df_samples.insert(4, "ENA_CHECKLIST", checklist)
-        df_samples.insert(5, "sample_description", "")
+        # df_samples.insert(5, "sample_description", df_schemas["sample_description"])
         # df_samples
         """
         alias      title taxon_id host health state  ...                                  scientific_name     collector name           collecting institution    isolate
@@ -207,9 +218,6 @@ class EnaUpload:
             df_run.loc[i, "sequence_file_R2_fastq"] = df_schemas.loc[
                 i, "sequence_file_R2_fastq"
             ]
-        import pdb
-
-        pdb.set_trace()
         df_run.insert(3, "status", self.action)
         df_run = df_run.rename(columns={"fastq_r1_md5": "file_checksum"})
 
@@ -228,6 +236,7 @@ class EnaUpload:
         df_run.insert(5, "file_name", df_run["sequence_file_R1_fastq"])
         df_run2 = df_run.copy()
         df_run2["file_name"] = df_run["sequence_file_R2_fastq"]
+        df_run2["file_checksum"] = df_run["fastq_r2_md5"]
         df_run_final = pd.concat([df_run, df_run2])
         df_run_final.reset_index()
 
@@ -252,6 +261,9 @@ class EnaUpload:
                 "library_selection",
                 "library_layout",
                 "instrument_model",
+                "design_description",
+                "insert_size",
+                "sequencing_instrument_platform",
             ]
         ]
 
@@ -263,9 +275,13 @@ class EnaUpload:
                 + "_"
                 + str(df_run.loc[i, "sequence_file_R2_fastq"])
             )
-        df_experiments.insert(5, "design_description", "")
-        df_experiments.insert(5, "insert_size", 0)
-        df_experiments.insert(5, "platform", "ILLUMINA")
+        # df_experiments.insert(5, "design_description", df_schemas["design_description"])
+        # df_experiments.insert(5, "insert_size", df_schemas["insert_size"])
+        # df_experiments.insert(5, "platform", df_schemas["sequencing_instrument_platform"])
+
+        df_experiments = df_experiments.rename(
+            columns={"sequencing_instrument_platform": "platform"}
+        )
         df_experiments = df_experiments.rename(columns={"study_title": "title"})
         df_experiments = df_experiments.rename(columns={"sample_name": "sample_alias"})
 
@@ -287,7 +303,12 @@ class EnaUpload:
         if ena_config["study_id"] is not None:
             schema_dataframe["study"] = df_study
 
-        if self.action == "ADD" or self.action == "add":
+        if (
+            self.action == "ADD"
+            or self.action == "add"
+            or self.action == "MODIFY"
+            or self.action == "modify"
+        ):
             file_paths = {}
             file_paths_r2 = {}
 
@@ -299,26 +320,28 @@ class EnaUpload:
 
             file_paths.update(file_paths_r2)
 
-            # submit data to webin ftp server
+            # submit data to webin ftp server. It should only upload fastq files in case the action is ADD.
+            # When the action is MODIFY rthe fastq are already submitted.
 
-            session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
+            if self.action == "ADD" or self.action == "add":
+                session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
 
-            for filename, path in file_paths.items():
+                for filename, path in file_paths.items():
 
-                print("Uploading path " + path + " and filename: " + filename)
+                    print("Uploading path " + path + " and filename: " + filename)
 
-                try:
-                    file = open(path, "rb")  # file to send
-                    g = session.storbinary(f"STOR {filename}", file)
-                    print(g)  # send the file
-                    file.close()  # close file and FTP
-                except BaseException as err:
+                    try:
+                        file = open(path, "rb")  # file to send
+                        g = session.storbinary(f"STOR {filename}", file)
+                        print(g)  # send the file
+                        file.close()  # close file and FTP
+                    except BaseException as err:
 
-                    print(f"ERROR: {err}")
-                    # print("ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000.")
+                        print(f"ERROR: {err}")
+                        # print("ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000.")
 
-            g2 = session.quit()
-            print(g2)
+                g2 = session.quit()
+                print(g2)
 
             # THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
             # chec = submit_data(file_paths, self.passwd, self.user)
@@ -340,16 +363,46 @@ class EnaUpload:
             )
             schema_xmls["submission"] = submission_xml
 
+            tree = ET.parse(schema_xmls["run"])
+            root = tree.getroot()
+
+            for files in root.iter("FILE"):
+                if "R2" in files.attrib["filename"]:
+                    # print(files.attrib["filename"])
+                    H = df_run_final.loc[
+                        df_run_final["sequence_file_R2_fastq"]
+                        == files.attrib["filename"]
+                    ].values[0][9]
+                    files.set("checksum", H)
+                    # print(files.attrib["checksum"])
+            tree.write(schema_xmls["run"])
+
+            tree = ET.parse(schema_xmls["sample"])
+            root = tree.getroot()
+
+            for files in root.iter("SAMPLE_ATTRIBUTES"):
+                tag = ET.SubElement(files, "SAMPLE_ATTRIBUTE")
+                tag_2 = ET.SubElement(tag, "TAG")
+                tag_2.text = str("ENA-CHECKLIST")
+                tag_2 = ET.SubElement(tag, "VALUE")
+                tag_2.text = str("ERC000033")
+
+            tree.write(schema_xmls["sample"])
+
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
             else:
                 url = "https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
 
             print(f"\nSubmitting XMLs to ENA server: {url}")
-            receipt = send_schemas(schema_xmls, url, self.user, self.passwd).text
-            print("Printing receipt to ./receipt.xml")
 
-            with open("receipt.xml", "w") as fw:
+            receipt = send_schemas(schema_xmls, url, self.user, self.passwd).text
+            if not os.path.exists(self.output_path):
+                os.mkdir(self.output_path)
+            receipt_dir = os.path.join(self.output_path, "receipt.xml")
+            print(f"Printing receipt to {receipt_dir}")
+
+            with open(f"{receipt_dir}", "w") as fw:
                 fw.write(receipt)
             try:
                 schema_update = process_receipt(receipt.encode("utf-8"), self.action)

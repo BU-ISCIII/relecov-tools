@@ -19,6 +19,8 @@ import relecov_tools.map_schema
 import relecov_tools.feed_database
 import relecov_tools.read_bioinfo_metadata
 import relecov_tools.long_table_parse
+import relecov_tools.metadata_homogeneizer
+import relecov_tools.gisaid_upload
 
 log = logging.getLogger()
 
@@ -57,9 +59,9 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "0.0.1"
+    __version__ = "0.0.4"
     stderr.print(
-        "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
+        "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
 
     # Lanch the click cli
@@ -135,14 +137,18 @@ def relecov_tools_cli(verbose, log_file):
 @relecov_tools_cli.command(help_priority=2)
 @click.option("-u", "--user", help="User name for login to sftp server")
 @click.option("-p", "--password", help="password for the user to login")
+@click.option("-r_u", "--user_relecov", help="User name for updating data to relecov")
+@click.option("-p_r", "--password_relecov", help="password for relecov user")
 @click.option(
     "-f",
     "--conf_file",
     help="Configuration file (no params file)",
 )
-def download(user, password, conf_file):
+def download(user, password, conf_file, user_relecov, password_relecov):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file)
+    sftp_connection = relecov_tools.sftp_handle.SftpHandle(
+        user, password, conf_file, user_relecov, password_relecov
+    )
     sftp_connection.download()
 
 
@@ -258,13 +264,21 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
 @relecov_tools_cli.command(help_priority=7)
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
-@click.option("-e", "--gisaid_json", help="where the validated json is")
+@click.option("-c", "--client_id", help="client-ID provided by clisupport@gisaid.org")
+@click.option("-t", "--token", help="path to athentication token")
+@click.option("-e", "--gisaid_json", help="patch validated json mapped to GISAID")
 @click.option(
     "-i",
     "--input_path",
-    help="the path where the fasta or multifasta, gisaid_mapped.json and the token file are located",
+    help="path to fasta or multifasta file",
 )
 @click.option("-o", "--output_path", help="output folder for log")
+@click.option(
+    "-f",
+    "--frameshift",
+    type=click.Choice(["catch_all", "catch_none", "catch_novel"], case_sensitive=False),
+    help="frameshift notification",
+)
 @click.option(
     "-x",
     "--proxy_config",
@@ -278,10 +292,31 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
     help="Default input is a multifasta.",
 )
 def upload_to_gisaid(
-    user, password, gisaid_json, input_path, output_path, proxy_config
+    user,
+    password,
+    client_id,
+    token,
+    gisaid_json,
+    input_path,
+    output_path,
+    frameshift,
+    proxy_config,
+    single,
 ):
     """parsed data to create files to upload to gisaid"""
-    pass
+    upload_gisaid = relecov_tools.gisaid_upload.GisaidUpload(
+        user,
+        password,
+        client_id,
+        token,
+        gisaid_json,
+        input_path,
+        output_path,
+        frameshift,
+        proxy_config,
+        single,
+    )
+    upload_gisaid.gisaid_upload()
 
 
 # launch
@@ -337,13 +372,19 @@ def update_db(user, password, json, schema, type, databaseServer):
 @click.option(
     "-o", "--metadata-out", type=click.Path(), help="Path to save output  metadata file"
 )
-def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
+@click.option(
+    "-p",
+    "--mapping-illumina",
+    type=click.Path(),
+    help="Name of the mapping_illumina file",
+)
+def read_bioinfo_metadata(metadata_file, input_folder, metadata_out, mapping_illumina):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
 
     new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        metadata_file, input_folder, metadata_out
+        metadata_file, input_folder, metadata_out, mapping_illumina
     )
 
     new_bioinfo_metadata.bioinfo_parse(metadata_file)
@@ -364,6 +405,29 @@ def long_table_parse(longtable_file, output):
         longtable_file, output
     )
     new_json_parse.parsing_csv()
+
+
+# read metadata bioinformatics
+@relecov_tools_cli.command(help_priority=12)
+@click.option(
+    "-i",
+    "--institution",
+    type=click.Choice(["isciii", "hugtip", "hunsc-iter"], case_sensitive=False),
+    help="select one of the available institution options",
+)
+@click.option(
+    "-d",
+    "--directory",
+    type=click.Path(),
+    help="Folder where are located the additional files",
+)
+@click.option("-o", "--output", type=click.Path(), help="Path to save json output")
+def metadata_homogeneizer(institution, directory, output):
+    """Parse institution metadata lab to the one used in relecov"""
+    new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
+        institution, directory, output
+    )
+    new_parse.converting_metadata()
 
 
 if __name__ == "__main__":

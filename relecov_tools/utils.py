@@ -32,6 +32,24 @@ def read_json_file(j_file):
     return data
 
 
+def read_csv_file_return_dict(file_name, sep):
+    """Read csv or tsv file, according to separator, and return a dictionary
+    where the main key is the first column
+    """
+    with open(file_name, "r") as fh:
+        lines = fh.readlines()
+    heading = lines[0].strip().split(sep)
+    if len(heading) == 0:
+        return {"ERROR": "not valid format"}
+    file_data = {}
+    for line in lines[1:]:
+        line_s = line.strip().split(sep)
+        file_data[line_s[0]] = {}
+        for idx in range(1, len(heading)):
+            file_data[line_s[0]][heading[idx]] = line_s[idx]
+    return file_data
+
+
 def get_md5_from_local_folder(local_folder):
     """Fetch the md5 values for each file in the file list"""
     md5_results = {}

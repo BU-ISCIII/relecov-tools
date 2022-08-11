@@ -62,7 +62,7 @@ class FeedDatabase:
         else:
             if os.path.isfile(schema):
                 log.error("Relecov schema file %s does not exists", schema)
-                stderr.print("[red] Relecov schema " + schema + "does not exists")
+                stderr.print(f"[red] Relecov schema  {schema} does not exists")
                 sys.exit(1)
         rel_schema_json = relecov_tools.utils.read_json_file(schema)
         try:
@@ -244,21 +244,23 @@ class FeedDatabase:
                     for i in range(10):
                         # wait 5 sec before resending the request
                         time.sleep(5)
-                        result = self.iskylims_rest_api.post_request(
+                        result = self.database_rest_api.post_request(
                             json.dumps(chunk),
                             {"user": self.user, "pass": self.passwd},
-                            self.iskylims_settings[post_url],
+                            self.database_settings[post_url],
                         )
                         if "ERROR" not in result:
                             break
                     if i == 9 and "ERROR" in result:
-                        log.error("Unable to sent the request to iSkyLIMS")
-                        stderr.print("[red] Unable to sent the request to iSkyLIMS")
+                        log.error("Unable to sent the request to remote server")
+                        stderr.print(
+                            "[red] Unable to sent the request to remote server"
+                        )
                         sys.exit(1)
                 else:
-                    log.error("Request to iSkyLIMS was not accepted")
+                    log.error("Request to %s was not accepted", self.database_server)
                     stderr.print(
-                        f"[red] Error {result['ERROR']} when sending request to iSkyLIMS "
+                        f"[red] Error {result['ERROR']} when sending request to {self.database_server}"
                     )
                     sys.exit(1)
             if "sampleName" in chunk:
@@ -274,7 +276,7 @@ class FeedDatabase:
 
     def store_data(self):
         """Collect data from json file and split them to store data in iSkyLIMS
-        amd in Relecov Platform
+        and in Relecov Platform
         """
         map_fields = {}  #
         if self.type_of_info == "sample":
@@ -293,12 +295,7 @@ class FeedDatabase:
                 print("relecov")
                 post_url = "analysis"
                 map_fields = self.map_relecov_bioinfo_data()
-                """
-                sample_fields, s_project_fields = self.get_iskylims_fields_sample()
-                map_fields = self.map_iskylims_sample_fields_values(
-                    sample_fields, s_project_fields
-                )
-                """
+
             elif self.server_type == "relecov_local":
                 print("relecov_local")
                 post_url = "analysis"
