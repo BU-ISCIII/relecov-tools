@@ -179,7 +179,7 @@ class MappingSchema:
                     "collecting_lab_sample_id"
                 ]
                 mapped_json_data[idx]["sample_title"] = self.json_data[idx][
-                    "collecting_lab_sample_id"
+                    "sequencing_sample_id"
                 ]
                 mapped_json_data[idx]["file_type"] = "fastq"
                 mapped_json_data[idx]["collector_name"] = self.json_data[idx][
@@ -189,7 +189,7 @@ class MappingSchema:
                     "library_kit"
                 ]
                 mapped_json_data[idx]["sample_name"] = self.json_data[idx][
-                    "collecting_lab_sample_id"
+                    "sequencing_sample_id"
                 ]
                 mapped_json_data[idx]["study_type"] = self.json_data[idx][
                     "purpose_sampling"
@@ -200,9 +200,47 @@ class MappingSchema:
                 mapped_json_data[idx]["sample_description"] = self.json_data[idx][
                     "sequence_file_R1_fastq"
                 ]
+                mapped_json_data[idx]["isolate"] = self.json_data[idx][
+                    "isolate_sample_id"
+                ]
                 mapped_json_data[idx][
                     "sequencing_instrument_platform"
-                ] = self.json_data[idx]["sequencing_instrument_platform"]
+                ] = self.json_data[idx]["sequencing_instrument_platform"].upper()
+
+                mapped_json_data[idx]["instrument_model"] = self.json_data[idx][
+                    "sequencing_instrument_model"
+                ]
+
+                if (
+                    "nextseq"
+                    in self.json_data[idx]["sequencing_instrument_model"].lower()
+                ):
+                    if (
+                        "500"
+                        in self.json_data[idx]["sequencing_instrument_model"].lower()
+                    ):
+                        mapped_json_data[idx]["instrument_model"] = "NextSeq 500"
+                    if (
+                        "1000"
+                        in self.json_data[idx]["sequencing_instrument_model"].lower()
+                    ):
+                        mapped_json_data[idx]["instrument_model"] = "NextSeq 1000"
+                    if (
+                        "2000"
+                        in self.json_data[idx]["sequencing_instrument_model"].lower()
+                    ):
+                        mapped_json_data[idx]["instrument_model"] = "NextSeq 2000"
+                    if (
+                        "550"
+                        in self.json_data[idx]["sequencing_instrument_model"].lower()
+                    ):
+                        mapped_json_data[idx]["instrument_model"] = "NextSeq 550"
+
+                mapped_json_data[idx]["host subject id"] = ""
+                mapped_json_data[idx]["host health state"] = ""
+                mapped_json_data[idx]["sample_description"] = ""
+                mapped_json_data[idx]["design_description"] = ""
+                mapped_json_data[idx]["insert_size"] = "0"
 
         return mapped_json_data
 

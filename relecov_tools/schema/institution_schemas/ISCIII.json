@@ -1,5 +1,5 @@
 {
-    "equivalence": {
+    "mapped_fields": {
         "Public Health sample id (SIVIES)": "Código SiViEs",
         "Sample ID given by originating laboratory": "Ref Hospital",
         "Sample ID given by the submitting laboratory": "ID CNM",
@@ -8,51 +8,67 @@
         "Sample ID given for sequencing": "ID VI-VRP",
         "GISAID id": "ID GISAID",
         "Originating Laboratory": "Hospital",
-        "Sample Collection Date": "Fecha de toma ",
+        "Sample Collection Date": "Fecha de toma",
         "Sample Received Date": "Fecha recepción",
-        "Host Age": "Grupo edad",
-        "Diagnostic Pcr Ct Value 1": "PCR genE",
-        "Sequencing Date": "Fecha de secuenciación"
+        "Host Age": "Edad (años)",
+        "Host Gender": "Sexo",
+        "Diagnostic Pcr Ct Value 1": "PCR genE"
 
     },
-    "constants": {
+    "fixed_fields": {
+        "Submitting Institution": "Instituto de Salud Carlos III",
         "Biological Sample Storage Condition": "-80 C",
         "Rna Extraction Protocol": "RT-PCR",
-        "ENA Sample ID": "",
-        "GISAID Virus Name": "",
-        "GISAID id": "",
-        "Submitting Institution": "",
         "Purpose of sampling": "Surveillance",
         "Specimen source": "Nasopharyngeal exudate",
-        "Environmental Material": "",
         "Environmental System": "Swab",
-        "Collection Device": "",
         "Host": "Human",
-        "Host Gender": "",
-        "Commercial All-in-one library kit": "",
         "Library Preparation Kit": "Illumina DNA Prep",
         "Enrichment Protocol": "Amplicon",
-        "If Enrichment Protocol. If Other,Specify": "",
         "Enrichment panel/assay": "ARTIC",
-        "If Enrichment panel/assay. If Other, Specify": "",
-        "Enrichment panel/assay version": "",
-        "Number Of Samples In Run": "",
-        "Runid": "",
-        "Sequencing Instrument Model": "",
-        "Flowcell Kit": "",
         "Source material": "Viral RNA",
         "Capture method": "PCR",
         "Sequencing technique": "Amplicon",
         "Library Layout": "Paired",
         "Gene Name 1": "ORF E",
         "Diagnostic Pcr Ct Value 1": "",
-        "Gene Name 2": "",
-        "Diagnostic Pcr Ct Value-2": "",
-        "Analysis Authors": "",
-        "Author Submitter": "A. Monzón; F. Casas; I. Jiménez; M. Camarero; P. Zaballos; ROMAN SOTO; S. Cuesta, I.; S. Iglesias-Caballero; S. Pozo; S. Varona; SERGIO; Sandonís; V. Vázquez-Morón",
-        "Authors": "",
-        "Sequence file R1 fastq": "",
-        "Sequence file R2 fastq": ""
+        "Authors": "A. Monzón; F. Casas; I. Jiménez; M. Camarero; P. Zaballos; ROMAN SOTO; S. Cuesta, I.; S. Iglesias-Caballero; S. Pozo; S. Varona; SERGIO; Sandonís; V. Vázquez-Morón"
+    },
+    "required_files": {
+        "org_lab_file": {
+            "file_name": "laboratory_mapping_list.tsv",
+            "metadata_field": ["Originating Laboratory"],
+            "file_field": ["mapped_org_lab"],
+            "req_process":{
+                "replace":{
+                }
+            }
         },
-    "outer": {}
+        "sequencer_file": {
+            "file_name": "samples_run_services.tsv",
+            "metadata_field": ["Sequencing Instrument Model"],
+            "file_field": ["run_name"],
+            "req_process":{
+                "condition":{
+                    "nextseq": "Illumina NextSeq",
+                    "next_seq": "Illumina NextSeq",
+                    "miseq": "Illumina MiSeq",
+                    "miseaq": "Illumina MiSeq",
+                    "novaseq": "Illumina NovaSeq"
+                }
+            }
+        },
+        "run_id_file": {
+            "file_name": "samples_run_services.tsv",
+            "metadata_field": ["Runid"],
+            "file_field": ["run_name"],
+            "req_process":"None"
+        },
+        "sample_file": {
+            "file_name": "sample_data.json",
+            "metadata_field":["Sequence file R1 fastq", "Sequence file R2 fastq"],
+            "file_field":["sequence_file_R1_fastq", "sequence_file_R2_fastq"],
+            "req_process":"None"
+        }
+    }
 }

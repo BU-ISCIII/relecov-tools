@@ -973,7 +973,7 @@
                 ""
             ],
             "ontology": "GENEPIO:0000079",
-            "type": "number",
+            "type": "string",
             "description": "If the information is unknown or can not be shared, leave blank.",
             "classification": "Database Identifiers",
             "label": "Sample ID given for sequencing",
@@ -1850,17 +1850,6 @@
             "label": "% genome  greater 10x",
             "fill_mode": "batch"
         },
-        "median_depth_of_coverage_value": {
-            "examples": [
-                ""
-            ],
-            "ontology": "NCIT:C167285",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "mean depth of coverage value",
-            "fill_mode": "batch"
-        },
         "per_Ns": {
             "examples": [
                 ""
@@ -1872,7 +1861,7 @@
             "label": "%Ns",
             "fill_mode": "batch"
         },
-        "number_of_variants_AF_greater_75percent": {
+        "number_of_variants_in_consensus": {
             "examples": [
                 ""
             ],

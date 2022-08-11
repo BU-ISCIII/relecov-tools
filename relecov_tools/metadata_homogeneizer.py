@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-# Imports
 import os
 import sys
 import logging
-import pandas as pd
 import rich.console
+import openpyxl
+from itertools import islice
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -17,318 +17,224 @@ stderr = rich.console.Console(
 )
 
 
-def check_extension(instring):
-    """Given a file as a string and a list of possible extensions,
-    returns the type of file extension can be found in the file"""
+class MetadataHomogeneizer:
+    """MetadataHomogeneizer object"""
 
-    # hard-coded extensions
-    extensions = {
-        "excel": [".xlsx", ".xls", ".xlsm", ".xlsb"],
-        "odf": [".odf"],
-        "csv": [".csv"],
-        "tsv": [".tsv"],
-    }
-
-    for extension, termination_list in extensions.items():
-        for termination in termination_list:
-            if instring.endswith(termination):
-                return extension
-
-
-def identify_load_dataframe(filename):
-    """Detect possible extensions for the metadata file
-    Open it into a dataframe"""
-
-    if check_extension(filename) == "excel":
-        df = pd.read_excel(filename, header=0)
-
-    elif check_extension(filename) == "odf":
-        # Needs a special package
-        df = pd.read_excel(filename, engine="odf", header=0)
-
-    elif check_extension(filename) == "csv":
-        df = pd.read_csv(filename, sep=",", header=0)
-
-    elif check_extension(filename) == "tsv":
-        df = pd.read_csv(filename, sep="\t", header=0)
-
-    # not real sure how to do this
-    elif check_extension(filename) == "json":
-        pass
-        # config_json = ConfigJson(filename="")
-
-    else:
-        print(f"The extension of the file '{filename}' could not be identified.")
-        return None
-
-    # remove spaces before and after
-    df.columns = df.columns.str.strip()
-
-    return df
-
-
-class Homogeneizer:
-    """Homogeneizer object"""
-
-    def __init__(self, filename):
-        self.filename = filename
-        self.dictionary_path = None
-        self.dicionary = None
-        self.centre = None
-        self.dataframe = None
-
-        config_json = ConfigJson()
-        self.header = config_json.get_configuration("new_table_headers")
-        self.translated_dataframe = pd.DataFrame(columns=self.header)
-        return
-
-    def associate_dict(self):
-        """Detect the origin centre of the metadata, and finds the corresponding json file to use"""
-
-        # Check name of the file attribute of the object
-        # Check schema with all centres and find their json
-        # Associate centre and json with object
-        # Raise error when in doubt
-        # Must check on schema/institution_schemas
-
-        try:
-            config_json = ConfigJson(
-                json_file=os.path.join(
-                    os.path.dirname(__file__), "schema", "institution_to_schema.json"
-                )
+    def __init__(
+        self, lab_metadata=None, institution=None, directory=None, output_folder=None
+    ):
+        self.config_json = ConfigJson()
+        self.heading = self.config_json.get_configuration("metadata_lab_heading")
+        if lab_metadata is None:
+            self.lab_metadata = relecov_tools.utils.prompt_path(
+                msg="Select the file which contains metadata"
             )
-            institution_dict = config_json.json_data
-            detected = {}
-
-            for key in institution_dict.keys():
-                # cap insensitive
-                if key.lower() in self.filename.split("/")[-1].lower():
-                    detected[key] = institution_dict[key]
-
-            if len(set(detected.values())) == 0:
-                log.error(
-                    f"No institution pattern could be found in the '{self.filename}' filename given."
-                )
-                stderr.print(
-                    f"[red]No institution pattern could be found in the '{self.filename}' filename given."
-                )
-                sys.exit(1)
-
-            elif len(set(detected.values())) > 1:
-                repeated = ", ".join(list(set(detected.values)))
-                log.error(
-                    f"The following matches were identified in the '{self.filename}' filename given: {repeated    }'"
-                )
-                stderr.print(
-                    f"[red]The following matches were identified in the '{self.filename}' filename given: {repeated}"
-                )
-                sys.exit(1)
-
-            else:
-                self.dictionary_path = detected[0]  # first item, they are all equal
-                stderr.print(
-                    f"[green]JSON file found successfully: {self.dictionary_path}"
-                )
-
-        except FileNotFoundError:
-            log.error(
-                "JSON file relating institutions and their JSON file could not be found or does not exist."
-            )
-            stderr.print(
-                "[red]JSON file relating institutions and their JSON file could not be found or does not exist."
-            )
+        else:
+            self.lab_metadata = lab_metadata
+        if not os.path.exists(self.lab_metadata):
+            log.error("Metadata file %s does not exist ", self.lab_metadata)
+            stderr.print("[red] Metadata file " + self.lab_metadata + " does not exist")
             sys.exit(1)
-
-        return
-
-    def load_dataframe(self):
-        """Detect possible extensions for the metadata file and
-        open it into a dataframe"""
-        self.dataframe = identify_load_dataframe(self.filename)
-        return
-
-    def load_dictionary(self):
-        """Load the corresponding dictionary"""
-
-        # To Do: replace string with local file system for testing
-        try:
-            config_json = ConfigJson(
-                json_file=os.path.join(
-                    os.path.dirname(__file__), "schema", self.dictionary_path
-                )
-            )
-            self.dictionary = config_json.json_data
-        except FileNotFoundError:
-            log.error(
-                f"JSON file {self.dictionary_path} could not be found or does not exist in the schema directory."
-            )
-            stderr.print(
-                f"[red]JSON file {self.dictionary_path} could not be found or does not exist in the schema directory."
-            )
-            sys.exit(1)
-        return
-
-    def translate_dataframe(self):
-        """Use the corresponding dictionary to translate the df"""
-        # if dictionary is "none" or similar, do nothing
-
-        try:  # not sure if a try is the best here, gotta check
-            for key, value in self.dictionary["equivalence"].items():
-                if len(value) == 0:
-                    log.error(
-                        f"Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'"
-                    )
-                    stderr.print(
-                        f"[red]Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'"
-                    )
-                    sys.exit(1)
-                elif value in self.dataframe.columns:
-                    self.translated_dataframe[key] = self.dataframe[value.strip()]
-                else:
-                    log.error(
-                        f"Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found in the input dataframe."
-                    )
-                    stderr.print(
-                        f"[red]Column '{value}' indicated in the '{self.dictionary_path}' schema could not be found in the input dataframe."
-                    )
-                    sys.exit(1)
-
-            for key, value in self.dictionary["constants"].items():
-                self.translated_dataframe[key] = value
-
-        except Exception:
-            log.error(
-                "Found empty equivalence in the '{self.dictionary_path}' schema: '{key}'"
-            )
-
-        # Nightmare
-        if len(self.dictionary["outer"]) == 0:
-            pass
-        else:
-            for key, value in self.dictionary["outer"].items():
-                if len(value) == 0:
-                    log.error(
-                        f"Found empty outer in the '{self.dictionary_path}' schema: '{key}'"
-                    )
-                    stderr.print(
-                        f"[red]Found empty outer in the '{self.dictionary_path}' schema: '{key}'"
-                    )
-                    sys.exit(1)
-                else:
-                    outer_filename = value["filename"]
-                    outer_sheet = value["sheet"]
-                    outer_column = value["column"]
-                    outer_samplename_col = value["samplename_col"]
-
-                    outer_dataframe = None
-                    outer_translated_dataframe = None
-                    # outer_dataframe = identify_load_dataframe(outer_filename)
-
-                    if check_extension(outer_filename) == "excel":
-                        if len(outer_sheet) == 0:
-                            log.error(
-                                "There is missing information, sheet name must be provided."
-                            )
-                            stderr.print(
-                                "[red]There is missing information, sheet name must be provided."
-                            )
-                            sys.exit(1)
-                        else:
-                            outer_dataframe = pd.read_excel(
-                                outer_filename, header=0, sheet_name=outer_sheet
-                            )
-                    elif check_extension(outer_filename) == "odf":
-                        if len(outer_sheet) == 0:
-                            log.error(
-                                "There is missing information, sheet name must be provided."
-                            )
-                            stderr.print(
-                                "[red]There is missing information, sheet name must be provided."
-                            )
-                            sys.exit(1)
-                        else:
-                            outer_dataframe = pd.read_excel(
-                                outer_filename, engine="odf", header=0
-                            )
-                    elif check_extension(outer_filename) == "csv":
-                        outer_dataframe = pd.read_csv(outer_filename, sep=",", header=0)
-                    elif check_extension(outer_filename) == "tsv":
-                        outer_dataframe = pd.read_csv(
-                            outer_filename, sep="\t", header=0
-                        )
-
-                    if len(outer_column) == 0:
-                        log.error(
-                            "There is missing information, column name must be provided."
-                        )
-                        stderr.print(
-                            "[red]There is missing information, column name must be provided."
-                        )
-                        sys.exit(1)
-                    else:
-                        outer_translated_dataframe[key] = outer_dataframe[
-                            outer_column.strip()
-                        ]
-
-                    if len(outer_samplename_col) == 0:
-                        log.error(
-                            "There is missing information, samplename_col must be provided."
-                        )
-                        stderr.print(
-                            "[red]There is missing information, samplename_col must be provided."
-                        )
-                        sys.exit(1)
-                    else:
-                        # Review left_on key (this key must be present in translated data_frame)
-                        outer_translated_dataframe[
-                            outer_samplename_col
-                        ] = outer_dataframe[outer_samplename_col.strip()]
-                        self.translated_dataframe.merge(
-                            outer_translated_dataframe,
-                            left_on="Sample ID given by originating laboratory",
-                            right_on=outer_samplename_col,
-                        )
-        return
-
-    def verify_translated_dataframe(self):
-        """Checks if the dataframe holds all the needed values for the relecov tools suite"""
-
-        if self.dataframe.shape[0] != self.translated_dataframe.shape[0]:
-            log.error("Different number of rows after translation")
-            sys.exit(1)
-        else:
-            stderr.print("[green]Number of rows: OK")
-
-        # search for missing values
-        missing_values = list(set(self.header) - set(self.translated_dataframe.columns))
-        if len(missing_values) > 0:
-            msg = ", ".join(missing_values)
-            log.error(
-                f"Found the following missing values during translated table validation: {msg}"
-            )
-            stderr.print(
-                f"[red]Found the following missing values during translated table validation: {msg}"
+        if institution is None:
+            self.institution = relecov_tools.utils.prompt_selection(
+                msg="Select the available mapping institution",
+                choices=["isciii", "hugtip", "hunsc-iter"],
             )
         else:
-            stderr.print("[green]No missing values in the translated table")
-        # search for extra values
-        extra_values = list(set(self.translated_dataframe.columns) - set(self.header))
-        if len(extra_values) > 0:
-            msg = ", ".join(extra_values)
-            log.error(
-                f"Found the following extra values during translated table validation: {msg}"
-            )
-            stderr.print(
-                f"[red]Found the following extra values during translated table validation: {msg}"
-            )
-        else:
-            stderr.print("[green]No extra values in the translated values")
-        return
-
-    def export_translated_dataframe(self):
-        # expected only one dot per file
-        filename, extension = self.filename.split(".")
-        self.translated_dataframe.to_excel(
-            excel_writer=filename + "_modified." + extension
+            self.institution = institution.upper()
+        mapping_json_file = os.path.join(
+            os.path.dirname(__file__),
+            "schema",
+            "institution_schemas",
+            self.config_json.get_topic_data("mapping_file", self.institution),
         )
+        if directory is None:
+            directory = relecov_tools.utils.prompt_path(
+                msg="Select the directory which contains additional files for metadata"
+            )
+        if not os.path.exists(directory):
+            log.error("Folder for additional files %s does not exist ", directory)
+            stderr.print(
+                "[red] Folder for additional files " + directory + " does not exist"
+            )
+            sys.exit(1)
+        self.mapping_json_data = relecov_tools.utils.read_json_file(mapping_json_file)
+        self.additional_files = []
+        if len(self.mapping_json_data["required_files"]) > 0:
+            for key, values in self.mapping_json_data["required_files"].items():
+                f_path = os.path.join(directory, values["file_name"])
+                if not os.path.isfile(f_path):
+                    log.error("Additional file %s does not exist ", f_path)
+                    stderr.print("[red] Additional file " + f_path + " does not exist")
+                    sys.exit(1)
+                values["file_name"] = f_path
+                self.additional_files.append(values)
+        if output_folder is None:
+            self.output_folder = relecov_tools.utils.prompt_path(
+                msg="Select the output folder"
+            )
+        else:
+            self.output_folder = output_folder
+
+    def read_metadata_file(self):
+        """Read the input metadata file"""
+        wb_file = openpyxl.load_workbook(self.lab_metadata, data_only=True)
+        ws_metadata_lab = wb_file["Sheet"]
+        heading = [i.value.strip() for i in ws_metadata_lab[1] if i.value]
+        ws_data = []
+        for row in islice(ws_metadata_lab.values, 1, ws_metadata_lab.max_row):
+            l_row = list(row)
+            data_row = {}
+            # Ignore the empty rows
+            # guessing that row 1 and 2 with no data are empty rows
+            if l_row[0] is None and l_row[1] is None:
+                continue
+            for idx in range(0, len(heading)):
+                data_row[heading[idx]] = l_row[idx]
+            ws_data.append(data_row)
+        # import pdb; pdb.set_trace()
+        return ws_data
+
+    def mapping_metadata(self, ws_data):
+        map_fields = self.mapping_json_data["mapped_fields"]
+        map_data = []
+        for row in ws_data:
+            row_data = {}
+            for dest_map, orig_map in map_fields.items():
+
+                row_data[dest_map] = row[orig_map]
+            map_data.append(row_data)
+
+        return map_data
+
+    def additional_fields(self, mapped_data):
+        add_data = [self.heading]
+        fixed_fields = self.mapping_json_data["fixed_fields"]
+        for row in mapped_data:
+            new_row_data = []
+            for field in self.heading:
+                if field in row:
+                    data = row[field]
+                elif field in fixed_fields:
+                    data = fixed_fields[field]
+                else:
+                    data = ""
+                new_row_data.append(data)
+            add_data.append(new_row_data)
+        return add_data
+
+    def handling_additional_files(self, additional_data):
+        for additional_file in self.additional_files:
+            f_name = additional_file["file_name"]
+            stderr.print("[blue] Start processing additional file " + f_name)
+            if f_name.endswith(".json"):
+                data = relecov_tools.utils.read_json_file(f_name)
+            elif f_name.endswith(".tsv"):
+                data = relecov_tools.utils.read_csv_file_return_dict(f_name, "\t")
+            elif f_name.endswith(".csv"):
+                data = relecov_tools.utils.read_csv_file_return_dict(f_name, ",")
+            else:
+                log.error("Additional file extension %s is not supported ", f_name)
+                stderr.print(
+                    "[red] Additional file extension " + f_name + " is not supported"
+                )
+                sys.exit(1)
+            sample_idx = self.heading.index("Sample ID given for sequencing")
+            for row in additional_data[1:]:
+                # new_row_data = []
+
+                s_value = str(row[sample_idx])
+
+                try:
+                    item_data = data[s_value]
+                except KeyError:
+                    pass
+                    """
+                    log.error(
+                        "Additional file %s does not have the information for %s ",
+                        f_name,
+                        s_value,
+                    )
+                    stderr.print(
+                        "[red] Additional file "
+                        + f_name
+                        + " does not have information for "
+                        + str(s_value)
+                    )
+                    continue
+                    """
+                    # sys.exit(1)
+
+                for m_idx in range(len(additional_file["metadata_field"])):
+
+                    try:
+                        meta_idx = self.heading.index(
+                            additional_file["metadata_field"][m_idx]
+                        )
+                    except ValueError as e:
+                        log.error("Field %s does not exist in Metadata ", e)
+                        stderr.print(f"[red] Field {e} does not exist")
+                        sys.exit(1)
+
+                    if additional_file["req_process"] == "None":
+                        row[meta_idx] = item_data[additional_file["file_field"][m_idx]]
+                    else:
+
+                        if "condition" in additional_file["req_process"]:
+                            for key, value in additional_file["req_process"][
+                                "condition"
+                            ].items():
+                                if (
+                                    key
+                                    in item_data[
+                                        additional_file["file_field"][m_idx]
+                                    ].lower()
+                                ):
+                                    row[meta_idx] = value
+                                    break
+                        elif "replace" in additional_file["req_process"]:
+                            row[meta_idx] = row[meta_idx].strip()
+                            try:
+                                row[meta_idx] = data[row[meta_idx]][
+                                    additional_file["file_field"][m_idx]
+                                ]
+                            except KeyError as e:
+                                log.error("Value  %s does not exist ", e)
+                                stderr.print(f"[red] Value {e} does not exist")
+                                sys.exit(1)
+                        else:
+                            log.error(
+                                "Processed method %s is not implemented yet",
+                                additional_data["req_process"].key(),
+                            )
+                            stderr.print(
+                                f"[red] Processed method {additional_data['req_process'].key()} is not implemented yet"
+                            )
+                            sys.exit(1)
+                # add_data.append(row)
+            # import pdb; pdb.set_trace()
+        stderr.print("[green] Succesful processing of additional file ")
+        return additional_data
+
+    def write_to_excel_file(self, data, f_name):
+        book = openpyxl.Workbook()
+        sheet = book.active
+        for row in data:
+            sheet.append(row)
+        sheet.title = "METADATA_LAB"
+        book.save(f_name)
+        return
+
+    def converting_metadata(self):
+        stderr.print("[blue] Reading the metadata file to convert")
+        ws_data = self.read_metadata_file()
+        mapped_data = self.mapping_metadata(ws_data)
+        stderr.print("[green] Successful conversion mapping to ISCIII metadata")
+        stderr.print("[blue] Adding fixed information")
+        additional_data = self.additional_fields(mapped_data)
+        # Fetch the additional files and include the information in metadata
+        stderr.print("[blue] reading and mapping de information that cames in files")
+        converted_data = self.handling_additional_files(additional_data)
+        f_name = os.path.join(self.output_folder, "converted_metadata_lab.xlsx")
+        self.write_to_excel_file(converted_data, f_name)
         return
