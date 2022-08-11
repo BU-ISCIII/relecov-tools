@@ -380,6 +380,32 @@
             "label": "Organism",
             "fill_mode": "batch"
         },
+        "host_subject_id": {
+            "examples": [
+                "e.g. #131"
+            ],
+            "ontology": "GENEPIO:0001398",
+            "type": "string",
+            "description": "a unique identifier by which each subject can be referred to, de-identified.",
+            "clasification": "Host information",
+            "label": "Host Subject Id",
+            "table": [
+                "sample"
+            ]
+        },
+        "host_health_state": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0001388",
+            "type": "string",
+            "description": " Status of the host",
+            "clasification": "Host information",
+            "label": "Host health state",
+            "table": [
+                "sample"
+            ]
+        },
         "host_scientific_name": {
             "Enums": [
                 "Bos taurus [NCBITaxon:9913]",
