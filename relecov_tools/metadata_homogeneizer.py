@@ -172,32 +172,30 @@ class MetadataHomogeneizer:
                         + " is not supported"
                     )
                     sys.exit(1)
-                sample_idx = self.heading.index("Sample ID given for sequencing")
+
             else:
                 data = ""
 
             if additional_file["function"] == "None":
+                mapping_idx = self.heading.index(additional_file["mapped_key"])
                 for row in additional_data[1:]:
                     # new_row_data = []
-                    s_value = str(row[sample_idx])
+                    s_value = str(row[mapping_idx])
                     try:
                         item_data = data[s_value]
                     except KeyError:
-                        pass
-                        """
                         log.error(
                             "Additional file %s does not have the information for %s ",
                             f_name,
                             s_value,
                         )
                         stderr.print(
-                            "[red] Additional file "
+                            "[yellow] Additional file "
                             + f_name
                             + " does not have information for "
                             + str(s_value)
                         )
                         continue
-                        """
                         # sys.exit(1)
                     for m_field, f_field in additional_file["mapped_fields"].items():
                         try:
@@ -243,7 +241,7 @@ class MetadataHomogeneizer:
         stderr.print("[blue] Adding fixed information")
         additional_data = self.additional_fields(mapped_data)
         # Fetch the additional files and include the information in metadata
-        stderr.print("[blue] reading and mapping de information that cames in files")
+        stderr.print("[blue] reading and mapping de information that are in files")
         converted_data = self.handling_additional_files(additional_data)
         f_name = os.path.join(self.output_folder, "converted_metadata_lab.xlsx")
         self.write_to_excel_file(converted_data, f_name)
