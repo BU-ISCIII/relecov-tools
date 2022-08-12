@@ -1072,7 +1072,7 @@
             "label": "Enrichment panel/assay",
             "fill_mode": "batch"
         },
-        "if_amplicon_protocol_if_other_especify": {
+        "if_amplicon_protocol_if_other_specify": {
             "examples": [
                 ""
             ],
@@ -1080,7 +1080,7 @@
             "type": "string",
             "description": "",
             "classification": "Sequencing",
-            "label": "If Enrichment panel/assay Is Other, Especify",
+            "label": "If Enrichment panel/assay Is Other, Specify",
             "fill_mode": "batch"
         },
         "amplicon_version": {

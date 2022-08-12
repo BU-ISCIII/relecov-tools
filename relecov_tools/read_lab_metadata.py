@@ -322,6 +322,7 @@ class RelecovMetadata:
                         try:
                             sample_data_row[self.label_prop_dict[heading[idx]]] = val
                         except TypeError as e:
+                            import pdb; pdb.set_trace()
                             stderr.print("[red] Error when reading " + row[2] + e)
                     else:
                         try:
@@ -329,6 +330,7 @@ class RelecovMetadata:
                                 row[idx] if row[idx] else ""
                             )
                         except KeyError as e:
+                            import pdb; pdb.set_trace()
                             stderr.print(
                                 "[red] Error when reading " + str(row[2]) + str(e)
                             )
