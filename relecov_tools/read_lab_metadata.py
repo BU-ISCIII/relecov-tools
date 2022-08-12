@@ -3,6 +3,7 @@ from itertools import islice
 
 import json
 import logging
+from queue import Empty
 
 # from turtle import heading
 import rich.console
@@ -128,7 +129,12 @@ class RelecovMetadata:
 
     def include_fields_already_set(self, row_sample):
         processed_data = {}
-        processed_data["collector_name"] = row_sample["author_submitter"]
+
+        if row_sample["author_submitter"] == "":
+            processed_data["collector_name"] = "unknown"
+        else:
+            processed_data["collector_name"] = row_sample["author_submitter"]
+        processed_data["host_subject_id"] = row_sample["microbiology_lab_sample_id"]
 
         return processed_data
 
@@ -256,6 +262,7 @@ class RelecovMetadata:
             row_sample["run_alias"] = str(
                 row_sample["fastq_r1"] + "_" + row_sample["fastq_r2"]
             )
+
             additional_metadata.append(row_sample)
 
         return additional_metadata

@@ -182,9 +182,7 @@ class MappingSchema:
                     "sequencing_sample_id"
                 ]
                 mapped_json_data[idx]["file_type"] = "fastq"
-                mapped_json_data[idx]["collector_name"] = self.json_data[idx][
-                    "author_submitter"
-                ]
+                # mapped_json_data[idx]["collector_name"] = self.json_data[idx][ "author_submitter"]
                 mapped_json_data[idx]["library_name"] = self.json_data[idx][
                     "library_kit"
                 ]
@@ -206,10 +204,6 @@ class MappingSchema:
                 mapped_json_data[idx][
                     "sequencing_instrument_platform"
                 ] = self.json_data[idx]["sequencing_instrument_platform"].upper()
-
-                mapped_json_data[idx]["instrument_model"] = self.json_data[idx][
-                    "sequencing_instrument_model"
-                ]
 
                 if (
                     "nextseq"
@@ -235,9 +229,17 @@ class MappingSchema:
                         in self.json_data[idx]["sequencing_instrument_model"].lower()
                     ):
                         mapped_json_data[idx]["instrument_model"] = "NextSeq 550"
+                    if (
+                        "illumina nextseq"
+                        in self.json_data[idx]["sequencing_instrument_model"].lower()
+                    ):
+                        mapped_json_data[idx]["instrument_model"] = "NextSeq 550"
+                else:
+                    mapped_json_data[idx]["instrument_model"] = self.json_data[idx][
+                        "sequencing_instrument_model"
+                    ]
 
-                # mapped_json_data[idx]["host subject id"] = ""
-                mapped_json_data[idx]["host health state"] = "unknown"
+                mapped_json_data[idx]["host health state"] = "not provided"
                 mapped_json_data[idx]["sample_description"] = ""
                 mapped_json_data[idx]["design_description"] = ""
                 mapped_json_data[idx]["insert_size"] = "0"
