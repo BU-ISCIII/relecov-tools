@@ -233,9 +233,13 @@ class FeedDatabase:
         """Send the request to update database"""
         for chunk in field_values:
             if "sample_name" in chunk:
-                stderr.print(f"[blue] sending request for sample {chunk['sample_name']}")
+                stderr.print(
+                    f"[blue] sending request for sample {chunk['sample_name']}"
+                )
             elif "sequencing_sample_id" in chunk:
-                stderr.print(f"[blue] sending request for sample {chunk['sequencing_sample_id']}")
+                stderr.print(
+                    f"[blue] sending request for sample {chunk['sequencing_sample_id']}"
+                )
             result = self.database_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
@@ -275,7 +279,9 @@ class FeedDatabase:
                 )
             else:
                 log.info("stored data in relecov")
-        stderr.print(f"[gren] All information was sent sucessfuly to {self.server_type}")
+        stderr.print(
+            f"[gren] All information was sent sucessfuly to {self.server_type}"
+        )
         return
 
     def store_data(self):
@@ -285,9 +291,7 @@ class FeedDatabase:
         map_fields = {}  #
         if self.type_of_info == "sample":
             if self.server_type == "iskylims":
-                stderr.print(
-                    f"[blue] Getting sample fields from {self.server_type}"
-                )
+                stderr.print(f"[blue] Getting sample fields from {self.server_type}")
                 sample_fields, s_project_fields = self.get_iskylims_fields_sample()
                 stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_iskylims_sample_fields_values(
