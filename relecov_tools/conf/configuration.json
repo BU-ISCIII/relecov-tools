@@ -113,7 +113,7 @@
             "url": "/wetlab/api/",
             "store_samples": "createSampleData",
             "url_project_fields": "sampleProjectFields",
-            "url_sample_fields": "samplefields",
+            "url_sample_fields": "sampleFields",
             "param_sample_project": "project",
             "project_name": "relecov",
             "token": ""
@@ -148,6 +148,7 @@
         "microbiology_lab_sample_id",
         "r1_fastq_filepath",
         "r2_fastq_filepath",
+        "collecting_lab_sample_id",
         "sequence_file_R1_fastq",
         "sequence_file_R2_fastq",
         "sequencing_sample_id",
