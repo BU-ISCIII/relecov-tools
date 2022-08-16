@@ -1,4 +1,5 @@
 import logging
+from re import template
 
 # from pyparsing import col
 import xml.etree.ElementTree as ET
@@ -34,7 +35,7 @@ import site
 pd.options.mode.chained_assignment = None
 
 template_path = os.path.join(site.getsitepackages()[0], "ena_upload", "templates")
-
+template_path = os.path.join(os.getcwd(), "relecov_tools/templates")
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -161,7 +162,9 @@ class EnaUpload:
                 "isolate",
                 "host_subject_id",
                 "host health state",
+                "authors",
                 "sample_description",
+                "address",
             ]
         ]
 
@@ -210,6 +213,7 @@ class EnaUpload:
                 "file_type",
                 "fastq_r1_md5",
                 "fastq_r2_md5",
+                "collecting_institution",
             ]
         ]
 
@@ -267,6 +271,7 @@ class EnaUpload:
                 "library_layout",
                 "instrument_model",
                 "design_description",
+                "collecting_institution",
                 "insert_size",
                 "sequencing_instrument_platform",
             ]
@@ -293,6 +298,9 @@ class EnaUpload:
         )
         df_experiments = df_experiments.rename(columns={"study_title": "title"})
         df_experiments = df_experiments.rename(columns={"sample_name": "sample_alias"})
+        df_experiments = df_experiments.rename(
+            columns={"collecting_institution": "collecting institution"}
+        )
 
         # df_experiments example
         """
@@ -389,6 +397,7 @@ class EnaUpload:
 
             tree = ET.parse(schema_xmls["sample"])
             root = tree.getroot()
+            """
 
             for files in root.iter("SAMPLE_ATTRIBUTES"):
                 tag = ET.SubElement(files, "SAMPLE_ATTRIBUTE")
@@ -398,6 +407,7 @@ class EnaUpload:
                 tag_3.text = str("ERC000033")
 
             tree.write(schema_xmls["sample"])
+            """
 
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"

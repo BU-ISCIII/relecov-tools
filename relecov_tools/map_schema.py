@@ -240,9 +240,18 @@ class MappingSchema:
                     ]
 
                 mapped_json_data[idx]["host health state"] = "not provided"
+                mapped_json_data[idx]["center_name"] = mapped_json_data[idx][
+                    "collecting_institution"
+                ]
+                mapped_json_data[idx]["authors"] = self.json_data[idx]["authors"]
                 mapped_json_data[idx]["sample_description"] = ""
                 mapped_json_data[idx]["design_description"] = ""
                 mapped_json_data[idx]["insert_size"] = "0"
+                mapped_json_data[idx]["address"] = (
+                    self.json_data[idx]["geo_loc_city"]
+                    + ", "
+                    + self.json_data[idx]["geo_loc_country"]
+                )
 
         return mapped_json_data
 
