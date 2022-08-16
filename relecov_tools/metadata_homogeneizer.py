@@ -227,8 +227,20 @@ class MetadataHomogeneizer:
     def write_to_excel_file(self, data, f_name):
         book = openpyxl.Workbook()
         sheet = book.active
+
         for row in data:
             sheet.append(row)
+        # adding one column with row number
+        sheet.insert_cols(1)
+        sheet["A1"] = "Campo"
+        counter = 1
+        for i in range(len(data)):
+            idx = "A" + str(counter + 1)
+            sheet[idx] = counter
+            counter += 1
+        # adding 3 empty rows
+        for x in range(3):
+            sheet.insert_rows(1)
         sheet.title = "METADATA_LAB"
         book.save(f_name)
         return
@@ -244,5 +256,6 @@ class MetadataHomogeneizer:
         stderr.print("[blue] reading and mapping de information that are in files")
         converted_data = self.handling_additional_files(additional_data)
         f_name = os.path.join(self.output_folder, "converted_metadata_lab.xlsx")
+        stderr.print("[blue] Dumping information to excel")
         self.write_to_excel_file(converted_data, f_name)
         return
