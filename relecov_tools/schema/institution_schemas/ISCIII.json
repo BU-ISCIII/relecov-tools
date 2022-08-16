@@ -37,7 +37,7 @@
                 "Diagnostic Pcr Ct Value 1": "",
                 "Authors": ""
             },
-            "function" : "None"
+            "function": "None"
         },
         "sample_file": {
             "file_name": "sample_data.json",
@@ -45,20 +45,20 @@
                 "Sequence file R1 fastq": "sequence_file_R1_fastq",
                 "Sequence file R2 fastq": "sequence_file_R2_fastq"
             },
-            "mapped_key": "Sample ID given for sequencing",
-            "function":"None"
+            "function": "None",
+            "mapped_key": "Sample ID given for sequencing"
         },
         "run_id_file": {
             "file_name": "samples_run_services.tsv",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Runid": "run_name"
             },
-            "mapped_key": "Sample ID given for sequencing",
-            "function":"None"
+            "function": "None",
+            "mapped_key": "Sample ID given for sequencing"
         },
         "org_lab_file": {
             "file_name": "laboratory_mapping_list.tsv",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Originating Laboratory": "mapped_org_lab"
             },
             "mapped_key": "",
@@ -66,7 +66,7 @@
         },
         "sequencer_file": {
             "file_name": "samples_run_services.tsv",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Sequencing Instrument Model": "run_name"
             },
             "mapped_key": "",
@@ -74,7 +74,7 @@
         },
         "host_gender_file": {
             "file_name": "",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Host Gender": ""
             },
             "mapped_key": "",
@@ -82,7 +82,7 @@
         },
         "authors_file": {
             "file_name": "gisaid_authors.tsv",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Authors": "authors"
             },
             "mapped_key": "GISAID id",
@@ -90,7 +90,7 @@
         },
         "run_date": {
             "file_name": "runName_runDate.tsv",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Sequencing Date": "run_date"
             },
             "mapped_key": "Runid",
@@ -98,7 +98,7 @@
         },
         "samples_in_run": {
             "file_name": "run_and_num_of_samples.csv",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Number Of Samples In Run": "num_samples"
             },
             "mapped_key": "Runid",
@@ -106,11 +106,11 @@
         },
         "artic_version": {
             "file_name": "samples_artic_version.tsv",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Enrichment panel/assay version": "artic_version"
             },
             "mapped_key": "Sample ID given for sequencing",
-            "function":"None"
+            "function": "None"
         }
     }
 }
