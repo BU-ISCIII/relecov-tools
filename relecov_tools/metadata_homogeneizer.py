@@ -172,32 +172,30 @@ class MetadataHomogeneizer:
                         + " is not supported"
                     )
                     sys.exit(1)
-                sample_idx = self.heading.index("Sample ID given for sequencing")
+
             else:
                 data = ""
 
             if additional_file["function"] == "None":
+                mapping_idx = self.heading.index(additional_file["mapped_key"])
                 for row in additional_data[1:]:
                     # new_row_data = []
-                    s_value = str(row[sample_idx])
+                    s_value = str(row[mapping_idx])
                     try:
                         item_data = data[s_value]
                     except KeyError:
-                        pass
-                        """
                         log.error(
                             "Additional file %s does not have the information for %s ",
                             f_name,
                             s_value,
                         )
                         stderr.print(
-                            "[red] Additional file "
+                            "[yellow] Additional file "
                             + f_name
                             + " does not have information for "
                             + str(s_value)
                         )
                         continue
-                        """
                         # sys.exit(1)
                     for m_field, f_field in additional_file["mapped_fields"].items():
                         try:
@@ -229,8 +227,20 @@ class MetadataHomogeneizer:
     def write_to_excel_file(self, data, f_name):
         book = openpyxl.Workbook()
         sheet = book.active
+
         for row in data:
             sheet.append(row)
+        # adding one column with row number
+        sheet.insert_cols(1)
+        sheet["A1"] = "Campo"
+        counter = 1
+        for i in range(len(data)):
+            idx = "A" + str(counter + 1)
+            sheet[idx] = counter
+            counter += 1
+        # adding 3 empty rows
+        for x in range(3):
+            sheet.insert_rows(1)
         sheet.title = "METADATA_LAB"
         book.save(f_name)
         return
@@ -243,8 +253,9 @@ class MetadataHomogeneizer:
         stderr.print("[blue] Adding fixed information")
         additional_data = self.additional_fields(mapped_data)
         # Fetch the additional files and include the information in metadata
-        stderr.print("[blue] reading and mapping de information that cames in files")
+        stderr.print("[blue] reading and mapping de information that are in files")
         converted_data = self.handling_additional_files(additional_data)
         f_name = os.path.join(self.output_folder, "converted_metadata_lab.xlsx")
+        stderr.print("[blue] Dumping information to excel")
         self.write_to_excel_file(converted_data, f_name)
         return

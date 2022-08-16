@@ -82,7 +82,7 @@ class FeedDatabase:
         if database_server is None:
             database_server = relecov_tools.utils.prompt_selection(
                 "Select:",
-                ["iskylims", "relecov", "relecov_local"],
+                ["iskylims", "relecov"],
             )
         self.server_type = database_server
         # Get database settings
@@ -122,7 +122,7 @@ class FeedDatabase:
                 elif key in s_fields:
                     s_dict[sample_fields[key]] = value
                 else:
-                    print("not key in iSkyLIMS", key)
+                    log.info("not key %s in iSkyLIMS", key)
             # include the fix value
             if self.server_type == "iskylims":
                 fixed_value = self.config_json.get_configuration(
@@ -174,7 +174,7 @@ class FeedDatabase:
                 # for the ones that do no have ontologuy label is the sample field
                 # and the value is empty
                 # sample_fields[key] = ""
-                print(values["field_name"])
+                log.info("not ontology for item  %s", values["field_name"])
 
         # fetch label for sample Project
         s_project_url = self.database_settings["url_project_fields"]
@@ -232,7 +232,14 @@ class FeedDatabase:
     def update_database(self, field_values, post_url):
         """Send the request to update database"""
         for chunk in field_values:
-            # print(chunk)
+            if "sample_name" in chunk:
+                stderr.print(
+                    f"[blue] sending request for sample {chunk['sample_name']}"
+                )
+            elif "sequencing_sample_id" in chunk:
+                stderr.print(
+                    f"[blue] sending request for sample {chunk['sequencing_sample_id']}"
+                )
             result = self.database_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
@@ -272,6 +279,9 @@ class FeedDatabase:
                 )
             else:
                 log.info("stored data in relecov")
+        stderr.print(
+            f"[gren] All information was sent sucessfuly to {self.server_type}"
+        )
         return
 
     def store_data(self):
@@ -281,23 +291,19 @@ class FeedDatabase:
         map_fields = {}  #
         if self.type_of_info == "sample":
             if self.server_type == "iskylims":
+                stderr.print(f"[blue] Getting sample fields from {self.server_type}")
                 sample_fields, s_project_fields = self.get_iskylims_fields_sample()
+                stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_iskylims_sample_fields_values(
                     sample_fields, s_project_fields
                 )
             else:
+                stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_relecov_sample_data()
             post_url = "store_samples"
         elif self.type_of_info == "analysis":
-            if self.server_type == "relecov":
-                print("relecov")
-                post_url = "analysis"
-                map_fields = self.map_relecov_bioinfo_data()
-
-            elif self.server_type == "relecov_local":
-                print("relecov_local")
-                post_url = "analysis"
-                map_fields = self.map_relecov_bioinfo_data()
+            post_url = "analysis"
+            map_fields = self.map_relecov_bioinfo_data()
 
         elif self.type_of_info == "longtable":
             post_url = "long_table"
@@ -305,3 +311,4 @@ class FeedDatabase:
             stderr.print("[red] Invalid type to upload to database")
             sys.exit(1)
         self.update_database(map_fields, post_url)
+        stderr.print(f"[green] Upload process to {self.server_type} completed")

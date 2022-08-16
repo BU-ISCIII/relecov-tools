@@ -62,7 +62,7 @@ def added_seq_inst_model(metadata, f_data, mapped_fields, heading):
 
 def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
     """Translate into english the host gender that is written in spanish"""
-    for row in metadata:
+    for row in metadata[1:]:
         for key, val in mapped_fields.items():
             m_idx = heading.index(key)
             if row[m_idx] is None:
@@ -77,4 +77,6 @@ def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
                 row[m_idx] = "not provided"
             elif "unknown" in row[m_idx].lower():
                 row[m_idx] = "not provided"
+            else:
+                row[m_idx] = "not applicable"
     return metadata

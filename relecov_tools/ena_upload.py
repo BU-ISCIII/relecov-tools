@@ -165,6 +165,9 @@ class EnaUpload:
             ]
         ]
 
+        df_samples["host_sex"].replace("unknown", "not provided", inplace=True)
+        df_samples["host_sex"].replace("Unknown", "not provided", inplace=True)
+
         df_samples = df_samples.rename(columns={"sample_name": "alias"})
         df_samples = df_samples.rename(columns={"sample_title": "title"})
         df_samples = df_samples.rename(
@@ -350,7 +353,6 @@ class EnaUpload:
                 g2 = session.quit()
                 print(g2)
             """
-
             # THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
             # chec = submit_data(file_paths, self.passwd, self.user)
             # print(chec)
@@ -392,8 +394,8 @@ class EnaUpload:
                 tag = ET.SubElement(files, "SAMPLE_ATTRIBUTE")
                 tag_2 = ET.SubElement(tag, "TAG")
                 tag_2.text = str("ENA-CHECKLIST")
-                tag_2 = ET.SubElement(tag, "VALUE")
-                tag_2.text = str("ERC000033")
+                tag_3 = ET.SubElement(tag, "VALUE")
+                tag_3.text = str("ERC000033")
 
             tree.write(schema_xmls["sample"])
 

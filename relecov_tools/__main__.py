@@ -137,14 +137,18 @@ def relecov_tools_cli(verbose, log_file):
 @relecov_tools_cli.command(help_priority=2)
 @click.option("-u", "--user", help="User name for login to sftp server")
 @click.option("-p", "--password", help="password for the user to login")
+@click.option("-r_u", "--user_relecov", help="User name for updating data to relecov")
+@click.option("-p_r", "--password_relecov", help="password for relecov user")
 @click.option(
     "-f",
     "--conf_file",
     help="Configuration file (no params file)",
 )
-def download(user, password, conf_file):
+def download(user, password, conf_file, user_relecov, password_relecov):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file)
+    sftp_connection = relecov_tools.sftp_handle.SftpHandle(
+        user, password, conf_file, user_relecov, password_relecov
+    )
     sftp_connection.download()
 
 
