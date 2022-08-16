@@ -291,7 +291,6 @@ class FeedDatabase:
             post_url = "store_samples"
         elif self.type_of_info == "analysis":
             if self.server_type == "relecov":
-                print("relecov")
                 post_url = "analysis"
                 map_fields = self.map_relecov_bioinfo_data()
 
@@ -305,10 +304,9 @@ class FeedDatabase:
 
 
             elif self.server_type == "relecov_local":
-                print("relecov_local")
                 post_url = "analysis"
                 map_fields = self.map_relecov_bioinfo_data()
-            post_url = "analysis"
+            # post_url = "analysis"
         elif self.type_of_info == "longtable":
             post_url = "long_table"
         else:
