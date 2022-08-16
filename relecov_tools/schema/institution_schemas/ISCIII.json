@@ -37,7 +37,7 @@
                 "Diagnostic Pcr Ct Value 1": "",
                 "Authors": ""
             },
-            "function" : "None"
+            "function": "None"
         },
         "sample_file": {
             "file_name": "sample_data.json",
@@ -45,32 +45,32 @@
                 "Sequence file R1 fastq": "sequence_file_R1_fastq",
                 "Sequence file R2 fastq": "sequence_file_R2_fastq"
             },
-            "function":"None"
+            "function": "None"
         },
         "run_id_file": {
             "file_name": "samples_run_services.tsv",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Runid": "run_name"
             },
-            "function":"None"
+            "function": "None"
         },
         "org_lab_file": {
             "file_name": "laboratory_mapping_list.tsv",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Originating Laboratory": "mapped_org_lab"
             },
             "function": "replace_originating_lab"
         },
         "sequencer_file": {
             "file_name": "samples_run_services.tsv",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Sequencing Instrument Model": "run_name"
             },
             "function": "added_seq_inst_model"
         },
         "host_gender_file": {
             "file_name": "",
-            "mapped_fields":{
+            "mapped_fields": {
                 "Host Gender": ""
             },
             "function": "translate_gender_to_english"
