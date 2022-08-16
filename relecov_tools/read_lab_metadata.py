@@ -3,7 +3,8 @@ from itertools import islice
 
 import json
 import logging
-from queue import Empty
+
+# from queue import Empty
 
 # from turtle import heading
 import rich.console
