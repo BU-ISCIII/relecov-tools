@@ -263,10 +263,14 @@ class RelecovMetadata:
             """
             # Add experiment_alias and run_alias
             row_sample["experiment_alias"] = str(
-                row_sample["sequence_file_R1_fastq"] + "_" + row_sample["sequence_file_R2_fastq"]
+                row_sample["sequence_file_R1_fastq"]
+                + "_"
+                + row_sample["sequence_file_R2_fastq"]
             )
             row_sample["run_alias"] = str(
-                row_sample["sequence_file_R1_fastq"] + "_" + row_sample["sequence_file_R2_fastq"]
+                row_sample["sequence_file_R1_fastq"]
+                + "_"
+                + row_sample["sequence_file_R2_fastq"]
             )
             additional_metadata.append(row_sample)
 
