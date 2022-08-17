@@ -398,8 +398,6 @@ class EnaUpload:
             """
             tree = ET.parse(schema_xmls["sample"])
             root = tree.getroot()
-            
-
             for files in root.iter("SAMPLE_ATTRIBUTES"):
                 tag = ET.SubElement(files, "SAMPLE_ATTRIBUTE")
                 tag_2 = ET.SubElement(tag, "TAG")
