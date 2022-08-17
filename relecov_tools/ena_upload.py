@@ -395,11 +395,9 @@ class EnaUpload:
                     files.set("checksum", H)
                     # print(files.attrib["checksum"])
             tree.write(schema_xmls["run"])
-
+            """
             tree = ET.parse(schema_xmls["sample"])
             root = tree.getroot()
-            """
-
             for files in root.iter("SAMPLE_ATTRIBUTES"):
                 tag = ET.SubElement(files, "SAMPLE_ATTRIBUTE")
                 tag_2 = ET.SubElement(tag, "TAG")
