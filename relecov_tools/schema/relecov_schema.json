@@ -1,5 +1,6 @@
 {
     "schema": "RELECOV",
+    "version": "0.1.0",
     "required": [
         "collecting_lab_sample_id",
         "collecting_institution",
