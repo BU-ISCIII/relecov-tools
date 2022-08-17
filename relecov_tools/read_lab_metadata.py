@@ -130,7 +130,7 @@ class RelecovMetadata:
         }
         fixed_data.update(self.configuration.get_configuration("ENA_configuration"))
         fixed_data["schema_name"] = self.schema_name
-        fixed_data["version"] = self.schema_version
+        fixed_data["schema_version"] = self.schema_version
         return fixed_data
 
     def include_fields_already_set(self, row_sample):
