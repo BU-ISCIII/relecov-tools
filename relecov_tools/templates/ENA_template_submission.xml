@@ -2,7 +2,7 @@
 <SUBMISSION_SET xmlns:py="http://genshi.edgewall.org/"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_6/SRA.submission.xsd">
-  <SUBMISSION center_name="$center">
+  <SUBMISSION>
     <ACTIONS>
       <py:choose test="">
         <py:when test="action in ['ADD', 'MODIFY']">

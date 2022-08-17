@@ -143,8 +143,8 @@ class BioinfoMetadata:
             fastq_r2 = row[48]
             bioinfo_dict = {}
             bioinfo_dict["sample_name"] = str(sample_name)
-            bioinfo_dict["fastq_r1"] = fastq_r1
-            bioinfo_dict["fastq_r2"] = fastq_r2
+            bioinfo_dict["sequence_file_R1_fastq"] = fastq_r1
+            bioinfo_dict["sequence_file_R2_fastq"] = fastq_r2
             # inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict
             for key in relecov_bioinfo_metadata.keys():
                 bioinfo_dict[key] = relecov_bioinfo_metadata[key]
