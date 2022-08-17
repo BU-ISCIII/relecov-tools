@@ -396,9 +396,12 @@ class EnaUpload:
                     # print(files.attrib["checksum"])
             tree.write(schema_xmls["run"])
 
+            # mapping_illumina_tab_path = os.path.join(self.input_folder, self.mapping_illumina)
+
+            """
             tree = ET.parse(schema_xmls["sample"])
             root = tree.getroot()
-            """
+            
 
             for files in root.iter("SAMPLE_ATTRIBUTES"):
                 tag = ET.SubElement(files, "SAMPLE_ATTRIBUTE")
