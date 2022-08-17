@@ -87,6 +87,30 @@
             },
             "mapped_key": "GISAID id",
             "function": "None"
+        },
+        "run_date": {
+            "file_name": "runName_runDate.tsv",
+            "mapped_fields":{
+                "Sequencing Date": "run_date"
+            },
+            "mapped_key": "Runid",
+            "function": "None"
+        },
+        "samples_in_run": {
+            "file_name": "run_and_num_of_samples.csv",
+            "mapped_fields":{
+                "Number Of Samples In Run": "num_samples"
+            },
+            "mapped_key": "Runid",
+            "function": "None"
+        },
+        "artic_version": {
+            "file_name": "samples_artic_version.tsv",
+            "mapped_fields":{
+                "Enrichment panel/assay version": "artic_version"
+            },
+            "mapped_key": "Sample ID given for sequencing",
+            "function":"None"
         }
     }
 }

@@ -345,19 +345,8 @@ class RelecovMetadata:
         return True
 
     def create_metadata_json(self):
+        stderr.print("[blue] Reading configuration settings")
         config_json = ConfigJson()
-        """
-        schema_location = config_json.get_topic_data(
-            "json_schemas", "phage_plus_schema"
-        )
-        schema_location_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "schema", schema_location
-        )
-        schema_json = self.read_json_file(schema_location_file)
-        phage_plus_schema = relecov_tools.schema_json.PhagePlusSchema(schema_json)
-        properties_in_schema = phage_plus_schema.get_schema_properties()
-        """
-
         geo_loc_json = config_json.get_configuration("geo_location_data")
         geo_loc_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "conf", geo_loc_json
@@ -366,38 +355,24 @@ class RelecovMetadata:
         lab_json_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "conf", lab_json
         )
-        """
-        metadata_mapping_json = config_json.get_configuration("mapping_metadata_json")
-        meta_map_json_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "schema", metadata_mapping_json
-        )
-        meta_map_json = self.read_json_file(meta_map_json_file)
-        """
+        stderr.print("[blue] Reading Lab Metadata Excel File")
         valid_metadata_rows, errors = self.read_metadata_file()
         if len(errors) > 0:
             stderr.print("[red] Stopped executing because the errors found")
             sys.exit(1)
         # Continue by adding extra information
-
+        stderr.print("[blue] Including additional information")
         completed_metadata = self.add_additional_data(
             valid_metadata_rows,
             lab_json_file,
             geo_loc_file,
         )
-        # comp_result = self.compare_sample_in_metadata(completed_metadata)
-        """
-        if isinstance(comp_result, list):
-            missing_samples = ",".join(comp_result)
-            log.error("Missing samples %s", missing_samples)
-        elif comp_result:
-            log.info("Samples in metadata matches with the ones uploaded")
-        else:
-            log.error("There is missing samples in metadata and/or uploaded")
-        """
+
         file_name = (
             "processed_"
             + os.path.splitext(os.path.basename(self.metadata_file))[0]
             + ".json"
         )
+        stderr.print("[blue] Creating Json file")
         self.write_json_fo_file(completed_metadata, file_name)
         return True
