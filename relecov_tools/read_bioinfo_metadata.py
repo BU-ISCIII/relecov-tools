@@ -139,6 +139,7 @@ class BioinfoMetadata:
             print(sample_name)
 
             fastq_r1 = row[47]
+
             fastq_r2 = row[48]
             bioinfo_dict = {}
             bioinfo_dict["sample_name"] = str(sample_name)
