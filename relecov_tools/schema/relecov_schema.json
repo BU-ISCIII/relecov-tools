@@ -1,5 +1,6 @@
 {
     "schema": "RELECOV",
+    "version": "0.1.0",
     "required": [
         "collecting_lab_sample_id",
         "collecting_institution",
@@ -1072,7 +1073,7 @@
             "label": "Enrichment panel/assay",
             "fill_mode": "batch"
         },
-        "if_amplicon_protocol_if_other_especify": {
+        "if_amplicon_protocol_if_other_specify": {
             "examples": [
                 ""
             ],
@@ -1080,7 +1081,7 @@
             "type": "string",
             "description": "",
             "classification": "Sequencing",
-            "label": "If Enrichment panel/assay If Other, Especify",
+            "label": "If Enrichment panel/assay Is Other, Specify",
             "fill_mode": "batch"
         },
         "amplicon_version": {
@@ -1127,7 +1128,7 @@
             "label": "Runid",
             "fill_mode": "batch"
         },
-        "sequencing_platforms": {
+        "sequencing_instrument_platform": {
             "examples": [
                 ""
             ],
@@ -1135,7 +1136,7 @@
             "type": "string",
             "description": "",
             "classification": "Sequencing",
-            "label": "Sequencing Platforms ",
+            "label": "Sequencing Instrument Platform",
             "fill_mode": "batch"
         },
         "library_preparation_kit": {
@@ -1457,7 +1458,7 @@
             "label": "Depth of coverage threshold",
             "fill_mode": "batch"
         },
-        "fastq_r1": {
+        "sequence_file_R1_fastq": {
             "examples": [
                 "ABC123_S1_L001_R1_001.fastq.gz"
             ],
@@ -1468,7 +1469,7 @@
             "label": "Sequence file R1 fastq",
             "fill_mode": "sample"
         },
-        "fastq_r2": {
+        "sequence_file_R2_fastq": {
             "examples": [
                 "ABC123_S1_L001_R2_002.fastq.gz"
             ],
