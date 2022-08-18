@@ -62,6 +62,7 @@ class RelecovMetadata:
             os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
         )
         self.configuration = config_json
+
         with open(relecov_sch_path, "r") as fh:
             self.relecov_sch_json = json.load(fh)
         self.label_prop_dict = {}
@@ -70,6 +71,8 @@ class RelecovMetadata:
                 self.label_prop_dict[values["label"]] = prop
             except KeyError:
                 continue
+        self.schema_name = self.relecov_sch_json["schema"]
+        self.schema_version = self.relecov_sch_json["version"]
 
     def fetch_metadata_file(folder, file_name):
         """Fetch the metadata file folder  Directory to fetch metadata file
@@ -126,6 +129,8 @@ class RelecovMetadata:
             "sample_description": "Sample for surveillance",
         }
         fixed_data.update(self.configuration.get_configuration("ENA_configuration"))
+        fixed_data["schema_name"] = self.schema_name
+        fixed_data["schema_version"] = self.schema_version
         return fixed_data
 
     def include_fields_already_set(self, row_sample):
@@ -258,12 +263,15 @@ class RelecovMetadata:
             """
             # Add experiment_alias and run_alias
             row_sample["experiment_alias"] = str(
-                row_sample["fastq_r1"] + "_" + row_sample["fastq_r2"]
+                row_sample["sequence_file_R1_fastq"]
+                + "_"
+                + row_sample["sequence_file_R2_fastq"]
             )
             row_sample["run_alias"] = str(
-                row_sample["fastq_r1"] + "_" + row_sample["fastq_r2"]
+                row_sample["sequence_file_R1_fastq"]
+                + "_"
+                + row_sample["sequence_file_R2_fastq"]
             )
-
             additional_metadata.append(row_sample)
 
         return additional_metadata

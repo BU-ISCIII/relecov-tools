@@ -41,8 +41,8 @@ class RestApi:
                 return {"ERROR": req.status_code}
             return {"DATA": json.loads(req.text)}
         except requests.ConnectionError:
-            log.error("Unable to open connection towards %s", self.server)
-            stderr.print("[red] Unable to open connection towards ", self.server)
+            log.error("Unable to open connection towards %s", self.request_url)
+            stderr.print("[red] Unable to open connection towards ", self.request_url)
             return {"ERROR": "Server not available"}
 
     def put_request(self, data, credentials, url):
