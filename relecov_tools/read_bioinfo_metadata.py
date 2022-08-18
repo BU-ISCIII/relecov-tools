@@ -66,6 +66,18 @@ class BioinfoMetadata:
         else:
             self.mapping_illumina = mapping_illumina
 
+        config_json = ConfigJson()
+        relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
+        relecov_sch_path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
+        )
+        self.configuration = config_json
+
+        with open(relecov_sch_path, "r") as fh:
+            self.relecov_sch_json = json.load(fh)
+        self.schema_name = self.relecov_sch_json["schema"]
+        self.schema_version = self.relecov_sch_json["version"]
+
     def bioinfo_parse(self, file_name):
         """Fetch the metadata file folder  Directory to fetch metadata file
         file_name   metadata file name
@@ -297,6 +309,9 @@ class BioinfoMetadata:
 
             bioinfo_list[str(sample_name)] = bioinfo_dict
             c = c + 1
+            # adding schema_name and schema_version
+            bioinfo_dict["schema_name"] = self.schema_name
+            bioinfo_dict["schema_version"] = self.schema_version
 
         json_file = "bioinfo_metadata.json"
         output_path = os.path.join(self.output_folder, json_file)
