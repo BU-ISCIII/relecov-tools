@@ -4,7 +4,6 @@
 import logging
 import json
 import datetime
-from operator import contains
 import re
 
 import rich.console
