@@ -232,7 +232,7 @@ class BioinfoMetadata:
 
             for i in range(len(md5_info)):
                 g = re.match(str(bioinfo_dict["sample_name"]) + "$", md5_info[0][i])
-                if g != None:
+                if g not None:
                     bioinfo_dict["consensus_sequence_R1_name"] = md5_info[2][i]
                     bioinfo_dict["consensus_sequence_R2_name"] = md5_info[2][i + 1]
                     bioinfo_dict["consensus_sequence_R1_md5"] = md5_info[1][i]
