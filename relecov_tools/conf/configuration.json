@@ -149,6 +149,8 @@
         "r1_fastq_filepath",
         "r2_fastq_filepath",
         "collecting_lab_sample_id",
+        "schema_name",
+        "schema_version",
         "sequence_file_R1_fastq",
         "sequence_file_R2_fastq",
         "sequencing_sample_id",
