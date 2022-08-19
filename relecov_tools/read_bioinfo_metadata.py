@@ -229,26 +229,27 @@ class BioinfoMetadata:
                             cons_array.values[i, 1]
                         )
             # fields from md5 file
-            bioinfo_dict["consensus_sequence_R1_name"] = str(
-                md5_info.loc[
-                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[0, 2]
-            )
-            bioinfo_dict["consensus_sequence_R2_name"] = str(
-                md5_info.loc[
-                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[1, 2]
-            )
-            bioinfo_dict["consensus_sequence_R1_md5"] = str(
-                md5_info.loc[
-                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[0, 1]
-            )
-            bioinfo_dict["consensus_sequence_R2_md5"] = str(
-                md5_info.loc[
-                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[1, 1]
-            )
+
+            for i in range(len(md5_info)):
+                if "-2" in bioinfo_dict["sequence_file_R1_fastq"]:
+                    g = re.match(
+                        str(bioinfo_dict["sequence_file_R1_fastq"][0:8]) + "$",
+                        md5_info[0][i],
+                    )
+                elif "-B" in bioinfo_dict["sequence_file_R1_fastq"]:
+
+                    g = re.match(
+                        str(bioinfo_dict["sequence_file_R1_fastq"][0:8]) + "$",
+                        md5_info[0][i],
+                    )
+                else:
+                    g = re.match(str(bioinfo_dict["sample_name"]) + "$", md5_info[0][i])
+                if g is not None:
+                    bioinfo_dict["consensus_sequence_R1_name"] = md5_info[2][i]
+                    bioinfo_dict["consensus_sequence_R2_name"] = md5_info[2][i + 1]
+                    bioinfo_dict["consensus_sequence_R1_md5"] = md5_info[1][i]
+                    bioinfo_dict["consensus_sequence_R2_md5"] = md5_info[1][i + 1]
+                    break
 
             # fields from software version file
             bioinfo_dict["dehosting_method_software_version"] = str(
