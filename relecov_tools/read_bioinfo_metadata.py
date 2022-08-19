@@ -4,6 +4,7 @@
 import logging
 import json
 import datetime
+from operator import contains
 import re
 
 import rich.console
@@ -231,7 +232,19 @@ class BioinfoMetadata:
             # fields from md5 file
 
             for i in range(len(md5_info)):
-                g = re.match(str(bioinfo_dict["sample_name"]) + "$", md5_info[0][i])
+                if "-2" in bioinfo_dict["sequence_file_R1_fastq"]:
+                    g = re.match(
+                        str(bioinfo_dict["sequence_file_R1_fastq"][0:8]) + "$",
+                        md5_info[0][i],
+                    )
+                elif "-B" in bioinfo_dict["sequence_file_R1_fastq"]:
+
+                    g = re.match(
+                        str(bioinfo_dict["sequence_file_R1_fastq"][0:8]) + "$",
+                        md5_info[0][i],
+                    )
+                else:
+                    g = re.match(str(bioinfo_dict["sample_name"]) + "$", md5_info[0][i])
                 if g is not None:
                     bioinfo_dict["consensus_sequence_R1_name"] = md5_info[2][i]
                     bioinfo_dict["consensus_sequence_R2_name"] = md5_info[2][i + 1]
