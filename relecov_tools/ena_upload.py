@@ -433,6 +433,7 @@ class EnaUpload:
                 schema_dataframe = update_table(
                     schema_dataframe, schema_targets, schema_update
                 )
+            ######
 
     def upload(self):
         """Create the required files and upload to ENA"""
