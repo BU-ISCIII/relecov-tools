@@ -367,6 +367,7 @@ class EnaUpload:
             # print(chec)
 
             # when ADD/MODIFY,
+            #
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
             # schema_xmls record XMLs for all these schema and following 'submission'
 
@@ -433,6 +434,7 @@ class EnaUpload:
                 schema_dataframe = update_table(
                     schema_dataframe, schema_targets, schema_update
                 )
+            ######
 
     def upload(self):
         """Create the required files and upload to ENA"""

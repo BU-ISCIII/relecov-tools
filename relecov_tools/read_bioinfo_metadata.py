@@ -82,6 +82,10 @@ class BioinfoMetadata:
         """Fetch the metadata file folder  Directory to fetch metadata file
         file_name   metadata file name
         """
+        # FUNCTION read_files
+        """
+        Read all the files and create dataframes
+        """
 
         wb_file = openpyxl.load_workbook(file_name, data_only=True)
         ws_metadata_lab = wb_file["METADATA_LAB"]
@@ -143,6 +147,9 @@ class BioinfoMetadata:
         self.mapping_illumina_tab_field_list = config_json.get_configuration(
             "mapping_illumina_tab_field_list"
         )
+        # FUNCTION fill_bioinfo_dict
+        """Iterating through each row and each loaded file the values of the bioinfo_dict are filled"""
+
         bioinfo_list = {}
 
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
@@ -157,29 +164,26 @@ class BioinfoMetadata:
             bioinfo_dict["sample_name"] = str(sample_name)
             bioinfo_dict["sequence_file_R1_fastq"] = fastq_r1
             bioinfo_dict["sequence_file_R2_fastq"] = fastq_r2
-            # inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict
+            # FUNCTION config_data
+            """inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict"""
             for key in relecov_bioinfo_metadata.keys():
                 bioinfo_dict[key] = relecov_bioinfo_metadata[key]
             bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
             bioinfo_dict["long_table_path"] = self.input_folder
+            # FUNCTION mapping_illumina_data
             # fields from mapping_illumina.tab
-
             mapping_illumina_tab_sample = mapping_illumina_tab[
                 mapping_illumina_tab["sample"].str.contains(bioinfo_dict["sample_name"])
             ]
-
-            # for key in self.mapping_illumina_tab_field_list.keys():
             config_keys = list(self.mapping_illumina_tab_field_list.keys())
-
             for i in config_keys:
                 bioinfo_dict[i] = str(
                     mapping_illumina_tab_sample[
                         self.mapping_illumina_tab_field_list[i]
                     ].values[0]
                 )
-
+            # FUNCTION summary_metrics_data
             # fields from summary_variants_metrics_mqc.csv
-
             bioinfo_dict["number_of_base_pairs_sequenced"] = str(
                 summary_variants_metrics.loc[
                     summary_variants_metrics["Sample"].str.contains(
@@ -204,6 +208,7 @@ class BioinfoMetadata:
                     )
                 ]["# Trimmed reads (fastp)"].values[0]
             )
+            # FUNCTION long_table_data
             # fields from variants_long_table.csv
 
             if os.path.isfile(
@@ -217,7 +222,7 @@ class BioinfoMetadata:
                 bioinfo_dict["reference_genome_accession"] = str(chrom.values[0])
             else:
                 bioinfo_dict["reference_genome_accession"] = "NC_045512.2"
-
+            # FUNCTION genome_length_data
             # fields from consensus_genome_length
             cons_array = consensus_genome_length.loc[
                 consensus_genome_length[0].str.contains(bioinfo_dict["sample_name"])
@@ -228,28 +233,30 @@ class BioinfoMetadata:
                         bioinfo_dict["consensus_genome_length"] = str(
                             cons_array.values[i, 1]
                         )
+            # FUNCTION md5_data
             # fields from md5 file
-            bioinfo_dict["consensus_sequence_R1_name"] = str(
-                md5_info.loc[
-                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[0, 2]
-            )
-            bioinfo_dict["consensus_sequence_R2_name"] = str(
-                md5_info.loc[
-                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[1, 2]
-            )
-            bioinfo_dict["consensus_sequence_R1_md5"] = str(
-                md5_info.loc[
-                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[0, 1]
-            )
-            bioinfo_dict["consensus_sequence_R2_md5"] = str(
-                md5_info.loc[
-                    md5_info[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[1, 1]
-            )
 
+            for i in range(len(md5_info)):
+                if "-2" in bioinfo_dict["sequence_file_R1_fastq"]:
+                    g = re.match(
+                        str(bioinfo_dict["sequence_file_R1_fastq"][0:8]) + "$",
+                        md5_info[0][i],
+                    )
+                elif "-B" in bioinfo_dict["sequence_file_R1_fastq"]:
+
+                    g = re.match(
+                        str(bioinfo_dict["sequence_file_R1_fastq"][0:8]) + "$",
+                        md5_info[0][i],
+                    )
+                else:
+                    g = re.match(str(bioinfo_dict["sample_name"]) + "$", md5_info[0][i])
+                if g is not None:
+                    bioinfo_dict["consensus_sequence_R1_name"] = md5_info[2][i]
+                    bioinfo_dict["consensus_sequence_R2_name"] = md5_info[2][i + 1]
+                    bioinfo_dict["consensus_sequence_R1_md5"] = md5_info[1][i]
+                    bioinfo_dict["consensus_sequence_R2_md5"] = md5_info[1][i + 1]
+                    break
+            # FUNCTION software_data
             # fields from software version file
             bioinfo_dict["dehosting_method_software_version"] = str(
                 list(software_versions["KRAKEN2_KRAKEN2"].values())[0]
@@ -271,6 +278,7 @@ class BioinfoMetadata:
             bioinfo_dict["mapping_software_version"] = str(
                 list(software_versions["BOWTIE2_ALIGN"].values())[0]
             )
+            # FUNCTION pangolin_data
             # files from pangolin.csv file
 
             bioinfo_dict["lineage_analysis_software_version"] = str(
@@ -283,12 +291,7 @@ class BioinfoMetadata:
                     pangolin_version_table[0].str.contains(bioinfo_dict["sample_name"])
                 ].values[0][2]
             )
-            """
-            last_modified = os.path.getctime(variants_long_table_path)
-            last_modified_date = datetime.datetime.fromtimestamp(last_modified)
-            bioinfo_dict["analysis_date"] = str(last_modified_date)
 
-            """
             # get the date from pangolin files
             string = re.split("(\d+)", self.mapping_illumina)[1]
             year, month, day = int(string[:4]), int(string[4:6]), int(string[6:-1])
