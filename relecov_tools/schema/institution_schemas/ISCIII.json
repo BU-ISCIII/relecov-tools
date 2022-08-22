@@ -2,7 +2,7 @@
     "pyhon_file": "ISCIII.py",
     "required_files": {
         "meta_file": {
-            "file_name": "new_lab_metadata2022_07_20_13_35_38.xlsx",
+            "file_name": "new_lab_metadata.xlsx",
             "mapped_fields": {
                 "Public Health sample id (SIVIES)": "Código SiViEs",
                 "Sample ID given by originating laboratory": "Ref Hospital",

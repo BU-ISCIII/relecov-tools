@@ -24,13 +24,13 @@ import relecov_tools.gisaid_upload
 
 log = logging.getLogger()
 
+# Set up rich stderr console
+stderr = rich.console.Console(
+    stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
+)
+
 
 def run_relecov_tools():
-
-    # Set up rich stderr console
-    stderr = rich.console.Console(
-        stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
-    )
 
     # Set up the rich traceback
     rich.traceback.install(console=stderr, width=200, word_wrap=True, extra_lines=1)
@@ -205,8 +205,14 @@ def validate(json_file, json_schema, metadata, out_folder):
     ) = relecov_tools.json_validation.validate_json(json_file, json_schema, out_folder)
     if len(invalid_json) > 0:
         log.error("Some of the samples in json metadata were not validated")
+        stderr.print("[red] Some of the Samples are not validate")
         if not os.path.isfile(metadata):
-            log.error("Metadata file %s does not exists", metadata)
+            log.error("Metadata file %s does not exist", metadata)
+            stderr.print(
+                "[red] Unable to create excel file for invalid samples. Metadata file ",
+                metadata,
+                " does not exist",
+            )
             exit(1)
         relecov_tools.json_validation.create_invalid_metadata(
             metadata, invalid_json, out_folder
