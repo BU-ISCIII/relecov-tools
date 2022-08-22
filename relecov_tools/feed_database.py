@@ -302,11 +302,9 @@ class FeedDatabase:
                 # post_url = "sample"
                 map_fields = self.map_relecov_sample_data()
             else:
-<<<<<<< HEAD
+
                 # sample_fields, s_project_fields = self.get_iskylims_fields_sample()
-=======
                 stderr.print("[blue] Selecting sample fields")
->>>>>>> 81811ac73801f69cf3f726a3173373ad2850da45
                 map_fields = self.map_relecov_sample_data()
             post_url = "store_samples"
 
