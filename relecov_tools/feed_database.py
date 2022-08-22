@@ -236,12 +236,12 @@ class FeedDatabase:
                 stderr.print(
                     f"[blue] sending request for sample {chunk['sample_name']}"
                 )
-                req_sample = chunk['sample_name']
+                req_sample = chunk["sample_name"]
             elif "sequencing_sample_id" in chunk:
                 stderr.print(
                     f"[blue] sending request for sample {chunk['sequencing_sample_id']}"
                 )
-                req_sample = chunk['sequencing_sample_id']
+                req_sample = chunk["sequencing_sample_id"]
             result = self.database_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
@@ -267,7 +267,11 @@ class FeedDatabase:
                         )
                         sys.exit(1)
                 elif "already defined" in result["ERROR_TEST"].lower():
-                    log.warning("Request to %s for %s was not accepted", self.database_server, req_sample)
+                    log.warning(
+                        "Request to %s for %s was not accepted",
+                        self.database_server,
+                        req_sample,
+                    )
                     stderr.print(
                         f"[yellow] Warning request for {req_sample} already defined"
                     )
