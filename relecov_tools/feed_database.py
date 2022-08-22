@@ -231,7 +231,11 @@ class FeedDatabase:
 
     def update_database(self, field_values, post_url):
         """Send the request to update database"""
+        suces_count = 0
+        request_count = 0
         for chunk in field_values:
+            req_sample = ""
+            request_count += 1
             if "sample_name" in chunk:
                 stderr.print(
                     f"[blue] sending request for sample {chunk['sample_name']}"
@@ -282,18 +286,22 @@ class FeedDatabase:
                         f"[red] Error {result['ERROR']} when sending request to {self.database_server}"
                     )
                     sys.exit(1)
-            if "sampleName" in chunk:
-                log.info("stored data in iskylims for sample %s", chunk["sampleName"])
-            elif "sequencing_sample_id" in chunk:
-                log.info(
-                    "stored data in relecov for sample %s",
-                    chunk["sequencing_sample_id"],
-                )
-            else:
-                log.info("stored data in relecov")
-        stderr.print(
-            f"[gren] All information was sent sucessfuly to {self.server_type}"
-        )
+            log.info(
+                "stored data in %s iskylims for sample %s",
+                self.database_server,
+                req_sample,
+            )
+            stderr.print(f"[green] Successful request for {req_sample}")
+            suces_count += 1
+        if request_count == suces_count:
+            stderr.print(
+                f"[gren] All information was sent sucessfuly to {self.server_type}"
+            )
+        else:
+            stderr.print(
+                "[yellow] Some of your requests were not successful stored in database"
+            )
+            stderr.print(f"[yellow] {suces_count} of the {request_count} were done ok")
         return
 
     def store_data(self):
