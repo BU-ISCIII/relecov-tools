@@ -12,7 +12,7 @@ def attributetest(row, column):
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_6/SRA.run.xsd">
     <py:for each="alias, experiment_alias in run_groups.iteritems()">
-    <RUN alias="${alias}">
+    <RUN alias="${alias}" broker_name="${center}">
         <EXPERIMENT_REF refname="${experiment_alias}"/>
         <DATA_BLOCK>
             <FILES>

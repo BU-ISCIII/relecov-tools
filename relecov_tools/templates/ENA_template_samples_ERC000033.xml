@@ -11,7 +11,7 @@ def attributetest(row, column):
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_6/SRA.sample.xsd">
     <py:for each="index, row in df.iterrows()">
-    <SAMPLE alias="${row.alias}" center_name="${row['collecting institution']}">
+    <SAMPLE alias="${row.alias}" broker_name="${center}" center_name="${row['collecting institution']}">
         <TITLE>${row.title}</TITLE>
         <SAMPLE_NAME>
             <TAXON_ID>${row.taxon_id}</TAXON_ID>
