@@ -12,7 +12,7 @@ def attributetest(row, column):
     xsi:noNamespaceSchemaLocation="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_6/SRA.study.xsd">
     <py:for each="index, row in df.iterrows()">
     <STUDY alias="${row.alias}"
-        center_name="${center}">
+        broker_name="${center}">
         <DESCRIPTOR>
             <STUDY_TITLE>${row.title}</STUDY_TITLE>
             <STUDY_TYPE existing_study_type="${row.study_type}"/>
