@@ -367,6 +367,7 @@ class EnaUpload:
             # print(chec)
 
             # when ADD/MODIFY,
+            #
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
             # schema_xmls record XMLs for all these schema and following 'submission'
 
