@@ -44,12 +44,14 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
     if not os.path.isfile(json_data_file):
         stderr.print("[red] Json file does not exists")
         sys.exit(1)
+    stderr.print("[blue] Reading the json file")
     json_data = relecov_tools.utils.read_json_file(json_data_file)
     with open(json_data_file, "r") as fh:
         json_data = json.load(fh)
     validated_json_data = []
     invalid_json = []
     errors = {}
+    stderr.print("[blue] Start processing the json file")
     for item_row in json_data:
         try:
             validate(instance=item_row, schema=json_schema)
@@ -59,6 +61,10 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
             invalid_json.append(item_row)
     # Enviar los errores por correo
     # logging.handlers.SMTPHandler(mailhost=("smtp.gmail.com", 465), fromaddr=correo_isciii, toaddrs=correo_usuario, subject="Validation errors", credentials=(usurario,contraseña), secure=None, timeout=1.0)
+    if len(invalid_json) == 0:
+        stderr.print("[green] Sucessful validation")
+    else:
+        stderr.print("[red] Some samples are not validated")
     return validated_json_data, invalid_json, errors
 
 
@@ -72,6 +78,7 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
     sample_list = []
     # import pdb; pdb.set_trace()
     # json_data = relecov_tools.utils.read_json_file(invalid_json)
+    stderr.print("[red] Start preparation of invalid samples")
     for row in invalid_json:
         sample_list.append(str(row["collecting_lab_sample_id"]))
     wb = openpyxl.load_workbook(metadata_file)
@@ -94,5 +101,6 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
     os.makedirs(out_folder, exist_ok=True)
     new_name = "invalid_" + os.path.basename(metadata_file)
     m_file = os.path.join(out_folder, new_name)
+    stderr.print("[red] Saving excel file with the invalid samples")
     wb.save(m_file)
     return
