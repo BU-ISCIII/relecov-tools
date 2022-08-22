@@ -60,7 +60,8 @@ class RestApi:
                 "Unable to post parameters. Received error code %s",
                 req.status_code,
             )
-            stderr.print(f"[red] Unable to post data because  {req.text}")
+            if req.status_code != 500:
+                stderr.print(f"[red] Unable to post data because  {req.text}")
             stderr.print(f"[red] Received error {req.status_code}")
             return {"ERROR": req.status_code}
         return {"Success": req.text}
@@ -84,9 +85,12 @@ class RestApi:
                     "Unable to post parameters. Received error code %s",
                     req.status_code,
                 )
-                stderr.print(f"[red] Unable to post data because  {req.text}")
                 stderr.print(f"[red] Received error {req.status_code}")
-                return {"ERROR": req.status_code}
+                if req.status_code != 500:
+                    stderr.print(f"[red] Unable to post data because  {req.text}")
+                    return {"ERROR": req.status_code, "ERROR_TEST": req.text}
+                else:
+                    return {"ERROR": req.status_code, "ERROR_TEST": ""}
             return {"Success": req.text}
         except requests.ConnectionError:
             log.error("Unable to open connection towards %s", self.request_url)
