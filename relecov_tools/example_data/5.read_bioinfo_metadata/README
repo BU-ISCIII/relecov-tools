@@ -1,0 +1,16 @@
+
+This module will generate a file name bioinfo_metadata.json with information to be uploaded to RELECOV DB
+The input for this module are the following: 
+-m metadata_lab.xlsx
+-i Input folder where all the fastq.gz, .md5, .vcf.gz, .consensus.fa, pangolin.csv are for each R1 and R2
+-o Output folder where the bioinfo_metadata.json will be generated 
+-p Exact name of the mapping_illumina.csv file (It should include the date at the end of the file name as follows mapping_illumina_20220624.csv)
+
+The input folder must include the following files named as stated here: 
+- summary_variants_metrics_mqc.csv 
+- mapping_illumina_XXXXXXXX.csv
+- variants_long_table.csv
+- consensus_genome_length.csv
+- software_versions.yml
+- pangolin_version.csv
+- md5_check_file.csv
