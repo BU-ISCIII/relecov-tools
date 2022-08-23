@@ -76,7 +76,7 @@ class LongTableParse:
         """_summary_
         This function generates a json file from the csv file entered by the user
         (long_table.csv).
-         - Checks if expected headers match with file headers
+        - Checks if expected headers match with file headers
         Returns:
             dictionary with key as sample and value the list of variants
         """
@@ -104,7 +104,7 @@ class LongTableParse:
 
             variant_dict["Position"] = {
                 "pos": line_s[heading_index["POS"]],
-                "nucleotide": line_s[heading_index["ALT"]],
+                "alt": line_s[heading_index["ALT"]],
             }
 
             variant_dict["Filter"] = {"filter": line_s[heading_index["FILTER"]]}
