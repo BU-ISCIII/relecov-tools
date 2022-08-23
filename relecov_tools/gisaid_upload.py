@@ -152,6 +152,8 @@ class GisaidUpload:
 
         df_data_comp = self.complete_mand_fields(df_data)
         df_data_path = os.path.join(self.output_path, "meta_gisaid.csv")
+        if not os.path.exists(self.output_path):
+            os.mkdir(self.output_path)
         df_data_comp.to_csv(df_data_path, index=False)
         metagisaid = df_data_path
         return metagisaid
