@@ -109,7 +109,7 @@
     },
     "external_url": {
         "iskylims": {
-            "server": "http://relecov-iskylims.isciiides.es",
+            "server": "http://relecov-iskylims.isciiides.es:8000",
             "url": "/wetlab/api/",
             "store_samples": "createSampleData",
             "url_project_fields": "sampleProjectFields",
@@ -119,7 +119,7 @@
             "token": ""
         },
         "relecov": {
-            "server": "http://relecov-platform.isciiides.es",
+            "server": "http://relecov-platform.isciiides.es:8000",
             "url": "/api/",
             "store_samples": "createSampleData",
             "analysis": "bioinfoData",
