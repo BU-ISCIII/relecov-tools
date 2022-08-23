@@ -122,8 +122,8 @@
             "server": "http://relecov-platform.isciiides.es",
             "url": "/api/",
             "store_samples": "createSampleData",
-            "analysis": "bioinfoData",
-            "long_table": "longtableData",
+            "bioinfodata": "createBioinfoData",
+            "variantdata": "createVariantData",
             "sftp_info": "sftpInfo",
             "token": ""
         }

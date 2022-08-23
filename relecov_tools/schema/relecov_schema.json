@@ -1874,7 +1874,7 @@
             "type": "string",
             "description": "",
             "classification": "Bioinformatics and QC metrics fields",
-            "label": "% genome  greater 10x",
+            "label": "% genome greater 10x",
             "fill_mode": "batch"
         },
         "per_Ns": {
