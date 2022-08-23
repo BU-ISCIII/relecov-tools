@@ -126,15 +126,6 @@
             "long_table": "longtableData",
             "sftp_info": "sftpInfo",
             "token": ""
-        },
-        "relecov_local": {
-            "server": "127.0.0.1:8000",
-            "url": "/api/",
-            "store_samples": "createSampleData",
-            "analysis": "bioinfoData",
-            "long_table": "longtableData",
-            "sftp_info": "sftpInfo",
-            "token": ""
         }
     },
     "iskylims_fixed_values": {
