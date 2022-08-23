@@ -180,8 +180,9 @@ class GisaidUpload:
     def create_multifasta(self):
         """Create multifasta from single fastas (if --single)"""
         if self.single:
+            gather_fastas_path = os.path.join(self.fasta_path, "*.fa*")
             os.system(
-                "cat %s > %s/multifasta.fasta" % (self.fasta_path, self.output_path)
+                "cat %s > %s/multifasta.fasta" % (gather_fastas_path, self.output_path)
             )
             multifasta = "%s/multifasta.fasta" % self.output_path
         else:
