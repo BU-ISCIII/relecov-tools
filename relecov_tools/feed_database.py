@@ -333,18 +333,12 @@ class FeedDatabase:
                 post_url = "analysis"
                 map_fields = self.map_relecov_bioinfo_data()
 
-            # sample_fields, s_project_fields = self.get_iskylims_fields_sample()
-            # map_fields = self.map_iskylims_sample_fields_values(
-            #    sample_fields, s_project_fields
-            # )
-            """ 
-            elif self.server_type == "relecov_local":
-                post_url = "analysis"
-                map_fields = self.map_relecov_bioinfo_data()
-            # post_url = "analysis"
-            """
-            # post_url = "analysis"
-            # map_fields = self.map_relecov_bioinfo_data()
+# sample_fields, s_project_fields = self.get_iskylims_fields_sample()
+# map_fields = self.map_iskylims_sample_fields_values(
+#    sample_fields, s_project_fields
+# )
+# post_url = "analysis"
+# map_fields = self.map_relecov_bioinfo_data()
 
         elif self.type_of_info == "longtable":
             post_url = "long_table"
