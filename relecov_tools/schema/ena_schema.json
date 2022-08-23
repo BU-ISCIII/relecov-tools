@@ -621,6 +621,19 @@
         "sample"
       ]
     },
+    "host_health_state": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001388",
+      "type": "string",
+      "description": " Status of the host",
+      "clasification": "Host information",
+      "label": "Host health state",
+      "table": [
+        "sample"
+      ]
+    },
     "host_sex": {
       "Enums": [
         "Female [NCIT:C46110]",

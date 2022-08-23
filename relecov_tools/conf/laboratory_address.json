@@ -407,14 +407,6 @@
     },
     {
         "collecting_institution": "Ministerio de Sanidad, Servicios Sociales e Igualdad",
-        "collecting_institution_address": "",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Madrid",
-        "geo_loc_city": "Madrid",
-        "geo_loc_country": "Spain"
-    },
-    {
-        "collecting_institution": "MINISTERIO DE SANIDAD, POLITICA SOCIAL E IGUALDAD",
         "collecting_institution_address": "P.º del Prado, 18",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",

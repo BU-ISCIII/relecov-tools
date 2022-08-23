@@ -24,13 +24,13 @@ import relecov_tools.gisaid_upload
 
 log = logging.getLogger()
 
+# Set up rich stderr console
+stderr = rich.console.Console(
+    stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
+)
+
 
 def run_relecov_tools():
-
-    # Set up rich stderr console
-    stderr = rich.console.Console(
-        stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
-    )
 
     # Set up the rich traceback
     rich.traceback.install(console=stderr, width=200, word_wrap=True, extra_lines=1)
@@ -59,9 +59,9 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "0.0.1"
+    __version__ = "0.0.4"
     stderr.print(
-        "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
+        "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
 
     # Lanch the click cli
@@ -137,14 +137,18 @@ def relecov_tools_cli(verbose, log_file):
 @relecov_tools_cli.command(help_priority=2)
 @click.option("-u", "--user", help="User name for login to sftp server")
 @click.option("-p", "--password", help="password for the user to login")
+@click.option("-r_u", "--user_relecov", help="User name for updating data to relecov")
+@click.option("-p_r", "--password_relecov", help="password for relecov user")
 @click.option(
     "-f",
     "--conf_file",
     help="Configuration file (no params file)",
 )
-def download(user, password, conf_file):
+def download(user, password, conf_file, user_relecov, password_relecov):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp_handle.SftpHandle(user, password, conf_file)
+    sftp_connection = relecov_tools.sftp_handle.SftpHandle(
+        user, password, conf_file, user_relecov, password_relecov
+    )
     sftp_connection.download()
 
 
@@ -201,8 +205,14 @@ def validate(json_file, json_schema, metadata, out_folder):
     ) = relecov_tools.json_validation.validate_json(json_file, json_schema, out_folder)
     if len(invalid_json) > 0:
         log.error("Some of the samples in json metadata were not validated")
+        stderr.print("[red] Some of the Samples are not validate")
         if not os.path.isfile(metadata):
-            log.error("Metadata file %s does not exists", metadata)
+            log.error("Metadata file %s does not exist", metadata)
+            stderr.print(
+                "[red] Unable to create excel file for invalid samples. Metadata file ",
+                metadata,
+                " does not exist",
+            )
             exit(1)
         relecov_tools.json_validation.create_invalid_metadata(
             metadata, invalid_json, out_folder
@@ -368,13 +378,19 @@ def update_db(user, password, json, schema, type, databaseServer):
 @click.option(
     "-o", "--metadata-out", type=click.Path(), help="Path to save output  metadata file"
 )
-def read_bioinfo_metadata(metadata_file, input_folder, metadata_out):
+@click.option(
+    "-p",
+    "--mapping-illumina",
+    type=click.Path(),
+    help="Name of the mapping_illumina file",
+)
+def read_bioinfo_metadata(metadata_file, input_folder, metadata_out, mapping_illumina):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
 
     new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        metadata_file, input_folder, metadata_out
+        metadata_file, input_folder, metadata_out, mapping_illumina
     )
 
     new_bioinfo_metadata.bioinfo_parse(metadata_file)
@@ -400,22 +416,22 @@ def long_table_parse(longtable_file, output):
 # read metadata bioinformatics
 @relecov_tools_cli.command(help_priority=12)
 @click.option(
-    "-l",
-    "--lab_metadata",
-    type=click.Path(),
-    help="file containing laboratory METADATA ",
-)
-@click.option(
     "-i",
     "--institution",
     type=click.Choice(["isciii", "hugtip", "hunsc-iter"], case_sensitive=False),
     help="select one of the available institution options",
 )
+@click.option(
+    "-d",
+    "--directory",
+    type=click.Path(),
+    help="Folder where are located the additional files",
+)
 @click.option("-o", "--output", type=click.Path(), help="Path to save json output")
-def metadata_homogeneizer(lab_metadata, institution, output):
+def metadata_homogeneizer(institution, directory, output):
     """Parse institution metadata lab to the one used in relecov"""
     new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
-        lab_metadata, institution, output
+        institution, directory, output
     )
     new_parse.converting_metadata()
 

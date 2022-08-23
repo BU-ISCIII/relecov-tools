@@ -27,9 +27,9 @@
         "Commercial All-in-one library kit",
         "Library Preparation Kit",
         "Enrichment Protocol",
-        "If Enrichment Protocol. If Other,Specify",
+        "If Enrichment Protocol Is Other, Specify",
         "Enrichment panel/assay",
-        "If Enrichment panel/assay. If Other, Specify",
+        "If Enrichment panel/assay Is Other, Specify",
         "Enrichment panel/assay version",
         "Number Of Samples In Run",
         "Runid",
@@ -113,7 +113,7 @@
             "url": "/wetlab/api/",
             "store_samples": "createSampleData",
             "url_project_fields": "sampleProjectFields",
-            "url_sample_fields": "samplefields",
+            "url_sample_fields": "sampleFields",
             "param_sample_project": "project",
             "project_name": "relecov",
             "token": ""
@@ -124,6 +124,7 @@
             "store_samples": "createSampleData",
             "analysis": "bioinfoData",
             "long_table": "longtableData",
+            "sftp_info": "sftpInfo",
             "token": ""
         }
     },
@@ -147,6 +148,11 @@
         "microbiology_lab_sample_id",
         "r1_fastq_filepath",
         "r2_fastq_filepath",
+        "collecting_lab_sample_id",
+        "schema_name",
+        "schema_version",
+        "sequence_file_R1_fastq",
+        "sequence_file_R2_fastq",
         "sequencing_sample_id",
         "submitting_lab_sample_id",
         "virus_name"
@@ -176,14 +182,13 @@
     },
     "mapping_illumina_tab_field_list": {
         "lineage_name": "Lineage",
-        "variant_designation": "Variantsinconsensusx10",
         "per_genome_greater_10x": "Coverage>10x(%)",
         "per_reads_host": "%readshost",
         "per_reads_virus": "%readsvirus",
         "per_unmapped": "%unmapedreads",
         "per_Ns": "%Ns10x",
         "depth_of_coverage_value": "medianDPcoveragevirus",
-        "number_of_variants_AF_greater_75percent": "Variantsinconsensusx10",
+        "number_of_variants_in_consensus": "Variantsinconsensusx10",
         "number_of_variants_with_effect": "MissenseVariants"
     },
     "files_read_bioinfo_metadata": {

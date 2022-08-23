@@ -14,6 +14,7 @@ import yaml
 import openpyxl
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
+from relecov_tools.rest_api import RestApi
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -25,7 +26,14 @@ stderr = rich.console.Console(
 
 
 class SftpHandle:
-    def __init__(self, user=None, passwd=None, conf_file=None):
+    def __init__(
+        self,
+        user=None,
+        passwd=None,
+        conf_file=None,
+        user_relecov=None,
+        password_relecov=None,
+    ):
         """Initializes the sftp object"""
         config_json = ConfigJson()
         self.allowed_sample_ext = config_json.get_configuration(
@@ -98,6 +106,10 @@ class SftpHandle:
                 msg="Enter your password"
             )
         self.client = None
+        external_servers = config_json.get_topic_data("external_url", "relecov")
+        self.relecov_server = external_servers["server"]
+        self.relecov_url = external_servers["url"]
+        self.relecov_post_url = external_servers["sftp_info"]
 
     def open_connection(self):
         """Establish sftp connection"""
@@ -343,6 +355,29 @@ class SftpHandle:
                 continue
         return
 
+    def create_json_with_downloaded_samples(self, sample_file_list, folder):
+        """From the download information prepare a json file"""
+        sample_dict = {}
+        for sample in sample_file_list:
+            sample_dict[sample] = {"folder": folder}
+        return json.dumps(sample_dict, indent=4, sort_keys=True, ensure_ascii=False)
+
+    def send_info_to_server(self, json_data):
+        rest_api = RestApi(self.database_server, self.database_url)
+        error_counts = 0
+        for item in json_data:
+            result = rest_api.post_request(item, "", self.relecov_post_url)
+            if "ERROR" in result:
+                error_counts += 1
+                log.error("Request was not accepted %s", result["ERROR"])
+                stderr.print(
+                    "[red] Error " + result["ERROR"] + " when sending request}"
+                )
+        if error_counts == 0:
+            log.info("Request was not accepted %s", result["ERROR"])
+            stderr.print("[green] Successful upload information to server")
+        return
+
     def delete_local_folder(self, local_folder):
         """Delete download folder because files does not complain requisites"""
         shutil.rmtree(local_folder, ignore_errors=True)
@@ -405,11 +440,15 @@ class SftpHandle:
             if self.validate_download_files(
                 sample_file_list, result_data["local_folder"]
             ):
-
                 self.create_tmp_files_with_metadata_info(
                     result_data["local_folder"], sample_file_list, md5_files, meta_file
                 )
-                # self.delete_remote_files(folder, files)
+                # Collect data to send the request to relecov_platform
+                json_sample_data = self.create_json_with_downloaded_samples(
+                    sample_file_list, folder
+                )
+                for record in json_sample_data:
+                    pass
             else:
                 log.info("Deleting local folder %s", result_data["local_folder"])
                 self.delete_local_folder(result_data["local_folder"])

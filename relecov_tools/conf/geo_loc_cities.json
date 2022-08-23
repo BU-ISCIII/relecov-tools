@@ -80,7 +80,7 @@
         "geo_loc_longitude": "-5.7000"
     },
     {
-        "geo_loc_city": "Vitoria-Gasteiz",
+        "geo_loc_city": "Vitoria",
         "geo_loc_latitude": "42.8500",
         "geo_loc_longitude": "-2.6833"
     },
@@ -365,12 +365,12 @@
         "geo_loc_longitude": "2.0417"
     },
     {
-        "geo_loc_city": "Ciudad de Ceuta",
+        "geo_loc_city": "Ceuta",
         "geo_loc_latitude": "35.8867",
         "geo_loc_longitude": "-5.3000"
     },
     {
-        "geo_loc_city": "Ciudad de Melilla",
+        "geo_loc_city": "Melilla",
         "geo_loc_latitude": "35.2919",
         "geo_loc_longitude": "-2.93848"
     },

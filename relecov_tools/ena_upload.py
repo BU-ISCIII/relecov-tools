@@ -1,5 +1,7 @@
 import logging
 
+# from re import template
+
 # from pyparsing import col
 import xml.etree.ElementTree as ET
 import rich.console
@@ -12,7 +14,7 @@ import pandas as pd
 import sys
 import os
 
-# import ftplib
+import ftplib
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -34,7 +36,7 @@ import site
 pd.options.mode.chained_assignment = None
 
 template_path = os.path.join(site.getsitepackages()[0], "ena_upload", "templates")
-
+template_path = os.path.join(os.getcwd(), "relecov_tools/templates")
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -159,11 +161,16 @@ class EnaUpload:
                 "collector_name",
                 "collecting_institution",
                 "isolate",
-                "host subject id",
+                "host_subject_id",
                 "host health state",
+                "authors",
                 "sample_description",
+                "address",
             ]
         ]
+
+        df_samples["host_sex"].replace("unknown", "not provided", inplace=True)
+        df_samples["host_sex"].replace("Unknown", "not provided", inplace=True)
 
         df_samples = df_samples.rename(columns={"sample_name": "alias"})
         df_samples = df_samples.rename(columns={"sample_title": "title"})
@@ -172,6 +179,7 @@ class EnaUpload:
                 "geographic_location_(country_and/or_sea)": "geographic location (country and/or sea)"
             }
         )
+        df_samples = df_samples.rename(columns={"host_subject_id": "host subject id"})
         df_samples = df_samples.rename(columns={"collection_date": "collection date"})
         df_samples = df_samples.rename(columns={"host_common_name": "host common name"})
         df_samples = df_samples.rename(columns={"host_common_name": "host common name"})
@@ -191,6 +199,7 @@ class EnaUpload:
         df_samples.insert(4, "ENA_CHECKLIST", checklist)
         # df_samples.insert(5, "sample_description", df_schemas["sample_description"])
         # df_samples
+
         """
         alias      title taxon_id host health state  ...                                  scientific_name     collector name           collecting institution    isolate
 0   212164375  212164375  2697049                    ...  Severe acute respiratory syndrome coronavirus 2  Inmaculada Casas      Hospital Clínic de Barcelona  212164375
@@ -205,6 +214,7 @@ class EnaUpload:
                 "file_type",
                 "fastq_r1_md5",
                 "fastq_r2_md5",
+                "collecting_institution",
             ]
         ]
 
@@ -262,10 +272,15 @@ class EnaUpload:
                 "library_layout",
                 "instrument_model",
                 "design_description",
+                "collecting_institution",
                 "insert_size",
                 "sequencing_instrument_platform",
             ]
         ]
+
+        df_experiments["instrument_model"] = df_experiments[
+            "instrument_model"
+        ].str.lower()
 
         df_experiments.insert(3, "status", self.action)
 
@@ -284,6 +299,9 @@ class EnaUpload:
         )
         df_experiments = df_experiments.rename(columns={"study_title": "title"})
         df_experiments = df_experiments.rename(columns={"sample_name": "sample_alias"})
+        df_experiments = df_experiments.rename(
+            columns={"collecting_institution": "collecting institution"}
+        )
 
         # df_experiments example
         """
@@ -293,6 +311,7 @@ class EnaUpload:
 2        214821_S12  RELECOV Spanish Network for genomics surveillance     RELECOV  ...         PAIRED   Illumina MiSeq  214823_S1_R1_001.fastq.gz_214823_S1_R2_001.fas...
 
         """
+
         ena_config = config_json.get_configuration("ENA_configuration")
         schema_dataframe = {}
         schema_dataframe["sample"] = df_samples
@@ -322,7 +341,7 @@ class EnaUpload:
 
             # submit data to webin ftp server. It should only upload fastq files in case the action is ADD.
             # When the action is MODIFY rthe fastq are already submitted.
-            """
+
             if self.action == "ADD" or self.action == "add":
                 session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
 
@@ -342,12 +361,13 @@ class EnaUpload:
 
                 g2 = session.quit()
                 print(g2)
-            """
+
             # THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
             # chec = submit_data(file_paths, self.passwd, self.user)
             # print(chec)
 
             # when ADD/MODIFY,
+            #
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
             # schema_xmls record XMLs for all these schema and following 'submission'
 
@@ -376,20 +396,18 @@ class EnaUpload:
                     files.set("checksum", H)
                     # print(files.attrib["checksum"])
             tree.write(schema_xmls["run"])
-
+            """
             tree = ET.parse(schema_xmls["sample"])
             root = tree.getroot()
-
             for files in root.iter("SAMPLE_ATTRIBUTES"):
-                tag = ET.SubElement(files, "TAG")
-                tag.text = str("ENA-CHECKLIST")
-                tag = ET.SubElement(files, "VALUE")
-                tag.text = str("ERC000033")
+                tag = ET.SubElement(files, "SAMPLE_ATTRIBUTE")
+                tag_2 = ET.SubElement(tag, "TAG")
+                tag_2.text = str("ENA-CHECKLIST")
+                tag_3 = ET.SubElement(tag, "VALUE")
+                tag_3.text = str("ERC000033")
 
             tree.write(schema_xmls["sample"])
-            import pdb
-
-            pdb.set_trace()
+            """
 
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
@@ -416,6 +434,7 @@ class EnaUpload:
                 schema_dataframe = update_table(
                     schema_dataframe, schema_targets, schema_update
                 )
+            ######
 
     def upload(self):
         """Create the required files and upload to ENA"""
