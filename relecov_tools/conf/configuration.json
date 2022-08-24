@@ -119,19 +119,10 @@
             "token": ""
         },
         "relecov": {
-            "server": "http://relecov-platform.isciiides.es:8000",
+            "server": "http://relecov-platform.isciiides.es",
             "url": "/api/",
             "store_samples": "createSampleData",
-            "analysis": "bioinfoData",
-            "long_table": "longtableData",
-            "sftp_info": "sftpInfo",
-            "token": ""
-        },
-        "relecov_local": {
-            "server": "http://127.0.0.1:8000",
-            "url": "/api/",
-            "store_samples": "createSampleData",
-            "bioinfodata": "createBioinfoData",
+            "analysis": "createBioinfoData",
             "variantdata": "createVariantData",
             "sftp_info": "sftpInfo",
             "token": ""
