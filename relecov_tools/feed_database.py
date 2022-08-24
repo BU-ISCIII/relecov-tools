@@ -289,8 +289,6 @@ class FeedDatabase:
         return
 
     def store_data(self):
-        import pdb
-
         """Collect data from json file and split them to store data in iSkyLIMS
         and in Relecov Platform
         """
@@ -322,6 +320,5 @@ class FeedDatabase:
             stderr.print("[red] Invalid type to upload to database")
             sys.exit(1)
 
-        pdb.set_trace()
         self.update_database(map_fields, post_url)
         stderr.print(f"[green] Upload process to {self.server_type} completed")
