@@ -272,7 +272,7 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-c", "--client_id", help="client-ID provided by clisupport@gisaid.org")
 @click.option("-t", "--token", help="path to athentication token")
-@click.option("-e", "--gisaid_json", help="patch validated json mapped to GISAID")
+@click.option("-e", "--gisaid_json", help="path to validated json mapped to GISAID")
 @click.option(
     "-i",
     "--input_path",
