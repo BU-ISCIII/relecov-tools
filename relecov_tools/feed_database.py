@@ -308,27 +308,9 @@ class FeedDatabase:
                 stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_relecov_sample_data()
             post_url = "store_samples"
-<<<<<<< HEAD
 
-        elif self.type_of_info == "analysis":
-
-            if self.server_type == "relecov":
-                post_url = "analysis"
-                map_fields = self.map_relecov_bioinfo_data()
-
-        # sample_fields, s_project_fields = self.get_iskylims_fields_sample()
-        # map_fields = self.map_iskylims_sample_fields_values(
-        #    sample_fields, s_project_fields
-        # )
-        # post_url = "analysis"
-        # map_fields = self.map_relecov_bioinfo_data()
-
-        elif self.type_of_info == "longtable":
-            post_url = "long_table"
-=======
         elif self.type_of_info == "bioinfodata":
             post_url = "bioinfodata"
->>>>>>> de48b8f4f9e7050df1b6e98da55ac231982d220b
             map_fields = self.json_data
 
         elif self.type_of_info == "variantdata":
