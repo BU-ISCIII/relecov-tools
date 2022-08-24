@@ -75,7 +75,7 @@ class FeedDatabase:
         if type_of_info is None:
             type_of_info = relecov_tools.utils.prompt_selection(
                 "Select:",
-                ["sample", "analysis", "longtable"],
+                ["sample", "bioinfodata", "variantdata"],
             )
         self.type_of_info = type_of_info
 
@@ -212,23 +212,6 @@ class FeedDatabase:
             field_values.append(s_dict)
         return field_values
 
-    def map_relecov_bioinfo_data(self):
-        # Select the values from self.json_data
-        field_values = []
-
-        for row in self.json_data:
-            s_dict = {}
-            for r_field in self.json_data[row]:
-                if r_field in self.json_data[row]:
-                    s_dict[r_field] = self.json_data[row][r_field]
-                    if r_field == "sample_name":
-                        s_dict[r_field] = row
-                else:
-                    s_dict[r_field] = None
-            field_values.append(s_dict)
-
-        return field_values
-
     def update_database(self, field_values, post_url):
         """Send the request to update database"""
         suces_count = 0
@@ -327,22 +310,12 @@ class FeedDatabase:
                 stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_relecov_sample_data()
             post_url = "store_samples"
-        elif self.type_of_info == "analysis":
-
-            if self.server_type == "relecov":
-                post_url = "analysis"
-                map_fields = self.map_relecov_bioinfo_data()
-
-        # sample_fields, s_project_fields = self.get_iskylims_fields_sample()
-        # map_fields = self.map_iskylims_sample_fields_values(
-        #    sample_fields, s_project_fields
-        # )
-        # post_url = "analysis"
-        # map_fields = self.map_relecov_bioinfo_data()
-
-        elif self.type_of_info == "longtable":
-            post_url = "long_table"
+        elif self.type_of_info == "bioinfodata":
+            post_url = "bioinfodata"
             map_fields = self.json_data
+
+        elif self.type_of_info == "variantdata":
+            post_url = "variantdata"
         else:
             stderr.print("[red] Invalid type to upload to database")
             sys.exit(1)
