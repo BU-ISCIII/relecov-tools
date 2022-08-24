@@ -340,7 +340,7 @@ def launch(user):
 @click.option(
     "-t",
     "--type",
-    type=click.Choice(["sample", "analysis"]),
+    type=click.Choice(["sample", "bioinfodata", "variantdata"]),
     multiple=False,
     help="Select the type of information to upload to database",
 )

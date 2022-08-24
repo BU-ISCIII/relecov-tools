@@ -314,6 +314,7 @@
     {
         "collecting_institution": "Banc de Sang i Teixits Catalunya",
         "collecting_institution_address": "Passeig del Taulat, 116",
+        "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain"
@@ -321,6 +322,7 @@
     {
         "collecting_institution": "Laboratorio Echevarne Sant Cugat del Vallès",
         "collecting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
+        "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain"
