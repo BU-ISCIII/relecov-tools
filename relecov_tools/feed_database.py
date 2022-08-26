@@ -302,22 +302,23 @@ class FeedDatabase:
                     sample_fields, s_project_fields
                 )
 
-            elif self.server_type == "relecov_local":
-                post_url = "analysis"
-                map_fields = self.map_relecov_sample_data()
-
             else:
+
+                # sample_fields, s_project_fields = self.get_iskylims_fields_sample()
                 stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_relecov_sample_data()
             post_url = "store_samples"
+
         elif self.type_of_info == "bioinfodata":
             post_url = "bioinfodata"
             map_fields = self.json_data
 
         elif self.type_of_info == "variantdata":
             post_url = "variantdata"
+            map_fields = self.json_data
         else:
             stderr.print("[red] Invalid type to upload to database")
             sys.exit(1)
+
         self.update_database(map_fields, post_url)
         stderr.print(f"[green] Upload process to {self.server_type} completed")
