@@ -135,7 +135,7 @@ class LongTableParse:
         """ """
         j_list = []
         for key, values in samp_dict.items():
-            j_dict = {"sample": key}
+            j_dict = {"sample_name": key}
             j_dict["variants"] = values
             j_list.append(j_dict)
         return j_list
