@@ -22,7 +22,7 @@
             ],
             "ontology": "GENEPIO:0001123",
             "type": "string",
-            "description": "The user-defined name for the sample.",
+            "description": "The name given for the sample by the collecting institution.",
             "classification": "Database Identifiers",
             "label": "Sample ID given by originating laboratory",
             "fill_mode": "sample"
@@ -33,7 +33,7 @@
             ],
             "ontology": "GENEPIO:0001153",
             "type": "string",
-            "description": "The name of the agency that collected the original sample.",
+            "description": "The name of the agency/institution that collected the sample.",
             "classification": "Sample collection and processing",
             "label": "Originating Laboratory",
             "fill_mode": "sample"
@@ -44,7 +44,7 @@
             ],
             "ontology": "GENEPIO:0001159",
             "type": "string",
-            "description": "The name of the agency that generated the sequence.",
+            "description": "The name of the agency that submitted the sequence to public databases.",
             "classification": "Sample collection and processing",
             "label": "Submitting Institution",
             "fill_mode": "sample"
