@@ -16,6 +16,17 @@
     ],
     "type": "object",
     "properties": {
+        "public_health_sample_id_sivies": {
+            "examples": [
+                "2022CEU03926"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Sample collection and processing",
+            "label": "Public Health sample id (SIVIES)",
+            "fill_mode": "sample"
+        },
         "collecting_lab_sample_id": {
             "examples": [
                 "prov_rona_99"
@@ -59,6 +70,28 @@
             "classification": "Sample collection and processing",
             "label": "Originating Laboratory Address",
             "fill_mode": "batch"
+        },
+         "microbiology_lab_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Sample collection and processing",
+            "label": "Sample ID given in the microbiology lab",
+            "fill_mode": "sample"
+        },
+        "sequencing_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0000079",
+            "type": "string",
+            "description": "If the information is unknown or can not be shared, leave blank.",
+            "classification": "Database Identifiers",
+            "label": "Sample ID given for sequencing",
+            "fill_mode": "sample"
         },
          "submitting_lab_sample_id": {
             "examples": [
@@ -116,7 +149,7 @@
             "label": "Sample Collection Date",
             "fill_mode": "sample"
         },
-          "sample_received_date": {
+        "sample_received_date": {
             "examples": [
                 "3/21/2020"
             ],
@@ -439,6 +472,190 @@
             "label": "Autonomic Community",
             "fill_mode": "batch"
         },
+         "geo_loc_region": {
+            "examples": [
+                "Derbyshire"
+            ],
+            "ontology": "GENEPIO:0100280",
+            "type": "string",
+            "description": "The county/region of origin of the sample.",
+            "classification": "Sample collection and processing",
+            "label": "Province",
+            "fill_mode": "batch"
+        },
+        "geo_loc_city": {
+            "examples": [
+                "Vancouver"
+            ],
+            "ontology": "GENEPIO:0001189",
+            "type": "string",
+            "description": "The city of origin of the sample.",
+            "classification": "Sample collection and processing",
+            "label": "City",
+            "fill_mode": "batch"
+        },
+        "geo_loc_latitude": {
+            "examples": [
+                "38.98 N"
+            ],
+            "ontology": "OBI:0001620",
+            "type": "string",
+            "description": "The latitude coordinates of the geographical location of sample collection.",
+            "classification": "Sample collection and processing",
+            "label": "Geo Loc Latitude",
+            "fill_mode": "batch"
+        },
+        "geo_loc_longitude": {
+            "examples": [
+                "77.11 W"
+            ],
+            "ontology": "OBI:0001621",
+            "type": "string",
+            "description": "The longitude coordinates of the geographical location of sample collection.",
+            "classification": "Sample collection and processing",
+            "label": "Geo Loc Longitude",
+            "fill_mode": "batch"
+        },
+        "purpose_sampling": {
+            "Enums": [
+                "Cluster/Outbreak Investigation [GENEPIO:0100001]",
+                "Diagnostic Testing [GENEPIO:0100002]",
+                "Research [GENEPIO:0100003]",
+                "Protocol Testing [GENEPIO:0100024]",
+                "Surveillance [GENEPIO:0100004]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "NCIT_C146997",
+            "type": "string",
+            "description": "The reason that the sample was collected.",
+            "examples": [
+                "Diagnostic Testing [GENEPIO:0100002]"
+            ],
+            "classification": "Sample collection and processing",
+            "label": "Purpose of sampling",
+            "fill_mode": "batch"
+        },
+        "anatomical_material": {
+            "Enums": [
+                "Blood [UBERON:0000178]",
+                "Fluid [UBERON:0006314]",
+                "Fluid (Cerebrospinal (CSF)) [UBERON:0001359]",
+                "Fluid (Pericardial) [UBERON:0002409]",
+                "Fluid (Pleural) [UBERON:0001087]",
+                "Fluid (Vaginal) [UBERON:0036243]",
+                "Fluid (Amniotic) [UBERON:0000173]",
+                "Saliva [UBERON:0001836]",
+                "Tissue [UBERON:0000479]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001211",
+            "type": "string",
+            "description": "A substance obtained from an anatomical part of an organism e.g. tissue, blood.",
+            "examples": [
+                "Blood [UBERON:0000178]"
+            ],
+            "classification": "Sample collection and processing",
+            "label": "Specimen source",
+            "fill_mode": "batch"
+        },
+        "environmental_material": {
+            "Enums": [
+                "Air vent [ENVO:03501208]",
+                "Banknote [ENVO:00003896]",
+                "Bed rail [ENVO:03501209]",
+                "Building Floor [ENVO:01000486]",
+                "Cloth [ENVO:02000058]",
+                "Control Panel [ENVO:03501210]",
+                "Door [ENVO:03501220]",
+                "Door Handle [ENVO:03501211]",
+                "Face Mask [OBI:0002787]",
+                "Face Shield [OBI:0002791]",
+                "Food [FOODON:00002403]",
+                "Food Packaging [FOODON:03490100]",
+                "Glass [ENVO:01000481]",
+                "Handrail [ENVO:03501212]",
+                "Hospital Gown [OBI:0002796]",
+                "Light Switch [ENVO:03501213]",
+                "Locker [ENVO:03501214]",
+                "N95 Mask [OBI:0002790]",
+                "Nurse Call Button [ENVO:03501215]",
+                "Paper [ENVO:03501256]",
+                "Particulate Matter [ENVO:01000060]",
+                "Plastic [ENVO:01000404]",
+                "PPE Gown [GENEPIO:0100025]",
+                "Sewage [ENVO:00002018]",
+                "Sink [ENVO:01000990]",
+                "Soil [ENVO:00001998]",
+                "Stainless Steel [ENVO:03501216]",
+                "Tissue Paper [ENVO:03501217]",
+                "Toilet Bowl [ENVO:03501218]",
+                "Water [ENVO:00002006]",
+                "Wastewater [ENVO:00002001]",
+                "Window [ENVO:03501219]",
+                "Wood [ENVO:00002040]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001223",
+            "type": "string",
+            "description": "A substance obtained from the natural or man-made environment e.g. soil, water, sewage, door handle, bed handrail, face mask.",
+            "examples": [
+                "Face Mask [OBI:0002787]"
+            ],
+            "classification": "Sample collection and processing",
+            "label": "Environmental Material",
+            "fill_mode": "batch"
+        },
+        "environmental_site": {
+            "Enums": [
+                "Acute care facility [ENVO:03501135]",
+                "Animal house [ENVO:00003040]",
+                "Bathroom [ENVO:01000422]",
+                "Clinical assessment centre [ENVO:03501136]",
+                "Conference venue [ENVO:03501127]",
+                "Corridor [ENVO:03501121]",
+                "Daycare [ENVO:01000927]",
+                "Emergency room (ER) [ENVO:03501145]",
+                "Family practice clinic [ENVO:03501186]",
+                "Group home [ENVO:03501196]",
+                "Homeless shelter [ENVO:03501133]",
+                "Hospital [ENVO:00002173]",
+                "Intensive Care Unit (ICU) [ENVO:03501152]",
+                "Long Term Care Facility [ENVO:03501194]",
+                "Patient room [ENVO:03501180]",
+                "Prison [ENVO:03501204]",
+                "Production Facility [ENVO:01000536]",
+                "School [ENVO:03501130]",
+                "Sewage Plant [ENVO:00003043]",
+                "Subway train [ENVO:03501109]",
+                "Wet market [ENVO:03501198]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001232",
+            "type": "string",
+            "description": "An environmental location may describe a site in the natural or built environment e.g. hospital, wet market, bat cave.",
+            "examples": [
+                "Hospital [ENVO:00002173]"
+            ],
+            "classification": "Sample collection and processing",
+            "label": "Environmental System",
+            "fill_mode": "batch"
+        },
         "organism": {
             "Enums": [
                 "Coronaviridae [NCBITaxon:11118]",
@@ -457,6 +674,17 @@
             ],
             "classification": "Sample collection and processing",
             "label": "Organism",
+            "fill_mode": "batch"
+        },
+        "tax_id": {
+            "examples": [
+                "probably 2697049 in all cases"
+            ],
+            "ontology": "GENEPIO_0001724",
+            "type": "string",
+            "description": "The NCBITaxon identifier for the organism being sequenced.",
+            "classification": "Sample collection and processing",
+            "label": "Tax ID",
             "fill_mode": "batch"
         },
         "host_subject_id": {
@@ -478,6 +706,37 @@
             "description": " Status of the host",
             "classification": "Host health state information",
             "label": "Host health state",
+        },
+        "host_common_name": {
+            "Enums": [
+                "Human [NCBITaxon:9606]",
+                "Bat [NCBITaxon:9397]",
+                "Cat [NCBITaxon:9685]",
+                "Chicken [NCBITaxon:9031]",
+                "Civet [NCBITaxon:9673]",
+                "Cow [NCBITaxon:9913]",
+                "Dog [NCBITaxon:9615]",
+                "Lion [NCBITaxon:9689]",
+                "Mink [NCBITaxon:452646]",
+                "Pangolin [NCBITaxon:9973]",
+                "Pig [NCBITaxon:9825]",
+                "Pigeon [NCBITaxon:8930]",
+                "Tiger [NCBITaxon:9694]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001386",
+            "type": "string",
+            "description": "The commonly used name of the host.",
+            "examples": [
+                "Human [NCBITaxon:9606]"
+            ],
+            "classification": "Host information",
+            "label": "Host",
+            "fill_mode": "batch"
         },
         "host_scientific_name": {
             "Enums": [
@@ -631,301 +890,6 @@
             "label": "Sequencing Instrument Model",
             "fill_mode": "batch"
         },
-       
-        "biosample_accession_ENA": {
-            "examples": [
-                "SAMN14180202"
-            ],
-            "ontology": "GENEPIO:0001139",
-            "type": "string",
-            "description": "The identifier assigned to a BioSample in INSDC archives.",
-            "classification": "Database Identifiers",
-            "label": "ENA Sample ID",
-            "fill_mode": "sample"
-        },
-        "virus_name": {
-            "examples": [
-                "hCoV-19/Canada/prov_rona_99/2020"
-            ],
-            "ontology": "GENEPIO:0100282",
-            "type": "string",
-            "description": "The user-defined GISAID virus name assigned to the sequence.",
-            "classification": "Database Identifiers",
-            "label": "GISAID Virus Name",
-            "fill_mode": "sample"
-        },
-       
-        "microbiology_lab_sample_id": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Sample collection and processing",
-            "label": "Sample ID given in the microbiology lab",
-            "fill_mode": "sample"
-        },
-        "public_health_sample_id_sivies": {
-            "examples": [
-                "2022CEU03926"
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Sample collection and processing",
-            "label": "Public Health sample id (SIVIES)",
-            "fill_mode": "sample"
-        },
-        "geo_loc_region": {
-            "examples": [
-                "Derbyshire"
-            ],
-            "ontology": "GENEPIO:0100280",
-            "type": "string",
-            "description": "The county/region of origin of the sample.",
-            "classification": "Sample collection and processing",
-            "label": "Province",
-            "fill_mode": "batch"
-        },
-        "geo_loc_city": {
-            "examples": [
-                "Vancouver"
-            ],
-            "ontology": "GENEPIO:0001189",
-            "type": "string",
-            "description": "The city of origin of the sample.",
-            "classification": "Sample collection and processing",
-            "label": "City",
-            "fill_mode": "batch"
-        },
-        "geo_loc_latitude": {
-            "examples": [
-                "38.98 N"
-            ],
-            "ontology": "OBI:0001620",
-            "type": "string",
-            "description": "The latitude coordinates of the geographical location of sample collection.",
-            "classification": "Sample collection and processing",
-            "label": "Geo Loc Latitude",
-            "fill_mode": "batch"
-        },
-        "geo_loc_longitude": {
-            "examples": [
-                "77.11 W"
-            ],
-            "ontology": "OBI:0001621",
-            "type": "string",
-            "description": "The longitude coordinates of the geographical location of sample collection.",
-            "classification": "Sample collection and processing",
-            "label": "Geo Loc Longitude",
-            "fill_mode": "batch"
-        },
-        "anatomical_material": {
-            "Enums": [
-                "Blood [UBERON:0000178]",
-                "Fluid [UBERON:0006314]",
-                "Fluid (Cerebrospinal (CSF)) [UBERON:0001359]",
-                "Fluid (Pericardial) [UBERON:0002409]",
-                "Fluid (Pleural) [UBERON:0001087]",
-                "Fluid (Vaginal) [UBERON:0036243]",
-                "Fluid (Amniotic) [UBERON:0000173]",
-                "Saliva [UBERON:0001836]",
-                "Tissue [UBERON:0000479]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001211",
-            "type": "string",
-            "description": "A substance obtained from an anatomical part of an organism e.g. tissue, blood.",
-            "examples": [
-                "Blood [UBERON:0000178]"
-            ],
-            "classification": "Sample collection and processing",
-            "label": "Specimen source",
-            "fill_mode": "batch"
-        },
-        "environmental_material": {
-            "Enums": [
-                "Air vent [ENVO:03501208]",
-                "Banknote [ENVO:00003896]",
-                "Bed rail [ENVO:03501209]",
-                "Building Floor [ENVO:01000486]",
-                "Cloth [ENVO:02000058]",
-                "Control Panel [ENVO:03501210]",
-                "Door [ENVO:03501220]",
-                "Door Handle [ENVO:03501211]",
-                "Face Mask [OBI:0002787]",
-                "Face Shield [OBI:0002791]",
-                "Food [FOODON:00002403]",
-                "Food Packaging [FOODON:03490100]",
-                "Glass [ENVO:01000481]",
-                "Handrail [ENVO:03501212]",
-                "Hospital Gown [OBI:0002796]",
-                "Light Switch [ENVO:03501213]",
-                "Locker [ENVO:03501214]",
-                "N95 Mask [OBI:0002790]",
-                "Nurse Call Button [ENVO:03501215]",
-                "Paper [ENVO:03501256]",
-                "Particulate Matter [ENVO:01000060]",
-                "Plastic [ENVO:01000404]",
-                "PPE Gown [GENEPIO:0100025]",
-                "Sewage [ENVO:00002018]",
-                "Sink [ENVO:01000990]",
-                "Soil [ENVO:00001998]",
-                "Stainless Steel [ENVO:03501216]",
-                "Tissue Paper [ENVO:03501217]",
-                "Toilet Bowl [ENVO:03501218]",
-                "Water [ENVO:00002006]",
-                "Wastewater [ENVO:00002001]",
-                "Window [ENVO:03501219]",
-                "Wood [ENVO:00002040]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001223",
-            "type": "string",
-            "description": "A substance obtained from the natural or man-made environment e.g. soil, water, sewage, door handle, bed handrail, face mask.",
-            "examples": [
-                "Face Mask [OBI:0002787]"
-            ],
-            "classification": "Sample collection and processing",
-            "label": "Environmental Material",
-            "fill_mode": "batch"
-        },
-        "environmental_site": {
-            "Enums": [
-                "Acute care facility [ENVO:03501135]",
-                "Animal house [ENVO:00003040]",
-                "Bathroom [ENVO:01000422]",
-                "Clinical assessment centre [ENVO:03501136]",
-                "Conference venue [ENVO:03501127]",
-                "Corridor [ENVO:03501121]",
-                "Daycare [ENVO:01000927]",
-                "Emergency room (ER) [ENVO:03501145]",
-                "Family practice clinic [ENVO:03501186]",
-                "Group home [ENVO:03501196]",
-                "Homeless shelter [ENVO:03501133]",
-                "Hospital [ENVO:00002173]",
-                "Intensive Care Unit (ICU) [ENVO:03501152]",
-                "Long Term Care Facility [ENVO:03501194]",
-                "Patient room [ENVO:03501180]",
-                "Prison [ENVO:03501204]",
-                "Production Facility [ENVO:01000536]",
-                "School [ENVO:03501130]",
-                "Sewage Plant [ENVO:00003043]",
-                "Subway train [ENVO:03501109]",
-                "Wet market [ENVO:03501198]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001232",
-            "type": "string",
-            "description": "An environmental location may describe a site in the natural or built environment e.g. hospital, wet market, bat cave.",
-            "examples": [
-                "Hospital [ENVO:00002173]"
-            ],
-            "classification": "Sample collection and processing",
-            "label": "Environmental System",
-            "fill_mode": "batch"
-        },
-        "collection_device": {
-            "Enums": [
-                "Air filter [ENVO:00003968]",
-                "Blood Collection Tube [OBI:0002859]",
-                "Bronchoscope [OBI:0002826]",
-                "Collection Container [OBI:0002088]",
-                "Collection Cup [GENEPIO:0100026]",
-                "Fibrobronchoscope Brush [OBI:0002825]",
-                "Filter [GENEPIO:0100103]",
-                "Fine Needle [OBI:0002827]",
-                "Microcapillary tube [OBI:0002858]",
-                "Micropipette [OBI:0001128]",
-                "Needle [OBI:0000436]",
-                "Serum Collection Tube [OBI:0002860]",
-                "Sputum Collection Tube [OBI:0002861]",
-                "Suction Catheter [OBI:0002831]",
-                "Swab [GENEPIO:0100027]",
-                "Urine Collection Tube [OBI:0002862]",
-                "Virus Transport Medium [OBI:0002866]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001234",
-            "type": "string",
-            "description": "The instrument or container used to collect the sample e.g. swab.",
-            "examples": [
-                "Swab [GENEPIO:0100027]"
-            ],
-            "classification": "Sample collection and processing",
-            "label": "Collection Device",
-            "fill_mode": "batch"
-        },
-        "tax_id": {
-            "examples": [
-                "probably 2697049 in all cases"
-            ],
-            "ontology": "GENEPIO_0001724",
-            "type": "string",
-            "description": "The NCBITaxon identifier for the organism being sequenced.",
-            "classification": "Sample collection and processing",
-            "label": "Tax ID",
-            "fill_mode": "batch"
-        },
-        "center_name": {
-            "examples": [
-                " KAROLINSKA INSITUTET"
-            ],
-            "ontology": "NCIT_C19983",
-            "type": "string",
-            "description": "The name of the institution",
-            "classification": "Sample collection and processing",
-            "label": "Center Name",
-            "fill_mode": "batch"
-        },
-        "host_common_name": {
-            "Enums": [
-                "Human [NCBITaxon:9606]",
-                "Bat [NCBITaxon:9397]",
-                "Cat [NCBITaxon:9685]",
-                "Chicken [NCBITaxon:9031]",
-                "Civet [NCBITaxon:9673]",
-                "Cow [NCBITaxon:9913]",
-                "Dog [NCBITaxon:9615]",
-                "Lion [NCBITaxon:9689]",
-                "Mink [NCBITaxon:452646]",
-                "Pangolin [NCBITaxon:9973]",
-                "Pig [NCBITaxon:9825]",
-                "Pigeon [NCBITaxon:8930]",
-                "Tiger [NCBITaxon:9694]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001386",
-            "type": "string",
-            "description": "The commonly used name of the host.",
-            "examples": [
-                "Human [NCBITaxon:9606]"
-            ],
-            "classification": "Host information",
-            "label": "Host",
-            "fill_mode": "batch"
-        },
         "purpose_of_sequencing": {
             "Enums": [
                 "Baseline surveillance (random sampling) [GENEPIO:0100005]",
@@ -968,40 +932,6 @@
             "label": "Purpose of Sequencing",
             "fill_mode": "batch"
         },
-        "purpose_sampling": {
-            "Enums": [
-                "Cluster/Outbreak Investigation [GENEPIO:0100001]",
-                "Diagnostic Testing [GENEPIO:0100002]",
-                "Research [GENEPIO:0100003]",
-                "Protocol Testing [GENEPIO:0100024]",
-                "Surveillance [GENEPIO:0100004]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "NCIT_C146997",
-            "type": "string",
-            "description": "The reason that the sample was collected.",
-            "examples": [
-                "Diagnostic Testing [GENEPIO:0100002]"
-            ],
-            "classification": "Sample collection and processing",
-            "label": "Purpose of sampling",
-            "fill_mode": "batch"
-        },
-        "sequencing_sample_id": {
-            "examples": [
-                ""
-            ],
-            "ontology": "GENEPIO:0000079",
-            "type": "string",
-            "description": "If the information is unknown or can not be shared, leave blank.",
-            "classification": "Database Identifiers",
-            "label": "Sample ID given for sequencing",
-            "fill_mode": "sample"
-        },
         "sequencing_date": {
             "examples": [
                 "4/26/2021"
@@ -1014,20 +944,30 @@
             "label": "Sequencing Date",
             "fill_mode": "batch"
         },
-        "rna_extraction_protocol": {
+        "extraction_protocol": {
             "examples": [
-                ""
+                "Opentrons custom protocol"
             ],
             "ontology": "OBI_0302884",
             "type": "string",
-            "description": "",
+            "description": "DNA/RNA extraction protocol",
             "classification": "Sequencing",
-            "label": "Rna Extraction Protocol",
+            "label": "Extraction Protocol",
             "fill_mode": "batch"
         },
-        "library_kit": {
+        "all_in_one_library_kit": {
+             "Enums": [
+                "Ion Xpress",
+                "ABL_DeepChek NGS",
+                "Ion AmpliSeq Kit for Chef DL8",
+                "NEBNext® Fast DNA Library Prep Set for Ion Torrent™",
+                "NEBNext® ARTIC SARS-CoV-2 FS",
+                "Illumina COVIDSeq Test",
+                "ABL DeepChek® Assay WG SC2 V1",
+                "Other"
+            ],
             "examples": [
-                ""
+                "Illumina COVIDSeq Test"
             ],
             "ontology": "GENEPIO_0000085",
             "type": "string",
@@ -1036,9 +976,46 @@
             "label": "Commercial All-in-one library kit",
             "fill_mode": "batch"
         },
+        "library_preparation_kit": {
+            "Enums": [
+                "Illumina DNA PCR-Free Prep",
+                "Illumina DNA Prep",
+                "Illumina Stranded mRNA Prep",
+                "Nextera XT DNA Library Preparation Kit",
+                "TruSeq DNA Nano",
+                "TruSeq DNA Nano Library Prep Kit for NeoPrep",
+                "TruSeq DNA PCR-Free",
+                "TruSeq RNA Library Prep Kit v2",
+                "TruSeq Stranded Total RNA",
+                "TruSeq Stranded mRNA",
+                "Nextera XT",
+                "NEBNex Fast DNA Library Prep Set for Ion Torrent",
+                "Nextera DNA Flex",
+                "Ion AmpliSeq Kit Library Kit Plus",
+                "Ion AmpliSeq Kit Library Kit Plus",
+                "Ion AmpliSeq Library Kit 2.0",
+                "Ion Xpress Plus Fragment Library Kit",
+                "Oxford Nanopore Sequencing Kit",
+                "SQK-RBK110-96",
+                "Nanopore COVID Maxi: 9216 samples",
+                "Nanopore COVID Midi: 2304 samples",
+                "Nanopore COVID Mini: 576 samples",
+                "Vela Diagnostics:ViroKey SQ FLEX Library Prep Reagents",
+                "Other",
+            ]
+            "examples": [
+                "Illumina DNA Prep Tagmentation"
+            ],
+            "ontology": "GENEPIO:0001450",
+            "type": "string",
+            "description": "The name of the DNA library preparation kit used to generate the library being sequenced.",
+            "classification": "Sequencing",
+            "label": "Library Preparation Kit",
+            "fill_mode": "batch"
+        },
         "enrichment_protocol": {
             "examples": [
-                ""
+                "AMPLICON"
             ],
             "ontology": "EFO_0009089",
             "type": "string",
@@ -1058,37 +1035,37 @@
             "label": "If Enrichment Protocol Is Other, Specify",
             "fill_mode": "batch"
         },
-        "amplicon_protocol": {
+        "enrichment_panel": {
             "examples": [
-                ""
+                "ARTIC"
             ],
-            "ontology": "EFO_0003747",
+            "ontology": "0",
             "type": "string",
             "description": "",
             "classification": "Sequencing",
             "label": "Enrichment panel/assay",
             "fill_mode": "batch"
         },
-        "if_amplicon_protocol_if_other_specify": {
+        "enrichment_panel_version": {
             "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Sequencing",
-            "label": "If Enrichment panel/assay Is Other, Specify",
-            "fill_mode": "batch"
-        },
-        "amplicon_version": {
-            "examples": [
-                ""
+                "ARTIC v4"
             ],
             "ontology": "0",
             "type": "string",
             "description": "",
             "classification": "Sequencing",
             "label": "Enrichment panel/assay version",
+            "fill_mode": "batch"
+        },
+         "amplicon_pcr_primer_scheme": {
+            "examples": [
+                "https://github.com/joshquick/artic-ncov2019/blob/master/primer_schemes/nCoV-2019/V3/nCoV-2019.tsv"
+            ],
+            "ontology": "GENEPIO:0001456",
+            "type": "string",
+            "description": "The specifications of the primers (primer sequences, binding positions, fragment size generated etc) used to generate the amplicons to be sequenced.",
+            "classification": "Sequencing",
+            "label": "Amplicon Pcr Primer Scheme",
             "fill_mode": "batch"
         },
         "number_of_samples_in_run": {
@@ -1133,28 +1110,6 @@
             "description": "",
             "classification": "Sequencing",
             "label": "Sequencing Instrument Platform",
-            "fill_mode": "batch"
-        },
-        "library_preparation_kit": {
-            "examples": [
-                "Nextera XT"
-            ],
-            "ontology": "GENEPIO:0001450",
-            "type": "string",
-            "description": "The name of the DNA library preparation kit used to generate the library being sequenced.",
-            "classification": "Sequencing",
-            "label": "Library Preparation Kit",
-            "fill_mode": "batch"
-        },
-        "amplicon_pcr_primer_scheme": {
-            "examples": [
-                "https://github.com/joshquick/artic-ncov2019/blob/master/primer_schemes/nCoV-2019/V3/nCoV-2019.tsv"
-            ],
-            "ontology": "GENEPIO:0001456",
-            "type": "string",
-            "description": "The specifications of the primers (primer sequences, binding positions, fragment size generated etc) used to generate the amplicons to be sequenced.",
-            "classification": "Sequencing",
-            "label": "Amplicon Pcr Primer Scheme",
             "fill_mode": "batch"
         },
         "library_selection": {
@@ -2537,6 +2492,39 @@
             "classification": "Database Identifiers",
             "label": "Type",
             "fill_mode": "batch"
-        }
+        },
+        "biosample_accession_ENA": {
+            "examples": [
+                "SAMN14180202"
+            ],
+            "ontology": "GENEPIO:0001139",
+            "type": "string",
+            "description": "The identifier assigned to a BioSample in INSDC archives.",
+            "classification": "Database Identifiers",
+            "label": "ENA Sample ID",
+            "fill_mode": "sample"
+        },
+        "virus_name": {
+            "examples": [
+                "hCoV-19/Canada/prov_rona_99/2020"
+            ],
+            "ontology": "GENEPIO:0100282",
+            "type": "string",
+            "description": "The user-defined GISAID virus name assigned to the sequence.",
+            "classification": "Database Identifiers",
+            "label": "GISAID Virus Name",
+            "fill_mode": "sample"
+        },
+               "center_name": {
+            "examples": [
+                " KAROLINSKA INSITUTET"
+            ],
+            "ontology": "NCIT_C19983",
+            "type": "string",
+            "description": "The name of the institution",
+            "classification": "Sample collection and processing",
+            "label": "Center Name",
+            "fill_mode": "batch"
+        },
     }
 }
