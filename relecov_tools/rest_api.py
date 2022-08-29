@@ -20,9 +20,16 @@ class RestApi:
         self.request_url = server + url
         self.headers = {"content-type": "application/json"}
 
-    def get_request(self, request_info, parameter, value, safe=True):
+    def get_request(self, request_info, parameter, value=None, safe=True):
         if parameter == "" or parameter is None:
             url_http = str(self.request_url + request_info)
+        elif isinstance(parameter, dict):
+            param_value = []
+            for key, value in parameter.items():
+                param_value.append(key + "=" + value)
+            url_http = str(
+                self.request_url + request_info + "?" + "?".join(param_value)
+            )
         else:
             url_http = str(
                 self.request_url + request_info + "?" + parameter + "=" + value
