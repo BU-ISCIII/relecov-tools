@@ -38,6 +38,39 @@
             "label": "Originating Laboratory",
             "fill_mode": "sample"
         },
+         "collecting_institution_email": {
+            "examples": [
+                "johnnyblogs@lab.ca"
+            ],
+            "ontology": "OBI:0001890",
+            "type": "string",
+            "description": "The email address of the contact responsible for follow-up regarding the sample.",
+            "classification": "Sample collection and processing",
+            "label": "Originating Laboratory Email",
+            "fill_mode": "batch"
+        },
+        "collecting_institution_address": {
+            "examples": [
+                "655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"
+            ],
+            "ontology": "GENEPIO:0001158",
+            "type": "string",
+            "description": "The mailing address of the agency submitting the sample.",
+            "classification": "Sample collection and processing",
+            "label": "Originating Laboratory Address",
+            "fill_mode": "batch"
+        },
+         "submitting_lab_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Sample ID given by the submitting laboratory",
+            "classification": "Sequencing",
+            "label": "Sample ID given by the submitting laboratory",
+            "fill_mode": "sample"
+        },
         "submitting_institution": {
             "examples": [
                 "Centers for Disease Control and Prevention"
@@ -48,6 +81,28 @@
             "classification": "Sample collection and processing",
             "label": "Submitting Institution",
             "fill_mode": "sample"
+        },
+        "submitting_institution_email": {
+            "examples": [
+                "RespLab@lab.ca"
+            ],
+            "ontology": "GENEPIO:0001165",
+            "type": "string",
+            "description": "The email address of the contact responsible for follow-up regarding the sequence.",
+            "classification": "Sample collection and processing",
+            "label": "Submitting Institution Email",
+            "fill_mode": "batch"
+        },
+        "submitting_institution_address": {
+            "examples": [
+                "123 Sunnybrooke St, Toronto, Ontario, M4P 1L6, Canada"
+            ],
+            "ontology": "GENEPIO:0001167",
+            "type": "string",
+            "description": "The mailing address of the agency submitting the sequence.",
+            "classification": "Sample collection and processing",
+            "label": "Submitting Institution Address",
+            "fill_mode": "batch"
         },
         "sample_collection_date": {
             "examples": [
@@ -60,6 +115,29 @@
             "classification": "Sample collection and processing",
             "label": "Sample Collection Date",
             "fill_mode": "sample"
+        },
+          "sample_received_date": {
+            "examples": [
+                "3/21/2020"
+            ],
+            "ontology": "GENEPIO:0001179",
+            "type": "string",
+            "description": "The date on which the sample was received.",
+            "format": "date",
+            "classification": "Sample collection and processing",
+            "label": "Sample Received Date",
+            "fill_mode": "sample"
+        },
+        "sample_storage_conditions": {
+            "examples": [
+                "24 degrees celsius"
+            ],
+            "ontology": "NCIT_C115535",
+            "type": "string",
+            "description": "The name and version of a particular protocol used for sampling.",
+            "classification": "Sample collection and processing",
+            "label": "Biological Sample Storage Condition",
+            "fill_mode": "batch"
         },
         "geo_loc_country": {
             "Enums": [
@@ -387,12 +465,9 @@
             ],
             "ontology": "GENEPIO:0001398",
             "type": "string",
-            "description": "a unique identifier by which each subject can be referred to, de-identified.",
-            "clasification": "Host information",
+            "description": "An unique identifier by which each subject can be referred to, de-identified.",
+            "classification": "Host information",
             "label": "Host Subject Id",
-            "table": [
-                "sample"
-            ]
         },
         "host_health_state": {
             "examples": [
@@ -401,11 +476,8 @@
             "ontology": "GENEPIO:0001388",
             "type": "string",
             "description": " Status of the host",
-            "clasification": "Host information",
+            "classification": "Host health state information",
             "label": "Host health state",
-            "table": [
-                "sample"
-            ]
         },
         "host_scientific_name": {
             "Enums": [
@@ -459,6 +531,41 @@
             "classification": "Host information",
             "label": "Host disease",
             "fill_mode": "batch"
+        },
+        "host_age": {
+            "ontology": "GENEPIO:0001392",
+            "type": "string",
+            "description": "Age of host at the time of sampling.",
+            "examples": [
+                "79"
+            ],
+            "classification": "Host information",
+            "label": "Host Age",
+            "fill_mode": "sample"
+        },
+        "host_gender": {
+            "Enums": [
+                "Female [NCIT:C46110]",
+                "Male [NCIT:C46109]",
+                "Non-binary Gender [GSSO:000132]",
+                "Transgender (assigned male at birth) [GSSO:004004]",
+                "Transgender (assigned female at birth) [GSSO:004005]",
+                "Undeclared [NCIT:C110959]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001395",
+            "type": "string",
+            "description": "The gender of the host at the time of sample collection.",
+            "examples": [
+                "Male [NCIT:C46109]"
+            ],
+            "classification": "Host information",
+            "label": "Host Gender",
+            "fill_mode": "sample"
         },
         "sequencing_instrument_model": {
             "Enums": [
@@ -524,17 +631,7 @@
             "label": "Sequencing Instrument Model",
             "fill_mode": "batch"
         },
-        "submitting_lab_sample_id": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "Sample ID given by the submitting laboratory",
-            "classification": "Sequencing",
-            "label": "Sample ID given by the submitting laboratory",
-            "fill_mode": "sample"
-        },
+       
         "biosample_accession_ENA": {
             "examples": [
                 "SAMN14180202"
@@ -557,108 +654,7 @@
             "label": "GISAID Virus Name",
             "fill_mode": "sample"
         },
-        "collecting_institution_email": {
-            "examples": [
-                "johnnyblogs@lab.ca"
-            ],
-            "ontology": "OBI:0001890",
-            "type": "string",
-            "description": "The email address of the contact responsible for follow-up regarding the sample.",
-            "classification": "Sample collection and processing",
-            "label": "Originating Laboratory Email",
-            "fill_mode": "batch"
-        },
-        "collecting_institution_address": {
-            "examples": [
-                "655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"
-            ],
-            "ontology": "GENEPIO:0001158",
-            "type": "string",
-            "description": "The mailing address of the agency submitting the sample.",
-            "classification": "Sample collection and processing",
-            "label": "Originating Laboratory Address",
-            "fill_mode": "batch"
-        },
-        "submitting_institution_email": {
-            "examples": [
-                "RespLab@lab.ca"
-            ],
-            "ontology": "GENEPIO:0001165",
-            "type": "string",
-            "description": "The email address of the contact responsible for follow-up regarding the sequence.",
-            "classification": "Sample collection and processing",
-            "label": "Submitting Institution Email",
-            "fill_mode": "batch"
-        },
-        "submitting_institution_address": {
-            "examples": [
-                "123 Sunnybrooke St, Toronto, Ontario, M4P 1L6, Canada"
-            ],
-            "ontology": "GENEPIO:0001167",
-            "type": "string",
-            "description": "The mailing address of the agency submitting the sequence.",
-            "classification": "Sample collection and processing",
-            "label": "Submitting Institution Address",
-            "fill_mode": "batch"
-        },
-        "sample_received_date": {
-            "examples": [
-                "3/21/2020"
-            ],
-            "ontology": "GENEPIO:0001179",
-            "type": "string",
-            "description": "The date on which the sample was received.",
-            "format": "date",
-            "classification": "Sample collection and processing",
-            "label": "Sample Received Date",
-            "fill_mode": "sample"
-        },
-        "sample_storage_conditions": {
-            "examples": [
-                "24 degrees celsius"
-            ],
-            "ontology": "NCIT_C115535",
-            "type": "string",
-            "description": "The name and version of a particular protocol used for sampling.",
-            "classification": "Sample collection and processing",
-            "label": "Biological Sample Storage Condition",
-            "fill_mode": "batch"
-        },
-        "host_age": {
-            "ontology": "GENEPIO:0001392",
-            "type": "string",
-            "description": "Age of host at the time of sampling.",
-            "examples": [
-                "79"
-            ],
-            "classification": "Host information",
-            "label": "Host Age",
-            "fill_mode": "sample"
-        },
-        "host_gender": {
-            "Enums": [
-                "Female [NCIT:C46110]",
-                "Male [NCIT:C46109]",
-                "Non-binary Gender [GSSO:000132]",
-                "Transgender (assigned male at birth) [GSSO:004004]",
-                "Transgender (assigned female at birth) [GSSO:004005]",
-                "Undeclared [NCIT:C110959]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001395",
-            "type": "string",
-            "description": "The gender of the host at the time of sample collection.",
-            "examples": [
-                "Male [NCIT:C46109]"
-            ],
-            "classification": "Host information",
-            "label": "Host Gender",
-            "fill_mode": "sample"
-        },
+       
         "microbiology_lab_sample_id": {
             "examples": [
                 ""
