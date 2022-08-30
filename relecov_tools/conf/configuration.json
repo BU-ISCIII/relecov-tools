@@ -119,7 +119,7 @@
             "token": ""
         },
         "relecov": {
-            "server": "http://relecov-platform.isciiides.es",
+            "server": "http://relecov-platform.isciiides.es:8000",
             "url": "/api/",
             "store_samples": "createSampleData",
             "bioinfodata": "createBioinfoData",
