@@ -316,6 +316,7 @@ class FeedDatabase:
 
         elif self.type_of_info == "variantdata":
             post_url = "variantdata"
+            map_fields = self.json_data
         else:
             stderr.print("[red] Invalid type to upload to database")
             sys.exit(1)
