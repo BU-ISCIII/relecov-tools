@@ -109,7 +109,7 @@
     },
     "external_url": {
         "iskylims": {
-            "server": "http://relecov-iskylims.isciiides.es:8001",
+            "server": "http://relecov-iskylims.isciiides.es",
             "url": "/wetlab/api/",
             "store_samples": "createSampleData",
             "url_project_fields": "sampleProjectFields",
@@ -119,7 +119,7 @@
             "token": ""
         },
         "relecov": {
-            "server": "http://relecov-platform.isciiides.es:8000",
+            "server": "http://relecov-platform.isciiides.es",
             "url": "/api/",
             "store_samples": "createSampleData",
             "bioinfodata": "createBioinfoData",
@@ -135,16 +135,8 @@
         "sampleLocation": "Not defined"
     },
     "relecov_sample_metadata": [
-        "author_submitter",
-        "authors",
-        "bioproject_accession_ENA",
-        "bioproject_umbrella_accession_ENA",
-        "biosample_accession_ENA",
         "fastq_r1_md5",
         "fastq_r2_md5",
-        "GenBank_ENA_DDBJ_accession",
-        "GISAID_accession",
-        "gisaid_id",
         "microbiology_lab_sample_id",
         "r1_fastq_filepath",
         "r2_fastq_filepath",
