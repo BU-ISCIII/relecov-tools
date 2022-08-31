@@ -1,6 +1,6 @@
 {
     "schema": "RELECOV",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "required": [
         "collecting_lab_sample_id",
         "collecting_institution",
@@ -16,13 +16,24 @@
     ],
     "type": "object",
     "properties": {
+        "public_health_sample_id_sivies": {
+            "examples": [
+                "2022CEU03926"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Sample collection and processing",
+            "label": "Public Health sample id (SIVIES)",
+            "fill_mode": "sample"
+        },
         "collecting_lab_sample_id": {
             "examples": [
                 "prov_rona_99"
             ],
             "ontology": "GENEPIO:0001123",
             "type": "string",
-            "description": "The user-defined name for the sample.",
+            "description": "The name given for the sample by the collecting institution.",
             "classification": "Database Identifiers",
             "label": "Sample ID given by originating laboratory",
             "fill_mode": "sample"
@@ -33,9 +44,75 @@
             ],
             "ontology": "GENEPIO:0001153",
             "type": "string",
-            "description": "The name of the agency that collected the original sample.",
+            "description": "The name of the agency/institution that collected the sample.",
             "classification": "Sample collection and processing",
             "label": "Originating Laboratory",
+            "fill_mode": "sample"
+        },
+         "collecting_institution_email": {
+            "examples": [
+                "johnnyblogs@lab.ca"
+            ],
+            "ontology": "OBI:0001890",
+            "type": "string",
+            "description": "The email address of the contact responsible for follow-up regarding the sample.",
+            "classification": "Sample collection and processing",
+            "label": "Originating Laboratory Email",
+            "fill_mode": "batch"
+        },
+        "collecting_institution_address": {
+            "examples": [
+                "655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"
+            ],
+            "ontology": "GENEPIO:0001158",
+            "type": "string",
+            "description": "The mailing address of the agency submitting the sample.",
+            "classification": "Sample collection and processing",
+            "label": "Originating Laboratory Address",
+            "fill_mode": "batch"
+        },
+         "microbiology_lab_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Sample collection and processing",
+            "label": "Sample ID given in the microbiology lab",
+            "fill_mode": "sample"
+        },
+        "isolate_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "NCIT:C53471",
+            "type": "string",
+            "description": "",
+            "classification": "Database Identifiers",
+            "label": "Sample ID given if multiple rna-extraction or passages",
+            "fill_mode": "sample"
+        },
+        "sequencing_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0000079",
+            "type": "string",
+            "description": "If the information is unknown or can not be shared, leave blank.",
+            "classification": "Database Identifiers",
+            "label": "Sample ID given for sequencing",
+            "fill_mode": "sample"
+        },
+         "submitting_lab_sample_id": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Sample ID given by the submitting laboratory",
+            "classification": "Sequencing",
+            "label": "Sample ID given by the submitting laboratory",
             "fill_mode": "sample"
         },
         "submitting_institution": {
@@ -44,10 +121,32 @@
             ],
             "ontology": "GENEPIO:0001159",
             "type": "string",
-            "description": "The name of the agency that generated the sequence.",
+            "description": "The name of the agency that submitted the sequence to public databases.",
             "classification": "Sample collection and processing",
             "label": "Submitting Institution",
             "fill_mode": "sample"
+        },
+        "submitting_institution_email": {
+            "examples": [
+                "RespLab@lab.ca"
+            ],
+            "ontology": "GENEPIO:0001165",
+            "type": "string",
+            "description": "The email address of the contact responsible for follow-up regarding the sequence.",
+            "classification": "Sample collection and processing",
+            "label": "Submitting Institution Email",
+            "fill_mode": "batch"
+        },
+        "submitting_institution_address": {
+            "examples": [
+                "123 Sunnybrooke St, Toronto, Ontario, M4P 1L6, Canada"
+            ],
+            "ontology": "GENEPIO:0001167",
+            "type": "string",
+            "description": "The mailing address of the agency submitting the sequence.",
+            "classification": "Sample collection and processing",
+            "label": "Submitting Institution Address",
+            "fill_mode": "batch"
         },
         "sample_collection_date": {
             "examples": [
@@ -60,6 +159,29 @@
             "classification": "Sample collection and processing",
             "label": "Sample Collection Date",
             "fill_mode": "sample"
+        },
+        "sample_received_date": {
+            "examples": [
+                "3/21/2020"
+            ],
+            "ontology": "GENEPIO:0001179",
+            "type": "string",
+            "description": "The date on which the sample was received.",
+            "format": "date",
+            "classification": "Sample collection and processing",
+            "label": "Sample Received Date",
+            "fill_mode": "sample"
+        },
+        "sample_storage_conditions": {
+            "examples": [
+                "24 degrees celsius"
+            ],
+            "ontology": "NCIT_C115535",
+            "type": "string",
+            "description": "The name and version of a particular protocol used for sampling.",
+            "classification": "Sample collection and processing",
+            "label": "Biological Sample Storage Condition",
+            "fill_mode": "batch"
         },
         "geo_loc_country": {
             "Enums": [
@@ -361,327 +483,7 @@
             "label": "Autonomic Community",
             "fill_mode": "batch"
         },
-        "organism": {
-            "Enums": [
-                "Coronaviridae [NCBITaxon:11118]",
-                "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001191",
-            "type": "string",
-            "description": "Taxonomic name of the organism.",
-            "examples": [
-                "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]"
-            ],
-            "classification": "Sample collection and processing",
-            "label": "Organism",
-            "fill_mode": "batch"
-        },
-        "host_subject_id": {
-            "examples": [
-                "e.g. #131"
-            ],
-            "ontology": "GENEPIO:0001398",
-            "type": "string",
-            "description": "a unique identifier by which each subject can be referred to, de-identified.",
-            "clasification": "Host information",
-            "label": "Host Subject Id",
-            "table": [
-                "sample"
-            ]
-        },
-        "host_health_state": {
-            "examples": [
-                ""
-            ],
-            "ontology": "GENEPIO:0001388",
-            "type": "string",
-            "description": " Status of the host",
-            "clasification": "Host information",
-            "label": "Host health state",
-            "table": [
-                "sample"
-            ]
-        },
-        "host_scientific_name": {
-            "Enums": [
-                "Bos taurus [NCBITaxon:9913]",
-                "Canis lupus familiaris [NCBITaxon:9615]",
-                "Chiroptera [NCBITaxon:9397]",
-                "Columbidae [NCBITaxon:8930]",
-                "Felis catus [NCBITaxon:9685]",
-                "Gallus gallus [NCBITaxon:9031]",
-                "Homo sapiens [NCBITaxon:9606]",
-                "Manis [NCBITaxon:9973]",
-                "Manis javanica [NCBITaxon:9974]",
-                "Neovison vison [NCBITaxon:452646]",
-                "Panthera leo [NCBITaxon:9689]",
-                "Panthera tigris [NCBITaxon:9694]",
-                "Rhinolophidae [NCBITaxon:58055]",
-                "Rhinolophus affinis [NCBITaxon:59477]",
-                "Sus scrofa domesticus [NCBITaxon:9825]",
-                "Viverridae [NCBITaxon:9673]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001387",
-            "type": "string",
-            "description": "The taxonomic, or scientific name of the host.",
-            "examples": [
-                "Homo sapiens [NCBITaxon:9606]"
-            ],
-            "classification": "Host information",
-            "label": "Host Scientific Name",
-            "fill_mode": "batch"
-        },
-        "host_disease": {
-            "Enums": [
-                "COVID-19 [MONDO:0100096]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001391",
-            "type": "string",
-            "description": "The name of the disease experienced by the host.",
-            "examples": [
-                "COVID-19 [MONDO:0100096]"
-            ],
-            "classification": "Host information",
-            "label": "Host disease",
-            "fill_mode": "batch"
-        },
-        "sequencing_instrument_model": {
-            "Enums": [
-                "Illumina sequencing instrument [GENEPIO:0100105]",
-                "Illumina Genome Analyzer [GENEPIO:0100106]",
-                "Illumina Genome Analyzer II [GENEPIO:0100107]",
-                "Illumina Genome Analyzer IIx [GENEPIO:0100108]",
-                "Illumina HiScanSQ [GENEPIO:0100109]",
-                "Illumina HiSeq [GENEPIO:0100110]",
-                "Illumina HiSeq X [GENEPIO:0100111]",
-                "Illumina HiSeq X Five [GENEPIO:0100112]",
-                "Illumina HiSeq X Ten [GENEPIO:0100113]",
-                "Illumina HiSeq 1000 [GENEPIO:0100114]",
-                "Illumina HiSeq 1500 [GENEPIO:0100115]",
-                "Illumina HiSeq 2000 [GENEPIO:0100116]",
-                "Illumina HiSeq 2500 [GENEPIO:0100117]",
-                "Illumina HiSeq 3000 [GENEPIO:0100118]",
-                "Illumina HiSeq 4000 [GENEPIO:0100119]",
-                "Illumina iSeq [GENEPIO:0100120]",
-                "Illumina iSeq 100 [GENEPIO:0100121]",
-                "Illumina NovaSeq [GENEPIO:0100122]",
-                "Illumina NovaSeq 6000 [GENEPIO:0100123]",
-                "Illumina MiniSeq [GENEPIO:0100124]",
-                "Illumina MiSeq [GENEPIO:0100125]",
-                "Illumina NextSeq [GENEPIO:0100126]",
-                "Illumina NextSeq 500 [GENEPIO:0100127]",
-                "Illumina NextSeq 550 [GENEPIO:0100128]",
-                "Illumina NextSeq 2000 [GENEPIO:0100129]",
-                "Pacific Biosciences sequencing instrument [GENEPIO:0100130]",
-                "PacBio RS [GENEPIO:0100131]",
-                "PacBio RS II [GENEPIO:0100132]",
-                "PacBio Sequel [GENEPIO:0100133]",
-                "PacBio Sequel II [GENEPIO:0100134]",
-                "Ion Torrent sequencing instrument [GENEPIO:0100135]",
-                "Ion Torrent PGM [GENEPIO:0100136]",
-                "Ion Torrent Proton [GENEPIO:0100137]",
-                "Ion Torrent S5 XL [GENEPIO:0100138]",
-                "Ion Torrent S5 [GENEPIO:0100139]",
-                "Oxford Nanopore sequencing instrument [GENEPIO:0100140]",
-                "Oxford Nanopore GridION [GENEPIO:0100141]",
-                "Oxford Nanopore MinION [GENEPIO:0100142]",
-                "Oxford Nanopore PromethION [GENEPIO:0100143]",
-                "BGI Genomics sequencing instrument [GENEPIO:0100144]",
-                "BGI SEQ-500 [GENEPIO:0100145]",
-                "MGI sequencing instrument [GENEPIO:0100146]",
-                "MGI DNBSEQ-T7 [GENEPIO:0100147]",
-                "MGI DNBSEQ-G400 [GENEPIO:0100148]",
-                "MGI DNBSEQ-G400RS FAST [GENEPIO:0100149]",
-                "MGI DNBSEQ-G50 [GENEPIO:0100150]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001452",
-            "type": "string",
-            "description": "The model of the sequencing instrument used.",
-            "examples": [
-                "Oxford Nanopore MinION [GENEPIO:0100142]"
-            ],
-            "classification": "Sequencing",
-            "label": "Sequencing Instrument Model",
-            "fill_mode": "batch"
-        },
-        "submitting_lab_sample_id": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "Sample ID given by the submitting laboratory",
-            "classification": "Sequencing",
-            "label": "Sample ID given by the submitting laboratory",
-            "fill_mode": "sample"
-        },
-        "biosample_accession_ENA": {
-            "examples": [
-                "SAMN14180202"
-            ],
-            "ontology": "GENEPIO:0001139",
-            "type": "string",
-            "description": "The identifier assigned to a BioSample in INSDC archives.",
-            "classification": "Database Identifiers",
-            "label": "ENA Sample ID",
-            "fill_mode": "sample"
-        },
-        "virus_name": {
-            "examples": [
-                "hCoV-19/Canada/prov_rona_99/2020"
-            ],
-            "ontology": "GENEPIO:0100282",
-            "type": "string",
-            "description": "The user-defined GISAID virus name assigned to the sequence.",
-            "classification": "Database Identifiers",
-            "label": "GISAID Virus Name",
-            "fill_mode": "sample"
-        },
-        "collecting_institution_email": {
-            "examples": [
-                "johnnyblogs@lab.ca"
-            ],
-            "ontology": "OBI:0001890",
-            "type": "string",
-            "description": "The email address of the contact responsible for follow-up regarding the sample.",
-            "classification": "Sample collection and processing",
-            "label": "Originating Laboratory Email",
-            "fill_mode": "batch"
-        },
-        "collecting_institution_address": {
-            "examples": [
-                "655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"
-            ],
-            "ontology": "GENEPIO:0001158",
-            "type": "string",
-            "description": "The mailing address of the agency submitting the sample.",
-            "classification": "Sample collection and processing",
-            "label": "Originating Laboratory Address",
-            "fill_mode": "batch"
-        },
-        "submitting_institution_email": {
-            "examples": [
-                "RespLab@lab.ca"
-            ],
-            "ontology": "GENEPIO:0001165",
-            "type": "string",
-            "description": "The email address of the contact responsible for follow-up regarding the sequence.",
-            "classification": "Sample collection and processing",
-            "label": "Submitting Institution Email",
-            "fill_mode": "batch"
-        },
-        "submitting_institution_address": {
-            "examples": [
-                "123 Sunnybrooke St, Toronto, Ontario, M4P 1L6, Canada"
-            ],
-            "ontology": "GENEPIO:0001167",
-            "type": "string",
-            "description": "The mailing address of the agency submitting the sequence.",
-            "classification": "Sample collection and processing",
-            "label": "Submitting Institution Address",
-            "fill_mode": "batch"
-        },
-        "sample_received_date": {
-            "examples": [
-                "3/21/2020"
-            ],
-            "ontology": "GENEPIO:0001179",
-            "type": "string",
-            "description": "The date on which the sample was received.",
-            "format": "date",
-            "classification": "Sample collection and processing",
-            "label": "Sample Received Date",
-            "fill_mode": "sample"
-        },
-        "sample_storage_conditions": {
-            "examples": [
-                "24 degrees celsius"
-            ],
-            "ontology": "NCIT_C115535",
-            "type": "string",
-            "description": "The name and version of a particular protocol used for sampling.",
-            "classification": "Sample collection and processing",
-            "label": "Biological Sample Storage Condition",
-            "fill_mode": "batch"
-        },
-        "host_age": {
-            "ontology": "GENEPIO:0001392",
-            "type": "string",
-            "description": "Age of host at the time of sampling.",
-            "examples": [
-                "79"
-            ],
-            "classification": "Host information",
-            "label": "Host Age",
-            "fill_mode": "sample"
-        },
-        "host_gender": {
-            "Enums": [
-                "Female [NCIT:C46110]",
-                "Male [NCIT:C46109]",
-                "Non-binary Gender [GSSO:000132]",
-                "Transgender (assigned male at birth) [GSSO:004004]",
-                "Transgender (assigned female at birth) [GSSO:004005]",
-                "Undeclared [NCIT:C110959]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "GENEPIO:0001395",
-            "type": "string",
-            "description": "The gender of the host at the time of sample collection.",
-            "examples": [
-                "Male [NCIT:C46109]"
-            ],
-            "classification": "Host information",
-            "label": "Host Gender",
-            "fill_mode": "sample"
-        },
-        "microbiology_lab_sample_id": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Sample collection and processing",
-            "label": "Sample ID given in the microbiology lab",
-            "fill_mode": "sample"
-        },
-        "public_health_sample_id_sivies": {
-            "examples": [
-                "2022CEU03926"
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Sample collection and processing",
-            "label": "Public Health sample id (SIVIES)",
-            "fill_mode": "sample"
-        },
-        "geo_loc_region": {
+         "geo_loc_region": {
             "examples": [
                 "Derbyshire"
             ],
@@ -723,6 +525,29 @@
             "description": "The longitude coordinates of the geographical location of sample collection.",
             "classification": "Sample collection and processing",
             "label": "Geo Loc Longitude",
+            "fill_mode": "batch"
+        },
+        "purpose_sampling": {
+            "Enums": [
+                "Cluster/Outbreak Investigation [GENEPIO:0100001]",
+                "Diagnostic Testing [GENEPIO:0100002]",
+                "Research [GENEPIO:0100003]",
+                "Protocol Testing [GENEPIO:0100024]",
+                "Surveillance [GENEPIO:0100004]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "NCIT_C146997",
+            "type": "string",
+            "description": "The reason that the sample was collected.",
+            "examples": [
+                "Diagnostic Testing [GENEPIO:0100002]"
+            ],
+            "classification": "Sample collection and processing",
+            "label": "Purpose of sampling",
             "fill_mode": "batch"
         },
         "anatomical_material": {
@@ -803,7 +628,7 @@
             "label": "Environmental Material",
             "fill_mode": "batch"
         },
-        "environmental_site": {
+        "environmental_system": {
             "Enums": [
                 "Acute care facility [ENVO:03501135]",
                 "Animal house [ENVO:00003040]",
@@ -842,44 +667,29 @@
             "label": "Environmental System",
             "fill_mode": "batch"
         },
-        "collection_device": {
+        "organism": {
             "Enums": [
-                "Air filter [ENVO:00003968]",
-                "Blood Collection Tube [OBI:0002859]",
-                "Bronchoscope [OBI:0002826]",
-                "Collection Container [OBI:0002088]",
-                "Collection Cup [GENEPIO:0100026]",
-                "Fibrobronchoscope Brush [OBI:0002825]",
-                "Filter [GENEPIO:0100103]",
-                "Fine Needle [OBI:0002827]",
-                "Microcapillary tube [OBI:0002858]",
-                "Micropipette [OBI:0001128]",
-                "Needle [OBI:0000436]",
-                "Serum Collection Tube [OBI:0002860]",
-                "Sputum Collection Tube [OBI:0002861]",
-                "Suction Catheter [OBI:0002831]",
-                "Swab [GENEPIO:0100027]",
-                "Urine Collection Tube [OBI:0002862]",
-                "Virus Transport Medium [OBI:0002866]",
+                "Coronaviridae [NCBITaxon:11118]",
+                "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]",
                 "Not Applicable [GENEPIO:0001619]",
                 "Not Collected [GENEPIO:0001620]",
                 "Not Provided [GENEPIO:0001668]",
                 "Missing [GENEPIO:0001618]",
                 "Restricted Access [GENEPIO:0001810]"
             ],
-            "ontology": "GENEPIO:0001234",
+            "ontology": "GENEPIO:0001191",
             "type": "string",
-            "description": "The instrument or container used to collect the sample e.g. swab.",
+            "description": "Taxonomic name of the organism.",
             "examples": [
-                "Swab [GENEPIO:0100027]"
+                "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]"
             ],
             "classification": "Sample collection and processing",
-            "label": "Collection Device",
+            "label": "Organism",
             "fill_mode": "batch"
         },
         "tax_id": {
             "examples": [
-                "probably 2697049 in all cases"
+                "2697049"
             ],
             "ontology": "GENEPIO_0001724",
             "type": "string",
@@ -888,16 +698,25 @@
             "label": "Tax ID",
             "fill_mode": "batch"
         },
-        "center_name": {
+        "host_subject_id": {
             "examples": [
-                " KAROLINSKA INSITUTET"
+                "e.g. #131"
             ],
-            "ontology": "NCIT_C19983",
+            "ontology": "GENEPIO:0001398",
             "type": "string",
-            "description": "The name of the institution",
-            "classification": "Sample collection and processing",
-            "label": "Center Name",
-            "fill_mode": "batch"
+            "description": "An unique identifier by which each subject can be referred to, de-identified.",
+            "classification": "Host information",
+            "label": "Host Subject Id"
+        },
+        "host_health_state": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0001388",
+            "type": "string",
+            "description": " Status of the host",
+            "classification": "Host health state information",
+            "label": "Host health state"
         },
         "host_common_name": {
             "Enums": [
@@ -928,6 +747,158 @@
             ],
             "classification": "Host information",
             "label": "Host",
+            "fill_mode": "batch"
+        },
+        "host_scientific_name": {
+            "Enums": [
+                "Bos taurus [NCBITaxon:9913]",
+                "Canis lupus familiaris [NCBITaxon:9615]",
+                "Chiroptera [NCBITaxon:9397]",
+                "Columbidae [NCBITaxon:8930]",
+                "Felis catus [NCBITaxon:9685]",
+                "Gallus gallus [NCBITaxon:9031]",
+                "Homo sapiens [NCBITaxon:9606]",
+                "Manis [NCBITaxon:9973]",
+                "Manis javanica [NCBITaxon:9974]",
+                "Neovison vison [NCBITaxon:452646]",
+                "Panthera leo [NCBITaxon:9689]",
+                "Panthera tigris [NCBITaxon:9694]",
+                "Rhinolophidae [NCBITaxon:58055]",
+                "Rhinolophus affinis [NCBITaxon:59477]",
+                "Sus scrofa domesticus [NCBITaxon:9825]",
+                "Viverridae [NCBITaxon:9673]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001387",
+            "type": "string",
+            "description": "The taxonomic, or scientific name of the host.",
+            "examples": [
+                "Homo sapiens [NCBITaxon:9606]"
+            ],
+            "classification": "Host information",
+            "label": "Host Scientific Name",
+            "fill_mode": "batch"
+        },
+        "host_disease": {
+            "Enums": [
+                "COVID-19 [MONDO:0100096]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001391",
+            "type": "string",
+            "description": "The name of the disease experienced by the host.",
+            "examples": [
+                "COVID-19 [MONDO:0100096]"
+            ],
+            "classification": "Host information",
+            "label": "Host disease",
+            "fill_mode": "batch"
+        },
+        "host_age": {
+            "ontology": "GENEPIO:0001392",
+            "type": "string",
+            "description": "Age of host at the time of sampling.",
+            "examples": [
+                "79"
+            ],
+            "classification": "Host information",
+            "label": "Host Age",
+            "fill_mode": "sample"
+        },
+        "host_gender": {
+            "Enums": [
+                "Female [NCIT:C46110]",
+                "Male [NCIT:C46109]",
+                "Non-binary Gender [GSSO:000132]",
+                "Transgender (assigned male at birth) [GSSO:004004]",
+                "Transgender (assigned female at birth) [GSSO:004005]",
+                "Undeclared [NCIT:C110959]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001395",
+            "type": "string",
+            "description": "The gender of the host at the time of sample collection.",
+            "examples": [
+                "Male [NCIT:C46109]"
+            ],
+            "classification": "Host information",
+            "label": "Host Gender",
+            "fill_mode": "sample"
+        },
+        "sequencing_instrument_model": {
+            "Enums": [
+                "Illumina sequencing instrument [GENEPIO:0100105]",
+                "Illumina Genome Analyzer [GENEPIO:0100106]",
+                "Illumina Genome Analyzer II [GENEPIO:0100107]",
+                "Illumina Genome Analyzer IIx [GENEPIO:0100108]",
+                "Illumina HiScanSQ [GENEPIO:0100109]",
+                "Illumina HiSeq [GENEPIO:0100110]",
+                "Illumina HiSeq X [GENEPIO:0100111]",
+                "Illumina HiSeq X Five [GENEPIO:0100112]",
+                "Illumina HiSeq X Ten [GENEPIO:0100113]",
+                "Illumina HiSeq 1000 [GENEPIO:0100114]",
+                "Illumina HiSeq 1500 [GENEPIO:0100115]",
+                "Illumina HiSeq 2000 [GENEPIO:0100116]",
+                "Illumina HiSeq 2500 [GENEPIO:0100117]",
+                "Illumina HiSeq 3000 [GENEPIO:0100118]",
+                "Illumina HiSeq 4000 [GENEPIO:0100119]",
+                "Illumina iSeq [GENEPIO:0100120]",
+                "Illumina iSeq 100 [GENEPIO:0100121]",
+                "Illumina NovaSeq [GENEPIO:0100122]",
+                "Illumina NovaSeq 6000 [GENEPIO:0100123]",
+                "Illumina MiniSeq [GENEPIO:0100124]",
+                "Illumina MiSeq [GENEPIO:0100125]",
+                "Illumina NextSeq [GENEPIO:0100126]",
+                "Illumina NextSeq 500 [GENEPIO:0100127]",
+                "Illumina NextSeq 550 [GENEPIO:0100128]",
+                "Illumina NextSeq 2000 [GENEPIO:0100129]",
+                "Pacific Biosciences sequencing instrument [GENEPIO:0100130]",
+                "PacBio RS [GENEPIO:0100131]",
+                "PacBio RS II [GENEPIO:0100132]",
+                "PacBio Sequel [GENEPIO:0100133]",
+                "PacBio Sequel II [GENEPIO:0100134]",
+                "Ion Torrent sequencing instrument [GENEPIO:0100135]",
+                "Ion Torrent PGM [GENEPIO:0100136]",
+                "Ion Torrent Proton [GENEPIO:0100137]",
+                "Ion Torrent S5 XL [GENEPIO:0100138]",
+                "Ion Torrent S5 [GENEPIO:0100139]",
+                "Oxford Nanopore sequencing instrument [GENEPIO:0100140]",
+                "Oxford Nanopore GridION [GENEPIO:0100141]",
+                "Oxford Nanopore MinION [GENEPIO:0100142]",
+                "Oxford Nanopore PromethION [GENEPIO:0100143]",
+                "BGI Genomics sequencing instrument [GENEPIO:0100144]",
+                "BGI SEQ-500 [GENEPIO:0100145]",
+                "MGI sequencing instrument [GENEPIO:0100146]",
+                "MGI DNBSEQ-T7 [GENEPIO:0100147]",
+                "MGI DNBSEQ-G400 [GENEPIO:0100148]",
+                "MGI DNBSEQ-G400RS FAST [GENEPIO:0100149]",
+                "MGI DNBSEQ-G50 [GENEPIO:0100150]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001452",
+            "type": "string",
+            "description": "The model of the sequencing instrument used.",
+            "examples": [
+                "Oxford Nanopore MinION [GENEPIO:0100142]"
+            ],
+            "classification": "Sequencing",
+            "label": "Sequencing Instrument Model",
             "fill_mode": "batch"
         },
         "purpose_of_sequencing": {
@@ -972,40 +943,6 @@
             "label": "Purpose of Sequencing",
             "fill_mode": "batch"
         },
-        "purpose_sampling": {
-            "Enums": [
-                "Cluster/Outbreak Investigation [GENEPIO:0100001]",
-                "Diagnostic Testing [GENEPIO:0100002]",
-                "Research [GENEPIO:0100003]",
-                "Protocol Testing [GENEPIO:0100024]",
-                "Surveillance [GENEPIO:0100004]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
-            ],
-            "ontology": "NCIT_C146997",
-            "type": "string",
-            "description": "The reason that the sample was collected.",
-            "examples": [
-                "Diagnostic Testing [GENEPIO:0100002]"
-            ],
-            "classification": "Sample collection and processing",
-            "label": "Purpose of sampling",
-            "fill_mode": "batch"
-        },
-        "sequencing_sample_id": {
-            "examples": [
-                ""
-            ],
-            "ontology": "GENEPIO:0000079",
-            "type": "string",
-            "description": "If the information is unknown or can not be shared, leave blank.",
-            "classification": "Database Identifiers",
-            "label": "Sample ID given for sequencing",
-            "fill_mode": "sample"
-        },
         "sequencing_date": {
             "examples": [
                 "4/26/2021"
@@ -1018,20 +955,30 @@
             "label": "Sequencing Date",
             "fill_mode": "batch"
         },
-        "rna_extraction_protocol": {
+        "extraction_protocol": {
             "examples": [
-                ""
+                "Opentrons custom protocol"
             ],
             "ontology": "OBI_0302884",
             "type": "string",
-            "description": "",
+            "description": "DNA/RNA extraction protocol",
             "classification": "Sequencing",
-            "label": "Rna Extraction Protocol",
+            "label": "Extraction Protocol",
             "fill_mode": "batch"
         },
-        "library_kit": {
+        "all_in_one_library_kit": {
+             "Enums": [
+                "Ion Xpress",
+                "ABL_DeepChek NGS",
+                "Ion AmpliSeq Kit for Chef DL8",
+                "NEBNext® Fast DNA Library Prep Set for Ion Torrent™",
+                "NEBNext® ARTIC SARS-CoV-2 FS",
+                "Illumina COVIDSeq Test",
+                "ABL DeepChek® Assay WG SC2 V1",
+                "Other"
+            ],
             "examples": [
-                ""
+                "Illumina COVIDSeq Test"
             ],
             "ontology": "GENEPIO_0000085",
             "type": "string",
@@ -1040,13 +987,58 @@
             "label": "Commercial All-in-one library kit",
             "fill_mode": "batch"
         },
-        "enrichment_protocol": {
+        "library_preparation_kit": {
+            "Enums": [
+                "Illumina DNA PCR-Free Prep",
+                "Illumina DNA Prep",
+                "Illumina Stranded mRNA Prep",
+                "Nextera XT DNA Library Preparation Kit",
+                "TruSeq DNA Nano",
+                "TruSeq DNA Nano Library Prep Kit for NeoPrep",
+                "TruSeq DNA PCR-Free",
+                "TruSeq RNA Library Prep Kit v2",
+                "TruSeq Stranded Total RNA",
+                "TruSeq Stranded mRNA",
+                "Nextera XT",
+                "NEBNex Fast DNA Library Prep Set for Ion Torrent",
+                "Nextera DNA Flex",
+                "Ion AmpliSeq Kit Library Kit Plus",
+                "Ion AmpliSeq Kit Library Kit Plus",
+                "Ion AmpliSeq Library Kit 2.0",
+                "Ion Xpress Plus Fragment Library Kit",
+                "Oxford Nanopore Sequencing Kit",
+                "SQK-RBK110-96",
+                "Nanopore COVID Maxi: 9216 samples",
+                "Nanopore COVID Midi: 2304 samples",
+                "Nanopore COVID Mini: 576 samples",
+                "Vela Diagnostics:ViroKey SQ FLEX Library Prep Reagents",
+                "Other"
+            ],
             "examples": [
-                ""
+                "Illumina DNA Prep Tagmentation"
+            ],
+            "ontology": "GENEPIO:0001450",
+            "type": "string",
+            "description": "The name of the DNA library preparation kit used to generate the library being sequenced.",
+            "classification": "Sequencing",
+            "label": "Library Preparation Kit",
+            "fill_mode": "batch"
+        },
+        "enrichment_protocol": {
+            "Enums":[
+                "Amplicon",
+                "Probes",
+                "Custom probes",
+                "Custom amplicon",
+                "No enrichment",
+                "Other"
+            ],
+            "examples": [
+                "AMPLICON"
             ],
             "ontology": "EFO_0009089",
             "type": "string",
-            "description": "",
+            "description": "Type of enrichment protocol",
             "classification": "Sequencing",
             "label": "Enrichment Protocol",
             "fill_mode": "batch"
@@ -1062,37 +1054,63 @@
             "label": "If Enrichment Protocol Is Other, Specify",
             "fill_mode": "batch"
         },
-        "amplicon_protocol": {
-            "examples": [
-                ""
+        "enrichment_panel": {
+            "Enums":[
+                "ARTIC",
+                "Illumina respiratory Virus Oligo Panel",
+                "Illumina AmpliSeq Community panel",
+                "Illumina AmpliSeq SARS-CoV-2 Research Panel for Illumina",
+                "Ion AmpliSeq SARS‑CoV‑2 Research Panel",
+                "xGen  SC2 Midnight1200 Amplicon Panel",
+                "ViroKey SQ FLEX SARS-CoV-2 Primer Set",
+                "NEBNext VarSkip Short SARS-CoV-2 primers",
+                "Other"
             ],
-            "ontology": "EFO_0003747",
+            "examples": [
+                "ARTIC"
+            ],
+            "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Commercial or custom panel/assay used for enrichment.",
             "classification": "Sequencing",
             "label": "Enrichment panel/assay",
             "fill_mode": "batch"
         },
-        "if_amplicon_protocol_if_other_specify": {
-            "examples": [
-                ""
+        "enrichment_panel_version": {
+            "Enums":[
+                "ARTIC v1",
+                "ARTIC v2",
+                "ARTIC v3",
+                "ARTIC v4",
+                "Illumina AmpliSeq Community panel",
+                "Illumina AmpliSeq SARS-CoV-2 Research Panel for Illumina",
+                "Illumina Respiratory Virus Oligos Panel V1",
+                "Illumina Respiratory Virus Oligos Panel V2",
+                "Ion AmpliSeq SARS-CoV-2 Insight",
+                "xGen  SC2 Midnight1200 Amplicon Panel",
+                "ViroKey SQ FLEX SARS-CoV-2 Primer Set", 
+                "NEBNext VarSkip Short SARS-CoV-2 primers",
+                "Other"
             ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Sequencing",
-            "label": "If Enrichment panel/assay Is Other, Specify",
-            "fill_mode": "batch"
-        },
-        "amplicon_version": {
             "examples": [
-                ""
+                "ARTIC v4"
             ],
             "ontology": "0",
             "type": "string",
             "description": "",
             "classification": "Sequencing",
             "label": "Enrichment panel/assay version",
+            "fill_mode": "batch"
+        },
+         "amplicon_pcr_primer_scheme": {
+            "examples": [
+                "https://github.com/joshquick/artic-ncov2019/blob/master/primer_schemes/nCoV-2019/V3/nCoV-2019.tsv"
+            ],
+            "ontology": "GENEPIO:0001456",
+            "type": "string",
+            "description": "The specifications of the primers (primer sequences, binding positions, fragment size generated etc) used to generate the amplicons to be sequenced.",
+            "classification": "Sequencing",
+            "label": "Amplicon Pcr Primer Scheme",
             "fill_mode": "batch"
         },
         "number_of_samples_in_run": {
@@ -1107,30 +1125,164 @@
             "fill_mode": "batch"
         },
         "flowcell_kit": {
+            "Enums":[
+                "HiSeq 3000/4000 PE Cluster Kit",
+                "HiSeq 3000/4000 SBS Kit (50 cycles)",
+                "HiSeq 3000/4000 SBS Kit (150 cycles)",
+                "HiSeq 3000/4000 SBS Kit (300 cycles)",
+                "HiSeq 3000/4000 SBS Kit",
+                "HiSeq 3000/4000 SR Cluster Kit",
+                "TG HiSeq 3000/4000 SBS Kit (50 cycles)",
+                "TG HiSeq 3000/4000 SBS Kit (150 cycles)",
+                "TG HiSeq 3000/4000 SBS Kit (300 cycles)",
+                "TG HiSeq 3000/4000 PE ClusterKit",
+                "TG HiSeq 3000/4000 SR ClusterKit",
+                "HiSeq PE Cluster Kit v4 cBot",
+                "HiSeq SR Rapid Cluster Kit v2",
+                "HiSeq PE Rapid Cluster Kit v2",
+                "TG HiSeq Rapid PE Cluster Kit v2",
+                "HiSeq Rapid Duo cBot Sample Loading Kit",
+                "TG TruSeq Rapid Duo cBot Sample Loading Kit",
+                "HiSeq Rapid SBS Kit v2 (50 cycles)",
+                "HiSeq Rapid SBS Kit v2 (200 cycles)",
+                "HiSeq Rapid SBS Kit v2 (500 cycles)",
+                "TG HiSeq Rapid SBS Kit v2 (200 Cycle)",
+                "TG HiSeq Rapid SBS Kit v2 (50 Cycle)",
+                "HiSeq SR Cluster Kit v4 cBot",
+                "TG HiSeq SR Cluster Kit v4 - cBot",
+                "TG HiSeq PE Cluster Kit v4 – cBot",
+                "HiSeq X Ten Reagent Kit v2.5",
+                "HiSeq X Ten Reagent Kit v2.5 - 10 pack",
+                "HiSeq X Five Reagent Kit v2.5",
+                "MiSeq Reagent Kit v3 (150-cycle)",
+                "MiSeq Reagent Kit v3 (600-cycle)",
+                "TG MiSeq Reagent Kit v3 (600 cycle)",
+                "TG MiSeq Reagent Kit v3 (150 cycle)",
+                "MiSeq Reagent Kit v3 (150-cycle)",
+                "MiSeq Reagent Kit v3 (600-cycle)",
+                "TG MiSeq Reagent Kit v3 (600 cycle)",
+                "TG MiSeq Reagent Kit v3 (150 cycle)",
+                "MiSeq Reagent Kit v3 (150-cycle)",
+                "MiSeq Reagent Kit v3 (600-cycle)",
+                "TG MiSeq Reagent Kit v3 (600 cycle)",
+                "TG MiSeq Reagent Kit v3 (150 cycle)",
+                "MiSeq Reagent Kit v2 (50-cycles)",
+                "MiSeq Reagent Kit v2 (300-cycles)",
+                "MiSeq Reagent Kit v2 (500-cycles)",
+                "MiniSeq Rapid Reagent Kit (100 cycles)",
+                "MiniSeq High Output Reagent Kit (75-cycles)",
+                "MiniSeq High Output Reagent Kit (150-cycles)",
+                "NextSeq 1000/2000 P1 Reagents (300 Cycles)",
+                "NextSeq 1000/2000 P2 Reagents (100 Cycles) v3",
+                "NextSeq 1000/2000 P2 Reagents (200 Cycles) v3",
+                "NextSeq 1000/2000 P2 Reagents (300 Cycles) v3",
+                "NextSeq 2000 P3 Reagents (50 Cycles)", 
+                "NextSeq 2000 P3 Reagents (100 Cycles)",
+                "NextSeq 2000 P3 Reagents (200 Cycles)", 
+                "NextSeq 2000 P3 Reagents (300 Cycles)",
+                "NextSeq 1000/2000 Read and Index Primers", 
+                "NextSeq 1000/2000 Index Primer Kit",
+                "NextSeq 1000/2000 Read Primer Kit", 
+                "NextSeq 500/550 High Output Kit v2.5 (75 Cycles)",
+                "NextSeq 500/550 High Output Kit v2.5 (150 Cycles)",
+                "NextSeq 500/550 High Output Kit v2.5 (300 Cycles)",
+                "NextSeq 500/550 Mid Output Kit v2.5 (150 Cycles)",
+                "NextSeq 500/550 Mid Output Kit v2.5 (300 Cycles)",
+                "TG NextSeq  500/550 High Output Kit v2.5 (75 Cycles)", 
+                "TG NextSeq  500/550 High Output Kit v2.5 (150 Cycles)",
+                "TG NextSeq  500/550 High Output Kit v2.5 (300 Cycles)",
+                "TG NextSeq 500/550 Mid Output Kit v2.5 (150 Cycles)",
+                "TG NextSeq 500/550 Mid Output Kit v2.5 (300 Cycles)",
+                "NovaSeq 6000 S4 Reagent Kit v1.5 (300 cycles)",
+                "NovaSeq 6000 S4 Reagent Kit v1.5 (200 cycles)",
+                "NovaSeq 6000 S4 Reagent Kit v1.5 (35 cycles)",
+                "NovaSeq 6000 S2 Reagent Kit v1.5 (300 cycles)",
+                "NovaSeq 6000 S2 Reagent Kit v1.5 (200 cycles)",
+                "NovaSeq 6000 S2 Reagent Kit v1.5 (100 cycles)",
+                "NovaSeq 6000 S1 Reagent Kit v1.5 (300 cycles)",
+                "NovaSeq 6000 S1 Reagent Kit v1.5 (200 cycles)", 
+                "NovaSeq 6000 S1 Reagent Kit v1.5 (100 cycles)", 
+                "NovaSeq 6000 SP Reagent Kit v1.5 (500 cycles)",
+                "NovaSeq 6000 SP Reagent Kit v1.5 (300 cycles)",
+                "NovaSeq 6000 SP Reagent Kit v1.5 (200 cycles)", 
+                "NovaSeq 6000 SP Reagent Kit v1.5 (100 cycles)",
+                "NovaSeq 6000 SP Reagent Kit (100 cycles)", 
+                "NovaSeq 6000 SP Reagent Kit (200 cycles)", 
+                "NovaSeq 6000 SP Reagent Kit (300 cycles)",
+                "NovaSeq 6000 SP Reagent Kit (500 cycles)",
+                "NovaSeq 6000 S1 Reagent Kit (100 cycles)",
+                "NovaSeq 6000 S1 Reagent Kit (200 cycles)",
+                "NovaSeq 6000 S1 Reagent Kit (300 cycles)",
+                "NovaSeq 6000 S2 Reagent Kit (100 cycles)",
+                "NovaSeq 6000 S2 Reagent Kit (200 cycles)", 
+                "NovaSeq 6000 S2 Reagent Kit (300 cycles)", 
+                "NovaSeq 6000 S4 Reagent Kit (200 cycles)",
+                "NovaSeq 6000 S4 Reagent Kit (300 cycles)", 
+                "NovaSeq 6000 S4 Reagent Kit (300 Cycles) – 10 pack",
+                "NovaSeq 6000 S4 Reagent Kit (300 Cycles) – 20 pack",
+                "NovaSeq 6000 S4 Reagent Kit (300 Cycles) – 40 pack",
+                "NovaSeq Library Tubes Accessory Pack (24 tubes)",
+                "NovaSeq XP 4-Lane Kit v1.5", 
+                "NovaSeq XP 2-Lane Kit v1.5",
+                "NovaSeq XP 2-Lane Kit",
+                "NovaSeq Xp 4-Lane Kit",
+                "NovaSeq Xp Flow Cell Dock",
+                "NovaSeq Xp 2-Lane Manifold Pack",
+                "NovaSeq Xp 4-Lane Manifold Pack",
+                "PhiX Control v3",
+                "TG PhiX Control Kit v3",
+                "NextSeq PhiX Control Kit",
+                "TruSeq Dual Index Sequencing Primer Box, Single-Read",
+                "TruSeq Dual Index Sequencing Primer Box, Paired-End",
+                "TruSeq PE Cluster Kit v3-cBot-HS",
+                "TruSeq PE Cluster Kit v5-CS-GA",
+                "HiSeq SR Rapid Cluster Kit v2",
+                "HiSeq PE Rapid Cluster Kit v2",
+                "TG HiSeq Rapid PE Cluster Kit v2",
+                "HiSeq SR Rapid Cluster Kit v2",
+                "HiSeq PE Rapid Cluster Kit v2",
+                "TG HiSeq Rapid PE Cluster Kit v2",
+                "TruSeq SBS Kit v3-HS (200 cycles)",
+                "TruSeq SBS Kit v3-HS (50 cycles)",
+                "TG TruSeq SBS Kit v3 - HS (200-cycles)",
+                "TruSeq SBS Kit v5-GA",
+                "TruSeq SR Cluster Kit v3-cBot-HS",
+                "TG TruSeq SR Cluster Kit v1–cBot - HS",
+                "iSeq 100 i1 Reagent v2 (300-cycle)",
+                "iSeq 100 i1 Reagent v2 (300-cycle) 4 pack",
+                "iSeq 100 i1 Reagent v2 (300-cycle) 8 pack",
+                "Other"
+            ],
             "examples": [
-                ""
+                "iSeq 100 i1 Reagent v2 (300-cycle) 8 pack"
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Flowcell sequencer used for sequencing the sample",
             "classification": "Sequencing",
             "label": "Flowcell Kit",
             "fill_mode": "batch"
         },
         "runID": {
             "examples": [
-                ""
+                "NextSeq_GEN_320"
             ],
             "ontology": "NCIT_C117058",
             "type": "string",
-            "description": "",
+            "description": "Unique sequencing run identifier.",
             "classification": "Sequencing",
             "label": "Runid",
             "fill_mode": "batch"
         },
         "sequencing_instrument_platform": {
+            "Enums":[
+                "Oxford Nanopore",
+                "Illumina",
+                "Ion Torrent",
+                "Other"
+            ],
             "examples": [
-                ""
+                "Illumina"
             ],
             "ontology": "0",
             "type": "string",
@@ -1139,29 +1291,55 @@
             "label": "Sequencing Instrument Platform",
             "fill_mode": "batch"
         },
-        "library_preparation_kit": {
-            "examples": [
-                "Nextera XT"
+        "library_source": {
+            "Enums": [
+                "GENOMIC",
+                "TRANSCRIPTOMIC",
+                "METAGENOMIC",
+                "METATRANSCRIPTOMIC",
+                "SYNTHETIC",
+                "VIRAL RNA",
+                "OTHER"
             ],
-            "ontology": "GENEPIO:0001450",
-            "type": "string",
-            "description": "The name of the DNA library preparation kit used to generate the library being sequenced.",
-            "classification": "Sequencing",
-            "label": "Library Preparation Kit",
-            "fill_mode": "batch"
-        },
-        "amplicon_pcr_primer_scheme": {
             "examples": [
-                "https://github.com/joshquick/artic-ncov2019/blob/master/primer_schemes/nCoV-2019/V3/nCoV-2019.tsv"
+                "METAGENOMIC"
             ],
-            "ontology": "GENEPIO:0001456",
+            "ontology": "GENEPIO_0001965",
             "type": "string",
-            "description": "The specifications of the primers (primer sequences, binding positions, fragment size generated etc) used to generate the amplicons to be sequenced.",
+            "description": "Molecule type used to make the library.",
             "classification": "Sequencing",
-            "label": "Amplicon Pcr Primer Scheme",
+            "label": "Source material",
             "fill_mode": "batch"
         },
         "library_selection": {
+            "Enums":[
+                "RANDOM",
+                "PCR",
+                "RANDOM PCR",
+                "RT-PCR",
+                "HMPR",
+                "MF",
+                "repeat fractionation",
+                "size fractionation",
+                "MSLL",
+                "cDNA",
+                "ChIP",
+                "MNase",
+                "DNase",
+                "Hybrid Selection",
+                "Reduced Representation",
+                "Restriction Digest",
+                "5-methylcytidine antibody",
+                "MBD2 protein methyl-CpG binding domain",
+                "CAGE",
+                "RACE",
+                "MDA",
+                "padlock probes capture method",
+                "Oligo-dT",
+                "Inverse rRNA selection",
+                "ChIP-Seq",
+                "Other"
+            ],
             "examples": [
                 "RANDOM PCR"
             ],
@@ -1206,256 +1384,18 @@
             "fill_mode": "batch"
         },
         "library_layout": {
+            "Enums":[
+               "SINGLE",
+               "PAIRED"
+            ],
             "examples": [
-                "PAIRED end"
+                "PAIRED"
             ],
             "ontology": "NCIT:C175894",
             "type": "string",
-            "description": "Single or paired.",
+            "description": "Single or paired sequencing configuration",
             "classification": "Sequencing",
             "label": "Library Layout",
-            "fill_mode": "batch"
-        },
-        "dehosting_method_software_name": {
-            "examples": [
-                "Nanostripper"
-            ],
-            "ontology": "GENEPIO:0001459",
-            "type": "string",
-            "description": "The method used to remove host reads from the pathogen sequence.",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Dehosting Method",
-            "fill_mode": "batch"
-        },
-        "dehosting_method_software_version": {
-            "examples": [
-                "2.4.1"
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "The method version used to remove host reads from the pathogen sequence.",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Dehosting Method Version",
-            "fill_mode": "batch"
-        },
-        "assembly": {
-            "examples": [
-                ""
-            ],
-            "ontology": "NCIT_C63548",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Assembly",
-            "fill_mode": "batch"
-        },
-        "if_assembly_other": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "If assembly Is Other, Specify",
-            "fill_mode": "batch"
-        },
-        "assembly_params": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Assambly params",
-            "fill_mode": "batch"
-        },
-        "variant_calling_software_name": {
-            "examples": [
-                ""
-            ],
-            "ontology": "operation_3227",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatic Variants",
-            "label": "Variant Calling",
-            "fill_mode": "batch"
-        },
-        "variant_calling_software_version": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatic Variants",
-            "label": "Variant Calling Version",
-            "fill_mode": "batch"
-        },
-        "if_variant_calling_other": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatic Variants",
-            "label": "If variant calling Is Other, Specify",
-            "fill_mode": "batch"
-        },
-        "variant_calling_params": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatic Variants",
-            "label": "Variant Calling params",
-            "fill_mode": "batch"
-        },
-        "consensus_sequence_R1_name": {
-            "ontology": "GENEPIO:0001461",
-            "type": "string",
-            "description": "The name of the consensus sequence.",
-            "examples": [
-                "ncov123assembly3"
-            ],
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus sequence name",
-            "fill_mode": "batch"
-        },
-        "consensus_sequence_R2_name": {
-            "ontology": "GENEPIO:0001460",
-            "type": "string",
-            "description": "The name of the consensus sequence.",
-            "examples": [
-                "ncov123assembly3"
-            ],
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus sequence name",
-            "fill_mode": "batch"
-        },
-        "consensus_sequence_R1_md5": {
-            "ontology": "NMR:1000568",
-            "type": "string",
-            "description": "The name of the consensus sequence.",
-            "examples": [
-                "ncov123assembly3"
-            ],
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus sequence name md5",
-            "fill_mode": "batch"
-        },
-        "consensus_sequence_R2_md5": {
-            "ontology": "NMR:1000569",
-            "type": "string",
-            "description": "The name of the consensus sequence.",
-            "examples": [
-                "ncov123assembly3"
-            ],
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus sequence name md5",
-            "fill_mode": "batch"
-        },
-        "consensus_sequence_filepath": {
-            "examples": [
-                "/User/Documents/RespLab/Data/ncov123assembly.fasta"
-            ],
-            "ontology": "GENEPIO:0001462",
-            "type": "string",
-            "description": "The filepath of the consesnsus sequence file.",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus sequence filepath",
-            "fill_mode": "batch"
-        },
-        "long_table_path": {
-            "examples": [
-                "1.3"
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "The path where the long table is ",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Long table path",
-            "fill_mode": "batch"
-        },
-        "consensus_sequence_software_name": {
-            "examples": [
-                "Ivar"
-            ],
-            "ontology": "GENEPIO:0001463",
-            "type": "string",
-            "description": "The name of software used to generate the consensus sequence.",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus sequence software name",
-            "fill_mode": "batch"
-        },
-        "if_consensus_other": {
-            "examples": [
-                "1.3"
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "The version of the software used to generate the consensus sequence.",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "If consensus Is Other, Specify",
-            "fill_mode": "batch"
-        },
-        "consensus_sequence_software_version": {
-            "examples": [
-                "1.3"
-            ],
-            "ontology": "GENEPIO:0001469",
-            "type": "string",
-            "description": "The version of the software used to generate the consensus sequence.",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus sequence software version",
-            "fill_mode": "batch"
-        },
-        "consensus_params": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus Params",
-            "fill_mode": "batch"
-        },
-        "depth_of_coverage_value": {
-            "examples": [
-                "400x"
-            ],
-            "ontology": "GENEPIO:0001474",
-            "type": "string",
-            "description": "The average number of reads representing a given nucleotide in the reconstructed sequence.",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "Depth of coverage value ",
-            "fill_mode": "batch"
-        },
-        "sample_name": {
-            "examples": [
-                "234546"
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "Sample Name",
-            "fill_mode": "batch"
-        },
-        "depth_of_coverage_threshold": {
-            "examples": [
-                "100x"
-            ],
-            "ontology": "GENEPIO:0001475",
-            "type": "string",
-            "description": "The threshold used as a cut-off for the depth of coverage.",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "Depth of coverage threshold",
             "fill_mode": "batch"
         },
         "sequence_file_R1_fastq": {
@@ -1524,37 +1464,38 @@
             "label": "Filepath fast5",
             "fill_mode": "batch"
         },
-        "number_of_base_pairs_sequenced": {
+        "analysis_date": {
             "examples": [
-                "387566"
+                "e.g 2020-08-07"
             ],
-            "ontology": "GENEPIO:0001482",
+            "ontology": "0",
             "type": "string",
-            "description": "The number of total base pairs generated by the sequencing process.",
+            "format": "date",
+            "description": "",
             "classification": "Bioinformatics and QC metrics fields",
-            "label": "Number of base pairs sequenced ",
+            "label": "Analysis date",
             "fill_mode": "batch"
         },
-        "consensus_genome_length": {
+        "dehosting_method_software_name": {
             "examples": [
-                "38677"
+                "Nanostripper"
             ],
-            "ontology": "GENEPIO:0001483",
+            "ontology": "GENEPIO:0001459",
             "type": "string",
-            "description": "Size of the assembled genome described as the number of base pairs.",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "Consensus genome length",
+            "description": "The method used to remove host reads from the pathogen sequence.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Dehosting Method",
             "fill_mode": "batch"
         },
-        "ns_per_100_kbp": {
+        "dehosting_method_software_version": {
             "examples": [
-                "300"
+                "2.4.1"
             ],
-            "ontology": "GENEPIO:0001484",
+            "ontology": "0",
             "type": "string",
-            "description": "The number of N symbols present in the consensus fasta sequence, per 100kbp of sequence.",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "Ns per 100 kbp",
+            "description": "The method version used to remove host reads from the pathogen sequence.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Dehosting Method Version",
             "fill_mode": "batch"
         },
         "reference_genome_accession": {
@@ -1602,6 +1543,11 @@
             "fill_mode": "batch"
         },
         "commercial_open_source_both": {
+            "Enums":[
+                "Commercial",
+                "Open Source",
+                "Both"
+            ],
             "examples": [
                 ""
             ],
@@ -1614,22 +1560,22 @@
         },
         "preprocessing_software_name": {
             "examples": [
-                ""
+                "fastp"
             ],
             "ontology": "MS_1002386",
             "type": "string",
-            "description": "",
+            "description": "Software used for preprocessing step.",
             "classification": "Bioinformatic Analysis fields",
             "label": "Preprocessing",
             "fill_mode": "batch"
         },
         "preprocessing_software_version": {
             "examples": [
-                ""
+                "v5.3.1"
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Version of the preprocessing software used.",
             "classification": "Bioinformatic Analysis fields",
             "label": "Preprocessing Version",
             "fill_mode": "batch"
@@ -1651,29 +1597,29 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Preprocessing parameters used.",
             "classification": "Bioinformatic Analysis fields",
             "label": "Preprocessing params",
             "fill_mode": "batch"
         },
         "mapping_software_name": {
             "examples": [
-                ""
+                "bowtie2"
             ],
             "ontology": "topic:0102",
             "type": "string",
-            "description": "",
+            "description": "Software used for mapping step.",
             "classification": "Bioinformatic Analysis fields",
             "label": "Mapping",
             "fill_mode": "batch"
         },
         "mapping_software_version": {
             "examples": [
-                ""
+                "v7.0.1"
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Version of the mapper used.",
             "classification": "Bioinformatic Analysis fields",
             "label": "Mapping Version",
             "fill_mode": "batch"
@@ -1695,9 +1641,328 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Parameters used for mapping step.",
             "classification": "Bioinformatic Analysis fields",
             "label": "Mapping params",
+            "fill_mode": "batch"
+        },
+        "assembly": {
+            "examples": [
+                "Spades"
+            ],
+            "ontology": "NCIT_C63548",
+            "type": "string",
+            "description": "Software used for assembly of the pathogen genome.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Assembly",
+            "fill_mode": "batch"
+        },
+        "if_assembly_other": {
+            "examples": [
+                "v3.1"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Assembly software version",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "If assembly Is Other, Specify",
+            "fill_mode": "batch"
+        },
+        "assembly_params": {
+            "examples": [
+                "-k 127,56,27"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Params used for genome assembly.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Assambly params",
+            "fill_mode": "batch"
+        },
+        "variant_calling_software_name": {
+            "examples": [
+                "Ivar"
+            ],
+            "ontology": "operation_3227",
+            "type": "string",
+            "description": "Software used for variant calling.",
+            "classification": "Bioinformatic Variants",
+            "label": "Variant Calling",
+            "fill_mode": "batch"
+        },
+        "variant_calling_software_version": {
+            "examples": [
+                "v4.1"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Variant calling software version",
+            "classification": "Bioinformatic Variants",
+            "label": "Variant Calling Version",
+            "fill_mode": "batch"
+        },
+        "if_variant_calling_other": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatic Variants",
+            "label": "If variant calling Is Other, Specify",
+            "fill_mode": "batch"
+        },
+        "variant_calling_params": {
+            "examples": [
+                "-t 0.5 -Q 20"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Params used for variant calling",
+            "classification": "Bioinformatic Variants",
+            "label": "Variant Calling params",
+            "fill_mode": "batch"
+        },
+        "consensus_sequence_name": {
+            "ontology": "GENEPIO:0001460",
+            "type": "string",
+            "description": "The name of the consensus sequence.",
+            "examples": [
+                "ncov123assembly3"
+            ],
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus sequence name",
+            "fill_mode": "batch"
+        },
+        "consensus_sequence_filename": {
+            "ontology": "GENEPIO:0001461",
+            "type": "string",
+            "description": "The name of the consensus sequence filename",
+            "examples": [
+                "ncov123assembly3"
+            ],
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus sequence name",
+            "fill_mode": "batch"
+        },
+        "consensus_sequence_md5": {
+            "ontology": "0",
+            "type": "string",
+            "description": "The name of the consensus sequence.",
+            "examples": [
+                "5gaskañlkdak3143242ñlkas"
+            ],
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus sequence name md5",
+            "fill_mode": "batch"
+        },
+        "consensus_sequence_filepath": {
+            "examples": [
+                "/User/Documents/RespLab/Data/ncov123assembly.fasta"
+            ],
+            "ontology": "GENEPIO:0001462",
+            "type": "string",
+            "description": "The filepath of the consesnsus sequence file.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus sequence filepath",
+            "fill_mode": "batch"
+        },
+        "long_table_path": {
+            "examples": [
+                "/User/Documents/RespLab/ncov123_longtable.tsv"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The path where the long table including all variants and annotations is.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Long table path",
+            "fill_mode": "batch"
+        },
+        "consensus_sequence_software_name": {
+            "examples": [
+                "Ivar"
+            ],
+            "ontology": "GENEPIO:0001463",
+            "type": "string",
+            "description": "The name of software used to generate the consensus sequence.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus sequence software name",
+            "fill_mode": "batch"
+        },
+        "if_consensus_other": {
+            "examples": [
+                "v1.3"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The version of the software used to generate the consensus sequence.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "If consensus Is Other, Specify",
+            "fill_mode": "batch"
+        },
+        "consensus_sequence_software_version": {
+            "examples": [
+                "1.3"
+            ],
+            "ontology": "GENEPIO:0001469",
+            "type": "string",
+            "description": "The version of the software used to generate the consensus sequence.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus sequence software version",
+            "fill_mode": "batch"
+        },
+        "consensus_params": {
+            "examples": [
+                "AF > 0.75"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Parameters used for consensus generation",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus Params",
+            "fill_mode": "batch"
+        },
+        "consensus_genome_length": {
+            "examples": [
+                "38677"
+            ],
+            "ontology": "GENEPIO:0001483",
+            "type": "string",
+            "description": "Size of the assembled genome described as the number of base pairs.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Consensus genome length",
+            "fill_mode": "batch"
+        },
+        "depth_of_coverage_threshold": {
+            "examples": [
+                "10x"
+            ],
+            "ontology": "GENEPIO:0001475",
+            "type": "string",
+            "description": "The threshold used as a cut-off for the depth of coverage.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Depth of coverage threshold",
+            "fill_mode": "batch"
+        },
+        "number_of_base_pairs_sequenced": {
+            "examples": [
+                "387566"
+            ],
+            "ontology": "GENEPIO:0001482",
+            "type": "string",
+            "description": "The number of total base pairs generated by the sequencing process.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of base pairs sequenced ",
+            "fill_mode": "batch"
+        },
+        "qc_filtered": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "%qc filtered",
+            "fill_mode": "batch"
+        },
+        "per_reads_host": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "%reads host",
+            "fill_mode": "batch"
+        },
+        "per_reads_virus": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "%reads virus",
+            "fill_mode": "batch"
+        },
+        "per_unmapped": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "%unmapped",
+            "fill_mode": "batch"
+        },
+        "depth_of_coverage_value": {
+            "examples": [
+                "400x"
+            ],
+            "ontology": "GENEPIO:0001474",
+            "type": "string",
+            "description": "The average number of reads representing a given nucleotide in the reconstructed sequence.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Depth of coverage value ",
+            "fill_mode": "batch"
+        },
+        "per_genome_greater_10x": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "% genome greater 10x",
+            "fill_mode": "batch"
+        },
+        "per_Ns": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "%Ns",
+            "fill_mode": "batch"
+        },
+        "ns_per_100_kbp": {
+            "examples": [
+                "300"
+            ],
+            "ontology": "GENEPIO:0001484",
+            "type": "string",
+            "description": "The number of N symbols present in the consensus fasta sequence, per 100kbp of sequence.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Ns per 100 kbp",
+            "fill_mode": "batch"
+        },
+        "number_of_variants_in_consensus": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatic Variants",
+            "label": "Number of variants (AF greater 75%)",
+            "fill_mode": "batch"
+        },
+        "number_of_variants_with_effect": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Bioinformatic Variants",
+            "label": "Number of variants with effect",
             "fill_mode": "batch"
         },
         "lineage_name": {
@@ -1724,7 +1989,7 @@
         },
         "if_lineage_identification_other": {
             "examples": [
-                "Other than Pangolin"
+                "Nextclade"
             ],
             "ontology": "0",
             "type": "string",
@@ -1744,17 +2009,6 @@
             "label": "Lineage/clade analysis software version",
             "fill_mode": "batch"
         },
-        "isolate_sample_id": {
-            "examples": [
-                ""
-            ],
-            "ontology": "NCIT:C53471",
-            "type": "string",
-            "description": "",
-            "classification": "Database Identifiers",
-            "label": "Sample ID given if multiple rna-extraction or passages",
-            "fill_mode": "sample"
-        },
         "variant_designation": {
             "Enums": [
                 "Variant of Interest (VOI) [GENEPIO:0100082]",
@@ -1767,7 +2021,7 @@
             "examples": [
                 "Variant of Concern (VOC) [GENEPIO:0100083]"
             ],
-            "classification": "Bioinformatic Variants",
+            "classification": "Lineage fields",
             "label": "Variant designation",
             "fill_mode": "batch"
         },
@@ -1820,94 +2074,6 @@
             ],
             "classification": "Pathogen diagnostic testing",
             "label": "Gene Name 1",
-            "fill_mode": "batch"
-        },
-        "qc_filtered": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "%qc filtered",
-            "fill_mode": "batch"
-        },
-        "per_reads_host": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "%reads host",
-            "fill_mode": "batch"
-        },
-        "per_reads_virus": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "%reads virus",
-            "fill_mode": "batch"
-        },
-        "per_unmapped": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "%unmapped",
-            "fill_mode": "batch"
-        },
-        "per_genome_greater_10x": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "% genome greater 10x",
-            "fill_mode": "batch"
-        },
-        "per_Ns": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "%Ns",
-            "fill_mode": "batch"
-        },
-        "number_of_variants_in_consensus": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatic Variants",
-            "label": "Number of variants (AF greater 75%)",
-            "fill_mode": "batch"
-        },
-        "number_of_variants_with_effect": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Bioinformatic Variants",
-            "label": "Number of variants with effect",
             "fill_mode": "batch"
         },
         "diagnostic_pcr_Ct_value_1": {
@@ -1972,30 +2138,6 @@
             "label": "Gene Name 2",
             "fill_mode": "batch"
         },
-        "analysis_date": {
-            "examples": [
-                "e.g 2020-08-07"
-            ],
-            "ontology": "0",
-            "type": "string",
-            "format": "date",
-            "description": "",
-            "classification": "Bioinformatics and QC metrics fields",
-            "label": "Analysis date",
-            "fill_mode": "batch"
-        },
-        "lineage_identification_date": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "format": "date",
-            "description": "",
-            "classification": "Lineage fields",
-            "label": "Lineage identification date",
-            "fill_mode": "batch"
-        },
         "diagnostic_pcr_Ct_value_2": {
             "examples": [
                 "36"
@@ -2007,39 +2149,6 @@
             "label": "Diagnostic Pcr Ct Value-2",
             "fill_mode": "batch"
         },
-        "analysis_authors": {
-            "examples": [
-                ""
-            ],
-            "ontology": "NCIT:C42781",
-            "type": "string",
-            "description": "",
-            "classification": "Contributor Acknowledgement",
-            "label": "Analysis Authors",
-            "fill_mode": "batch"
-        },
-        "author_submitter": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Contributor Acknowledgement",
-            "label": "Author Submitter",
-            "fill_mode": "batch"
-        },
-        "gisaid_id": {
-            "examples": [
-                ""
-            ],
-            "ontology": "NCIT:C54269",
-            "type": "string",
-            "description": "enter your GISAID-Username",
-            "classification": "Database Identifiers",
-            "label": "GISAID id",
-            "fill_mode": "sample"
-        },
         "authors": {
             "examples": [
                 ""
@@ -2047,479 +2156,143 @@
             "ontology": "GENEPIO:0001517",
             "type": "string",
             "description": "",
-            "classification": "Contributor Acknowledgement",
+            "classification": "Public databases",
             "label": "Authors",
             "fill_mode": "batch"
         },
-        "common_name": {
+        "gisaid_submitter_id": {
             "examples": [
                 ""
             ],
-            "ontology": "NCIT:C164471",
+            "ontology": "NCIT:C54269",
             "type": "string",
-            "description": "The common name of the organism.",
-            "classification": "Sample collection and processing",
-            "label": "Common name",
-            "fill_mode": "batch"
+            "description": "GISAID sequence ID.",
+            "classification": "Public Databases",
+            "label": "GISAID id",
+            "fill_mode": "sample"
         },
-        "collector_name": {
+        "gisaid_accession_id": {
             "examples": [
-                "John Smith"
+                "NCIT:C180324"
             ],
-            "ontology": "GENEPIO:0001797",
+            "ontology": "",
             "type": "string",
-            "description": "Name of the person who collected the specimen",
-            "classification": "Sample collection and processing",
-            "label": "Sample collector name",
-            "table": "sample",
-            "fill_mode": "batch"
+            "description": "GISAID sequence ID.",
+            "classification": "Public Databases",
+            "label": "GISAID id",
+            "fill_mode": "sample"
         },
-        "library_source": {
-            "Enums": [
-                "5-methycytidine antibody method [GENPIO:0001941]",
-                "CAGE method [GENPIO:0001942]",
-                "CF-H method [GENPIO:0001943]",
-                "CF-M method ]GENPIO:0001944]",
-                "CF-S method [GENPIO:0001945]",
-                "CF-T method [GENPIO:0001946]",
-                "ChIP method ]GENPIO:0001947]",
-                "DNAse method [GENPIO:0001948]",
-                "HMPR method [GENPIO:0001949]",
-                "Hybrid Selection Method [GENPIO:0001950]",
-                "MBD2 protein methyl-CpG binding domain method [GENPIO:0001951]",
-                "MF method [GENPIO:0001952]",
-                "MNase method [GENPIO:0001953]",
-                "MSLL method [GENPIO:0001954]",
-                "PCR method [GENPIO:0001955]",
-                "RACE method [GENPIO:0001956]",
-                "RANDOM PCR method [GENPIO:0001957]",
-                "RANDOM method [GENPIO:0001958]",
-                "RT-PCR method [GENPIO:0001959]",
-                "Reduced Representation method [GENPIO:0001960]",
-                "Resctriction Digest method [GENPIO:0001961]",
-                "cDNA method [GENPIO:0001962]",
-                "other library method [GENPIO:0001964]",
-                "size fractionation method [GENPIO:0001963]"
-            ],
+        "gisaid_virus_name": {
             "examples": [
-                "METAGENOMIC"
+                "hCoV-19/Canada/prov_rona_99/2020"
             ],
-            "ontology": "GENEPIO_0001965",
+            "ontology": "GENEPIO:0100282",
             "type": "string",
-            "description": "Molecule type used to make the library.",
-            "classification": "Sequencing",
-            "label": "Source material",
-            "fill_mode": "batch"
+            "description": "The user-defined GISAID virus name assigned to the sequence.",
+            "classification": "Public Databases",
+            "label": "GISAID Virus Name",
+            "fill_mode": "sample"
         },
-        "analysis_accession": {
+        "ena_analysis_accession": {
             "examples": [
                 ""
             ],
             "ontology": "GENEPIO_0001145",
             "type": "string",
             "description": "",
-            "classification": "Submission ENA",
+            "classification": "Public databases",
             "label": "Analysis Accession",
             "fill_mode": "batch"
         },
-        "study_accession": {
+        "ena_study_accession": {
             "examples": [
                 "e.g PRJEB39632"
             ],
             "ontology": "GENEPIO_0001136",
             "type": "string",
             "description": "",
-            "classification": "Submission ENA",
+            "classification": "Public databases",
             "label": "Study accession",
             "fill_mode": "batch"
         },
-        "secondary_study_accession": {
-            "examples": [
-                "e.g ERP123173"
-            ],
-            "ontology": "BU_ISCIII:012",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Secondary study accession",
-            "fill_mode": "batch"
-        },
-        "sample_accession": {
+        "ena_sample_accession": {
             "examples": [
                 "e.g SAMEA7098096"
             ],
             "ontology": "GENEPIO_0001139",
             "type": "string",
             "description": "",
-            "classification": "Submission ENA",
+            "classification": "Public databases",
             "label": "Sample accession",
             "fill_mode": "batch"
         },
-        "secondary_sample_accession": {
-            "examples": [
-                "e.g ERS4858671"
-            ],
-            "ontology": "BU_ISCIII:014",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Secondary sample accession",
-            "fill_mode": "batch"
-        },
-        "experiment_accession": {
+        "ena_experiment_accession": {
             "examples": [
                 "e.g ERX4331406"
             ],
             "ontology": "BU_ISCIII:015",
             "type": "string",
             "description": "",
-            "classification": "Submission ENA",
+            "classification": "Public databases",
             "label": "Experiment Accession",
             "fill_mode": "batch"
         },
-        "run_accession": {
+        "ena_run_accession": {
             "examples": [
                 "e.g ERX4331406"
             ],
             "ontology": "BU_ISCIII:016",
             "type": "string",
             "description": "",
-            "classification": "Submission ENA",
+            "classification": "Public databases",
             "label": "Run Accession",
             "fill_mode": "batch"
         },
-        "submission_accession": {
+        "ena_submission_accession": {
             "examples": [
                 "e.g ERA2794974"
             ],
             "ontology": "BU_ISCIII:017",
             "type": "string",
             "description": "",
-            "classification": "Submission ENA",
+            "classification": "Public databases",
             "label": "Submission Accession",
             "fill_mode": "batch"
         },
-        "read_count": {
-            "examples": [
-                "e.g 837055"
-            ],
-            "ontology": "STATO_0000064",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Read count",
-            "fill_mode": "batch"
-        },
-        "read_length": {
-            "examples": [
-                ""
-            ],
-            "ontology": "STATO_0000064",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Read length",
-            "fill_mode": "batch"
-        },
-        "base_count": {
-            "examples": [
-                "e.g 503907110"
-            ],
-            "ontology": "UO_0000244",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Base count",
-            "fill_mode": "batch"
-        },
-        "first_public": {
-            "examples": [
-                "e.g 2020-08-07"
-            ],
-            "ontology": "NCIT_C142711",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "First Public date",
-            "fill_mode": "batch"
-        },
-        "last_updated": {
-            "examples": [
-                "e.g 2020-07-29"
-            ],
-            "ontology": "OMIABIS_0001005",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "format": "date",
-            "label": "Last Updated",
-            "fill_mode": "batch"
-        },
-        "experiment_title": {
+        "ena_experiment_title": {
             "examples": [
                 "e.g Illumina MiSeq paired end sequencing"
             ],
             "ontology": "ORNASEQ_0000004",
             "type": "string",
             "description": "",
-            "classification": "Submission ENA",
+            "classification": "Public Databases",
             "label": "Experiment title",
             "fill_mode": "batch"
         },
-        "study_title": {
+        "ena_study_title": {
             "examples": [
                 "e.g SARS-CoV-2 genomes from late April in Stockholm"
             ],
             "ontology": "OPMI_0000380",
             "type": "string",
             "description": "",
-            "classification": "Submission ENA",
+            "classification": "Public Databases",
             "label": "Study title",
             "fill_mode": "batch"
         },
-        "study_alias": {
-            "examples": [
-                "e.g Sweden"
-            ],
-            "ontology": "SIO_001066",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Study alias",
-            "fill_mode": "batch"
-        },
-        "experiment_alias": {
-            "examples": [
-                "e.g ena-STUDY-KAROLINSKA INSITUTET-29-07-2020-14:18:07:925-2092"
-            ],
-            "ontology": "NCIT_C42790",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Experiment alias",
-            "fill_mode": "batch"
-        },
-        "run_alias": {
-            "examples": [
-                "e.g ena-EXPERIMENT-KAROLINSKA INSITUTET-29-07-2020-14:50:07:151-1"
-            ],
-            "ontology": "NCIT_C47911",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Run Alias",
-            "fill_mode": "batch"
-        },
-        "fastq_bytes": {
-            "examples": [
-                "e.g ena-RUN-KAROLINSKA INSITUTET-29-07-2020-14:50:07:151-1"
-            ],
-            "ontology": "NCIT_C48047",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Fastq bytes",
-            "fill_mode": "batch"
-        },
-        "fastq_md5_r1": {
-            "examples": [
-                ""
-            ],
-            "ontology": "MS_1000568",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Fastq md5 r1",
-            "fill_mode": "batch"
-        },
-        "fastq_md5_r2": {
-            "examples": [
-                ""
-            ],
-            "ontology": "MS_1000568",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Fastq md5 r2",
-            "fill_mode": "batch"
-        },
-        "fastq_ftp": {
-            "examples": [
-                ""
-            ],
-            "ontology": "PRIDE_0000469",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Fastq ftp",
-            "fill_mode": "batch"
-        },
-        "fastq_aspera": {
-            "examples": [
-                "e.g ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_1.fastq.gz;ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_2.fastq.gz"
-            ],
-            "ontology": "BU_ISCIII:032",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Fastq aspera",
-            "fill_mode": "batch"
-        },
-        "fastq_galaxy": {
-            "examples": [
-                "e.g fasp.sra.ebi.ac.uk:/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_1.fastq.gz;fasp.sra.ebi.ac.uk:/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_2.fastq.gz"
-            ],
-            "ontology": "ENVO_01000807",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Fastq galaxy",
-            "fill_mode": "batch"
-        },
-        "submitted_bytes": {
-            "examples": [
-                "e.g ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_1.fastq.gz;ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_2.fastq.gz"
-            ],
-            "ontology": "NCIT_C172872",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Submitted bytes ",
-            "fill_mode": "batch"
-        },
-        "submitted_md5": {
-            "examples": [
-                "e.g 139853010;166270048"
-            ],
-            "ontology": "BU_ISCIII:035",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Submitted md5",
-            "fill_mode": "batch"
-        },
-        "submitted_ftp": {
-            "examples": [
-                "e.g d726a9abc918e2b43bd68b24c7d01b3a;f01eba1b2bad974bdf61b81b1ae8ac2a"
-            ],
-            "ontology": "BU_ISCIII:036",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Submitted ftp",
-            "fill_mode": "batch"
-        },
-        "submitted_aspera": {
-            "examples": [
-                "e.g ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R1_001.fastq.gz;ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R2_001.fastq.gz"
-            ],
-            "ontology": "BU_ISCIII:037",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Submitted aspera",
-            "fill_mode": "batch"
-        },
-        "submitted_galaxy": {
-            "examples": [
-                "e.g fasp.sra.ebi.ac.uk:/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R1_001.fastq.gz;fasp.sra.ebi.ac.uk:/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R2_001.fastq.gz"
-            ],
-            "ontology": "BU_ISCIII:038",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Submitted Galaxy",
-            "fill_mode": "batch"
-        },
-        "submitted_format": {
-            "examples": [
-                "e.g  ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R1_001.fastq.gz;ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R2_001.fastq.gz"
-            ],
-            "ontology": "BU_ISCIII:039",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Submitted Format",
-            "fill_mode": "batch"
-        },
-        "sra_bytes": {
-            "examples": [
-                "e.g FASTQ;FASTQ"
-            ],
-            "ontology": "BU_ISCIII:040",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "SRA bytes",
-            "fill_mode": "batch"
-        },
-        "sra_md5": {
-            "examples": [
-                "e.g 260236789"
-            ],
-            "ontology": "BU_ISCIII:041",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "SRA md5",
-            "fill_mode": "batch"
-        },
-        "sra_ftp": {
-            "examples": [
-                "e.g 2cf0d467d6dc4ae0a5473774d54c059c"
-            ],
-            "ontology": "BU_ISCIII:042",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "SRA ftp",
-            "fill_mode": "batch"
-        },
-        "sra_aspera": {
-            "examples": [
-                "e.g ftp.sra.ebi.ac.uk/vol1/err/ERR438/005/ERR4387385"
-            ],
-            "ontology": "BU_ISCIII:043",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "SRA aspera",
-            "fill_mode": "batch"
-        },
-        "sra_galaxy": {
-            "examples": [
-                "e.g fasp.sra.ebi.ac.uk:/vol1/err/ERR438/005/ERR4387385"
-            ],
-            "ontology": "BU_ISCIII:044",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "SRA galaxy",
-            "fill_mode": "batch"
-        },
-        "broker_name": {
+        "ena_broker_name": {
             "examples": [
                 "P17157_1007"
             ],
             "ontology": "BU_ISCIII:045",
             "type": "string",
             "description": "",
-            "classification": "Submission ENA",
+            "classification": "Public Databases",
             "label": "Broker Name",
             "fill_mode": "batch"
         },
-        "nominal_sdev": {
-            "examples": [
-                ""
-            ],
-            "ontology": "STATO_0000237",
-            "type": "string",
-            "description": "",
-            "classification": "Submission ENA",
-            "label": "Nominal sdev",
-            "fill_mode": "batch"
-        },
-        "first_created_date": {
+        "ena_first_created_date": {
             "examples": [
                 "e.g 2020-08-07"
             ],
@@ -2527,19 +2300,8 @@
             "type": "string",
             "format": "date",
             "description": "",
-            "classification": "Submission ENA",
+            "classification": "Public Databases",
             "label": "First created date",
-            "fill_mode": "batch"
-        },
-        "type": {
-            "examples": [
-                "betacoronavirus"
-            ],
-            "ontology": "NCIT:C25284",
-            "type": "string",
-            "description": "default must remain 'betacoronavirus'",
-            "classification": "Database Identifiers",
-            "label": "Type",
             "fill_mode": "batch"
         }
     }
