@@ -63,13 +63,15 @@ class LongTableParse:
         config_json = ConfigJson()
         self.long_table_heading = config_json.get_configuration("long_table_heading")
 
-    def valid_file(self, heading):
+    def validate_file(self, heading):
         """Check if long table file has all mandatory fields defined in
         configuration file
         """
         for field in self.long_table_heading:
             if field not in heading:
-                return False
+                log.error("Incorrect format file. %s is missing", field)
+                stderr.print(f"[red]Incorrect Format. {field} is missing in file")
+                sys.exit(1)
         return True
 
     def parse_file(self):
@@ -83,9 +85,7 @@ class LongTableParse:
         with open(self.file_path) as fh:
             lines = fh.readlines()
 
-        if not self.valid_file(lines[0].strip().split(",")):
-            stderr.print("[red]Incorrect Format, fields don't match")
-            sys.exit(1)
+        self.validate_file(lines[0].strip().split(","))
 
         heading_index = {}
         headings_from_csv = lines[0].strip().split(",")
@@ -100,14 +100,15 @@ class LongTableParse:
             if sample not in samp_dict:
                 samp_dict[sample] = []
             variant_dict = {}
-            variant_dict["Chromosome"] = {"chromosome": line_s[heading_index["CHROM"]]}
+            variant_dict["Chromosome"] = line_s[heading_index["CHROM"]]
 
-            variant_dict["Position"] = {
+            variant_dict["Variant"] = {
                 "pos": line_s[heading_index["POS"]],
                 "alt": line_s[heading_index["ALT"]],
+                "ref": line_s[heading_index["REF"]],
             }
 
-            variant_dict["Filter"] = {"filter": line_s[heading_index["FILTER"]]}
+            variant_dict["Filter"] = line_s[heading_index["FILTER"]]
 
             variant_dict["VariantInSample"] = {
                 "dp": line_s[heading_index["DP"]],
@@ -116,7 +117,7 @@ class LongTableParse:
                 "af": line_s[heading_index["AF"]],
             }
 
-            variant_dict["Gene"] = {"gene": line_s[heading_index["GENE"]]}
+            variant_dict["Gene"] = line_s[heading_index["GENE"]]
 
             variant_dict["Effect"] = {
                 "effect": line_s[heading_index["EFFECT"]],
@@ -124,8 +125,6 @@ class LongTableParse:
                 "hgvs_p": line_s[heading_index["HGVS_P"]],
                 "hgvs_p_1_letter": line_s[heading_index["HGVS_P_1LETTER"]],
             }
-
-            variant_dict["Variant"] = {"ref": line_s[heading_index["REF"]]}
 
             samp_dict[sample].append(variant_dict)
 
