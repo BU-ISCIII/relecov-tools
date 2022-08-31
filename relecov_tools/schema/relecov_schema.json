@@ -576,6 +576,10 @@
             "enum": [
                 "Blood [UBERON:0000178]",
                 "Fluid (Cerebrospinal (CSF)) [UBERON:0001359]",
+                "Fluid (Pericardial) [UBERON:0002409]",
+                "Fluid (Pleural) [UBERON:0001087]",
+                "Fluid (Vaginal) [UBERON:0036243]",
+                "Fluid (Amniotic) [UBERON:0000173]",
                 "Saliva [UBERON:0001836]",
                 "Tissue [UBERON:0000479]",
                 "Not Applicable [GENEPIO:0001619]",
@@ -597,6 +601,8 @@
         },
         "anatomical_part": {
             "enum": [
+                "Eye [UBERON:0000970]",
+                "Intestine [UBERON:0000160]",
                 "Lower respiratory tract [UBERON:0001558]",
                 "Bronchus [UBERON:0002185]",
                 "Lung [UBERON:0002048]",
@@ -624,7 +630,7 @@
                 "Missing [GENEPIO:0001618]",
                 "Restricted Access [GENEPIO:0001810]",
             ],
-            "ontology": "",
+            "ontology": "GENEPIO:0001214",
             "type": "string",
             "description": "",
             "examples": [
@@ -637,6 +643,16 @@
         },
         "collection_device": {
             "enum": [
+                "Air filter [GENEPIO:0100031]",
+                "Blood Collection Tube [GENEPIO:0100031]",
+                "Bronchoscope [NCIT:C17611]",
+                "Collection Container [NCIT:C43446]",
+                "Collection Cup [GENEPIO:0100026]",
+                "Filter [NCIT:C45801]",
+                "Needle [NCIT:C69013]",
+                "Serum Collection Tube [NCIT:C113675]",
+                "Sputum Collection Tube [GENEPIO:0002115]",
+                "Suction Catheter [58253008]",
                 "Swab [GENEPIO:0100027]",
                 "Not Applicable [GENEPIO:0001619]",
                 "Not Collected [GENEPIO:0001620]",
@@ -644,7 +660,7 @@
                 "Missing [GENEPIO:0001618]",
                 "Restricted Access [GENEPIO:0001810]"
             ],
-            "ontology": "",
+            "ontology": "GENEPIO:0001234",
             "type": "string",
             "description": "",
             "examples": [
@@ -657,6 +673,25 @@
         },
         "collection_method": {
             "enum": [
+                "Amniocentesis [NCIT:C52009]",
+                "Suprapublic Aspiration [GENEPIO:0100028]",
+                "Tracheal Aspiration [GENEPIO:0100029]",
+                "Vacuum Aspiration [GENEPIO:0100030]",
+                "Needle Biopsy [OBI:0002654]",
+                "Filtration [NCIT:C16583]",
+                "Lavage [NCIT:C38068]",
+                "Bronchoalveolar Lavage (BAL) [GENEPIO:0100032]",
+                "Gastric Lavage [GENEPIO:0100033]",
+                "Lumbar Puncture [NCIT:C15327]",
+                "Necropsy [NCIT:C166270]",
+                "Phlebotomy [NCIT:C28221]",
+                "Rinsing [GENEPIO:0002116]",
+                "Scraping [GENEPIO:0100035]",
+                "Swabbing [NCIT:C17627]",
+                "Finger Pick [GENEPIO:0100036]",
+                "Wash [NCIT:C65077]",
+                "Washout Tear Collection [GENEPIO:0100038]",
+                "Inferior Nasal Turbinate [NCIT:C32794]",
                 "Aspiration [NCIT:C15631]",
                 "Biopsy [NCIT:C15189]",
                 "Not Applicable [GENEPIO:0001619]",
@@ -665,7 +700,7 @@
                 "Missing [GENEPIO:0001618]",
                 "Restricted Access [GENEPIO:0001810]"
             ],
-            "ontology": "",
+            "ontology": "GENEPIO:0001241",
             "type": "string",
             "description": "",
             "examples": [
@@ -678,17 +713,18 @@
         },
         "body_product": {
             "enum": [
-                "Feces UBERON:0001988]",
-                "Mucus UBERON:0000912]",
-                "Sputum UBERON:0007311]",
-                "Sweat UBERON:0001089]",
-                "Tear UBERON:0001827]",
-                "Urine UBERON:0001088]",
-                "Not Applicable GENEPIO:0001619]",
-                "Not Collected GENEPIO:0001620]",
-                "Not Provided GENEPIO:0001668]",
-                "Missing GENEPIO:0001618]",
-                "Restricted Access GENEPIO:0001810]"
+                "Breast Milk [UBERON:0001913]",
+                "Feces [UBERON:0001988]",
+                "Mucus [UBERON:0000912]",
+                "Sputum [UBERON:0007311]",
+                "Sweat [UBERON:0001089]",
+                "Tear [UBERON:0001827]",
+                "Urine [UBERON:0001088]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
             ],
             "ontology": "",
             "type": "string",
