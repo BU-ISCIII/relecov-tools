@@ -2,7 +2,8 @@
 import json
 import os
 
-#
+
+# pass test
 class ConfigJson:
     def __init__(
         self,
