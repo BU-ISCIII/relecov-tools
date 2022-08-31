@@ -162,7 +162,7 @@ class RelecovMetadata:
                 "Illumina NextSeq",
                 "Illumina NovaSeq 6000",
             ],
-            "MinION": ["Oxford Nanopore"],
+            "Oxford Nanopore": ["MinION"],
             "Ion Torrent": ["Ion Torrent S5", "Ion Torrent PGM"],
         }
         for key, values in p_data.items():
