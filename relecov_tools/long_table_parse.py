@@ -86,7 +86,8 @@ class LongTableParse:
             lines = fh.readlines()
 
         self.validate_file(lines[0].strip().split(","))
-
+        stderr.print("[green]Successful checking heading fields")
+        stderr.print("[blue]Parsing the input file")
         heading_index = {}
         headings_from_csv = lines[0].strip().split(",")
         for heading in self.long_table_heading:
@@ -119,15 +120,15 @@ class LongTableParse:
 
             variant_dict["Gene"] = line_s[heading_index["GENE"]]
 
-            variant_dict["Effect"] = {
-                "effect": line_s[heading_index["EFFECT"]],
+            variant_dict["Effect"] = line_s[heading_index["EFFECT"]]
+            variant_dict["VariantAnnotation"] = {
                 "hgvs_c": line_s[heading_index["HGVS_C"]],
                 "hgvs_p": line_s[heading_index["HGVS_P"]],
                 "hgvs_p_1_letter": line_s[heading_index["HGVS_P_1LETTER"]],
             }
 
             samp_dict[sample].append(variant_dict)
-
+        stderr.print("[green]Successful parsing data")
         return samp_dict
 
     def convert_to_json(self, samp_dict):
@@ -144,6 +145,7 @@ class LongTableParse:
         Transform the p0arsed data into a jsonf file, naming as
         "long_table_" + "current date" + ".json"
         """
+        stderr.print("[blue]Saving parsed data to file")
         date_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         file_name = "long_table_" + date_now + ".json"
         file_path = os.path.join(self.output_directory, file_name)
@@ -156,6 +158,8 @@ class LongTableParse:
         """
         function called when using the relecov-tools long-table-parse function.
         """
+        stderr.print("[blue]Starting reading the input file")
         parsed_data = self.parse_file()
         j_list = self.convert_to_json(parsed_data)
         self.saving_file(j_list)
+        stderr.print("[green]Process completed")
