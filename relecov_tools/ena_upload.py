@@ -134,15 +134,23 @@ class EnaUpload:
 1      Hospital Clínic de Barcelona      2021-05-07   Inmaculada Casas  ...  RELECOV Spanish Network for genomics surveillance  Surveillance  2697049
 
         """
+        """
         df_study = df_schemas[
             ["study_alias", "study_title", "study_type", "study_abstract"]
         ]
 
         df_study = df_study.rename(columns={"study_alias": "alias"})
         df_study = df_study.rename(columns={"study_title": "title"})
-        df_study.insert(3, "status", self.action)
-        # df_study
+        
+        
         """
+        df_study = df_schemas[["study_type", "study_abstract"]]
+        df_study["alias"] = df_study["study_abstract"][0].rsplit(" ", 5)[0]
+        df_study["title"] = df_study["study_abstract"]
+        df_study.insert(3, "status", self.action)
+
+        """
+        # df_study
         alias                                              title    study_type status                                     study_abstract
 0   RELECOV  RELECOV Spanish Network for genomics surveillance  Surveillance    ADD  RELECOV Spanish Network for genomics surveillance
 1   RELECOV  RELECOV Spanish Network for genomics surveillance  Surveillance    ADD  RELECOV Spanish Network for genomics surveillance
@@ -206,6 +214,9 @@ class EnaUpload:
 1   212163777  212163777  2697049                    ...  Severe acute respiratory syndrome coronavirus 2   Inmaculada Casas     Hospital Clínic de Barcelona  212163777
 2   212153091  212153091  2697049                    ...  Severe acute respiratory syndrome coronavirus 2   Inmaculada Casas     Hospital Clínic de Barcelona  212153091
         """
+        import pdb
+
+        pdb.set_trace()
         df_run = df_schemas[
             [
                 "experiment_alias",
@@ -341,7 +352,8 @@ class EnaUpload:
 
             # submit data to webin ftp server. It should only upload fastq files in case the action is ADD.
             # When the action is MODIFY rthe fastq are already submitted.
-
+            """
+            
             if self.action == "ADD" or self.action == "add":
                 session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
 
@@ -361,6 +373,7 @@ class EnaUpload:
 
                 g2 = session.quit()
                 print(g2)
+            """
 
             # THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
             # chec = submit_data(file_paths, self.passwd, self.user)
@@ -396,18 +409,6 @@ class EnaUpload:
                     files.set("checksum", H)
                     # print(files.attrib["checksum"])
             tree.write(schema_xmls["run"])
-            """
-            tree = ET.parse(schema_xmls["sample"])
-            root = tree.getroot()
-            for files in root.iter("SAMPLE_ATTRIBUTES"):
-                tag = ET.SubElement(files, "SAMPLE_ATTRIBUTE")
-                tag_2 = ET.SubElement(tag, "TAG")
-                tag_2.text = str("ENA-CHECKLIST")
-                tag_3 = ET.SubElement(tag, "VALUE")
-                tag_3.text = str("ERC000033")
-
-            tree.write(schema_xmls["sample"])
-            """
 
             if self.dev:
                 url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
