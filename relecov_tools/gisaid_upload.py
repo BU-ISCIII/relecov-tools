@@ -23,8 +23,6 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
-#
-
 
 class GisaidUpload:
     def __init__(

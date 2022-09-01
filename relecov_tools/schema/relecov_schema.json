@@ -25,7 +25,8 @@
             "description": "",
             "classification": "Sample collection and processing",
             "label": "Public Health sample id (SIVIES)",
-            "fill_mode": "sample"
+            "fill_mode": "sample",
+            "minLenght": "1"
         },
         "collecting_lab_sample_id": {
             "examples": [
@@ -36,7 +37,8 @@
             "description": "The name given for the sample by the collecting institution.",
             "classification": "Database Identifiers",
             "label": "Sample ID given by originating laboratory",
-            "fill_mode": "sample"
+            "fill_mode": "sample",
+            "minLenght": "1"
         },
         "collecting_institution": {
             "examples": [
@@ -47,7 +49,8 @@
             "description": "The name of the agency/institution that collected the sample.",
             "classification": "Sample collection and processing",
             "label": "Originating Laboratory",
-            "fill_mode": "sample"
+            "fill_mode": "sample",
+            "minLenght": "1"
         },
         "collecting_institution_email": {
             "examples": [
@@ -80,7 +83,8 @@
             "description": "",
             "classification": "Sample collection and processing",
             "label": "Sample ID given in the microbiology lab",
-            "fill_mode": "sample"
+            "fill_mode": "sample",
+            "minLenght": "1"
         },
         "isolate_sample_id": {
             "examples": [
@@ -91,7 +95,8 @@
             "description": "",
             "classification": "Database Identifiers",
             "label": "Sample ID given if multiple rna-extraction or passages",
-            "fill_mode": "sample"
+            "fill_mode": "sample",
+            "minLenght": "1"
         },
         "sequencing_sample_id": {
             "examples": [
@@ -102,7 +107,8 @@
             "description": "If the information is unknown or can not be shared, leave blank.",
             "classification": "Database Identifiers",
             "label": "Sample ID given for sequencing",
-            "fill_mode": "sample"
+            "fill_mode": "sample",
+            "minLenght": "1"
         },
         "submitting_lab_sample_id": {
             "examples": [
@@ -113,7 +119,8 @@
             "description": "Sample ID given by the submitting laboratory",
             "classification": "Sequencing",
             "label": "Sample ID given by the submitting laboratory",
-            "fill_mode": "sample"
+            "fill_mode": "sample",
+            "minLenght": "1"
         },
         "submitting_institution": {
             "examples": [
@@ -124,7 +131,8 @@
             "description": "The name of the agency that submitted the sequence to public databases.",
             "classification": "Sample collection and processing",
             "label": "Submitting Institution",
-            "fill_mode": "sample"
+            "fill_mode": "sample",
+            "minLenght": "1"
         },
         "submitting_institution_email": {
             "examples": [
@@ -158,7 +166,8 @@
             "format": "date",
             "classification": "Sample collection and processing",
             "label": "Sample Collection Date",
-            "fill_mode": "sample"
+            "fill_mode": "sample",
+            "minLenght": "1"
         },
         "sample_received_date": {
             "examples": [
@@ -470,7 +479,8 @@
             ],
             "classification": "Sample collection and processing",
             "label": "Country",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "geo_loc_state": {
             "examples": [
@@ -481,7 +491,8 @@
             "description": "The state/province/territory of origin of the sample.",
             "classification": "Sample collection and processing",
             "label": "Autonomic Community",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "geo_loc_region": {
             "examples": [
@@ -818,7 +829,8 @@
             ],
             "classification": "Sample collection and processing",
             "label": "Organism",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "tax_id": {
             "examples": [
@@ -829,7 +841,8 @@
             "description": "The NCBITaxon identifier for the organism being sequenced.",
             "classification": "Sample collection and processing",
             "label": "Tax ID",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "host_subject_id": {
             "examples": [
@@ -839,7 +852,8 @@
             "type": "string",
             "description": "An unique identifier by which each subject can be referred to, de-identified.",
             "classification": "Host information",
-            "label": "Host Subject Id"
+            "label": "Host Subject Id",
+            "minLenght": "1"
         },
         "host_health_state": {
             "examples": [
@@ -914,7 +928,8 @@
             ],
             "classification": "Host information",
             "label": "Host Scientific Name",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "host_disease": {
             "enum": [
@@ -1032,7 +1047,8 @@
             ],
             "classification": "Sequencing",
             "label": "Sequencing Instrument Model",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "purpose_of_sequencing": {
             "enum": [
@@ -1422,7 +1438,8 @@
             "description": "",
             "classification": "Sequencing",
             "label": "Sequencing Instrument Platform",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "library_source": {
             "enum": [
@@ -1607,7 +1624,8 @@
             "description": "",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "Analysis date",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "dehosting_method_software_name": {
             "examples": [
@@ -1662,7 +1680,8 @@
             "description": "The name  of the bioinformatics protocol used.",
             "classification": "Bioinformatic Analysis fields",
             "label": "If bioinformatic protocol Is Other, Specify",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "bioinformatics_protocol_software_version": {
             "examples": [
@@ -1673,7 +1692,8 @@
             "description": "The version number of the bioinformatics protocol used.",
             "classification": "Bioinformatic Analysis fields",
             "label": "bioinformatics protocol version",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "commercial_open_source_both": {
             "enum": [
