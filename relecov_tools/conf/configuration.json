@@ -218,5 +218,623 @@
     "mapping_file": {
         "ISCIII": "ISCIII.json",
         "HUGTiP": "HUGTiP.json"
-    }
+    },
+    "anatomical_part_collection_method_list": [
+        [
+            "Bronchus",
+            "Aspiration"
+        ],
+        [
+            "Lung",
+            "Aspiration"
+        ],
+        [
+            "Bronchiole",
+            "Aspiration"
+        ],
+        [
+            "Alveolar sac",
+            "Aspiration"
+        ],
+        [
+            "Pleural sac",
+            "Aspiration"
+        ],
+        [
+            "Pleural cavity",
+            "Aspiration"
+        ],
+        [
+            "Trachea",
+            "Aspiration"
+        ],
+        [
+            "Upper respiratory tract",
+            "Aspiration"
+        ],
+        [
+            "Anterior Nares",
+            "Aspiration"
+        ],
+        [
+            "Esophagus",
+            "Aspiration"
+        ],
+        [
+            "Ethmoid sinus",
+            "Aspiration"
+        ],
+        [
+            "Nasal Cavity",
+            "Aspiration"
+        ],
+        [
+            "Middle Nasal Turbinate",
+            "Aspiration"
+        ],
+        [
+            "Nasopharynx",
+            "Aspiration"
+        ],
+        [
+            "Oropharynx",
+            "Aspiration"
+        ],
+        [
+            "Lower respiratory tract",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Bronchus",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Lung",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Bronchiole",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Alveolar sac",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Pleural sac",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Pleural cavity",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Trachea",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Upper respiratory tract",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Anterior Nares",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Esophagus",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Ethmoid sinus",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Nasal Cavity",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Middle Nasal Turbinate",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Nasopharynx",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Oropharynx",
+            "Vacuum Aspiration"
+        ],
+        [
+            "Lower respiratory tract",
+            "Biopsy"
+        ],
+        [
+            "Bronchus",
+            "Biopsy"
+        ],
+        [
+            "Lung",
+            "Biopsy"
+        ],
+        [
+            "Bronchiole",
+            "Biopsy"
+        ],
+        [
+            "Alveolar sac",
+            "Biopsy"
+        ],
+        [
+            "Pleural sac",
+            "Biopsy"
+        ],
+        [
+            "Pleural cavity",
+            "Biopsy"
+        ],
+        [
+            "Trachea",
+            "Biopsy"
+        ],
+        [
+            "Rectum",
+            "Biopsy"
+        ],
+        [
+            "Skin",
+            "Biopsy"
+        ],
+        [
+            "Stomach",
+            "Biopsy"
+        ],
+        [
+            "Upper respiratory tract",
+            "Biopsy"
+        ],
+        [
+            "Anterior Nares",
+            "Biopsy"
+        ],
+        [
+            "Esophagus",
+            "Biopsy"
+        ],
+        [
+            "Ethmoid sinus",
+            "Biopsy"
+        ],
+        [
+            "Nasal Cavity",
+            "Biopsy"
+        ],
+        [
+            "Middle Nasal Turbinate",
+            "Biopsy"
+        ],
+        [
+            "Duodenum",
+            "Biopsy"
+        ],
+        [
+            "Nasopharynx",
+            "Biopsy"
+        ],
+        [
+            "Oropharynx",
+            "Biopsy"
+        ],
+        [
+            "Lower respiratory tract",
+            "Needle Biopsy"
+        ],
+        [
+            "Bronchus",
+            "Needle Biopsy"
+        ],
+        [
+            "Lung",
+            "Needle Biopsy"
+        ],
+        [
+            "Bronchiole",
+            "Needle Biopsy"
+        ],
+        [
+            "Alveolar sac",
+            "Needle Biopsy"
+        ],
+        [
+            "Pleural sac",
+            "Needle Biopsy"
+        ],
+        [
+            "Pleural cavity",
+            "Needle Biopsy"
+        ],
+        [
+            "Trachea",
+            "Needle Biopsy"
+        ],
+        [
+            "Rectum",
+            "Needle Biopsy"
+        ],
+        [
+            "Skin",
+            "Needle Biopsy"
+        ],
+        [
+            "Stomach",
+            "Needle Biopsy"
+        ],
+        [
+            "Upper respiratory tract",
+            "Needle Biopsy"
+        ],
+        [
+            "Anterior Nares",
+            "Needle Biopsy"
+        ],
+        [
+            "Esophagus",
+            "Needle Biopsy"
+        ],
+        [
+            "Ethmoid sinus",
+            "Needle Biopsy"
+        ],
+        [
+            "Nasal Cavity",
+            "Needle Biopsy"
+        ],
+        [
+            "Middle Nasal Turbinate",
+            "Needle Biopsy"
+        ],
+        [
+            "Duodenum",
+            "Needle Biopsy"
+        ],
+        [
+            "Nasopharynx",
+            "Needle Biopsy"
+        ],
+        [
+            "Oropharynx",
+            "Needle Biopsy"
+        ],
+        [
+            "Lower respiratory tract",
+            "Lavage"
+        ],
+        [
+            "Bronchus",
+            "Lavage"
+        ],
+        [
+            "Lung",
+            "Lavage"
+        ],
+        [
+            "Pleural sac",
+            "Lavage"
+        ],
+        [
+            "Pleural cavity",
+            "Lavage"
+        ],
+        [
+            "Trachea",
+            "Lavage"
+        ],
+        [
+            "Upper respiratory tract",
+            "Lavage"
+        ],
+        [
+            "Anterior Nares",
+            "Lavage"
+        ],
+        [
+            "Esophagus",
+            "Lavage"
+        ],
+        [
+            "Ethmoid sinus",
+            "Lavage"
+        ],
+        [
+            "Nasal Cavity",
+            "Lavage"
+        ],
+        [
+            "Middle Nasal Turbinate",
+            "Lavage"
+        ],
+        [
+            "Nasopharynx",
+            "Lavage"
+        ],
+        [
+            "Oropharynx",
+            "Lavage"
+        ],
+        [
+            "Bronchoalveolar",
+            "Lavage"
+        ],
+        [
+            "Gastric",
+            "Lavage"
+        ],
+        [
+            "Lower respiratory tract",
+            "Necropsy"
+        ],
+        [
+            "Bronchus",
+            "Necropsy"
+        ],
+        [
+            "Lung",
+            "Necropsy"
+        ],
+        [
+            "Bronchiole",
+            "Necropsy"
+        ],
+        [
+            "Alveolar sac",
+            "Necropsy"
+        ],
+        [
+            "Pleural sac",
+            "Necropsy"
+        ],
+        [
+            "Pleural cavity",
+            "Necropsy"
+        ],
+        [
+            "Trachea",
+            "Necropsy"
+        ],
+        [
+            "Rectum",
+            "Necropsy"
+        ],
+        [
+            "Skin",
+            "Necropsy"
+        ],
+        [
+            "Stomach",
+            "Necropsy"
+        ],
+        [
+            "Upper respiratory tract",
+            "Necropsy"
+        ],
+        [
+            "Anterior Nares",
+            "Necropsy"
+        ],
+        [
+            "Esophagus",
+            "Necropsy"
+        ],
+        [
+            "Ethmoid sinus",
+            "Necropsy"
+        ],
+        [
+            "Nasal Cavity",
+            "Necropsy"
+        ],
+        [
+            "Middle Nasal Turbinate",
+            "Necropsy"
+        ],
+        [
+            "Duodenum",
+            "Necropsy"
+        ],
+        [
+            "Nasopharynx",
+            "Necropsy"
+        ],
+        [
+            "Oropharynx",
+            "Necropsy"
+        ],
+        [
+            "Lower respiratory tract",
+            "Rinsing"
+        ],
+        [
+            "Bronchus",
+            "Rinsing"
+        ],
+        [
+            "Lung",
+            "Rinsing"
+        ],
+        [
+            "Bronchiole",
+            "Rinsing"
+        ],
+        [
+            "Alveolar sac",
+            "Rinsing"
+        ],
+        [
+            "Pleural sac",
+            "Rinsing"
+        ],
+        [
+            "Pleural cavity",
+            "Rinsing"
+        ],
+        [
+            "Trachea",
+            "Rinsing"
+        ],
+        [
+            "Upper respiratory tract",
+            "Rinsing"
+        ],
+        [
+            "Anterior Nares",
+            "Rinsing"
+        ],
+        [
+            "Esophagus",
+            "Rinsing"
+        ],
+        [
+            "Ethmoid sinus",
+            "Rinsing"
+        ],
+        [
+            "Nasal Cavity",
+            "Rinsing"
+        ],
+        [
+            "Middle Nasal Turbinate",
+            "Rinsing"
+        ],
+        [
+            "Nasopharynx",
+            "Rinsing"
+        ],
+        [
+            "Oropharynx",
+            "Rinsing"
+        ],
+        [
+            "Bronchiole",
+            "Scraping"
+        ],
+        [
+            "Alveolar sac",
+            "Scraping"
+        ],
+        [
+            "Pleural sac",
+            "Scraping"
+        ],
+        [
+            "Pleural cavity",
+            "Scraping"
+        ],
+        [
+            "Trachea",
+            "Scraping"
+        ],
+        [
+            "Upper respiratory tract",
+            "Scraping"
+        ],
+        [
+            "Anterior Nares",
+            "Scraping"
+        ],
+        [
+            "Esophagus",
+            "Scraping"
+        ],
+        [
+            "Ethmoid sinus",
+            "Scraping"
+        ],
+        [
+            "Nasal Cavity",
+            "Scraping"
+        ],
+        [
+            "Middle Nasal Turbinate",
+            "Scraping"
+        ],
+        [
+            "Nasopharynx",
+            "Scraping"
+        ],
+        [
+            "Oropharynx",
+            "Scraping"
+        ],
+        [
+            "Nasopharynx",
+            "Swabbing"
+        ],
+        [
+            "Oropharynx",
+            "Swabbing"
+        ],
+        [
+            "Lower respiratory tract",
+            "Wash"
+        ],
+        [
+            "Bronchus",
+            "Wash"
+        ],
+        [
+            "Lung",
+            "Wash"
+        ],
+        [
+            "Bronchiole",
+            "Wash"
+        ],
+        [
+            "Alveolar sac",
+            "Wash"
+        ],
+        [
+            "Pleural sac",
+            "Wash"
+        ],
+        [
+            "Pleural cavity",
+            "Wash"
+        ],
+        [
+            "Trachea",
+            "Wash"
+        ],
+        [
+            "Upper respiratory tract",
+            "Wash"
+        ],
+        [
+            "Anterior Nares",
+            "Wash"
+        ],
+        [
+            "Esophagus",
+            "Wash"
+        ],
+        [
+            "Ethmoid sinus",
+            "Wash"
+        ],
+        [
+            "Nasal Cavity",
+            "Wash"
+        ],
+        [
+            "Middle Nasal Turbinate",
+            "Wash"
+        ],
+        [
+            "Nasopharynx",
+            "Wash"
+        ],
+        [
+            "Oropharynx",
+            "Wash"
+        ]
+    ]
 }
