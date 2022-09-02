@@ -44,15 +44,15 @@ def added_seq_inst_model(metadata, f_data, mapped_fields, heading):
                 stderr.print(f"[red] Value {e} does not exist")
                 sys.exit(1)
             if "nextseq" in run_name:
-                row[m_idx] = "Illumina NextSeq"
+                row[m_idx] = "Illumina NextSeq 500"
             elif "next_seq" in run_name:
-                row[m_idx] = "Illumina NextSeq"
+                row[m_idx] = "Illumina NextSeq 500"
             elif "miseq" in run_name:
                 row[m_idx] = "Illumina MiSeq"
             elif "miseaq" in run_name:
                 row[m_idx] = "Illumina MiSeq"
             elif "novaseq" in run_name:
-                row[m_idx] = "Illumina NovaSeq"
+                row[m_idx] = "Illumina NovaSeq 6000"
             else:
                 log.error("Value  %s is not defined in the mapping ", run_name)
                 stderr.print(f"[red] Value {run_name} is not defined in the mapping")
