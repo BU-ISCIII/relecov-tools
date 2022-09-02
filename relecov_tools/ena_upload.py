@@ -14,7 +14,7 @@ import pandas as pd
 import sys
 import os
 
-import ftplib
+# import ftplib
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -141,14 +141,11 @@ class EnaUpload:
 
         df_study = df_study.rename(columns={"study_alias": "alias"})
         df_study = df_study.rename(columns={"study_title": "title"})
-        
-        
         """
         df_study = df_schemas[["study_type", "study_abstract"]]
         df_study["alias"] = df_study["study_abstract"][0].rsplit(" ", 5)[0]
         df_study["title"] = df_study["study_abstract"]
         df_study.insert(3, "status", self.action)
-
         """
         # df_study
         alias                                              title    study_type status                                     study_abstract
