@@ -23,8 +23,6 @@
                 "Biological Sample Storage Condition": "-80 C",
                 "Rna Extraction Protocol": "RT-PCR",
                 "Purpose of sampling": "Surveillance",
-                "Specimen source": "Nasopharyngeal exudate",
-                "Environmental System": "Swab",
                 "Host": "Human",
                 "Library Preparation Kit": "Illumina DNA Prep",
                 "Enrichment Protocol": "Amplicon",
