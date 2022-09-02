@@ -348,9 +348,8 @@ class EnaUpload:
             file_paths.update(file_paths_r2)
 
             # submit data to webin ftp server. It should only upload fastq files in case the action is ADD.
-            # When the action is MODIFY rthe fastq are already submitted.
+            # # When the action is MODIFY rthe fastq are already submitted
             """
-            
             if self.action == "ADD" or self.action == "add":
                 session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
 
