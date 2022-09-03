@@ -18,6 +18,7 @@ stderr = rich.console.Console(
 
 class MetadataHomogeneizer:
     """MetadataHomogeneizer object"""
+
     def __init__(self, institution=None, directory=None, output_folder=None):
         self.config_json = ConfigJson()
         self.heading = self.config_json.get_configuration("metadata_lab_heading")
