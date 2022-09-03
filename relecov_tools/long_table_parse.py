@@ -61,7 +61,9 @@ class LongTableParse:
         Path(self.output_directory).mkdir(parents=True, exist_ok=True)
 
         config_json = ConfigJson()
-        self.long_table_heading = config_json.get_topic_data("headings", "long_table_heading")
+        self.long_table_heading = config_json.get_topic_data(
+            "headings", "long_table_heading"
+        )
 
     def validate_file(self, heading):
         """Check if long table file has all mandatory fields defined in
