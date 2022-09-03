@@ -1,5 +1,5 @@
 {
-    "pyhon_file": "ISCIII.py",
+    "python_file": "ISCIII.py",
     "required_files": {
         "metadata_file": {
             "file_name": "new_lab_metadata.xlsx",

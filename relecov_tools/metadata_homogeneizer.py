@@ -63,7 +63,7 @@ class MetadataHomogeneizer:
         self.lab_metadata = self.mapping_json_data["required_files"]["metadata_file"]
         self.lab_metadata["file_name"] = metadata_path
         # Check if python file is defined
-        function_file = self.mapping_json_data["pyhon_file"]
+        function_file = self.mapping_json_data["python_file"]
         if function_file == "":
             self.function_file = None
         else:
