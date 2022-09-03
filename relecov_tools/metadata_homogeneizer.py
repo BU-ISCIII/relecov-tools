@@ -21,7 +21,9 @@ class MetadataHomogeneizer:
 
     def __init__(self, institution=None, directory=None, output_folder=None):
         self.config_json = ConfigJson()
-        self.heading = self.config_json.get_topic_data("headings", "metadata_lab_heading")
+        self.heading = self.config_json.get_topic_data(
+            "headings", "metadata_lab_heading"
+        )
 
         if institution is None:
             self.institution = relecov_tools.utils.prompt_selection(
