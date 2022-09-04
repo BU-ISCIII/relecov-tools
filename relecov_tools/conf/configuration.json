@@ -109,7 +109,7 @@
         "geo_location_data": "geo_loc_cities.json",
         "anatomical_material": "anatomical_material_collection_method.json"
     },
-    "mapping_file": {
+    "institution_mapping_file": {
         "ISCIII": "ISCIII.json",
         "HUGTiP": "HUGTiP.json"
     },

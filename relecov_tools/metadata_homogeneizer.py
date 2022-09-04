@@ -36,7 +36,9 @@ class MetadataHomogeneizer:
             os.path.dirname(__file__),
             "schema",
             "institution_schemas",
-            self.config_json.get_topic_data("mapping_file", self.institution),
+            self.config_json.get_topic_data(
+                "institution_mapping_file", self.institution
+            ),
         )
         if directory is None:
             directory = relecov_tools.utils.prompt_path(
