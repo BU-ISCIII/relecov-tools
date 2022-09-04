@@ -65,6 +65,22 @@ class MetadataHomogeneizer:
             sys.exit(1)
         self.lab_metadata = self.mapping_json_data["required_files"]["metadata_file"]
         self.lab_metadata["file_name"] = metadata_path
+
+        self.additional_files = []
+        if len(self.mapping_json_data["required_files"]) > 1:
+            for key, values in self.mapping_json_data["required_files"].items():
+                if key == "metadata_file":
+                    continue
+                if values["file_name"] == "":
+                    self.additional_files.append(values)
+                    continue
+                f_path = os.path.join(directory, values["file_name"])
+                if not os.path.isfile(f_path):
+                    log.error("Additional file %s does not exist ", f_path)
+                    stderr.print("[red] Additional file " + f_path + " does not exist")
+                    sys.exit(1)
+                values["file_name"] = f_path
+                self.additional_files.append(values)
         # Check if python file is defined
         function_file = self.mapping_json_data["python_file"]
         if function_file == "":
@@ -81,27 +97,13 @@ class MetadataHomogeneizer:
                     + " does not exist"
                 )
                 sys.exit(1)
-        self.additional_files = []
-        if len(self.mapping_json_data["required_files"]) > 1:
-            for key, values in self.mapping_json_data["required_files"].items():
-                if key == "metadata_file":
-                    continue
-                if values["file_name"] == "":
-                    self.additional_files.append(values)
-                    continue
-                f_path = os.path.join(directory, values["file_name"])
-                if not os.path.isfile(f_path):
-                    log.error("Additional file %s does not exist ", f_path)
-                    stderr.print("[red] Additional file " + f_path + " does not exist")
-                    sys.exit(1)
-                values["file_name"] = f_path
-                self.additional_files.append(values)
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
             self.output_folder = output_folder
+        self.processed_metadata = False
 
     def mapping_metadata(self, ws_data):
         map_fields = self.mapping_json_data["required_files"]["metadata_file"][
@@ -151,7 +153,6 @@ class MetadataHomogeneizer:
                 data = relecov_tools.utils.read_csv_file_return_dict(f_name, ",")
             elif f_name.endswith(".xlsx"):
                 data = relecov_tools.utils.read_execl_file(f_name, "Sheet")
-                return self.mapping_metadata(data)
             else:
                 log.error("Additional file extension %s is not supported ", f_name)
                 stderr.print(
@@ -160,6 +161,10 @@ class MetadataHomogeneizer:
                 sys.exit(1)
         else:
             data = ""
+        if not self.processed_metadata:
+            self.processed_metadata = True
+            return self.mapping_metadata(data)
+
         if file_data["function"] == "None":
             mapping_idx = self.heading.index(file_data["mapped_key"])
             for row in additional_data[1:]:
