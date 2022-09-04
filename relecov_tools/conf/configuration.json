@@ -104,6 +104,15 @@
         "ena_schema": "ena_schema.json",
         "gisaid_schema": "gisaid_schema.json"
     },
+    "lab_metadata_req_json":{
+        "laboratory_data": "laboratory_address.json",
+        "geo_location_data": "geo_loc_cities.json",
+        "anatomical_material": "anatomical_material_collection_method.json"
+    },
+    "mapping_file": {
+        "ISCIII": "ISCIII.json",
+        "HUGTiP": "HUGTiP.json"
+    },
     "sftp_connection": {
         "sftp_server": "sftprelecov.isciii.es",
         "sftp_port": "22"
@@ -115,8 +124,6 @@
         "fastq.gz",
         "fasta"
     ],
-    "laboratory_data": "laboratory_address.json",
-    "geo_location_data": "geo_loc_cities.json",
     "ENA_configuration": {
         "study_alias": "RELECOV",
         "design_description": "Design Description",
@@ -216,9 +223,5 @@
         "tool_version": "0.5.3"
     },
     "md5_file_name": "md5_check_file.csv",
-    "checklist": "ERC000033",
-    "mapping_file": {
-        "ISCIII": "ISCIII.json",
-        "HUGTiP": "HUGTiP.json"
-    }
+    "checklist": "ERC000033"
 }
