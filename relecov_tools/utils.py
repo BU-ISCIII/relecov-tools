@@ -34,15 +34,15 @@ def read_json_file(j_file):
     return data
 
 
-def read_execl_file(f_name, sheet_name):
+def read_excel_file(f_name, sheet_name, heading_row):
     """Read the input excel file and give the information in a list
     of dictionaries
     """
     wb_file = openpyxl.load_workbook(f_name, data_only=True)
     ws_metadata_lab = wb_file[sheet_name]
-    heading = [i.value.strip() for i in ws_metadata_lab[1] if i.value]
+    heading = [i.value.strip() for i in ws_metadata_lab[heading_row] if i.value]
     ws_data = []
-    for row in islice(ws_metadata_lab.values, 1, ws_metadata_lab.max_row):
+    for row in islice(ws_metadata_lab.values, heading_row, ws_metadata_lab.max_row):
         l_row = list(row)
         data_row = {}
         # Ignore the empty rows
@@ -127,6 +127,13 @@ def save_local_md5(file_name, md5_value):
     return True
 
 
+def write_json_fo_file(data, file_name):
+    """Write metadata to json file"""
+    with open(file_name, "w", encoding="utf-8") as fh:
+        fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
+    return True
+
+
 def write_to_excel_file(data, f_name, sheet_name, post_process=None):
     book = openpyxl.Workbook()
     sheet = book.active
@@ -138,7 +145,7 @@ def write_to_excel_file(data, f_name, sheet_name, post_process=None):
         sheet.insert_cols(post_process["insert_cols"])
         sheet["A1"] = "Campo"
         counter = 1
-        for i in range(len(data)):
+        for i in range(len(data) - 1):
             idx = "A" + str(counter + 1)
             sheet[idx] = counter
             counter += 1
