@@ -74,16 +74,6 @@ class RelecovMetadata:
         self.schema_name = self.relecov_sch_json["schema"]
         self.schema_version = self.relecov_sch_json["version"]
 
-    def fetch_metadata_file(folder, file_name):
-        """Fetch the metadata file folder  Directory to fetch metadata file
-        file_name   metadata file name
-        """
-        wb_file = openpyxl.load_workbook(file_name, data_only=True)
-        ws_metadata_lab = wb_file["METADATA_LAB"]
-        heading = []
-        for cell in ws_metadata_lab[1]:
-            heading.append(cell.value)
-
     def read_json_file(self, j_file):
         """Read json file."""
         with open(j_file, "r") as fh:
