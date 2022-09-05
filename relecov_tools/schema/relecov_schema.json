@@ -1113,7 +1113,7 @@
             "type": "string",
             "description": "DNA/RNA extraction protocol",
             "classification": "Sequencing",
-            "label": "Extraction Protocol",
+            "label": "Nucleic acid extraction protocol",
             "fill_mode": "batch"
         },
         "all_in_one_library_kit": {
