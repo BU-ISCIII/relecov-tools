@@ -16,6 +16,7 @@ stderr = rich.console.Console(
     highlight=False,
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
+#
 
 
 class RelecovMetadata:
