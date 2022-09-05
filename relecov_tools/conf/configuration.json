@@ -24,7 +24,7 @@
             "Host Age",
             "Host Gender",
             "Sequencing Date",
-            "Rna Extraction Protocol",
+            "Nucleic acid extraction protocol",
             "Commercial All-in-one library kit",
             "Library Preparation Kit",
             "Enrichment Protocol",
@@ -44,8 +44,7 @@
             "Diagnostic Pcr Ct Value 1",
             "Gene Name 2",
             "Diagnostic Pcr Ct Value-2",
-            "Analysis Authors",
-            "Author Submitter",
+            "Broker Name",
             "Authors",
             "Sequence file R1 fastq",
             "Sequence file R2 fastq"

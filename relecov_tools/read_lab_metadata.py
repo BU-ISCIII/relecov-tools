@@ -121,7 +121,9 @@ class RelecovMetadata:
         return processed_data
 
     def include_processed_data(self, metadata):
-        """Include the data that requires to be processed to set the value"""
+        """Include the data that requires to be processed to set the value.
+        This values are checked aginst the available options in the schema
+        """
         new_data = {}
         p_data = {
             "host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]},
