@@ -80,3 +80,33 @@ def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
             else:
                 row[m_idx] = "not applicable"
     return metadata
+
+
+def translate_anatomical_part(metadata, f_data, mapped_fields, heading):
+    """Translate into english the "muestra" that is written in spanish"""
+    for row in metadata[1:]:
+        for key, val in mapped_fields.items():
+            m_idx = heading.index(key)
+            if row[m_idx] is None:
+                row[m_idx] = "not provided"
+            elif "ASPIRADO NASOFARÍNGEO" in row[m_idx].lower():
+                row[m_idx] = "Nasopharynx Aspiration"
+            elif "ASPIRADO BRONQUIAL" in row[m_idx].lower():
+                row[m_idx] = "Bronchus Aspiration"
+            elif "ESPUTO" in row[m_idx].lower():
+                row[m_idx] = "Sputum"
+            elif "EXTRACTO" in row[m_idx].lower():
+                row[m_idx] = "Scraping"
+            elif "EXUDADO FARÍNGEO" in row[m_idx].lower():
+                row[m_idx] = "Nasopharynx Swabbing"
+            elif "EXUDADO NASOFARÍNGEO" in row[m_idx].lower():
+                row[m_idx] = "Nasopharynx Swabbing"
+            elif "EXUDADO OROFARINGEO" in row[m_idx].lower():
+                row[m_idx] = "Oropharynx Swabbing"
+            elif "PLACENTA" in row[m_idx].lower():
+                row[m_idx] = "Placenta"
+            elif "SALIVA" in row[m_idx].lower():
+                row[m_idx] = "Saliva"
+            else:
+                row[m_idx] = "not applicable"
+    return metadata
