@@ -16,7 +16,8 @@
                 "Sample Received Date": "Fecha recepción",
                 "Host Age": "Edad (años)",
                 "Host Gender": "Sexo",
-                "Diagnostic Pcr Ct Value 1": "PCR genE"
+                "Diagnostic Pcr Ct Value 1": "PCR genE",
+                "Specimen source": "Muestra"
             },
             "function": "None"
         },
@@ -105,10 +106,9 @@
     "fixed_fields": {
         "Submitting Institution": "Instituto de Salud Carlos III",
         "Biological Sample Storage Condition": "-80 C",
-        "Rna Extraction Protocol": "RT-PCR",
+        "Nucleic acid extraction protocol": "RT-PCR",
         "Purpose of sampling": "Surveillance",
         "Specimen source": "Nasopharyngeal exudate",
-        "Environmental System": "Swab",
         "Host": "Human",
         "Library Preparation Kit": "Illumina DNA Prep",
         "Enrichment Protocol": "Amplicon",

@@ -89,23 +89,23 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
             m_idx = heading.index(key)
             if row[m_idx] is None:
                 row[m_idx] = "not provided"
-            elif "ASPIRADO NASOFARÍNGEO" in row[m_idx].lower():
+            elif "ASPIRADO NASOFARÍNGEO" in row[m_idx].upper():
                 row[m_idx] = "Nasopharynx Aspiration"
-            elif "ASPIRADO BRONQUIAL" in row[m_idx].lower():
+            elif "ASPIRADO BRONQUIAL" in row[m_idx].upper():
                 row[m_idx] = "Bronchus Aspiration"
-            elif "ESPUTO" in row[m_idx].lower():
+            elif "ESPUTO" in row[m_idx].upper():
                 row[m_idx] = "Sputum"
-            elif "EXTRACTO" in row[m_idx].lower():
+            elif "EXTRACTO" in row[m_idx].upper():
                 row[m_idx] = "Scraping"
-            elif "EXUDADO FARÍNGEO" in row[m_idx].lower():
+            elif "EXUDADO FARÍNGEO" in row[m_idx].upper():
                 row[m_idx] = "Nasopharynx Swabbing"
-            elif "EXUDADO NASOFARÍNGEO" in row[m_idx].lower():
+            elif "EXUDADO NASOFARÍNGEO" in row[m_idx].upper():
                 row[m_idx] = "Nasopharynx Swabbing"
-            elif "EXUDADO OROFARINGEO" in row[m_idx].lower():
+            elif "EXUDADO OROFARINGEO" in row[m_idx].upper():
                 row[m_idx] = "Oropharynx Swabbing"
-            elif "PLACENTA" in row[m_idx].lower():
+            elif "PLACENTA" in row[m_idx].upper():
                 row[m_idx] = "Placenta"
-            elif "SALIVA" in row[m_idx].lower():
+            elif "SALIVA" in row[m_idx].upper():
                 row[m_idx] = "Saliva"
             else:
                 log.error("The field is not correctly written or is not filled")
