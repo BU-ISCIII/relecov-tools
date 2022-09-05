@@ -16,7 +16,8 @@
                 "Sample Received Date": "Fecha recepción",
                 "Host Age": "Edad (años)",
                 "Host Gender": "Sexo",
-                "Diagnostic Pcr Ct Value 1": "PCR genE"
+                "Diagnostic Pcr Ct Value 1": "PCR genE",
+                "Specimen source": "Muestra"
             },
             "function": "None"
         },
