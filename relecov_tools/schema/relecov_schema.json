@@ -1106,7 +1106,7 @@
             "label": "Sequencing Date",
             "fill_mode": "batch"
         },
-        "extraction_protocol": {
+        "nucleic_acid_extraction_protocol": {
             "examples": [
                 "Opentrons custom protocol"
             ],
