@@ -1,0 +1,990 @@
+{
+    "Lower respiratory tract Aspiration": {
+        "anatomical_part": "Lower respiratory tract",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchus Aspiration": {
+        "anatomical_part": "Bronchus",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lung Aspiration": {
+        "anatomical_part": "Lung",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchiole Aspiration": {
+        "anatomical_part": "Bronchiole",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Alveolar sac Aspiration": {
+        "anatomical_part": "Alveolar sac",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural sac Aspiration": {
+        "anatomical_part": "Pleural sac",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural cavity Aspiration": {
+        "anatomical_part": "Pleural cavity",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Trachea Aspiration": {
+        "anatomical_part": "Trachea",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Upper respiratory tract Aspiration": {
+        "anatomical_part": "Upper respiratory tract",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Anterior Nares Aspiration": {
+        "anatomical_part": "Anterior Nares",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Esophagus Aspiration": {
+        "anatomical_part": "Esophagus",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Ethmoid sinus Aspiration": {
+        "anatomical_part": "Ethmoid sinus",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasal Cavity Aspiration": {
+        "anatomical_part": "Nasal Cavity",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Middle Nasal Turbinate Aspiration": {
+        "anatomical_part": "Middle Nasal Turbinate",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasopharynx Aspiration": {
+        "anatomical_part": "Nasopharynx",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Oropharynx Aspiration": {
+        "anatomical_part": "Oropharynx",
+        "collection_device": "Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lower respiratory tract Vacuum Aspiration": {
+        "anatomical_part": "Lower respiratory tract",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchus Vacuum Aspiration": {
+        "anatomical_part": "Bronchus",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lung Vacuum Aspiration": {
+        "anatomical_part": "Lung",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchiole Vacuum Aspiration": {
+        "anatomical_part": "Bronchiole",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Alveolar sac Vacuum Aspiration": {
+        "anatomical_part": "Alveolar sac",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural sac Vacuum Aspiration": {
+        "anatomical_part": "Pleural sac",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural cavity Vacuum Aspiration": {
+        "anatomical_part": "Pleural cavity",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Trachea Vacuum Aspiration": {
+        "anatomical_part": "Trachea",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Upper respiratory tract Vacuum Aspiration": {
+        "anatomical_part": "Upper respiratory tract",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Anterior Nares Vacuum Aspiration": {
+        "anatomical_part": "Anterior Nares",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Esophagus Vacuum Aspiration": {
+        "anatomical_part": "Esophagus",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Ethmoid sinus Vacuum Aspiration": {
+        "anatomical_part": "Ethmoid sinus",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasal Cavity Vacuum Aspiration": {
+        "anatomical_part": "Nasal Cavity",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Middle Nasal Turbinate Vacuum Aspiration": {
+        "anatomical_part": "Middle Nasal Turbinate",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasopharynx Vacuum Aspiration": {
+        "anatomical_part": "Nasopharynx",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Oropharynx Vacuum Aspiration": {
+        "anatomical_part": "Oropharynx",
+        "collection_device": "Vacuum Aspiration",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lower respiratory tract Biopsy": {
+        "anatomical_part": "Lower respiratory tract",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchus Biopsy": {
+        "anatomical_part": "Bronchus",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lung Biopsy": {
+        "anatomical_part": "Lung",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchiole Biopsy": {
+        "anatomical_part": "Bronchiole",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Alveolar sac Biopsy": {
+        "anatomical_part": "Alveolar sac",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural sac Biopsy": {
+        "anatomical_part": "Pleural sac",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural cavity Biopsy": {
+        "anatomical_part": "Pleural cavity",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Trachea Biopsy": {
+        "anatomical_part": "Trachea",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Rectum Biopsy": {
+        "anatomical_part": "Rectum",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Skin Biopsy": {
+        "anatomical_part": "Skin",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Stomach Biopsy": {
+        "anatomical_part": "Stomach",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Upper respiratory tract Biopsy": {
+        "anatomical_part": "Upper respiratory tract",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Anterior Nares Biopsy": {
+        "anatomical_part": "Anterior Nares",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Esophagus Biopsy": {
+        "anatomical_part": "Esophagus",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Ethmoid sinus Biopsy": {
+        "anatomical_part": "Ethmoid sinus",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasal Cavity Biopsy": {
+        "anatomical_part": "Nasal Cavity",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Middle Nasal Turbinate Biopsy": {
+        "anatomical_part": "Middle Nasal Turbinate",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Duodenum Biopsy": {
+        "anatomical_part": "Duodenum",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasopharynx Biopsy": {
+        "anatomical_part": "Nasopharynx",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Oropharynx Biopsy": {
+        "anatomical_part": "Oropharynx",
+        "collection_device": "Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lower respiratory tract Needle Biopsy": {
+        "anatomical_part": "Lower respiratory tract",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchus Needle Biopsy": {
+        "anatomical_part": "Bronchus",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lung Needle Biopsy": {
+        "anatomical_part": "Lung",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchiole Needle Biopsy": {
+        "anatomical_part": "Bronchiole",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Alveolar sac Needle Biopsy": {
+        "anatomical_part": "Alveolar sac",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural sac Needle Biopsy": {
+        "anatomical_part": "Pleural sac",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural cavity Needle Biopsy": {
+        "anatomical_part": "Pleural cavity",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Trachea Needle Biopsy": {
+        "anatomical_part": "Trachea",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Rectum Needle Biopsy": {
+        "anatomical_part": "Rectum",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Skin Needle Biopsy": {
+        "anatomical_part": "Skin",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Stomach Needle Biopsy": {
+        "anatomical_part": "Stomach",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Upper respiratory tract Needle Biopsy": {
+        "anatomical_part": "Upper respiratory tract",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Anterior Nares Needle Biopsy": {
+        "anatomical_part": "Anterior Nares",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Esophagus Needle Biopsy": {
+        "anatomical_part": "Esophagus",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Ethmoid sinus Needle Biopsy": {
+        "anatomical_part": "Ethmoid sinus",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasal Cavity Needle Biopsy": {
+        "anatomical_part": "Nasal Cavity",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Middle Nasal Turbinate Needle Biopsy": {
+        "anatomical_part": "Middle Nasal Turbinate",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Duodenum Needle Biopsy": {
+        "anatomical_part": "Duodenum",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasopharynx Needle Biopsy": {
+        "anatomical_part": "Nasopharynx",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Oropharynx Needle Biopsy": {
+        "anatomical_part": "Oropharynx",
+        "collection_device": "Needle Biopsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lower respiratory tract Lavage": {
+        "anatomical_part": "Lower respiratory tract",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchus Lavage": {
+        "anatomical_part": "Bronchus",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lung Lavage": {
+        "anatomical_part": "Lung",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural sac Lavage": {
+        "anatomical_part": "Pleural sac",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural cavity Lavage": {
+        "anatomical_part": "Pleural cavity",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Trachea Lavage": {
+        "anatomical_part": "Trachea",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Upper respiratory tract Lavage": {
+        "anatomical_part": "Upper respiratory tract",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Anterior Nares Lavage": {
+        "anatomical_part": "Anterior Nares",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Esophagus Lavage": {
+        "anatomical_part": "Esophagus",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Ethmoid sinus Lavage": {
+        "anatomical_part": "Ethmoid sinus",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasal Cavity Lavage": {
+        "anatomical_part": "Nasal Cavity",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Middle Nasal Turbinate Lavage": {
+        "anatomical_part": "Middle Nasal Turbinate",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasopharynx Lavage": {
+        "anatomical_part": "Nasopharynx",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Oropharynx Lavage": {
+        "anatomical_part": "Oropharynx",
+        "collection_device": "Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lower respiratory tract Necropsy": {
+        "anatomical_part": "Lower respiratory tract",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchus Necropsy": {
+        "anatomical_part": "Bronchus",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lung Necropsy": {
+        "anatomical_part": "Lung",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchiole Necropsy": {
+        "anatomical_part": "Bronchiole",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Alveolar sac Necropsy": {
+        "anatomical_part": "Alveolar sac",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural sac Necropsy": {
+        "anatomical_part": "Pleural sac",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural cavity Necropsy": {
+        "anatomical_part": "Pleural cavity",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Trachea Necropsy": {
+        "anatomical_part": "Trachea",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Rectum Necropsy": {
+        "anatomical_part": "Rectum",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Skin Necropsy": {
+        "anatomical_part": "Skin",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Stomach Necropsy": {
+        "anatomical_part": "Stomach",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Upper respiratory tract Necropsy": {
+        "anatomical_part": "Upper respiratory tract",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Anterior Nares Necropsy": {
+        "anatomical_part": "Anterior Nares",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Esophagus Necropsy": {
+        "anatomical_part": "Esophagus",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Ethmoid sinus Necropsy": {
+        "anatomical_part": "Ethmoid sinus",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasal Cavity Necropsy": {
+        "anatomical_part": "Nasal Cavity",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Middle Nasal Turbinate Necropsy": {
+        "anatomical_part": "Middle Nasal Turbinate",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Duodenum Necropsy": {
+        "anatomical_part": "Duodenum",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasopharynx Necropsy": {
+        "anatomical_part": "Nasopharynx",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Oropharynx Necropsy": {
+        "anatomical_part": "Oropharynx",
+        "collection_device": "Necropsy",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lower respiratory tract Rinsing": {
+        "anatomical_part": "Lower respiratory tract",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchus Rinsing": {
+        "anatomical_part": "Bronchus",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lung Rinsing": {
+        "anatomical_part": "Lung",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchiole Rinsing": {
+        "anatomical_part": "Bronchiole",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Alveolar sac Rinsing": {
+        "anatomical_part": "Alveolar sac",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural sac Rinsing": {
+        "anatomical_part": "Pleural sac",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural cavity Rinsing": {
+        "anatomical_part": "Pleural cavity",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Trachea Rinsing": {
+        "anatomical_part": "Trachea",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Upper respiratory tract Rinsing": {
+        "anatomical_part": "Upper respiratory tract",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Anterior Nares Rinsing": {
+        "anatomical_part": "Anterior Nares",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Esophagus Rinsing": {
+        "anatomical_part": "Esophagus",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Ethmoid sinus Rinsing": {
+        "anatomical_part": "Ethmoid sinus",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasal Cavity Rinsing": {
+        "anatomical_part": "Nasal Cavity",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Middle Nasal Turbinate Rinsing": {
+        "anatomical_part": "Middle Nasal Turbinate",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasopharynx Rinsing": {
+        "anatomical_part": "Nasopharynx",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Oropharynx Rinsing": {
+        "anatomical_part": "Oropharynx",
+        "collection_device": "Rinsing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchiole Scraping": {
+        "anatomical_part": "Bronchiole",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Alveolar sac Scraping": {
+        "anatomical_part": "Alveolar sac",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural sac Scraping": {
+        "anatomical_part": "Pleural sac",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural cavity Scraping": {
+        "anatomical_part": "Pleural cavity",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Trachea Scraping": {
+        "anatomical_part": "Trachea",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Upper respiratory tract Scraping": {
+        "anatomical_part": "Upper respiratory tract",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Anterior Nares Scraping": {
+        "anatomical_part": "Anterior Nares",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Esophagus Scraping": {
+        "anatomical_part": "Esophagus",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Ethmoid sinus Scraping": {
+        "anatomical_part": "Ethmoid sinus",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasal Cavity Scraping": {
+        "anatomical_part": "Nasal Cavity",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Middle Nasal Turbinate Scraping": {
+        "anatomical_part": "Middle Nasal Turbinate",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasopharynx Scraping": {
+        "anatomical_part": "Nasopharynx",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Oropharynx Scraping": {
+        "anatomical_part": "Oropharynx",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasopharynx Swabbing": {
+        "anatomical_part": "Nasopharynx",
+        "collection_device": "Swabbing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Oropharynx Swabbing": {
+        "anatomical_part": "Oropharynx",
+        "collection_device": "Swabbing",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lower respiratory tract Wash": {
+        "anatomical_part": "Lower respiratory tract",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchus Wash": {
+        "anatomical_part": "Bronchus",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Lung Wash": {
+        "anatomical_part": "Lung",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchiole Wash": {
+        "anatomical_part": "Bronchiole",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Alveolar sac Wash": {
+        "anatomical_part": "Alveolar sac",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural sac Wash": {
+        "anatomical_part": "Pleural sac",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Pleural cavity Wash": {
+        "anatomical_part": "Pleural cavity",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Trachea Wash": {
+        "anatomical_part": "Trachea",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Upper respiratory tract Wash": {
+        "anatomical_part": "Upper respiratory tract",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Anterior Nares Wash": {
+        "anatomical_part": "Anterior Nares",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Esophagus Wash": {
+        "anatomical_part": "Esophagus",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Ethmoid sinus Wash": {
+        "anatomical_part": "Ethmoid sinus",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasal Cavity Wash": {
+        "anatomical_part": "Nasal Cavity",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Middle Nasal Turbinate Wash": {
+        "anatomical_part": "Middle Nasal Turbinate",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Nasopharynx Wash": {
+        "anatomical_part": "Nasopharynx",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Oropharynx Wash": {
+        "anatomical_part": "Oropharynx",
+        "collection_device": "Wash",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Bronchoalveolar Lavage": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Bronchoalveolar Lavage"
+    },
+    "Gastric Lavage": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Gastric Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Feces": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Not Applicable",
+        "body_product": "Feces",
+        "anatomical_material": "Not Applicable"
+    },
+    "Mucus": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Not Applicable",
+        "body_product": "Mucus",
+        "anatomical_material": "Not Applicable"
+    },
+    "Sputum": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Not Applicable",
+        "body_product": "Sputum",
+        "anatomical_material": "Not Applicable"
+    },
+    "Sweat": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Not Applicable",
+        "body_product": "Sweat",
+        "anatomical_material": "Not Applicable"
+    },
+    "Tear": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Not Applicable",
+        "body_product": "Tear",
+        "anatomical_material": "Not Applicable"
+    },
+    "Urine": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Not Applicable",
+        "body_product": "Urine",
+        "anatomical_material": "Not Applicable"
+    },
+    "Blood": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Not Applicable",
+        "body_product": "Blood",
+        "anatomical_material": "Not Applicable"
+    },
+    "Cerebrospinal Fluid": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Not Applicable",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Cerebrospinal Fluid"
+    },
+    "Saliva": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Not Applicable",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Saliva"
+    },
+    "Tissue": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Not Applicable",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Tissue"
+    }
+}
