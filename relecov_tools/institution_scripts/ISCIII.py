@@ -82,7 +82,7 @@ def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
     return metadata
 
 
-def translate_anatomical_part(metadata, f_data, mapped_fields, heading):
+def translate_specimen_source(metadata, f_data, mapped_fields, heading):
     """Translate into english the "muestra" that is written in spanish"""
     for row in metadata[1:]:
         for key, val in mapped_fields.items():
@@ -108,5 +108,6 @@ def translate_anatomical_part(metadata, f_data, mapped_fields, heading):
             elif "SALIVA" in row[m_idx].lower():
                 row[m_idx] = "Saliva"
             else:
-                row[m_idx] = "not applicable"
+                log.error("The field is not correctly written or is not filled")
+                stderr.print(f"The field is not correctly written or is not filled")
     return metadata
