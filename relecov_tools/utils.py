@@ -9,6 +9,8 @@ import logging
 from rich.console import Console
 import questionary
 import json
+import openpyxl
+from itertools import islice
 
 log = logging.getLogger(__name__)
 
@@ -30,6 +32,28 @@ def read_json_file(j_file):
     with open(j_file, "r") as fh:
         data = json.load(fh)
     return data
+
+
+def read_excel_file(f_name, sheet_name, heading_row):
+    """Read the input excel file and give the information in a list
+    of dictionaries
+    """
+    wb_file = openpyxl.load_workbook(f_name, data_only=True)
+    ws_metadata_lab = wb_file[sheet_name]
+    heading = [i.value.strip() for i in ws_metadata_lab[heading_row] if i.value]
+    ws_data = []
+    for row in islice(ws_metadata_lab.values, heading_row, ws_metadata_lab.max_row):
+        l_row = list(row)
+        data_row = {}
+        # Ignore the empty rows
+        # guessing that row 1 and 2 with no data are empty rows
+        if l_row[0] is None and l_row[1] is None:
+            continue
+        for idx in range(0, len(heading)):
+            data_row[heading[idx]] = l_row[idx]
+        ws_data.append(data_row)
+
+    return ws_data
 
 
 def read_csv_file_return_dict(file_name, sep):
@@ -101,6 +125,37 @@ def save_local_md5(file_name, md5_value):
     with open(file_name, "w") as fh:
         fh.write(md5_value)
     return True
+
+
+def write_json_fo_file(data, file_name):
+    """Write metadata to json file"""
+    with open(file_name, "w", encoding="utf-8") as fh:
+        fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
+    return True
+
+
+def write_to_excel_file(data, f_name, sheet_name, post_process=None):
+    book = openpyxl.Workbook()
+    sheet = book.active
+
+    for row in data:
+        sheet.append(row)
+    # adding one column with row number
+    if "insert_cols" in post_process:
+        sheet.insert_cols(post_process["insert_cols"])
+        sheet["A1"] = "Campo"
+        counter = 1
+        for i in range(len(data) - 1):
+            idx = "A" + str(counter + 1)
+            sheet[idx] = counter
+            counter += 1
+    # adding 3 empty rows
+    if "insert_rows" in post_process:
+        for x in range(post_process["insert_rows"]):
+            sheet.insert_rows(1)
+        sheet.title = sheet_name
+    book.save(f_name)
+    return
 
 
 def rich_force_colors():
