@@ -2288,6 +2288,39 @@
             "label": "Gene Name 2",
             "fill_mode": "batch"
         },
+        "bioproject_umbrella_accession_ENA": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0001133",
+            "type": "string",
+            "description": "The INSDC umbrella accession number of the BioProject to which the BioSample belongs.",
+            "classification": "Sample collection and processing",
+            "label": "Bioproject umbrella accession ENA",
+            "fill_mode": "batch"
+        },
+        "bioproject_accession_ENA": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0001136",
+            "type": "string",
+            "description": "The INSDC accession number of the BioProject(s) to which the BioSample belongs.",
+            "classification": "Sample collection and processing",
+            "label": "Bioproject accession ENA",
+            "fill_mode": "batch"
+        },
+        "biosample_accession_ENA": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0001139",
+            "type": "string",
+            "description": "The identifier assigned to a BioSample in INSDC archives.",
+            "classification": "Sample collection and processing",
+            "label": "ENA Sample Id",
+            "fill_mode": "batch"
+        },
         "diagnostic_pcr_Ct_value_2": {
             "examples": [
                 "36"
@@ -2308,6 +2341,17 @@
             "description": "",
             "classification": "Public databases",
             "label": "Authors",
+            "fill_mode": "batch"
+        },
+        "broker_name": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Public databases",
+            "label": "Broker Name",
             "fill_mode": "batch"
         },
         "gisaid_submitter_id": {
