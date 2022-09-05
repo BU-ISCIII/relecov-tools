@@ -655,7 +655,7 @@
                 ""
             ],
             "classification": "Sample collection and processing",
-            "label": "Specimen source",
+            "label": "Collection device",
             "fill_mode": "batch"
         },
         "collection_method": {
