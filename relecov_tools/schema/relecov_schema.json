@@ -1113,7 +1113,7 @@
             "type": "string",
             "description": "DNA/RNA extraction protocol",
             "classification": "Sequencing",
-            "label": "Extraction Protocol",
+            "label": "Nucleic acid extraction protocol",
             "fill_mode": "batch"
         },
         "all_in_one_library_kit": {
@@ -1121,9 +1121,9 @@
                 "Ion Xpress",
                 "ABL_DeepChek NGS",
                 "Ion AmpliSeq Kit for Chef DL8",
-                "NEBNext® Fast DNA Library Prep Set for Ion Torrent™",
-                "NEBNext® ARTIC SARS-CoV-2 FS",
-                "Illumina COVIDSeq Test",
+                "NEBNext Fast DNA Library Prep Set for Ion Torrent",
+                "NEBNext ARTIC SARS-CoV-2 FS",
+                "Illumina COVIDSeq Test [CIDO:0020172]",
                 "ABL DeepChek® Assay WG SC2 V1",
                 "Other"
             ],
@@ -1161,7 +1161,7 @@
                 "Nanopore COVID Midi: 2304 samples",
                 "Nanopore COVID Mini: 576 samples",
                 "Vela Diagnostics:ViroKey SQ FLEX Library Prep Reagents",
-                "Other"
+                "Other [NCIT:C17649]"
             ],
             "examples": [
                 "Illumina DNA Prep Tagmentation"
@@ -1175,12 +1175,12 @@
         },
         "enrichment_protocol": {
             "enum": [
-                "Amplicon",
-                "Probes",
-                "Custom probes",
-                "Custom amplicon",
-                "No enrichment",
-                "Other"
+                "Amplicon [GENEPIO:0001974]",
+                "Probes [OMIT:0016121]",
+                "Custom probes [OMIT:0016112]",
+                "Custom amplicon [OMIT:0016112]",
+                "No enrichment [NCIT:C154307]",
+                "Other [NCIT:C17649]"
             ],
             "examples": [
                 "AMPLICON"
@@ -1249,6 +1249,17 @@
             "description": "",
             "classification": "Sequencing",
             "label": "Enrichment panel/assay version",
+            "fill_mode": "batch"
+        },
+        "if_enrichment_panel_assay_if_other_especify": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Sequencing",
+            "label": "If Enrichment panel/assay If Other, Especify",
             "fill_mode": "batch"
         },
         "amplicon_pcr_primer_scheme": {
@@ -1411,8 +1422,8 @@
         },
         "sequencing_instrument_platform": {
             "enum": [
-                "Oxford Nanopore",
-                "Illumina",
+                "Oxford Nanopore [OBI:0002750]",
+                "Illumina [OBI:0000759]",
                 "Ion Torrent",
                 "Other"
             ],
@@ -1502,7 +1513,7 @@
                 "WCS strategy [GENPIO:0001991]",
                 "WGS strategy [GENPIO:0001992]",
                 "WXS strategy [GENPIO:0001993]",
-                "amplicon strategy [GENPIO:0001974]",
+                "amplicon [GENPIO:0001974]",
                 "clone end strategy [GENPIO:0001976]",
                 "clone strategy [GENPIO:0001977]",
                 "finishing strategy [GENPIO:0001982]",
@@ -2277,6 +2288,39 @@
             "label": "Gene Name 2",
             "fill_mode": "batch"
         },
+        "bioproject_umbrella_accession_ENA": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0001133",
+            "type": "string",
+            "description": "The INSDC umbrella accession number of the BioProject to which the BioSample belongs.",
+            "classification": "Sample collection and processing",
+            "label": "Bioproject umbrella accession ENA",
+            "fill_mode": "batch"
+        },
+        "bioproject_accession_ENA": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0001136",
+            "type": "string",
+            "description": "The INSDC accession number of the BioProject(s) to which the BioSample belongs.",
+            "classification": "Sample collection and processing",
+            "label": "Bioproject accession ENA",
+            "fill_mode": "batch"
+        },
+        "biosample_accession_ENA": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0001139",
+            "type": "string",
+            "description": "The identifier assigned to a BioSample in INSDC archives.",
+            "classification": "Sample collection and processing",
+            "label": "ENA Sample Id",
+            "fill_mode": "batch"
+        },
         "diagnostic_pcr_Ct_value_2": {
             "examples": [
                 "36"
@@ -2297,6 +2341,17 @@
             "description": "",
             "classification": "Public databases",
             "label": "Authors",
+            "fill_mode": "batch"
+        },
+        "broker_name": {
+            "examples": [
+                ""
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "classification": "Public databases",
+            "label": "Broker Name",
             "fill_mode": "batch"
         },
         "gisaid_submitter_id": {

@@ -61,6 +61,14 @@
             "mapped_key": "",
             "function": "translate_gender_to_english"
         },
+        "specimen_source_file": {
+            "file_name": "",
+            "mapped_fields": {
+                "Specimen source": ""
+            },
+            "mapped_key": "",
+            "function": "translate_specimen_source"
+        },
         "authors_file": {
             "file_name": "gisaid_authors.tsv",
             "mapped_fields": {
