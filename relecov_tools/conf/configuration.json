@@ -103,7 +103,7 @@
         "ena_schema": "ena_schema.json",
         "gisaid_schema": "gisaid_schema.json"
     },
-    "lab_metadata_req_json":{
+    "lab_metadata_req_json": {
         "laboratory_data": "laboratory_address.json",
         "geo_location_data": "geo_loc_cities.json",
         "anatomical_material": "anatomical_material_collection_method.json"
@@ -226,5 +226,50 @@
     "mapping_file": {
         "ISCIII": "ISCIII.json",
         "HUGTiP": "HUGTiP.json"
-    }
+    },
+    "df_study_fields": [
+        "study_type",
+        "study_abstract"
+    ],
+    "df_samples_fields": [
+        "sample_name",
+        "sample_title",
+        "taxon_id",
+        "collection_date",
+        "geographic_location_(country_and/or_sea)",
+        "host_common_name",
+        "host_scientific_name",
+        "host_sex",
+        "scientific_name",
+        "collector_name",
+        "collecting_institution",
+        "isolate",
+        "host_subject_id",
+        "host health state",
+        "authors",
+        "sample_description",
+        "address"
+    ],
+    "df_run_fields": [
+        "r1_fastq_filepath",
+        "r2_fastq_filepath",
+        "file_type",
+        "fastq_r1_md5",
+        "fastq_r2_md5",
+        "collecting_institution"
+    ],
+    "df_experiment_fields": [
+        "study_abstract",
+        "sample_name",
+        "library_name",
+        "library_strategy",
+        "library_source",
+        "library_selection",
+        "library_layout",
+        "instrument_model",
+        "design_description",
+        "collecting_institution",
+        "insert_size",
+        "sequencing_instrument_platform"
+    ]
 }
