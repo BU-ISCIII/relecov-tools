@@ -149,15 +149,6 @@
         "ena_schema": "ena_schema.json",
         "gisaid_schema": "gisaid_schema.json"
     },
-<<<<<<< HEAD
-
-=======
-    "lab_metadata_req_json": {
-        "laboratory_data": "laboratory_address.json",
-        "geo_location_data": "geo_loc_cities.json",
-        "anatomical_material": "anatomical_material_collection_method.json"
-    },
->>>>>>> c39c0ded483e5453088d6294d67dcb51d2ef9333
     "institution_mapping_file": {
         "ISCIII": "ISCIII.json",
         "HUGTiP": "HUGTiP.json"
@@ -264,15 +255,7 @@
         "tool_version": "0.5.3"
     },
     "md5_file_name": "md5_check_file.csv",
-<<<<<<< HEAD
-    "checklist": "ERC000033"
-}
-=======
     "checklist": "ERC000033",
-    "mapping_file": {
-        "ISCIII": "ISCIII.json",
-        "HUGTiP": "HUGTiP.json"
-    },
     "df_study_fields": [
         "study_type",
         "study_abstract"
@@ -319,4 +302,3 @@
         "sequencing_instrument_platform"
     ]
 }
->>>>>>> c39c0ded483e5453088d6294d67dcb51d2ef9333

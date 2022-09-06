@@ -64,7 +64,9 @@ class RelecovMetadata:
                 self.label_prop_dict[values["label"]] = prop
             except KeyError:
                 continue
-        self.json_req_files = config_json.get_topic_data("lab_metadata", "lab_metadata_req_json")
+        self.json_req_files = config_json.get_topic_data(
+            "lab_metadata", "lab_metadata_req_json"
+        )
         self.schema_name = self.relecov_sch_json["schema"]
         self.schema_version = self.relecov_sch_json["version"]
 
@@ -76,7 +78,9 @@ class RelecovMetadata:
             "tax_id": "2697049",
             "organism": "Severe acute respiratory syndrome coronavirus 2",
         }
-        fixed_data.update(self.configuration.get_topic_data("lab_metadata", "fields_required_for_ENA"))
+        fixed_data.update(
+            self.configuration.get_topic_data("lab_metadata", "fields_required_for_ENA")
+        )
         fixed_data["schema_name"] = self.schema_name
         fixed_data["schema_version"] = self.schema_version
         return fixed_data
