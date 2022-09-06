@@ -85,7 +85,9 @@ def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
 def translate_specimen_source(metadata, f_data, mapped_fields, heading):
     """Translate into english the "muestra" that is written in spanish"""
     for row in metadata[1:]:
+
         for key, val in mapped_fields.items():
+
             m_idx = heading.index(key)
             if row[m_idx] is None:
                 row[m_idx] = "not provided"
@@ -110,4 +112,4 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
             else:
                 log.error("The field is not correctly written or is not filled")
                 stderr.print("The field is not correctly written or is not filled")
-            return metadata
+    return metadata
