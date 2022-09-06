@@ -64,7 +64,7 @@ class RelecovMetadata:
                 self.label_prop_dict[values["label"]] = prop
             except KeyError:
                 continue
-        self.json_files = config_json.get_configuration("lab_metadata_req_json")
+        self.json_req_files = config_json.get_configuration("lab_metadata_req_json")
         self.schema_name = self.relecov_sch_json["schema"]
         self.schema_version = self.relecov_sch_json["version"]
 
@@ -133,34 +133,7 @@ class RelecovMetadata:
                 metadata["sequencing_sample_id"],
             ],
         }
-        seq_inst_plat = {
-            "Illumina": [
-                "Illumina iSeq 100",
-                "Illumina MiSeq",
-                "Illumina Miniseq",
-                "Illumina NextSeq 550",
-                "Illumina NextSeq 500",
-                "Illumina NextSeq 1000",
-                "Illumina NextSeq 2000",
-                "Illumina NovaSeq 6000",
-                "Illumina Miniseq",
-                "Illumina Hiseq x five",
-                "Illumina Hiseq x ten",
-                "Illumina Hiseq x",
-                "Illumina Genome analyzer",
-                "Illumina Genome analyzer ii",
-                "Illumina Genome analyzer iix",
-                "Illumina Hiscansq",
-                "Illumina Hiseq 1000",
-                "Illumina Hiseq 1500",
-                "Illumina Hiseq 2000",
-                "Illumina Hiseq 2500",
-                "Illumina Hiseq 3000",
-                "Illumina Hiseq 4000",
-            ],
-            "Oxford Nanopore": ["MinION"],
-            "Ion Torrent": ["Ion Torrent S5", "Ion Torrent PGM"],
-        }
+
         for key, values in p_data.items():
             v_data = metadata[key]
             if isinstance(values, dict):
@@ -169,13 +142,69 @@ class RelecovMetadata:
             else:
                 new_data[values[0]] = values[1]
         """New fields that required processing from other field """
-        for key, values in seq_inst_plat.items():
-            if metadata["sequencing_instrument_model"] in values:
-
-                new_data["sequencing_instrument_platform"] = key
-                break
 
         return new_data
+
+    def process_from_json(self, m_data, json_fields):
+        """ """
+        if isinstance(json_fields["map_field"], dict):
+            # Search for the value which contains data
+
+            for m_field in json_fields["map_field"]["any_of"]:
+                try:
+                    m_data[0][m_field]
+                    map_field = m_field
+                except KeyError:
+                    continue
+        else:
+            map_field = json_fields["map_field"]
+        json_data = json_fields["j_data"]
+        if isinstance(json_data, dict):
+            # import pdb; pdb.set_trace()
+            for idx in range(len(m_data)):
+                m_data[idx].update(json_data[m_data[idx][map_field]])
+        elif isinstance(json_data, list):
+            # to avoid searching for data for each row, for the first time searchs
+            # it is stored temporary.
+            tmp_data = {}
+            for idx in range(len(m_data)):
+                if m_data[idx][map_field] not in tmp_data:
+                    for item in json_data:
+                        if m_data[idx][map_field] == item[map_field]:
+                            if json_fields["adding_fields"] == "__all__":
+                                m_data[idx].update(item)
+                                tmp_data[m_data[idx][map_field]] = item
+                            else:
+                                tmp_data[m_data[idx][map_field]] = {}
+                                for field in json_fields["adding_fields"]:
+                                    m_data[idx][field] = item[field]
+                                    tmp_data[m_data[idx][map_field]][field] = item[
+                                        field
+                                    ]
+                            break
+                else:
+                    m_data[idx].update(tmp_data[m_data[idx][map_field]])
+        return m_data
+
+    def adding_fields(self, metadata):
+        """Add fields"""
+
+        for key, values in self.json_req_files.items():
+            stderr.print(f"[blue] Processing {key}")
+            f_path = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)), "conf", values["file"]
+            )
+            values["j_data"] = relecov_tools.utils.read_json_file(f_path)
+            metadata = self.process_from_json(metadata, values)
+            stderr.print(f"[green] Processed {key}")
+        stderr.print("[blue] Reading sample list file")
+        # Include Sample informatin data from sample json file
+        s_json = {}
+        s_json["map_field"] = "sequencing_sample_id"
+        s_json["adding_field"] = "__all__"
+        s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
+        metadata = self.process_from_json(metadata, s_json)
+        return metadata
 
     def add_additional_data(self, metadata, conf_json_data):
         """Add the additional information that must be included in final metadata
@@ -335,8 +364,8 @@ class RelecovMetadata:
         return metadata_values, errors
 
     def create_metadata_json(self):
-        stderr.print("[blue] Reading configuration settings")
-        conf_json_data = self.read_configuration_json_files()
+        # stderr.print("[blue] Reading configuration settings")
+        # conf_json_data = self.read_configuration_json_files()
         stderr.print("[blue] Reading Lab Metadata Excel File")
         valid_metadata_rows, errors = self.read_metadata_file()
         if len(errors) > 0:
@@ -344,6 +373,12 @@ class RelecovMetadata:
             sys.exit(1)
         # Continue by adding extra information
         stderr.print("[blue] Including additional information")
+
+        completed_metadata = self.adding_fields(valid_metadata_rows)
+        import pdb
+
+        pdb.set_trace()
+
         completed_metadata = self.add_additional_data(
             valid_metadata_rows, conf_json_data
         )
