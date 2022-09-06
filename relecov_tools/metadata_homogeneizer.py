@@ -202,7 +202,6 @@ class MetadataHomogeneizer:
                         sys.exit(1)
                     row[meta_idx] = item_data[f_field]
 
-            # import pdb; pdb.set_trace()
         else:
             func_name = file_data["function"]
             stderr.print("[yellow] Start processing function " + func_name)
