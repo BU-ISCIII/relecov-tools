@@ -611,6 +611,7 @@
                 "Middle Nasal Turbinate [UBERON:0001762]",
                 "Anus [UBERON:0001245]",
                 "Duodenum [UBERON:0002114]",
+                "Pharynx [UBERON:0006562]",
                 "Nasopharynx (NP) [UBERON:0001728]",
                 "Oropharynx (OP) [UBERON:0001729]",
                 "Not Applicable [GENEPIO:0001619]",
@@ -1105,7 +1106,7 @@
             "label": "Sequencing Date",
             "fill_mode": "batch"
         },
-        "extraction_protocol": {
+        "nucleic_acid_extraction_protocol": {
             "examples": [
                 "Opentrons custom protocol"
             ],

@@ -108,5 +108,6 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
             elif "SALIVA" in row[m_idx].upper():
                 row[m_idx] = "Saliva"
             else:
-                row[m_idx] = "not applicable"
-    return metadata
+                log.error("The field is not correctly written or is not filled")
+                stderr.print("The field is not correctly written or is not filled")
+            return metadata
