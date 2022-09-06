@@ -321,6 +321,8 @@ class BioinfoMetadata:
         json_file = "bioinfo_metadata.json"
         output_path = os.path.join(self.output_folder, json_file)
 
+        """Create json"""
+
         with open(output_path, "w", encoding="utf-8") as fh:
             fh.write(
                 json.dumps(bioinfo_list, indent=4, sort_keys=True, ensure_ascii=False)
