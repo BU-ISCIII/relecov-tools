@@ -51,7 +51,7 @@ def read_excel_file(f_name, sheet_name, heading_row, empty_value=True):
             continue
         for idx in range(0, len(heading)):
             if l_row[idx] is None:
-                if empty_value :
+                if empty_value:
                     data_row[heading[idx]] = ""
                 else:
                     data_row[heading[idx]] = "Not Provided"
