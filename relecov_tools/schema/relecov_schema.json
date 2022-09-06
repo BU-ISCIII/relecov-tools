@@ -1461,31 +1461,31 @@
         },
         "library_selection": {
             "enum": [
-                "RANDOM",
-                "PCR",
-                "RANDOM PCR",
-                "RT-PCR",
-                "HMPR",
-                "MF",
+                "RANDOM [NCIT:C60702]",
+                "PCR [GENEPIO:0001955]",
+                "RANDOM PCR [GENEPIO:0001957]",
+                "RT-PCR [GENEPIO:0001959]",
+                "HMPR [GENEPIO:0001949]",
+                "MF [GENEPIO:0001952]",
                 "repeat fractionation",
-                "size fractionation",
-                "MSLL",
-                "cDNA",
-                "ChIP",
-                "MNase",
-                "DNase",
-                "Hybrid Selection",
-                "Reduced Representation",
-                "Restriction Digest",
-                "5-methylcytidine antibody",
-                "MBD2 protein methyl-CpG binding domain",
-                "CAGE",
-                "RACE",
+                "size fractionation [GENEPIO:0001963]",
+                "MSLL [GENEPIO:0001954]",
+                "cDNA [GENEPIO:0001962]",
+                "ChIP [GENEPIO:0001947]",
+                "MNase [GENEPIO:0001953]",
+                "DNase [GENEPIO:0001948]",
+                "Hybrid Selection [GENEPIO:0001950]",
+                "Reduced Representation [GENEPIO:0001960]",
+                "Restriction Digest [GENEPIO:0001961]",
+                "5-methylcytidine antibody [GENEPIO:0001941]",
+                "MBD2 protein methyl-CpG binding domain [GENEPIO:0001951]",
+                "CAGE [GENEPIO:0001942]",
+                "RACE [GENEPIO:0001956]",
                 "MDA",
                 "padlock probes capture method",
                 "Oligo-dT",
                 "Inverse rRNA selection",
-                "ChIP-Seq",
+                "ChIP-Seq [GENEPIO:0001947]",
                 "Other"
             ],
             "examples": [
@@ -1533,8 +1533,8 @@
         },
         "library_layout": {
             "enum": [
-                "SINGLE",
-                "PAIRED"
+                "SINGLE [OBI:0002481]",
+                "PAIRED [OBI:0001852]"
             ],
             "examples": [
                 "PAIRED"

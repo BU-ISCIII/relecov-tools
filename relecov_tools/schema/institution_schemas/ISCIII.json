@@ -106,7 +106,7 @@
     "fixed_fields": {
         "Submitting Institution": "Instituto de Salud Carlos III",
         "Biological Sample Storage Condition": "-80 C",
-        "Nucleic acid extraction protocol": "RT-PCR",
+        "Nucleic acid extraction protocol": "Opentrons custom rna extraction protocol",
         "Purpose of sampling": "Surveillance",
         "Specimen source": "Nasopharyngeal exudate",
         "Host": "Human",
