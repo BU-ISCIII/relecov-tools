@@ -22,7 +22,7 @@ class MetadataHomogeneizer:
     def __init__(self, institution=None, directory=None, output_folder=None):
         self.config_json = ConfigJson()
         self.heading = self.config_json.get_topic_data(
-            "headings", "metadata_lab_heading"
+            "lab_metadata", "metadata_lab_heading"
         )
 
         if institution is None:
@@ -221,8 +221,7 @@ class MetadataHomogeneizer:
 
     def converting_metadata(self):
         stderr.print("[blue] Reading the metadata file to convert")
-        # ws_data = self.read_metadata_file()
-        # mapped_data = self.mapping_metadata(ws_data)
+
         mapped_data = self.handling_files(self.lab_metadata, "")
         stderr.print("[green] Successful conversion mapping to ISCIII metadata")
         stderr.print("[blue] Adding fixed information")
