@@ -190,7 +190,7 @@ class RelecovMetadata:
         """
         heading_row_number = 4
         ws_metadata_lab = relecov_tools.utils.read_excel_file(
-            self.metadata_file, "METADATA_LAB", heading_row_number
+            self.metadata_file, "METADATA_LAB", heading_row_number, False
         )
 
         metadata_values = []
