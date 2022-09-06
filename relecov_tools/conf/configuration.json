@@ -55,14 +55,6 @@
             "Sequence file R1 fastq",
             "Sequence file R2 fastq"
         ],
-        "fields_required_for_ENA": {
-            "study_alias": "RELECOV",
-            "design_description": "Design Description",
-            "experiment_title": "Example project for ENA submission RELECOV",
-            "study_title": "RELECOV Spanish Network for genomics surveillance",
-            "study_type": "",
-            "study_id": "ERP137164"
-        },
         "lab_metadata_req_json": {
             "laboratory_data": {
                 "file": "laboratory_address.json",
