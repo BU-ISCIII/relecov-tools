@@ -50,7 +50,10 @@ def read_excel_file(f_name, sheet_name, heading_row):
         if l_row[0] is None and l_row[1] is None:
             continue
         for idx in range(0, len(heading)):
-            data_row[heading[idx]] = l_row[idx]
+            if l_row[idx] is None:
+                data_row[heading[idx]] = ""
+            else:
+                data_row[heading[idx]] = l_row[idx]
         ws_data.append(data_row)
 
     return ws_data
