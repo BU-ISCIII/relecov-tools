@@ -112,4 +112,5 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
             else:
                 log.error("The field is not correctly written or is not filled")
                 stderr.print("The field is not correctly written or is not filled")
+
     return metadata
