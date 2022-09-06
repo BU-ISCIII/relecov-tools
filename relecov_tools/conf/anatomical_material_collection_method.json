@@ -986,5 +986,17 @@
         "collection_device": "Not Applicable",
         "body_product": "Not Applicable",
         "anatomical_material": "Tissue"
+    },
+    "Scraping": {
+        "anatomical_part": "Not Applicable",
+        "collection_device": "Scraping",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
+    },
+    "Placenta": {
+        "anatomical_part": "Placenta",
+        "collection_device": "Not Applicable",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
     }
 }
