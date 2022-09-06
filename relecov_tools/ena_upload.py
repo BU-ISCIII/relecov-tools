@@ -117,6 +117,19 @@ class EnaUpload:
         """Split the input ena json, in samples and runs json"""
         pass
 
+    def create_dataframe(self, dataframe_name, fields_config, df_schemas):
+        df_list = []
+        config_json = ConfigJson()
+        for index in range(len(dataframe_name)):
+            fields = config_json.get_configuration(fields_config[index])
+            dataframe_name[index] = df_schemas[fields]
+            import pdb
+
+            pdb.set_trace()
+            df_list.append(dataframe_name[index])
+
+        return df_list
+
     def create_structure_to_ena(self):
         """Convert json to dataframe required by ena-upload-cli package"""
 
@@ -127,7 +140,18 @@ class EnaUpload:
         config_json = ConfigJson()
 
         df_schemas = pd.DataFrame(squema_json)
+        dataframe_name_list = ["df_study", "df_samples", "df_run", "df_experiments"]
+        dataframe_fileds_config_list = [
+            "df_study_fields",
+            "df_samples_fields",
+            "df_run_fields" "df_experiment_fields",
+        ]
+        self.create_dataframe(
+            dataframe_name_list, dataframe_fileds_config_list, df_schemas
+        )
+        import pdb
 
+        pdb.set_trace()
         # df_schema
         """
         collecting_institution collection_date     collector_name  ...                                        study_title    study_type taxon_id
@@ -157,9 +181,7 @@ class EnaUpload:
         """
 
         fields_samples = config_json.get_configuration("df_samples_fields")
-        import pdb
 
-        pdb.set_trace()
         df_samples = df_schemas[fields_samples]
 
         df_samples["host_sex"].replace("unknown", "not provided", inplace=True)
