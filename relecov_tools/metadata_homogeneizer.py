@@ -32,14 +32,15 @@ class MetadataHomogeneizer:
             )
         else:
             self.institution = institution.upper()
-        mapping_json_file = os.path.join(
-            os.path.dirname(__file__),
-            "schema",
-            "institution_schemas",
-            self.config_json.get_topic_data(
-                "institution_mapping_file", self.institution
-            ),
-        )
+            mapping_json_file = os.path.join(
+                os.path.dirname(__file__),
+                "schema",
+                "institution_schemas",
+                self.config_json.get_topic_data(
+                    "institution_mapping_file", self.institution
+                ),
+            )
+
         if directory is None:
             directory = relecov_tools.utils.prompt_path(
                 msg="Select the directory which contains additional files for metadata"
@@ -50,6 +51,7 @@ class MetadataHomogeneizer:
                 "[red] Folder for additional files " + directory + " does not exist"
             )
             sys.exit(1)
+
         self.mapping_json_data = relecov_tools.utils.read_json_file(mapping_json_file)
 
         try:

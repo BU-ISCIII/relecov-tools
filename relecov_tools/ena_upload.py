@@ -211,12 +211,9 @@ class EnaUpload:
 1   212163777  212163777  2697049                    ...  Severe acute respiratory syndrome coronavirus 2   Inmaculada Casas     Hospital Clínic de Barcelona  212163777
 2   212153091  212153091  2697049                    ...  Severe acute respiratory syndrome coronavirus 2   Inmaculada Casas     Hospital Clínic de Barcelona  212153091
         """
-        import pdb
 
-        pdb.set_trace()
         df_run = df_schemas[
             [
-                "experiment_alias",
                 "r1_fastq_filepath",
                 "r2_fastq_filepath",
                 "file_type",
@@ -237,6 +234,7 @@ class EnaUpload:
                 i, "sequence_file_R2_fastq"
             ]
         df_run.insert(3, "status", self.action)
+
         df_run = df_run.rename(columns={"fastq_r1_md5": "file_checksum"})
 
         for i in range(len(df_run)):
@@ -269,9 +267,7 @@ class EnaUpload:
 
         df_experiments = df_schemas[
             [
-                "experiment_alias",
-                "study_title",
-                "study_alias",
+                "study_abstract",
                 "sample_name",
                 "library_name",
                 "library_strategy",
@@ -289,7 +285,7 @@ class EnaUpload:
         df_experiments["instrument_model"] = df_experiments[
             "instrument_model"
         ].str.lower()
-
+        df_experiments["study_alias"] = df_study["alias"]
         df_experiments.insert(3, "status", self.action)
 
         for i in range(len(df_experiments)):
@@ -305,7 +301,7 @@ class EnaUpload:
         df_experiments = df_experiments.rename(
             columns={"sequencing_instrument_platform": "platform"}
         )
-        df_experiments = df_experiments.rename(columns={"study_title": "title"})
+        df_experiments = df_experiments.rename(columns={"study_abstract": "title"})
         df_experiments = df_experiments.rename(columns={"sample_name": "sample_alias"})
         df_experiments = df_experiments.rename(
             columns={"collecting_institution": "collecting institution"}
@@ -401,7 +397,7 @@ class EnaUpload:
                     H = df_run_final.loc[
                         df_run_final["sequence_file_R2_fastq"]
                         == files.attrib["filename"]
-                    ].values[0][9]
+                    ].values[0][8]
                     files.set("checksum", H)
                     # print(files.attrib["checksum"])
             tree.write(schema_xmls["run"])
