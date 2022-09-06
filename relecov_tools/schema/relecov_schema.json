@@ -713,7 +713,7 @@
                 "Missing [GENEPIO:0001618]",
                 "Restricted Access [GENEPIO:0001810]"
             ],
-            "ontology": "",
+            "ontology": "SNOMED:364684009",
             "type": "string",
             "description": "",
             "examples": [
@@ -2370,7 +2370,7 @@
             "examples": [
                 "NCIT:C180324"
             ],
-            "ontology": "",
+            "ontology": "NCIT:C180324",
             "type": "string",
             "description": "GISAID sequence ID.",
             "classification": "Public Databases",
