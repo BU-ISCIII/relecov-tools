@@ -170,7 +170,7 @@ class EnaUpload:
 0      Hospital Clínic de Barcelona      2021-05-10  Inmaculada Casas   ...  RELECOV Spanish Network for genomics surveillance  Surveillance  2697049
 1      Hospital Clínic de Barcelona      2021-05-07   Inmaculada Casas  ...  RELECOV Spanish Network for genomics surveillance  Surveillance  2697049
         """
-        ###################### Parsing the dataframes specifically according to ENA requirements#############
+        # Parsing the dataframes specifically according to ENA requirements #
         # df_study
         df_study["alias"] = df_study["study_abstract"][0].rsplit(" ", 5)[0]
         df_study["title"] = df_study["study_abstract"]
@@ -267,7 +267,6 @@ class EnaUpload:
         df_experiments = df_experiments.rename(
             columns={"collecting_institution": "collecting institution"}
         )
-
         """
         # df_experiments example
         experiment_alias                                              title study_alias  ... library_layout instrument_model                                              alias
