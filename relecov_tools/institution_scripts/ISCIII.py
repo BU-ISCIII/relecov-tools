@@ -100,7 +100,7 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
             elif "EXTRACTO" in row[m_idx].upper():
                 row[m_idx] = "Scraping"
             elif "EXUDADO FARÍNGEO" in row[m_idx].upper():
-                row[m_idx] = "Nasopharynx Swabbing"
+                row[m_idx] = "Pharynx Swabbing"
             elif "EXUDADO NASOFARÍNGEO" in row[m_idx].upper():
                 row[m_idx] = "Nasopharynx Swabbing"
             elif "EXUDADO OROFARINGEO" in row[m_idx].upper():
