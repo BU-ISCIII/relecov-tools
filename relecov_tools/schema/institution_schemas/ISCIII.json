@@ -113,11 +113,11 @@
         "Library Preparation Kit": "Illumina DNA Prep",
         "Enrichment Protocol": "Amplicon",
         "Enrichment panel/assay": "ARTIC",
-        "Source material": "Viral RNA",
+        "Source material": "VIRAL RNA",
         "Capture method": "PCR",
         "Sequencing technique": "Amplicon",
         "Library Layout": "Paired",
-        "Gene Name 1": "ORF E",
+        "Gene Name 1": "E gene",
         "Diagnostic Pcr Ct Value 1": "",
         "Authors": ""
     }

@@ -55,14 +55,6 @@
             "Sequence file R1 fastq",
             "Sequence file R2 fastq"
         ],
-        "fields_required_for_ENA": {
-            "study_alias": "RELECOV",
-            "design_description": "Design Description",
-            "experiment_title": "Example project for ENA submission RELECOV",
-            "study_title": "RELECOV Spanish Network for genomics surveillance",
-            "study_type": "",
-            "study_id": "ERP137164"
-        },
         "lab_metadata_req_json": {
             "laboratory_data": {
                 "file": "laboratory_address.json",
@@ -94,6 +86,20 @@
                 },
                 "adding_fields": "__all__"
             }
+        },
+        "required_post_processing":{
+            "host_common_name": {
+                "Human": "host_scientific_name::Homo sapiens"
+            },
+            "sequencing_instrument_model":{
+                "Illumina": "sequencing_instrument_platform::Illumina",
+                "PacBio": "sequencing_instrument_platform::PacBio",
+                "Ion Torrent": "sequencing_instrument_platform::Ion Torrent",
+                "Oxford Nanopore": "sequencing_instrument_platform::Oxford Nanopore"
+            }
+        },
+        "required_copy_from_other_field": {
+            "isolate_sample_id": "sequencing_sample_id"
         }
     },
     "long_table_heading": [
