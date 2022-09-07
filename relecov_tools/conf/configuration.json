@@ -92,7 +92,7 @@
                         "anatomical_material"
                     ]
                 },
-                "adding_fields" : "__all__"
+                "adding_fields": "__all__"
             }
         }
     },
@@ -300,5 +300,29 @@
         "collecting_institution",
         "insert_size",
         "sequencing_instrument_platform"
+    ],
+    "rename_sample_list_og": [
+        "sample_name",
+        "sample_title",
+        "geographic_location_(country_and/or_sea)",
+        "host_subject_id",
+        "collection_date",
+        "host_common_name",
+        "host_sex",
+        "host_scientific_name",
+        "collector_name",
+        "collecting_institution"
+    ],
+    "rename_sample_list_final": [
+        "alias",
+        "title",
+        "geographic location (country and/or sea)",
+        "host subject id",
+        "collection date",
+        "host common name",
+        "host sex",
+        "host scientific name",
+        "collector name",
+        "collecting institution"
     ]
 }
