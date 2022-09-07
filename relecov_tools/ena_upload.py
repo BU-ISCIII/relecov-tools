@@ -276,6 +276,17 @@ class EnaUpload:
 
         """
 
+        """
+        "ENA_configuration": {
+        "study_alias": "RELECOV",
+        "design_description": "Design Description",
+        "experiment_title": "Example project for ENA submission RELECOV",
+        "study_title": "RELECOV Spanish Network for genomics surveillance",
+        "study_type": "",
+        "study_id": "ERP137164"
+    },
+        """
+
         ena_config = config_json.get_configuration("ENA_configuration")
         schema_dataframe = {}
         schema_dataframe["sample"] = df_samples
