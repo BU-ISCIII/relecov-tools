@@ -612,8 +612,8 @@
                 "Anus [UBERON:0001245]",
                 "Duodenum [UBERON:0002114]",
                 "Pharynx [UBERON:0006562]",
-                "Nasopharynx (NP) [UBERON:0001728]",
-                "Oropharynx (OP) [UBERON:0001729]",
+                "Nasopharynx [UBERON:0001728]",
+                "Oropharynx [UBERON:0001729]",
                 "Not Applicable [GENEPIO:0001619]",
                 "Not Collected [GENEPIO:0001620]",
                 "Not Provided [GENEPIO:0001668]",
@@ -1126,6 +1126,7 @@
                 "NEBNext ARTIC SARS-CoV-2 FS",
                 "Illumina COVIDSeq Test [CIDO:0020172]",
                 "ABL DeepChek® Assay WG SC2 V1",
+                "Not Provided [GENEPIO:0001668]",
                 "Other"
             ],
             "examples": [
@@ -1398,6 +1399,7 @@
                 "iSeq 100 i1 Reagent v2 (300-cycle)",
                 "iSeq 100 i1 Reagent v2 (300-cycle) 4 pack",
                 "iSeq 100 i1 Reagent v2 (300-cycle) 8 pack",
+                "Not Provided [GENEPIO:0001668]",
                 "Other"
             ],
             "examples": [
@@ -1425,7 +1427,10 @@
             "enum": [
                 "Oxford Nanopore [OBI:0002750]",
                 "Illumina [OBI:0000759]",
-                "Ion Torrent",
+                "Ion Torrent [GENEPIO:0002683]",
+                "PacBio [GENEPIO:0001927]",
+                "BGI",
+                "MGI",
                 "Other"
             ],
             "examples": [
@@ -1514,12 +1519,12 @@
                 "WCS strategy [GENPIO:0001991]",
                 "WGS strategy [GENPIO:0001992]",
                 "WXS strategy [GENPIO:0001993]",
-                "amplicon [GENPIO:0001974]",
-                "clone end strategy [GENPIO:0001976]",
-                "clone strategy [GENPIO:0001977]",
-                "finishing strategy [GENPIO:0001982]",
-                "other library strategy [GENPIO:0001988]",
-                "pool clone strategy [GENPIO:0001989]"
+                "Amplicon [GENPIO:0001974]",
+                "Clone end strategy [GENPIO:0001976]",
+                "Clone strategy [GENPIO:0001977]",
+                "Finishing strategy [GENPIO:0001982]",
+                "Other library strategy [GENPIO:0001988]",
+                "Pool clone strategy [GENPIO:0001989]"
             ],
             "examples": [
                 "WGS"
@@ -1533,11 +1538,11 @@
         },
         "library_layout": {
             "enum": [
-                "SINGLE [OBI:0002481]",
-                "PAIRED [OBI:0001852]"
+                "Single [OBI:0002481]",
+                "Paired [OBI:0001852]"
             ],
             "examples": [
-                "PAIRED"
+                "Paired"
             ],
             "ontology": "NCIT:C175894",
             "type": "string",
@@ -2178,10 +2183,10 @@
         },
         "gene_name_1": {
             "enum": [
-                "E gene (orf4) [GENEPIO:0100151]",
-                "M gene (orf5) [GENEPIO:0100152]",
-                "N gene (orf9) [GENEPIO:0100153]",
-                "Spike gene (orf2) [GENEPIO:0100154]",
+                "E gene [GENEPIO:0100151]",
+                "M gene [GENEPIO:0100152]",
+                "N gene [GENEPIO:0100153]",
+                "Spike gene [GENEPIO:0100154]",
                 "orf1ab (rep) [GENEPIO:0100155]",
                 "orf1a (pp1a) [GENEPIO:0100156]",
                 "nsp11 [GENEPIO:0100157]",
@@ -2221,7 +2226,7 @@
             "type": "string",
             "description": "The name of the gene used in the diagnostic RT-PCR test.",
             "examples": [
-                "E gene (orf4) [GENEPIO:0100151]"
+                "E gene [GENEPIO:0100151]"
             ],
             "classification": "Pathogen diagnostic testing",
             "label": "Gene Name 1",
@@ -2240,10 +2245,10 @@
         },
         "gene_name_2": {
             "enum": [
-                "E gene (orf4) [GENEPIO:0100151]",
-                "M gene (orf5) [GENEPIO:0100152]",
-                "N gene (orf9) [GENEPIO:0100153]",
-                "Spike gene (orf2) [GENEPIO:0100154]",
+                "E gene [GENEPIO:0100151]",
+                "M gene [GENEPIO:0100152]",
+                "N gene [GENEPIO:0100153]",
+                "Spike gene [GENEPIO:0100154]",
                 "orf1ab (rep) [GENEPIO:0100155]",
                 "orf1a (pp1a) [GENEPIO:0100156]",
                 "nsp11 [GENEPIO:0100157]",

@@ -86,6 +86,20 @@
                 },
                 "adding_fields" : "__all__"
             }
+        },
+        "required_post_processing":{
+            "host_common_name": {
+                "Human": "host_scientific_name::Homo sapiens"
+            },
+            "sequencing_instrument_model":{
+                "Illumina": "sequencing_instrument_platform::Illumina",
+                "PacBio": "sequencing_instrument_platform::PacBio",
+                "Ion Torrent": "sequencing_instrument_platform::Ion Torrent",
+                "Oxford Nanopore": "sequencing_instrument_platform::Oxford Nanopore"
+            }
+        },
+        "required_copy_from_other_field": {
+            "isolate_sample_id": "sequencing_sample_id"
         }
     },
     "long_table_heading": [
