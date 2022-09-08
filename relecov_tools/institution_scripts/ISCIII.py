@@ -62,39 +62,36 @@ def added_seq_inst_model(metadata, f_data, mapped_fields, heading):
 
 def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
     """Translate into english the host gender that is written in spanish"""
+    map_dict = {
+        "hombre": "Male",
+        "mujer": "Female",
+        "genero no-binario": "Non-binary Gender",
+        "genero no-binario": "Non-binary Gender",
+        "desconocido": "Not Provided",
+        "unknown": "Not Provided",
+    }
     for row in metadata[1:]:
         for key, val in mapped_fields.items():
             m_idx = heading.index(key)
-            if row[m_idx] is None:
-                row[m_idx] = "not provided"
-            elif "hombre" in row[m_idx].lower():
-                row[m_idx] = "Male"
-            elif "mujer" in row[m_idx].lower():
-                row[m_idx] = "Female"
-            elif "genero no-binario" in row[m_idx].lower():
-                row[m_idx] = "Non-binary Gender"
-            elif "genero no-binario" in row[m_idx].lower():
-                row[m_idx] = "Non-binary Gender"
-            elif "desconocido" in row[m_idx].lower():
+            if row[m_idx] is None or row[m_idx] == "":
                 row[m_idx] = "Not Provided"
-            elif "unknown" in row[m_idx].lower():
-                row[m_idx] = "Not Provided"
+                continue
+            item = row[m_idx].lower()
+            if item in map_dict:
+                row[m_idx] = map_dict[item]
             else:
-                log.error("The '%s' is not a valid data for translation" , row[m_idx])
-                stderr.print("f[red] The '{row[m_idx]}' is not a valid data for translation")
-
+                log.error("The '%s' is not a valid data for translation", row[m_idx])
+                stderr.print(
+                    "f[red] The '{row[m_idx]}' is not a valid data for translation"
+                )
+                sys.exit(1)
     return metadata
-
-
-#
 
 
 def translate_specimen_source(metadata, f_data, mapped_fields, heading):
     """Translate into english the "muestra" that is written in spanish"""
     for row in metadata[1:]:
-
         for key, val in mapped_fields.items():
-
             m_idx = heading.index(key)
             if row[m_idx] is None:
                 row[m_idx] = "not provided"
@@ -119,4 +116,50 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
             else:
                 log.error("The field is not correctly written or is not filled")
                 stderr.print("The field is not correctly written or not filled")
+                sys.exit(1)
+    return metadata
+
+
+def translate_purpose_seq_to_english(metadata, f_data, mapped_fields, heading):
+    """Fetch the first words of the option to group them according the
+    schema
+    """
+    map_dict = {
+        "estudio variante": "Targeted surveillance (non-random sampling)",
+        "trabajador/a granja visones": "Targeted surveillance (non-random sampling)",
+        "sospecha reinfección": "Re-infection surveillance",
+        "i-move-covid": "Research",
+        "irag": "Research",
+        "muestreo aleatorio": "Baseline surveillance (random sampling)",
+        "paciente vacunado": "Vaccine escape surveillance",
+        "posible variante": "Sample has epidemiological link to Variant of Concern (VoC)",
+        "no consta": "Not Collected",
+        "brote": "Cluster/Outbreak investigation",
+        "viaje": "Surveillance of international border crossing by air travel or ground transport",
+        "posible variante": "Sample has epidemiological link to Variant of Concern (VoC)",
+    }
+    for row in metadata[1:]:
+        for key, val in mapped_fields.items():
+            m_idx = heading.index(key)
+            if row[m_idx] is None or row[m_idx] == "":
+                row[m_idx] = "Not Provided"
+                continue
+            item = row[m_idx].lower()
+            if item in map_dict:
+                row[m_idx] = map_dict[item]
+            elif "brote" in item:
+                row[m_idx] = map_dict["brote"]
+            elif "viaje" in item:
+                row[m_idx] = map_dict["viaje"]
+            elif "posible variante" in item:
+                row[m_idx] = map_dict["posible variante"]
+            else:
+                log.error("The '%s' is not a valid data for translation", row[m_idx])
+                stderr.print(
+                    "f[red] The {row[m_idx]} is not a valid data for translation"
+                )
+                import pdb
+
+                pdb.set_trace()
+                sys.exit(1)
     return metadata
