@@ -656,7 +656,7 @@
                 ""
             ],
             "classification": "Sample collection and processing",
-            "label": "Collection device",
+            "label": "Collection Device",
             "fill_mode": "batch"
         },
         "collection_method": {
@@ -1256,7 +1256,7 @@
             "label": "Enrichment panel/assay version",
             "fill_mode": "batch"
         },
-        "if_enrichment_panel_assay_if_other_especify": {
+        "if_enrichment_panel_assay_is_other_specify": {
             "examples": [
                 ""
             ],
@@ -1264,7 +1264,7 @@
             "type": "string",
             "description": "",
             "classification": "Sequencing",
-            "label": "If Enrichment panel/assay If Other, Especify",
+            "label": "If Enrichment panel/assay Is Other, Specify",
             "fill_mode": "batch"
         },
         "amplicon_pcr_primer_scheme": {
@@ -2350,7 +2350,7 @@
             "type": "string",
             "description": "The identifier assigned to a BioSample in INSDC archives.",
             "classification": "Sample collection and processing",
-            "label": "ENA Sample Id",
+            "label": "ENA Sample ID",
             "fill_mode": "batch"
         },
         "diagnostic_pcr_Ct_value_2": {
