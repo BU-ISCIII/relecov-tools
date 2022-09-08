@@ -44,6 +44,10 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
     if not os.path.isfile(json_data_file):
         stderr.print("[red] Json file does not exists")
         sys.exit(1)
+    if out_folder is None:
+        out_folder = relecov_tools.utils.prompt_path(
+            msg="Select the folder where to save excel with invalid data"
+        )
     stderr.print("[blue] Reading the json file")
     json_data = relecov_tools.utils.read_json_file(json_data_file)
     with open(json_data_file, "r") as fh:
@@ -65,7 +69,7 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
         stderr.print("[green] Sucessful validation")
     else:
         stderr.print("[red] Some samples are not validated")
-    return validated_json_data, invalid_json, errors
+    return validated_json_data, invalid_json, errors, out_folder
 
 
 def create_invalid_metadata(metadata_file, invalid_json, out_folder):
@@ -81,6 +85,7 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
     stderr.print("[red] Start preparation of invalid samples")
     for row in invalid_json:
         sample_list.append(str(row["collecting_lab_sample_id"]))
+
     wb = openpyxl.load_workbook(metadata_file)
     ws_sheet = wb["METADATA_LAB"]
     row_to_del = []
@@ -89,15 +94,21 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
         # if not data on row 1 and 2 assume that no more data are in file
         # then start deleting rows
         if not row[2].value and not row[1].value:
-            if len(row_to_del) > 0:
-                row_to_del.sort(reverse=True)
-                for idx in row_to_del:
-                    ws_sheet.delete_rows(idx)
             break
-
         if str(row[2].value) not in sample_list:
             row_to_del.append(row[0].row)
-
+    stderr.print("[red] Collected rows to create the excel file")
+    if len(row_to_del) > 0:
+        row_to_del.sort(reverse=True)
+        for idx in row_to_del:
+            try:
+                ws_sheet.delete_rows(idx)
+            except TypeError as e:
+                log.error(
+                    "Unable to delete row %s from metadata file because of", idx, e
+                )
+                stderr.print("f[red] Unable to delete row {idx} becuase of {e}")
+                sys.exit(1)
     os.makedirs(out_folder, exist_ok=True)
     new_name = "invalid_" + os.path.basename(metadata_file)
     m_file = os.path.join(out_folder, new_name)

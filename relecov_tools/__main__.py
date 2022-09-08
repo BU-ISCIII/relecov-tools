@@ -202,6 +202,7 @@ def validate(json_file, json_schema, metadata, out_folder):
         validated_json_data,
         invalid_json,
         errors,
+        out_folder
     ) = relecov_tools.json_validation.validate_json(json_file, json_schema, out_folder)
     if len(invalid_json) > 0:
         log.error("Some of the samples in json metadata were not validated")
