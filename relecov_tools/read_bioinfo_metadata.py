@@ -150,11 +150,12 @@ class BioinfoMetadata:
         # FUNCTION fill_bioinfo_dict
         """Iterating through each row and each loaded file the values of the bioinfo_dict are filled"""
 
-        bioinfo_list = {}
+        bioinfo_list = []
 
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
-            # row = ws_metadata_lab[5]
-            sample_name = row[5]
+            if row[6] is None:
+                continue
+            sample_name = row[6]
             print(sample_name)
 
             fastq_r1 = row[47]
@@ -259,13 +260,13 @@ class BioinfoMetadata:
             # FUNCTION software_data
             # fields from software version file
             bioinfo_dict["dehosting_method_software_version"] = str(
-                list(software_versions["KRAKEN2_KRAKEN2"].values())[0]
+                software_versions["KRAKEN2_KRAKEN2"]["kraken2"]
             )
             bioinfo_dict["variant_calling_software_version"] = str(
-                list(software_versions["IVAR_VARIANTS"].values())[0]
+                software_versions["IVAR_VARIANTS"]["ivar"]
             )
             bioinfo_dict["consensus_sequence_software_version"] = str(
-                list(software_versions["BCFTOOLS_CONSENSUS"].values())[0]
+                software_versions["BCFTOOLS_CONSENSUS"]["bcftools"]
             )
 
             bioinfo_dict["bioinformatics_protocol_software_version"] = str(
@@ -273,11 +274,12 @@ class BioinfoMetadata:
             )
 
             bioinfo_dict["preprocessing_software_version"] = str(
-                list(software_versions["FASTP"].values())[0]
+                software_versions["FASTP"]["fastp"]
             )
             bioinfo_dict["mapping_software_version"] = str(
-                list(software_versions["BOWTIE2_ALIGN"].values())[0]
+                software_versions["BOWTIE2_ALIGN"]["bowtie2"]
             )
+
             # FUNCTION pangolin_data
             # files from pangolin.csv file
 
@@ -309,8 +311,8 @@ class BioinfoMetadata:
                 bioinfo_dict["lineage_identification_date"] = str(
                     pango_last_modified_date
                 )
-
-            bioinfo_list[str(sample_name)] = bioinfo_dict
+            bioinfo_list.append(bioinfo_dict)
+            # bioinfo_list[str(sample_name)] = bioinfo_dict
             c = c + 1
             # adding schema_name and schema_version
             bioinfo_dict["schema_name"] = self.schema_name
@@ -318,6 +320,8 @@ class BioinfoMetadata:
 
         json_file = "bioinfo_metadata.json"
         output_path = os.path.join(self.output_folder, json_file)
+
+        """Create json"""
 
         with open(output_path, "w", encoding="utf-8") as fh:
             fh.write(

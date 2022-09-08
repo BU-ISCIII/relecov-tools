@@ -9,8 +9,8 @@
     <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'unspecified'">unspecified</INSTRUMENT_MODEL>
 </LS454>
 <ILLUMINA py:when="row.platform.lower().strip() == 'illumina'" py:choose="">
-    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'hiseq x five'">HiSeq X Five</INSTRUMENT_MODEL>
-    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'hiseq x ten'">HiSeq X Ten</INSTRUMENT_MODEL>
+    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina hiseq x five'">HiSeq X Five</INSTRUMENT_MODEL>
+    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina hiseq x ten'">HiSeq X Ten</INSTRUMENT_MODEL>
     <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina genome analyzer'">Illumina Genome Analyzer</INSTRUMENT_MODEL>
     <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina genome analyzer ii'">Illumina Genome Analyzer II</INSTRUMENT_MODEL>
     <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina genome analyzer iix'">Illumina Genome Analyzer IIx</INSTRUMENT_MODEL>
@@ -26,10 +26,10 @@
     <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina miseq'">Illumina MiSeq</INSTRUMENT_MODEL>
     <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina miniseq'">Illumina MiniSeq</INSTRUMENT_MODEL>
     <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina novaseq 6000'">Illumina NovaSeq 6000</INSTRUMENT_MODEL>
-    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'nextseq 500'">NextSeq 500</INSTRUMENT_MODEL>
-    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'nextseq 550'">NextSeq 550</INSTRUMENT_MODEL>
-    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'nextseq 1000'">NextSeq 1000</INSTRUMENT_MODEL>
-    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'nextseq 2000'">NextSeq 2000</INSTRUMENT_MODEL>
+    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina nextseq 500'">NextSeq 500</INSTRUMENT_MODEL>
+    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina nextseq 550'">NextSeq 550</INSTRUMENT_MODEL>
+    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina nextseq 1000'">NextSeq 1000</INSTRUMENT_MODEL>
+    <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'illumina nextseq 2000'">NextSeq 2000</INSTRUMENT_MODEL>
     <INSTRUMENT_MODEL py:when="row.instrument_model.lower().strip() == 'unspecified'">unspecified</INSTRUMENT_MODEL>
 </ILLUMINA>
 <HELICOS py:when="row.platform.lower().strip() == 'helicos'" py:choose="">

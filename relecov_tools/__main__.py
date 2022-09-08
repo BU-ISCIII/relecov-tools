@@ -59,7 +59,7 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "0.0.4"
+    __version__ = "0.0.5"
     stderr.print(
         "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
@@ -346,7 +346,7 @@ def launch(user):
 @click.option(
     "-t",
     "--type",
-    type=click.Choice(["sample", "analysis"]),
+    type=click.Choice(["sample", "bioinfodata", "variantdata"]),
     multiple=False,
     help="Select the type of information to upload to database",
 )
@@ -412,10 +412,10 @@ def read_bioinfo_metadata(metadata_file, input_folder, metadata_out, mapping_ill
 )
 @click.option("-o", "--output", type=click.Path(), help="Path to save json output")
 def long_table_parse(longtable_file, output):
-    """Create Json file from long table"""
     new_json_parse = relecov_tools.long_table_parse.LongTableParse(
         longtable_file, output
     )
+    """Create Json file from long table"""
     new_json_parse.parsing_csv()
 
 

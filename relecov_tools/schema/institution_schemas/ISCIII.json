@@ -1,7 +1,7 @@
 {
-    "pyhon_file": "ISCIII.py",
+    "python_file": "ISCIII.py",
     "required_files": {
-        "meta_file": {
+        "metadata_file": {
             "file_name": "new_lab_metadata.xlsx",
             "mapped_fields": {
                 "Public Health sample id (SIVIES)": "Código SiViEs",
@@ -16,26 +16,8 @@
                 "Sample Received Date": "Fecha recepción",
                 "Host Age": "Edad (años)",
                 "Host Gender": "Sexo",
-                "Diagnostic Pcr Ct Value 1": "PCR genE"
-            },
-            "fixed_fields": {
-                "Submitting Institution": "Instituto de Salud Carlos III",
-                "Biological Sample Storage Condition": "-80 C",
-                "Rna Extraction Protocol": "RT-PCR",
-                "Purpose of sampling": "Surveillance",
-                "Specimen source": "Nasopharyngeal exudate",
-                "Environmental System": "Swab",
-                "Host": "Human",
-                "Library Preparation Kit": "Illumina DNA Prep",
-                "Enrichment Protocol": "Amplicon",
-                "Enrichment panel/assay": "ARTIC",
-                "Source material": "Viral RNA",
-                "Capture method": "PCR",
-                "Sequencing technique": "Amplicon",
-                "Library Layout": "Paired",
-                "Gene Name 1": "ORF E",
-                "Diagnostic Pcr Ct Value 1": "",
-                "Authors": ""
+                "Diagnostic Pcr Ct Value 1": "PCR genE",
+                "Specimen source": "Muestra"
             },
             "function": "None"
         },
@@ -80,6 +62,14 @@
             "mapped_key": "",
             "function": "translate_gender_to_english"
         },
+        "specimen_source_file": {
+            "file_name": "",
+            "mapped_fields": {
+                "Specimen source": ""
+            },
+            "mapped_key": "",
+            "function": "translate_specimen_source"
+        },
         "authors_file": {
             "file_name": "gisaid_authors.tsv",
             "mapped_fields": {
@@ -112,5 +102,23 @@
             "mapped_key": "Sample ID given for sequencing",
             "function": "None"
         }
+    },
+    "fixed_fields": {
+        "Submitting Institution": "Instituto de Salud Carlos III",
+        "Biological Sample Storage Condition": "-80 C",
+        "Nucleic acid extraction protocol": "Opentrons custom rna extraction protocol",
+        "Purpose of sampling": "Surveillance",
+        "Specimen source": "Nasopharyngeal exudate",
+        "Host": "Human",
+        "Library Preparation Kit": "Illumina DNA Prep",
+        "Enrichment Protocol": "Amplicon",
+        "Enrichment panel/assay": "ARTIC",
+        "Source material": "Viral RNA",
+        "Capture method": "PCR",
+        "Sequencing technique": "Amplicon",
+        "Library Layout": "Paired",
+        "Gene Name 1": "ORF E",
+        "Diagnostic Pcr Ct Value 1": "",
+        "Authors": ""
     }
 }
