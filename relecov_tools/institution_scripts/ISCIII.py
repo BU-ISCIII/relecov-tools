@@ -76,14 +76,12 @@ def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
             elif "genero no-binario" in row[m_idx].lower():
                 row[m_idx] = "Non-binary Gender"
             elif "desconocido" in row[m_idx].lower():
-                row[m_idx] = "not provided"
-            elif "Unknown" in row[m_idx].lower():
-                row[m_idx] = "not provided"
+                row[m_idx] = "Not Provided"
             elif "unknown" in row[m_idx].lower():
-                row[m_idx] = "not provided"
+                row[m_idx] = "Not Provided"
             else:
-                log.error("The field is not correctly written or is not filled")
-                stderr.print("The field is not correctly written or is not filled")
+                log.error("The '%s' is not a valid data for translation" , row[m_idx])
+                stderr.print("f[red] The '{row[m_idx]}' is not a valid data for translation")
 
     return metadata
 
