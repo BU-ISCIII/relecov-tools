@@ -1576,6 +1576,30 @@
             "label": "Sequence file R2 fastq",
             "fill_mode": "sample"
         },
+        "sequence_file_R1_md5": {
+            "examples": [
+                "b5242d60471e5a5a97b35531dbbe8c30"
+            ],
+            "ontology": "MS_1000568",
+            "type": "string",
+            "description": "Checksum value to validate successful file transmission",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Fastq md5 r1",
+            "fill_mode": "sample",
+            "minLenght": "1"
+
+        },
+        "sequence_file_R2_md5": {
+            "examples": [
+                "b5242d60471e5a5a97b35531dbbe8c30"
+            ],
+            "ontology": "MS_1000569",
+            "type": "string",
+            "description": "Checksum value to validate successful file transmission",
+            "classification": "Bioinformatics and QC metrics fields"",
+            "label": "Sequence fastq R2 md5",
+            "fill_mode": "sample"
+        },
         "r1_fastq_filepath": {
             "examples": [
                 "/User/Documents/RespLab/Data/"
