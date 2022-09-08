@@ -17,7 +17,8 @@
                 "Host Age": "Edad (años)",
                 "Host Gender": "Sexo",
                 "Diagnostic Pcr Ct Value 1": "PCR genE",
-                "Specimen source": "Muestra"
+                "Specimen source": "Muestra",
+                "Purpose of Sequencing": "Contexto"
             },
             "function": "None"
         },
@@ -101,6 +102,12 @@
             },
             "mapped_key": "Sample ID given for sequencing",
             "function": "None"
+        },
+        "purpose_of_sequencing": {
+            "file_name": "",
+            "mapped_fields" : {"Purpose of Sequencing" : "" },
+            "mapped_key" : "",
+            "function": "translate_purpose_seq_to_english"
         }
     },
     "fixed_fields": {
