@@ -186,18 +186,21 @@ class GisaidUpload:
             gather_fastas_path = os.path.join(self.fasta_path, "*.fa*")
             if self.gzip:
                 os.system(
-                "zcat %s > %s/multifasta.fasta" % (gather_fastas_path, self.output_path)
-                )            
+                    "zcat %s > %s/multifasta.fasta" % (
+                        gather_fastas_path, self.output_path)
+                )
             else:
                 os.system(
-                "cat %s > %s/multifasta.fasta" % (gather_fastas_path, self.output_path)
+                    "cat %s > %s/multifasta.fasta" % (gather_fastas_path,
+                                                      self.output_path)
                 )
             multifasta = "%s/multifasta.fasta" % self.output_path
-                
+
         else:
             if self.gzip:
                 os.system(
-                "zcat %s > %s/multifasta.fasta" % (self.fasta_path, self.output_path
+                    "zcat %s > %s/multifasta.fasta" % (self.fasta_path,
+                                                       self.output_path)
                 )
                 multifasta = "%s/multifasta.fasta" % self.output_path
             else:
@@ -247,7 +250,7 @@ class GisaidUpload:
                 % (
                     self.token,
                     self.metadata_to_csv(),
-                    self.change_headers(),
+                    self.change_headers(self.create_multifasta()),
                     self.frameshift,
                     self.proxy_config,
                 )
