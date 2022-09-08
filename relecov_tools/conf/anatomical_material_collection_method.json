@@ -1000,9 +1000,9 @@
         "anatomical_material": "Not Applicable"
     },
     "Placenta": {
-        "anatomical_part": "Placenta",
+        "anatomical_part": "Not Applicable",
         "collection_method": "Not Applicable",
         "body_product": "Not Applicable",
-        "anatomical_material": "Not Applicable"
+        "anatomical_material": "Placenta"
     }
 }
