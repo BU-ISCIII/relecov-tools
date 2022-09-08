@@ -10,6 +10,7 @@ import os
 import relecov_tools.utils
 from Bio import SeqIO
 from relecov_tools.config_json import ConfigJson
+import gzip
 
 
 # import site
@@ -37,6 +38,7 @@ class GisaidUpload:
         frameshift=None,
         proxy_config=None,
         single=False,
+        gzip=False
     ):
         if (
             token is None
@@ -96,6 +98,7 @@ class GisaidUpload:
         else:
             self.proxy_config = proxy_config
         self.single = single
+        self.gzip = gzip
 
     # Metadatos
 
@@ -181,12 +184,24 @@ class GisaidUpload:
         """Create multifasta from single fastas (if --single)"""
         if self.single:
             gather_fastas_path = os.path.join(self.fasta_path, "*.fa*")
-            os.system(
+            if self.gzip:
+                os.system(
+                "zcat %s > %s/multifasta.fasta" % (gather_fastas_path, self.output_path)
+                )            
+            else:
+                os.system(
                 "cat %s > %s/multifasta.fasta" % (gather_fastas_path, self.output_path)
-            )
+                )
             multifasta = "%s/multifasta.fasta" % self.output_path
+                
         else:
-            multifasta = self.fasta_path
+            if self.gzip:
+                os.system(
+                "zcat %s > %s/multifasta.fasta" % (self.fasta_path, self.output_path
+                )
+                multifasta = "%s/multifasta.fasta" % self.output_path
+            else:
+                multifasta = self.fasta_path
         return multifasta
 
     def change_headers(self, multifasta):
