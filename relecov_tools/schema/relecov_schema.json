@@ -855,6 +855,7 @@
             "description": "An unique identifier by which each subject can be referred to, de-identified.",
             "classification": "Host information",
             "label": "Host Subject Id",
+            "fill_mode": "sample",
             "minLenght": "1"
         },
         "host_health_state": {
@@ -865,7 +866,8 @@
             "type": "string",
             "description": " Status of the host",
             "classification": "Host information",
-            "label": "Host health state"
+            "label": "Host health state",
+            "fill_mode": "sample"
         },
         "host_common_name": {
             "enum": [
@@ -2349,17 +2351,6 @@
             "label": "Authors",
             "fill_mode": "batch"
         },
-        "broker_name": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Public databases",
-            "label": "Broker Name",
-            "fill_mode": "batch"
-        },
         "gisaid_submitter_id": {
             "examples": [
                 ""
@@ -2367,8 +2358,8 @@
             "ontology": "NCIT:C54269",
             "type": "string",
             "description": "GISAID sequence ID.",
-            "classification": "Public Databases",
-            "label": "GISAID id",
+            "classification": "Public databases",
+            "label": "GISAID submitter id",
             "fill_mode": "sample"
         },
         "gisaid_accession_id": {
@@ -2378,7 +2369,7 @@
             "ontology": "NCIT:C180324",
             "type": "string",
             "description": "GISAID sequence ID.",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "GISAID id",
             "fill_mode": "sample"
         },
@@ -2389,7 +2380,7 @@
             "ontology": "GENEPIO:0100282",
             "type": "string",
             "description": "The user-defined GISAID virus name assigned to the sequence.",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "GISAID Virus Name",
             "fill_mode": "sample"
         },
@@ -2466,7 +2457,7 @@
             "ontology": "ORNASEQ_0000004",
             "type": "string",
             "description": "",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "Experiment title",
             "fill_mode": "batch"
         },
@@ -2477,7 +2468,7 @@
             "ontology": "OPMI_0000380",
             "type": "string",
             "description": "",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "Study title",
             "fill_mode": "batch"
         },
@@ -2488,7 +2479,7 @@
             "ontology": "BU_ISCIII:045",
             "type": "string",
             "description": "",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "Broker Name",
             "fill_mode": "batch"
         },
@@ -2500,7 +2491,7 @@
             "type": "string",
             "format": "date",
             "description": "",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "First created date",
             "fill_mode": "batch"
         }
