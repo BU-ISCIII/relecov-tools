@@ -87,11 +87,11 @@
                 "adding_fields": "__all__"
             }
         },
-        "required_post_processing":{
+        "required_post_processing": {
             "host_common_name": {
                 "Human": "host_scientific_name::Homo sapiens"
             },
-            "sequencing_instrument_model":{
+            "sequencing_instrument_model": {
                 "Illumina": "sequencing_instrument_platform::Illumina",
                 "PacBio": "sequencing_instrument_platform::PacBio",
                 "Ion Torrent": "sequencing_instrument_platform::Ion Torrent",
@@ -258,6 +258,14 @@
     },
     "md5_file_name": "md5_check_file.csv",
     "ENA_fields": {
+        "ENA_configuration": {
+            "study_alias": "RELECOV",
+            "design_description": "Design Description",
+            "experiment_title": "Project for ENA submission RELECOV",
+            "study_title": "RELECOV Spanish Network for genomics surveillance",
+            "study_type": "",
+            "study_id": "ERP137164"
+        },
         "tool": {
             "tool_name": "ena-upload-cli",
             "tool_version": "0.5.3"
