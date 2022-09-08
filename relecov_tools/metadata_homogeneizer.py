@@ -180,7 +180,7 @@ class MetadataHomogeneizer:
                 try:
                     item_data = data[s_value]
                 except KeyError:
-                    log.error(
+                    log.info(
                         "Additional file %s does not have the information for %s ",
                         f_name,
                         s_value,
