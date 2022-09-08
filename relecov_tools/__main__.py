@@ -314,6 +314,7 @@ def upload_to_gisaid(
     frameshift,
     proxy_config,
     single,
+    gzip
 ):
     """parsed data to create files to upload to gisaid"""
     upload_gisaid = relecov_tools.gisaid_upload.GisaidUpload(
@@ -327,6 +328,7 @@ def upload_to_gisaid(
         frameshift,
         proxy_config,
         single,
+        gzip
     )
     upload_gisaid.gisaid_upload()
 
