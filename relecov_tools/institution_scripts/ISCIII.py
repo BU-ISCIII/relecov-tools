@@ -88,9 +88,6 @@ def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
     return metadata
 
 
-#
-
-
 def translate_specimen_source(metadata, f_data, mapped_fields, heading):
     """Translate into english the "muestra" that is written in spanish"""
     for row in metadata[1:]:

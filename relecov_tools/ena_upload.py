@@ -121,7 +121,8 @@ class EnaUpload:
         df_list = []
         config_json = ConfigJson()
         for index in range(len(dataframe_name)):
-            fields = config_json.get_configuration(fields_config[index])
+
+            fields = config_json.get_configuration("ENA_fields")[fields_config[index]]
             dataframe_name[index] = df_schemas[fields]
             df_list.append(dataframe_name[index])
 
@@ -147,6 +148,7 @@ class EnaUpload:
         config_json = ConfigJson()
 
         df_schemas = pd.DataFrame(squema_json)
+
         dataframe_name_list = ["df_study", "df_samples", "df_run", "df_experiments"]
         dataframe_fileds_config_list = [
             "df_study_fields",
@@ -182,18 +184,19 @@ class EnaUpload:
 0   RELECOV  RELECOV Spanish Network for genomics surveillance  Surveillance    ADD  RELECOV Spanish Network for genomics surveillance
 1   RELECOV  RELECOV Spanish Network for genomics surveillance  Surveillance    ADD  RELECOV Spanish Network for genomics surveillance
         """
+
         # df_samples
         df_samples["host_sex"].replace("unknown", "not provided", inplace=True)
         df_samples["host_sex"].replace("Unknown", "not provided", inplace=True)
-        df_samples_fileds_config = ["rename_sample_list_og", "rename_sample_list_final"]
+        # df_samples_fileds_config = ["rename_sample_list_og", "rename_sample_list_final"]
         df_samples = self.rename_cols_df(
             "df_samples",
             df_samples,
-            config_json.get_configuration(df_samples_fileds_config[0]),
-            config_json.get_configuration(df_samples_fileds_config[1]),
+            config_json.get_configuration("ENA_fields")["rename_sample_list_og"],
+            config_json.get_configuration("ENA_fields")["rename_sample_list_final"],
         )
         df_samples.insert(3, "status", self.action)
-        checklist = config_json.get_configuration("checklist")
+        checklist = config_json.get_configuration("ENA_fields")["checklist"]
         df_samples.insert(4, "ENA_CHECKLIST", checklist)
 
         """
@@ -276,18 +279,7 @@ class EnaUpload:
 
         """
 
-        """
-        "ENA_configuration": {
-        "study_alias": "RELECOV",
-        "design_description": "Design Description",
-        "experiment_title": "Example project for ENA submission RELECOV",
-        "study_title": "RELECOV Spanish Network for genomics surveillance",
-        "study_type": "",
-        "study_id": "ERP137164"
-    },
-        """
-
-        ena_config = config_json.get_configuration("ENA_configuration")
+        ena_config = config_json.get_configuration("ENA_fields")["ENA_configuration"]
         schema_dataframe = {}
         schema_dataframe["sample"] = df_samples
         schema_dataframe["run"] = df_run_final
@@ -347,7 +339,7 @@ class EnaUpload:
             # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
             # schema_xmls record XMLs for all these schema and following 'submission'
 
-            tool = config_json.get_configuration("tool")
+            tool = config_json.get_configuration("ENA_fields")["tool"]
 
             schema_xmls = run_construct(
                 template_path, schema_targets, self.center, checklist, tool
