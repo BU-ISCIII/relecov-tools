@@ -83,7 +83,7 @@
       "examples": [
         ""
       ],
-      "ontology": "0",
+      "ontology": "NCIT:C53471",
       "type": "string",
       "description": "",
       "clasification": "",
@@ -125,7 +125,7 @@
         "experiments"
       ]
     },
-    "geographic_location_(country_and/or_sea)": {
+    "geographic location (country and/or sea)": {
       "Enums": [
         "Afghanistan [GAZ:00006882]",
         "Albania [GAZ:00002953]",
@@ -460,6 +460,18 @@
       "examples": [
         "Diagnostic testing"
       ],
+      "enum": [
+        "Cluster/Outbreak Investigation [GENEPIO:0100001]",
+        "Diagnostic Testing [GENEPIO:0100002]",
+        "Research [GENEPIO:0100003]",
+        "Protocol Testing [GENEPIO:0100024]",
+        "Surveillance [GENEPIO:0100004]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
       "ontology": "NCIT_C146997",
       "type": "string",
       "description": "The reason that the sample was collected.",
@@ -746,16 +758,25 @@
       ]
     },
     "platform": {
+      "enum": [
+        "Oxford Nanopore [OBI:0002750]",
+        "Illumina [OBI:0000759]",
+        "Ion Torrent [GENEPIO:0002683]",
+        "PacBio [GENEPIO:0001927]",
+        "BGI",
+        "MGI",
+        "Other"
+      ],
       "examples": [
-        "MinIon"
+        "Illumina"
       ],
       "ontology": "GENEPIO_0000071",
       "type": "string",
-      "description": "The model of the sequencing instrument used.",
-      "label": "Sequencing Platforms ",
-      "table": [
-        "experiments"
-      ]
+      "description": "",
+      "classification": "Sequencing",
+      "label": "Sequencing Instrument Platform",
+      "fill_mode": "batch",
+      "minLenght": "1"
     },
     "sequence_file_R1_fastq": {
       "examples": [
@@ -806,19 +827,6 @@
       "description": "",
       "clasification": "Bioinformatics and QC metrics",
       "label": "file type",
-      "table": [
-        "runs"
-      ]
-    },
-    "fastq_md5_r1": {
-      "examples": [
-        "3e69af1f875fab020aed82f5edbc1f03"
-      ],
-      "ontology": "MS_1000568",
-      "type": "string",
-      "description": "",
-      "clasification": "Bioinformatics and QC metrics",
-      "label": "file checksum",
       "table": [
         "runs"
       ]
@@ -902,31 +910,16 @@
       "label": "Biological Sample Storage Condition"
     },
     "library_source": {
-      "Enums": [
-        "5-methycytidine antibody method [GENPIO:0001941]",
-        "CAGE method [GENPIO:0001942]",
-        "CF-H method [GENPIO:0001943]",
-        "CF-M method ]GENPIO:0001944]",
-        "CF-S method [GENPIO:0001945]",
-        "CF-T method [GENPIO:0001946]",
-        "ChIP method ]GENPIO:0001947]",
-        "DNAse method [GENPIO:0001948]",
-        "HMPR method [GENPIO:0001949]",
-        "Hybrid Selection Method [GENPIO:0001950]",
-        "MBD2 protein methyl-CpG binding domain method [GENPIO:0001951]",
-        "MF method [GENPIO:0001952]",
-        "MNase method [GENPIO:0001953]",
-        "MSLL method [GENPIO:0001954]",
-        "PCR method [GENPIO:0001955]",
-        "RACE method [GENPIO:0001956]",
-        "RANDOM PCR method [GENPIO:0001957]",
-        "RANDOM method [GENPIO:0001958]",
-        "RT-PCR method [GENPIO:0001959]",
-        "Reduced Representation method [GENPIO:0001960]",
-        "Resctriction Digest method [GENPIO:0001961]",
-        "cDNA method [GENPIO:0001962]",
-        "other library method [GENPIO:0001964]",
-        "size fractionation method [GENPIO:0001963]"
+      "enum": [
+        "genomic",
+        "genomic single cell",
+        "transcriptomic",
+        "transcriptomic single cell",
+        "metagenomic",
+        "metatranscriptomic",
+        "synthetic",
+        "viral rna",
+        "other"
       ],
       "examples": [
         "METAGENOMIC"
@@ -941,17 +934,43 @@
       ]
     },
     "library_selection": {
+      "enum": [
+        "RANDOM [NCIT:C60702]",
+        "PCR [GENEPIO:0001955]",
+        "RANDOM PCR [GENEPIO:0001957]",
+        "RT-PCR [GENEPIO:0001959]",
+        "HMPR [GENEPIO:0001949]",
+        "MF [GENEPIO:0001952]",
+        "repeat fractionation",
+        "size fractionation [GENEPIO:0001963]",
+        "MSLL [GENEPIO:0001954]",
+        "cDNA [GENEPIO:0001962]",
+        "ChIP [GENEPIO:0001947]",
+        "MNase [GENEPIO:0001953]",
+        "DNase [GENEPIO:0001948]",
+        "Hybrid Selection [GENEPIO:0001950]",
+        "Reduced Representation [GENEPIO:0001960]",
+        "Restriction Digest [GENEPIO:0001961]",
+        "5-methylcytidine antibody [GENEPIO:0001941]",
+        "MBD2 protein methyl-CpG binding domain [GENEPIO:0001951]",
+        "CAGE [GENEPIO:0001942]",
+        "RACE [GENEPIO:0001956]",
+        "MDA",
+        "padlock probes capture method",
+        "Oligo-dT",
+        "Inverse rRNA selection",
+        "ChIP-Seq [GENEPIO:0001947]",
+        "Other"
+      ],
       "examples": [
         "RANDOM PCR"
       ],
       "ontology": "GENPIO_0001940",
       "type": "string",
       "description": "Library capture method.",
-      "clasification": "Sequencing",
+      "classification": "Sequencing",
       "label": "Capture method",
-      "table": [
-        "experiments"
-      ]
+      "fill_mode": "batch"
     },
     "library_construction_protocol": {
       "examples": [
@@ -967,7 +986,7 @@
       ]
     },
     "library_strategy": {
-      "Enums": [
+      "enum": [
         "Bisultife-Seq strategy [GENPIO:0001975]",
         "CTS strategy [GENPIO:0001978]",
         "ChIP-Seq strategy [GENPIO:0001979]",
@@ -982,12 +1001,12 @@
         "WCS strategy [GENPIO:0001991]",
         "WGS strategy [GENPIO:0001992]",
         "WXS strategy [GENPIO:0001993]",
-        "amplicon strategy [GENPIO:0001974]",
-        "clone end strategy [GENPIO:0001976]",
-        "clone strategy [GENPIO:0001977]",
-        "finishing strategy [GENPIO:0001982]",
-        "other library strategy [GENPIO:0001988]",
-        "pool clone strategy [GENPIO:0001989]"
+        "Amplicon [GENPIO:0001974]",
+        "Clone end strategy [GENPIO:0001976]",
+        "Clone strategy [GENPIO:0001977]",
+        "Finishing strategy [GENPIO:0001982]",
+        "Other library strategy [GENPIO:0001988]",
+        "Pool clone strategy [GENPIO:0001989]"
       ],
       "examples": [
         "WGS"
@@ -995,11 +1014,9 @@
       "ontology": "GENPIO_0001973",
       "type": "string",
       "description": "Overall sequencing strategy or approach.",
-      "clasification": "Sequencing",
+      "classification": "Sequencing",
       "label": "Sequencing technique",
-      "table": [
-        "experiments"
-      ]
+      "fill_mode": "batch"
     },
     "library_layout": {
       "examples": [
@@ -1051,7 +1068,7 @@
       "examples": [
         ""
       ],
-      "ontology": "STATO_0000064",
+      "ontology": "GENEPIO_0000076",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1146,19 +1163,6 @@
       "description": "",
       "clasification": "Submission ENA",
       "label": "Base count"
-    },
-    "insert_size": {
-      "examples": [
-        "250"
-      ],
-      "ontology": "0",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Insert size",
-      "table": [
-        "experiments"
-      ]
     },
     "center_name": {
       "examples": [
@@ -1317,16 +1321,6 @@
       "label": "Fastq bytes"
     },
     "fastq_md5_r1": {
-      "examples": [
-        ""
-      ],
-      "ontology": "MS_1000568",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Fastq md5 r1"
-    },
-    "fastq_md5_r2": {
       "examples": [
         ""
       ],
