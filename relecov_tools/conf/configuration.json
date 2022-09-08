@@ -55,14 +55,6 @@
             "Sequence file R1 fastq",
             "Sequence file R2 fastq"
         ],
-        "fields_required_for_ENA": {
-            "study_alias": "RELECOV",
-            "design_description": "Design Description",
-            "experiment_title": "Example project for ENA submission RELECOV",
-            "study_title": "RELECOV Spanish Network for genomics surveillance",
-            "study_type": "",
-            "study_id": "ERP137164"
-        },
         "lab_metadata_req_json": {
             "laboratory_data": {
                 "file": "laboratory_address.json",
@@ -92,8 +84,22 @@
                         "anatomical_material"
                     ]
                 },
-                "adding_fields" : "__all__"
+                "adding_fields": "__all__"
             }
+        },
+        "required_post_processing":{
+            "host_common_name": {
+                "Human": "host_scientific_name::Homo sapiens"
+            },
+            "sequencing_instrument_model":{
+                "Illumina": "sequencing_instrument_platform::Illumina",
+                "PacBio": "sequencing_instrument_platform::PacBio",
+                "Ion Torrent": "sequencing_instrument_platform::Ion Torrent",
+                "Oxford Nanopore": "sequencing_instrument_platform::Oxford Nanopore"
+            }
+        },
+        "required_copy_from_other_field": {
+            "isolate_sample_id": "sequencing_sample_id"
         }
     },
     "long_table_heading": [
@@ -250,55 +256,81 @@
         "consensus_genome_length.csv": "consensus_genome_length_path",
         "software_versions.yml": "software_versions_path"
     },
-    "tool": {
-        "tool_name": "ena-upload-cli",
-        "tool_version": "0.5.3"
-    },
     "md5_file_name": "md5_check_file.csv",
-    "checklist": "ERC000033",
-    "df_study_fields": [
-        "study_type",
-        "study_abstract"
-    ],
-    "df_samples_fields": [
-        "sample_name",
-        "sample_title",
-        "taxon_id",
-        "collection_date",
-        "geographic_location_(country_and/or_sea)",
-        "host_common_name",
-        "host_scientific_name",
-        "host_sex",
-        "scientific_name",
-        "collector_name",
-        "collecting_institution",
-        "isolate",
-        "host_subject_id",
-        "host health state",
-        "authors",
-        "sample_description",
-        "address"
-    ],
-    "df_run_fields": [
-        "r1_fastq_filepath",
-        "r2_fastq_filepath",
-        "file_type",
-        "fastq_r1_md5",
-        "fastq_r2_md5",
-        "collecting_institution"
-    ],
-    "df_experiment_fields": [
-        "study_abstract",
-        "sample_name",
-        "library_name",
-        "library_strategy",
-        "library_source",
-        "library_selection",
-        "library_layout",
-        "instrument_model",
-        "design_description",
-        "collecting_institution",
-        "insert_size",
-        "sequencing_instrument_platform"
-    ]
+    "ENA_fields": {
+        "tool": {
+            "tool_name": "ena-upload-cli",
+            "tool_version": "0.5.3"
+        },
+        "checklist": "ERC000033",
+        "df_study_fields": [
+            "study_type",
+            "study_abstract"
+        ],
+        "df_samples_fields": [
+            "sample_name",
+            "sample_title",
+            "taxon_id",
+            "collection_date",
+            "geographic_location_(country_and/or_sea)",
+            "host_common_name",
+            "host_scientific_name",
+            "host_sex",
+            "scientific_name",
+            "collector_name",
+            "collecting_institution",
+            "isolate",
+            "host_subject_id",
+            "host health state",
+            "authors",
+            "sample_description",
+            "address"
+        ],
+        "df_run_fields": [
+            "r1_fastq_filepath",
+            "r2_fastq_filepath",
+            "file_type",
+            "fastq_r1_md5",
+            "fastq_r2_md5",
+            "collecting_institution"
+        ],
+        "df_experiment_fields": [
+            "study_abstract",
+            "sample_name",
+            "library_name",
+            "library_strategy",
+            "library_source",
+            "library_selection",
+            "library_layout",
+            "instrument_model",
+            "design_description",
+            "collecting_institution",
+            "insert_size",
+            "sequencing_instrument_platform"
+        ],
+        "rename_sample_list_og": [
+            "sample_name",
+            "sample_title",
+            "geographic_location_(country_and/or_sea)",
+            "host_subject_id",
+            "collection_date",
+            "host_common_name",
+            "host_sex",
+            "host_scientific_name",
+            "collector_name",
+            "collecting_institution"
+        ],
+        "rename_sample_list_final": [
+            "alias",
+            "title",
+            "geographic location (country and/or sea)",
+            "host subject id",
+            "collection date",
+            "host common name",
+            "host sex",
+            "host scientific name",
+            "collector name",
+            "collecting institution"
+        ]
+    }
 }

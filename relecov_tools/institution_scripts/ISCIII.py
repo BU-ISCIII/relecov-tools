@@ -71,6 +71,10 @@ def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
                 row[m_idx] = "Male"
             elif "mujer" in row[m_idx].lower():
                 row[m_idx] = "Female"
+            elif "genero no-binario" in row[m_idx].lower():
+                row[m_idx] = "Non-binary Gender"
+            elif "genero no-binario" in row[m_idx].lower():
+                row[m_idx] = "Non-binary Gender"
             elif "desconocido" in row[m_idx].lower():
                 row[m_idx] = "not provided"
             elif "Unknown" in row[m_idx].lower():
@@ -78,8 +82,13 @@ def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
             elif "unknown" in row[m_idx].lower():
                 row[m_idx] = "not provided"
             else:
-                row[m_idx] = "not applicable"
+                log.error("The field is not correctly written or is not filled")
+                stderr.print("The field is not correctly written or is not filled")
+
     return metadata
+
+
+#
 
 
 def translate_specimen_source(metadata, f_data, mapped_fields, heading):
@@ -100,7 +109,7 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
             elif "EXTRACTO" in row[m_idx].upper():
                 row[m_idx] = "Scraping"
             elif "EXUDADO FARÍNGEO" in row[m_idx].upper():
-                row[m_idx] = "Nasopharynx Swabbing"
+                row[m_idx] = "Pharynx Swabbing"
             elif "EXUDADO NASOFARÍNGEO" in row[m_idx].upper():
                 row[m_idx] = "Nasopharynx Swabbing"
             elif "EXUDADO OROFARINGEO" in row[m_idx].upper():
@@ -111,5 +120,5 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
                 row[m_idx] = "Saliva"
             else:
                 log.error("The field is not correctly written or is not filled")
-                stderr.print("The field is not correctly written or is not filled")
+                stderr.print("The field is not correctly written or not filled")
     return metadata

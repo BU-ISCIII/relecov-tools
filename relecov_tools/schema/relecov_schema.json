@@ -612,8 +612,8 @@
                 "Anus [UBERON:0001245]",
                 "Duodenum [UBERON:0002114]",
                 "Pharynx [UBERON:0006562]",
-                "Nasopharynx (NP) [UBERON:0001728]",
-                "Oropharynx (OP) [UBERON:0001729]",
+                "Nasopharynx [UBERON:0001728]",
+                "Oropharynx [UBERON:0001729]",
                 "Not Applicable [GENEPIO:0001619]",
                 "Not Collected [GENEPIO:0001620]",
                 "Not Provided [GENEPIO:0001668]",
@@ -855,6 +855,7 @@
             "description": "An unique identifier by which each subject can be referred to, de-identified.",
             "classification": "Host information",
             "label": "Host Subject Id",
+            "fill_mode": "sample",
             "minLenght": "1"
         },
         "host_health_state": {
@@ -865,7 +866,8 @@
             "type": "string",
             "description": " Status of the host",
             "classification": "Host information",
-            "label": "Host health state"
+            "label": "Host health state",
+            "fill_mode": "sample"
         },
         "host_common_name": {
             "enum": [
@@ -1126,6 +1128,7 @@
                 "NEBNext ARTIC SARS-CoV-2 FS",
                 "Illumina COVIDSeq Test [CIDO:0020172]",
                 "ABL DeepChek® Assay WG SC2 V1",
+                "Not Provided [GENEPIO:0001668]",
                 "Other"
             ],
             "examples": [
@@ -1398,6 +1401,7 @@
                 "iSeq 100 i1 Reagent v2 (300-cycle)",
                 "iSeq 100 i1 Reagent v2 (300-cycle) 4 pack",
                 "iSeq 100 i1 Reagent v2 (300-cycle) 8 pack",
+                "Not Provided [GENEPIO:0001668]",
                 "Other"
             ],
             "examples": [
@@ -1425,7 +1429,10 @@
             "enum": [
                 "Oxford Nanopore [OBI:0002750]",
                 "Illumina [OBI:0000759]",
-                "Ion Torrent",
+                "Ion Torrent [GENEPIO:0002683]",
+                "PacBio [GENEPIO:0001927]",
+                "BGI",
+                "MGI",
                 "Other"
             ],
             "examples": [
@@ -1514,12 +1521,12 @@
                 "WCS strategy [GENPIO:0001991]",
                 "WGS strategy [GENPIO:0001992]",
                 "WXS strategy [GENPIO:0001993]",
-                "amplicon [GENPIO:0001974]",
-                "clone end strategy [GENPIO:0001976]",
-                "clone strategy [GENPIO:0001977]",
-                "finishing strategy [GENPIO:0001982]",
-                "other library strategy [GENPIO:0001988]",
-                "pool clone strategy [GENPIO:0001989]"
+                "Amplicon [GENPIO:0001974]",
+                "Clone end strategy [GENPIO:0001976]",
+                "Clone strategy [GENPIO:0001977]",
+                "Finishing strategy [GENPIO:0001982]",
+                "Other library strategy [GENPIO:0001988]",
+                "Pool clone strategy [GENPIO:0001989]"
             ],
             "examples": [
                 "WGS"
@@ -1533,11 +1540,11 @@
         },
         "library_layout": {
             "enum": [
-                "SINGLE [OBI:0002481]",
-                "PAIRED [OBI:0001852]"
+                "Single [OBI:0002481]",
+                "Paired [OBI:0001852]"
             ],
             "examples": [
-                "PAIRED"
+                "Paired"
             ],
             "ontology": "NCIT:C175894",
             "type": "string",
@@ -2178,10 +2185,10 @@
         },
         "gene_name_1": {
             "enum": [
-                "E gene (orf4) [GENEPIO:0100151]",
-                "M gene (orf5) [GENEPIO:0100152]",
-                "N gene (orf9) [GENEPIO:0100153]",
-                "Spike gene (orf2) [GENEPIO:0100154]",
+                "E gene [GENEPIO:0100151]",
+                "M gene [GENEPIO:0100152]",
+                "N gene [GENEPIO:0100153]",
+                "Spike gene [GENEPIO:0100154]",
                 "orf1ab (rep) [GENEPIO:0100155]",
                 "orf1a (pp1a) [GENEPIO:0100156]",
                 "nsp11 [GENEPIO:0100157]",
@@ -2221,7 +2228,7 @@
             "type": "string",
             "description": "The name of the gene used in the diagnostic RT-PCR test.",
             "examples": [
-                "E gene (orf4) [GENEPIO:0100151]"
+                "E gene [GENEPIO:0100151]"
             ],
             "classification": "Pathogen diagnostic testing",
             "label": "Gene Name 1",
@@ -2240,10 +2247,10 @@
         },
         "gene_name_2": {
             "enum": [
-                "E gene (orf4) [GENEPIO:0100151]",
-                "M gene (orf5) [GENEPIO:0100152]",
-                "N gene (orf9) [GENEPIO:0100153]",
-                "Spike gene (orf2) [GENEPIO:0100154]",
+                "E gene [GENEPIO:0100151]",
+                "M gene [GENEPIO:0100152]",
+                "N gene [GENEPIO:0100153]",
+                "Spike gene [GENEPIO:0100154]",
                 "orf1ab (rep) [GENEPIO:0100155]",
                 "orf1a (pp1a) [GENEPIO:0100156]",
                 "nsp11 [GENEPIO:0100157]",
@@ -2344,17 +2351,6 @@
             "label": "Authors",
             "fill_mode": "batch"
         },
-        "broker_name": {
-            "examples": [
-                ""
-            ],
-            "ontology": "0",
-            "type": "string",
-            "description": "",
-            "classification": "Public databases",
-            "label": "Broker Name",
-            "fill_mode": "batch"
-        },
         "gisaid_submitter_id": {
             "examples": [
                 ""
@@ -2362,8 +2358,8 @@
             "ontology": "NCIT:C54269",
             "type": "string",
             "description": "GISAID sequence ID.",
-            "classification": "Public Databases",
-            "label": "GISAID id",
+            "classification": "Public databases",
+            "label": "GISAID submitter id",
             "fill_mode": "sample"
         },
         "gisaid_accession_id": {
@@ -2373,7 +2369,7 @@
             "ontology": "NCIT:C180324",
             "type": "string",
             "description": "GISAID sequence ID.",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "GISAID id",
             "fill_mode": "sample"
         },
@@ -2384,7 +2380,7 @@
             "ontology": "GENEPIO:0100282",
             "type": "string",
             "description": "The user-defined GISAID virus name assigned to the sequence.",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "GISAID Virus Name",
             "fill_mode": "sample"
         },
@@ -2461,7 +2457,7 @@
             "ontology": "ORNASEQ_0000004",
             "type": "string",
             "description": "",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "Experiment title",
             "fill_mode": "batch"
         },
@@ -2472,7 +2468,7 @@
             "ontology": "OPMI_0000380",
             "type": "string",
             "description": "",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "Study title",
             "fill_mode": "batch"
         },
@@ -2483,7 +2479,7 @@
             "ontology": "BU_ISCIII:045",
             "type": "string",
             "description": "",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "Broker Name",
             "fill_mode": "batch"
         },
@@ -2495,7 +2491,7 @@
             "type": "string",
             "format": "date",
             "description": "",
-            "classification": "Public Databases",
+            "classification": "Public databases",
             "label": "First created date",
             "fill_mode": "batch"
         }

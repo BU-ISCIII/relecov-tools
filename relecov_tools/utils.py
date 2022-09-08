@@ -34,7 +34,7 @@ def read_json_file(j_file):
     return data
 
 
-def read_excel_file(f_name, sheet_name, heading_row):
+def read_excel_file(f_name, sheet_name, heading_row, empty_value=True):
     """Read the input excel file and give the information in a list
     of dictionaries
     """
@@ -51,7 +51,10 @@ def read_excel_file(f_name, sheet_name, heading_row):
             continue
         for idx in range(0, len(heading)):
             if l_row[idx] is None:
-                data_row[heading[idx]] = ""
+                if empty_value:
+                    data_row[heading[idx]] = ""
+                else:
+                    data_row[heading[idx]] = "Not Provided"
             else:
                 data_row[heading[idx]] = l_row[idx]
         ws_data.append(data_row)

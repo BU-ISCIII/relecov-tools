@@ -70,50 +70,81 @@ class RelecovMetadata:
         self.schema_name = self.relecov_sch_json["schema"]
         self.schema_version = self.relecov_sch_json["version"]
 
-    def include_fixed_data(self):
+    def adding_fixed_fields(self, m_data):
         """Include fixed data that are always the same for each samples"""
-        fixed_data = {
-            "host_disease": "COVID-19",
-            "type": "betacoronavirus",
-            "tax_id": "2697049",
-            "organism": "Severe acute respiratory syndrome coronavirus 2",
-        }
-        fixed_data.update(
-            self.configuration.get_topic_data("lab_metadata", "fields_required_for_ENA")
-        )
-        fixed_data["schema_name"] = self.schema_name
-        fixed_data["schema_version"] = self.schema_version
-        return fixed_data
+        p_data = self.configuration.get_topic_data("lab_metadata", "fixed_fields")
+        for idx in range(len(m_data)):
+            for key, value in p_data.items():
+                m_data[idx][key] = value
+            m_data[idx]["schema_name"] = self.schema_name
+            m_data[idx]["schema_version"] = self.schema_version
+        return m_data
 
-    def include_processed_data(self, metadata):
-        """Include the data that requires to be processed to set the value.
-        This values are checked aginst the available options in the schema
+    def adding_copy_from_other_field(self, m_data):
+        """Add in a new field the information that is already set in another
+        field.
         """
-        new_data = {}
-        p_data = {
-            "host_common_name": {"Human": ["host_scientific_name", "Homo Sapiens"]},
-            "collecting_lab_sample_id": [
-                "isolate_sample_id",
-                metadata["sequencing_sample_id"],
-            ],
-        }
+        p_data = self.configuration.get_topic_data(
+            "lab_metadata", "required_copy_from_other_field"
+        )
+        for idx in range(len(m_data)):
+            for key, value in p_data.items():
+                m_data[idx][key] = m_data[idx][value]
+        return m_data
 
-        for key, values in p_data.items():
-            v_data = metadata[key]
-            if isinstance(values, dict):
-                if v_data in values:
-                    new_data[values[v_data][0]] = values[v_data][1]
-            else:
-                new_data[values[0]] = values[1]
-        """New fields that required processing from other field """
+    def adding_post_processing(self, m_data):
+        """Add the fields that requires to set based on the existing value
+        in other field
+        """
+        p_data = self.configuration.get_topic_data(
+            "lab_metadata", "required_post_processing"
+        )
+        for idx in range(len(m_data)):
+            for key, p_values in p_data.items():
+                value = m_data[idx][key]
+                if value in p_values:
+                    p_field, p_set = p_values[value].split("::")
+                    m_data[idx][p_field] = p_set
+                else:
+                    # Check if key p_values should match only part of the value
+                    for reg_key, reg_value in p_values.items():
+                        if reg_key in value:
+                            p_field, p_set = reg_value.split("::")
+                            m_data[idx][p_field] = p_set
 
-        return new_data
+        return m_data
+
+    def adding_ontology_to_enum(self, m_data):
+        """Read the schema to get the properties enum and for those fields
+        which has an enum property value then replace the value for the one it
+        is defined in the schema
+        """
+        enum_dict = {}
+        for prop, values in self.relecov_sch_json["properties"].items():
+            # import pdb; pdb.set_trace()
+            if "enum" in values:
+                enum_dict[prop] = {}
+                for enum in values["enum"]:
+                    go_match = re.search(r"(.+) \[\w+:.*", enum)
+                    if go_match:
+                        enum_dict[prop][go_match.group(1)] = enum
+                    else:
+                        enum_dict[prop][enum] = enum
+
+        for idx in range(len(m_data)):
+            for key, e_values in enum_dict.items():
+                if key in m_data[idx]:
+                    if m_data[idx][key] in e_values:
+                        m_data[idx][key] = e_values[m_data[idx][key]]
+                    else:
+                        continue
+                        # import pdb; pdb.set_trace()
+        return m_data
 
     def process_from_json(self, m_data, json_fields):
         """ """
         if isinstance(json_fields["map_field"], dict):
             # Search for the value which contains data
-
             for m_field in json_fields["map_field"]["any_of"]:
                 try:
                     m_data[0][m_field]
@@ -151,7 +182,8 @@ class RelecovMetadata:
         return m_data
 
     def adding_fields(self, metadata):
-        """Add fields"""
+        """Add information that requires to handle json files to include in
+        the  fields"""
 
         for key, values in self.json_req_files.items():
             stderr.print(f"[blue] Processing {key}")
@@ -162,6 +194,8 @@ class RelecovMetadata:
             metadata = self.process_from_json(metadata, values)
             stderr.print(f"[green] Processed {key}")
         stderr.print("[blue] Reading sample list file")
+        # Because sample data file is comming in an input parameter it cannot
+        # be inside the configuration json file.
         # Include Sample informatin data from sample json file
         s_json = {}
         s_json["map_field"] = "sequencing_sample_id"
@@ -190,7 +224,7 @@ class RelecovMetadata:
         """
         heading_row_number = 4
         ws_metadata_lab = relecov_tools.utils.read_excel_file(
-            self.metadata_file, "METADATA_LAB", heading_row_number
+            self.metadata_file, "METADATA_LAB", heading_row_number, False
         )
 
         metadata_values = []
@@ -234,7 +268,7 @@ class RelecovMetadata:
                                 )
                 else:
                     if isinstance(row[key], float) or isinstance(row[key], int):
-                        row[key] = str(int(row[key]))
+                        row[key] = str(row[key])
                 try:
                     property_row[self.label_prop_dict[key]] = row[key]
                 except KeyError as e:
@@ -255,8 +289,12 @@ class RelecovMetadata:
         # Continue by adding extra information
         stderr.print("[blue] Including additional information")
 
-        completed_metadata = self.adding_fields(valid_metadata_rows)
-
+        extended_metadata = self.adding_fields(valid_metadata_rows)
+        stderr.print("[blue] Including post processing information")
+        extended_metadata = self.adding_post_processing(extended_metadata)
+        extended_metadata = self.adding_copy_from_other_field(extended_metadata)
+        extended_metadata = self.adding_fixed_fields(extended_metadata)
+        completed_metadata = self.adding_ontology_to_enum(extended_metadata)
         file_name = (
             "processed_"
             + os.path.splitext(os.path.basename(self.metadata_file))[0]

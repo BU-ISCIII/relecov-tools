@@ -123,12 +123,19 @@ class EnaUpload:
         for index in range(len(dataframe_name)):
             fields = config_json.get_configuration(fields_config[index])
             dataframe_name[index] = df_schemas[fields]
-            import pdb
-
-            pdb.set_trace()
             df_list.append(dataframe_name[index])
 
         return df_list
+
+    def rename_cols_df(self, dataframe_name, dataframe, col_name_og, col_name_final):
+        col_dict = {}
+
+        for index in range(len(col_name_og)):
+            col_dict[col_name_og[index]] = col_name_final[index]
+
+        dataframe_name = dataframe.rename(columns=col_dict)
+
+        return dataframe_name
 
     def create_structure_to_ena(self):
         """Convert json to dataframe required by ena-upload-cli package"""
@@ -144,31 +151,27 @@ class EnaUpload:
         dataframe_fileds_config_list = [
             "df_study_fields",
             "df_samples_fields",
-            "df_run_fields" "df_experiment_fields",
+            "df_run_fields",
+            "df_experiment_fields",
         ]
-        self.create_dataframe(
+        # Creating the dataframes df_Study, df_samples, df_run and df_experiment
+        df_list = self.create_dataframe(
             dataframe_name_list, dataframe_fileds_config_list, df_schemas
         )
-        import pdb
 
-        pdb.set_trace()
+        df_study = df_list[0]
+        df_samples = df_list[1]
+        df_run = df_list[2]
+        df_experiments = df_list[3]
+
         # df_schema
         """
         collecting_institution collection_date     collector_name  ...                                        study_title    study_type taxon_id
 0      Hospital Clínic de Barcelona      2021-05-10  Inmaculada Casas   ...  RELECOV Spanish Network for genomics surveillance  Surveillance  2697049
 1      Hospital Clínic de Barcelona      2021-05-07   Inmaculada Casas  ...  RELECOV Spanish Network for genomics surveillance  Surveillance  2697049
-
         """
-        """
-        df_study = df_schemas[
-            ["study_alias", "study_title", "study_type", "study_abstract"]
-        ]
-
-        df_study = df_study.rename(columns={"study_alias": "alias"})
-        df_study = df_study.rename(columns={"study_title": "title"})
-        """
-        fields_study = config_json.get_configuration("df_study_fields")
-        df_study = df_schemas[fields_study]
+        # Parsing the dataframes specifically according to ENA requirements #
+        # df_study
         df_study["alias"] = df_study["study_abstract"][0].rsplit(" ", 5)[0]
         df_study["title"] = df_study["study_abstract"]
         df_study.insert(3, "status", self.action)
@@ -179,50 +182,28 @@ class EnaUpload:
 0   RELECOV  RELECOV Spanish Network for genomics surveillance  Surveillance    ADD  RELECOV Spanish Network for genomics surveillance
 1   RELECOV  RELECOV Spanish Network for genomics surveillance  Surveillance    ADD  RELECOV Spanish Network for genomics surveillance
         """
-
-        fields_samples = config_json.get_configuration("df_samples_fields")
-
-        df_samples = df_schemas[fields_samples]
-
+        # df_samples
         df_samples["host_sex"].replace("unknown", "not provided", inplace=True)
         df_samples["host_sex"].replace("Unknown", "not provided", inplace=True)
-
-        df_samples = df_samples.rename(columns={"sample_name": "alias"})
-        df_samples = df_samples.rename(columns={"sample_title": "title"})
-        df_samples = df_samples.rename(
-            columns={
-                "geographic_location_(country_and/or_sea)": "geographic location (country and/or sea)"
-            }
-        )
-        df_samples = df_samples.rename(columns={"host_subject_id": "host subject id"})
-        df_samples = df_samples.rename(columns={"collection_date": "collection date"})
-        df_samples = df_samples.rename(columns={"host_common_name": "host common name"})
-        df_samples = df_samples.rename(columns={"host_common_name": "host common name"})
-        df_samples = df_samples.rename(columns={"host_sex": "host sex"})
-        df_samples = df_samples.rename(
-            columns={"host_scientific_name": "host scientific name"}
-        )
-        df_samples = df_samples.rename(columns={"collector_name": "collector name"})
-        df_samples = df_samples.rename(
-            columns={"collecting_institution": "collecting institution"}
+        df_samples_fileds_config = ["rename_sample_list_og", "rename_sample_list_final"]
+        df_samples = self.rename_cols_df(
+            "df_samples",
+            df_samples,
+            config_json.get_configuration(df_samples_fileds_config[0]),
+            config_json.get_configuration(df_samples_fileds_config[1]),
         )
         df_samples.insert(3, "status", self.action)
-        # df_samples.insert(3, "host subject id", df_schemas["host subject id"])
-        # df_samples.insert(3, "host health state", df_schemas["host health state"])
         checklist = config_json.get_configuration("checklist")
         df_samples.insert(4, "ENA_CHECKLIST", checklist)
-        # df_samples.insert(5, "sample_description", df_schemas["sample_description"])
-        # df_samples
 
         """
+        # df_samples
         alias      title taxon_id host health state  ...                                  scientific_name     collector name           collecting institution    isolate
 0   212164375  212164375  2697049                    ...  Severe acute respiratory syndrome coronavirus 2  Inmaculada Casas      Hospital Clínic de Barcelona  212164375
 1   212163777  212163777  2697049                    ...  Severe acute respiratory syndrome coronavirus 2   Inmaculada Casas     Hospital Clínic de Barcelona  212163777
 2   212153091  212153091  2697049                    ...  Severe acute respiratory syndrome coronavirus 2   Inmaculada Casas     Hospital Clínic de Barcelona  212153091
         """
-        fields_run = config_json.get_configuration("df_run_fields")
-        df_run = df_schemas[fields_run]
-
+        # df_run
         df_run.insert(1, "sequence_file_R1_fastq", "None")
         df_run.insert(2, "sequence_file_R2_fastq", "None")
         for i in range(len(df_schemas)):
@@ -256,17 +237,15 @@ class EnaUpload:
         df_run_final = pd.concat([df_run, df_run2])
         df_run_final.reset_index()
 
-        # df_run
         """
+        # df_run
         experiment_alias      sequence_file_R1_fastq      sequence_file_R2_fastq  ... file_type                     file_checksum                      fastq_r2_md5
 0        214821_S12  214821_S12_R1_001.fastq.gz  214821_S12_R2_001.fastq.gz  ...     fastq  372ca8b10a8eeb7a04107634baf340ab  7f5081eec1b64b171402b66f37fe640d
 1        214821_S12  214822_S13_R1_001.fastq.gz  214822_S13_R2_001.fastq.gz  ...     fastq  b268d7be80e80455bec0807b5961d23c  a15be39feaf73eec9b2c026717878bba
 2        214821_S12   214823_S1_R1_001.fastq.gz   214823_S1_R2_001.fastq.gz  ...     fastq  c16bdbfc03c354496fcfb2c107e3cbf6  4d9b80b977a75bf7e2a4282ca910d94a
 
         """
-        fields_experiment = config_json.get_configuration("df_experiment_fields")
-        df_experiments = df_schemas[[fields_experiment]]
-
+        # df_experiments
         df_experiments["instrument_model"] = df_experiments[
             "instrument_model"
         ].str.lower()
@@ -279,9 +258,6 @@ class EnaUpload:
                 + "_"
                 + str(df_run.loc[i, "sequence_file_R2_fastq"])
             )
-        # df_experiments.insert(5, "design_description", df_schemas["design_description"])
-        # df_experiments.insert(5, "insert_size", df_schemas["insert_size"])
-        # df_experiments.insert(5, "platform", df_schemas["sequencing_instrument_platform"])
 
         df_experiments = df_experiments.rename(
             columns={"sequencing_instrument_platform": "platform"}
@@ -291,14 +267,24 @@ class EnaUpload:
         df_experiments = df_experiments.rename(
             columns={"collecting_institution": "collecting institution"}
         )
-
-        # df_experiments example
         """
+        # df_experiments example
         experiment_alias                                              title study_alias  ... library_layout instrument_model                                              alias
 0        214821_S12  RELECOV Spanish Network for genomics surveillance     RELECOV  ...         PAIRED   Illumina MiSeq  214821_S12_R1_001.fastq.gz_214821_S12_R2_001.f...
 1        214821_S12  RELECOV Spanish Network for genomics surveillance     RELECOV  ...         PAIRED   Illumina MiSeq  214822_S13_R1_001.fastq.gz_214822_S13_R2_001.f...
 2        214821_S12  RELECOV Spanish Network for genomics surveillance     RELECOV  ...         PAIRED   Illumina MiSeq  214823_S1_R1_001.fastq.gz_214823_S1_R2_001.fas...
 
+        """
+
+        """
+        "ENA_configuration": {
+        "study_alias": "RELECOV",
+        "design_description": "Design Description",
+        "experiment_title": "Example project for ENA submission RELECOV",
+        "study_title": "RELECOV Spanish Network for genomics surveillance",
+        "study_type": "",
+        "study_id": "ERP137164"
+    },
         """
 
         ena_config = config_json.get_configuration("ENA_configuration")
