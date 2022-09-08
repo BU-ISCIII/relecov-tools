@@ -71,7 +71,7 @@
         "geo_loc_latitude": "37.1781",
         "geo_loc_longitude": "-3.6008"
     },
-    "Oviedo": {
+    "Asturias": {
         "geo_loc_latitude": "43.3600",
         "geo_loc_longitude": "-5.8450"
     },
@@ -222,5 +222,82 @@
     "Pontevedra": {
         "geo_loc_latitude": "42.4333",
         "geo_loc_longitude": "-8.6333"
+    },
+    {
+    "Alcázar de San Juan": {
+        "geo_loc_latitude": "39.4056",
+        "geo_loc_longitude": "-3.2056"
+    },
+    "Manzanares": {
+       "geo_loc_latitude": "38.9964",
+       "geo_loc_longitude": "-3.3731"
+   },
+   "Valdepeñas": {
+        "geo_loc_latitude": "38.7667",
+        "geo_loc_longitude": "-3.4000"
+    },
+    "Puertollano": {
+        "geo_loc_latitude": "38.6833",
+        "geo_loc_longitude": "-4.1167"
+    },
+    "Talavera de la Reina": {
+        "geo_loc_latitude": "39.95",
+        "geo_loc_longitude": "-4.8333"
+    },
+    "Badalona": {
+        "geo_loc_latitude": "41.4333",
+        "geo_loc_longitude": "2.2333"
+    },
+    "L'Hospitalet de Llobregat": {
+        "geo_loc_latitude": "41.4217",
+        "geo_loc_longitude": "2.1897"
+    },
+    "Sant Cugat del Vallès": {
+        "geo_loc_latitude": "41.4667",
+        "geo_loc_longitude": "2.0833"
+    },
+    "Mostoles": {
+        "geo_loc_latitude": "40.3223",
+        "geo_loc_longitude": "-3.865"
+    },
+    "Leganés": {
+        "geo_loc_latitude": "40.3281",
+        "geo_loc_longitude": "-3.7644"
+    },
+    "Getafe": {
+        "geo_loc_latitude": "40.3047",
+        "geo_loc_longitude": "-3.7311"
+    },
+    "Cartagena": {
+        "geo_loc_latitude": "37.6000",
+        "geo_loc_longitude": "-0.9819"
+    },
+    "Pozo Aledo": {
+        "geo_loc_latitude": "37.8167",
+        "geo_loc_longitude": "-0.85"
+    },
+    "Lorca": {
+        "geo_loc_latitude": "37.6798",
+        "geo_loc_longitude": "-1.6944"
+    },
+    "Cieza": {
+        "geo_loc_latitude": "38.2392",
+        "geo_loc_longitude": "-1.4189"
+    },
+    "Mérida": {
+       "geo_loc_latitude": "38.9000",
+       "geo_loc_longitude": "-6.3333"
+   },
+   "Santiago de Compostela": {
+       "geo_loc_latitude": "42.8833",
+       "geo_loc_longitude": "-8.55"
+   },
+   "Elche": {
+        "geo_loc_latitude": "38.2669",
+        "geo_loc_longitude": "-0.6983"
+    },
+    "Gazteiz": {
+        "geo_loc_latitude": "42.85",
+        "geo_loc_longitude": "-2.6667"
     }
 }

@@ -4,6 +4,7 @@
         "collecting_institution_address": "Crta. Pozuelo Majadahonda S/N,",
         "collecting_institution_email": "info@isciii.es",
         "geo_loc_state": "Madrid",
+        "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain"
     },
@@ -12,6 +13,7 @@
         "collecting_institution_address": "Av. del Conocimiento S/N,",
         "collecting_institution_email": "fegarcia@ugr.es",
         "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Granada",
         "geo_loc_city": "Granada",
         "geo_loc_country": "Spain"
     },
@@ -20,6 +22,7 @@
         "collecting_institution_address": "Avenida Manuel Siurot s/n",
         "collecting_institution_email": "josea.lepe.sspa@juntadeandalucia.es",
         "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Sevilla",
         "geo_loc_city": "Sevilla",
         "geo_loc_country": "Spain"
     },
@@ -27,7 +30,8 @@
         "collecting_institution": "Hospital Clínico Universitario Lozano Blesa",
         "collecting_institution_address": "S. Juan Bosco, 15",
         "collecting_institution_email": "rbenito@salud.aragon.es",
-        "geo_loc_state": "Aragon",
+        "geo_loc_state": "Aragón",
+        "geo_loc_region": "Zaragoza",
         "geo_loc_city": "Zaragoza",
         "geo_loc_country": "Spain"
     },
@@ -35,7 +39,8 @@
         "collecting_institution": "Hospital Universitario Miguel Servet",
         "collecting_institution_address": "P.º Isabel la Católica, 1-3",
         "collecting_institution_email": "rbenito@salud.aragon.es",
-        "geo_loc_state": "Aragon",
+        "geo_loc_state": "Aragón",
+        "geo_loc_region": "Zaragoza",
         "geo_loc_city": "Zaragoza",
         "geo_loc_country": "Spain"
     },
@@ -43,7 +48,8 @@
         "collecting_institution": "Centro de Investigación Biomédica de Aragón",
         "collecting_institution_address": "Avenida San Juan Bosco 13",
         "collecting_institution_email": "mhpstrunk.iacs@aragon.es",
-        "geo_loc_state": "Aragon",
+        "geo_loc_state": "Aragón",
+        "geo_loc_region": "Zaragoza",
         "geo_loc_city": "Zaragoza",
         "geo_loc_country": "Spain"
     },
@@ -52,14 +58,16 @@
         "collecting_institution_address": " Av. Roma, s/n,",
         "collecting_institution_email": "santiago.melon@sespa.es",
         "geo_loc_state": "Asturias",
-        "geo_loc_city": "Oviedo",
+        "geo_loc_region": "Asturias",
+        "geo_loc_city": "Asturias",
         "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Servicio de Microbiologia HU Son Espases",
         "collecting_institution_address": " Ctra. Valldemossa 79",
         "collecting_institution_email": "antonio.oliver@ssib.es",
-        "geo_loc_state": "Baleares",
+        "geo_loc_state": "Islas Baleares",
+        "geo_loc_region": "Palma de Mallorca",
         "geo_loc_city": "Palma de Mallorca",
         "geo_loc_country": "Spain"
     },
@@ -67,7 +75,8 @@
         "collecting_institution": "Hospital Universitario Ntra. Sra de Candelaria",
         "collecting_institution_address": "Carretera del Rosario 145",
         "collecting_institution_email": "jalcflo@gobiernodecanarias.org",
-        "geo_loc_state": "Canarias",
+        "geo_loc_state": "Islas Canarias",
+        "geo_loc_region": "Santa Cruz de Tenerife",
         "geo_loc_city": "Santa Cruz de Tenerife",
         "geo_loc_country": "Spain"
     },
@@ -75,7 +84,8 @@
         "collecting_institution": "Instituto Tecnológico y de Energías Renovables",
         "collecting_institution_address": "Polígono Industrial de Granadilla, s/n",
         "collecting_institution_email": "jlorenzo@iter.es",
-        "geo_loc_state": "Canarias",
+        "geo_loc_state": "Islas Canarias",
+        "geo_loc_region": "Santa Cruz de Tenerife",
         "geo_loc_city": "Santa Cruz de Tenerife",
         "geo_loc_country": "Spain"
     },
@@ -83,7 +93,8 @@
         "collecting_institution": "Hospital Universitario de Canarias",
         "collecting_institution_address": "Carretera Ofra S/N, La Laguna",
         "collecting_institution_email": "",
-        "geo_loc_state": "Canarias",
+        "geo_loc_state": "Islas Canarias",
+        "geo_loc_region": "Santa Cruz de Tenerife",
         "geo_loc_city": "Santa Cruz de Tenerife",
         "geo_loc_country": "Spain"
     },
@@ -91,7 +102,8 @@
         "collecting_institution": "Hospital Universitario de Gran Canaria",
         "collecting_institution_address": "C. Pl. Barranco de la Ballena s/n",
         "collecting_institution_email": "",
-        "geo_loc_state": "Canarias",
+        "geo_loc_state": "Islas Canarias",
+        "geo_loc_region": "Las Palmas",
         "geo_loc_city": "Las Palmas",
         "geo_loc_country": "Spain"
     },
@@ -99,7 +111,8 @@
         "collecting_institution": "Hospital Insular de Lanzarote",
         "collecting_institution_address": "C. Juan de Quesada, s/n, Arrecife",
         "collecting_institution_email": "",
-        "geo_loc_state": "Canarias",
+        "geo_loc_state": "Islas Canarias",
+        "geo_loc_region": "Las Palmas",
         "geo_loc_city": "Las Palmas",
         "geo_loc_country": "Spain"
     },
@@ -108,6 +121,7 @@
         "collecting_institution_address": "Av. Valdecilla s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Cantabria",
+        "geo_loc_region": "Cantabria",
         "geo_loc_city": "Santander",
         "geo_loc_country": "Spain"
     },
@@ -116,6 +130,7 @@
         "collecting_institution_address": "Bo. Ganzo, s/n, Torrelavega",
         "collecting_institution_email": "",
         "geo_loc_state": "Cantabria",
+        "geo_loc_region": "Cantabria",
         "geo_loc_city": "Santander",
         "geo_loc_country": "Spain"
     },
@@ -123,7 +138,8 @@
         "collecting_institution": "Hospital General Universitario de Ciudad Real",
         "collecting_institution_address": "Calle Obispo Rafael Torija s/n",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Ciudad Real",
         "geo_loc_city": "Ciudad Real",
         "geo_loc_country": "Spain"
     },
@@ -131,47 +147,53 @@
         "collecting_institution": "Hospital General La Mancha Centro",
         "collecting_institution_address": "Av. Constitución, 3, Alcázar de San Juan",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
-        "geo_loc_city": "Ciudad Real",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Ciudad Real",
+        "geo_loc_city": "Alcázar de San Juan",
         "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Hospital Virgen de Altagracia",
         "collecting_institution_address": "Avda. D. Emiliano García Roldán, s/n, Manzanares,",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
-        "geo_loc_city": "Ciudad Real",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Ciudad Real",
+        "geo_loc_city": "Manzanares",
         "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Hospital General de Valdepeñas",
         "collecting_institution_address": "Av. de los Estudiantes, s/n, Valdepeñas",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
-        "geo_loc_city": "Ciudad Real",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Ciudad Real",
+        "geo_loc_city": "Valdepeñas",
         "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Hospital General Universitario de Ciudad Real",
         "collecting_institution_address": "C. Obispo Rafael Torija, s/n",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Ciudad Real",
         "geo_loc_city": "Ciudad Real",
         "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Hospital Público Santa Bárbara",
-        "collecting_institution_address": "C. Obispo Rafael Torija, s/n",
+        "collecting_institution_address": "C. Malagón s/n",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
-        "geo_loc_city": "Ciudad Real",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Ciudad Real",
+        "geo_loc_city": "Puertollano",
         "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Hospital Virgen de la Luz",
         "collecting_institution_address": "Hermandad de Donantes de Sangre, 1",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Cuenca",
         "geo_loc_city": "Cuenca",
         "geo_loc_country": "Spain"
     },
@@ -179,7 +201,8 @@
         "collecting_institution": "Hospital Universitario de Guadalajara",
         "collecting_institution_address": "C. Donante de Sangre, S/N",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Guadalajara",
         "geo_loc_city": "Guadalajara",
         "geo_loc_country": "Spain"
     },
@@ -187,7 +210,8 @@
         "collecting_institution": "Hospital Virgen de la Salud",
         "collecting_institution_address": "Calle Barber 30",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Toledo",
         "geo_loc_city": "Toledo",
         "geo_loc_country": "Spain"
     },
@@ -195,15 +219,17 @@
         "collecting_institution": "Hospital General Nuestra Sra. del Prado",
         "collecting_institution_address": "CTRA. MADRID, Av. Extremadura, KM 114",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
-        "geo_loc_city": "Toledo",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Toledo",
+        "geo_loc_city": "Talavera de la Reina",
         "geo_loc_country": "Spain"
     },
     {
         "collecting_institution": "Consejería de Sanidad",
         "collecting_institution_address": "Avda. de Francia, 4.",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Toledo",
         "geo_loc_city": "Toledo",
         "geo_loc_country": "Spain"
     },
@@ -211,7 +237,8 @@
         "collecting_institution": "Hospital General Universitario de Albacete",
         "collecting_institution_address": "Calle Hermanos Falcó 37",
         "collecting_institution_email": "",
-        "geo_loc_state": "Castilla la Mancha",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Albacete",
         "geo_loc_city": "Albacete",
         "geo_loc_country": "Spain"
     },
@@ -220,6 +247,7 @@
         "collecting_institution_address": "Paseo de Belen 19",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
+        "geo_loc_region": "Valladolid",
         "geo_loc_city": "Valladolid",
         "geo_loc_country": "Spain"
     },
@@ -228,6 +256,7 @@
         "collecting_institution_address": "P.º de San Vicente, 58",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
+        "geo_loc_region": "Salamanca",
         "geo_loc_city": "Salamanca",
         "geo_loc_country": "Spain"
     },
@@ -236,6 +265,7 @@
         "collecting_institution_address": "P.º el Espolón",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
+        "geo_loc_region": "Soria",
         "geo_loc_city": "Soria",
         "geo_loc_country": "Spain"
     },
@@ -244,6 +274,7 @@
         "collecting_institution_address": "Av. Donantes de Sangre, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
+        "geo_loc_region": "Palencia",
         "geo_loc_city": "Palencia",
         "geo_loc_country": "Spain"
     },
@@ -252,6 +283,7 @@
         "collecting_institution_address": " Av. Juan Carlos I, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
+        "geo_loc_region": "Avila",
         "geo_loc_city": "Avila",
         "geo_loc_country": "Spain"
     },
@@ -260,6 +292,7 @@
         "collecting_institution_address": "Av. Islas Baleares, 3",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
+        "geo_loc_region": "Burgos",
         "geo_loc_city": "Burgos",
         "geo_loc_country": "Spain"
     },
@@ -268,6 +301,7 @@
         "collecting_institution_address": " Passeig de la Vall d’Hebron, 119-129",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain"
     },
@@ -276,7 +310,8 @@
         "collecting_institution_address": " Crta del Canyet s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
-        "geo_loc_city": "Barcelona",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Badalona",
         "geo_loc_country": "Spain"
     },
     {
@@ -284,6 +319,7 @@
         "collecting_institution_address": "C/Villarroel 170",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain"
     },
@@ -292,7 +328,8 @@
         "collecting_institution_address": "Carrer Feixa Llarga s/n ",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
-        "geo_loc_city": "Barcelona",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "L'Hospitalet de Llobregat",
         "geo_loc_country": "Spain"
     },
     {
@@ -300,6 +337,7 @@
         "collecting_institution_address": "c/ Dr. Mallafrè Guasch, 4,",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Tarragona",
         "geo_loc_city": "Tarragona",
         "geo_loc_country": "Spain"
     },
@@ -308,6 +346,7 @@
         "collecting_institution_address": "Carrer de la Selva, 10",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain"
     },
@@ -316,6 +355,7 @@
         "collecting_institution_address": "Passeig del Taulat, 116",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain"
     },
@@ -324,7 +364,8 @@
         "collecting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
-        "geo_loc_city": "Barcelona",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Sant Cugat del Vallès",
         "geo_loc_country": "Spain"
     },
     {
@@ -332,6 +373,7 @@
         "collecting_institution_address": "Avinguda de França, S/N,",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Girona",
         "geo_loc_city": "Girona",
         "geo_loc_country": "Spain"
     },
@@ -339,7 +381,8 @@
         "collecting_institution": "Hospital Universitario San Jorge",
         "collecting_institution_address": "Av. Martínez de Velasco, 36",
         "collecting_institution_email": "",
-        "geo_loc_state": "Cataluña",
+        "geo_loc_state": "Aragón",
+        "geo_loc_region": "Huesca",
         "geo_loc_city": "Huesca",
         "geo_loc_country": "Spain"
     },
@@ -348,6 +391,7 @@
         "collecting_institution_address": "Colmenar s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Ceuta",
+        "geo_loc_region": "Ceuta",
         "geo_loc_city": "Ceuta",
         "geo_loc_country": "Spain"
     },
@@ -356,6 +400,7 @@
         "collecting_institution_address": "Remonta, 2",
         "collecting_institution_email": "",
         "geo_loc_state": "Melilla",
+        "geo_loc_region": "Melilla",
         "geo_loc_city": "Melilla",
         "geo_loc_country": "Spain"
     },
@@ -364,7 +409,8 @@
         "collecting_institution_address": "C. Dr. Luis Montes, S/N",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
-        "geo_loc_city": "Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Mostoles",
         "geo_loc_country": "Spain"
     },
     {
@@ -372,6 +418,7 @@
         "collecting_institution_address": "Calle del Prof Martín Lagos",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
+        "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain"
     },
@@ -380,6 +427,7 @@
         "collecting_institution_address": "C. Darío Gazapo 3",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
+        "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain"
     },
@@ -388,7 +436,8 @@
         "collecting_institution_address": "Av. de Orellana, s/n, Leganés",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
-        "geo_loc_city": "Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Leganés",
         "geo_loc_country": "Spain"
     },
     {
@@ -396,7 +445,8 @@
         "collecting_institution_address": "Carr. Madrid - Toledo, Km 12,500, Getafe",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
-        "geo_loc_city": "Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Getafe",
         "geo_loc_country": "Spain"
     },
     {
@@ -404,6 +454,7 @@
         "collecting_institution_address": "",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
+        "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain"
     },
@@ -412,6 +463,7 @@
         "collecting_institution_address": "P.º del Prado, 18",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
+        "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain"
     },
@@ -420,6 +472,7 @@
         "collecting_institution_address": "Ctra. Madrid-Cartagena, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
+        "geo_loc_region": "Murcia",
         "geo_loc_city": "Murcia",
         "geo_loc_country": "Spain"
     },
@@ -428,6 +481,7 @@
         "collecting_institution_address": "Av. Intendente Jorge Palacios, 1",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
+        "geo_loc_region": "Murcia",
         "geo_loc_city": "Murcia",
         "geo_loc_country": "Spain"
     },
@@ -436,7 +490,8 @@
         "collecting_institution_address": "C. Minarete, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
-        "geo_loc_city": "Murcia",
+        "geo_loc_region": "Murcia",
+        "geo_loc_city": "Cartagena",
         "geo_loc_country": "Spain"
     },
     {
@@ -444,7 +499,8 @@
         "collecting_institution_address": "Paraje Torre Octavio, 54, Pozo Aledo",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
-        "geo_loc_city": "Murcia",
+        "geo_loc_region": "Murcia",
+        "geo_loc_city": "Pozo Aledo",
         "geo_loc_country": "Spain"
     },
     {
@@ -452,6 +508,7 @@
         "collecting_institution_address": "Av. Marqués de Los Vélez, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
+        "geo_loc_region": "Murcia",
         "geo_loc_city": "Murcia",
         "geo_loc_country": "Spain"
     },
@@ -460,6 +517,7 @@
         "collecting_institution_address": "Ctra. Madrid-Cartagena, s/n, El Palmar",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
+        "geo_loc_region": "Murcia",
         "geo_loc_city": "Murcia",
         "geo_loc_country": "Spain"
     },
@@ -468,7 +526,8 @@
         "collecting_institution_address": "Ctra.N-340, Lorca",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
-        "geo_loc_city": "Murcia",
+        "geo_loc_region": "Murcia",
+        "geo_loc_city": "Lorca",
         "geo_loc_country": "Spain"
     },
     {
@@ -476,14 +535,16 @@
         "collecting_institution_address": "Vereda de Morcillo, s/n, Cieza",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
-        "geo_loc_city": "Murcia",
+        "geo_loc_region": "Murcia",
+        "geo_loc_city": "Cieza",
         "geo_loc_country": "Spain"
     },
     {
-        "collecting_institution": "HU de Donostia",
+        "collecting_institution": "Hospital Univeristario Donostia",
         "collecting_institution_address": "Begiristain Doktorea Pasealekua, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "País Vasco",
+        "geo_loc_region": "Guipúzcoa",
         "geo_loc_city": "Donostia",
         "geo_loc_country": "Spain"
     },
@@ -492,6 +553,7 @@
         "collecting_institution_address": "Av. de Elvas, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Extremadura",
+        "geo_loc_region": "Badajoz",
         "geo_loc_city": "Badajoz",
         "geo_loc_country": "Spain"
     },
@@ -500,7 +562,8 @@
         "collecting_institution_address": "Av. Don Antonio Campos Hoyos, 26, Mérida",
         "collecting_institution_email": "",
         "geo_loc_state": "Extremadura",
-        "geo_loc_city": "Badajoz",
+        "geo_loc_region": "Badajoz",
+        "geo_loc_city": "Mérida",
         "geo_loc_country": "Spain"
     },
     {
@@ -508,6 +571,7 @@
         "collecting_institution_address": "Av. Pablo Naranjo Porras, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Extremadura",
+        "geo_loc_region": "Caceres",
         "geo_loc_city": "Caceres",
         "geo_loc_country": "Spain"
     },
@@ -516,7 +580,8 @@
         "collecting_institution_address": "Av. das Camelias, 109, Vigo",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
-        "geo_loc_city": "Pontevedra",
+        "geo_loc_region": "Pontevedra",
+        "geo_loc_city": "Vigo",
         "geo_loc_country": "Spain"
     },
     {
@@ -524,6 +589,7 @@
         "collecting_institution_address": " Rúa Dr. Ulises Romero, 1",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
+        "geo_loc_region": "Lugp",
         "geo_loc_city": "Lugo",
         "geo_loc_country": "Spain"
     },
@@ -532,6 +598,7 @@
         "collecting_institution_address": "As Xubias, 84",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
+        "geo_loc_region": "A Coruña",
         "geo_loc_city": "A Coruña",
         "geo_loc_country": "Spain"
     },
@@ -540,7 +607,8 @@
         "collecting_institution_address": "Rúa da Choupana, s/n, Santiago de Compostela",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
-        "geo_loc_city": "A Coruña",
+        "geo_loc_region": "A Coruña",
+        "geo_loc_city": "Santiago de Compostela",
         "geo_loc_country": "Spain"
     },
     {
@@ -548,6 +616,7 @@
         "collecting_institution_address": "C. de Irunlarrea, 3, Pamplona",
         "collecting_institution_email": "",
         "geo_loc_state": "Navarra",
+        "geo_loc_region": "Navarra",
         "geo_loc_city": "Pamplona",
         "geo_loc_country": "Spain"
     },
@@ -556,7 +625,8 @@
         "collecting_institution_address": "Carrer Almazara, 11, Elche",
         "collecting_institution_email": "",
         "geo_loc_state": "Valenciana",
-        "geo_loc_city": "Alicante",
+        "geo_loc_region": "Alicante",
+        "geo_loc_city": "Elche",
         "geo_loc_country": "Spain"
     },
     {
@@ -564,6 +634,7 @@
         "collecting_institution_address": "C. Piqueras, 98",
         "collecting_institution_email": "",
         "geo_loc_state": "La Rioja",
+        "geo_loc_region": "La Rioja",
         "geo_loc_city": "Logroño",
         "geo_loc_country": "Spain"
     },
@@ -572,7 +643,8 @@
         "collecting_institution_address": " Jose Atxotegi Kalea, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "País Vasco",
-        "geo_loc_city": "Vitoria",
+        "geo_loc_region": "Alava",
+        "geo_loc_city": "Gasteiz",
         "geo_loc_country": "Spain"
     }
 ]
