@@ -1587,7 +1587,6 @@
             "label": "Fastq md5 r1",
             "fill_mode": "sample",
             "minLenght": "1"
-
         },
         "sequence_file_R2_md5": {
             "examples": [
@@ -1596,7 +1595,7 @@
             "ontology": "MS_1000569",
             "type": "string",
             "description": "Checksum value to validate successful file transmission",
-            "classification": "Bioinformatics and QC metrics fields"",
+            "classification": "Bioinformatics and QC metrics fields",
             "label": "Sequence fastq R2 md5",
             "fill_mode": "sample"
         },

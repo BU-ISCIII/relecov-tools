@@ -223,7 +223,6 @@
         "geo_loc_latitude": "42.4333",
         "geo_loc_longitude": "-8.6333"
     },
-    {
     "Alcázar de San Juan": {
         "geo_loc_latitude": "39.4056",
         "geo_loc_longitude": "-3.2056"
@@ -296,7 +295,7 @@
         "geo_loc_latitude": "38.2669",
         "geo_loc_longitude": "-0.6983"
     },
-    "Gazteiz": {
+    "Gasteiz": {
         "geo_loc_latitude": "42.85",
         "geo_loc_longitude": "-2.6667"
     }
