@@ -1940,29 +1940,6 @@
             "label": "Consensus sequence name md5",
             "fill_mode": "batch"
         },
-        "fastq_md5_r2": {
-            "examples": [
-                "3e69af1f875fab020aed82f5edbc1f03"
-            ],
-            "ontology": "MS_1000568",
-            "type": "string",
-            "description": "",
-            "clasification": "Bioinformatics and QC metrics",
-            "label": "file checksum",
-            "table": [
-                "runs"
-            ]
-        },
-        "fastq_md5_r1": {
-            "examples": [
-                ""
-            ],
-            "ontology": "MS_1000568",
-            "type": "string",
-            "description": "",
-            "clasification": "Submission ENA",
-            "label": "Fastq md5 r1"
-        },
         "consensus_sequence_filepath": {
             "examples": [
                 "/User/Documents/RespLab/Data/ncov123assembly.fasta"
