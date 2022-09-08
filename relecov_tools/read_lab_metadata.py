@@ -268,7 +268,7 @@ class RelecovMetadata:
                                 )
                 else:
                     if isinstance(row[key], float) or isinstance(row[key], int):
-                        row[key] = str(int(row[key]))
+                        row[key] = str(row[key])
                 try:
                     property_row[self.label_prop_dict[key]] = row[key]
                 except KeyError as e:
