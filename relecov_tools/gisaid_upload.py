@@ -136,9 +136,9 @@ class GisaidUpload:
                 df_data.insert(4, field, "")
 
         config_lab_json = ConfigJson()
-        lab_json_conf = config_lab_json.get_configuration("laboratory_data")
+        lab_json_conf = config_lab_json.get_topic_data("lab_metadata", "laboratory_data")
         lab_json_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "conf", lab_json_conf
+            os.path.dirname(os.path.realpath(__file__)), "conf", lab_json_conf["file"]
         )
         lab_json = relecov_tools.utils.read_json_file(lab_json_file)
         for lab in lab_json:
