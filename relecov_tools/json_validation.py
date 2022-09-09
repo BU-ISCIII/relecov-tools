@@ -20,7 +20,7 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
-#
+
 def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
     """Validate json file against the schema"""
     if json_data_file is None:
