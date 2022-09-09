@@ -158,13 +158,13 @@ class BioinfoMetadata:
             sample_name = row[6]
             print(sample_name)
 
-            fastq_r1 = row[47]
+            # fastq_r1 = row[47]
 
-            fastq_r2 = row[48]
+            # fastq_r2 = row[48]
             bioinfo_dict = {}
             bioinfo_dict["sample_name"] = str(sample_name)
-            bioinfo_dict["sequence_file_R1_fastq"] = fastq_r1
-            bioinfo_dict["sequence_file_R2_fastq"] = fastq_r2
+            # bioinfo_dict["sequence_file_R1_fastq"] = fastq_r1
+            # bioinfo_dict["sequence_file_R2_fastq"] = fastq_r2
             # FUNCTION config_data
             """inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict"""
             for key in relecov_bioinfo_metadata.keys():
