@@ -246,7 +246,6 @@ class EnaUpload:
 0        214821_S12  214821_S12_R1_001.fastq.gz  214821_S12_R2_001.fastq.gz  ...     fastq  372ca8b10a8eeb7a04107634baf340ab  7f5081eec1b64b171402b66f37fe640d
 1        214821_S12  214822_S13_R1_001.fastq.gz  214822_S13_R2_001.fastq.gz  ...     fastq  b268d7be80e80455bec0807b5961d23c  a15be39feaf73eec9b2c026717878bba
 2        214821_S12   214823_S1_R1_001.fastq.gz   214823_S1_R2_001.fastq.gz  ...     fastq  c16bdbfc03c354496fcfb2c107e3cbf6  4d9b80b977a75bf7e2a4282ca910d94a
-
         """
         # df_experiments
         df_experiments["instrument_model"] = df_experiments[

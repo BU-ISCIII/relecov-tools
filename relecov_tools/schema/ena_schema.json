@@ -1274,7 +1274,7 @@
       "examples": [
         "s_20201007_026"
       ],
-      "ontology": "0",
+      "ontology": "GENEPIO:0000079",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
