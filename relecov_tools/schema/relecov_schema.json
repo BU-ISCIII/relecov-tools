@@ -1110,7 +1110,7 @@
         },
         "nucleic_acid_extraction_protocol": {
             "examples": [
-                "Opentrons custom protocol"
+                "Opentrons custom rna extraction protocol"
             ],
             "ontology": "OBI_0302884",
             "type": "string",
@@ -1554,6 +1554,17 @@
             "description": "Single or paired sequencing configuration",
             "classification": "Sequencing",
             "label": "Library Layout",
+            "fill_mode": "batch"
+        },
+        "read_length": {
+            "examples": [
+                "75"
+            ],
+            "ontology": "GENEPIO:0000076",
+            "type": "string",
+            "description": "number of base pairs per read",
+            "classification": "Sequencing",
+            "label": "Read Length",
             "fill_mode": "batch"
         },
         "sequence_file_R1_fastq": {
