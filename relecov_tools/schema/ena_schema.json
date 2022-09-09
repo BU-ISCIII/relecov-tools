@@ -89,6 +89,16 @@
       "clasification": "",
       "label": "Sample ID given if multiple rna-extraction or passages"
     },
+    "subject_exposure_duration": {
+      "examples": [
+        ""
+      ],
+      "ontology": "NCIT:C83280",
+      "type": "string",
+      "description": "",
+      "clasification": "",
+      "label": "Additional Host Information"
+    },
     "collection_date": {
       "examples": [
         "3/19/2020"
@@ -642,6 +652,32 @@
       "description": " Status of the host",
       "clasification": "Host information",
       "label": "Host health state",
+      "table": [
+        "sample"
+      ]
+    },
+    "type_exposure": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001417",
+      "type": "string",
+      "description": " Date, Location e.g. type of gathering, Family cluster, etc.",
+      "clasification": "Host information",
+      "label": "Outbreak Exposure Event Location",
+      "table": [
+        "sample"
+      ]
+    },
+    "personal_protective_equipment": {
+      "examples": [
+        ""
+      ],
+      "ontology": "NCIT:C173748",
+      "type": "string",
+      "description": "Use of personal protective equipment, such as gloves, gowns, during any type of exposure. Example: mask",
+      "clasification": "Host information",
+      "label": "Personal protective equipment",
       "table": [
         "sample"
       ]
@@ -1211,7 +1247,7 @@
       "examples": [
         ""
       ],
-      "ontology": "GENEPIO:0001808",
+      "ontology": "GENEPIO:0000079",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
