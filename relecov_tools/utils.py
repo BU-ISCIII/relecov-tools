@@ -69,7 +69,7 @@ def read_csv_file_return_dict(file_name, sep):
     with open(file_name, "r") as fh:
         lines = fh.readlines()
     heading = lines[0].strip().split(sep)
-    if len(heading) == 0:
+    if len(heading) == 1:
         return {"ERROR": "not valid format"}
     file_data = {}
     for line in lines[1:]:
