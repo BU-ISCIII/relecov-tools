@@ -185,7 +185,7 @@
             "examples": [
                 "24 degrees celsius"
             ],
-            "ontology": "NCIT_C115535",
+            "ontology": "NCIT:C115535",
             "type": "string",
             "description": "The name and version of a particular protocol used for sampling.",
             "classification": "Sample collection and processing",
@@ -823,7 +823,7 @@
                 "Missing [GENEPIO:0001618]",
                 "Restricted Access [GENEPIO:0001810]"
             ],
-            "ontology": "GENEPIO:0001191",
+            "ontology": "NCIT:C43459",
             "type": "string",
             "description": "Taxonomic name of the organism.",
             "examples": [
@@ -838,7 +838,7 @@
             "examples": [
                 "2697049"
             ],
-            "ontology": "GENEPIO_0001724",
+            "ontology": "NCIT:C164641",
             "type": "string",
             "description": "The NCBITaxon identifier for the organism being sequenced.",
             "classification": "Sample collection and processing",

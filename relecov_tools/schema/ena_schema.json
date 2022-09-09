@@ -501,7 +501,7 @@
         "Blood [UBERON:0000178]"
       ],
       "classification": "Sample collection and processing",
-      "label": "Organism Substance"
+      "label": "Specimen source"
     },
     "isolation source non-host-associated": {
       "Enums": [
@@ -685,7 +685,7 @@
       "examples": [
         "e.g. Patient infected while traveling in …."
       ],
-      "ontology": "GENEPIO_0001268",
+      "ontology": "NCIT:C83280",
       "type": "string",
       "description": "If the information is unknown or can not be shared, leave blank.",
       "clasification": "Host information",
@@ -848,7 +848,7 @@
       "examples": [
         "probably 2697049 in all cases"
       ],
-      "ontology": "GENEPIO_0001724",
+      "ontology": "NCIT:C164641",
       "type": "string",
       "description": "The NCBITaxon identifier for the organism being sequenced.",
       "clasification": "Sample collection and processing",
@@ -870,7 +870,7 @@
       "examples": [
         ""
       ],
-      "ontology": "GENEPIO:0001191",
+      "ontology": "NCIT:C43459",
       "type": "string",
       "description": "The taxonomic name of the organism.",
       "clasification": "Sample collection and processing",
@@ -892,7 +892,7 @@
       "examples": [
         ""
       ],
-      "ontology": "GENEPIO:0001156",
+      "ontology": "sep:00196",
       "type": "string",
       "description": "Free text description of the sample.",
       "clasification": "Sample collection and processing",
@@ -903,7 +903,7 @@
       "examples": [
         "24 degrees celsius"
       ],
-      "ontology": "NCIT_C115535",
+      "ontology": "NCIT:C115535",
       "type": "string",
       "description": "The name and version of a particular protocol used for sampling.",
       "clasification": "Sample collection and processing",
@@ -1211,7 +1211,7 @@
       "examples": [
         ""
       ],
-      "ontology": "0",
+      "ontology": "GENEPIO:0001808",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1237,7 +1237,7 @@
       "examples": [
         ""
       ],
-      "ontology": "OPMI_0000380",
+      "ontology": "GENEPIO:0000156",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1268,6 +1268,19 @@
       "label": "Study abstract",
       "table": [
         "study"
+      ]
+    },
+    "sample_alias": {
+      "examples": [
+        "s_20201007_026"
+      ],
+      "ontology": "0",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Sample alias",
+      "table": [
+        "sample"
       ]
     },
     "study_alias": {
