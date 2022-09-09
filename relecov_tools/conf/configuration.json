@@ -2,7 +2,6 @@
     "lab_metadata": {
         "fixed_fields": {
             "host_disease": "COVID-19",
-            "type": "betacoronavirus",
             "tax_id": "2697049",
             "organism": "Severe acute respiratory syndrome coronavirus 2"
         },
@@ -30,6 +29,7 @@
             "Host Age",
             "Host Gender",
             "Sequencing Date",
+            "Purpose of Sequencing",
             "Nucleic acid extraction protocol",
             "Commercial All-in-one library kit",
             "Library Preparation Kit",
