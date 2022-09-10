@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Common utility function for relecov_tools package.
+Common utility function used for relecov_tools package.
 """
 import os
 import glob
@@ -10,6 +10,7 @@ from rich.console import Console
 import questionary
 import json
 import openpyxl
+import yaml
 from itertools import islice
 
 log = logging.getLogger(__name__)
@@ -30,7 +31,11 @@ def file_exists(file_to_check):
 def read_json_file(j_file):
     """Read json file."""
     with open(j_file, "r") as fh:
-        data = json.load(fh)
+        try:
+            data = json.load(fh)
+        except (UnicodeDecodeError, ValueError):
+            raise
+
     return data
 
 
@@ -62,9 +67,10 @@ def read_excel_file(f_name, sheet_name, heading_row, empty_value=True):
     return ws_data
 
 
-def read_csv_file_return_dict(file_name, sep):
+def read_csv_file_return_dict(file_name, sep, key_position=None):
     """Read csv or tsv file, according to separator, and return a dictionary
-    where the main key is the first column
+    where the main key is the first column, if key position is None otherwise
+    the index value of the kwy position is used as key
     """
     with open(file_name, "r") as fh:
         lines = fh.readlines()
@@ -74,10 +80,27 @@ def read_csv_file_return_dict(file_name, sep):
     file_data = {}
     for line in lines[1:]:
         line_s = line.strip().split(sep)
-        file_data[line_s[0]] = {}
-        for idx in range(1, len(heading)):
-            file_data[line_s[0]][heading[idx]] = line_s[idx]
+        if key_position is None:
+            file_data[line_s[0]] = {}
+            for idx in range(1, len(heading)):
+                file_data[line_s[0]][heading[idx]] = line_s[idx]
+        else:
+            file_data[line_s[key_position]] = {}
+            for idx in range(len(heading)):
+                if idx == key_position:
+                    continue
+                file_data[line_s[key_position]][heading[idx]] = line_s[idx]
+
     return file_data
+
+
+def read_yml_file(file_name):
+    """Read yml file"""
+    with open(file_name, "r") as fh:
+        try:
+            return yaml.safe_load(fh)
+        except yaml.YAMLError:
+            raise
 
 
 def get_md5_from_local_folder(local_folder):
