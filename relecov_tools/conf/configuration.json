@@ -259,6 +259,7 @@
             "reference_genome_accession": "Virussequence"
         },
         "required_fields_from_lab_json": {
+            "read_length": "number_of_base_paired_sequence",
             "schema_name": "schema_name",
             "schema_version": "schema_version",
             "sequence_file_R1_fastq": "sequence_file_R1_fastq",
@@ -268,6 +269,12 @@
             "sequencing_sample_id" : "sample_name"
         },
         "version_mapping":{
+            "bioinformatics_protocol_software_version":{
+                "Workflow": "nf-core/viralrecon"
+            },
+            "consensus_sequence_software_version":{
+                "BCFTOOLS_CONSENSUS": "bcftools"
+            },
             "dehosting_method_software_version": {
                 "KRAKEN2_KRAKEN2": "kraken2"
             },
@@ -280,7 +287,6 @@
             "variant_calling_software_version": {
                 "IVAR_VARIANTS": "ivar"
             }
-
         }
     },
     "files_read_bioinfo_metadata": {

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# from itertools import islice
 
 import logging
 import rich.console
@@ -159,6 +158,7 @@ class BioinfoMetadata:
         j_data = self.add_fixed_values(j_data)
         stderr.print("[blue]Adding data from mapping stats")
         j_data = self.include_data_from_mapping_stats(j_data)
+        stderr.print("[blue]Adding software versions")
         j_data = self.include_software_versions(j_data)
 
         return
