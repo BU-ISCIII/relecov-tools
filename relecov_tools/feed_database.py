@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import os
+import re
 import jsonschema
 import json
 import logging
@@ -108,15 +109,17 @@ class FeedDatabase:
         return ontology_dict
 
     def map_iskylims_sample_fields_values(self, sample_fields, s_project_fields):
-        """Map the values to the properties send to dtabasee
+        """Map the values to the properties send to databasee
         in json schema based on label
         """
         sample_list = []
         s_fields = list(sample_fields.keys())
         for row in self.json_data:
             s_dict = {}
-
             for key, value in row.items():
+                found_ontology = re.search(r"(.+) \[\w+:.*", value)
+                if found_ontology:
+                    value = found_ontology.group(1)
                 if key in s_project_fields:
                     s_dict[key] = value
                 elif key in s_fields:
@@ -301,10 +304,7 @@ class FeedDatabase:
                 map_fields = self.map_iskylims_sample_fields_values(
                     sample_fields, s_project_fields
                 )
-
             else:
-
-                # sample_fields, s_project_fields = self.get_iskylims_fields_sample()
                 stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_relecov_sample_data()
             post_url = "store_samples"
