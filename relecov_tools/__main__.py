@@ -370,31 +370,28 @@ def update_db(user, password, json, schema, type, databaseServer):
 # read metadata bioinformatics
 @relecov_tools_cli.command(help_priority=10)
 @click.option(
-    "-m",
-    "--metadata_file",
+    "-j",
+    "--json_file",
     type=click.Path(),
-    help="file containing metadata",
+    help="json file containing lab metadata",
 )
-@click.option("-i", "--input-folder", type=click.Path(), help="Path to input files")
-@click.option(
-    "-o", "--metadata-out", type=click.Path(), help="Path to save output  metadata file"
-)
+@click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
+@click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file")
 @click.option(
     "-p",
     "--mapping-illumina",
     type=click.Path(),
     help="Name of the mapping_illumina file",
 )
-def read_bioinfo_metadata(metadata_file, input_folder, metadata_out, mapping_illumina):
+def read_bioinfo_metadata(json_file, input_folder, out_dir, mapping_illumina):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
-
     new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        metadata_file, input_folder, metadata_out, mapping_illumina
+        json_file, input_folder, out_dir, mapping_illumina
     )
 
-    new_bioinfo_metadata.bioinfo_parse(metadata_file)
+    new_bioinfo_metadata.create_bioinfo_file()
 
 
 # read metadata bioinformatics
