@@ -72,8 +72,11 @@ def read_csv_file_return_dict(file_name, sep, key_position=None):
     where the main key is the first column, if key position is None otherwise
     the index value of the kwy position is used as key
     """
-    with open(file_name, "r") as fh:
-        lines = fh.readlines()
+    try:
+        with open(file_name, "r") as fh:
+            lines = fh.readlines()
+    except FileNotFoundError:
+        raise
     heading = lines[0].strip().split(sep)
     if len(heading) == 1:
         return {"ERROR": "not valid format"}

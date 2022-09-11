@@ -243,9 +243,14 @@
         "required_file": {
             "variants_metrics": "summary_variants_metrics_mqc.csv",
             "versions": "software_versions.yml",
-            "pangoling": "pangolin_version.csv"
+            "pangoling": "pangolin_version.csv",
+            "variant_metrics": "summary_variants_metrics_mqc.csv"
+        },
+        "mapping_pangolin":{
+            "variant_designation": "scorpio_call"
         },
         "mapping_stats": {
+            "analysis_date": "analysis date",
             "depth_of_coverage_value": "medianDPcoveragevirus",
             "lineage_name": "Lineage",
             "number_of_variants_in_consensus": "Variantsinconsensusx10",
@@ -258,17 +263,10 @@
             "qc_filtered": "totalreads",
             "reference_genome_accession": "Virussequence"
         },
-        "required_fields_from_lab_json": {
-            "read_length": "number_of_base_paired_sequence",
-            "schema_name": "schema_name",
-            "schema_version": "schema_version",
-            "sequence_file_R1_fastq": "sequence_file_R1_fastq",
-            "sequence_file_R2_fastq": "sequence_file_R2_fastq",
-            "sequence_file_R1_md5": "sequence_file_R1_md5",
-            "sequence_file_R2_md5" : "sequence_file_R2_md5",
-            "sequencing_sample_id" : "sample_name"
+        "mapping_variant_metrics": {
+            "ns_per_100_kbp": "# Ns per 100kb consensus"
         },
-        "version_mapping":{
+        "mapping_version":{
             "bioinformatics_protocol_software_version":{
                 "Workflow": "nf-core/viralrecon"
             },
@@ -287,14 +285,17 @@
             "variant_calling_software_version": {
                 "IVAR_VARIANTS": "ivar"
             }
+        },
+        "required_fields_from_lab_json": {
+            "read_length": "number_of_base_paired_sequence",
+            "schema_name": "schema_name",
+            "schema_version": "schema_version",
+            "sequence_file_R1_fastq": "sequence_file_R1_fastq",
+            "sequence_file_R2_fastq": "sequence_file_R2_fastq",
+            "sequence_file_R1_md5": "sequence_file_R1_md5",
+            "sequence_file_R2_md5" : "sequence_file_R2_md5",
+            "sequencing_sample_id" : "sample_name"
         }
-    },
-    "files_read_bioinfo_metadata": {
-        "mapping_illumina.tab": "mapping_illumina_tab_path",
-        "summary_variants_metrics_mqc.csv": "summary_variants_metrics_path ",
-        "variants_long_table.csv": "variants_long_table_path",
-        "consensus_genome_length.csv": "consensus_genome_length_path",
-        "software_versions.yml": "software_versions_path"
     },
     "md5_file_name": "md5_check_file.csv",
     "ENA_fields": {
