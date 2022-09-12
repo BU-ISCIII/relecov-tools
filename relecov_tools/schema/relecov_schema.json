@@ -44,7 +44,7 @@
             "examples": [
                 "Public Health Agency of Canada"
             ],
-            "ontology": "GENEPIO:0001153",
+            "ontology": "GENEPIO:0001797",
             "type": "string",
             "description": "The name of the agency/institution that collected the sample.",
             "classification": "Sample collection and processing",
@@ -110,6 +110,37 @@
             "fill_mode": "sample",
             "minLenght": "1"
         },
+        "sample_description": {
+            "examples": [
+                "Sample from Belgian Covid-19 patient. Sample was obtained at the Hospital AZ Rivierenland, in Antwerp, Belgium."
+            ],
+            "ontology": "sep:00196",
+            "type": "string",
+            "description": "Free text description of the sample.",
+            "clasification": "Sample collection and processing",
+            "label": "Sample Description",
+            "table": "sample"
+        },
+        "illness_symptoms": {
+            "examples": [
+                "cough, diarrhea, fever, headache, malaise, myalgia"
+            ],
+            "ontology": "GENEPIO:0001523",
+            "type": "string",
+            "description": "The symptoms that have been reported in relation to the illness.  If multiple exposures are applicable, please state them separated by semicolon.",
+            "clasification": "Sample collection and processing",
+            "label": "Illness symptoms",
+            "table": "sample"
+        },
+        "hospitalisation": {
+            "examples": [],
+            "ontology": "NCIT:C25179",
+            "type": "string",
+            "description": " Was the subject confined to a hospital as a result of virus infection or problems occurring secondary to virus infection?",
+            "clasification": "Sample collection and processing",
+            "label": "Hospitalisation",
+            "table": "sample"
+        },
         "submitting_lab_sample_id": {
             "examples": [
                 ""
@@ -173,13 +204,65 @@
             "examples": [
                 "3/21/2020"
             ],
-            "ontology": "GENEPIO:0001179",
+            "ontology": "NCIT:C93644",
             "type": "string",
             "description": "The date on which the sample was received.",
             "format": "date",
             "classification": "Sample collection and processing",
             "label": "Sample Received Date",
             "fill_mode": "sample"
+        },
+        "definition for seropositive sample": {
+            "examples": [
+                ""
+            ],
+            "ontology": "NCIT:C159692",
+            "type": "string",
+            "description": " The cut off value used by an investigatior in determining that a sample was seropositive.",
+            "clasification": "Sample collection and processing",
+            "label": "Definition for seropositive sample",
+            "table": [
+                "sample"
+            ]
+        },
+        "serotype (required for a seropositive sample)": {
+            "examples": [
+                "h1n1"
+            ],
+            "ontology": "NCIT:C88894",
+            "type": "string",
+            "description": " erological variety of a species characterised by its antigenic properties. For influenza, ha subtype should be the letter h followed by a number between 1-16 unless novel subtype is identified and the na subtype should be the letter n followed by a number between 1-9 unless novel subtype is identified. If only one of the subtypes have been tested then use the format h5nx or hxn1.",
+            "clasification": "Sample collection and processing",
+            "label": "Serotype (required for a seropositive sample)",
+            "table": [
+                "sample"
+            ]
+        },
+        "strain": {
+            "examples": [
+                ""
+            ],
+            "ontology": "NCIT:C14419",
+            "type": "string",
+            "description": "Name of the strain from which the sample was obtained..",
+            "clasification": "Sample collection and processing",
+            "label": "Strain",
+            "table": [
+                "sample"
+            ]
+        },
+        "host habitat": {
+            "examples": [
+                ""
+            ],
+            "ontology": "ENVO:00002036",
+            "type": "string",
+            "description": "Natural habitat of the avian or mammalian host.",
+            "clasification": "Sample collection and processing",
+            "label": "Host habitat",
+            "table": [
+                "sample"
+            ]
         },
         "sample_storage_conditions": {
             "examples": [
@@ -498,8 +581,8 @@
             "examples": [
                 "Derbyshire"
             ],
-            "ontology": "GENEPIO:0100280",
-            "type": "string",
+            "ontology": "NCIT:C87189",
+            "type": "s tring",
             "description": "The county/region of origin of the sample.",
             "classification": "Sample collection and processing",
             "label": "Province",
@@ -527,6 +610,19 @@
             "label": "Geo Loc Latitude",
             "fill_mode": "batch"
         },
+        "gravidity": {
+            "examples": [
+                ""
+            ],
+            "ontology": "OBI:0002456",
+            "type": "string",
+            "description": "Whether or not the subject is gravid. If so, report date due or date post-conception and specify which of these two dates is being reported.",
+            "clasification": "Host information",
+            "label": "Gravidity",
+            "table": [
+                "sample"
+            ]
+        },
         "geo_loc_longitude": {
             "examples": [
                 "77.11 W"
@@ -551,7 +647,7 @@
                 "Missing [GENEPIO:0001618]",
                 "Restricted Access [GENEPIO:0001810]"
             ],
-            "ontology": "NCIT_C146997",
+            "ontology": "GENEPIO:0001198",
             "type": "string",
             "description": "The reason that the sample was collected.",
             "examples": [
@@ -560,6 +656,32 @@
             "classification": "Sample collection and processing",
             "label": "Purpose of sampling",
             "fill_mode": "batch"
+        },
+        "host disease outcome": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0001390",
+            "type": "string",
+            "description": "Disease outcome in the host.",
+            "clasification": "Host information",
+            "label": "Host disease outcome",
+            "table": [
+                "sample"
+            ]
+        },
+        "host description": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO:0000009",
+            "type": "string",
+            "description": "Other descriptive information relating to the host.",
+            "clasification": "Host information",
+            "label": "Host description",
+            "table": [
+                "sample"
+            ]
         },
         "anatomical_material": {
             "enum": [
