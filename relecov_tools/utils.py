@@ -29,6 +29,11 @@ def file_exists(file_to_check):
     return False
 
 
+def get_files_match_condition(condition):
+    """find all path names that matches with the condition"""
+    return glob.glob(condition)
+
+
 def read_json_file(j_file):
     """Read json file."""
     with open(j_file, "r") as fh:

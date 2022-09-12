@@ -174,6 +174,20 @@ class BioinfoMetadata:
 
         return j_data
 
+    def include_long_table_path(self, j_data):
+        """Include the variant long table path by searchin the in input folder
+        the file name that contains long_table.csv
+        """
+        condition = os.path.join(self.input_folder, "*long_table.csv")
+        f_path = relecov_tools.utils.get_files_match_condition(condition)
+        if len(f_path) == 0:
+            long_table_path = ""
+        else:
+            long_table_path = f_path[0]
+        for row in j_data:
+            row["long_table_path"] = long_table_path
+        return j_data
+
     def include_variant_metrics(self, j_data):
         """Include the # Ns per 100kb consensus from the summary variant
         metric file_exists
@@ -252,7 +266,8 @@ class BioinfoMetadata:
         j_data = self.include_pangolin_data(j_data)
         stderr.print("[blue]Adding consensus data")
         j_data = self.include_consensus_data(j_data)
-
+        stderr.print("[blue]Adding variant long table path")
+        j_data = self.include_long_table_path(j_data)
         file_name = (
             "bioinfo_" + os.path.splitext(os.path.basename(self.json_file))[0] + ".json"
         )
@@ -260,4 +275,5 @@ class BioinfoMetadata:
         os.makedirs(self.output_folder, exist_ok=True)
         file_path = os.path.join(self.output_folder, file_name)
         relecov_tools.utils.write_json_fo_file(j_data, file_path)
+        stderr.print("[green]Sucessful creation of bioinfo analyis file")
         return True
