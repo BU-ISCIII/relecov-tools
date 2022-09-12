@@ -1138,7 +1138,7 @@
       "examples": [
         "library_construction_protocol_1"
       ],
-      "ontology": "0",
+      "ontology": "NCIT:C41111",
       "type": "string",
       "description": "",
       "clasification": "Sequencing",
@@ -1214,7 +1214,7 @@
       "type": "string",
       "description": "",
       "clasification": "Sequencing",
-      "label": "Nominal Length"
+      "label": "Insert size"
     },
     "analysis_accession": {
       "examples": [
@@ -1468,6 +1468,19 @@
       "description": "",
       "clasification": "Submission ENA",
       "label": "Experiment alias",
+      "table": [
+        "experiments"
+      ]
+    },
+    "file_format": {
+      "examples": [
+        "BAM,CRAM,FASTQ"
+      ],
+      "ontology": "NMR:1001459",
+      "type": "string",
+      "description": "The run data file model.",
+      "clasification": "Submission ENA",
+      "label": "File format",
       "table": [
         "experiments"
       ]
