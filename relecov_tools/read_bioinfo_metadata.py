@@ -114,18 +114,58 @@ class BioinfoMetadata:
             "bioinfo_analysis", "mapping_pangolin"
         )
         for row in j_data:
-            f_name = row["sample_name"] + ".pangolin." + row["analysis_date"] + ".csv"
+            if "-" in row["sample_name"]:
+                sample_name = row["sample_name"].replace("-", "_")
+            else:
+                sample_name = row["sample_name"]
+            f_name = sample_name + ".pangolin." + row["analysis_date"] + ".csv"
             f_path = os.path.join(self.input_folder, f_name)
             try:
                 f_data = relecov_tools.utils.read_csv_file_return_dict(f_path, ",")
             except FileNotFoundError as e:
                 log.error("File %s not found ", e)
                 stderr.print(f"[red]File {e} not found")
-                sys.exit(1)
+                # When file does not exist set all values to empty
+                for field, value in mapping_fields.items():
+                    row[field] = ""
+                continue
+                # sys.exit(1)
             pang_key = list(f_data.keys())[0]
             for field, value in mapping_fields.items():
                 row[field] = f_data[pang_key][value]
 
+        return j_data
+
+    def include_consensus_data(self, j_data):
+        """Include genome length, name, file name, path and md5 by preprocessing
+        each file of consensus.fa
+        """
+
+        mapping_fields = self.configuration.get_topic_data(
+            "bioinfo_analysis", "mapping_consensus"
+        )
+        for row in j_data:
+            if "-" in row["sample_name"]:
+                sample_name = row["sample_name"].replace("-", "_")
+            else:
+                sample_name = row["sample_name"]
+            f_name = sample_name + ".consensus.fa"
+            f_path = os.path.join(self.input_folder, f_name)
+            try:
+                record_fasta = relecov_tools.utils.read_fasta_return_SeqIO_instance(
+                    f_path
+                )
+            except FileNotFoundError as e:
+                log.error("File %s not found ", e)
+                stderr.print(f"[red]File {e} not found")
+                for item in mapping_fields:
+                    row[item] = ""
+                continue
+            row["consensus_geneme_length"] = str(len(record_fasta))
+            row["consensus_sequence_name"] = record_fasta.description
+            row["consensus_sequence_filepath"] = self.input_folder
+            row["consensus_file_name"] = f_name
+            row["consensus_sequence_md5"] = relecov_tools.utils.calculate_md5(f_path)
         return j_data
 
     def include_variant_metrics(self, j_data):
@@ -204,6 +244,8 @@ class BioinfoMetadata:
         j_data = self.include_variant_metrics(j_data)
         stderr.print("[blue]Adding pangolin informtion")
         j_data = self.include_pangolin_data(j_data)
+        stderr.print("[blue]Adding consensus data")
+        j_data = self.include_consensus_data(j_data)
 
         file_name = (
             "bioinfo_" + os.path.splitext(os.path.basename(self.json_file))[0] + ".json"

@@ -246,6 +246,13 @@
             "pangoling": "pangolin_version.csv",
             "variant_metrics": "summary_variants_metrics_mqc.csv"
         },
+        "mapping_consensus": [
+            "consensus_genome_length",
+            "consensus_sequence_filename",
+            "consensus_sequence_filepath",
+            "consensus_sequence_md5",
+            "consensus_sequence_name"
+        ],
         "mapping_pangolin":{
             "variant_designation": "scorpio_call"
         },

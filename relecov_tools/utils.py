@@ -6,12 +6,13 @@ import os
 import glob
 import hashlib
 import logging
-from rich.console import Console
 import questionary
 import json
 import openpyxl
 import yaml
 from itertools import islice
+from Bio import SeqIO
+from rich.console import Console
 
 log = logging.getLogger(__name__)
 
@@ -95,6 +96,14 @@ def read_csv_file_return_dict(file_name, sep, key_position=None):
                 file_data[line_s[key_position]][heading[idx]] = line_s[idx]
 
     return file_data
+
+
+def read_fasta_return_SeqIO_instance(file_name):
+    """Read fasta and return SeqIO instance"""
+    try:
+        return SeqIO.read(file_name, "fasta")
+    except FileNotFoundError:
+        raise
 
 
 def read_yml_file(file_name):
