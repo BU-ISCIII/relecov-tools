@@ -251,7 +251,8 @@
             "consensus_sequence_filename",
             "consensus_sequence_filepath",
             "consensus_sequence_md5",
-            "consensus_sequence_name"
+            "consensus_sequence_name",
+            "number_of_base_pairs_sequenced"
         ],
         "mapping_pangolin":{
             "variant_designation": "scorpio_call"
