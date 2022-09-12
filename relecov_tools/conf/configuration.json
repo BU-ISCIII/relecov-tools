@@ -295,7 +295,7 @@
             }
         },
         "required_fields_from_lab_json": {
-            "read_length": "number_of_base_paired_sequence",
+            "read_length": "number_of_base_pairs_sequence",
             "schema_name": "schema_name",
             "schema_version": "schema_version",
             "sequence_file_R1_fastq": "sequence_file_R1_fastq",
