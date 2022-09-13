@@ -166,7 +166,9 @@ class BioinfoMetadata:
             row["consensus_sequence_filepath"] = self.input_folder
             row["consensus_file_name"] = f_name
             row["consensus_sequence_md5"] = relecov_tools.utils.calculate_md5(f_path)
-            base_calculation = int(row["number_of_base_pairs_sequenced"]) * len(record_fasta)
+            base_calculation = int(row["number_of_base_pairs_sequenced"]) * len(
+                record_fasta
+            )
             if row["sequence_file_R2_fastq"] != "":
                 row["number_of_base_pairs_sequenced"] = str(base_calculation * 2)
             else:
