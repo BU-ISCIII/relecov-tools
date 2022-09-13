@@ -112,6 +112,8 @@ class FeedDatabase:
         """Map the values to the properties send to databasee
         in json schema based on label
         """
+        anatomical_fields = ["anatomical_part", "collection_method", "body_product", "anatomical_material"]
+        # collection_method = self.get_sample_type()
         sample_list = []
         s_fields = list(sample_fields.keys())
         for row in self.json_data:
@@ -127,14 +129,16 @@ class FeedDatabase:
                 else:
                     log.info("not key %s in iSkyLIMS", key)
             # include the fix value
-            if self.server_type == "iskylims":
-                fixed_value = self.config_json.get_configuration(
-                    "iskylims_fixed_values"
-                )
-                for prop, val in fixed_value.items():
-                    s_dict[prop] = val
+            fixed_value = self.config_json.get_configuration("iskylims_fixed_values")
+            for prop, val in fixed_value.items():
+                s_dict[prop] = val
+            # Using tha anatomical field find out the sampleType
+            sample_type = []
+            for item in anatomical_fields:
+                if s_dict[item] != "Not Applicable":
+                    sample_type.append(s_dict[item])
+            s_dict["sampleType"] = " ".join(sample_type)
             sample_list.append(s_dict)
-
         return sample_list
 
     def get_iskylims_fields_sample(self):
@@ -143,6 +147,7 @@ class FeedDatabase:
         The second request is for getting the sample project fields. These are
         mapped using the label value.
         """
+
         sample_fields = {}
         s_project_fields = []
         # get the ontology values for mapping values in sample fields
@@ -178,7 +183,6 @@ class FeedDatabase:
                 # and the value is empty
                 # sample_fields[key] = ""
                 log.info("not ontology for item  %s", values["field_name"])
-
         # fetch label for sample Project
         s_project_url = self.database_settings["url_project_fields"]
         param = self.database_settings["param_sample_project"]
@@ -295,6 +299,7 @@ class FeedDatabase:
         """Collect data from json file and split them to store data in iSkyLIMS
         and in Relecov Platform
         """
+
         map_fields = {}  #
         if self.type_of_info == "sample":
             if self.server_type == "iskylims":
