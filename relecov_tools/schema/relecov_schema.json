@@ -527,6 +527,34 @@
             "label": "Geo Loc Latitude",
             "fill_mode": "batch"
         },
+        "study_type": {
+            "examples": [
+                ""
+            ],
+            "enum": [
+                "Whole Genome Sequencing [NCIT:C101294]",
+                "Metagenomics [NCIT:C153191]",
+                "Transcriptome Analysis [GENEPIO:0001111]",
+                "Resequencing [NCIT:C41254]",
+                "Epigenetics [OMIT:0027036] ",
+                "Synthetic Genomics [NCIT:C84343]",
+                "Forensic or Paleo-genomics [topic:3943]",
+                "Gene Regulation Study [topic:0204]",
+                "Cancer Genomics [NCIT:C18247]",
+                "Population Genomics [topic:3796]",
+                "RNASeq [OBI:0001177]",
+                "Exome Sequencing [OBI:0002118]",
+                "Pooled Clone Sequencing [OBI:2100402]",
+                "Transcriptome Sequencing [NCIT:C124261]",
+                "Other [NCIT:C124261]"
+            ],
+            "ontology": "GENEPIO:0000156",
+            "type": "string",
+            "description": "",
+            "clasification": "Submission ENA",
+            "label": "Study type",
+            "table": "study"
+        },
         "geo_loc_longitude": {
             "examples": [
                 "77.11 W"

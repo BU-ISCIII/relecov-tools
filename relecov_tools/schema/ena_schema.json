@@ -1178,21 +1178,21 @@
         ""
       ],
       "enum": [
-        "Whole Genome Sequencing []",
-        "Metagenomics []",
-        "Transcriptome Analysis []",
-        "Resequencing []",
-        "Epigenetics [] ",
-        "Synthetic Genomics []",
-        "Forensic or Paleo-genomics []",
-        "Gene Regulation Study []",
-        "Cancer Genomics []",
-        "Population Genomics []",
-        "RNASeq []",
-        "Exome Sequencing []",
-        "Pooled Clone Sequencing []",
-        "Transcriptome Sequencing []",
-        "Other []"
+        "Whole Genome Sequencing [NCIT:C101294]",
+        "Metagenomics [NCIT:C153191]",
+        "Transcriptome Analysis [GENEPIO:0001111]",
+        "Resequencing [NCIT:C41254]",
+        "Epigenetics [OMIT:0027036] ",
+        "Synthetic Genomics [NCIT:C84343]",
+        "Forensic or Paleo-genomics [topic:3943]",
+        "Gene Regulation Study [topic:0204]",
+        "Cancer Genomics [NCIT:C18247]",
+        "Population Genomics [topic:3796]",
+        "RNASeq [OBI:0001177]",
+        "Exome Sequencing [OBI:0002118]",
+        "Pooled Clone Sequencing [OBI:2100402]",
+        "Transcriptome Sequencing [NCIT:C124261]",
+        "Other [NCIT:C124261]"
       ],
       "ontology": "GENEPIO:0000156",
       "type": "string",
@@ -1203,11 +1203,11 @@
     },
     "study_abstract": {
       "examples": [
-        ""
+        "Whole-genome sequences of SARS-CoV-2 from oro-pharyngeal swabs obtained from Belgian Covid-19 patients."
       ],
       "ontology": "NCIT:C93415",
       "type": "string",
-      "description": "",
+      "description": " Briefly describes the goals, purpose, and scope of the Study.  This need not be listed if it can be inherited from a referenced publication.",
       "clasification": "Submission ENA",
       "label": "Study abstract",
       "table": [
