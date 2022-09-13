@@ -585,7 +585,7 @@
                 "Blood [UBERON:0000178]"
             ],
             "classification": "Sample collection and processing",
-            "label": "Specimen source",
+            "label": "Anatomical Material",
             "fill_mode": "batch"
         },
         "anatomical_part": {
@@ -627,7 +627,7 @@
                 ""
             ],
             "classification": "Sample collection and processing",
-            "label": "Specimen source",
+            "label": "Anatomical Part",
             "fill_mode": "batch"
         },
         "collection_device": {
@@ -695,7 +695,7 @@
                 ""
             ],
             "classification": "Sample collection and processing",
-            "label": "Specimen source",
+            "label": "Collection Method",
             "fill_mode": "batch"
         },
         "body_product": {
@@ -720,7 +720,7 @@
                 ""
             ],
             "classification": "Sample collection and processing",
-            "label": "Specimen source",
+            "label": "Body Product",
             "fill_mode": "batch"
         },
         "environmental_material": {
