@@ -161,10 +161,10 @@ class BioinfoMetadata:
                 for item in mapping_fields:
                     row[item] = ""
                 continue
-            row["consensus_geneme_length"] = str(len(record_fasta))
+            row["consensus_genome_length"] = str(len(record_fasta))
             row["consensus_sequence_name"] = record_fasta.description
             row["consensus_sequence_filepath"] = self.input_folder
-            row["consensus_file_name"] = f_name
+            row["consensus_filename"] = f_name
             row["consensus_sequence_md5"] = relecov_tools.utils.calculate_md5(f_path)
             base_calculation = int(row["number_of_base_pairs_sequenced"]) * len(
                 record_fasta
