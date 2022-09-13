@@ -1,22 +1,14 @@
 #!/usr/bin/env python
-# from itertools import islice
 
 import logging
-import json
-import datetime
-import re
-
 import rich.console
-from itertools import islice
-import pandas as pd
-import yaml
-
-import openpyxl
 import os
 import sys
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
-import relecov_tools.json_schema
+from yaml import YAMLError
+
+# import relecov_tools.json_schema
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -30,23 +22,21 @@ stderr = rich.console.Console(
 class BioinfoMetadata:
     def __init__(
         self,
-        metadata_file=None,
+        json_file=None,
         input_folder=None,
         output_folder=None,
         mapping_illumina=None,
     ):
-        if metadata_file is None:
-            self.metadata_file = relecov_tools.utils.prompt_path(
-                msg="Select the excel file which contains metadata"
+        if json_file is None:
+            json_file = relecov_tools.utils.prompt_path(
+                msg="Select the json file that was created by the read-lab-metadata"
             )
-        else:
-            self.metadata_file = metadata_file
-        if not os.path.exists(self.metadata_file):
-            log.error("Metadata file %s does not exist ", self.metadata_file)
-            stderr.print(
-                "[red] Metadata file " + self.metadata_file + " does not exist"
-            )
+        if not os.path.isfile(json_file):
+            log.error("json file %s does not exist ", json_file)
+            stderr.print(f"[red] file {json_file} does not exist")
             sys.exit(1)
+        self.json_file = json_file
+
         if input_folder is None:
             self.input_folder = relecov_tools.utils.prompt_path(
                 msg="Select the input folder"
@@ -65,265 +55,227 @@ class BioinfoMetadata:
             )
         else:
             self.mapping_illumina = mapping_illumina
+        if not os.path.isfile(self.mapping_illumina):
+            log.error("%s does not exist", self.mapping_illumina)
+            stderr.print(f"[red] {self.mapping_illumina} does not exist")
+            sys.exit(1)
 
         config_json = ConfigJson()
-        relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
-        relecov_sch_path = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
-        )
         self.configuration = config_json
+        required_files = self.configuration.get_topic_data(
+            "bioinfo_analysis", "required_file"
+        )
+        self.req_files = {}
+        for key, file in required_files.items():
+            f_path = os.path.join(self.input_folder, file)
+            if not os.path.isfile(f_path):
+                log.error("File %s does not exist", file)
+                stderr.print(f"[red]File {file} does not exist")
+                sys.exit(1)
+            self.req_files[key] = f_path
 
-        with open(relecov_sch_path, "r") as fh:
-            self.relecov_sch_json = json.load(fh)
-        self.schema_name = self.relecov_sch_json["schema"]
-        self.schema_version = self.relecov_sch_json["version"]
+    def add_fixed_values(self, j_data):
+        """include the fixed data defined in configuration"""
+        f_values = self.configuration.get_topic_data("bioinfo_analysis", "fixed_values")
+        for row in j_data:
+            for field, value in f_values.items():
+                row[field] = value
+        return j_data
 
-    def bioinfo_parse(self, file_name):
-        """Fetch the metadata file folder  Directory to fetch metadata file
-        file_name   metadata file name
+    def include_data_from_mapping_stats(self, j_data):
+        """By processing mapping stats file the following information is
+        included in schema properties:  depth_of_coverage_value, lineage_name,
+        number_of_variants_in_consensus, number_of_variants_with_effect,
+        per_genome_greater_10x. per_Ns. per_reads_host, per_reads_virus.
+        per_unmapped, qc_filtered, reference_genome_accession
         """
-        # FUNCTION read_files
-        """
-        Read all the files and create dataframes
-        """
-
-        wb_file = openpyxl.load_workbook(file_name, data_only=True)
-        ws_metadata_lab = wb_file["METADATA_LAB"]
-        config_json = ConfigJson()
-        relecov_bioinfo_metadata = config_json.get_configuration(
-            "relecov_bioinfo_metadata"
+        # position of the aample columns inside mapping file
+        sample_position = 4
+        map_data = relecov_tools.utils.read_csv_file_return_dict(
+            self.mapping_illumina, ",", sample_position
         )
-        c = 0
-        self.files_read_bioinfo_metadata = config_json.get_configuration(
-            "files_read_bioinfo_metadata"
+        mapping_fields = self.configuration.get_topic_data(
+            "bioinfo_analysis", "mapping_stats"
         )
 
-        mapping_illumina_tab_path = os.path.join(
-            self.input_folder, self.mapping_illumina
-        )
+        for row in j_data:
+            for field, value in mapping_fields.items():
+                try:
+                    row[field] = map_data[row["sample_name"]][value]
+                except KeyError as e:
+                    log.error("Field %s not found in mapping stats", e)
+                    stderr.print(f"[red]Field {e} not found in mapping stats")
+                    sys.exit(1)
+        return j_data
 
-        summary_variants_metrics_path = os.path.join(
-            self.input_folder, "summary_variants_metrics_mqc.csv"
+    def include_pangolin_data(self, j_data):
+        """Include pangolin data collecting form each file generated by pangolin"""
+        mapping_fields = self.configuration.get_topic_data(
+            "bioinfo_analysis", "mapping_pangolin"
         )
-        variants_long_table_path = os.path.join(
-            self.input_folder, "variants_long_table.csv"
-        )
-        consensus_genome_length_path = os.path.join(
-            self.input_folder, "consensus_genome_length.csv"
-        )
-        software_versions_path = os.path.join(
-            self.input_folder, "software_versions.yml"
-        )
-        pangolin_versions_path = os.path.join(self.input_folder, "pangolin_version.csv")
-        self.md5_file_name = config_json.get_configuration("md5_file_name")
-        md5_info_path = os.path.join(
-            self.input_folder,
-            self.md5_file_name,  # como hacer esto general para los servicios
-        )
-
-        mapping_illumina_tab = pd.read_csv(
-            mapping_illumina_tab_path, sep=",", encoding="utf-8"
-        )
-        summary_variants_metrics = pd.read_csv(
-            summary_variants_metrics_path, sep=",", encoding="utf-8"
-        )
-        variants_long_table = pd.read_csv(
-            variants_long_table_path,
-            sep=",",
-            encoding="utf-8",
-            dtype={"SAMPLE": "string"},
-        )
-        consensus_genome_length = pd.read_csv(
-            consensus_genome_length_path, header=None, sep="\t", encoding="utf-8"
-        )
-        md5_info = pd.read_csv(md5_info_path, header=None, sep=",", encoding="utf-8")
-        pangolin_version_table = pd.read_csv(
-            pangolin_versions_path, header=None, sep="\t", encoding="utf-8"
-        )
-
-        with open(software_versions_path) as file:
-            software_versions = yaml.load(file, Loader=yaml.FullLoader)
-
-        self.mapping_illumina_tab_field_list = config_json.get_configuration(
-            "mapping_illumina_tab_field_list"
-        )
-        # FUNCTION fill_bioinfo_dict
-        """Iterating through each row and each loaded file the values of the bioinfo_dict are filled"""
-
-        bioinfo_list = []
-
-        for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
-            if row[6] is None:
-                continue
-            sample_name = row[6]
-            print(sample_name)
-
-            fastq_r1 = row[47]
-
-            fastq_r2 = row[48]
-            bioinfo_dict = {}
-            bioinfo_dict["sample_name"] = str(sample_name)
-            bioinfo_dict["sequence_file_R1_fastq"] = fastq_r1
-            bioinfo_dict["sequence_file_R2_fastq"] = fastq_r2
-            # FUNCTION config_data
-            """inserting all keys from configuration.json  relecov_bioinfo_metadata into bioinfo_dict"""
-            for key in relecov_bioinfo_metadata.keys():
-                bioinfo_dict[key] = relecov_bioinfo_metadata[key]
-            bioinfo_dict["consensus_sequence_filepath"] = self.input_folder
-            bioinfo_dict["long_table_path"] = self.input_folder
-            # FUNCTION mapping_illumina_data
-            # fields from mapping_illumina.tab
-            mapping_illumina_tab_sample = mapping_illumina_tab[
-                mapping_illumina_tab["sample"].str.contains(bioinfo_dict["sample_name"])
-            ]
-            config_keys = list(self.mapping_illumina_tab_field_list.keys())
-            for i in config_keys:
-                bioinfo_dict[i] = str(
-                    mapping_illumina_tab_sample[
-                        self.mapping_illumina_tab_field_list[i]
-                    ].values[0]
-                )
-            # FUNCTION summary_metrics_data
-            # fields from summary_variants_metrics_mqc.csv
-            bioinfo_dict["number_of_base_pairs_sequenced"] = str(
-                summary_variants_metrics.loc[
-                    summary_variants_metrics["Sample"].str.contains(
-                        bioinfo_dict["sample_name"]
-                    )
-                ]["# Input reads"].values[0]
-                * 2
-            )
-
-            bioinfo_dict["ns_per_100_kbp"] = str(
-                summary_variants_metrics.loc[
-                    summary_variants_metrics["Sample"].str.contains(
-                        bioinfo_dict["sample_name"]
-                    )
-                ]["# Ns per 100kb consensus"].values[0]
-            )
-
-            bioinfo_dict["qc_filtered"] = str(
-                summary_variants_metrics.loc[
-                    summary_variants_metrics["Sample"].str.contains(
-                        bioinfo_dict["sample_name"]
-                    )
-                ]["# Trimmed reads (fastp)"].values[0]
-            )
-            # FUNCTION long_table_data
-            # fields from variants_long_table.csv
-
-            if os.path.isfile(
-                self.input_folder + bioinfo_dict["sample_name"] + ".consensus.fa"
-            ):
-                chrom = variants_long_table.loc[
-                    variants_long_table["SAMPLE"].str.contains(
-                        bioinfo_dict["sample_name"]
-                    )
-                ]["CHROM"]
-                bioinfo_dict["reference_genome_accession"] = str(chrom.values[0])
+        for row in j_data:
+            if "-" in row["sample_name"]:
+                sample_name = row["sample_name"].replace("-", "_")
             else:
-                bioinfo_dict["reference_genome_accession"] = "NC_045512.2"
-            # FUNCTION genome_length_data
-            # fields from consensus_genome_length
-            cons_array = consensus_genome_length.loc[
-                consensus_genome_length[0].str.contains(bioinfo_dict["sample_name"])
-            ]
-            if len(cons_array) > 1:
-                for i in cons_array:
-                    if cons_array.values[i, 1] != 0:
-                        bioinfo_dict["consensus_genome_length"] = str(
-                            cons_array.values[i, 1]
-                        )
-            # FUNCTION md5_data
-            # fields from md5 file
+                sample_name = row["sample_name"]
+            f_name = sample_name + ".pangolin." + row["analysis_date"] + ".csv"
+            f_path = os.path.join(self.input_folder, f_name)
+            try:
+                f_data = relecov_tools.utils.read_csv_file_return_dict(f_path, ",")
+            except FileNotFoundError as e:
+                log.error("File %s not found ", e)
+                stderr.print(f"[red]File {e} not found")
+                # When file does not exist set all values to empty
+                for field, value in mapping_fields.items():
+                    row[field] = ""
+                continue
+                # sys.exit(1)
+            pang_key = list(f_data.keys())[0]
+            for field, value in mapping_fields.items():
+                row[field] = f_data[pang_key][value]
 
-            for i in range(len(md5_info)):
-                if "-2" in bioinfo_dict["sequence_file_R1_fastq"]:
-                    g = re.match(
-                        str(bioinfo_dict["sequence_file_R1_fastq"][0:8]) + "$",
-                        md5_info[0][i],
-                    )
-                elif "-B" in bioinfo_dict["sequence_file_R1_fastq"]:
+        return j_data
 
-                    g = re.match(
-                        str(bioinfo_dict["sequence_file_R1_fastq"][0:8]) + "$",
-                        md5_info[0][i],
-                    )
-                else:
-                    g = re.match(str(bioinfo_dict["sample_name"]) + "$", md5_info[0][i])
-                if g is not None:
-                    bioinfo_dict["consensus_sequence_R1_name"] = md5_info[2][i]
-                    bioinfo_dict["consensus_sequence_R2_name"] = md5_info[2][i + 1]
-                    bioinfo_dict["consensus_sequence_R1_md5"] = md5_info[1][i]
-                    bioinfo_dict["consensus_sequence_R2_md5"] = md5_info[1][i + 1]
-                    break
-            # FUNCTION software_data
-            # fields from software version file
-            bioinfo_dict["dehosting_method_software_version"] = str(
-                software_versions["KRAKEN2_KRAKEN2"]["kraken2"]
-            )
-            bioinfo_dict["variant_calling_software_version"] = str(
-                software_versions["IVAR_VARIANTS"]["ivar"]
-            )
-            bioinfo_dict["consensus_sequence_software_version"] = str(
-                software_versions["BCFTOOLS_CONSENSUS"]["bcftools"]
-            )
+    def include_consensus_data(self, j_data):
+        """Include genome length, name, file name, path and md5 by preprocessing
+        each file of consensus.fa
+        """
 
-            bioinfo_dict["bioinformatics_protocol_software_version"] = str(
-                software_versions["Workflow"]["nf-core/viralrecon"]
-            )
-
-            bioinfo_dict["preprocessing_software_version"] = str(
-                software_versions["FASTP"]["fastp"]
-            )
-            bioinfo_dict["mapping_software_version"] = str(
-                software_versions["BOWTIE2_ALIGN"]["bowtie2"]
-            )
-
-            # FUNCTION pangolin_data
-            # files from pangolin.csv file
-
-            bioinfo_dict["lineage_analysis_software_version"] = str(
-                pangolin_version_table.loc[
-                    pangolin_version_table[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[0][1]
-            )
-            bioinfo_dict["variant_designation"] = str(
-                pangolin_version_table.loc[
-                    pangolin_version_table[0].str.contains(bioinfo_dict["sample_name"])
-                ].values[0][2]
-            )
-
-            # get the date from pangolin files
-            string = re.split("(\d+)", self.mapping_illumina)[1]
-            year, month, day = int(string[:4]), int(string[4:6]), int(string[6:-1])
-            x = datetime.datetime(year, month, day)
-            bioinfo_dict["analysis_date"] = x.strftime("%b %d %Y %H:%M:%S")
-
-            pango_file_path = (
-                self.input_folder + bioinfo_dict["sample_name"] + ".pangolin.csv"
-            )
-            if os.path.isfile(pango_file_path):
-                pango_last_modified = os.path.getctime(pango_file_path)
-                pango_last_modified_date = datetime.datetime.fromtimestamp(
-                    pango_last_modified
+        mapping_fields = self.configuration.get_topic_data(
+            "bioinfo_analysis", "mapping_consensus"
+        )
+        for row in j_data:
+            if "-" in row["sample_name"]:
+                sample_name = row["sample_name"].replace("-", "_")
+            else:
+                sample_name = row["sample_name"]
+            f_name = sample_name + ".consensus.fa"
+            f_path = os.path.join(self.input_folder, f_name)
+            try:
+                record_fasta = relecov_tools.utils.read_fasta_return_SeqIO_instance(
+                    f_path
                 )
-                bioinfo_dict["lineage_identification_date"] = str(
-                    pango_last_modified_date
-                )
-            bioinfo_list.append(bioinfo_dict)
-            # bioinfo_list[str(sample_name)] = bioinfo_dict
-            c = c + 1
-            # adding schema_name and schema_version
-            bioinfo_dict["schema_name"] = self.schema_name
-            bioinfo_dict["schema_version"] = self.schema_version
-
-        json_file = "bioinfo_metadata.json"
-        output_path = os.path.join(self.output_folder, json_file)
-
-        """Create json"""
-
-        with open(output_path, "w", encoding="utf-8") as fh:
-            fh.write(
-                json.dumps(bioinfo_list, indent=4, sort_keys=True, ensure_ascii=False)
+            except FileNotFoundError as e:
+                log.error("File %s not found ", e)
+                stderr.print(f"[red]File {e} not found")
+                for item in mapping_fields:
+                    row[item] = ""
+                continue
+            row["consensus_geneme_length"] = str(len(record_fasta))
+            row["consensus_sequence_name"] = record_fasta.description
+            row["consensus_sequence_filepath"] = self.input_folder
+            row["consensus_file_name"] = f_name
+            row["consensus_sequence_md5"] = relecov_tools.utils.calculate_md5(f_path)
+            base_calculation = int(row["number_of_base_pairs_sequenced"]) * len(
+                record_fasta
             )
+            if row["sequence_file_R2_fastq"] != "":
+                row["number_of_base_pairs_sequenced"] = str(base_calculation * 2)
+            else:
+                row["number_of_base_pairs_sequenced"] = str(base_calculation)
+
+        return j_data
+
+    def include_long_table_path(self, j_data):
+        """Include the variant long table path by searchin the in input folder
+        the file name that contains long_table.csv
+        """
+        condition = os.path.join(self.input_folder, "*long_table.csv")
+        f_path = relecov_tools.utils.get_files_match_condition(condition)
+        if len(f_path) == 0:
+            long_table_path = ""
+        else:
+            long_table_path = f_path[0]
+        for row in j_data:
+            row["long_table_path"] = long_table_path
+        return j_data
+
+    def include_variant_metrics(self, j_data):
+        """Include the # Ns per 100kb consensus from the summary variant
+        metric file_exists
+        """
+        map_data = relecov_tools.utils.read_csv_file_return_dict(
+            self.req_files["variant_metrics"], ","
+        )
+        mapping_fields = self.configuration.get_topic_data(
+            "bioinfo_analysis", "mapping_variant_metrics"
+        )
+        for row in j_data:
+            for field, value in mapping_fields.items():
+                try:
+                    row[field] = map_data[row["sample_name"]][value]
+                except KeyError as e:
+                    log.error("Field %s not found in mapping stats", e)
+                    stderr.print(f"[red]Field {e} not found in mapping stats")
+                    sys.exit(1)
+        return j_data
+
+    def include_software_versions(self, j_data):
+        """Include versions from the yaml version file"""
+        version_fields = self.configuration.get_topic_data(
+            "bioinfo_analysis", "mapping_version"
+        )
+        try:
+            versions = relecov_tools.utils.read_yml_file(self.req_files["versions"])
+        except YAMLError as e:
+            log.error("Unable to process version file return error %s", e)
+            stderr.print("[red]Unable to process version file")
+            stderr.print(f" {e}")
+            sys.exit(1)
+        for row in j_data:
+            for field, version_data in version_fields.items():
+                for key, value in version_data.items():
+                    row[field] = versions[key][value]
+        return j_data
+
+    def collect_info_from_lab_json(self):
+        """Craeate the list of dictionaries from the data that is on json lab
+        metadata file. Return j_data that is used to add the rest of the fields
+        """
+        try:
+            json_lab_data = relecov_tools.utils.read_json_file(self.json_file)
+        except ValueError:
+            log.error("%s invalid json file", self.json_file)
+            stderr.print(f"[red] {self.json_file} invalid json file")
+            sys.exit(1)
+        j_data = []
+        mapping_fields = self.configuration.get_topic_data(
+            "bioinfo_analysis", "required_fields_from_lab_json"
+        )
+        for row in json_lab_data:
+            j_data_dict = {}
+            for lab_field, bio_field in mapping_fields.items():
+                j_data_dict[bio_field] = row[lab_field]
+            j_data.append(j_data_dict)
+        return j_data
+
+    def create_bioinfo_file(self):
+        """Create the bioinfodata json with collecting information from lab
+        metadata json, mapping_stats, and more information from the files
+        inside input directory
+        """
+        stderr.print("[blue]Reading lab metadata json")
+        j_data = self.collect_info_from_lab_json()
+        stderr.print("[blue]Adding fixed values")
+        j_data = self.add_fixed_values(j_data)
+        stderr.print("[blue]Adding data from mapping stats")
+        j_data = self.include_data_from_mapping_stats(j_data)
+        stderr.print("[blue]Adding software versions")
+        j_data = self.include_software_versions(j_data)
+        stderr.print("[blue]Adding summary variant metrics")
+        j_data = self.include_variant_metrics(j_data)
+        stderr.print("[blue]Adding pangolin informtion")
+        j_data = self.include_pangolin_data(j_data)
+        stderr.print("[blue]Adding consensus data")
+        j_data = self.include_consensus_data(j_data)
+        stderr.print("[blue]Adding variant long table path")
+        j_data = self.include_long_table_path(j_data)
+        file_name = (
+            "bioinfo_" + os.path.splitext(os.path.basename(self.json_file))[0] + ".json"
+        )
+        stderr.print("[blue]Writting output json file")
+        os.makedirs(self.output_folder, exist_ok=True)
+        file_path = os.path.join(self.output_folder, file_name)
+        relecov_tools.utils.write_json_fo_file(j_data, file_path)
+        stderr.print("[green]Sucessful creation of bioinfo analyis file")
+        return True

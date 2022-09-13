@@ -46,6 +46,7 @@
             "Capture method",
             "Sequencing technique",
             "Library Layout",
+            "Read Length",
             "Gene Name 1",
             "Diagnostic Pcr Ct Value 1",
             "Gene Name 2",
@@ -215,46 +216,94 @@
         "submitting_lab_sample_id",
         "virus_name"
     ],
-    "relecov_bioinfo_metadata": {
-        "dehosting_method_software_name": "KRAKEN2_KRAKEN2",
-        "assembly": "None",
-        "if_assembly_other": "None",
-        "assembly_params": "None",
-        "variant_calling_software_name": "IVAR_VARIANTS",
-        "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20 -m 10",
-        "consensus_sequence_software_name": "BCFTOOLS_CONSENSUS",
-        "if_consensus_other": "None",
-        "consensus_params": "-p vcf -f",
-        "depth_of_coverage_threshold": ">10x",
-        "bioinformatics_protocol_software_name": "nf-core/viralrecon",
-        "if_bioinformatic_protocol_is_other_specify": "None",
-        "commercial_open_source_both": "open-source",
-        "preprocessing_software_name": "FASTP",
-        "if_preprocessing_other": "None",
-        "preprocessing_params": "--cut_front --cut_tail --trim_poly_x --cut_mean_quality 30 --qualified_quality_phred 30 --unqualified_percent_limit 10 --length_required 50",
-        "mapping_software_name": "BOWTIE2_ALIGN",
-        "if_mapping_other": "None",
-        "mapping_params": "--seed 1",
-        "lineage_analysis_software_name": "pangolin",
-        "if_lineage_identification_other": "None"
-    },
-    "mapping_illumina_tab_field_list": {
-        "lineage_name": "Lineage",
-        "per_genome_greater_10x": "Coverage>10x(%)",
-        "per_reads_host": "%readshost",
-        "per_reads_virus": "%readsvirus",
-        "per_unmapped": "%unmapedreads",
-        "per_Ns": "%Ns10x",
-        "depth_of_coverage_value": "medianDPcoveragevirus",
-        "number_of_variants_in_consensus": "Variantsinconsensusx10",
-        "number_of_variants_with_effect": "MissenseVariants"
-    },
-    "files_read_bioinfo_metadata": {
-        "mapping_illumina.tab": "mapping_illumina_tab_path",
-        "summary_variants_metrics_mqc.csv": "summary_variants_metrics_path ",
-        "variants_long_table.csv": "variants_long_table_path",
-        "consensus_genome_length.csv": "consensus_genome_length_path",
-        "software_versions.yml": "software_versions_path"
+    "bioinfo_analysis": {
+        "fixed_values": {
+            "assembly": "None",
+            "assembly_params": "None",
+            "bioinformatics_protocol_software_name": "nf-core/viralrecon",
+            "commercial_open_source_both": "open-source",
+            "consensus_params": "-p vcf -f",
+            "consensus_sequence_software_name": "BCFTOOLS_CONSENSUS",
+            "dehosting_method_software_name": "KRAKEN2_KRAKEN2",
+            "depth_of_coverage_threshold": ">10x",
+            "if_assembly_other": "None",
+            "if_bioinformatic_protocol_is_other_specify": "None",
+            "if_consensus_other": "None",
+            "if_lineage_identification_other": "None",
+            "if_mapping_other": "None",
+            "if_preprocessing_other": "None",
+            "lineage_analysis_software_name": "pangolin",
+            "mapping_params": "--seed 1",
+            "mapping_software_name": "BOWTIE2_ALIGN",
+            "preprocessing_params": "--cut_front --cut_tail --trim_poly_x --cut_mean_quality 30 --qualified_quality_phred 30 --unqualified_percent_limit 10 --length_required 50",
+            "preprocessing_software_name": "FASTP",
+            "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20 -m 10",
+            "variant_calling_software_name": "IVAR_VARIANTS"
+        },
+        "required_file": {
+            "variants_metrics": "summary_variants_metrics_mqc.csv",
+            "versions": "software_versions.yml",
+            "pangoling": "pangolin_version.csv",
+            "variant_metrics": "summary_variants_metrics_mqc.csv"
+        },
+        "mapping_consensus": [
+            "consensus_genome_length",
+            "consensus_sequence_filename",
+            "consensus_sequence_filepath",
+            "consensus_sequence_md5",
+            "consensus_sequence_name",
+            "number_of_base_pairs_sequenced"
+        ],
+        "mapping_pangolin":{
+            "variant_designation": "scorpio_call"
+        },
+        "mapping_stats": {
+            "analysis_date": "analysis date",
+            "depth_of_coverage_value": "medianDPcoveragevirus",
+            "lineage_name": "Lineage",
+            "number_of_variants_in_consensus": "Variantsinconsensusx10",
+            "number_of_variants_with_effect": "MissenseVariants",
+            "per_genome_greater_10x": "Coverage>10x(%)",
+            "per_Ns": "%Ns10x",
+            "per_reads_host": "%readshost",
+            "per_reads_virus": "%readsvirus",
+            "per_unmapped": "%unmapedreads",
+            "qc_filtered": "totalreads",
+            "reference_genome_accession": "Virussequence"
+        },
+        "mapping_variant_metrics": {
+            "ns_per_100_kbp": "# Ns per 100kb consensus"
+        },
+        "mapping_version":{
+            "bioinformatics_protocol_software_version":{
+                "Workflow": "nf-core/viralrecon"
+            },
+            "consensus_sequence_software_version":{
+                "BCFTOOLS_CONSENSUS": "bcftools"
+            },
+            "dehosting_method_software_version": {
+                "KRAKEN2_KRAKEN2": "kraken2"
+            },
+            "mapping_software_name": {
+                "BOWTIE2_ALIGN": "bowtie2"
+            },
+            "preprocessing_software_version": {
+                "FASTP": "fastp"
+            },
+            "variant_calling_software_version": {
+                "IVAR_VARIANTS": "ivar"
+            }
+        },
+        "required_fields_from_lab_json": {
+            "read_length": "number_of_base_pairs_sequenced",
+            "schema_name": "schema_name",
+            "schema_version": "schema_version",
+            "sequence_file_R1_fastq": "sequence_file_R1_fastq",
+            "sequence_file_R2_fastq": "sequence_file_R2_fastq",
+            "sequence_file_R1_md5": "sequence_file_R1_md5",
+            "sequence_file_R2_md5" : "sequence_file_R2_md5",
+            "sequencing_sample_id" : "sample_name"
+        }
     },
     "md5_file_name": "md5_check_file.csv",
     "ENA_fields": {
