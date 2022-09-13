@@ -18,7 +18,8 @@
                 "Host Gender": "Sexo",
                 "Diagnostic Pcr Ct Value 1": "PCR genE",
                 "Specimen source": "Muestra",
-                "Purpose of Sequencing": "Contexto"
+                "Purpose of Sequencing": "Contexto",
+                "Nucleic acid extraction protocol": "Extracción"
             },
             "function": "None"
         },
@@ -32,7 +33,7 @@
             "mapped_key": "Sample ID given for sequencing"
         },
         "run_id_file": {
-            "file_name": "samples_run_services.tsv",
+            "file_name": "samples_run_services_length.tsv",
             "mapped_fields": {
                 "Runid": "run_name"
             },
@@ -48,7 +49,7 @@
             "function": "replace_originating_lab"
         },
         "sequencer_file": {
-            "file_name": "samples_run_services.tsv",
+            "file_name": "samples_run_services_length.tsv",
             "mapped_fields": {
                 "Sequencing Instrument Model": "run_name"
             },
@@ -87,6 +88,14 @@
             "mapped_key": "Runid",
             "function": "None"
         },
+        "read_length": {
+            "file_name": "samples_run_services_length.tsv",
+            "mapped_fields": {
+                "Read Length" : "read1_cycles"
+            },
+            "mapped_key": "Sample ID given for sequencing",
+            "function": "None"
+        },
         "samples_in_run": {
             "file_name": "run_and_num_of_samples.csv",
             "mapped_fields": {
@@ -108,24 +117,33 @@
             "mapped_fields" : {"Purpose of Sequencing" : "" },
             "mapped_key" : "",
             "function": "translate_purpose_seq_to_english"
+        },
+        "nucleic_acid_extraction_protocol": {
+            "file_name": "",
+            "mapped_fields" : {"Nucleic acid extraction protocol" : "" },
+            "mapped_key" : "",
+            "function": "translate_nucleic_acid_extract_prot"
+        },
+        "library_layout": {
+            "file_name": "samples_run_services_length.tsv",
+            "mapped_fields" : {"Library Layout" : "read2_cycles" },
+            "mapped_key" : "sample_name",
+            "function": "findout_library_layout"
         }
     },
     "fixed_fields": {
         "Submitting Institution": "Instituto de Salud Carlos III",
         "Biological Sample Storage Condition": "-80 C",
-        "Nucleic acid extraction protocol": "Opentrons custom rna extraction protocol",
         "Purpose of sampling": "Surveillance",
         "Specimen source": "Nasopharyngeal exudate",
         "Host": "Human",
         "Library Preparation Kit": "Illumina DNA Prep",
         "Enrichment Protocol": "Amplicon",
         "Enrichment panel/assay": "ARTIC",
-        "Source material": "VIRAL RNA",
+        "Source material": "viral rna",
         "Capture method": "PCR",
         "Sequencing technique": "Amplicon",
-        "Library Layout": "Paired",
         "Gene Name 1": "E gene",
-        "Diagnostic Pcr Ct Value 1": "",
-        "Authors": ""
+        "Diagnostic Pcr Ct Value 1": ""
     }
 }

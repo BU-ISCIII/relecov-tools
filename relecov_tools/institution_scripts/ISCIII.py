@@ -158,8 +158,44 @@ def translate_purpose_seq_to_english(metadata, f_data, mapped_fields, heading):
                 stderr.print(
                     "f[red] The {row[m_idx]} is not a valid data for translation"
                 )
-                import pdb
+                sys.exit(1)
+    return metadata
 
-                pdb.set_trace()
+
+def translate_nucleic_acid_extract_prot(metadata, f_data, mapped_fields, heading):
+    """Fetch the short name given in the input laboratory file and change for
+    the one is allow according to schema
+    """
+    for row in metadata[1:]:
+        for key, val in mapped_fields.items():
+            m_idx = heading.index(key)
+            if "NA" in row[m_idx]:
+                row[m_idx] = "Not Applicable"
+            elif "opentrons" in row[m_idx].lower():
+                row[m_idx] = "Opentrons custom rna extraction protocol"
+            else:
+                # allow from now on until more options are available
+                continue
+    return metadata
+
+
+def findout_library_layout(metadata, f_data, mapped_fields, heading):
+    """Read the file and by checking if read2_cycles is 0 set to Single otherwise
+    to paired"""
+    s_idx = heading.index("Sample ID given for sequencing")
+    for row in metadata[1:]:
+
+        for key, val in mapped_fields.items():
+            m_idx = heading.index(key)
+            try:
+                if f_data[str(row[s_idx])][val] == "0":
+                    row[m_idx] = "Single"
+                else:
+                    row[m_idx] = "Paired"
+            except KeyError as e:
+                log.error("The %s is not defined in function findout_library_layout", e)
+                stderr.print(
+                    f"[red] {e} is not defined in function findout_library_layout"
+                )
                 sys.exit(1)
     return metadata
