@@ -2416,6 +2416,72 @@
             "label": "GISAID Virus Name",
             "fill_mode": "sample"
         },
+        "ena_analysis_accession": {
+            "examples": [
+                ""
+            ],
+            "ontology": "GENEPIO_0001145",
+            "type": "string",
+            "description": "",
+            "classification": "Public databases",
+            "label": "Analysis Accession",
+            "fill_mode": "batch"
+        },
+        "ena_study_accession": {
+            "examples": [
+                "e.g PRJEB39632"
+            ],
+            "ontology": "GENEPIO_0001136",
+            "type": "string",
+            "description": "",
+            "classification": "Public databases",
+            "label": "Study accession",
+            "fill_mode": "batch"
+        },
+        "ena_sample_accession": {
+            "examples": [
+                "e.g SAMEA7098096"
+            ],
+            "ontology": "GENEPIO_0001139",
+            "type": "string",
+            "description": "",
+            "classification": "Public databases",
+            "label": "Sample accession",
+            "fill_mode": "batch"
+        },
+        "ena_experiment_accession": {
+            "examples": [
+                "e.g ERX4331406"
+            ],
+            "ontology": "BU_ISCIII:015",
+            "type": "string",
+            "description": "",
+            "classification": "Public databases",
+            "label": "Experiment Accession",
+            "fill_mode": "batch"
+        },
+        "ena_run_accession": {
+            "examples": [
+                "e.g ERX4331406"
+            ],
+            "ontology": "BU_ISCIII:016",
+            "type": "string",
+            "description": "",
+            "classification": "Public databases",
+            "label": "Run Accession",
+            "fill_mode": "batch"
+        },
+        "ena_submission_accession": {
+            "examples": [
+                "e.g ERA2794974"
+            ],
+            "ontology": "BU_ISCIII:017",
+            "type": "string",
+            "description": "",
+            "classification": "Public databases",
+            "label": "Submission Accession",
+            "fill_mode": "batch"
+        },
         "ena_experiment_title": {
             "examples": [
                 "e.g Illumina MiSeq paired end sequencing"
@@ -2447,6 +2513,18 @@
             "description": "",
             "classification": "Public databases",
             "label": "Broker Name",
+            "fill_mode": "batch"
+        },
+        "ena_first_created_date": {
+            "examples": [
+                "e.g 2020-08-07"
+            ],
+            "ontology": "NCIT_C164483",
+            "type": "string",
+            "format": "date",
+            "description": "",
+            "classification": "Public databases",
+            "label": "First created date",
             "fill_mode": "batch"
         }
     }
