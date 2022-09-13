@@ -112,7 +112,12 @@ class FeedDatabase:
         """Map the values to the properties send to databasee
         in json schema based on label
         """
-        anatomical_fields = ["anatomical_part", "collection_method", "body_product", "anatomical_material"]
+        anatomical_fields = [
+            "anatomical_part",
+            "collection_method",
+            "body_product",
+            "anatomical_material",
+        ]
         # collection_method = self.get_sample_type()
         sample_list = []
         s_fields = list(sample_fields.keys())
