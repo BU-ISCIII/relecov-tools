@@ -585,7 +585,7 @@
                 "Blood [UBERON:0000178]"
             ],
             "classification": "Sample collection and processing",
-            "label": "Specimen source",
+            "label": "Anatomical Material",
             "fill_mode": "batch"
         },
         "anatomical_part": {
@@ -627,7 +627,7 @@
                 ""
             ],
             "classification": "Sample collection and processing",
-            "label": "Specimen source",
+            "label": "Anatomical Part",
             "fill_mode": "batch"
         },
         "collection_device": {
@@ -656,7 +656,7 @@
                 ""
             ],
             "classification": "Sample collection and processing",
-            "label": "Collection device",
+            "label": "Collection Device",
             "fill_mode": "batch"
         },
         "collection_method": {
@@ -695,7 +695,7 @@
                 ""
             ],
             "classification": "Sample collection and processing",
-            "label": "Specimen source",
+            "label": "Collection Method",
             "fill_mode": "batch"
         },
         "body_product": {
@@ -720,7 +720,7 @@
                 ""
             ],
             "classification": "Sample collection and processing",
-            "label": "Specimen source",
+            "label": "Body Product",
             "fill_mode": "batch"
         },
         "environmental_material": {
@@ -1110,7 +1110,7 @@
         },
         "nucleic_acid_extraction_protocol": {
             "examples": [
-                "Opentrons custom protocol"
+                "Opentrons custom rna extraction protocol"
             ],
             "ontology": "OBI_0302884",
             "type": "string",
@@ -1235,6 +1235,7 @@
                 "ARTIC v2",
                 "ARTIC v3",
                 "ARTIC v4",
+                "ARTIC v4.1",
                 "Illumina AmpliSeq Community panel",
                 "Illumina AmpliSeq SARS-CoV-2 Research Panel for Illumina",
                 "Illumina Respiratory Virus Oligos Panel V1",
@@ -1255,7 +1256,7 @@
             "label": "Enrichment panel/assay version",
             "fill_mode": "batch"
         },
-        "if_enrichment_panel_assay_if_other_especify": {
+        "if_enrichment_panel_assay_is_other_specify": {
             "examples": [
                 ""
             ],
@@ -1263,7 +1264,7 @@
             "type": "string",
             "description": "",
             "classification": "Sequencing",
-            "label": "If Enrichment panel/assay If Other, Especify",
+            "label": "If Enrichment panel/assay Is Other, Specify",
             "fill_mode": "batch"
         },
         "amplicon_pcr_primer_scheme": {
@@ -1438,7 +1439,7 @@
             "examples": [
                 "Illumina"
             ],
-            "ontology": "0",
+            "ontology": "GENEPIO_0000071",
             "type": "string",
             "description": "",
             "classification": "Sequencing",
@@ -1448,16 +1449,18 @@
         },
         "library_source": {
             "enum": [
-                "GENOMIC",
-                "TRANSCRIPTOMIC",
-                "METAGENOMIC",
-                "METATRANSCRIPTOMIC",
-                "SYNTHETIC",
-                "VIRAL RNA",
-                "OTHER"
+                "genomic",
+                "genomic single cell",
+                "transcriptomic",
+                "transcriptomic single cell",
+                "metagenomic",
+                "metatranscriptomic",
+                "synthetic",
+                "viral rna",
+                "other"
             ],
             "examples": [
-                "METAGENOMIC"
+                "metagenomic"
             ],
             "ontology": "GENEPIO_0001965",
             "type": "string",
@@ -1553,6 +1556,17 @@
             "label": "Library Layout",
             "fill_mode": "batch"
         },
+        "read_length": {
+            "examples": [
+                "75"
+            ],
+            "ontology": "GENEPIO:0000076",
+            "type": "string",
+            "description": "number of base pairs per read",
+            "classification": "Sequencing",
+            "label": "Read Length",
+            "fill_mode": "batch"
+        },
         "sequence_file_R1_fastq": {
             "examples": [
                 "ABC123_S1_L001_R1_001.fastq.gz"
@@ -1573,6 +1587,29 @@
             "description": "The user-specified filename of the r2 FASTQ file.",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "Sequence file R2 fastq",
+            "fill_mode": "sample"
+        },
+        "sequence_file_R1_md5": {
+            "examples": [
+                "b5242d60471e5a5a97b35531dbbe8c30"
+            ],
+            "ontology": "MS_1000568",
+            "type": "string",
+            "description": "Checksum value to validate successful file transmission",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Fastq md5 r1",
+            "fill_mode": "sample",
+            "minLenght": "1"
+        },
+        "sequence_file_R2_md5": {
+            "examples": [
+                "b5242d60471e5a5a97b35531dbbe8c30"
+            ],
+            "ontology": "MS_1000569",
+            "type": "string",
+            "description": "Checksum value to validate successful file transmission",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Sequence fastq R2 md5",
             "fill_mode": "sample"
         },
         "r1_fastq_filepath": {
@@ -2326,7 +2363,7 @@
             "type": "string",
             "description": "The identifier assigned to a BioSample in INSDC archives.",
             "classification": "Sample collection and processing",
-            "label": "ENA Sample Id",
+            "label": "ENA Sample ID",
             "fill_mode": "batch"
         },
         "diagnostic_pcr_Ct_value_2": {

@@ -121,7 +121,6 @@ class RelecovMetadata:
         """
         enum_dict = {}
         for prop, values in self.relecov_sch_json["properties"].items():
-            # import pdb; pdb.set_trace()
             if "enum" in values:
                 enum_dict[prop] = {}
                 for enum in values["enum"]:
@@ -138,7 +137,7 @@ class RelecovMetadata:
                         m_data[idx][key] = e_values[m_data[idx][key]]
                     else:
                         continue
-                        # import pdb; pdb.set_trace()
+
         return m_data
 
     def process_from_json(self, m_data, json_fields):
@@ -155,7 +154,6 @@ class RelecovMetadata:
             map_field = json_fields["map_field"]
         json_data = json_fields["j_data"]
         if isinstance(json_data, dict):
-            # import pdb; pdb.set_trace()
             for idx in range(len(m_data)):
                 m_data[idx].update(json_data[m_data[idx][map_field]])
         elif isinstance(json_data, list):
@@ -226,7 +224,6 @@ class RelecovMetadata:
         ws_metadata_lab = relecov_tools.utils.read_excel_file(
             self.metadata_file, "METADATA_LAB", heading_row_number, False
         )
-
         metadata_values = []
         errors = {}
         row_number = heading_row_number
@@ -272,8 +269,9 @@ class RelecovMetadata:
                 try:
                     property_row[self.label_prop_dict[key]] = row[key]
                 except KeyError as e:
+                    log.error("Error when mapping the label %s", e)
+                    stderr.print(f"[red] Error when mapping the label {str(e)}")
                     continue
-                    stderr.print(f"[red] Error when reading {sample_number} {str(e)}")
 
             metadata_values.append(property_row)
         return metadata_values, errors

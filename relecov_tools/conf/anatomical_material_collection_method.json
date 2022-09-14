@@ -925,7 +925,9 @@
     },
     "Bronchoalveolar Lavage": {
         "anatomical_part": "Not Applicable",
-        "collection_method": "Bronchoalveolar Lavage"
+        "collection_method": "Bronchoalveolar Lavage",
+        "body_product": "Not Applicable",
+        "anatomical_material": "Not Applicable"
     },
     "Gastric Lavage": {
         "anatomical_part": "Not Applicable",
