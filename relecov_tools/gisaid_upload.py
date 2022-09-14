@@ -120,7 +120,14 @@ class GisaidUpload:
         dataframe.loc[
             dataframe["covv_patient_status"] == "", "covv_patient_status"
         ] = "unknown"
+        
+        config_json = ConfigJson()
+        gisaid_config = config_json.get_configuration("GISAID_configuration")
+        submitter_id = gisaid_config["submitter"]
+        dataframe.loc[dataframe["submitter"] == "", "submitter"] = submitter_id
+        
         return dataframe
+
 
     def metadata_to_csv(self):
         """Transform metadata json to csv"""
