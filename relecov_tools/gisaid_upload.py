@@ -166,8 +166,7 @@ class GisaidUpload:
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
         df_data_comp.to_csv(df_data_path, index=False)
-        metagisaid = df_data_path
-        return metagisaid
+        return df_data_path
 
     # generar template con cli3
     # ADD TOKEN WARNING and file token  .authtoken
@@ -230,8 +229,7 @@ class GisaidUpload:
                         record.id = name
                         record.description = name
                         SeqIO.write(record, new_fasta, "fasta")
-        fastagisaid = multi_gis_path
-        return fastagisaid
+        return multi_gis_path
 
     def cli3_auth(self):
         """Create authenticate token"""
