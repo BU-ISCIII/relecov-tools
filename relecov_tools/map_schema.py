@@ -153,77 +153,64 @@ class MappingSchema:
         """
         if self.destination_schema == "ENA":
             for idx in range(len(self.json_data)):
-                mapped_json_data[idx]["fastq_r1_md5"] = self.json_data[idx][
-                    "fastq_r1_md5"
+
+                mapped_json_data[idx]["collector_name"] = "unknown"
+                mapped_json_data[idx]["file_format"] = "FASTQ [format:1930]"
+                mapped_json_data[idx][
+                    "study_type"
+                ] = "Whole Genome Sequencing [NCIT:C101294]"
+                mapped_json_data[idx][
+                    "study_title"
+                ] = "RELECOV Spanish Network for genomics surveillance"
+                mapped_json_data[idx]["study_abstract"] = mapped_json_data[idx][
+                    "study_title"
                 ]
-                mapped_json_data[idx]["fastq_r2_md5"] = self.json_data[idx][
-                    "fastq_r2_md5"
-                ]
-                mapped_json_data[idx]["r1_fastq_filepath"] = (
-                    self.json_data[idx]["r1_fastq_filepath"]
-                    + "/"
-                    + self.json_data[idx]["sequence_file_R1_fastq"]
-                )
-                mapped_json_data[idx]["r2_fastq_filepath"] = (
-                    self.json_data[idx]["r2_fastq_filepath"]
-                    + "/"
-                    + self.json_data[idx]["sequence_file_R2_fastq"]
-                )
-                mapped_json_data[idx]["collecting_institution"] = self.json_data[idx][
+                mapped_json_data[idx]["broker_name"] = "Instituto de Salud Carlos III"
+                mapped_json_data[idx]["host health state"] = "not provided"
+                mapped_json_data[idx]["center_name"] = self.json_data[idx][
                     "collecting_institution"
                 ]
-                mapped_json_data[idx]["collector_name"] = self.json_data[idx][
-                    "collector_name"
-                ]
                 mapped_json_data[idx]["library_name"] = self.json_data[idx][
-                    "collecting_lab_sample_id"
+                    "library_preparation_kit"
                 ]
                 mapped_json_data[idx]["sample_title"] = self.json_data[idx][
                     "sequencing_sample_id"
                 ]
-                mapped_json_data[idx]["file_type"] = "fastq"
-                # mapped_json_data[idx]["collector_name"] = self.json_data[idx][ "author_submitter"]
-                mapped_json_data[idx]["library_name"] = self.json_data[idx][
-                    "library_kit"
-                ]
                 mapped_json_data[idx]["sample_name"] = self.json_data[idx][
                     "sequencing_sample_id"
                 ]
-                mapped_json_data[idx]["study_type"] = self.json_data[idx][
-                    "purpose_sampling"
+                mapped_json_data[idx]["study_alias"] = self.json_data[idx][
+                    "schema_name"
                 ]
-                mapped_json_data[idx]["study_abstract"] = self.json_data[idx][
-                    "study_title"
-                ]
-                mapped_json_data[idx]["sample_description"] = self.json_data[idx][
-                    "sequence_file_R1_fastq"
-                ]
+
+                mapped_json_data[idx]["sample_description"] = (
+                    self.json_data[idx]["anatomical_part"]
+                    + " "
+                    + self.json_data[idx]["collection_method"]
+                )
                 mapped_json_data[idx]["isolate"] = self.json_data[idx][
                     "isolate_sample_id"
                 ]
-                mapped_json_data[idx][
+                mapped_json_data[idx]["platform"] = self.json_data[idx][
                     "sequencing_instrument_platform"
-                ] = self.json_data[idx]["sequencing_instrument_platform"].upper()
+                ].upper()
 
-                """
-                mapped_json_data[idx]["instrument_model"] = self.json_data[idx][
-                    "sequencing_instrument_model"
-                ]
-                """
-
-                mapped_json_data[idx]["host health state"] = "not provided"
-                mapped_json_data[idx]["center_name"] = mapped_json_data[idx][
-                    "collecting_institution"
-                ]
                 mapped_json_data[idx]["authors"] = self.json_data[idx]["authors"]
-                mapped_json_data[idx]["sample_description"] = ""
-                mapped_json_data[idx]["design_description"] = ""
-                mapped_json_data[idx]["insert_size"] = "0"
-                mapped_json_data[idx]["address"] = (
-                    self.json_data[idx]["geo_loc_city"]
-                    + ", "
-                    + self.json_data[idx]["geo_loc_country"]
+                mapped_json_data[idx]["design_description"] = (
+                    self.json_data[idx]["library_layout"]
+                    + " "
+                    + self.json_data[idx]["library_preparation_kit"]
+                    + " "
+                    + self.json_data[idx]["library_selection"]
+                    + " "
+                    + self.json_data[idx]["library_source"]
+                    + "  "
+                    + self.json_data[idx]["library_strategy"]
                 )
+                mapped_json_data[idx]["insert_size"] = "0"
+                mapped_json_data[idx]["address"] = self.json_data[idx][
+                    "collecting_institution_address"
+                ]
 
         return mapped_json_data
 
@@ -245,7 +232,7 @@ class MappingSchema:
         return True
 
     def map_to_data_to_new_schema(self):
-        """Mapping the json data from phage plus schema to the requested one"""
+        """Mapping the json data from relecov schema to the requested one"""
         mapping_schema_dict = self.maping_schemas_based_on_geontology()
         mapped_json_data = self.mapping_json_data(mapping_schema_dict)
         updated_json_data = self.additional_formating(mapped_json_data)

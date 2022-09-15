@@ -914,11 +914,11 @@
       "clasification": "Bioinformatics and QC metrics",
       "label": "Filepath R2 fastq"
     },
-    "fastq_md5_r2": {
+    "sequence_file_R2_md5": {
       "examples": [
         "3e69af1f875fab020aed82f5edbc1f03"
       ],
-      "ontology": "MS_1000568",
+      "ontology": "MS_1000569",
       "type": "string",
       "description": "",
       "clasification": "Bioinformatics and QC metrics",
@@ -1285,7 +1285,7 @@
         "runs"
       ]
     },
-    "fastq_md5_r1": {
+    "sequence_file_R1_md5": {
       "examples": [
         ""
       ],

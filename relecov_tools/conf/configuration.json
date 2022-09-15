@@ -202,8 +202,8 @@
         "sampleLocation": "Not defined"
     },
     "relecov_sample_metadata": [
-        "fastq_r1_md5",
-        "fastq_r2_md5",
+        "sequence_file_R1_md5",
+        "sequence_file_R2_md5",
         "microbiology_lab_sample_id",
         "r1_fastq_filepath",
         "r2_fastq_filepath",
@@ -388,6 +388,23 @@
             "host scientific name",
             "collector name",
             "collecting institution"
+        ],
+        "map_not_provided_fields": [
+            "subject exposure",
+            "subject exposure duration",
+            "type exposure",
+            "personal protective equipment",
+            "hospitalisation",
+            "illness duration",
+            "illness symptoms",
+            "host disease outcome",
+            "definition for seropositive sample",
+            "serotype (required for a seropositive sample)",
+            "strain",
+            "host habitat",
+            "host description",
+            "gravidity",
+            "host behaviour"
         ]
     }
 }
