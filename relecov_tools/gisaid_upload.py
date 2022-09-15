@@ -159,7 +159,8 @@ class GisaidUpload:
                             lab["geo_loc_city"],
                         ]
                     )
-
+        
+        df_data.replace("not provided", "unknown", inplace=True)
         df_data_comp = self.complete_mand_fields(df_data)
         df_data_path = os.path.join(self.output_path, "meta_gisaid.csv")
         if not os.path.exists(self.output_path):
