@@ -141,6 +141,9 @@ class MappingSchema:
             map_sample_dict = OrderedDict()
             for item, value in mapping_schema_dict.items():
                 try:
+
+                    data[value] = data[value].split(" [", 1)[0]
+
                     map_sample_dict[item] = data[value]
                 except KeyError as e:
                     log.warning("Property %s not set in the source data", e)
@@ -155,10 +158,8 @@ class MappingSchema:
             for idx in range(len(self.json_data)):
 
                 mapped_json_data[idx]["collector_name"] = "unknown"
-                mapped_json_data[idx]["file_format"] = "FASTQ [format:1930]"
-                mapped_json_data[idx][
-                    "study_type"
-                ] = "Whole Genome Sequencing [NCIT:C101294]"
+                mapped_json_data[idx]["file_format"] = "FASTQ"
+                mapped_json_data[idx]["study_type"] = "Whole Genome Sequencing"
                 mapped_json_data[idx][
                     "study_title"
                 ] = "RELECOV Spanish Network for genomics surveillance"
@@ -184,9 +185,9 @@ class MappingSchema:
                 ]
 
                 mapped_json_data[idx]["sample_description"] = (
-                    self.json_data[idx]["anatomical_part"]
+                    self.json_data[idx]["anatomical_part"].split(" [", 1)[0]
                     + " "
-                    + self.json_data[idx]["collection_method"]
+                    + self.json_data[idx]["collection_method"].split(" [", 1)[0]
                 )
                 mapped_json_data[idx]["isolate"] = self.json_data[idx][
                     "isolate_sample_id"
@@ -197,15 +198,15 @@ class MappingSchema:
 
                 mapped_json_data[idx]["authors"] = self.json_data[idx]["authors"]
                 mapped_json_data[idx]["design_description"] = (
-                    self.json_data[idx]["library_layout"]
+                    self.json_data[idx]["library_layout"].split(" [", 1)[0]
                     + " "
-                    + self.json_data[idx]["library_preparation_kit"]
+                    + self.json_data[idx]["library_preparation_kit"].split(" [", 1)[0]
                     + " "
-                    + self.json_data[idx]["library_selection"]
+                    + self.json_data[idx]["library_selection"].split(" [", 1)[0]
                     + " "
-                    + self.json_data[idx]["library_source"]
+                    + self.json_data[idx]["library_source"].split(" [", 1)[0]
                     + "  "
-                    + self.json_data[idx]["library_strategy"]
+                    + self.json_data[idx]["library_strategy"].split(" [", 1)[0]
                 )
                 mapped_json_data[idx]["insert_size"] = "0"
                 mapped_json_data[idx]["address"] = self.json_data[idx][
