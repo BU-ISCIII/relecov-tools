@@ -499,7 +499,7 @@
                 "Derbyshire"
             ],
             "ontology": "NCIT:C87189",
-            "type": "s tring",
+            "type": "string",
             "description": "The county/region of origin of the sample.",
             "classification": "Sample collection and processing",
             "label": "Province",
@@ -1686,12 +1686,12 @@
         },
         "analysis_date": {
             "examples": [
-                "e.g 2020-08-07"
+                "e.g 20220705"
             ],
             "ontology": "0",
             "type": "string",
             "format": "date",
-            "description": "",
+            "description": "The time of a sample analysis process",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "Analysis date",
             "fill_mode": "batch",
@@ -1699,7 +1699,7 @@
         },
         "dehosting_method_software_name": {
             "examples": [
-                "Nanostripper"
+                "KRAKEN2_KRAKEN2                "
             ],
             "ontology": "GENEPIO:0001459",
             "type": "string",
@@ -1776,7 +1776,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "If bioinformatics protocol used was open-source or commercial",
             "classification": "Bioinformatic Analysis fields",
             "label": "Commercial/Open-source/both",
             "fill_mode": "batch"
@@ -1809,7 +1809,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Preprocessing software name other",
             "classification": "Bioinformatic Analysis fields",
             "label": "If preprocessing Is Other, Specify",
             "fill_mode": "batch"
@@ -1853,7 +1853,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Mapping software used other ",
             "classification": "Bioinformatic Analysis fields",
             "label": "If mapping Is Other, Specify",
             "fill_mode": "batch"
@@ -1951,7 +1951,7 @@
             "type": "string",
             "description": "The name of the consensus sequence.",
             "examples": [
-                "ncov123assembly3"
+                "2018086 NC_045512.2"
             ],
             "classification": "Bioinformatic Analysis fields",
             "label": "Consensus sequence name",
@@ -1962,7 +1962,7 @@
             "type": "string",
             "description": "The name of the consensus sequence filename",
             "examples": [
-                "ncov123assembly3"
+                "2018102.consensus.fa"
             ],
             "classification": "Bioinformatic Analysis fields",
             "label": "Consensus sequence name",
@@ -1971,7 +1971,7 @@
         "consensus_sequence_md5": {
             "ontology": "0",
             "type": "string",
-            "description": "The name of the consensus sequence.",
+            "description": "The md5 of the consensus sequence.",
             "examples": [
                 "5gaskañlkdak3143242ñlkas"
             ],
@@ -2084,7 +2084,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of read that pass quality control threshold ",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%qc filtered",
             "fill_mode": "batch"
@@ -2095,7 +2095,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of reads mapped to host",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%reads host",
             "fill_mode": "batch"
@@ -2106,7 +2106,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of reads mapped to virus",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%reads virus",
             "fill_mode": "batch"
@@ -2117,7 +2117,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of reads unmapped to virus or to host",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%unmapped",
             "fill_mode": "batch"
@@ -2139,7 +2139,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of genome with coverage greater than 10x",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "% genome greater 10x",
             "fill_mode": "batch"
@@ -2150,7 +2150,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of Ns",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%Ns",
             "fill_mode": "batch"
@@ -2172,7 +2172,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "The number of variants found in consensus sequence",
             "classification": "Bioinformatic Variants",
             "label": "Number of variants (AF greater 75%)",
             "fill_mode": "batch"
@@ -2183,7 +2183,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "The number of missense variants",
             "classification": "Bioinformatic Variants",
             "label": "Number of variants with effect",
             "fill_mode": "batch"

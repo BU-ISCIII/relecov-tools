@@ -161,7 +161,7 @@ class BioinfoMetadata:
                 for item in mapping_fields:
                     row[item] = ""
                 continue
-            row["consensus_geneme_length"] = str(len(record_fasta))
+            row["consensus_genome_length"] = str(len(record_fasta))
             row["consensus_sequence_name"] = record_fasta.description
             row["consensus_sequence_filepath"] = self.input_folder
             row["consensus_file_name"] = f_name

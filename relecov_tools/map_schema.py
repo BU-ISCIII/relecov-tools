@@ -204,41 +204,12 @@ class MappingSchema:
                 mapped_json_data[idx][
                     "sequencing_instrument_platform"
                 ] = self.json_data[idx]["sequencing_instrument_platform"].upper()
-                """
-                if (
-                    "nextseq"
-                    in self.json_data[idx]["sequencing_instrument_model"].lower()
-                ):
-                    if (
-                        "500"
-                        in self.json_data[idx]["sequencing_instrument_model"].lower()
-                    ):
-                        mapped_json_data[idx]["instrument_model"] = "NextSeq 500"
-                    if (
-                        "1000"
-                        in self.json_data[idx]["sequencing_instrument_model"].lower()
-                    ):
-                        mapped_json_data[idx]["instrument_model"] = "NextSeq 1000"
-                    if (
-                        "2000"
-                        in self.json_data[idx]["sequencing_instrument_model"].lower()
-                    ):
-                        mapped_json_data[idx]["instrument_model"] = "NextSeq 2000"
-                    if (
-                        "550"
-                        in self.json_data[idx]["sequencing_instrument_model"].lower()
-                    ):
-                        mapped_json_data[idx]["instrument_model"] = "NextSeq 550"
-                    if (
-                        "illumina nextseq"
-                        in self.json_data[idx]["sequencing_instrument_model"].lower()
-                    ):
-                        mapped_json_data[idx]["instrument_model"] = "NextSeq 550"
-                else:
+
                 """
                 mapped_json_data[idx]["instrument_model"] = self.json_data[idx][
                     "sequencing_instrument_model"
                 ]
+                """
 
                 mapped_json_data[idx]["host health state"] = "not provided"
                 mapped_json_data[idx]["center_name"] = mapped_json_data[idx][

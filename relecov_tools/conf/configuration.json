@@ -254,7 +254,7 @@
             "consensus_sequence_name",
             "number_of_base_pairs_sequenced"
         ],
-        "mapping_pangolin":{
+        "mapping_pangolin": {
             "variant_designation": "scorpio_call"
         },
         "mapping_stats": {
@@ -274,11 +274,11 @@
         "mapping_variant_metrics": {
             "ns_per_100_kbp": "# Ns per 100kb consensus"
         },
-        "mapping_version":{
-            "bioinformatics_protocol_software_version":{
+        "mapping_version": {
+            "bioinformatics_protocol_software_version": {
                 "Workflow": "nf-core/viralrecon"
             },
-            "consensus_sequence_software_version":{
+            "consensus_sequence_software_version": {
                 "BCFTOOLS_CONSENSUS": "bcftools"
             },
             "dehosting_method_software_version": {
@@ -301,8 +301,8 @@
             "sequence_file_R1_fastq": "sequence_file_R1_fastq",
             "sequence_file_R2_fastq": "sequence_file_R2_fastq",
             "sequence_file_R1_md5": "sequence_file_R1_md5",
-            "sequence_file_R2_md5" : "sequence_file_R2_md5",
-            "sequencing_sample_id" : "sample_name"
+            "sequence_file_R2_md5": "sequence_file_R2_md5",
+            "sequencing_sample_id": "sample_name"
         }
     },
     "md5_file_name": "md5_check_file.csv",
