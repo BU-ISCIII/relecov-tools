@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 import jsonschema
 from jsonschema import Draft202012Validator
+from relecov_tools.config_json import ConfigJson
 import logging
 import rich.console
 import os
@@ -212,6 +213,13 @@ class MappingSchema:
                 mapped_json_data[idx]["address"] = self.json_data[idx][
                     "collecting_institution_address"
                 ]
+                config_json = ConfigJson()
+                fields = config_json.get_configuration("ENA_fields")[
+                    "map_not_provided_fields"
+                ]
+                for i, j in enumerate(fields):
+
+                    mapped_json_data[idx][j] = "not provided"
 
         return mapped_json_data
 
