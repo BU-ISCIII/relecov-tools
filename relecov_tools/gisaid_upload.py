@@ -9,7 +9,6 @@ import os
 import relecov_tools.utils
 from Bio import SeqIO
 from relecov_tools.config_json import ConfigJson
-import gzip
 
 # import site
 
