@@ -213,6 +213,7 @@ class MappingSchema:
                 mapped_json_data[idx]["address"] = self.json_data[idx][
                     "collecting_institution_address"
                 ]
+                "Adding all the 'not provided' fields that are not being captured"
                 config_json = ConfigJson()
                 fields = config_json.get_configuration("ENA_fields")[
                     "map_not_provided_fields"
