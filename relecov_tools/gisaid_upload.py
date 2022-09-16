@@ -6,12 +6,10 @@ import rich.console
 import pandas as pd
 import os
 
-# import ftplib
 import relecov_tools.utils
 from Bio import SeqIO
 from relecov_tools.config_json import ConfigJson
 import gzip
-
 
 # import site
 
@@ -38,7 +36,7 @@ class GisaidUpload:
         frameshift=None,
         proxy_config=None,
         single=False,
-        gzip=False
+        gzip=False,
     ):
         if (
             token is None
@@ -120,14 +118,13 @@ class GisaidUpload:
         dataframe.loc[
             dataframe["covv_patient_status"] == "", "covv_patient_status"
         ] = "unknown"
-        
+
         config_json = ConfigJson()
         gisaid_config = config_json.get_configuration("GISAID_configuration")
         submitter_id = gisaid_config["submitter"]
         dataframe.loc[dataframe["submitter"] == "", "submitter"] = submitter_id
-        
-        return dataframe
 
+        return dataframe
 
     def metadata_to_csv(self):
         """Transform metadata json to csv"""
@@ -143,7 +140,9 @@ class GisaidUpload:
                 df_data.insert(4, field, "")
 
         config_lab_json = ConfigJson()
-        lab_json_conf = config_lab_json.get_topic_data("lab_metadata", "laboratory_data")
+        lab_json_conf = config_lab_json.get_topic_data(
+            "lab_metadata", "laboratory_data"
+        )
         lab_json_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "conf", lab_json_conf["file"]
         )
@@ -159,7 +158,7 @@ class GisaidUpload:
                             lab["geo_loc_city"],
                         ]
                     )
-        
+
         df_data.replace("not provided", "unknown", inplace=True)
         df_data_comp = self.complete_mand_fields(df_data)
         df_data_path = os.path.join(self.output_path, "meta_gisaid.csv")
@@ -193,21 +192,21 @@ class GisaidUpload:
             gather_fastas_path = os.path.join(self.fasta_path, "*.fa*")
             if self.gzip:
                 os.system(
-                    "zcat %s > %s/multifasta.fasta" % (
-                        gather_fastas_path, self.output_path)
+                    "zcat %s > %s/multifasta.fasta"
+                    % (gather_fastas_path, self.output_path)
                 )
             else:
                 os.system(
-                    "cat %s > %s/multifasta.fasta" % (gather_fastas_path,
-                                                      self.output_path)
+                    "cat %s > %s/multifasta.fasta"
+                    % (gather_fastas_path, self.output_path)
                 )
             multifasta = "%s/multifasta.fasta" % self.output_path
 
         else:
             if self.gzip:
                 os.system(
-                    "zcat %s > %s/multifasta.fasta" % (self.fasta_path,
-                                                       self.output_path)
+                    "zcat %s > %s/multifasta.fasta"
+                    % (self.fasta_path, self.output_path)
                 )
                 multifasta = "%s/multifasta.fasta" % self.output_path
             else:
