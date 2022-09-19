@@ -322,7 +322,7 @@ class EnaUpload:
             """
             THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
             chec = submit_data(file_paths, self.passwd, self.user)
-            print(chec)            
+            print(chec)         
             When ADD/MODIFY:
             requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
             schema_xmls record XMLs for all these schema and following 'submission'
