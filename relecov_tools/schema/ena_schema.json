@@ -611,6 +611,18 @@
         "sample"
       ]
     },
+    "taxon_id": {
+      "examples": [
+        "2697049"
+      ],
+      "ontology": "NCIT:C164641",
+      "type": "string",
+      "description": "The NCBITaxon identifier for the organism being sequenced.",
+      "classification": "Sample collection and processing",
+      "label": "Tax ID",
+      "fill_mode": "batch",
+      "minLenght": "1"
+    },
     "definition for seropositive sample": {
       "examples": [
         ""

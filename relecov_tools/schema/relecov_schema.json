@@ -874,17 +874,18 @@
             "fill_mode": "batch",
             "minLenght": "1"
         },
-        "host_subject_id": {
+        "host subject id": {
             "examples": [
                 "e.g. #131"
             ],
             "ontology": "GENEPIO:0001398",
             "type": "string",
-            "description": "An unique identifier by which each subject can be referred to, de-identified.",
-            "classification": "Host information",
+            "description": "a unique identifier by which each subject can be referred to, de-identified.",
+            "clasification": "Host information",
             "label": "Host Subject Id",
-            "fill_mode": "sample",
-            "minLenght": "1"
+            "table": [
+                "sample"
+            ]
         },
         "host_health_state": {
             "examples": [

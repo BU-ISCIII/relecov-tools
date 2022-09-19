@@ -181,6 +181,9 @@ class MappingSchema:
                 mapped_json_data[idx]["sample_name"] = self.json_data[idx][
                     "sequencing_sample_id"
                 ]
+                mapped_json_data[idx]["host subject id"] = self.json_data[idx][
+                    "sequencing_sample_id"
+                ]
                 mapped_json_data[idx]["study_alias"] = self.json_data[idx][
                     "schema_name"
                 ]

@@ -174,8 +174,8 @@ class EnaUpload:
         """
         # Parsing the dataframes specifically according to ENA requirements #
         # df_study
-        df_study["alias"] = df_study["study_abstract"][0].rsplit(" ", 5)[0]
-        df_study["title"] = df_study["study_abstract"]
+        df_study["alias"] = df_study["study_alias"]
+        df_study["title"] = df_study["study_title"]
         df_study.insert(3, "status", self.action)
 
         """
@@ -186,9 +186,6 @@ class EnaUpload:
         """
 
         # df_samples
-        df_samples["host_sex"].replace("unknown", "not provided", inplace=True)
-        df_samples["host_sex"].replace("Unknown", "not provided", inplace=True)
-        # df_samples_fileds_config = ["rename_sample_list_og", "rename_sample_list_final"]
         df_samples = self.rename_cols_df(
             "df_samples",
             df_samples,
@@ -219,7 +216,7 @@ class EnaUpload:
             ]
         df_run.insert(3, "status", self.action)
 
-        df_run = df_run.rename(columns={"fastq_r1_md5": "file_checksum"})
+        df_run = df_run.rename(columns={"sequence_file_R1_md5": "file_checksum"})
 
         for i in range(len(df_run)):
             df_run.loc[i, "alias"] = (
@@ -236,7 +233,7 @@ class EnaUpload:
         df_run.insert(5, "file_name", df_run["sequence_file_R1_fastq"])
         df_run2 = df_run.copy()
         df_run2["file_name"] = df_run["sequence_file_R2_fastq"]
-        df_run2["file_checksum"] = df_run["fastq_r2_md5"]
+        df_run2["file_checksum"] = df_run["sequence_file_R2_md5"]
         df_run_final = pd.concat([df_run, df_run2])
         df_run_final.reset_index()
 
@@ -248,9 +245,12 @@ class EnaUpload:
 2        214821_S12   214823_S1_R1_001.fastq.gz   214823_S1_R2_001.fastq.gz  ...     fastq  c16bdbfc03c354496fcfb2c107e3cbf6  4d9b80b977a75bf7e2a4282ca910d94a
         """
         # df_experiments
+
         df_experiments["instrument_model"] = df_experiments[
             "instrument_model"
         ].str.lower()
+        df_experiments["sample_alias"] = df_samples["alias"]
+        df_experiments["title"] = df_study["study_abstract"]
         df_experiments["study_alias"] = df_study["alias"]
         df_experiments.insert(3, "status", self.action)
 
@@ -261,14 +261,6 @@ class EnaUpload:
                 + str(df_run.loc[i, "sequence_file_R2_fastq"])
             )
 
-        df_experiments = df_experiments.rename(
-            columns={"sequencing_instrument_platform": "platform"}
-        )
-        df_experiments = df_experiments.rename(columns={"study_abstract": "title"})
-        df_experiments = df_experiments.rename(columns={"sample_name": "sample_alias"})
-        df_experiments = df_experiments.rename(
-            columns={"collecting_institution": "collecting institution"}
-        )
         """
         # df_experiments example
         experiment_alias                                              title study_alias  ... library_layout instrument_model                                              alias
@@ -305,8 +297,8 @@ class EnaUpload:
 
             file_paths.update(file_paths_r2)
 
-            # submit data to webin ftp server. It should only upload fastq files in case the action is ADD.
-            # # When the action is MODIFY rthe fastq are already submitted
+            # Submit data to webin ftp server. It should only upload fastq files in case the action is ADD.
+            # When the action is MODIFY rthe fastq are already submitted
             """
             if self.action == "ADD" or self.action == "add":
                 session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
@@ -328,23 +320,20 @@ class EnaUpload:
                 g2 = session.quit()
                 print(g2)
             """
-
-            # THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
-            # chec = submit_data(file_paths, self.passwd, self.user)
-            # print(chec)
-
-            # when ADD/MODIFY,
-            #
-            # requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
-            # schema_xmls record XMLs for all these schema and following 'submission'
-
+            """
+            THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
+            chec = submit_data(file_paths, self.passwd, self.user)
+            print(chec)            
+            When ADD/MODIFY:
+            requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
+            schema_xmls record XMLs for all these schema and following 'submission'
+            """
             tool = config_json.get_configuration("ENA_fields")["tool"]
 
             schema_xmls = run_construct(
                 template_path, schema_targets, self.center, checklist, tool
             )
 
-            # submission_xml = construct_submission(template_path, self.action, schema_xmls, self.center, checklist, tool)
             submission_xml = construct_submission(
                 template_path, self.action, schema_xmls, self.center, checklist, tool
             )
@@ -355,13 +344,13 @@ class EnaUpload:
 
             for files in root.iter("FILE"):
                 if "R2" in files.attrib["filename"]:
-                    # print(files.attrib["filename"])
+
                     H = df_run_final.loc[
                         df_run_final["sequence_file_R2_fastq"]
                         == files.attrib["filename"]
                     ].values[0][8]
                     files.set("checksum", H)
-                    # print(files.attrib["checksum"])
+
             tree.write(schema_xmls["run"])
 
             if self.dev:
@@ -389,7 +378,6 @@ class EnaUpload:
                 schema_dataframe = update_table(
                     schema_dataframe, schema_targets, schema_update
                 )
-            ######
 
     def upload(self):
         """Create the required files and upload to ENA"""
