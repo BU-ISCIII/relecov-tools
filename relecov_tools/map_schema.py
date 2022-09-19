@@ -12,7 +12,7 @@ import sys
 
 # import jsonschema
 import relecov_tools.utils
-from relecov_tools.config_json import ConfigJson
+
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(

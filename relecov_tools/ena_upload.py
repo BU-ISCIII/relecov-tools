@@ -288,7 +288,6 @@ class EnaUpload:
         ):
             file_paths = {}
             file_paths_r2 = {}
-
             for path in df_schemas["r1_fastq_filepath"]:
                 file_paths[os.path.basename(path)] = os.path.abspath(path)
 
