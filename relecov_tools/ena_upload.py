@@ -327,6 +327,7 @@ class EnaUpload:
             requires source XMLs for 'run', 'experiment', 'sample', 'experiment'
             schema_xmls record XMLs for all these schema and following 'submission'
             """
+            #
             tool = config_json.get_configuration("ENA_fields")["tool"]
 
             schema_xmls = run_construct(
