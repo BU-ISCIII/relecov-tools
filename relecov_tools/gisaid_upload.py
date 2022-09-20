@@ -6,12 +6,10 @@ import rich.console
 import pandas as pd
 import os
 
-# import ftplib
 import relecov_tools.utils
 from Bio import SeqIO
 from relecov_tools.config_json import ConfigJson
 
-#
 
 # import site
 
@@ -38,6 +36,7 @@ class GisaidUpload:
         frameshift=None,
         proxy_config=None,
         single=False,
+        gzip=False,
     ):
         if (
             token is None
@@ -97,6 +96,7 @@ class GisaidUpload:
         else:
             self.proxy_config = proxy_config
         self.single = single
+        self.gzip = gzip
 
     # Metadatos
 
@@ -118,6 +118,12 @@ class GisaidUpload:
         dataframe.loc[
             dataframe["covv_patient_status"] == "", "covv_patient_status"
         ] = "unknown"
+
+        config_json = ConfigJson()
+        gisaid_config = config_json.get_configuration("GISAID_configuration")
+        submitter_id = gisaid_config["submitter"]
+        dataframe.loc[dataframe["submitter"] == "", "submitter"] = submitter_id
+
         return dataframe
 
     def metadata_to_csv(self):
@@ -134,9 +140,11 @@ class GisaidUpload:
                 df_data.insert(4, field, "")
 
         config_lab_json = ConfigJson()
-        lab_json_conf = config_lab_json.get_configuration("laboratory_data")
+        lab_json_conf = config_lab_json.get_topic_data(
+            "lab_metadata", "laboratory_data"
+        )
         lab_json_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "conf", lab_json_conf
+            os.path.dirname(os.path.realpath(__file__)), "conf", lab_json_conf["file"]
         )
         lab_json = relecov_tools.utils.read_json_file(lab_json_file)
         for lab in lab_json:
@@ -151,13 +159,13 @@ class GisaidUpload:
                         ]
                     )
 
+        df_data.replace("not provided", "unknown", inplace=True)
         df_data_comp = self.complete_mand_fields(df_data)
         df_data_path = os.path.join(self.output_path, "meta_gisaid.csv")
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
         df_data_comp.to_csv(df_data_path, index=False)
-        metagisaid = df_data_path
-        return metagisaid
+        return df_data_path
 
     # generar template con cli3
     # ADD TOKEN WARNING and file token  .authtoken
@@ -182,12 +190,27 @@ class GisaidUpload:
         """Create multifasta from single fastas (if --single)"""
         if self.single:
             gather_fastas_path = os.path.join(self.fasta_path, "*.fa*")
-            os.system(
-                "cat %s > %s/multifasta.fasta" % (gather_fastas_path, self.output_path)
-            )
+            if self.gzip:
+                os.system(
+                    "zcat %s > %s/multifasta.fasta"
+                    % (gather_fastas_path, self.output_path)
+                )
+            else:
+                os.system(
+                    "cat %s > %s/multifasta.fasta"
+                    % (gather_fastas_path, self.output_path)
+                )
             multifasta = "%s/multifasta.fasta" % self.output_path
+
         else:
-            multifasta = self.fasta_path
+            if self.gzip:
+                os.system(
+                    "zcat %s > %s/multifasta.fasta"
+                    % (self.fasta_path, self.output_path)
+                )
+                multifasta = "%s/multifasta.fasta" % self.output_path
+            else:
+                multifasta = self.fasta_path
         return multifasta
 
     def change_headers(self, multifasta):
@@ -205,8 +228,7 @@ class GisaidUpload:
                         record.id = name
                         record.description = name
                         SeqIO.write(record, new_fasta, "fasta")
-        fastagisaid = multi_gis_path
-        return fastagisaid
+        return multi_gis_path
 
     def cli3_auth(self):
         """Create authenticate token"""
@@ -233,7 +255,7 @@ class GisaidUpload:
                 % (
                     self.token,
                     self.metadata_to_csv(),
-                    self.change_headers(),
+                    self.change_headers(self.create_multifasta()),
                     self.frameshift,
                     self.proxy_config,
                 )
