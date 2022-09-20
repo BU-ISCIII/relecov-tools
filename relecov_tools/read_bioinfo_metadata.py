@@ -101,7 +101,7 @@ class BioinfoMetadata:
         for row in j_data:
             for field, value in mapping_fields.items():
                 try:
-                    row[field] = map_data[row["sample_name"]][value]
+                    row[field] = map_data[row["sequencing_sample_id"]][value]
                 except KeyError as e:
                     log.error("Field %s not found in mapping stats", e)
                     stderr.print(f"[red]Field {e} not found in mapping stats")
@@ -118,7 +118,7 @@ class BioinfoMetadata:
                 sample_name = row["sample_name"].replace("-", "_")
             else:
                 sample_name = row["sample_name"]
-            f_name = sample_name + ".pangolin." + row["analysis_date"] + ".csv"
+            f_name = sample_name + ".pangolin." + row["analysis date"] + ".csv"
             f_path = os.path.join(self.input_folder, f_name)
             try:
                 f_data = relecov_tools.utils.read_csv_file_return_dict(f_path, ",")

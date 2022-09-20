@@ -221,6 +221,14 @@ class MappingSchema:
                 fields = config_json.get_configuration("ENA_fields")[
                     "map_not_provided_fields"
                 ]
+                mapped_json_data[idx]["r1_fastq_filepath"] = (
+                    self.json_data[idx]["r1_fastq_filepath"]
+                    + self.json_data[idx]["sequence_file_R1_fastq"]
+                )
+                mapped_json_data[idx]["r2_fastq_filepath"] = (
+                    self.json_data[idx]["r2_fastq_filepath"]
+                    + self.json_data[idx]["sequence_file_R2_fastq"]
+                )
                 for i, j in enumerate(fields):
 
                     mapped_json_data[idx][j] = "not provided"

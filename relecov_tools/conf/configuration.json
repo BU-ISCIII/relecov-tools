@@ -251,14 +251,13 @@
             "consensus_sequence_filename",
             "consensus_sequence_filepath",
             "consensus_sequence_md5",
-            "consensus_sequence_name",
             "number_of_base_pairs_sequenced"
         ],
         "mapping_pangolin": {
             "variant_designation": "scorpio_call"
         },
         "mapping_stats": {
-            "analysis_date": "analysis date",
+            "analysis date": "analysis date",
             "depth_of_coverage_value": "medianDPcoveragevirus",
             "lineage_name": "Lineage",
             "number_of_variants_in_consensus": "Variantsinconsensusx10",
@@ -287,6 +286,9 @@
             "mapping_software_name": {
                 "BOWTIE2_ALIGN": "bowtie2"
             },
+            "mapping_software_version": {
+                "BOWTIE2_ALIGN": "2.4.4"
+            },
             "preprocessing_software_version": {
                 "FASTP": "fastp"
             },
@@ -302,7 +304,7 @@
             "sequence_file_R2_fastq": "sequence_file_R2_fastq",
             "sequence_file_R1_md5": "sequence_file_R1_md5",
             "sequence_file_R2_md5": "sequence_file_R2_md5",
-            "sequencing_sample_id": "sample_name"
+            "sequencing_sample_id": "sequencing_sample_id"
         }
     },
     "md5_file_name": "md5_check_file.csv",

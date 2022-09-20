@@ -14,7 +14,7 @@ import pandas as pd
 import sys
 import os
 
-# import ftplib
+import ftplib
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
@@ -298,7 +298,7 @@ class EnaUpload:
 
             # Submit data to webin ftp server. It should only upload fastq files in case the action is ADD.
             # When the action is MODIFY rthe fastq are already submitted
-            """
+
             if self.action == "ADD" or self.action == "add":
                 session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
 
@@ -318,7 +318,7 @@ class EnaUpload:
 
                 g2 = session.quit()
                 print(g2)
-            """
+
             """
             THE ENA_UPLOAD_CLI METHOD DOES NOT WORK (below)
             chec = submit_data(file_paths, self.passwd, self.user)
