@@ -78,6 +78,7 @@ def read_csv_file_return_dict(file_name, sep, key_position=None):
     where the main key is the first column, if key position is None otherwise
     the index value of the kwy position is used as key
     """
+
     try:
         with open(file_name, "r") as fh:
             lines = fh.readlines()

@@ -89,7 +89,7 @@ class BioinfoMetadata:
         per_genome_greater_10x. per_Ns. per_reads_host, per_reads_virus.
         per_unmapped, qc_filtered, reference_genome_accession
         """
-        # position of the aample columns inside mapping file
+        # position of the sample columns inside mapping file
         sample_position = 4
         map_data = relecov_tools.utils.read_csv_file_return_dict(
             self.mapping_illumina, ",", sample_position
@@ -114,12 +114,13 @@ class BioinfoMetadata:
             "bioinfo_analysis", "mapping_pangolin"
         )
         for row in j_data:
-            if "-" in row["sample_name"]:
-                sample_name = row["sample_name"].replace("-", "_")
+            if "-" in row["sequencing_sample_id"]:
+                sample_name = row["sequencing_sample_id"].replace("-", "_")
             else:
-                sample_name = row["sample_name"]
+                sample_name = row["sequencing_sample_id"]
             f_name = sample_name + ".pangolin." + row["analysis date"] + ".csv"
             f_path = os.path.join(self.input_folder, f_name)
+
             try:
                 f_data = relecov_tools.utils.read_csv_file_return_dict(f_path, ",")
             except FileNotFoundError as e:
@@ -145,10 +146,10 @@ class BioinfoMetadata:
             "bioinfo_analysis", "mapping_consensus"
         )
         for row in j_data:
-            if "-" in row["sample_name"]:
-                sample_name = row["sample_name"].replace("-", "_")
+            if "-" in row["sequencing_sample_id"]:
+                sample_name = row["sequencing_sample_id"].replace("-", "_")
             else:
-                sample_name = row["sample_name"]
+                sample_name = row["sequencing_sample_id"]
             f_name = sample_name + ".consensus.fa"
             f_path = os.path.join(self.input_folder, f_name)
             try:
@@ -164,12 +165,12 @@ class BioinfoMetadata:
             row["consensus_genome_length"] = str(len(record_fasta))
             row["consensus_sequence_name"] = record_fasta.description
             row["consensus_sequence_filepath"] = self.input_folder
-            row["consensus_file_name"] = f_name
+            row["consensus_sequence_filename"] = f_name
             row["consensus_sequence_md5"] = relecov_tools.utils.calculate_md5(f_path)
             base_calculation = int(row["number_of_base_pairs_sequenced"]) * len(
                 record_fasta
             )
-            if row["sequence_file_R2_fastq"] != "":
+            if row["sequencing_sample_id"] != "":
                 row["number_of_base_pairs_sequenced"] = str(base_calculation * 2)
             else:
                 row["number_of_base_pairs_sequenced"] = str(base_calculation)
@@ -203,7 +204,7 @@ class BioinfoMetadata:
         for row in j_data:
             for field, value in mapping_fields.items():
                 try:
-                    row[field] = map_data[row["sample_name"]][value]
+                    row[field] = map_data[row["sequencing_sample_id"]][value]
                 except KeyError as e:
                     log.error("Field %s not found in mapping stats", e)
                     stderr.print(f"[red]Field {e} not found in mapping stats")
@@ -215,6 +216,7 @@ class BioinfoMetadata:
         version_fields = self.configuration.get_topic_data(
             "bioinfo_analysis", "mapping_version"
         )
+
         try:
             versions = relecov_tools.utils.read_yml_file(self.req_files["versions"])
         except YAMLError as e:
@@ -224,7 +226,9 @@ class BioinfoMetadata:
             sys.exit(1)
         for row in j_data:
             for field, version_data in version_fields.items():
+
                 for key, value in version_data.items():
+
                     row[field] = versions[key][value]
         return j_data
 

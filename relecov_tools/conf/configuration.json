@@ -287,7 +287,7 @@
                 "BOWTIE2_ALIGN": "bowtie2"
             },
             "mapping_software_version": {
-                "BOWTIE2_ALIGN": "2.4.4"
+                "BOWTIE2_ALIGN": "bowtie2"
             },
             "preprocessing_software_version": {
                 "FASTP": "fastp"
@@ -300,8 +300,6 @@
             "read_length": "number_of_base_pairs_sequenced",
             "schema_name": "schema_name",
             "schema_version": "schema_version",
-            "sequence_file_R1_fastq": "sequence_file_R1_fastq",
-            "sequence_file_R2_fastq": "sequence_file_R2_fastq",
             "sequence_file_R1_md5": "sequence_file_R1_md5",
             "sequence_file_R2_md5": "sequence_file_R2_md5",
             "sequencing_sample_id": "sequencing_sample_id"
