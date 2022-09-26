@@ -117,6 +117,8 @@ class GisaidUpload:
         dataframe.loc[
             dataframe["covv_patient_status"] == "", "covv_patient_status"
         ] = "unknown"
+        dataframe.loc[dataframe["covv_type"] == "", "covv_type"] = "betacoronavirus"
+        dataframe.loc[dataframe["covv_passage"] =="", "covv_passage"] = "Original"
 
         config_json = ConfigJson()
         gisaid_config = config_json.get_configuration("GISAID_configuration")
@@ -129,7 +131,6 @@ class GisaidUpload:
         """Transform metadata json to csv"""
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
         df_data = pd.DataFrame(data)
-        df_data.insert(4, "covv_passage", "Original")
 
         config_json = ConfigJson()
         fields = config_json.get_configuration("gisaid_csv_headers")
@@ -164,6 +165,7 @@ class GisaidUpload:
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
         df_data_comp.to_csv(df_data_path, index=False)
+        import pdb; pdb.set_trace()
         return df_data_path
 
     # generar template con cli3
