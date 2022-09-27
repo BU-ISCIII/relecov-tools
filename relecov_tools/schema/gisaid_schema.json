@@ -247,6 +247,15 @@
             "classification": "Database Identifiers",
             "label": "Sample ID given by originating laboratory",
             "fill_mode": "sample"
+        },
+        "covv_patient_status": {
+            "examples": ["Hospitalized", "Released", "Live", "Deceased"],
+            "ontology": "GENEPIO:0001388",
+            "type": "string",
+            "description": " Status of the host",
+            "classification": "Host information",
+            "label": "Host health state",
+            "fill_mode": "sample"
         }
     }
 }
