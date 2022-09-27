@@ -124,6 +124,10 @@ class GisaidUpload:
         gisaid_config = config_json.get_configuration("GISAID_configuration")
         submitter_id = gisaid_config["submitter"]
         dataframe.loc[dataframe["submitter"] == "", "submitter"] = submitter_id
+        
+        bioinfo_config = config_json.get_configuration("bioinfo_analysis")
+        assembly_method = bioinfo_config["fixed_values"]["bioinformatics_protocol_software_name"]
+        dataframe.loc[dataframe["covv_assembly_method"] == "", "covv_assembly_method"] = assembly_method
 
         return dataframe
 
@@ -165,7 +169,6 @@ class GisaidUpload:
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
         df_data_comp.to_csv(df_data_path, index=False)
-        import pdb; pdb.set_trace()
         return df_data_path
 
     # generar template con cli3
