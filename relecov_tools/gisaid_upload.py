@@ -240,6 +240,7 @@ class GisaidUpload:
             "cli3 authenticate --username %s --password %s --client_id %s"
             % (self.user, self.passwd, self.client_id)
         )
+        self.token = "gisaid.authtoken"
 
     def cli3_upload(self):
         """Upload to GISAID"""
