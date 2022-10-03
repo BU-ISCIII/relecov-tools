@@ -277,7 +277,7 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
 @click.option(
     "-i",
     "--input_path",
-    help="path to fasta or multifasta file",
+    help="path to fastas folder or multifasta file",
 )
 @click.option("-o", "--output_path", help="output folder for log")
 @click.option(
@@ -296,7 +296,13 @@ def upload_to_ena(user, password, center, ena_json, dev, study, action, output_p
     "--single",
     is_flag=True,
     default=False,
-    help="Default input is a multifasta.",
+    help="input is a folder with several fasta files. Default: False",
+)
+@click.option(
+    "--gzip",
+    is_flag=True,
+    default=False,
+    help="input fasta is gziped. Default: False",
 )
 def upload_to_gisaid(
     user,
@@ -309,6 +315,7 @@ def upload_to_gisaid(
     frameshift,
     proxy_config,
     single,
+    gzip,
 ):
     """parsed data to create files to upload to gisaid"""
     upload_gisaid = relecov_tools.gisaid_upload.GisaidUpload(
@@ -322,6 +329,7 @@ def upload_to_gisaid(
         frameshift,
         proxy_config,
         single,
+        gzip,
     )
     upload_gisaid.gisaid_upload()
 
