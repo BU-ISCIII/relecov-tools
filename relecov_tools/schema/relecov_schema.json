@@ -173,7 +173,7 @@
             "examples": [
                 "3/21/2020"
             ],
-            "ontology": "GENEPIO:0001179",
+            "ontology": "NCIT:C93644",
             "type": "string",
             "description": "The date on which the sample was received.",
             "format": "date",
@@ -185,7 +185,7 @@
             "examples": [
                 "24 degrees celsius"
             ],
-            "ontology": "NCIT_C115535",
+            "ontology": "NCIT:C115535",
             "type": "string",
             "description": "The name and version of a particular protocol used for sampling.",
             "classification": "Sample collection and processing",
@@ -498,7 +498,7 @@
             "examples": [
                 "Derbyshire"
             ],
-            "ontology": "GENEPIO:0100280",
+            "ontology": "NCIT:C87189",
             "type": "string",
             "description": "The county/region of origin of the sample.",
             "classification": "Sample collection and processing",
@@ -527,6 +527,34 @@
             "label": "Geo Loc Latitude",
             "fill_mode": "batch"
         },
+        "study_type": {
+            "examples": [
+                ""
+            ],
+            "enum": [
+                "Whole Genome Sequencing [NCIT:C101294]",
+                "Metagenomics [NCIT:C153191]",
+                "Transcriptome Analysis [GENEPIO:0001111]",
+                "Resequencing [NCIT:C41254]",
+                "Epigenetics [OMIT:0027036] ",
+                "Synthetic Genomics [NCIT:C84343]",
+                "Forensic or Paleo-genomics [topic:3943]",
+                "Gene Regulation Study [topic:0204]",
+                "Cancer Genomics [NCIT:C18247]",
+                "Population Genomics [topic:3796]",
+                "RNASeq [OBI:0001177]",
+                "Exome Sequencing [OBI:0002118]",
+                "Pooled Clone Sequencing [OBI:2100402]",
+                "Transcriptome Sequencing [NCIT:C124261]",
+                "Other [NCIT:C124261]"
+            ],
+            "ontology": "GENEPIO:0000156",
+            "type": "string",
+            "description": "",
+            "clasification": "Submission ENA",
+            "label": "Study type",
+            "table": "study"
+        },
         "geo_loc_longitude": {
             "examples": [
                 "77.11 W"
@@ -551,7 +579,7 @@
                 "Missing [GENEPIO:0001618]",
                 "Restricted Access [GENEPIO:0001810]"
             ],
-            "ontology": "NCIT_C146997",
+            "ontology": "GENEPIO:0001198",
             "type": "string",
             "description": "The reason that the sample was collected.",
             "examples": [
@@ -823,7 +851,7 @@
                 "Missing [GENEPIO:0001618]",
                 "Restricted Access [GENEPIO:0001810]"
             ],
-            "ontology": "GENEPIO:0001191",
+            "ontology": "NCIT:C43459",
             "type": "string",
             "description": "Taxonomic name of the organism.",
             "examples": [
@@ -838,7 +866,7 @@
             "examples": [
                 "2697049"
             ],
-            "ontology": "GENEPIO_0001724",
+            "ontology": "NCIT:C164641",
             "type": "string",
             "description": "The NCBITaxon identifier for the organism being sequenced.",
             "classification": "Sample collection and processing",
@@ -846,17 +874,18 @@
             "fill_mode": "batch",
             "minLenght": "1"
         },
-        "host_subject_id": {
+        "host subject id": {
             "examples": [
                 "e.g. #131"
             ],
             "ontology": "GENEPIO:0001398",
             "type": "string",
-            "description": "An unique identifier by which each subject can be referred to, de-identified.",
-            "classification": "Host information",
+            "description": "a unique identifier by which each subject can be referred to, de-identified.",
+            "clasification": "Host information",
             "label": "Host Subject Id",
-            "fill_mode": "sample",
-            "minLenght": "1"
+            "table": [
+                "sample"
+            ]
         },
         "host_health_state": {
             "examples": [
@@ -1658,12 +1687,12 @@
         },
         "analysis_date": {
             "examples": [
-                "e.g 2020-08-07"
+                "e.g 20220705"
             ],
             "ontology": "0",
             "type": "string",
             "format": "date",
-            "description": "",
+            "description": "The time of a sample analysis process",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "Analysis date",
             "fill_mode": "batch",
@@ -1671,7 +1700,7 @@
         },
         "dehosting_method_software_name": {
             "examples": [
-                "Nanostripper"
+                "KRAKEN2_KRAKEN2                "
             ],
             "ontology": "GENEPIO:0001459",
             "type": "string",
@@ -1748,7 +1777,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "If bioinformatics protocol used was open-source or commercial",
             "classification": "Bioinformatic Analysis fields",
             "label": "Commercial/Open-source/both",
             "fill_mode": "batch"
@@ -1781,7 +1810,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Preprocessing software name other",
             "classification": "Bioinformatic Analysis fields",
             "label": "If preprocessing Is Other, Specify",
             "fill_mode": "batch"
@@ -1825,7 +1854,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Mapping software used other ",
             "classification": "Bioinformatic Analysis fields",
             "label": "If mapping Is Other, Specify",
             "fill_mode": "batch"
@@ -1923,7 +1952,7 @@
             "type": "string",
             "description": "The name of the consensus sequence.",
             "examples": [
-                "ncov123assembly3"
+                "2018086 NC_045512.2"
             ],
             "classification": "Bioinformatic Analysis fields",
             "label": "Consensus sequence name",
@@ -1934,7 +1963,7 @@
             "type": "string",
             "description": "The name of the consensus sequence filename",
             "examples": [
-                "ncov123assembly3"
+                "2018102.consensus.fa"
             ],
             "classification": "Bioinformatic Analysis fields",
             "label": "Consensus sequence name",
@@ -1943,7 +1972,7 @@
         "consensus_sequence_md5": {
             "ontology": "0",
             "type": "string",
-            "description": "The name of the consensus sequence.",
+            "description": "The md5 of the consensus sequence.",
             "examples": [
                 "5gaskañlkdak3143242ñlkas"
             ],
@@ -2056,7 +2085,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of read that pass quality control threshold ",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%qc filtered",
             "fill_mode": "batch"
@@ -2067,7 +2096,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of reads mapped to host",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%reads host",
             "fill_mode": "batch"
@@ -2078,7 +2107,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of reads mapped to virus",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%reads virus",
             "fill_mode": "batch"
@@ -2089,7 +2118,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of reads unmapped to virus or to host",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%unmapped",
             "fill_mode": "batch"
@@ -2111,7 +2140,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of genome with coverage greater than 10x",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "% genome greater 10x",
             "fill_mode": "batch"
@@ -2122,7 +2151,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Percentage of Ns",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%Ns",
             "fill_mode": "batch"
@@ -2144,7 +2173,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "The number of variants found in consensus sequence",
             "classification": "Bioinformatic Variants",
             "label": "Number of variants (AF greater 75%)",
             "fill_mode": "batch"
@@ -2155,7 +2184,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "The number of missense variants",
             "classification": "Bioinformatic Variants",
             "label": "Number of variants with effect",
             "fill_mode": "batch"
@@ -2331,39 +2360,6 @@
             ],
             "classification": "Pathogen diagnostic testing",
             "label": "Gene Name 2",
-            "fill_mode": "batch"
-        },
-        "bioproject_umbrella_accession_ENA": {
-            "examples": [
-                ""
-            ],
-            "ontology": "GENEPIO:0001133",
-            "type": "string",
-            "description": "The INSDC umbrella accession number of the BioProject to which the BioSample belongs.",
-            "classification": "Sample collection and processing",
-            "label": "Bioproject umbrella accession ENA",
-            "fill_mode": "batch"
-        },
-        "bioproject_accession_ENA": {
-            "examples": [
-                ""
-            ],
-            "ontology": "GENEPIO:0001136",
-            "type": "string",
-            "description": "The INSDC accession number of the BioProject(s) to which the BioSample belongs.",
-            "classification": "Sample collection and processing",
-            "label": "Bioproject accession ENA",
-            "fill_mode": "batch"
-        },
-        "biosample_accession_ENA": {
-            "examples": [
-                ""
-            ],
-            "ontology": "GENEPIO:0001139",
-            "type": "string",
-            "description": "The identifier assigned to a BioSample in INSDC archives.",
-            "classification": "Sample collection and processing",
-            "label": "ENA Sample ID",
             "fill_mode": "batch"
         },
         "diagnostic_pcr_Ct_value_2": {

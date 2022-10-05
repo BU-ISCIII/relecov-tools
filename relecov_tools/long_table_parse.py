@@ -23,7 +23,6 @@ stderr = rich.console.Console(
 
 class LongTableParse:
     """
-
     - parse_a_list_of_dictionaries() : returns generated_JSON
     - saving_file(generated_JSON)
     - parsing_csv() : It manages all this proccess:
@@ -62,9 +61,7 @@ class LongTableParse:
         Path(self.output_directory).mkdir(parents=True, exist_ok=True)
 
         config_json = ConfigJson()
-        self.long_table_heading = config_json.get_topic_data(
-            "headings", "long_table_heading"
-        )
+        self.long_table_heading = config_json.get_configuration("long_table_heading")
 
     def validate_file(self, heading):
         """Check if long table file has all mandatory fields defined in
@@ -78,12 +75,9 @@ class LongTableParse:
         return True
 
     def parse_file(self):
-        """_summary_
-        This function generates a json file from the csv file entered by the user
-        (long_table.csv).
-        - Checks if expected headers match with file headers
-        Returns:
-            dictionary with key as sample and value the list of variants
+        """This function generates a json file from the csv file entered by
+        the user (long_table.csv).
+        Validate the file by checking the header line
         """
         with open(self.file_path) as fh:
             lines = fh.readlines()
@@ -135,7 +129,6 @@ class LongTableParse:
         return samp_dict
 
     def convert_to_json(self, samp_dict):
-        """ """
         j_list = []
         for key, values in samp_dict.items():
             j_dict = {"sample_name": key}
@@ -143,9 +136,8 @@ class LongTableParse:
             j_list.append(j_dict)
         return j_list
 
-    def saving_file(self, j_list):
-        """
-        Transform the p0arsed data into a jsonf file, naming as
+    def save_to_file(self, j_list):
+        """Transform the parsed data into a jsonf file, naming as
         "long_table_" + "current date" + ".json"
         """
         stderr.print("[blue]Saving parsed data to file")
@@ -164,5 +156,5 @@ class LongTableParse:
         stderr.print("[blue]Starting reading the input file")
         parsed_data = self.parse_file()
         j_list = self.convert_to_json(parsed_data)
-        self.saving_file(j_list)
+        self.save_to_file(j_list)
         stderr.print("[green]Process completed")

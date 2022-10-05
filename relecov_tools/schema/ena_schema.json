@@ -1,36 +1,44 @@
 {
   "schema": "ENA",
   "required": [
-    "sample_name",
-    "collecting_institution",
-    "geographic_location_(country_and/or_sea)",
+    "sample_title",
+    "collecting institution",
+    "geographic location (country and/or sea)",
     "isolate",
-    "host_scientific_name",
-    "host_common_name",
+    "collector name",
+    "host scientific name",
+    "host common name",
     "instrument_model",
-    "taxon_id",
+    "host subject id",
+    "host health state",
+    "host sex",
+    "host scientific name",
     "scientific_name",
-    "common_name",
     "sample_description",
     "library_source",
     "library_selection",
     "library_strategy",
     "library_layout",
+    "sample_alias",
     "study_alias",
     "experiment_alias",
     "run_alias",
     "experiment_title",
-    "study_title"
+    "study_title",
+    "study_type",
+    "platform",
+    "file_format",
+    "file_name"
   ],
   "type": "object",
   "properties": {
-    "sample_name": {
+    "virus identifier": {
       "examples": [
-        "prov_rona_99"
+        ""
       ],
       "ontology": "GENEPIO:0001123",
       "type": "string",
-      "description": "The user-defined name for the sample.",
+      "description": "Unique laboratory identifier assigned to the virus by the investigator. Strain name is not sufficient since it might not be unique due to various passsages of the same virus. Format: up to 50 alphanumeric characters",
       "clasification": "Database Identifiers",
       "label": "Sample ID given by originating laboratory",
       "table": [
@@ -38,7 +46,7 @@
         "experiments"
       ]
     },
-    "collecting_institution": {
+    "collecting institution": {
       "examples": [
         "Public Health Agency of Canada"
       ],
@@ -48,48 +56,18 @@
       "label": "Originating Laboratory",
       "table": "sample"
     },
-    "collector_name": {
+    "collector name": {
       "examples": [
-        "John Smith"
+        "John Smith, unknown"
       ],
-      "ontology": "GENEPIO:0001153",
+      "ontology": "GENEPIO:0001797",
       "type": "string",
       "description": "Name of the person who collected the specimen",
       "clasification": "Sample collection and processing",
       "label": "Sample collector name",
       "table": "sample"
     },
-    "public_health_sample_id_sivies": {
-      "examples": [
-        "2022CEU03926"
-      ],
-      "ontology": "0",
-      "type": "string",
-      "description": "",
-      "clasification": "Sample collection and processing",
-      "label": "Public Health sample id (SIVIES)"
-    },
-    "microbiology_lab_sample_id": {
-      "examples": [
-        ""
-      ],
-      "ontology": "0",
-      "type": "string",
-      "description": "",
-      "clasification": "Sample collection and processing",
-      "label": "Sample ID given in the microbiology lab"
-    },
-    "isolate_sample_id": {
-      "examples": [
-        ""
-      ],
-      "ontology": "NCIT:C53471",
-      "type": "string",
-      "description": "",
-      "clasification": "",
-      "label": "Sample ID given if multiple rna-extraction or passages"
-    },
-    "collection_date": {
+    "collection date": {
       "examples": [
         "3/19/2020"
       ],
@@ -101,11 +79,11 @@
       "label": "Sample Collection Date",
       "table": "sample"
     },
-    "receipt_date": {
+    "receipt date": {
       "examples": [
         "3/21/2020"
       ],
-      "ontology": "GENEPIO:0001179",
+      "ontology": "NCIT:C93644",
       "type": "string",
       "description": "The date on which the sample was received.",
       "format": "date",
@@ -415,7 +393,7 @@
       "table": "sample"
     },
     "geographic location (region and locality)": {
-      "ontology": "GENEPIO:0100280",
+      "ontology": "NCIT:C87189",
       "type": "string",
       "description": "The county/region of origin of the sample.",
       "examples": [
@@ -456,7 +434,7 @@
       "label": "Sample ID given by originating laboratory",
       "table": "sample"
     },
-    "purpose_sampling": {
+    "sample capture status": {
       "examples": [
         "Diagnostic testing"
       ],
@@ -472,7 +450,7 @@
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
-      "ontology": "NCIT_C146997",
+      "ontology": "GENEPIO:0001198",
       "type": "string",
       "description": "The reason that the sample was collected.",
       "clasification": "Sample collection and processing"
@@ -501,7 +479,7 @@
         "Blood [UBERON:0000178]"
       ],
       "classification": "Sample collection and processing",
-      "label": "Organism Substance"
+      "label": "Specimen source"
     },
     "isolation source non-host-associated": {
       "Enums": [
@@ -553,7 +531,7 @@
       "clasification": "Sample collection and processing",
       "label": "Environmental Material"
     },
-    "host_common_name": {
+    "host common name": {
       "Enums": [
         "Human [NCBITaxon:9606]",
         "Bat [NCBITaxon:9397]",
@@ -584,7 +562,7 @@
       "label": "Host Common Name",
       "table": "sample"
     },
-    "host_scientific_name": {
+    "host scientific name": {
       "Enums": [
         "Bos taurus [NCBITaxon:9913]",
         "Canis lupus familiaris [NCBITaxon:9615]",
@@ -620,7 +598,7 @@
         "runs"
       ]
     },
-    "host_subject_id": {
+    "host subject id": {
       "examples": [
         "e.g. #131"
       ],
@@ -633,7 +611,121 @@
         "sample"
       ]
     },
-    "host_health_state": {
+    "taxon_id": {
+      "examples": [
+        "2697049"
+      ],
+      "ontology": "NCIT:C164641",
+      "type": "string",
+      "description": "The NCBITaxon identifier for the organism being sequenced.",
+      "classification": "Sample collection and processing",
+      "label": "Tax ID",
+      "fill_mode": "batch",
+      "minLenght": "1"
+    },
+    "definition for seropositive sample": {
+      "examples": [
+        ""
+      ],
+      "ontology": "NCIT:C159692",
+      "type": "string",
+      "description": " The cut off value used by an investigatior in determining that a sample was seropositive.",
+      "clasification": "Sample collection and processing",
+      "label": "Definition for seropositive sample",
+      "table": [
+        "sample"
+      ]
+    },
+    "serotype (required for a seropositive sample)": {
+      "examples": [
+        "h1n1"
+      ],
+      "ontology": "NCIT:C88894",
+      "type": "string",
+      "description": " erological variety of a species characterised by its antigenic properties. For influenza, ha subtype should be the letter h followed by a number between 1-16 unless novel subtype is identified and the na subtype should be the letter n followed by a number between 1-9 unless novel subtype is identified. If only one of the subtypes have been tested then use the format h5nx or hxn1.",
+      "clasification": "Sample collection and processing",
+      "label": "Serotype (required for a seropositive sample)",
+      "table": [
+        "sample"
+      ]
+    },
+    "host habitat": {
+      "examples": [
+        ""
+      ],
+      "ontology": "ENVO:00002036",
+      "type": "string",
+      "description": "Natural habitat of the avian or mammalian host.",
+      "clasification": "Sample collection and processing",
+      "label": "Host habitat",
+      "table": [
+        "sample"
+      ]
+    },
+    "host description": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0000009",
+      "type": "string",
+      "description": "Other descriptive information relating to the host.",
+      "clasification": "Host information",
+      "label": "Host description",
+      "table": [
+        "sample"
+      ]
+    },
+    "gravidity": {
+      "examples": [
+        ""
+      ],
+      "ontology": "OBI:0002456",
+      "type": "string",
+      "description": "Whether or not the subject is gravid. If so, report date due or date post-conception and specify which of these two dates is being reported.",
+      "clasification": "Host information",
+      "label": "Gravidity",
+      "table": [
+        "sample"
+      ]
+    },
+    "strain": {
+      "examples": [
+        ""
+      ],
+      "ontology": "NCIT:C14419",
+      "type": "string",
+      "description": "Name of the strain from which the sample was obtained..",
+      "clasification": "Sample collection and processing",
+      "label": "Strain",
+      "table": [
+        "sample"
+      ]
+    },
+    "host_age": {
+      "ontology": "GENEPIO:0001392",
+      "type": "string",
+      "description": "Age of host at the time of sampling.",
+      "examples": [
+        "79"
+      ],
+      "classification": "Host information",
+      "label": "Host Age",
+      "fill_mode": "sample"
+    },
+    "host disease outcome": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001390",
+      "type": "string",
+      "description": "Disease outcome in the host.",
+      "clasification": "Host information",
+      "label": "Host disease outcome",
+      "table": [
+        "sample"
+      ]
+    },
+    "host health state": {
       "examples": [
         ""
       ],
@@ -646,7 +738,33 @@
         "sample"
       ]
     },
-    "host_sex": {
+    "type exposure": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001417",
+      "type": "string",
+      "description": " Date, Location e.g. type of gathering, Family cluster, etc.",
+      "clasification": "Host information",
+      "label": "Outbreak Exposure Event Location",
+      "table": [
+        "sample"
+      ]
+    },
+    "personal_protective_equipment": {
+      "examples": [
+        ""
+      ],
+      "ontology": "NCIT:C173748",
+      "type": "string",
+      "description": "Use of personal protective equipment, such as gloves, gowns, during any type of exposure. Example: mask",
+      "clasification": "Host information",
+      "label": "Personal protective equipment",
+      "table": [
+        "sample"
+      ]
+    },
+    "host sex": {
       "Enums": [
         "Female [NCIT:C46110]",
         "Male [NCIT:C46109]",
@@ -671,21 +789,11 @@
         "sample"
       ]
     },
-    "type exposure": {
-      "examples": [
-        "Date, Location e.g. type of gathering, Family cluster, etc."
-      ],
-      "ontology": "GENEPIO:0001417",
-      "type": "string",
-      "description": "If the information is unknown or can not be shared, leave blank.",
-      "clasification": "Host information",
-      "label": "Outbreak Exposure Event Location"
-    },
     "subject exposure duration": {
       "examples": [
         "e.g. Patient infected while traveling in …."
       ],
-      "ontology": "GENEPIO_0001268",
+      "ontology": "NCIT:C83280",
       "type": "string",
       "description": "If the information is unknown or can not be shared, leave blank.",
       "clasification": "Host information",
@@ -818,43 +926,17 @@
       "clasification": "Bioinformatics and QC metrics",
       "label": "Filepath R2 fastq"
     },
-    "file_type": {
-      "examples": [
-        "fastq"
-      ],
-      "ontology": "0",
-      "type": "string",
-      "description": "",
-      "clasification": "Bioinformatics and QC metrics",
-      "label": "file type",
-      "table": [
-        "runs"
-      ]
-    },
-    "fastq_md5_r2": {
+    "sequence_file_R2_md5": {
       "examples": [
         "3e69af1f875fab020aed82f5edbc1f03"
       ],
-      "ontology": "MS_1000568",
+      "ontology": "MS_1000569",
       "type": "string",
       "description": "",
       "clasification": "Bioinformatics and QC metrics",
       "label": "file checksum",
       "table": [
         "runs"
-      ]
-    },
-    "taxon_id": {
-      "examples": [
-        "probably 2697049 in all cases"
-      ],
-      "ontology": "GENEPIO_0001724",
-      "type": "string",
-      "description": "The NCBITaxon identifier for the organism being sequenced.",
-      "clasification": "Sample collection and processing",
-      "label": "Tax ID",
-      "table": [
-        "sample"
       ]
     },
     "scientific_name": {
@@ -870,7 +952,7 @@
       "examples": [
         ""
       ],
-      "ontology": "GENEPIO:0001191",
+      "ontology": "NCIT:C43459",
       "type": "string",
       "description": "The taxonomic name of the organism.",
       "clasification": "Sample collection and processing",
@@ -878,32 +960,42 @@
       "label": "Organism",
       "table": "sample"
     },
-    "common_name": {
-      "examples": [
-        ""
-      ],
-      "ontology": "NCIT:C164471",
+    "hospitalisation": {
+      "examples": [],
+      "ontology": "NCIT:C25179",
       "type": "string",
-      "description": "The common name of the organism.",
+      "description": " Was the subject confined to a hospital as a result of virus infection or problems occurring secondary to virus infection?",
       "clasification": "Sample collection and processing",
-      "label": "Common name"
+      "label": "Hospitalisation",
+      "table": "sample"
+    },
+    "illness symptoms": {
+      "examples": [
+        "cough, diarrhea, fever, headache, malaise, myalgia"
+      ],
+      "ontology": "GENEPIO:0001523",
+      "type": "string",
+      "description": "The symptoms that have been reported in relation to the illness.  If multiple exposures are applicable, please state them separated by semicolon.",
+      "clasification": "Sample collection and processing",
+      "label": "Illness symptoms",
+      "table": "sample"
     },
     "sample_description": {
       "examples": [
-        ""
+        "Sample from Belgian Covid-19 patient. Sample was obtained at the Hospital AZ Rivierenland, in Antwerp, Belgium."
       ],
-      "ontology": "GENEPIO:0001156",
+      "ontology": "sep:00196",
       "type": "string",
       "description": "Free text description of the sample.",
       "clasification": "Sample collection and processing",
       "label": "Sample Description",
       "table": "sample"
     },
-    "sample_storage_conditions": {
+    "sample storage conditions": {
       "examples": [
         "24 degrees celsius"
       ],
-      "ontology": "NCIT_C115535",
+      "ontology": "NCIT:C115535",
       "type": "string",
       "description": "The name and version of a particular protocol used for sampling.",
       "clasification": "Sample collection and processing",
@@ -976,7 +1068,7 @@
       "examples": [
         "library_construction_protocol_1"
       ],
-      "ontology": "0",
+      "ontology": "NCIT:C41111",
       "type": "string",
       "description": "",
       "clasification": "Sequencing",
@@ -1044,7 +1136,7 @@
         "experiments"
       ]
     },
-    "nominal_length ": {
+    "insert_size": {
       "examples": [
         "350"
       ],
@@ -1052,147 +1144,7 @@
       "type": "string",
       "description": "",
       "clasification": "Sequencing",
-      "label": "Nominal Length"
-    },
-    "analysis_accession": {
-      "examples": [
-        ""
-      ],
-      "ontology": "GENEPIO_0001145",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Analysis Accession"
-    },
-    "read_length": {
-      "examples": [
-        ""
-      ],
-      "ontology": "GENEPIO_0000076",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Read length"
-    },
-    "study_accession": {
-      "examples": [
-        "e.g PRJEB39632"
-      ],
-      "ontology": "GENEPIO_0001136",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Study accession"
-    },
-    "secondary_study_accession": {
-      "examples": [
-        "e.g ERP123173"
-      ],
-      "ontology": "BU_ISCIII:012",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Secondary study accession"
-    },
-    "sample_accession": {
-      "examples": [
-        "e.g SAMEA7098096"
-      ],
-      "ontology": "GENEPIO_0001139",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Sample accession"
-    },
-    "secondary_sample_accession": {
-      "examples": [
-        "e.g ERS4858671"
-      ],
-      "ontology": "BU_ISCIII:014",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Secondary sample accession"
-    },
-    "experiment_accession": {
-      "examples": [
-        "e.g ERX4331406"
-      ],
-      "ontology": "BU_ISCIII:015",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Experiment Accession"
-    },
-    "run_accession": {
-      "examples": [
-        "e.g ERX4331406"
-      ],
-      "ontology": "BU_ISCIII:016",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Run Accession"
-    },
-    "submission_accession": {
-      "examples": [
-        "e.g ERA2794974"
-      ],
-      "ontology": "BU_ISCIII:017",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Submission accession"
-    },
-    "read_count": {
-      "examples": [
-        "e.g 837055"
-      ],
-      "ontology": "STATO_0000064",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Read count"
-    },
-    "base_count": {
-      "examples": [
-        "e.g 503907110"
-      ],
-      "ontology": "UO_0000244",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Base count"
-    },
-    "center_name": {
-      "examples": [
-        " KAROLINSKA INSITUTET"
-      ],
-      "ontology": "NCIT_C19983",
-      "type": "string",
-      "description": "The name of the institution",
-      "clasification": "Sample collection and processing",
-      "label": "Center Name"
-    },
-    "first_public_date": {
-      "examples": [
-        "e.g 2020-08-07"
-      ],
-      "ontology": "NCIT_C142711",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "First Public date"
-    },
-    "last_updated": {
-      "examples": [
-        "e.g 2020-07-29"
-      ],
-      "ontology": "OMIABIS_0001005",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Last Updated"
+      "label": "Insert size"
     },
     "experiment_title": {
       "examples": [
@@ -1211,7 +1163,7 @@
       "examples": [
         ""
       ],
-      "ontology": "0",
+      "ontology": "GENEPIO:0000079",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1237,37 +1189,54 @@
       "examples": [
         ""
       ],
-      "ontology": "OPMI_0000380",
+      "enum": [
+        "Whole Genome Sequencing [NCIT:C101294]",
+        "Metagenomics [NCIT:C153191]",
+        "Transcriptome Analysis [GENEPIO:0001111]",
+        "Resequencing [NCIT:C41254]",
+        "Epigenetics [OMIT:0027036] ",
+        "Synthetic Genomics [NCIT:C84343]",
+        "Forensic or Paleo-genomics [topic:3943]",
+        "Gene Regulation Study [topic:0204]",
+        "Cancer Genomics [NCIT:C18247]",
+        "Population Genomics [topic:3796]",
+        "RNASeq [OBI:0001177]",
+        "Exome Sequencing [OBI:0002118]",
+        "Pooled Clone Sequencing [OBI:2100402]",
+        "Transcriptome Sequencing [NCIT:C124261]",
+        "Other [NCIT:C124261]"
+      ],
+      "ontology": "GENEPIO:0000156",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
       "label": "Study type",
       "table": "study"
     },
-    "pubmed_id": {
-      "examples": [
-        ""
-      ],
-      "ontology": "0",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "pubmed id",
-      "table": [
-        "study"
-      ]
-    },
     "study_abstract": {
       "examples": [
-        ""
+        "Whole-genome sequences of SARS-CoV-2 from oro-pharyngeal swabs obtained from Belgian Covid-19 patients."
       ],
-      "ontology": "0",
+      "ontology": "NCIT:C93415",
       "type": "string",
-      "description": "",
+      "description": " Briefly describes the goals, purpose, and scope of the Study.  This need not be listed if it can be inherited from a referenced publication.",
       "clasification": "Submission ENA",
       "label": "Study abstract",
       "table": [
         "study"
+      ]
+    },
+    "sample_alias": {
+      "examples": [
+        "s_20201007_026"
+      ],
+      "ontology": "GENEPIO:0000079",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Sample alias",
+      "table": [
+        "sample"
       ]
     },
     "study_alias": {
@@ -1297,6 +1266,24 @@
         "experiments"
       ]
     },
+    "file_format": {
+      "examples": [
+        "BAM,CRAM,FASTQ"
+      ],
+      "enum": [
+        "BAM [format:2572]",
+        "CRAM [format:3462]",
+        "FASTQ [format:1930]"
+      ],
+      "ontology": "NMR:1001459",
+      "type": "string",
+      "description": "The run data file model.",
+      "clasification": "Submission ENA",
+      "label": "File format",
+      "table": [
+        "experiments"
+      ]
+    },
     "run_alias": {
       "examples": [
         "e.g ena-EXPERIMENT-KAROLINSKA INSITUTET-29-07-2020-14:50:07:151-1"
@@ -1310,17 +1297,7 @@
         "runs"
       ]
     },
-    "fastq_bytes": {
-      "examples": [
-        "e.g ena-RUN-KAROLINSKA INSITUTET-29-07-2020-14:50:07:151-1"
-      ],
-      "ontology": "NCIT_C48047",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Fastq bytes"
-    },
-    "fastq_md5_r1": {
+    "sequence_file_R1_md5": {
       "examples": [
         ""
       ],
@@ -1329,146 +1306,6 @@
       "description": "",
       "clasification": "Submission ENA",
       "label": "Fastq md5 r1"
-    },
-    "fastq_ftp": {
-      "examples": [
-        ""
-      ],
-      "ontology": "PRIDE_0000469",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Fastq ftp"
-    },
-    "fastq_aspera": {
-      "examples": [
-        "e.g ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_1.fastq.gz;ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_2.fastq.gz"
-      ],
-      "ontology": "BU_ISCIII:032",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Fastq aspera"
-    },
-    "fastq_galaxy": {
-      "examples": [
-        "e.g fasp.sra.ebi.ac.uk:/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_1.fastq.gz;fasp.sra.ebi.ac.uk:/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_2.fastq.gz"
-      ],
-      "ontology": "ENVO_01000807",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Fastq galaxy"
-    },
-    "submitted_bytes": {
-      "examples": [
-        "e.g ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_1.fastq.gz;ftp.sra.ebi.ac.uk/vol1/fastq/ERR438/005/ERR4387385/ERR4387385_2.fastq.gz"
-      ],
-      "ontology": "NCIT_C172872",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Submitted bytes "
-    },
-    "submitted_md5": {
-      "examples": [
-        "e.g 139853010;166270048"
-      ],
-      "ontology": "BU_ISCIII:035",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Submitted md5"
-    },
-    "submitted_ftp": {
-      "examples": [
-        "e.g d726a9abc918e2b43bd68b24c7d01b3a;f01eba1b2bad974bdf61b81b1ae8ac2a"
-      ],
-      "ontology": "BU_ISCIII:036",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Submitted ftp"
-    },
-    "submitted_aspera": {
-      "examples": [
-        "e.g ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R1_001.fastq.gz;ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R2_001.fastq.gz"
-      ],
-      "ontology": "BU_ISCIII:037",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Submitted aspera"
-    },
-    "submitted_galaxy": {
-      "examples": [
-        "e.g fasp.sra.ebi.ac.uk:/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R1_001.fastq.gz;fasp.sra.ebi.ac.uk:/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R2_001.fastq.gz"
-      ],
-      "ontology": "BU_ISCIII:038",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Submitted Galaxy"
-    },
-    "submitted_format": {
-      "examples": [
-        "e.g  ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R1_001.fastq.gz;ftp.sra.ebi.ac.uk/vol1/run/ERR438/ERR4387385/P17157_1007_S7_L001_R2_001.fastq.gz"
-      ],
-      "ontology": "BU_ISCIII:039",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Submitted Format"
-    },
-    "sra_bytes": {
-      "examples": [
-        "e.g FASTQ;FASTQ"
-      ],
-      "ontology": "BU_ISCIII:040",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "SRA bytes"
-    },
-    "sra_md5": {
-      "examples": [
-        "e.g 260236789"
-      ],
-      "ontology": "BU_ISCIII:041",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "SRA md5"
-    },
-    "sra_ftp": {
-      "examples": [
-        "e.g 2cf0d467d6dc4ae0a5473774d54c059c"
-      ],
-      "ontology": "BU_ISCIII:042",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "SRA ftp"
-    },
-    "sra_aspera": {
-      "examples": [
-        "e.g ftp.sra.ebi.ac.uk/vol1/err/ERR438/005/ERR4387385"
-      ],
-      "ontology": "BU_ISCIII:043",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "SRA aspera"
-    },
-    "sra_galaxy": {
-      "examples": [
-        "e.g fasp.sra.ebi.ac.uk:/vol1/err/ERR438/005/ERR4387385"
-      ],
-      "ontology": "BU_ISCIII:044",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "SRA galaxy"
     },
     "broker_name": {
       "examples": [
@@ -1479,27 +1316,6 @@
       "description": "",
       "clasification": "Submission ENA",
       "label": "Broker Name"
-    },
-    "nominal_sdev": {
-      "examples": [
-        ""
-      ],
-      "ontology": "STATO_0000237",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Nominal sdev"
-    },
-    "first_created_date": {
-      "examples": [
-        "e.g 2020-08-07"
-      ],
-      "ontology": "NCIT_C164483",
-      "type": "string",
-      "format": "date",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "First created date"
     }
   }
 }
