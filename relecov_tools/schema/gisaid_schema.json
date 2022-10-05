@@ -240,12 +240,30 @@
             "label": "Submitting Institution"
         },
         "covv_subm_sample_id": {
+            "examples": "",
+            "ontology": "GENEPIO:0001148",
+            "type": "string",
+            "description": "Sample ID given by the submitting laboratory",
+            "classification": "Database Identifiers",
+            "label": "Sample ID given by submitting laboratory",
+            "fill_mode": "sample"
+        },
+        "covv_provider_sample_id": {
             "examples": ["prov_rona_99"],
             "ontology": "GENEPIO:0001123",
             "type": "string",
             "description": "The user-defined name for the sample.",
             "classification": "Database Identifiers",
             "label": "Sample ID given by originating laboratory",
+            "fill_mode": "sample"
+        },
+        "covv_patient_status": {
+            "examples": ["Hospitalized", "Released", "Live", "Deceased"],
+            "ontology": "GENEPIO:0001388",
+            "type": "string",
+            "description": " Status of the host",
+            "classification": "Host information",
+            "label": "Host health state",
             "fill_mode": "sample"
         }
     }

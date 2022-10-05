@@ -2,7 +2,7 @@ import logging
 
 # from pyparsing import col
 import rich.console
-
+import sys
 import pandas as pd
 import os
 
@@ -106,7 +106,15 @@ class GisaidUpload:
         dataframe.loc[
             dataframe["covv_patient_age"] == "", "covv_patient_age"
         ] = "unknown"
-        dataframe.loc[dataframe["covv_authors"] == "", "covv_authors"] = "unknown"
+
+        authors = [authors_field for authors_field in dataframe["covv_authors"]]
+        if "" in authors or "unknown" in authors:
+            log.error("Invalid value for author. This field is required in full")
+            stderr.print(
+                "[red] Invalid value for authors. This field is required in full, 'unknown' is not allowed"
+            )
+            sys.exit(1)
+
         dataframe.loc[
             dataframe["covv_subm_lab_addr"] == "", "covv_subm_lab_addr"
         ] = "unknown"
@@ -118,11 +126,21 @@ class GisaidUpload:
         dataframe.loc[
             dataframe["covv_patient_status"] == "", "covv_patient_status"
         ] = "unknown"
+        dataframe.loc[dataframe["covv_type"] == "", "covv_type"] = "betacoronavirus"
+        dataframe.loc[dataframe["covv_passage"] == "", "covv_passage"] = "Original"
 
         config_json = ConfigJson()
         gisaid_config = config_json.get_configuration("GISAID_configuration")
         submitter_id = gisaid_config["submitter"]
         dataframe.loc[dataframe["submitter"] == "", "submitter"] = submitter_id
+
+        bioinfo_config = config_json.get_configuration("bioinfo_analysis")
+        assembly_method = bioinfo_config["fixed_values"][
+            "bioinformatics_protocol_software_name"
+        ]
+        dataframe.loc[
+            dataframe["covv_assembly_method"] == "", "covv_assembly_method"
+        ] = assembly_method
 
         return dataframe
 
@@ -130,7 +148,6 @@ class GisaidUpload:
         """Transform metadata json to csv"""
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
         df_data = pd.DataFrame(data)
-        df_data.insert(4, "covv_passage", "Original")
 
         config_json = ConfigJson()
         fields = config_json.get_configuration("gisaid_csv_headers")
@@ -236,6 +253,7 @@ class GisaidUpload:
             "cli3 authenticate --username %s --password %s --client_id %s"
             % (self.user, self.passwd, self.client_id)
         )
+        self.token = "gisaid.authtoken"
 
     def cli3_upload(self):
         """Upload to GISAID"""

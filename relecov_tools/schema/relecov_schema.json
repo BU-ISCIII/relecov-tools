@@ -114,7 +114,7 @@
             "examples": [
                 ""
             ],
-            "ontology": "0",
+            "ontology": "GENEPIO:0001148",
             "type": "string",
             "description": "Sample ID given by the submitting laboratory",
             "classification": "Sequencing",
