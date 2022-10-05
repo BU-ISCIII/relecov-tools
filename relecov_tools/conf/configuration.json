@@ -283,7 +283,7 @@
             "dehosting_method_software_version": {
                 "KRAKEN2_KRAKEN2": "kraken2"
             },
-            "mapping_software_name": {
+            "mapping_software_version": {
                 "BOWTIE2_ALIGN": "bowtie2"
             },
             "mapping_software_version": {
