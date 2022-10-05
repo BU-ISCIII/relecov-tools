@@ -731,81 +731,81 @@
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Bronchiole Scraping": {
+    "Bronchiole Extract": {
         "anatomical_part": "Bronchiole",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Alveolar sac Scraping": {
+    "Alveolar sac Extract": {
         "anatomical_part": "Alveolar sac",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Pleural sac Scraping": {
+    "Pleural sac Extract": {
         "anatomical_part": "Pleural sac",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Pleural cavity Scraping": {
+    "Pleural cavity Extract": {
         "anatomical_part": "Pleural cavity",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Trachea Scraping": {
+    "Trachea Extract": {
         "anatomical_part": "Trachea",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Upper respiratory tract Scraping": {
+    "Upper respiratory tract Extract": {
         "anatomical_part": "Upper respiratory tract",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Anterior Nares Scraping": {
+    "Anterior Nares Extract": {
         "anatomical_part": "Anterior Nares",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Esophagus Scraping": {
+    "Esophagus Extract": {
         "anatomical_part": "Esophagus",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Ethmoid sinus Scraping": {
+    "Ethmoid sinus Extract": {
         "anatomical_part": "Ethmoid sinus",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Nasal Cavity Scraping": {
+    "Nasal Cavity Extract": {
         "anatomical_part": "Nasal Cavity",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Middle Nasal Turbinate Scraping": {
+    "Middle Nasal Turbinate Extract": {
         "anatomical_part": "Middle Nasal Turbinate",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Nasopharynx Scraping": {
+    "Nasopharynx Extract": {
         "anatomical_part": "Nasopharynx",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Oropharynx Scraping": {
+    "Oropharynx Extract": {
         "anatomical_part": "Oropharynx",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
@@ -995,9 +995,9 @@
         "body_product": "Not Applicable",
         "anatomical_material": "Tissue"
     },
-    "Scraping": {
+    "Extract": {
         "anatomical_part": "Not Applicable",
-        "collection_method": "Scraping",
+        "collection_method": "Extract",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
