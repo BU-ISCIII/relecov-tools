@@ -59,7 +59,7 @@
         "lab_metadata_req_json": {
             "laboratory_data": {
                 "file": "laboratory_address.json",
-                "map_field": "collecting_institution",
+                "map_field": "collecting institution",
                 "adding_fields": "__all__"
             },
             "geo_location_data": {
@@ -93,10 +93,10 @@
                 "Human": "host_scientific_name::Homo sapiens"
             },
             "sequencing_instrument_model": {
-                "Illumina": "sequencing_instrument_platform::Illumina",
-                "PacBio": "sequencing_instrument_platform::PacBio",
-                "Ion Torrent": "sequencing_instrument_platform::Ion Torrent",
-                "Oxford Nanopore": "sequencing_instrument_platform::Oxford Nanopore"
+                "Illumina": "platform::Illumina",
+                "PacBio": "platform::PacBio",
+                "Ion Torrent": "platform::Ion Torrent",
+                "Oxford Nanopore": "platform::Oxford Nanopore"
             }
         },
         "required_copy_from_other_field": {
@@ -202,8 +202,8 @@
         "sampleLocation": "Not defined"
     },
     "relecov_sample_metadata": [
-        "fastq_r1_md5",
-        "fastq_r2_md5",
+        "sequence_file_R1_md5",
+        "sequence_file_R2_md5",
         "microbiology_lab_sample_id",
         "r1_fastq_filepath",
         "r2_fastq_filepath",
@@ -251,14 +251,13 @@
             "consensus_sequence_filename",
             "consensus_sequence_filepath",
             "consensus_sequence_md5",
-            "consensus_sequence_name",
             "number_of_base_pairs_sequenced"
         ],
-        "mapping_pangolin":{
+        "mapping_pangolin": {
             "variant_designation": "scorpio_call"
         },
         "mapping_stats": {
-            "analysis_date": "analysis date",
+            "analysis date": "analysis date",
             "depth_of_coverage_value": "medianDPcoveragevirus",
             "lineage_name": "Lineage",
             "number_of_variants_in_consensus": "Variantsinconsensusx10",
@@ -274,15 +273,18 @@
         "mapping_variant_metrics": {
             "ns_per_100_kbp": "# Ns per 100kb consensus"
         },
-        "mapping_version":{
-            "bioinformatics_protocol_software_version":{
+        "mapping_version": {
+            "bioinformatics_protocol_software_version": {
                 "Workflow": "nf-core/viralrecon"
             },
-            "consensus_sequence_software_version":{
+            "consensus_sequence_software_version": {
                 "BCFTOOLS_CONSENSUS": "bcftools"
             },
             "dehosting_method_software_version": {
                 "KRAKEN2_KRAKEN2": "kraken2"
+            },
+            "mapping_software_version": {
+                "BOWTIE2_ALIGN": "bowtie2"
             },
             "mapping_software_version": {
                 "BOWTIE2_ALIGN": "bowtie2"
@@ -298,11 +300,9 @@
             "read_length": "number_of_base_pairs_sequenced",
             "schema_name": "schema_name",
             "schema_version": "schema_version",
-            "sequence_file_R1_fastq": "sequence_file_R1_fastq",
-            "sequence_file_R2_fastq": "sequence_file_R2_fastq",
             "sequence_file_R1_md5": "sequence_file_R1_md5",
-            "sequence_file_R2_md5" : "sequence_file_R2_md5",
-            "sequencing_sample_id" : "sequencing_sample_id"
+            "sequence_file_R2_md5": "sequence_file_R2_md5",
+            "sequencing_sample_id": "sequencing_sample_id"
         }
     },
     "md5_file_name": "md5_check_file.csv",
@@ -322,38 +322,38 @@
         "checklist": "ERC000033",
         "df_study_fields": [
             "study_type",
-            "study_abstract"
+            "study_abstract",
+            "study_alias",
+            "study_title"
         ],
         "df_samples_fields": [
             "sample_name",
             "sample_title",
-            "taxon_id",
-            "collection_date",
-            "geographic_location_(country_and/or_sea)",
-            "host_common_name",
-            "host_scientific_name",
-            "host_sex",
+            "collection date",
+            "geographic location (country and/or sea)",
+            "host common name",
+            "host scientific name",
+            "host sex",
             "scientific_name",
             "collector_name",
-            "collecting_institution",
+            "collecting institution",
             "isolate",
-            "host_subject_id",
+            "host subject id",
             "host health state",
             "authors",
+            "taxon_id",
             "sample_description",
             "address"
         ],
         "df_run_fields": [
             "r1_fastq_filepath",
             "r2_fastq_filepath",
-            "file_type",
-            "fastq_r1_md5",
-            "fastq_r2_md5",
-            "collecting_institution"
+            "file_format",
+            "sequence_file_R1_md5",
+            "sequence_file_R2_md5",
+            "collecting institution"
         ],
         "df_experiment_fields": [
-            "study_abstract",
-            "sample_name",
             "library_name",
             "library_strategy",
             "library_source",
@@ -361,9 +361,10 @@
             "library_layout",
             "instrument_model",
             "design_description",
-            "collecting_institution",
+            "collecting institution",
+            "library_construction_protocol",
             "insert_size",
-            "sequencing_instrument_platform"
+            "platform"
         ],
         "rename_sample_list_og": [
             "sample_name",
@@ -372,10 +373,10 @@
             "host_subject_id",
             "collection_date",
             "host_common_name",
-            "host_sex",
+            "host sex",
             "host_scientific_name",
             "collector_name",
-            "collecting_institution"
+            "collecting institution"
         ],
         "rename_sample_list_final": [
             "alias",
@@ -388,6 +389,24 @@
             "host scientific name",
             "collector name",
             "collecting institution"
+        ],
+        "map_not_provided_fields": [
+            "subject exposure",
+            "subject exposure duration",
+            "type exposure",
+            "personal protective equipment",
+            "hospitalisation",
+            "illness duration",
+            "illness symptoms",
+            "host disease outcome",
+            "definition for seropositive sample",
+            "library_construction_protocol",
+            "serotype (required for a seropositive sample)",
+            "strain",
+            "host habitat",
+            "host description",
+            "gravidity",
+            "host behaviour"
         ]
     }
 }
