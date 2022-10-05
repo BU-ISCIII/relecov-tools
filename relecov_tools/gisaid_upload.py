@@ -105,13 +105,15 @@ class GisaidUpload:
         dataframe.loc[
             dataframe["covv_patient_age"] == "", "covv_patient_age"
         ] = "unknown"
-        
+
         authors = [authors_field for authors_field in dataframe["covv_authors"]]
         if "" in authors or "unknown" in authors:
-            log.error( "Invalid value for author. This field is required in full")
-            stderr.print("[red] Invalid value for authors. This field is required in full, 'unknown' is not allowed")
+            log.error("Invalid value for author. This field is required in full")
+            stderr.print(
+                "[red] Invalid value for authors. This field is required in full, 'unknown' is not allowed"
+            )
             sys.exit(1)
-            
+
         dataframe.loc[
             dataframe["covv_subm_lab_addr"] == "", "covv_subm_lab_addr"
         ] = "unknown"
@@ -124,19 +126,23 @@ class GisaidUpload:
             dataframe["covv_patient_status"] == "", "covv_patient_status"
         ] = "unknown"
         dataframe.loc[dataframe["covv_type"] == "", "covv_type"] = "betacoronavirus"
-        dataframe.loc[dataframe["covv_passage"] =="", "covv_passage"] = "Original"
+        dataframe.loc[dataframe["covv_passage"] == "", "covv_passage"] = "Original"
 
         config_json = ConfigJson()
         gisaid_config = config_json.get_configuration("GISAID_configuration")
         submitter_id = gisaid_config["submitter"]
         dataframe.loc[dataframe["submitter"] == "", "submitter"] = submitter_id
-        
+
         bioinfo_config = config_json.get_configuration("bioinfo_analysis")
-        assembly_method = bioinfo_config["fixed_values"]["bioinformatics_protocol_software_name"]
-        dataframe.loc[dataframe["covv_assembly_method"] == "", "covv_assembly_method"] = assembly_method
+        assembly_method = bioinfo_config["fixed_values"][
+            "bioinformatics_protocol_software_name"
+        ]
+        dataframe.loc[
+            dataframe["covv_assembly_method"] == "", "covv_assembly_method"
+        ] = assembly_method
 
         return dataframe
-        
+
     def metadata_to_csv(self):
         """Transform metadata json to csv"""
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
