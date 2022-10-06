@@ -29,17 +29,20 @@ class MetadataHomogeneizer:
             self.institution = relecov_tools.utils.prompt_selection(
                 msg="Select the available mapping institution",
                 choices=["isciii", "hugtip", "hunsc-iter"],
-            )
+            ).upper()
         else:
             self.institution = institution.upper()
-            mapping_json_file = os.path.join(
-                os.path.dirname(__file__),
-                "schema",
-                "institution_schemas",
-                self.config_json.get_topic_data(
-                    "institution_mapping_file", self.institution
-                ),
-            )
+
+        mapping_json_file = os.path.join(
+            os.path.dirname(__file__),
+            "schema",
+            "institution_schemas",
+            self.config_json.get_topic_data(
+                "institution_mapping_file", self.institution
+            ),
+        )
+
+        self.mapping_json_data = relecov_tools.utils.read_json_file(mapping_json_file)
 
         if directory is None:
             directory = relecov_tools.utils.prompt_path(
@@ -51,8 +54,6 @@ class MetadataHomogeneizer:
                 "[red] Folder for additional files " + directory + " does not exist"
             )
             sys.exit(1)
-
-        self.mapping_json_data = relecov_tools.utils.read_json_file(mapping_json_file)
 
         try:
             lab_metadata = self.mapping_json_data["required_files"]["metadata_file"][
