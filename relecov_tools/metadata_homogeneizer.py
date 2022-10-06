@@ -63,7 +63,9 @@ class MetadataHomogeneizer:
             log.error("Metadata File is not defined in schema")
             stderr.print("[red] Metadata File is not defined in schema")
             sys.exit(1)
+
         metadata_path = os.path.join(directory, lab_metadata)
+
         if not os.path.isfile(metadata_path):
             log.error("Metadata File %s does not exists", metadata_path)
             stderr.print("[red] Metadata File " + metadata_path + "does not exists")
@@ -72,6 +74,7 @@ class MetadataHomogeneizer:
         self.lab_metadata["file_name"] = metadata_path
 
         self.additional_files = []
+
         if len(self.mapping_json_data["required_files"]) > 1:
             for key, values in self.mapping_json_data["required_files"].items():
                 if key == "metadata_file":
@@ -86,8 +89,10 @@ class MetadataHomogeneizer:
                     sys.exit(1)
                 values["file_name"] = f_path
                 self.additional_files.append(values)
+
         # Check if python file is defined
         function_file = self.mapping_json_data["python_file"]
+
         if function_file == "":
             self.function_file = None
         else:
