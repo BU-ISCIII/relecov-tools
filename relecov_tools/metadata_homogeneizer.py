@@ -20,11 +20,15 @@ class MetadataHomogeneizer:
     """MetadataHomogeneizer object"""
 
     def __init__(self, institution=None, directory=None, output_folder=None):
+
+        # open config
         self.config_json = ConfigJson()
+        # read heading from config
         self.heading = self.config_json.get_topic_data(
             "lab_metadata", "metadata_lab_heading"
         )
 
+        # handle institution
         if institution is None:
             self.institution = relecov_tools.utils.prompt_selection(
                 msg="Select the available mapping institution",
@@ -123,7 +127,6 @@ class MetadataHomogeneizer:
         for row in ws_data:
             row_data = {}
             for dest_map, orig_map in map_fields.items():
-
                 row_data[dest_map] = row[orig_map]
             map_data.append(row_data)
 
@@ -145,7 +148,7 @@ class MetadataHomogeneizer:
             add_data.append(new_row_data)
         return add_data
 
-    def handling_files(self, file_data, additional_data):
+    def handling_files(self, file_data, data_to_add):
         """Added information based on the required file configuration.
         The first time this function is called is for mapping the laboratory
         metadata to ISCIII. For this time mapping_metadata method is used.
@@ -154,7 +157,7 @@ class MetadataHomogeneizer:
         """
         if file_data["file_name"] != "":
             f_name = file_data["file_name"]
-            stderr.print("[blue] Start processing additional file " + f_name)
+            stderr.print("[blue] Starting processing file " + f_name)
             if f_name.endswith(".json"):
                 data = relecov_tools.utils.read_json_file(f_name)
             elif f_name.endswith(".tsv"):
@@ -180,7 +183,7 @@ class MetadataHomogeneizer:
 
         if file_data["function"] == "None":
             mapping_idx = self.heading.index(file_data["mapped_key"])
-            for row in additional_data[1:]:
+            for row in data_to_add[1:]:
                 # new_row_data = []
                 s_value = str(row[mapping_idx])
                 try:
@@ -217,6 +220,7 @@ class MetadataHomogeneizer:
                 + " import "
                 + func_name
             )
+            # somehow this overrides additional_data working as a pointer
             eval(
                 func_name
                 + "(additional_data, data, file_data['mapped_fields'], self.heading)"
@@ -228,14 +232,20 @@ class MetadataHomogeneizer:
     def converting_metadata(self):
         stderr.print("[blue] Reading the metadata file to convert")
 
+        # metadata_file contains the primary source of information. First we map it.
         mapped_data = self.handling_files(self.lab_metadata, "")
         stderr.print("[green] Successful conversion mapping to ISCIII metadata")
         stderr.print("[blue] Adding fixed information")
+
+        # Then we add the fixed data
         additional_data = self.add_fixed_fields(mapped_data)
+
         # Fetch the additional files and include the information in metadata
         stderr.print("[blue] reading and mapping de information that are in files")
         for additional_file in self.additional_files:
             additional_data = self.handling_files(additional_file, additional_data)
+
+        ## write to excel mapped data
         f_name = os.path.join(self.output_folder, "converted_metadata_lab.xlsx")
         stderr.print("[blue] Dumping information to excel")
         post_process = {"insert_rows": 3, "insert_cols": 1}
