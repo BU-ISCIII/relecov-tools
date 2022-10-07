@@ -551,9 +551,9 @@
             "ontology": "GENEPIO:0000156",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Study type",
-            "table": "study"
+            "fill_mode": "batch"
         },
         "geo_loc_longitude": {
             "examples": [
@@ -874,18 +874,16 @@
             "fill_mode": "batch",
             "minLenght": "1"
         },
-        "host subject id": {
+        "host_subject_id": {
             "examples": [
                 "e.g. #131"
             ],
             "ontology": "GENEPIO:0001398",
             "type": "string",
             "description": "a unique identifier by which each subject can be referred to, de-identified.",
-            "clasification": "Host information",
+            "classification": "Host information",
             "label": "Host Subject Id",
-            "table": [
-                "sample"
-            ]
+            "fill_mode": "sample"
         },
         "host_health_state": {
             "examples": [
