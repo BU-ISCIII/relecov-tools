@@ -27,28 +27,33 @@ class RelecovMetadata:
             )
         else:
             self.metadata_file = metadata_file
+
         if not os.path.exists(self.metadata_file):
             log.error("Metadata file %s does not exist ", self.metadata_file)
             stderr.print("[red] Metadata file " + self.metadata_file + " does not exist")
             sys.exit(1)
+
         if sample_list_file is None:
             self.sample_list_file = relecov_tools.utils.prompt_path(
                 msg="Select the file which contains the sample information"
             )
         else:
             self.sample_list_file = sample_list_file
+
         if not os.path.exists(self.sample_list_file):
-            log.error("Sample information file %s does not exist ", self.metadata_file)
+            log.error("Sample information file %s does not exist ", self.sample_list_file)
             stderr.print(
                 "[red] Sample information " + self.sample_list_file + " does not exist"
             )
             sys.exit(1)
+
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
             self.output_folder = output_folder
+
         config_json = ConfigJson()
         relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
         relecov_sch_path = os.path.join(

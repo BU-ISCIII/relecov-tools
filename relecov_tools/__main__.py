@@ -164,11 +164,6 @@ def download(user, password, conf_file, user_relecov, password_relecov):
     "-s",
     "--sample_list_file",
     type=click.Path(),
-    default=os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        "assets",
-        "additional_metadata.json",
-    ),
     help="Json with the additional metadata to add to the received user metadata",
 )
 @click.option(
