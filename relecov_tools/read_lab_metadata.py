@@ -29,7 +29,7 @@ class RelecovMetadata:
             self.metadata_file = metadata_file
         if not os.path.exists(self.metadata_file):
             log.error("Metadata file %s does not exist ", self.metadata_file)
-            stderr.print("[red] Metadata file " + self.meta_file + " does not exist")
+            stderr.print("[red] Metadata file " + self.metadata_file + " does not exist")
             sys.exit(1)
         if sample_list_file is None:
             self.sample_list_file = relecov_tools.utils.prompt_path(
