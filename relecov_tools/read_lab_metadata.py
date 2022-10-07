@@ -68,6 +68,10 @@ class RelecovMetadata:
             try:
                 self.label_prop_dict[values["label"]] = prop
             except KeyError:
+                log.warning("Property %s does not have 'label' attribute", prop)
+                stderr.print(
+                    "[orange] Property " + prop + " does not have 'label' attribute"
+                )
                 continue
         self.json_req_files = config_json.get_topic_data(
             "lab_metadata", "lab_metadata_req_json"
