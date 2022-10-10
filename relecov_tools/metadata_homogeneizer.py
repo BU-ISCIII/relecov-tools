@@ -223,11 +223,11 @@ class MetadataHomogeneizer:
             # somehow this overrides additional_data working as a pointer
             eval(
                 func_name
-                + "(additional_data, data, file_data['mapped_fields'], self.heading)"
+                + "(data_to_add, data, file_data['mapped_fields'], self.heading)"
             )
 
         stderr.print("[green] Succesful processing of additional file ")
-        return additional_data
+        return data_to_add
 
     def converting_metadata(self):
         stderr.print("[blue] Reading the metadata file to convert")
