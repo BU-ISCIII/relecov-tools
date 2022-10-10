@@ -245,7 +245,7 @@ class MetadataHomogeneizer:
         for additional_file in self.additional_files:
             additional_data = self.handling_files(additional_file, additional_data)
 
-        ## write to excel mapped data
+        # write to excel mapped data
         f_name = os.path.join(self.output_folder, "converted_metadata_lab.xlsx")
         stderr.print("[blue] Dumping information to excel")
         post_process = {"insert_rows": 3, "insert_cols": 1}
