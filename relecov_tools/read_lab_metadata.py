@@ -30,7 +30,9 @@ class RelecovMetadata:
 
         if not os.path.exists(self.metadata_file):
             log.error("Metadata file %s does not exist ", self.metadata_file)
-            stderr.print("[red] Metadata file " + self.metadata_file + " does not exist")
+            stderr.print(
+                "[red] Metadata file " + self.metadata_file + " does not exist"
+            )
             sys.exit(1)
 
         if sample_list_file is None:
@@ -41,7 +43,9 @@ class RelecovMetadata:
             self.sample_list_file = sample_list_file
 
         if not os.path.exists(self.sample_list_file):
-            log.error("Sample information file %s does not exist ", self.sample_list_file)
+            log.error(
+                "Sample information file %s does not exist ", self.sample_list_file
+            )
             stderr.print(
                 "[red] Sample information " + self.sample_list_file + " does not exist"
             )
