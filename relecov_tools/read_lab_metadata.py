@@ -153,17 +153,22 @@ class RelecovMetadata:
 
     def process_from_json(self, m_data, json_fields):
         """ """
-        if isinstance(json_fields["map_field"], dict):
-            # Search for the value which contains data
-            for m_field in json_fields["map_field"]["any_of"]:
-                try:
-                    m_data[0][m_field]
-                    map_field = m_field
-                except KeyError:
-                    continue
-        else:
-            map_field = json_fields["map_field"]
+#         if isinstance(json_fields["map_field"], dict):
+#             # Search for the value which contains data
+#             for m_field in json_fields["map_field"]["any_of"]:
+#                 try:
+#                     #m_data[0][m_field]
+#                     map_field = m_field
+#                 except KeyError:
+#                     continue
+#        else:
+
+        map_field = json_fields["map_field"]
+
+        import pdb; pdb.set_trace()
+
         json_data = json_fields["j_data"]
+
         if isinstance(json_data, dict):
             for idx in range(len(m_data)):
                 m_data[idx].update(json_data[m_data[idx][map_field]])
