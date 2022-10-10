@@ -279,6 +279,10 @@ class RelecovMetadata:
                                 stderr.print(
                                     f"[red] Invalid date format in sample {sample_number},  {key}"
                                 )
+                elif "sample id" in key.lower():
+                    if isinstance(row[key], float):
+                        row[key] = str(int(row[key]))
+
                 else:
                     if isinstance(row[key], float) or isinstance(row[key], int):
                         row[key] = str(row[key])
