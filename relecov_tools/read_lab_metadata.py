@@ -64,6 +64,7 @@ class RelecovMetadata:
         with open(relecov_sch_path, "r") as fh:
             self.relecov_sch_json = json.load(fh)
         self.label_prop_dict = {}
+
         for prop, values in self.relecov_sch_json["properties"].items():
             try:
                 self.label_prop_dict[values["label"]] = prop
@@ -73,6 +74,7 @@ class RelecovMetadata:
                     "[orange] Property " + prop + " does not have 'label' attribute"
                 )
                 continue
+
         self.json_req_files = config_json.get_topic_data(
             "lab_metadata", "lab_metadata_req_json"
         )
