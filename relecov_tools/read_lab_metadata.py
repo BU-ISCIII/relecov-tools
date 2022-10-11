@@ -82,7 +82,7 @@ class RelecovMetadata:
         self.json_req_files = config_json.get_topic_data(
             "lab_metadata", "lab_metadata_req_json"
         )
-        self.schema_name = self.relecov_sch_json["schema"]
+        self.schema_name = self.relecov_sch_json["title"]
         self.schema_version = self.relecov_sch_json["version"]
 
     def adding_fixed_fields(self, m_data):
