@@ -96,7 +96,12 @@ class SchemaValidation:
         stderr.print("[blue] VALIDATION SUMMARY")
         stderr.print("[blue] --------------------")
         for error_type in errors.keys():
-            stderr.print("[red]" + str(errors[error_type]) + " samples failed validation:\n" + error_type)
+            stderr.print(
+                "[red]"
+                + str(errors[error_type])
+                + " samples failed validation:\n"
+                + error_type
+            )
             stderr.print("[red] --------------------")
 
         return invalid_json
@@ -155,7 +160,9 @@ class SchemaValidation:
                         ws_sheet.delete_rows(idx)
                     except TypeError as e:
                         log.error(
-                            "Unable to delete row %s from metadata file because of", idx, e
+                            "Unable to delete row %s from metadata file because of",
+                            idx,
+                            e,
                         )
                         stderr.print("f[red] Unable to delete row {idx} becuase of {e}")
                         sys.exit(1)
