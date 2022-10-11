@@ -91,10 +91,10 @@
                 "Human": "host_scientific_name::Homo sapiens"
             },
             "sequencing_instrument_model": {
-                "Illumina": "platform::Illumina",
-                "PacBio": "platform::PacBio",
-                "Ion Torrent": "platform::Ion Torrent",
-                "Oxford Nanopore": "platform::Oxford Nanopore"
+                "Illumina": "sequencing_instrument_platform::Illumina",
+                "PacBio": "sequencing_instrument_platform::PacBio",
+                "Ion Torrent": "sequencing_instrument_platform::Ion Torrent",
+                "Oxford Nanopore": "sequencing_instrument_platform::Oxford Nanopore"
             }
         },
         "required_copy_from_other_field": {

@@ -1,5 +1,8 @@
 {
-    "schema": "RELECOV",
+    "schema": "https://json-schema.org/draft/2020-12/schema",
+    "id": "https://github.com/BU-ISCIII/relecov-tools/blob/develop/relecov_tools/schema/relecov_schema.json",
+    "title": "RELECOV schema",
+    "description":"Json schema including the ",
     "version": "1.0.0",
     "required": [
         "collecting_lab_sample_id",
@@ -759,6 +762,7 @@
                 "Oropharynx  Scraping",
                 "Nasopharynx Swabbing",
                 "Oropharynx Swabbing",
+                "Pharynx Swabbing",
                 "Lower respiratory tract Wash",
                 "Bronchus Wash",
                 "Lung Wash",
