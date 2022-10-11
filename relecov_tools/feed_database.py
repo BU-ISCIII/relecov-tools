@@ -112,12 +112,6 @@ class FeedDatabase:
         """Map the values to the properties send to databasee
         in json schema based on label
         """
-        anatomical_fields = [
-            "anatomical_part",
-            "collection_method",
-            "body_product",
-            "anatomical_material",
-        ]
         # collection_method = self.get_sample_type()
         sample_list = []
         s_fields = list(sample_fields.keys())
@@ -126,23 +120,22 @@ class FeedDatabase:
             for key, value in row.items():
                 found_ontology = re.search(r"(.+) \[\w+:.*", value)
                 if found_ontology:
+                    # remove the ontology data from item value
                     value = found_ontology.group(1)
                 if key in s_project_fields:
                     s_dict[key] = value
                 elif key in s_fields:
                     s_dict[sample_fields[key]] = value
                 else:
+                    # just for debug loginng write the fields that will not
+                    # be inlcuded in iSkyLIMS request
                     log.info("not key %s in iSkyLIMS", key)
             # include the fix value
             fixed_value = self.config_json.get_configuration("iskylims_fixed_values")
             for prop, val in fixed_value.items():
                 s_dict[prop] = val
-            # Using tha anatomical field find out the sampleType
-            sample_type = []
-            for item in anatomical_fields:
-                if s_dict[item] != "Not Applicable":
-                    sample_type.append(s_dict[item])
-            s_dict["sampleType"] = " ".join(sample_type)
+            # Adding tha specimen_source field for setting sampleType
+            s_dict["sampleType"] = row["specimen_source"]
             sample_list.append(s_dict)
         return sample_list
 
