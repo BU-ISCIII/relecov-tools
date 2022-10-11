@@ -40,7 +40,7 @@
             "Enrichment panel/assay version",
             "Number Of Samples In Run",
             "Runid",
-            "Sequencing Instrument Platform",
+            "Sequencing Instrument Model",
             "Flowcell Kit",
             "Source material",
             "Capture method",
