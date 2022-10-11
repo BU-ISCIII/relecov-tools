@@ -995,9 +995,9 @@
         "body_product": "Not Applicable",
         "anatomical_material": "Tissue"
     },
-    "Extract": {
+    "Scraping": {
         "anatomical_part": "Not Applicable",
-        "collection_method": "Extract",
+        "collection_method": "Scraping2",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
