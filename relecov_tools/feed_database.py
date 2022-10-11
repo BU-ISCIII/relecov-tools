@@ -2,18 +2,14 @@
 import sys
 import os
 import re
-import jsonschema
 import json
 import logging
 import rich.console
-from jsonschema import Draft202012Validator
 import time
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.rest_api import RestApi
-
-# import relecov_tools.json_schema
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -30,7 +26,6 @@ class FeedDatabase:
         user=None,
         passwd=None,
         json_file=None,
-        schema=None,
         type_of_info=None,
         database_server=None,
     ):
@@ -44,7 +39,6 @@ class FeedDatabase:
         self.passwd = passwd
         self.config_json = ConfigJson()
         if json_file is None:
-            self.config_json = ConfigJson()
             json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file which have the data to map"
             )
@@ -54,25 +48,14 @@ class FeedDatabase:
             sys.exit(1)
         self.json_data = relecov_tools.utils.read_json_file(json_file)
         self.json_file = json_file
-        if schema is None:
-            schema = os.path.join(
-                os.path.dirname(os.path.realpath(__file__)),
-                "schema",
-                self.config_json.get_topic_data("json_schemas", "relecov_schema"),
-            )
-        else:
-            if os.path.isfile(schema):
-                log.error("Relecov schema file %s does not exists", schema)
-                stderr.print(f"[red] Relecov schema  {schema} does not exists")
-                sys.exit(1)
-        rel_schema_json = relecov_tools.utils.read_json_file(schema)
-        try:
-            Draft202012Validator.check_schema(rel_schema_json)
-        except jsonschema.ValidationError:
-            log.error("Schema does not fulfil Draft 202012 Validation ")
-            stderr.print("[red] Schema does not fulfil Draft 202012 Validation")
-            sys.exit(1)
-        self.schema = rel_schema_json
+        schema = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            "schema",
+            self.config_json.get_topic_data("json_schemas", "relecov_schema"),
+        )
+
+        self.schema = relecov_tools.utils.read_json_file(schema)
+
         if type_of_info is None:
             type_of_info = relecov_tools.utils.prompt_selection(
                 "Select:",
