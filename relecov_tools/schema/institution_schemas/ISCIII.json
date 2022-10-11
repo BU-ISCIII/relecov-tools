@@ -51,7 +51,7 @@
         "sequencer_file": {
             "file_name": "samples_run_services_length.tsv",
             "mapped_fields": {
-                "Sequencing Instrument Model": "run_name"
+                "Sequencing Instrument Platform": "run_name"
             },
             "mapped_key": "",
             "function": "added_seq_inst_model"
