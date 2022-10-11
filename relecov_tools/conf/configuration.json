@@ -59,7 +59,7 @@
         "lab_metadata_req_json": {
             "laboratory_data": {
                 "file": "laboratory_address.json",
-                "map_field": "collecting institution",
+                "map_field": "collecting_institution",
                 "adding_fields": "__all__"
             },
             "geo_location_data": {
@@ -75,19 +75,17 @@
                     "submitting_institution_email"
                 ]
             },
-            "anatomical_material": {
+            "specimen_source_splitting": {
                 "file": "anatomical_material_collection_method.json",
-                "map_field": {
-                    "any_of": [
-                        "body_product",
-                        "anatomical_part",
-                        "collection_method",
-                        "anatomical_material"
-                    ]
-                },
-                "adding_fields": "__all__"
+                "map_field": "specimen_source",
+                "adding_fields": [
+                    "anatomical_material",
+                    "anatomical_part",
+                    "body_product",
+                    "collection_method"
+                ]
             }
-        },
+         },
         "required_post_processing": {
             "host_common_name": {
                 "Human": "host_scientific_name::Homo sapiens"

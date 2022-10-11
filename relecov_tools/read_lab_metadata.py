@@ -27,28 +27,37 @@ class RelecovMetadata:
             )
         else:
             self.metadata_file = metadata_file
+
         if not os.path.exists(self.metadata_file):
             log.error("Metadata file %s does not exist ", self.metadata_file)
-            stderr.print("[red] Metadata file " + self.meta_file + " does not exist")
+            stderr.print(
+                "[red] Metadata file " + self.metadata_file + " does not exist"
+            )
             sys.exit(1)
+
         if sample_list_file is None:
             self.sample_list_file = relecov_tools.utils.prompt_path(
                 msg="Select the file which contains the sample information"
             )
         else:
             self.sample_list_file = sample_list_file
+
         if not os.path.exists(self.sample_list_file):
-            log.error("Sample information file %s does not exist ", self.metadata_file)
+            log.error(
+                "Sample information file %s does not exist ", self.sample_list_file
+            )
             stderr.print(
                 "[red] Sample information " + self.sample_list_file + " does not exist"
             )
             sys.exit(1)
+
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
             self.output_folder = output_folder
+
         config_json = ConfigJson()
         relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
         relecov_sch_path = os.path.join(
@@ -59,11 +68,17 @@ class RelecovMetadata:
         with open(relecov_sch_path, "r") as fh:
             self.relecov_sch_json = json.load(fh)
         self.label_prop_dict = {}
+
         for prop, values in self.relecov_sch_json["properties"].items():
             try:
                 self.label_prop_dict[values["label"]] = prop
             except KeyError:
+                log.warning("Property %s does not have 'label' attribute", prop)
+                stderr.print(
+                    "[orange] Property " + prop + " does not have 'label' attribute"
+                )
                 continue
+
         self.json_req_files = config_json.get_topic_data(
             "lab_metadata", "lab_metadata_req_json"
         )
@@ -142,16 +157,8 @@ class RelecovMetadata:
 
     def process_from_json(self, m_data, json_fields):
         """ """
-        if isinstance(json_fields["map_field"], dict):
-            # Search for the value which contains data
-            for m_field in json_fields["map_field"]["any_of"]:
-                try:
-                    m_data[0][m_field]
-                    map_field = m_field
-                except KeyError:
-                    continue
-        else:
-            map_field = json_fields["map_field"]
+        map_field = json_fields["map_field"]
+
         json_data = json_fields["j_data"]
         if isinstance(json_data, dict):
             for idx in range(len(m_data)):
@@ -191,15 +198,17 @@ class RelecovMetadata:
             values["j_data"] = relecov_tools.utils.read_json_file(f_path)
             metadata = self.process_from_json(metadata, values)
             stderr.print(f"[green] Processed {key}")
-        stderr.print("[blue] Reading sample list file")
+
         # Because sample data file is comming in an input parameter it cannot
         # be inside the configuration json file.
         # Include Sample informatin data from sample json file
+        stderr.print("[blue] Processing sample data file")
         s_json = {}
         s_json["map_field"] = "sequencing_sample_id"
         s_json["adding_field"] = "__all__"
         s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
         metadata = self.process_from_json(metadata, s_json)
+        stderr.print("[green] Processed sample data file.")
         return metadata
 
     def read_configuration_json_files(self):
@@ -263,6 +272,10 @@ class RelecovMetadata:
                                 stderr.print(
                                     f"[red] Invalid date format in sample {sample_number},  {key}"
                                 )
+                elif "sample id" in key.lower():
+                    if isinstance(row[key], float) or isinstance(row[key], int):
+                        row[key] = str(int(row[key]))
+
                 else:
                     if isinstance(row[key], float) or isinstance(row[key], int):
                         row[key] = str(row[key])
