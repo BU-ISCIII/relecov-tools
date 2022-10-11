@@ -198,15 +198,17 @@ class RelecovMetadata:
             values["j_data"] = relecov_tools.utils.read_json_file(f_path)
             metadata = self.process_from_json(metadata, values)
             stderr.print(f"[green] Processed {key}")
-        stderr.print("[blue] Reading sample list file")
+
         # Because sample data file is comming in an input parameter it cannot
         # be inside the configuration json file.
         # Include Sample informatin data from sample json file
+        stderr.print("[blue] Processing sample data file")
         s_json = {}
         s_json["map_field"] = "sequencing_sample_id"
         s_json["adding_field"] = "__all__"
         s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
         metadata = self.process_from_json(metadata, s_json)
+        stderr.print("[green] Processed sample data file.")
         return metadata
 
     def read_configuration_json_files(self):
