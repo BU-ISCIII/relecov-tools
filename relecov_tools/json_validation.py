@@ -80,12 +80,25 @@ class SchemaValidation:
             if validator.is_valid(item_row):
                 validated_json_data.append(item_row)
             else:
+                # Count error types
                 for error in validator.iter_errors(item_row):
-                    stderr.print("[red] Invalid sample data " + error.message)
-                    # log.error("Invalid sample data %s", error.message)
+                    if error.message in errors.keys():
+                        errors[error.message] += 1
+                    else:
+                        errors[error.message] = 1
 
+                # log.error("Invalid sample data %s", error.message)
                 # append row with errors
                 invalid_json.append(item_row)
+
+        # Summarize errors
+        stderr.print("[red] --------------------")
+        stderr.print("[red] VALIDATION SUMMARY")
+        stderr.print("[red] --------------------")
+        for error_type in errors.keys():
+            stderr.print("[red]" + str(errors[error_type]) + " samples failed validation:\n" + error_type)
+            stderr.print("[red] --------------------")
+
         return invalid_json
 
     def create_invalid_metadata(self, invalid_json, metadata, out_folder):
