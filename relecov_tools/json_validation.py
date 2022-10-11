@@ -72,9 +72,8 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
             validated_json_data.append(item_row)
         else:
             for error in draft_202012_validator.iter_errors(item_row):
-                #import pdb; pdb.set_trace()
                 stderr.print("[red] Invalid sample data " + error.message)
-                log.error("Invalid sample data %s", error.message)
+                #log.error("Invalid sample data %s", error.message)
 
             # append row with errors
             invalid_json.append(item_row)
