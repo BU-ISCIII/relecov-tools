@@ -2,7 +2,6 @@
 import logging
 import rich.console
 import jsonschema
-from jsonschema import validate
 from jsonschema import Draft202012Validator
 import json
 import sys
@@ -21,67 +20,80 @@ stderr = rich.console.Console(
 )
 
 
-def validate_json(json_data_file=None, json_schema_file=None, metadata=None, out_folder=None):
-    """Validate json file against the schema"""
+class SchemaValidation:
 
-    if json_schema_file is None:
-        config_json = ConfigJson()
-        schema_name = config_json.get_topic_data("json_schemas", "relecov_schema")
-        json_schema_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
-        )
+    def __init__(json_data_file=None, json_schema_file=None, metadata=None, out_folder=None):
+        """Validate json file against the schema"""
 
-    with open(json_schema_file, "r") as fh:
-        json_schema = json.load(fh)
+        if json_schema_file is None:
+            config_json = ConfigJson()
+            schema_name = config_json.get_topic_data("json_schemas", "relecov_schema")
+            json_schema_file = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
+            )
 
-    try:
-        Draft202012Validator.check_schema(json_schema)
-        draft_202012_validator = Draft202012Validator(json_schema)
-    except jsonschema.ValidationError:
-        stderr.print("[red] Json schema does not fulfill Draft 202012 Validation")
-        sys.exit(1)
+        self.json_schema = relecov_tools.utils.read_json_file(json_schema_file)
 
-    if json_data_file is None:
-        json_data_file = relecov_tools.utils.prompt_path(
-            msg="Select the json file to validate"
-        )
 
-    if out_folder is None:
-        out_folder = relecov_tools.utils.prompt_path(
-            msg="Select the folder where to save excel with invalid data"
-        )
+        if json_data_file is None:
+            json_data_file = relecov_tools.utils.prompt_path(
+                msg="Select the json file to validate"
+            )
 
-    # Read and check json to validate file
-    if not os.path.isfile(json_data_file):
-        stderr.print("[red] Json file does not exists")
-        sys.exit(1)
+        if out_folder is None:
+            self.out_folder = relecov_tools.utils.prompt_path(
+                msg="Select the folder where to save excel with invalid data"
+            )
 
-    stderr.print("[blue] Reading the json file")
-    json_data = relecov_tools.utils.read_json_file(json_data_file)
+        # Read and check json to validate file
+        if not os.path.isfile(json_data_file):
+            stderr.print("[red] Json file does not exists")
+            sys.exit(1)
 
-    with open(json_data_file, "r") as fh:
-        json_data = json.load(fh)
+        stderr.print("[blue] Reading the json file")
+        self.json_data = relecov_tools.utils.read_json_file(json_data_file)
+
+def validate_schema(self):
+    """Validate json schema against draft"""
+        try:
+            Draft202012Validator.check_schema(self.json_schema)
+        except jsonschema.ValidationError:
+            stderr.print("[red] Json schema does not fulfill Draft 202012 Validation")
+            sys.exit(1)
+
+def validate_instances(self):
+    """ Validate data instances against a validated json schema """
+
+    # create validator
+    validator = Draft202012Validator(self.json_schema)
 
     validated_json_data = []
     invalid_json = []
     errors = {}
     stderr.print("[blue] Start processing the json file")
-    for item_row in json_data:
+    for item_row in self.json_data:
         #validate(instance=item_row, schema=json_schema)
-        if draft_202012_validator.is_valid(item_row):
+        if validator.is_valid(item_row):
             validated_json_data.append(item_row)
         else:
-            for error in draft_202012_validator.iter_errors(item_row):
+            for error in validator.iter_errors(item_row):
                 stderr.print("[red] Invalid sample data " + error.message)
                 #log.error("Invalid sample data %s", error.message)
 
             # append row with errors
             invalid_json.append(item_row)
+    return invalid_json
 
-    # Enviar los errores por correo
-    # logging.handlers.SMTPHandler(mailhost=("smtp.gmail.com", 465), fromaddr=correo_isciii, toaddrs=correo_usuario, subject="Validation errors", credentials=(usurario,contraseña), secure=None, timeout=1.0)
+
+def create_invalid_metadata(invalid_json, out_folder):
+    """Create a new sub excel file having only the samples that were invalid.
+    Samples name are checking the Sequencing sample id which are in
+    column B (index 1).
+    The rows that match the value collected from json file on tag
+    collecting_lab_sample_id are removed from excel
+    """
     if len(invalid_json) == 0:
-        stderr.print("[green] Sucessful validation")
+        stderr.print("[green] Sucessful validation, no invalid file will be written.")
     else:
         log.error("Some of the samples in json metadata were not validated")
         stderr.print("[red] Some of the Samples are not validate")
@@ -96,24 +108,12 @@ def validate_json(json_data_file=None, json_schema_file=None, metadata=None, out
                 metadata,
                 " does not exist",
             )
-            exit(1)
-        relecov_tools.json_validation.create_invalid_metadata(
-            metadata, invalid_json, out_folder
-        )
+            sys.exit(1)
 
-    return
-
-def create_invalid_metadata(metadata_file, invalid_json, out_folder):
-    """Create a new sub excel file having only the samples that were invalid.
-    Samples name are checking the Sequencing sample id which are in
-    column B (index 1).
-    The rows that match the value collected from json file on tag
-    collecting_lab_sample_id are removed from excel
-    """
     sample_list = []
-    # import pdb; pdb.set_trace()
-    # json_data = relecov_tools.utils.read_json_file(invalid_json)
+
     stderr.print("[red] Start preparation of invalid samples")
+
     for row in invalid_json:
         sample_list.append(str(row["collecting_lab_sample_id"]))
 
@@ -128,6 +128,7 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
             break
         if str(row[2].value) not in sample_list:
             row_to_del.append(row[0].row)
+
     stderr.print("[red] Collected rows to create the excel file")
     if len(row_to_del) > 0:
         row_to_del.sort(reverse=True)
@@ -140,6 +141,7 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
                 )
                 stderr.print("f[red] Unable to delete row {idx} becuase of {e}")
                 sys.exit(1)
+
     os.makedirs(out_folder, exist_ok=True)
     new_name = "invalid_" + os.path.basename(metadata_file)
     m_file = os.path.join(out_folder, new_name)
@@ -147,4 +149,12 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
     wb.save(m_file)
     return
 
+def validate(self):
+    """ Write invalid samples from metadata to excel """
 
+    self.validate_schema()
+    self.validate_instances()
+    self.create_invalid_metadata(invalid_json, self.out_folder)
+
+    # Enviar los errores por correo
+    # logging.handlers.SMTPHandler(mailhost=("smtp.gmail.com", 465), fromaddr=correo_isciii, toaddrs=correo_usuario, subject="Validation errors", credentials=(usurario,contraseña), secure=None, timeout=1.0)

@@ -192,10 +192,9 @@ def read_lab_metadata(metadata_file, sample_list_file, metadata_out):
 )
 @click.option("-o", "--out_folder", help="Path to save validate json file")
 def validate(json_file, json_schema, metadata, out_folder):
-    """Validate json file against schema."""
-    relecov_tools.json_validation.validate_json(json_file, json_schema, metadata, out_folder)
-
-
+    """ Validate json file against schema."""
+    validation = relecov_tools.json_validation.SchemaValidation(json_file, json_schema, metadata, out_folder)
+    validation.validate()
 
 # mapping to ENA schema
 @relecov_tools_cli.command(help_priority=5)
