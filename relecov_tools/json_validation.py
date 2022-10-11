@@ -92,9 +92,9 @@ class SchemaValidation:
                 invalid_json.append(item_row)
 
         # Summarize errors
-        stderr.print("[red] --------------------")
-        stderr.print("[red] VALIDATION SUMMARY")
-        stderr.print("[red] --------------------")
+        stderr.print("[blue] --------------------")
+        stderr.print("[blue] VALIDATION SUMMARY")
+        stderr.print("[blue] --------------------")
         for error_type in errors.keys():
             stderr.print("[red]" + str(errors[error_type]) + " samples failed validation:\n" + error_type)
             stderr.print("[red] --------------------")
@@ -110,7 +110,7 @@ class SchemaValidation:
         """
         if len(invalid_json) == 0:
             stderr.print(
-                "[green] Sucessful validation, no invalid file will be written."
+                "[green] Sucessful validation, no invalid file will be written!!"
             )
         else:
             log.error("Some of the samples in json metadata were not validated")
@@ -128,43 +128,43 @@ class SchemaValidation:
                 )
                 sys.exit(1)
 
-        sample_list = []
+            sample_list = []
 
-        stderr.print("[red] Start preparation of invalid samples")
+            stderr.print("[red] Start preparation of invalid samples")
 
-        for row in invalid_json:
-            sample_list.append(str(row["collecting_lab_sample_id"]))
+            for row in invalid_json:
+                sample_list.append(str(row["collecting_lab_sample_id"]))
 
-        wb = openpyxl.load_workbook(metadata)
-        ws_sheet = wb["METADATA_LAB"]
-        row_to_del = []
+            wb = openpyxl.load_workbook(metadata)
+            ws_sheet = wb["METADATA_LAB"]
+            row_to_del = []
 
-        for row in ws_sheet.iter_rows(min_row=5, max_row=ws_sheet.max_row):
-            # if not data on row 1 and 2 assume that no more data are in file
-            # then start deleting rows
-            if not row[2].value and not row[1].value:
-                break
-            if str(row[2].value) not in sample_list:
-                row_to_del.append(row[0].row)
+            for row in ws_sheet.iter_rows(min_row=5, max_row=ws_sheet.max_row):
+                # if not data on row 1 and 2 assume that no more data are in file
+                # then start deleting rows
+                if not row[2].value and not row[1].value:
+                    break
+                if str(row[2].value) not in sample_list:
+                    row_to_del.append(row[0].row)
 
-        stderr.print("[red] Collected rows to create the excel file")
-        if len(row_to_del) > 0:
-            row_to_del.sort(reverse=True)
-            for idx in row_to_del:
-                try:
-                    ws_sheet.delete_rows(idx)
-                except TypeError as e:
-                    log.error(
-                        "Unable to delete row %s from metadata file because of", idx, e
-                    )
-                    stderr.print("f[red] Unable to delete row {idx} becuase of {e}")
-                    sys.exit(1)
+            stderr.print("[red] Collected rows to create the excel file")
+            if len(row_to_del) > 0:
+                row_to_del.sort(reverse=True)
+                for idx in row_to_del:
+                    try:
+                        ws_sheet.delete_rows(idx)
+                    except TypeError as e:
+                        log.error(
+                            "Unable to delete row %s from metadata file because of", idx, e
+                        )
+                        stderr.print("f[red] Unable to delete row {idx} becuase of {e}")
+                        sys.exit(1)
 
-        os.makedirs(out_folder, exist_ok=True)
-        new_name = "invalid_" + os.path.basename(metadata)
-        m_file = os.path.join(out_folder, new_name)
-        stderr.print("[red] Saving excel file with the invalid samples")
-        wb.save(m_file)
+            os.makedirs(out_folder, exist_ok=True)
+            new_name = "invalid_" + os.path.basename(metadata)
+            m_file = os.path.join(out_folder, new_name)
+            stderr.print("[red] Saving excel file with the invalid samples")
+            wb.save(m_file)
         return
 
     def validate(self):
