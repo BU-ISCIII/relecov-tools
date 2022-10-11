@@ -160,7 +160,6 @@ class RelecovMetadata:
         map_field = json_fields["map_field"]
 
         json_data = json_fields["j_data"]
-
         if isinstance(json_data, dict):
             for idx in range(len(m_data)):
                 m_data[idx].update(json_data[m_data[idx][map_field]])
@@ -272,7 +271,7 @@ class RelecovMetadata:
                                     f"[red] Invalid date format in sample {sample_number},  {key}"
                                 )
                 elif "sample id" in key.lower():
-                    if isinstance(row[key], float):
+                    if isinstance(row[key], float) or isinstance(row[key], int):
                         row[key] = str(int(row[key]))
 
                 else:

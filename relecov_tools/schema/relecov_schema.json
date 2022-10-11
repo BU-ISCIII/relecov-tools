@@ -2632,7 +2632,7 @@
             "type": "string",
             "description": "",
             "classification": "Public databases",
-            "label": "Sample accession",
+            "label": "ENA Sample ID",
             "fill_mode": "batch"
         },
         "ena_experiment_accession": {
