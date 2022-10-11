@@ -21,7 +21,7 @@ stderr = rich.console.Console(
 )
 
 
-def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
+def validate_json(json_data_file=None, json_schema_file=None, metadata=None, out_folder=None):
     """Validate json file against the schema"""
 
     if json_schema_file is None:
@@ -83,9 +83,25 @@ def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
     if len(invalid_json) == 0:
         stderr.print("[green] Sucessful validation")
     else:
-        stderr.print("[red] Some samples are not validated")
-    return validated_json_data, invalid_json, errors, out_folder
+        log.error("Some of the samples in json metadata were not validated")
+        stderr.print("[red] Some of the Samples are not validate")
+        if metadata is None:
+            metadata = relecov_tools.utils.prompt_path(
+                msg="Select the metadata file to select those samples not validated."
+            )
+        if not os.path.isfile(metadata):
+            log.error("Metadata file %s does not exist", metadata)
+            stderr.print(
+                "[red] Unable to create excel file for invalid samples. Metadata file ",
+                metadata,
+                " does not exist",
+            )
+            exit(1)
+        relecov_tools.json_validation.create_invalid_metadata(
+            metadata, invalid_json, out_folder
+        )
 
+    return
 
 def create_invalid_metadata(metadata_file, invalid_json, out_folder):
     """Create a new sub excel file having only the samples that were invalid.
@@ -130,3 +146,5 @@ def create_invalid_metadata(metadata_file, invalid_json, out_folder):
     stderr.print("[red] Saving excel file with the invalid samples")
     wb.save(m_file)
     return
+
+

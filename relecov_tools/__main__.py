@@ -193,29 +193,8 @@ def read_lab_metadata(metadata_file, sample_list_file, metadata_out):
 @click.option("-o", "--out_folder", help="Path to save validate json file")
 def validate(json_file, json_schema, metadata, out_folder):
     """Validate json file against schema."""
-    (
-        validated_json_data,
-        invalid_json,
-        errors,
-        out_folder,
-    ) = relecov_tools.json_validation.validate_json(json_file, json_schema, out_folder)
-    if len(invalid_json) > 0:
-        log.error("Some of the samples in json metadata were not validated")
-        stderr.print("[red] Some of the Samples are not validate")
-        if not os.path.isfile(metadata):
-            log.error("Metadata file %s does not exist", metadata)
-            stderr.print(
-                "[red] Unable to create excel file for invalid samples. Metadata file ",
-                metadata,
-                " does not exist",
-            )
-            exit(1)
-        relecov_tools.json_validation.create_invalid_metadata(
-            metadata, invalid_json, out_folder
-        )
+    relecov_tools.json_validation.validate_json(json_file, json_schema, metadata, out_folder)
 
-    else:
-        log.info("All data in json were validated")
 
 
 # mapping to ENA schema
