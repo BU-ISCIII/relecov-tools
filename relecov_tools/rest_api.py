@@ -57,7 +57,7 @@ class RestApi:
             auth = (credentials["user"], credentials["pass"])
         url_http = str(self.request_url + url)
         try:
-            req = requests.put(url_http, data=data, headers=self.headers, auth=auth)
+            req = requests.put(url_http, data=data, auth=auth)
         except requests.ConnectionError:
             log.error("Unable to open connection towards %s", self.request_url)
             stderr.print("[red] Unable to open connection towards ", self.request_url)
