@@ -23,46 +23,62 @@ stderr = rich.console.Console(
 
 def validate_json(json_data_file=None, json_schema_file=None, out_folder=None):
     """Validate json file against the schema"""
-    if json_data_file is None:
-        json_data_file = relecov_tools.utils.prompt_path(
-            msg="Select the json file to validate"
-        )
+
     if json_schema_file is None:
         config_json = ConfigJson()
         schema_name = config_json.get_topic_data("json_schemas", "relecov_schema")
         json_schema_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
         )
-    # schema_file = open('/home/lchapado/Projects/Proyecto_ERA/relecov-tools/schema/phage_plus_V0.json')
+
     with open(json_schema_file, "r") as fh:
         json_schema = json.load(fh)
+
     try:
         Draft202012Validator.check_schema(json_schema)
+        draft_202012_validator = Draft202012Validator(json_schema)
     except jsonschema.ValidationError:
-        stderr.print("[red] Json schema does not fulfil Draft 202012 Validation")
+        stderr.print("[red] Json schema does not fulfill Draft 202012 Validation")
         sys.exit(1)
-    if not os.path.isfile(json_data_file):
-        stderr.print("[red] Json file does not exists")
-        sys.exit(1)
+
+    if json_data_file is None:
+        json_data_file = relecov_tools.utils.prompt_path(
+            msg="Select the json file to validate"
+        )
+
     if out_folder is None:
         out_folder = relecov_tools.utils.prompt_path(
             msg="Select the folder where to save excel with invalid data"
         )
+
+    # Read and check json to validate file
+    if not os.path.isfile(json_data_file):
+        stderr.print("[red] Json file does not exists")
+        sys.exit(1)
+
     stderr.print("[blue] Reading the json file")
     json_data = relecov_tools.utils.read_json_file(json_data_file)
+
     with open(json_data_file, "r") as fh:
         json_data = json.load(fh)
+
     validated_json_data = []
     invalid_json = []
     errors = {}
     stderr.print("[blue] Start processing the json file")
     for item_row in json_data:
-        try:
-            validate(instance=item_row, schema=json_schema)
+        #validate(instance=item_row, schema=json_schema)
+        if draft_202012_validator.is_valid(item_row):
             validated_json_data.append(item_row)
-        except jsonschema.ValidationError as e:
-            log.error("Invalid sample data %s", e)
+        else:
+            for error in draft_202012_validator.iter_errors(item_row):
+                #import pdb; pdb.set_trace()
+                stderr.print("[red] Invalid sample data " + error.message)
+                log.error("Invalid sample data %s", error.message)
+
+            # append row with errors
             invalid_json.append(item_row)
+
     # Enviar los errores por correo
     # logging.handlers.SMTPHandler(mailhost=("smtp.gmail.com", 465), fromaddr=correo_isciii, toaddrs=correo_usuario, subject="Validation errors", credentials=(usurario,contraseña), secure=None, timeout=1.0)
     if len(invalid_json) == 0:
