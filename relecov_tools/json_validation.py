@@ -3,7 +3,6 @@ import logging
 import rich.console
 import jsonschema
 from jsonschema import Draft202012Validator
-import json
 import sys
 import os
 import openpyxl
