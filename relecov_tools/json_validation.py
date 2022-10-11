@@ -21,8 +21,9 @@ stderr = rich.console.Console(
 
 
 class SchemaValidation:
-
-    def __init__(json_data_file=None, json_schema_file=None, metadata=None, out_folder=None):
+    def __init__(
+        json_data_file=None, json_schema_file=None, metadata=None, out_folder=None
+    ):
         """Validate json file against the schema"""
 
         if json_schema_file is None:
@@ -33,7 +34,6 @@ class SchemaValidation:
             )
 
         self.json_schema = relecov_tools.utils.read_json_file(json_schema_file)
-
 
         if json_data_file is None:
             json_data_file = relecov_tools.utils.prompt_path(
@@ -53,16 +53,18 @@ class SchemaValidation:
         stderr.print("[blue] Reading the json file")
         self.json_data = relecov_tools.utils.read_json_file(json_data_file)
 
+
 def validate_schema(self):
     """Validate json schema against draft"""
-        try:
-            Draft202012Validator.check_schema(self.json_schema)
-        except jsonschema.ValidationError:
-            stderr.print("[red] Json schema does not fulfill Draft 202012 Validation")
-            sys.exit(1)
+    try:
+        Draft202012Validator.check_schema(self.json_schema)
+    except jsonschema.ValidationError:
+        stderr.print("[red] Json schema does not fulfill Draft 202012 Validation")
+        sys.exit(1)
+
 
 def validate_instances(self):
-    """ Validate data instances against a validated json schema """
+    """Validate data instances against a validated json schema"""
 
     # create validator
     validator = Draft202012Validator(self.json_schema)
@@ -72,13 +74,13 @@ def validate_instances(self):
     errors = {}
     stderr.print("[blue] Start processing the json file")
     for item_row in self.json_data:
-        #validate(instance=item_row, schema=json_schema)
+        # validate(instance=item_row, schema=json_schema)
         if validator.is_valid(item_row):
             validated_json_data.append(item_row)
         else:
             for error in validator.iter_errors(item_row):
                 stderr.print("[red] Invalid sample data " + error.message)
-                #log.error("Invalid sample data %s", error.message)
+                # log.error("Invalid sample data %s", error.message)
 
             # append row with errors
             invalid_json.append(item_row)
@@ -149,8 +151,9 @@ def create_invalid_metadata(invalid_json, out_folder):
     wb.save(m_file)
     return
 
+
 def validate(self):
-    """ Write invalid samples from metadata to excel """
+    """Write invalid samples from metadata to excel"""
 
     self.validate_schema()
     self.validate_instances()
