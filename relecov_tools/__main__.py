@@ -320,7 +320,6 @@ def launch(user):
 # update_db
 @relecov_tools_cli.command(help_priority=9)
 @click.option("-j", "--json", help="data in json format")
-@click.option("-s", "--schema", help="json schema if relecov is not used")
 @click.option(
     "-t",
     "--type",
@@ -342,10 +341,10 @@ def launch(user):
 )
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
-def update_db(user, password, json, schema, type, databaseServer):
+def update_db(user, password, json, type, databaseServer):
     """feed database with json"""
     feed_database = relecov_tools.feed_database.FeedDatabase(
-        user, password, json, schema, type, databaseServer
+        user, password, json, type, databaseServer
     )
     feed_database.store_data()
 
