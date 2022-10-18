@@ -1065,28 +1065,6 @@
             "fill_mode": "batch",
             "minLenght": "1"
         },
-        "host_subject_id": {
-            "examples": [
-                "e.g. #131"
-            ],
-            "ontology": "GENEPIO:0001398",
-            "type": "string",
-            "description": "a unique identifier by which each subject can be referred to, de-identified.",
-            "classification": "Host information",
-            "label": "Host Subject Id",
-            "fill_mode": "sample"
-        },
-        "host_health_state": {
-            "examples": [
-                ""
-            ],
-            "ontology": "GENEPIO:0001388",
-            "type": "string",
-            "description": " Status of the host",
-            "classification": "Host information",
-            "label": "Host health state",
-            "fill_mode": "sample"
-        },
         "host_common_name": {
             "enum": [
                 "Human [NCBITaxon:9606]",
