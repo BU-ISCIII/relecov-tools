@@ -242,7 +242,7 @@
             "variants_metrics": "summary_variants_metrics_mqc.csv",
             "versions": "software_versions.yml",
             "pangoling": "pangolin_version.csv",
-            "variant_metrics": "summary_variants_metrics_mqc.csv"
+            "mapping_stats": "mapping_illumina_stats.tab"
         },
         "mapping_consensus": [
             "consensus_genome_length",
@@ -255,7 +255,7 @@
             "variant_designation": "scorpio_call"
         },
         "mapping_stats": {
-            "analysis date": "analysis date",
+            "analysis_date": "analysis date",
             "depth_of_coverage_value": "medianDPcoveragevirus",
             "lineage_name": "Lineage",
             "number_of_variants_in_consensus": "Variantsinconsensusx10",
@@ -298,8 +298,6 @@
             "read_length": "number_of_base_pairs_sequenced",
             "schema_name": "schema_name",
             "schema_version": "schema_version",
-            "sequence_file_R1_md5": "sequence_file_R1_md5",
-            "sequence_file_R2_md5": "sequence_file_R2_md5",
             "sequencing_sample_id": "sequencing_sample_id"
         }
     },
