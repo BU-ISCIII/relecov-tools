@@ -157,9 +157,7 @@ class BioinfoMetadata:
             row["consensus_sequence_filepath"] = self.input_folder
             row["consensus_sequence_filename"] = f_name
             row["consensus_sequence_md5"] = relecov_tools.utils.calculate_md5(f_path)
-            base_calculation = int(row["read_length"]) * len(
-                record_fasta
-            )
+            base_calculation = int(row["read_length"]) * len(record_fasta)
             if row["sequencing_sample_id"] != "":
                 row["number_of_base_pairs_sequenced"] = str(base_calculation * 2)
             else:
@@ -232,16 +230,18 @@ class BioinfoMetadata:
             log.error("%s invalid json file", self.json_file)
             stderr.print(f"[red] {self.json_file} invalid json file")
             sys.exit(1)
-        import pdb; pdb.set_trace()
-#        j_data = []
-#        mapping_fields = self.configuration.get_topic_data(
-#            "bioinfo_analysis", "required_fields_from_lab_json"
-#        )
-#        for row in json_lab_data:
-#            j_data_dict = {}
-#            for lab_field, bio_field in mapping_fields.items():
-#                j_data_dict[bio_field] = row[lab_field]
-#            j_data.append(j_data_dict)
+        import pdb
+
+        pdb.set_trace()
+        #        j_data = []
+        #        mapping_fields = self.configuration.get_topic_data(
+        #            "bioinfo_analysis", "required_fields_from_lab_json"
+        #        )
+        #        for row in json_lab_data:
+        #            j_data_dict = {}
+        #            for lab_field, bio_field in mapping_fields.items():
+        #                j_data_dict[bio_field] = row[lab_field]
+        #            j_data.append(j_data_dict)
         return json_lab_data
 
     def create_bioinfo_file(self):
