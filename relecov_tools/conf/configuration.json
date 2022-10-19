@@ -200,19 +200,25 @@
         "sampleLocation": "Not defined"
     },
     "relecov_sample_metadata": [
-        "sequence_file_R1_md5",
-        "sequence_file_R2_md5",
+        "authors",
+        "collecting_institution",
+        "collecting_lab_sample_id",
+        "ena_broker_name",
+        "ena_sample_accession",
+        "gisaid_accession_id",
+        "gisaid_virus_name",
         "microbiology_lab_sample_id",
         "r1_fastq_filepath",
         "r2_fastq_filepath",
-        "collecting_lab_sample_id",
         "schema_name",
         "schema_version",
+        "sequencing_date",
+        "sequence_file_R1_md5",
+        "sequence_file_R2_md5",
         "sequence_file_R1_fastq",
         "sequence_file_R2_fastq",
         "sequencing_sample_id",
-        "submitting_lab_sample_id",
-        "virus_name"
+        "submitting_lab_sample_id"
     ],
     "bioinfo_analysis": {
         "fixed_values": {
