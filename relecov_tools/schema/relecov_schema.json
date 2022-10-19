@@ -799,11 +799,11 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "",
+            "description": "Source of the specimen, merge of anatomical_part, anatomical_material, body_product and collection method.",
             "examples": [
                 ""
             ],
-            "classification": "Source of the specimen, merge of anatomical_part, anatomical_material, body_product and collection method.",
+            "classification": "Sample collection and processing",
             "label": "Specimen source",
             "fill_mode": "batch"
         },
