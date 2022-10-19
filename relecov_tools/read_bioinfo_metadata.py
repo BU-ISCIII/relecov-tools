@@ -25,7 +25,6 @@ class BioinfoMetadata:
         json_file=None,
         input_folder=None,
         output_folder=None,
-        mapping_illumina=None,
     ):
         if json_file is None:
             json_file = relecov_tools.utils.prompt_path(
@@ -49,16 +48,6 @@ class BioinfoMetadata:
             )
         else:
             self.output_folder = output_folder
-        if mapping_illumina is None:
-            self.mapping_illumina = relecov_tools.utils.prompt_path(
-                msg="Select the mapping illumina file"
-            )
-        else:
-            self.mapping_illumina = mapping_illumina
-        if not os.path.isfile(self.mapping_illumina):
-            log.error("%s does not exist", self.mapping_illumina)
-            stderr.print(f"[red] {self.mapping_illumina} does not exist")
-            sys.exit(1)
 
         config_json = ConfigJson()
         self.configuration = config_json
@@ -92,8 +81,9 @@ class BioinfoMetadata:
         # position of the sample columns inside mapping file
         sample_position = 4
         map_data = relecov_tools.utils.read_csv_file_return_dict(
-            self.mapping_illumina, ",", sample_position
+            self.req_files["mapping_stats"], "\t", sample_position
         )
+
         mapping_fields = self.configuration.get_topic_data(
             "bioinfo_analysis", "mapping_stats"
         )
@@ -118,7 +108,7 @@ class BioinfoMetadata:
                 sample_name = row["sequencing_sample_id"].replace("-", "_")
             else:
                 sample_name = row["sequencing_sample_id"]
-            f_name = sample_name + ".pangolin." + row["analysis date"] + ".csv"
+            f_name = sample_name + ".pangolin." + row["analysis_date"] + ".csv"
             f_path = os.path.join(self.input_folder, f_name)
 
             try:
@@ -167,7 +157,7 @@ class BioinfoMetadata:
             row["consensus_sequence_filepath"] = self.input_folder
             row["consensus_sequence_filename"] = f_name
             row["consensus_sequence_md5"] = relecov_tools.utils.calculate_md5(f_path)
-            base_calculation = int(row["number_of_base_pairs_sequenced"]) * len(
+            base_calculation = int(row["read_length"]) * len(
                 record_fasta
             )
             if row["sequencing_sample_id"] != "":
@@ -196,7 +186,7 @@ class BioinfoMetadata:
         metric file_exists
         """
         map_data = relecov_tools.utils.read_csv_file_return_dict(
-            self.req_files["variant_metrics"], ","
+            self.req_files["variants_metrics"], ","
         )
         mapping_fields = self.configuration.get_topic_data(
             "bioinfo_analysis", "mapping_variant_metrics"
@@ -233,7 +223,7 @@ class BioinfoMetadata:
         return j_data
 
     def collect_info_from_lab_json(self):
-        """Craeate the list of dictionaries from the data that is on json lab
+        """Create the list of dictionaries from the data that is on json lab
         metadata file. Return j_data that is used to add the rest of the fields
         """
         try:
@@ -242,16 +232,17 @@ class BioinfoMetadata:
             log.error("%s invalid json file", self.json_file)
             stderr.print(f"[red] {self.json_file} invalid json file")
             sys.exit(1)
-        j_data = []
-        mapping_fields = self.configuration.get_topic_data(
-            "bioinfo_analysis", "required_fields_from_lab_json"
-        )
-        for row in json_lab_data:
-            j_data_dict = {}
-            for lab_field, bio_field in mapping_fields.items():
-                j_data_dict[bio_field] = row[lab_field]
-            j_data.append(j_data_dict)
-        return j_data
+        import pdb; pdb.set_trace()
+#        j_data = []
+#        mapping_fields = self.configuration.get_topic_data(
+#            "bioinfo_analysis", "required_fields_from_lab_json"
+#        )
+#        for row in json_lab_data:
+#            j_data_dict = {}
+#            for lab_field, bio_field in mapping_fields.items():
+#                j_data_dict[bio_field] = row[lab_field]
+#            j_data.append(j_data_dict)
+        return json_lab_data
 
     def create_bioinfo_file(self):
         """Create the bioinfodata json with collecting information from lab
