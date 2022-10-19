@@ -108,6 +108,7 @@ class BioinfoMetadata:
                 sample_name = row["sequencing_sample_id"].replace("-", "_")
             else:
                 sample_name = row["sequencing_sample_id"]
+
             f_name = sample_name + ".pangolin." + row["analysis_date"] + ".csv"
             f_path = os.path.join(self.input_folder, f_name)
 
