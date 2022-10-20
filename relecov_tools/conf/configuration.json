@@ -258,12 +258,12 @@
             "number_of_base_pairs_sequenced"
         ],
         "mapping_pangolin": {
-            "variant_designation": "scorpio_call"
+            "variant_designation": "scorpio_call",
+            "lineage_name": "lineage"
         },
         "mapping_stats": {
             "analysis_date": "analysis date",
             "depth_of_coverage_value": "medianDPcoveragevirus",
-            "lineage_name": "Lineage",
             "number_of_variants_in_consensus": "Variantsinconsensusx10",
             "number_of_variants_with_effect": "MissenseVariants",
             "per_genome_greater_10x": "Coverage>10x(%)",
