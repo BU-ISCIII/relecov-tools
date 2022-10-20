@@ -2400,6 +2400,17 @@
             "label": "Lineage/clade analysis software version",
             "fill_mode": "batch"
         },
+        "lineage_analysis_date": {
+            "examples": [
+                "2022/10/24"
+            ],
+            "ontology": "0",
+            "type": "date",
+            "description": "Date when the lineage analysis was performed",
+            "classification": "Lineage fields",
+            "label": "lineage/clade analysis date",
+            "fill_mode": "batch"
+        },
         "variant_designation": {
             "enum": [
                 "Variant of Interest (VOI) [GENEPIO:0100082]",
