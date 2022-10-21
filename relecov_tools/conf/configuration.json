@@ -3,7 +3,8 @@
         "fixed_fields": {
             "host_disease": "COVID-19",
             "tax_id": "2697049",
-            "organism": "Severe acute respiratory syndrome coronavirus 2"
+            "organism": "Severe acute respiratory syndrome coronavirus 2",
+            "study_type": "Whole Genome Sequencing"
         },
         "metadata_lab_heading": [
             "Public Health sample id (SIVIES)",
