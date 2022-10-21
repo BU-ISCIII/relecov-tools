@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
-import logging
-import rich.console
 import os
 import sys
+import re
+import logging
+import glob
+import rich.console
+from datetime import datetime
+from yaml import YAMLError
+
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
-from yaml import YAMLError
 
 # import relecov_tools.json_schema
 
@@ -109,22 +113,45 @@ class BioinfoMetadata:
             else:
                 sample_name = row["sequencing_sample_id"]
 
-            f_name = sample_name + ".pangolin." + row["analysis_date"] + ".csv"
-            f_path = os.path.join(self.input_folder, f_name)
+            f_name_regex = sample_name + ".pangolin.*.csv"
+            f_path = os.path.join(self.input_folder, f_name_regex)
+            pangolin_sample_file = glob.glob(f_path)
+            if pangolin_sample_file:
+                if len(pangolin_sample_file) == 1:
+                    try:
+                        result_regex = re.search(
+                            "(.*)\.pangolin\.(.*)\.csv", pangolin_sample_file[0]
+                        )
+                        row["lineage_analysis_date"] = result_regex.group(2)
+                        row["lineage_analysis_date"] = datetime.strptime( row["lineage_analysis_date"],
+                            "%Y%m%d"
+                        ).strftime("%Y-%m-%d")
+                    except Exception as e:
+                        stderr.print(f"[red] Pattern not found in file name.")
+                        import pdb;pdb.set_trace()
+                    try:
+                        f_data = relecov_tools.utils.read_csv_file_return_dict(result_regex
+                        .group(), ",")
+                    except FileNotFoundError as e:
+                        log.error("File %s not found ", e)
+                        stderr.print(f"[red]File {e} not found")
+                        # When file does not exist set all values to empty
+                        for field, value in mapping_fields.items():
+                            row[field] = ""
+                        continue
+                        # sys.exit(1)
+                    pang_key = list(f_data.keys())[0]
+                    for field, value in mapping_fields.items():
+                        row[field] = f_data[pang_key][value]
+                else:
+                    ## We need to handle this when more than one analysis in the folder. How can we do this? Use the last one?
+                    stderr.print(
+                        f"[red] More than one pangolin file found for the same sample "
+                    )
+                    sys.exit(1)
+            else:
+                stderr.print(f"[yellow] No pangolin file for sample: " + sample_name)
 
-            try:
-                f_data = relecov_tools.utils.read_csv_file_return_dict(f_path, ",")
-            except FileNotFoundError as e:
-                log.error("File %s not found ", e)
-                stderr.print(f"[red]File {e} not found")
-                # When file does not exist set all values to empty
-                for field, value in mapping_fields.items():
-                    row[field] = ""
-                continue
-                # sys.exit(1)
-            pang_key = list(f_data.keys())[0]
-            for field, value in mapping_fields.items():
-                row[field] = f_data[pang_key][value]
 
         return j_data
 
@@ -231,9 +258,6 @@ class BioinfoMetadata:
             log.error("%s invalid json file", self.json_file)
             stderr.print(f"[red] {self.json_file} invalid json file")
             sys.exit(1)
-        import pdb
-
-        pdb.set_trace()
         #        j_data = []
         #        mapping_fields = self.configuration.get_topic_data(
         #            "bioinfo_analysis", "required_fields_from_lab_json"
@@ -260,7 +284,7 @@ class BioinfoMetadata:
         j_data = self.include_software_versions(j_data)
         stderr.print("[blue]Adding summary variant metrics")
         j_data = self.include_variant_metrics(j_data)
-        stderr.print("[blue]Adding pangolin informtion")
+        stderr.print("[blue]Adding pangolin information")
         j_data = self.include_pangolin_data(j_data)
         stderr.print("[blue]Adding consensus data")
         j_data = self.include_consensus_data(j_data)
