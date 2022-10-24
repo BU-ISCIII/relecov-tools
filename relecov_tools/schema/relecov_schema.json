@@ -2389,6 +2389,17 @@
             "label": "If lineage identification Is Other, Specify",
             "fill_mode": "batch"
         },
+        "lineage_algorithm_software_version": {
+            "examples": [
+                "2.1.10"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the software used to determine the lineage/clade.",
+            "classification": "Lineage fields",
+            "label": "Lineage/clade analysis software version",
+            "fill_mode": "batch"
+        },
         "lineage_analysis_software_version": {
             "examples": [
                 "2.1.10"
@@ -2396,6 +2407,28 @@
             "ontology": "GENEPIO:0001502",
             "type": "string",
             "description": "The version of the software used to determine the lineage/clade.",
+            "classification": "Lineage fields",
+            "label": "Lineage/clade analysis software version",
+            "fill_mode": "batch"
+        },
+        "lineage_analysis_scorpio_version": {
+            "examples": [
+                "2.1.10"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the scorpio data used to determine the lineage/clade.",
+            "classification": "Lineage fields",
+            "label": "Lineage/clade analysis software version",
+            "fill_mode": "batch"
+        },
+        "lineage_analysis_constellation_version": {
+            "examples": [
+                "2.1.10"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the constellations databases used to determine the lineage/clade.",
             "classification": "Lineage fields",
             "label": "Lineage/clade analysis software version",
             "fill_mode": "batch"
