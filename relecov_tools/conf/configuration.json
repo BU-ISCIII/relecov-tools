@@ -259,7 +259,11 @@
         ],
         "mapping_pangolin": {
             "variant_designation": "scorpio_call",
-            "lineage_name": "lineage"
+            "lineage_name": "lineage",
+            "lineage_algorithm_software_version": "version",
+            "lineage_analysis_software_version": "pangolin_version",
+            "lineage_analysis_scorpio_version": "scorpio_version",
+            "lineage_analysis_constellation_version": "constellation_version"
         },
         "mapping_stats": {
             "analysis_date": "analysis date",
