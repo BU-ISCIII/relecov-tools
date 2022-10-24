@@ -248,7 +248,6 @@
         "required_file": {
             "variants_metrics": "summary_variants_metrics_mqc.csv",
             "versions": "software_versions.yml",
-            "pangoling": "pangolin_version.csv",
             "mapping_stats": "mapping_illumina_stats.tab"
         },
         "mapping_consensus": [
