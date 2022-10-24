@@ -2438,7 +2438,8 @@
                 "2022/10/24"
             ],
             "ontology": "0",
-            "type": "date",
+            "type": "string",
+            "format": "date",
             "description": "Date when the lineage analysis was performed",
             "classification": "Lineage fields",
             "label": "lineage/clade analysis date",
