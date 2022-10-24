@@ -123,15 +123,15 @@ class BioinfoMetadata:
                             "(.*)\.pangolin\.(.*)\.csv", pangolin_sample_file[0]
                         )
                         row["lineage_analysis_date"] = result_regex.group(2)
-                        row["lineage_analysis_date"] = datetime.strptime( row["lineage_analysis_date"],
-                            "%Y%m%d"
+                        row["lineage_analysis_date"] = datetime.strptime(
+                            row["lineage_analysis_date"], "%Y%m%d"
                         ).strftime("%Y-%m-%d")
                     except Exception as e:
                         stderr.print(f"[red] Pattern not found in file name.")
-                        import pdb;pdb.set_trace()
                     try:
-                        f_data = relecov_tools.utils.read_csv_file_return_dict(result_regex
-                        .group(), ",")
+                        f_data = relecov_tools.utils.read_csv_file_return_dict(
+                            result_regex.group(), ","
+                        )
                     except FileNotFoundError as e:
                         log.error("File %s not found ", e)
                         stderr.print(f"[red]File {e} not found")
@@ -151,7 +151,6 @@ class BioinfoMetadata:
                     sys.exit(1)
             else:
                 stderr.print(f"[yellow] No pangolin file for sample: " + sample_name)
-
 
         return j_data
 
