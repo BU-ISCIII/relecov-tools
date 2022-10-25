@@ -226,7 +226,7 @@
             "assembly": "None",
             "assembly_params": "None",
             "bioinformatics_protocol_software_name": "nf-core/viralrecon",
-            "commercial_open_source_both": "open-source",
+            "commercial_open_source_both": "Open Source",
             "consensus_params": "-p vcf -f",
             "consensus_sequence_software_name": "BCFTOOLS_CONSENSUS",
             "dehosting_method_software_name": "KRAKEN2_KRAKEN2",
@@ -258,7 +258,7 @@
             "number_of_base_pairs_sequenced"
         ],
         "mapping_pangolin": {
-            "variant_designation": "scorpio_call",
+            "variant_name": "scorpio_call",
             "lineage_name": "lineage",
             "lineage_algorithm_software_version": "version",
             "lineage_analysis_software_version": "pangolin_version",

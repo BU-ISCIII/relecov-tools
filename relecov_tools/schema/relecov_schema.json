@@ -2445,6 +2445,22 @@
             "label": "lineage/clade analysis date",
             "fill_mode": "batch"
         },
+        "variant_name": {
+            "enum": [
+                "Variant of Interest (VOI) [GENEPIO:0100082]",
+                "Variant of Concern (VOC) [GENEPIO:0100083]",
+                "Variant Under Monitoring (VUM) [GENEPIO:0100279]"
+            ],
+            "ontology": "GENEPIO:0001503",
+            "type": "string",
+            "description": "The variant classification of the lineage/clade i.e. variant, variant of concern.",
+            "examples": [
+                "Variant of Concern (VOC) [GENEPIO:0100083]"
+            ],
+            "classification": "Lineage fields",
+            "label": "Variant designation",
+            "fill_mode": "batch"
+        },
         "variant_designation": {
             "enum": [
                 "Variant of Interest (VOI) [GENEPIO:0100082]",
