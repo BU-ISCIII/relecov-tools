@@ -2446,14 +2446,12 @@
             "fill_mode": "batch"
         },
         "variant_name": {
-            "enum": [
-                "Variant of Interest (VOI) [GENEPIO:0100082]",
-                "Variant of Concern (VOC) [GENEPIO:0100083]",
-                "Variant Under Monitoring (VUM) [GENEPIO:0100279]"
+            "examples": [
+                "Alpha"
             ],
-            "ontology": "GENEPIO:0001503",
+            "ontology": "",
             "type": "string",
-            "description": "The variant classification of the lineage/clade i.e. variant, variant of concern.",
+            "description": "The variant classification of the lineage/clade i.e. alpha, beta, etc.",
             "examples": [
                 "Variant of Concern (VOC) [GENEPIO:0100083]"
             ],
