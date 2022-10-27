@@ -127,7 +127,7 @@ class BioinfoMetadata:
                             row["lineage_analysis_date"], "%Y%m%d"
                         ).strftime("%Y-%m-%d")
                     except Exception as e:
-                        stderr.print(f"[red] Pattern not found in file name.")
+                        stderr.print(f"[red] Pattern not found in file name. Error: {e}")
                     try:
                         f_data = relecov_tools.utils.read_csv_file_return_dict(
                             result_regex.group(), ","
@@ -144,13 +144,13 @@ class BioinfoMetadata:
                     for field, value in mapping_fields.items():
                         row[field] = f_data[pang_key][value]
                 else:
-                    ## We need to handle this when more than one analysis in the folder. How can we do this? Use the last one?
+                    # We need to handle this when more than one analysis in the folder. How can we do this? Use the last one?
                     stderr.print(
-                        f"[red] More than one pangolin file found for the same sample "
+                        "[red] More than one pangolin file found for the same sample "
                     )
                     sys.exit(1)
             else:
-                stderr.print(f"[yellow] No pangolin file for sample: " + sample_name)
+                stderr.print(f"[yellow] No pangolin file for sample: {sample_name}")
 
         return j_data
 
