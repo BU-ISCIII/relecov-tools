@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
-import logging
-import rich.console
 import os
 import sys
+import re
+import logging
+import glob
+import rich.console
+from datetime import datetime
+from yaml import YAMLError
+
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
-from yaml import YAMLError
 
 # import relecov_tools.json_schema
 
@@ -25,7 +29,6 @@ class BioinfoMetadata:
         json_file=None,
         input_folder=None,
         output_folder=None,
-        mapping_illumina=None,
     ):
         if json_file is None:
             json_file = relecov_tools.utils.prompt_path(
@@ -49,16 +52,6 @@ class BioinfoMetadata:
             )
         else:
             self.output_folder = output_folder
-        if mapping_illumina is None:
-            self.mapping_illumina = relecov_tools.utils.prompt_path(
-                msg="Select the mapping illumina file"
-            )
-        else:
-            self.mapping_illumina = mapping_illumina
-        if not os.path.isfile(self.mapping_illumina):
-            log.error("%s does not exist", self.mapping_illumina)
-            stderr.print(f"[red] {self.mapping_illumina} does not exist")
-            sys.exit(1)
 
         config_json = ConfigJson()
         self.configuration = config_json
@@ -92,8 +85,9 @@ class BioinfoMetadata:
         # position of the sample columns inside mapping file
         sample_position = 4
         map_data = relecov_tools.utils.read_csv_file_return_dict(
-            self.mapping_illumina, ",", sample_position
+            self.req_files["mapping_stats"], "\t", sample_position
         )
+
         mapping_fields = self.configuration.get_topic_data(
             "bioinfo_analysis", "mapping_stats"
         )
@@ -118,22 +112,47 @@ class BioinfoMetadata:
                 sample_name = row["sequencing_sample_id"].replace("-", "_")
             else:
                 sample_name = row["sequencing_sample_id"]
-            f_name = sample_name + ".pangolin." + row["analysis date"] + ".csv"
-            f_path = os.path.join(self.input_folder, f_name)
 
-            try:
-                f_data = relecov_tools.utils.read_csv_file_return_dict(f_path, ",")
-            except FileNotFoundError as e:
-                log.error("File %s not found ", e)
-                stderr.print(f"[red]File {e} not found")
-                # When file does not exist set all values to empty
-                for field, value in mapping_fields.items():
-                    row[field] = ""
-                continue
-                # sys.exit(1)
-            pang_key = list(f_data.keys())[0]
-            for field, value in mapping_fields.items():
-                row[field] = f_data[pang_key][value]
+            f_name_regex = sample_name + ".pangolin.*.csv"
+            f_path = os.path.join(self.input_folder, f_name_regex)
+            pangolin_sample_file = glob.glob(f_path)
+            if pangolin_sample_file:
+                if len(pangolin_sample_file) == 1:
+                    try:
+                        result_regex = re.search(
+                            "(.*)\.pangolin\.(.*)\.csv", pangolin_sample_file[0]
+                        )
+                        row["lineage_analysis_date"] = result_regex.group(2)
+                        row["lineage_analysis_date"] = datetime.strptime(
+                            row["lineage_analysis_date"], "%Y%m%d"
+                        ).strftime("%Y-%m-%d")
+                    except Exception as e:
+                        stderr.print(
+                            f"[red] Pattern not found in file name. Error: {e}"
+                        )
+                    try:
+                        f_data = relecov_tools.utils.read_csv_file_return_dict(
+                            result_regex.group(), ","
+                        )
+                    except FileNotFoundError as e:
+                        log.error("File %s not found ", e)
+                        stderr.print(f"[red]File {e} not found")
+                        # When file does not exist set all values to empty
+                        for field, value in mapping_fields.items():
+                            row[field] = ""
+                        continue
+                        # sys.exit(1)
+                    pang_key = list(f_data.keys())[0]
+                    for field, value in mapping_fields.items():
+                        row[field] = f_data[pang_key][value]
+                else:
+                    # We need to handle this when more than one analysis in the folder. How can we do this? Use the last one?
+                    stderr.print(
+                        "[red] More than one pangolin file found for the same sample "
+                    )
+                    sys.exit(1)
+            else:
+                stderr.print(f"[yellow] No pangolin file for sample: {sample_name}")
 
         return j_data
 
@@ -167,9 +186,7 @@ class BioinfoMetadata:
             row["consensus_sequence_filepath"] = self.input_folder
             row["consensus_sequence_filename"] = f_name
             row["consensus_sequence_md5"] = relecov_tools.utils.calculate_md5(f_path)
-            base_calculation = int(row["number_of_base_pairs_sequenced"]) * len(
-                record_fasta
-            )
+            base_calculation = int(row["read_length"]) * len(record_fasta)
             if row["sequencing_sample_id"] != "":
                 row["number_of_base_pairs_sequenced"] = str(base_calculation * 2)
             else:
@@ -196,7 +213,7 @@ class BioinfoMetadata:
         metric file_exists
         """
         map_data = relecov_tools.utils.read_csv_file_return_dict(
-            self.req_files["variant_metrics"], ","
+            self.req_files["variants_metrics"], ","
         )
         mapping_fields = self.configuration.get_topic_data(
             "bioinfo_analysis", "mapping_variant_metrics"
@@ -233,7 +250,7 @@ class BioinfoMetadata:
         return j_data
 
     def collect_info_from_lab_json(self):
-        """Craeate the list of dictionaries from the data that is on json lab
+        """Create the list of dictionaries from the data that is on json lab
         metadata file. Return j_data that is used to add the rest of the fields
         """
         try:
@@ -242,16 +259,16 @@ class BioinfoMetadata:
             log.error("%s invalid json file", self.json_file)
             stderr.print(f"[red] {self.json_file} invalid json file")
             sys.exit(1)
-        j_data = []
-        mapping_fields = self.configuration.get_topic_data(
-            "bioinfo_analysis", "required_fields_from_lab_json"
-        )
-        for row in json_lab_data:
-            j_data_dict = {}
-            for lab_field, bio_field in mapping_fields.items():
-                j_data_dict[bio_field] = row[lab_field]
-            j_data.append(j_data_dict)
-        return j_data
+        #        j_data = []
+        #        mapping_fields = self.configuration.get_topic_data(
+        #            "bioinfo_analysis", "required_fields_from_lab_json"
+        #        )
+        #        for row in json_lab_data:
+        #            j_data_dict = {}
+        #            for lab_field, bio_field in mapping_fields.items():
+        #                j_data_dict[bio_field] = row[lab_field]
+        #            j_data.append(j_data_dict)
+        return json_lab_data
 
     def create_bioinfo_file(self):
         """Create the bioinfodata json with collecting information from lab
@@ -268,7 +285,7 @@ class BioinfoMetadata:
         j_data = self.include_software_versions(j_data)
         stderr.print("[blue]Adding summary variant metrics")
         j_data = self.include_variant_metrics(j_data)
-        stderr.print("[blue]Adding pangolin informtion")
+        stderr.print("[blue]Adding pangolin information")
         j_data = self.include_pangolin_data(j_data)
         stderr.print("[blue]Adding consensus data")
         j_data = self.include_consensus_data(j_data)

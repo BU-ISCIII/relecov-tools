@@ -1065,28 +1065,6 @@
             "fill_mode": "batch",
             "minLenght": "1"
         },
-        "host_subject_id": {
-            "examples": [
-                "e.g. #131"
-            ],
-            "ontology": "GENEPIO:0001398",
-            "type": "string",
-            "description": "a unique identifier by which each subject can be referred to, de-identified.",
-            "classification": "Host information",
-            "label": "Host Subject Id",
-            "fill_mode": "sample"
-        },
-        "host_health_state": {
-            "examples": [
-                ""
-            ],
-            "ontology": "GENEPIO:0001388",
-            "type": "string",
-            "description": " Status of the host",
-            "classification": "Host information",
-            "label": "Host health state",
-            "fill_mode": "sample"
-        },
         "host_common_name": {
             "enum": [
                 "Human [NCBITaxon:9606]",
@@ -2411,6 +2389,17 @@
             "label": "If lineage identification Is Other, Specify",
             "fill_mode": "batch"
         },
+        "lineage_algorithm_software_version": {
+            "examples": [
+                "2.1.10"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the software used to determine the lineage/clade.",
+            "classification": "Lineage fields",
+            "label": "Lineage/clade analysis software version",
+            "fill_mode": "batch"
+        },
         "lineage_analysis_software_version": {
             "examples": [
                 "2.1.10"
@@ -2420,6 +2409,54 @@
             "description": "The version of the software used to determine the lineage/clade.",
             "classification": "Lineage fields",
             "label": "Lineage/clade analysis software version",
+            "fill_mode": "batch"
+        },
+        "lineage_analysis_scorpio_version": {
+            "examples": [
+                "2.1.10"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the scorpio data used to determine the lineage/clade.",
+            "classification": "Lineage fields",
+            "label": "Lineage/clade analysis software version",
+            "fill_mode": "batch"
+        },
+        "lineage_analysis_constellation_version": {
+            "examples": [
+                "2.1.10"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the constellations databases used to determine the lineage/clade.",
+            "classification": "Lineage fields",
+            "label": "Lineage/clade analysis software version",
+            "fill_mode": "batch"
+        },
+        "lineage_analysis_date": {
+            "examples": [
+                "2022/10/24"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "format": "date",
+            "description": "Date when the lineage analysis was performed",
+            "classification": "Lineage fields",
+            "label": "lineage/clade analysis date",
+            "fill_mode": "batch"
+        },
+        "variant_name": {
+            "examples": [
+                "Alpha"
+            ],
+            "ontology": "",
+            "type": "string",
+            "description": "The variant classification of the lineage/clade i.e. alpha, beta, etc.",
+            "examples": [
+                "Variant of Concern (VOC) [GENEPIO:0100083]"
+            ],
+            "classification": "Lineage fields",
+            "label": "Variant designation",
             "fill_mode": "batch"
         },
         "variant_designation": {

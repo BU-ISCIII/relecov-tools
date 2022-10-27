@@ -3,7 +3,8 @@
         "fixed_fields": {
             "host_disease": "COVID-19",
             "tax_id": "2697049",
-            "organism": "Severe acute respiratory syndrome coronavirus 2"
+            "organism": "Severe acute respiratory syndrome coronavirus 2",
+            "study_type": "Whole Genome Sequencing"
         },
         "metadata_lab_heading": [
             "Public Health sample id (SIVIES)",
@@ -225,7 +226,7 @@
             "assembly": "None",
             "assembly_params": "None",
             "bioinformatics_protocol_software_name": "nf-core/viralrecon",
-            "commercial_open_source_both": "open-source",
+            "commercial_open_source_both": "Open Source",
             "consensus_params": "-p vcf -f",
             "consensus_sequence_software_name": "BCFTOOLS_CONSENSUS",
             "dehosting_method_software_name": "KRAKEN2_KRAKEN2",
@@ -247,8 +248,7 @@
         "required_file": {
             "variants_metrics": "summary_variants_metrics_mqc.csv",
             "versions": "software_versions.yml",
-            "pangoling": "pangolin_version.csv",
-            "variant_metrics": "summary_variants_metrics_mqc.csv"
+            "mapping_stats": "mapping_illumina_stats.tab"
         },
         "mapping_consensus": [
             "consensus_genome_length",
@@ -258,12 +258,16 @@
             "number_of_base_pairs_sequenced"
         ],
         "mapping_pangolin": {
-            "variant_designation": "scorpio_call"
+            "variant_name": "scorpio_call",
+            "lineage_name": "lineage",
+            "lineage_algorithm_software_version": "version",
+            "lineage_analysis_software_version": "pangolin_version",
+            "lineage_analysis_scorpio_version": "scorpio_version",
+            "lineage_analysis_constellation_version": "constellation_version"
         },
         "mapping_stats": {
-            "analysis date": "analysis date",
+            "analysis_date": "analysis date",
             "depth_of_coverage_value": "medianDPcoveragevirus",
-            "lineage_name": "Lineage",
             "number_of_variants_in_consensus": "Variantsinconsensusx10",
             "number_of_variants_with_effect": "MissenseVariants",
             "per_genome_greater_10x": "Coverage>10x(%)",
@@ -304,8 +308,6 @@
             "read_length": "number_of_base_pairs_sequenced",
             "schema_name": "schema_name",
             "schema_version": "schema_version",
-            "sequence_file_R1_md5": "sequence_file_R1_md5",
-            "sequence_file_R2_md5": "sequence_file_R2_md5",
             "sequencing_sample_id": "sequencing_sample_id"
         }
     },
