@@ -127,7 +127,9 @@ class BioinfoMetadata:
                             row["lineage_analysis_date"], "%Y%m%d"
                         ).strftime("%Y-%m-%d")
                     except Exception as e:
-                        stderr.print(f"[red] Pattern not found in file name. Error: {e}")
+                        stderr.print(
+                            f"[red] Pattern not found in file name. Error: {e}"
+                        )
                     try:
                         f_data = relecov_tools.utils.read_csv_file_return_dict(
                             result_regex.group(), ","
