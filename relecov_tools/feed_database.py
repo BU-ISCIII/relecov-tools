@@ -242,6 +242,17 @@ class FeedDatabase:
                             "[red] Unable to sent the request to remote server"
                         )
                         sys.exit(1)
+
+                elif "is not defined" in result["ERROR_TEST"].lower():
+                    log.warning(
+                        "Request to %s for %s was not accepted",
+                        self.database_server,
+                        req_sample,
+                    )
+                    stderr.print(
+                        f"[yellow] Warning: {req_sample} is not defined"
+                    )
+                    continue
                 elif "already defined" in result["ERROR_TEST"].lower():
                     log.warning(
                         "Request to %s for %s was not accepted",
