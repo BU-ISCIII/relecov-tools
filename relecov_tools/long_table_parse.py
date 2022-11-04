@@ -126,11 +126,11 @@ class LongTableParse:
                 "hgvs_p_1_letter": line_s[heading_index["HGVS_P_1LETTER"]],
             }
 
-            if re.search("&",line_s[heading_index["GENE"]]):
+            if re.search("&", line_s[heading_index["GENE"]]):
                 # Example
                 # 215184,NC_045512.2,27886,AAACGAACATGAAATT,A,PASS,1789,1756,1552,0.87,ORF7b&ORF8,gene_fusion,n.27887_27901delAACGAACATGAAATT,.,.,ivar,B.1.1.318
                 # This only occurs (for now) as gene fusion, so we just duplicate lines with same values
-                genes = re.split("&",line_s[heading_index["GENE"]])
+                genes = re.split("&", line_s[heading_index["GENE"]])
                 for gene in genes:
                     variant_dict_copy = variant_dict.copy()
                     variant_dict_copy["Gene"] = gene

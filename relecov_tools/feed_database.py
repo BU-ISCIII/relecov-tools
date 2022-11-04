@@ -249,9 +249,7 @@ class FeedDatabase:
                         self.database_server,
                         req_sample,
                     )
-                    stderr.print(
-                        f"[yellow] Warning: {req_sample} is not defined"
-                    )
+                    stderr.print(f"[yellow] Warning: {req_sample} is not defined")
                     continue
                 elif "already defined" in result["ERROR_TEST"].lower():
                     log.warning(
