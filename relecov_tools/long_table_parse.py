@@ -79,6 +79,7 @@ class LongTableParse:
         the user (long_table.csv).
         Validate the file by checking the header line
         """
+
         with open(self.file_path) as fh:
             lines = fh.readlines()
 
@@ -130,8 +131,12 @@ class LongTableParse:
 
     def convert_to_json(self, samp_dict):
         j_list = []
+        # Grab date from filename
+        result_regex = re.search(
+            "variants_long_table_(.*).csv", os.path.basename(self.file_path)
+        )
         for key, values in samp_dict.items():
-            j_dict = {"sample_name": key}
+            j_dict = {"sample_name": key, "analysis_date": result_regex.group(1)}
             j_dict["variants"] = values
             j_list.append(j_dict)
         return j_list
