@@ -1,10 +1,13 @@
-from datetime import datetime
 import json
+import re
 import logging
-import os.path
 import sys
-from pathlib import Path
 import rich
+import os.path
+
+from pathlib import Path
+from datetime import datetime
+
 import relecov_tools
 from relecov_tools.config_json import ConfigJson
 
@@ -116,8 +119,6 @@ class LongTableParse:
                 "af": line_s[heading_index["AF"]],
             }
 
-            variant_dict["Gene"] = line_s[heading_index["GENE"]]
-
             variant_dict["Effect"] = line_s[heading_index["EFFECT"]]
             variant_dict["VariantAnnotation"] = {
                 "hgvs_c": line_s[heading_index["HGVS_C"]],
@@ -125,7 +126,19 @@ class LongTableParse:
                 "hgvs_p_1_letter": line_s[heading_index["HGVS_P_1LETTER"]],
             }
 
-            samp_dict[sample].append(variant_dict)
+            if re.search("&",line_s[heading_index["GENE"]]):
+                # Example
+                # 215184,NC_045512.2,27886,AAACGAACATGAAATT,A,PASS,1789,1756,1552,0.87,ORF7b&ORF8,gene_fusion,n.27887_27901delAACGAACATGAAATT,.,.,ivar,B.1.1.318
+                # This only occurs (for now) as gene fusion, so we just duplicate lines with same values
+                genes = re.split("&",line_s[heading_index["GENE"]])
+                for gene in genes:
+                    variant_dict_copy = variant_dict.copy()
+                    variant_dict_copy["Gene"] = gene
+                    samp_dict[sample].append(variant_dict_copy)
+            else:
+                variant_dict["Gene"] = line_s[heading_index["GENE"]]
+                samp_dict[sample].append(variant_dict)
+
         stderr.print("[green]Successful parsing data")
         return samp_dict
 
