@@ -28,7 +28,7 @@ class RestApi:
             for key, value in parameter.items():
                 param_value.append(key + "=" + value)
             url_http = str(
-                self.request_url + request_info + "?" + "?".join(param_value)
+                self.request_url + request_info + "?" + "&".join(param_value)
             )
         else:
             url_http = str(
