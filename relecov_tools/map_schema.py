@@ -142,7 +142,6 @@ class MappingSchema:
             map_sample_dict = OrderedDict()
             for item, value in mapping_schema_dict.items():
                 try:
-
                     data[value] = data[value].split(" [", 1)[0]
 
                     map_sample_dict[item] = data[value]
@@ -157,7 +156,6 @@ class MappingSchema:
         """
         if self.destination_schema == "ENA":
             for idx in range(len(self.json_data)):
-
                 mapped_json_data[idx]["collector_name"] = "unknown"
                 mapped_json_data[idx]["file_format"] = "FASTQ"
                 mapped_json_data[idx]["study_type"] = "Whole Genome Sequencing"
@@ -230,7 +228,6 @@ class MappingSchema:
                     + self.json_data[idx]["sequence_file_R2_fastq"]
                 )
                 for i, j in enumerate(fields):
-
                     mapped_json_data[idx][j] = "not provided"
 
         return mapped_json_data
