@@ -183,7 +183,6 @@ def findout_library_layout(metadata, f_data, mapped_fields, heading):
     to paired"""
     s_idx = heading.index("Sample ID given for sequencing")
     for row in metadata[1:]:
-
         for key, val in mapped_fields.items():
             m_idx = heading.index(key)
             try:
