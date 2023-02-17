@@ -20,7 +20,6 @@ class MetadataHomogeneizer:
     """MetadataHomogeneizer object"""
 
     def __init__(self, institution=None, directory=None, output_folder=None):
-
         # open config
         self.config_json = ConfigJson()
         # read heading from config
