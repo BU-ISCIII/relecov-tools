@@ -122,7 +122,6 @@ class EnaUpload:
         df_list = []
         config_json = ConfigJson()
         for index in range(len(dataframe_name)):
-
             fields = config_json.get_configuration("ENA_fields")[fields_config[index]]
             dataframe_name[index] = df_schemas[fields]
             df_list.append(dataframe_name[index])
@@ -304,7 +303,6 @@ class EnaUpload:
                 session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
 
                 for filename, path in file_paths.items():
-
                     print("Uploading path " + path + " and filename: " + filename)
 
                     try:
@@ -313,7 +311,6 @@ class EnaUpload:
                         print(g)  # send the file
                         file.close()  # close file and FTP
                     except BaseException as err:
-
                         print(f"ERROR: {err}")
                         # print("ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000.")
 
@@ -345,7 +342,6 @@ class EnaUpload:
 
             for files in root.iter("FILE"):
                 if "R2" in files.attrib["filename"]:
-
                     H = df_run_final.loc[
                         df_run_final["sequence_file_R2_fastq"]
                         == files.attrib["filename"]
