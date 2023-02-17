@@ -33,6 +33,7 @@ class SftpHandle:
         conf_file=None,
         user_relecov=None,
         password_relecov=None,
+        target_folders=None
     ):
         """Initializes the sftp object"""
         config_json = ConfigJson()
@@ -41,6 +42,7 @@ class SftpHandle:
         )
         self.sftp_user = user
         self.sftp_passwd = passwd
+        self.target_folders = target_folders
         if conf_file is None:
             self.sftp_server = config_json.get_topic_data(
                 "sftp_connection", "sftp_server"
@@ -69,6 +71,7 @@ class SftpHandle:
             try:
                 self.sftp_server = config["sftp_server"]
                 self.sftp_port = config["sftp_port"]
+                self.target_folders = config["target_folders"]
                 try:
                     self.storage_local_folder = config["storage_local_folder"]
                 except KeyError:
@@ -105,6 +108,7 @@ class SftpHandle:
             self.sftp_passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password"
             )
+
         self.client = None
         external_servers = config_json.get_topic_data("external_url", "relecov")
         self.relecov_server = external_servers["server"]
@@ -331,6 +335,48 @@ class SftpHandle:
                     ]
         return sample_file_list
 
+    def validate_fetched_files(self, fetched_folder):
+        """Check if the files in the fetched folder are the ones defined in metadata file"""
+        try:
+            files_list = self.client.listdir(fetched_folder)
+        except FileNotFoundError as e:
+            log.error("Invalid folder at remote sftp %s", e)
+            return False
+        meta_files = [fi for fi in files_list if fi.endswith(".xlsx")]
+        if len(meta_files) == 0:
+            log.error("Excel file for metadata does not exist on %s", fetched_folder)
+            stderr.print("[red] Metadata file does not exist on " + fetched_folder)
+            return False
+        if len(meta_files) > 1:
+            log.error("Too many Excel files on folder %s", fetched_folder)
+            stderr.print("[red] Metadata file does not exist on " + fetched_folder)
+            return False
+        target_meta_file = os.path.join(fetched_folder, meta_files[0])
+        temp_folder = "/tmp/metadata_validation_file/"
+        os.makedirs(temp_folder, exist_ok=True)
+        local_meta_file = os.path.join(temp_folder, os.path.basename(target_meta_file))
+        try:
+            self.client.get(
+                target_meta_file,
+                local_meta_file,
+                )
+        except FileNotFoundError as e:
+            log.error("Unable to fetch metadata file %s ", e)
+        samples_files_list = self.get_sample_fastq_file_names(temp_folder, local_meta_file)
+        samples_files_list = sorted(sum([list(fi.values()) for sample, fi in samples_files_list.items()], []))
+        filtered_files_list = sorted([fi for fi in files_list if fi.endswith('fastq.gz')])
+        self.delete_local_folder(temp_folder)
+        stderr.print("files in metadata")
+        stderr.print(samples_files_list)
+        stderr.print("files in fetch")
+        stderr.print(filtered_files_list)
+        if samples_files_list == filtered_files_list:
+            return True
+        else:
+            log.info("Files in %s do not match metadata file", fetched_folder)
+            stderr.print("Files in " + fetched_folder + " do not match the ones described in metadata")
+            return False        
+
     def validate_download_files(self, sample_file_list, local_folder):
         """Check if download sample files are the ones defined on metadata file"""
         if not sample_file_list:
@@ -394,25 +440,39 @@ class SftpHandle:
             log.error("Unable to establish connection towards sftp server")
             stderr.print("[red] Unable to establish sftp connection")
             sys.exit(1)
-
         root_directory_list = self.list_folders(".")
         if not root_directory_list:
-            log.error("There is no folders under root directory")
+            log.error("There are no folders under root directory")
+            sys.exit(1)
+        if self.target_folders == "ALL":
+            target_folders = relecov_tools.utils.prompt_checkbox(
+                msg="Select the folders that will be downloaded",
+                choices=sorted(root_directory_list)
+            )
+        elif self.target_folders is None:
+            target_folders = root_directory_list
+        else:
+            target_folders = [tf for tf in root_directory_list if tf in self.target_folders]
+        if not target_folders:
+            log.error("There are no folders that match selection")
             sys.exit(1)
         folders_to_download = {}
         # create_main_folders(root_directory_list)
-        for folder in root_directory_list:
+        for folder in target_folders:
             list_files = self.get_file_list(folder)
             if len(list_files) > 0:
                 folders_to_download[folder] = list_files
         if len(folders_to_download) == 0:
-            log.info("Exiting download. There is no files on sftp to dowload")
+            log.info("Exiting download. There are no files on sftp to dowload")
             self.close_connection()
             sys.exit(0)
 
         for folder, files in folders_to_download.items():
             log.info("Processing folder %s", folder)
             stderr.print("Processing folder " + folder)
+            # Validate that the files are the ones described in metadata.
+            if not self.validate_fetched_files(folder):
+                continue
             # get the files in each folder
             result_data = self.get_files_from_sftp_folder(folder, files)
             md5_files, req_retransmition = self.verify_md5_checksum(
