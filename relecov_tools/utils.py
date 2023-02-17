@@ -214,7 +214,7 @@ def rich_force_colors():
         or os.getenv("FORCE_COLOR")
         or os.getenv("PY_COLORS")
     ):
-        return TrueS
+        return True
     return None
 
 
