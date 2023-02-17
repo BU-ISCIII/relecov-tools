@@ -214,7 +214,7 @@ def rich_force_colors():
         or os.getenv("FORCE_COLOR")
         or os.getenv("PY_COLORS")
     ):
-        return True
+        return TrueS
     return None
 
 
@@ -258,3 +258,8 @@ def prompt_skip_folder_creation():
     stderr.print("Do you want to skip folder creation? (Y/N)")
     confirmation = questionary.confirm("Skip?", default=False).unsafe_ask()
     return confirmation
+
+
+def prompt_checkbox(msg, choices):
+    selected_options = questionary.checkbox(msg, choices=choices).unsafe_ask()
+    return selected_options
