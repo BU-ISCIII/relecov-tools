@@ -243,9 +243,7 @@ class BioinfoMetadata:
             sys.exit(1)
         for row in j_data:
             for field, version_data in version_fields.items():
-
                 for key, value in version_data.items():
-
                     row[field] = versions[key][value]
         return j_data
 
