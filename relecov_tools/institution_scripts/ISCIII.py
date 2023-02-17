@@ -36,7 +36,6 @@ def added_seq_inst_model(metadata, f_data, mapped_fields, heading):
     for row in metadata[1:]:
         for key, val in mapped_fields.items():
             m_idx = heading.index(key)
-
             try:
                 run_name = f_data[str(row[s_idx])][val].lower()
             except KeyError as e:
