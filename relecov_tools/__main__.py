@@ -30,7 +30,6 @@ stderr = rich.console.Console(
 
 
 def run_relecov_tools():
-
     # Set up the rich traceback
     rich.traceback.install(console=stderr, width=200, word_wrap=True, extra_lines=1)
 
@@ -116,7 +115,6 @@ class CustomHelpOrder(click.Group):
     "-l", "--log-file", help="Save a verbose log to a file.", metavar="<filename>"
 )
 def relecov_tools_cli(verbose, log_file):
-
     # Set the base logger to output DEBUG
     log.setLevel(logging.DEBUG)
 
@@ -144,12 +142,12 @@ def relecov_tools_cli(verbose, log_file):
     help="Configuration file (no params file)",
 )
 @click.option(
-    "-t", 
-    "--target_folders", 
+    "-t",
+    "--target_folders",
     is_flag=False,
     flag_value="ALL",
     default=None,
-    help="Flag: Select which folders will be downloaded giving [paths] or via prompt"
+    help="Flag: Select which folders will be downloaded giving [paths] or via prompt",
 )
 def download(user, password, conf_file, user_relecov, password_relecov, target_folders):
     """Download files located in sftp server."""
