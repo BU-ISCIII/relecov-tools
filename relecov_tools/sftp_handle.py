@@ -33,7 +33,7 @@ class SftpHandle:
         conf_file=None,
         user_relecov=None,
         password_relecov=None,
-        target_folders=None
+        target_folders=None,
     ):
         """Initializes the sftp object"""
         config_json = ConfigJson()
@@ -359,12 +359,18 @@ class SftpHandle:
             self.client.get(
                 target_meta_file,
                 local_meta_file,
-                )
+            )
         except FileNotFoundError as e:
             log.error("Unable to fetch metadata file %s ", e)
-        samples_files_list = self.get_sample_fastq_file_names(temp_folder, local_meta_file)
-        samples_files_list = sorted(sum([list(fi.values()) for sample, fi in samples_files_list.items()], []))
-        filtered_files_list = sorted([fi for fi in files_list if fi.endswith('fastq.gz')])
+        samples_files_list = self.get_sample_fastq_file_names(
+            temp_folder, local_meta_file
+        )
+        samples_files_list = sorted(
+            sum([list(fi.values()) for sample, fi in samples_files_list.items()], [])
+        )
+        filtered_files_list = sorted(
+            [fi for fi in files_list if fi.endswith("fastq.gz")]
+        )
         self.delete_local_folder(temp_folder)
         stderr.print("files in metadata")
         stderr.print(samples_files_list)
@@ -374,8 +380,12 @@ class SftpHandle:
             return True
         else:
             log.info("Files in %s do not match metadata file", fetched_folder)
-            stderr.print("Files in " + fetched_folder + " do not match the ones described in metadata")
-            return False        
+            stderr.print(
+                "Files in "
+                + fetched_folder
+                + " do not match the ones described in metadata"
+            )
+            return False
 
     def validate_download_files(self, sample_file_list, local_folder):
         """Check if download sample files are the ones defined on metadata file"""
@@ -447,12 +457,14 @@ class SftpHandle:
         if self.target_folders == "ALL":
             target_folders = relecov_tools.utils.prompt_checkbox(
                 msg="Select the folders that will be downloaded",
-                choices=sorted(root_directory_list)
+                choices=sorted(root_directory_list),
             )
         elif self.target_folders is None:
             target_folders = root_directory_list
         else:
-            target_folders = [tf for tf in root_directory_list if tf in self.target_folders]
+            target_folders = [
+                tf for tf in root_directory_list if tf in self.target_folders
+            ]
         if not target_folders:
             log.error("There are no folders that match selection")
             sys.exit(1)
