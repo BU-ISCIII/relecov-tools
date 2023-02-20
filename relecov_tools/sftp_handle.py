@@ -14,7 +14,7 @@ import yaml
 import openpyxl
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
-#from relecov_tools.rest_api import RestApi
+# from relecov_tools.rest_api import RestApi
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -108,7 +108,6 @@ class SftpHandle:
             self.sftp_passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password"
             )
-
         self.client = None
 
     def open_connection(self):
