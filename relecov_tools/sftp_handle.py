@@ -14,6 +14,7 @@ import yaml
 import openpyxl
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
+
 # from relecov_tools.rest_api import RestApi
 
 log = logging.getLogger(__name__)
@@ -274,7 +275,7 @@ class SftpHandle:
             full_folder = os.path.join(self.storage_local_folder, folder)
             os.makedirs(full_folder, exist_ok=True)
         return True
-    
+
     def find_metadata_file(self, local_folder):
         """Find excel extension file which contains metatada"""
         reg_for_xlsx = os.path.join(local_folder, "*.xlsx")
@@ -329,7 +330,7 @@ class SftpHandle:
                         index_fastq_r2
                     ]
         return sample_file_list
-    
+
     def list_fetched_files(self, fetched_folder):
         """Check if the metadata file exists"""
         try:
@@ -370,7 +371,9 @@ class SftpHandle:
         temp_folder = self.metadata_tmp_folder
         if not local_meta_file:
             log.error("Excel file for metadata not found %s", fetched_folder)
-            stderr.print("[red] Metadata file could not be obtained from " + fetched_folder)
+            stderr.print(
+                "[red] Metadata file could not be obtained from " + fetched_folder
+            )
             return False
         allowed_extensions = self.allowed_sample_ext
         samples_files_list = self.get_sample_fastq_file_names(
