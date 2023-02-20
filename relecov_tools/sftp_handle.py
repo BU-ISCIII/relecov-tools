@@ -110,10 +110,6 @@ class SftpHandle:
             )
 
         self.client = None
-        external_servers = config_json.get_topic_data("external_url", "relecov")
-        self.relecov_server = external_servers["server"]
-        self.relecov_url = external_servers["url"]
-        self.relecov_post_url = external_servers["sftp_info"]
 
     def open_connection(self):
         """Establish sftp connection"""
@@ -279,7 +275,7 @@ class SftpHandle:
             full_folder = os.path.join(self.storage_local_folder, folder)
             os.makedirs(full_folder, exist_ok=True)
         return True
-
+    
     def find_metadata_file(self, local_folder):
         """Find excel extension file which contains metatada"""
         reg_for_xlsx = os.path.join(local_folder, "*.xlsx")
@@ -334,25 +330,30 @@ class SftpHandle:
                         index_fastq_r2
                     ]
         return sample_file_list
-
-    def validate_fetched_files(self, fetched_folder):
-        """Check if the files in the fetched folder are the ones defined in metadata file"""
+    
+    def list_fetched_files(self, fetched_folder):
+        """Check if the metadata file exists"""
         try:
-            files_list = self.client.listdir(fetched_folder)
+            fetched_files_list = self.client.listdir(fetched_folder)
         except FileNotFoundError as e:
             log.error("Invalid folder at remote sftp %s", e)
             return False
-        meta_files = [fi for fi in files_list if fi.endswith(".xlsx")]
+        return fetched_files_list
+
+    def validate_metadata_file(self, fetched_folder):
+        """Check if the metadata file exists"""
+        fetched_files_list = self.list_fetched_files(fetched_folder)
+        meta_files = [fi for fi in fetched_files_list if fi.endswith(".xlsx")]
         if len(meta_files) == 0:
             log.error("Excel file for metadata does not exist on %s", fetched_folder)
             stderr.print("[red] Metadata file does not exist on " + fetched_folder)
             return False
         if len(meta_files) > 1:
             log.error("Too many Excel files on folder %s", fetched_folder)
-            stderr.print("[red] Metadata file does not exist on " + fetched_folder)
+            stderr.print("[red] Too many metadata files on " + fetched_folder)
             return False
         target_meta_file = os.path.join(fetched_folder, meta_files[0])
-        temp_folder = "/tmp/metadata_validation_file/"
+        temp_folder = self.metadata_tmp_folder
         os.makedirs(temp_folder, exist_ok=True)
         local_meta_file = os.path.join(temp_folder, os.path.basename(target_meta_file))
         try:
@@ -362,20 +363,27 @@ class SftpHandle:
             )
         except FileNotFoundError as e:
             log.error("Unable to fetch metadata file %s ", e)
+        return local_meta_file
+
+    def validate_fetched_files(self, fetched_folder):
+        """Check if the files in the fetched folder are the ones defined in metadata file"""
+        local_meta_file = self.validate_metadata_file(fetched_folder)
+        temp_folder = self.metadata_tmp_folder
+        if not local_meta_file:
+            log.error("Excel file for metadata not found %s", fetched_folder)
+            stderr.print("[red] Metadata file could not be obtained from " + fetched_folder)
+            return False
+        allowed_extensions = self.allowed_sample_ext
         samples_files_list = self.get_sample_fastq_file_names(
             temp_folder, local_meta_file
         )
         samples_files_list = sorted(
             sum([list(fi.values()) for sample, fi in samples_files_list.items()], [])
         )
+        fetched_files_list = self.list_fetched_files(fetched_folder)
         filtered_files_list = sorted(
-            [fi for fi in files_list if fi.endswith("fastq.gz")]
+            [fi for fi in fetched_files_list if fi.endswith(tuple(allowed_extensions))]
         )
-        self.delete_local_folder(temp_folder)
-        stderr.print("files in metadata")
-        stderr.print(samples_files_list)
-        stderr.print("files in fetch")
-        stderr.print(filtered_files_list)
         if samples_files_list == filtered_files_list:
             return True
         else:
@@ -385,6 +393,7 @@ class SftpHandle:
                 + fetched_folder
                 + " do not match the ones described in metadata"
             )
+            self.delete_local_folder(temp_folder)
             return False
 
     def validate_download_files(self, sample_file_list, local_folder):
@@ -417,22 +426,6 @@ class SftpHandle:
         for sample in sample_file_list:
             sample_dict[sample] = {"folder": folder}
         return json.dumps(sample_dict, indent=4, sort_keys=True, ensure_ascii=False)
-
-    def send_info_to_server(self, json_data):
-        rest_api = RestApi(self.database_server, self.database_url)
-        error_counts = 0
-        for item in json_data:
-            result = rest_api.post_request(item, "", self.relecov_post_url)
-            if "ERROR" in result:
-                error_counts += 1
-                log.error("Request was not accepted %s", result["ERROR"])
-                stderr.print(
-                    "[red] Error " + result["ERROR"] + " when sending request}"
-                )
-        if error_counts == 0:
-            log.info("Request was not accepted %s", result["ERROR"])
-            stderr.print("[green] Successful upload information to server")
-        return
 
     def delete_local_folder(self, local_folder):
         """Delete download folder because files does not complain requisites"""
