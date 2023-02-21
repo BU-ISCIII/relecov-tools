@@ -274,7 +274,9 @@ class SftpHandle:
                     pass
         with open(sample_data_path, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
-        log.info("Successfully created file with sample names list %s", sample_data_path)
+        log.info(
+            "Successfully created file with sample names list %s", sample_data_path
+        )
         return True
 
     def create_main_folders(self, root_directory_list):
@@ -374,7 +376,11 @@ class SftpHandle:
         except FileNotFoundError as e:
             log.error("Unable to fetch metadata file %s ", e)
             return False
-        log.info(f"Obtained metadata file {local_meta_file} from {fetched folder}")
+        log.info(
+            "Obtained metadata file %s from %s",
+            local_meta_file,
+            fetched_folder,
+        )
         return local_meta_file
 
     def validate_fetched_files(self, fetched_folder):
