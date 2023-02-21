@@ -113,6 +113,7 @@ class SftpHandle:
 
     def open_connection(self):
         """Establish sftp connection"""
+        log.info("Setting credentials for SFTP connection with remote server")
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.client.connect(
@@ -124,6 +125,7 @@ class SftpHandle:
             look_for_keys=False,
         )
         try:
+            log.info("Trying to stablish SFTP connection")
             self.client = self.client.open_sftp()
             return True
         except paramiko.SSHException as e:
@@ -132,11 +134,13 @@ class SftpHandle:
 
     def close_connection(self):
         """Closes SFTP connection"""
+        log.info("Closing SFTP connection")
         self.client.close()
         return True
 
     def list_folders(self, folder_name):
         """Creates a directories list from the given path"""
+        log.info("Listing directories in %s", folder_name)
         directory_list = []
         try:
             content_list = self.client.listdir(folder_name)
@@ -155,6 +159,7 @@ class SftpHandle:
 
     def get_file_list(self, folder_name):
         """Return a tuple with file name and directory path"""
+        log.info("Listing files in %s", folder_name)
         file_list = []
         content_list = self.client.listdir(folder_name)
         for content in content_list:
@@ -173,6 +178,7 @@ class SftpHandle:
         """Create the subfolder with the present date and fetch all files from
         the sftp server
         """
+        log.info("Creating folder %s to download files", folder)
         result_data = {"unable_to_fetch": [], "fetched_files": []}
         date = datetime.today().strftime("%Y%m%d")
         local_folder_path = os.path.join(self.storage_local_folder, folder, date)
@@ -180,7 +186,7 @@ class SftpHandle:
         os.makedirs(local_folder_path, exist_ok=True)
         log.info("created the folder to download files %s", local_folder_path)
         self.open_connection()
-
+        log.info("Trying to fetch files in remote server")
         for file_list in files_list:
             try:
                 self.client.get(
@@ -201,9 +207,11 @@ class SftpHandle:
         required_retransmition = []
         successful_files = []
         # fetch the md5 file if exists
+        log.info("Searching for local md5 file")
         sftp_md5 = relecov_tools.utils.get_md5_from_local_folder(local_folder)
         if len(sftp_md5) > 0:
             # check md5 checksum for eac file
+            log.info("md5 file was not found in local, trying to fetch from SFTP")
             for f_name, values in sftp_md5.items():
                 f_path_name = os.path.join(local_folder, f_name)
                 # Checksum value is stored in the index 1
@@ -266,7 +274,7 @@ class SftpHandle:
                     pass
         with open(sample_data_path, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
-
+        log.info("Successfully created file with sample names list %s", sample_data_path)
         return True
 
     def create_main_folders(self, root_directory_list):
@@ -274,6 +282,7 @@ class SftpHandle:
         for folder in root_directory_list:
             full_folder = os.path.join(self.storage_local_folder, folder)
             os.makedirs(full_folder, exist_ok=True)
+        log.info("Created main folder for process %s", full_folder)
         return True
 
     def find_metadata_file(self, local_folder):
@@ -334,6 +343,7 @@ class SftpHandle:
     def list_fetched_files(self, fetched_folder):
         """Check if the metadata file exists"""
         try:
+            log.info("List files in fetched folder %s", fetched_folder)
             fetched_files_list = self.client.listdir(fetched_folder)
         except FileNotFoundError as e:
             log.error("Invalid folder at remote sftp %s", e)
@@ -363,6 +373,8 @@ class SftpHandle:
             )
         except FileNotFoundError as e:
             log.error("Unable to fetch metadata file %s ", e)
+            return False
+        log.info(f"Obtained metadata file {local_meta_file} from {fetched folder}")
         return local_meta_file
 
     def validate_fetched_files(self, fetched_folder):
@@ -387,9 +399,10 @@ class SftpHandle:
             [fi for fi in fetched_files_list if fi.endswith(tuple(allowed_extensions))]
         )
         if samples_files_list == filtered_files_list:
+            log.info("Files in %s match with metadata file", fetched_folder)
             return True
         else:
-            log.info("Files in %s do not match metadata file", fetched_folder)
+            log.error("Files in %s do not match metadata file", fetched_folder)
             stderr.print(
                 "Files in "
                 + fetched_folder
@@ -430,6 +443,7 @@ class SftpHandle:
 
     def delete_local_folder(self, local_folder):
         """Delete download folder because files does not complain requisites"""
+        log.info("Deleting local folder %s", local_folder)
         shutil.rmtree(local_folder, ignore_errors=True)
         return True
 
@@ -449,6 +463,7 @@ class SftpHandle:
             log.error("There are no folders under root directory")
             sys.exit(1)
         if self.target_folders == "ALL":
+            log.info("Showing folders from remote sftp for selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
                 msg="Select the folders that will be downloaded",
                 choices=sorted(root_directory_list),
@@ -469,7 +484,8 @@ class SftpHandle:
             if len(list_files) > 0:
                 folders_to_download[folder] = list_files
         if len(folders_to_download) == 0:
-            log.info("Exiting download. There are no files on sftp to dowload")
+            log.info("Exiting download.")
+            log.error("There are no files on sftp to dowload")
             self.close_connection()
             sys.exit(0)
 
