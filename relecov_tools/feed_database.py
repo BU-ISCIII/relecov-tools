@@ -1,122 +1,124 @@
-#!/usr/bin/env python
-import sys
-import os
-import re
-import json
-import logging
-import rich.console
-import time
+    #!/usr/bin/env python
+    import sys
+    import os
+    import re
+    import json
+    import logging
+    import rich.console
+    import time
 
-import relecov_tools.utils
-from relecov_tools.config_json import ConfigJson
-from relecov_tools.rest_api import RestApi
+    import relecov_tools.utils
+    from relecov_tools.config_json import ConfigJson
+    from relecov_tools.rest_api import RestApi
 
-log = logging.getLogger(__name__)
-stderr = rich.console.Console(
-    stderr=True,
-    style="dim",
-    highlight=False,
-    force_terminal=relecov_tools.utils.rich_force_colors(),
-)
+    log = logging.getLogger(__name__)
+    stderr = rich.console.Console(
+        stderr=True,
+        style="dim",
+        highlight=False,
+        force_terminal=relecov_tools.utils.rich_force_colors(),
+    )
 
 
-class FeedDatabase:
-    def __init__(
-        self,
-        user=None,
-        passwd=None,
-        json_file=None,
-        type_of_info=None,
-        database_server=None,
-    ):
-        if user is None:
-            user = relecov_tools.utils.prompt_text(
-                msg="Enter username for upload data to server"
+    class FeedDatabase:
+        def __init__(
+            self,
+            user=None,
+            passwd=None,
+            json_file=None,
+            type_of_info=None,
+            database_server=None,
+        ):
+            if user is None:
+                user = relecov_tools.utils.prompt_text(
+                    msg="Enter username for upload data to server"
+                )
+            self.user = user
+            if passwd is None:
+                passwd = relecov_tools.utils.prompt_text(msg="Enter credential password")
+            self.passwd = passwd
+            self.config_json = ConfigJson()
+            if json_file is None:
+                json_file = relecov_tools.utils.prompt_path(
+                    msg="Select the json file which have the data to map"
+                )
+            if not os.path.isfile(json_file):
+                log.error("json data file %s does not exist ", json_file)
+                stderr.print(f"[red] json data file {json_file} does not exist")
+                sys.exit(1)
+            self.json_data = relecov_tools.utils.read_json_file(json_file)
+            self.json_file = json_file
+            schema = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                "schema",
+                self.config_json.get_topic_data("json_schemas", "relecov_schema"),
             )
-        self.user = user
-        if passwd is None:
-            passwd = relecov_tools.utils.prompt_text(msg="Enter credential password")
-        self.passwd = passwd
-        self.config_json = ConfigJson()
-        if json_file is None:
-            json_file = relecov_tools.utils.prompt_path(
-                msg="Select the json file which have the data to map"
-            )
-        if not os.path.isfile(json_file):
-            log.error("json data file %s does not exist ", json_file)
-            stderr.print(f"[red] json data file {json_file} does not exist")
-            sys.exit(1)
-        self.json_data = relecov_tools.utils.read_json_file(json_file)
-        self.json_file = json_file
-        schema = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            "schema",
-            self.config_json.get_topic_data("json_schemas", "relecov_schema"),
-        )
 
-        self.schema = relecov_tools.utils.read_json_file(schema)
+            self.schema = relecov_tools.utils.read_json_file(schema)
 
-        if type_of_info is None:
-            type_of_info = relecov_tools.utils.prompt_selection(
-                "Select:",
-                ["sample", "bioinfodata", "variantdata"],
-            )
-        self.type_of_info = type_of_info
+            if type_of_info is None:
+                type_of_info = relecov_tools.utils.prompt_selection(
+                    "Select:",
+                    ["sample", "bioinfodata", "variantdata"],
+                )
+            self.type_of_info = type_of_info
 
-        if database_server is None:
-            database_server = relecov_tools.utils.prompt_selection(
-                "Select:",
-                ["iskylims", "relecov"],
-            )
-        self.server_type = database_server
-        # Get database settings
-        try:
-            self.database_settings = self.config_json.get_topic_data(
-                "external_url", database_server
-            )
-        except KeyError:
-            log.error("Unable to get parameters for dataserver")
-            stderr.print(f"[red] Unable to fetch parameters data for {database_server}")
-            sys.exit(1)
-        self.database_server = self.database_settings["server"]
-        self.database_url = self.database_settings["url"]
+            if database_server is None:
+                database_server = relecov_tools.utils.prompt_selection(
+                    "Select:",
+                    ["iskylims", "relecov"],
+                )
+            self.server_type = database_server
+            # Get database settings
+            try:
+                self.database_settings = self.config_json.get_topic_data(
+                    "external_url", database_server
+                )
+            except KeyError:
+                log.error("Unable to get parameters for dataserver")
+                stderr.print(f"[red] Unable to fetch parameters data for {database_server}")
+                sys.exit(1)
+            self.database_server = self.database_settings["server"]
+            self.database_url = self.database_settings["url"]
 
-        self.database_rest_api = RestApi(self.database_server, self.database_url)
+            self.database_rest_api = RestApi(self.database_server, self.database_url)
 
-    def get_schema_ontology_values(self):
-        """Read the schema and extract the values of ontology with the label"""
-        ontology_dict = {}
-        for prop, values in self.schema["properties"].items():
-            if "ontology" in values and values["ontology"] != "":
-                ontology_dict[values["ontology"]] = prop
-        return ontology_dict
+        def get_schema_ontology_values(self):
+            """Read the schema and extract the values of ontology with the label"""
+            ontology_dict = {}
+            for prop, values in self.schema["properties"].items():
+                if "ontology" in values and values["ontology"] != "":
+                    ontology_dict[values["ontology"]] = prop
+            return ontology_dict
 
-    def map_iskylims_sample_fields_values(self, sample_fields, s_project_fields):
-        """Map the values to the properties send to databasee
-        in json schema based on label
-        """
-        sample_list = []
-        s_fields = list(sample_fields.keys())
-        for row in self.json_data:
-            s_dict = {}
-            for key, value in row.items():
-                found_ontology = re.search(r"(.+) \[\w+:.*", value)
-                if found_ontology:
-                    # remove the ontology data from item value
-                    value = found_ontology.group(1)
-                if key in s_project_fields:
-                    s_dict[key] = value
-                if key in s_fields:
-                    s_dict[sample_fields[key]] = value
-                if key not in s_project_fields and key not in s_fields:
-                    # just for debugging, write the fields that will not
-                    # be included in iSkyLIMS request
-                    log.info("not key %s in iSkyLIMS", key)
-            # include the fixed value
-            fixed_value = self.config_json.get_configuration("iskylims_fixed_values")
-            for prop, val in fixed_value.items():
-                s_dict[prop] = val
-            # Adding tha specimen_source field to set sampleType
+        def map_iskylims_sample_fields_values(self, sample_fields, s_project_fields):
+            """Map the values to the properties send to databasee
+            in json schema based on label
+            """
+            sample_list = []
+            s_fields = list(sample_fields.keys())
+            for row in self.json_data:
+                s_dict = {}
+                for key, value in row.items():
+                    found_ontology = re.search(r"(.+) \[\w+:.*", value)
+                    if found_ontology:
+                        # remove the ontology data from item value
+                        value = found_ontology.group(1)
+                    if key in s_fields:
+                        s_dict[sample_fields[key]] = value
+                    elif key in s_project_fields:
+                        s_dict[key] = value
+                    else:
+                        # just for debug loginng write the fields that will not
+                        # be inlcuded in iSkyLIMS request
+                        log.info("not key %s in iSkyLIMS", key)
+
+                # include the fix value
+                fixed_value = self.config_json.get_configuration("iskylims_fixed_values")
+                for prop, val in fixed_value.items():
+                    s_dict[prop] = val
+
+                # Adding tha specimen_source field for setting sampleType
             s_dict["sampleType"] = row["specimen_source"]
             sample_list.append(s_dict)
         return sample_list
@@ -310,6 +312,5 @@ class FeedDatabase:
         else:
             stderr.print("[red] Invalid type to upload to database")
             sys.exit(1)
-
         self.update_database(map_fields, post_url)
         stderr.print(f"[green] Upload process to {self.server_type} completed")
