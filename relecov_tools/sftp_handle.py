@@ -312,7 +312,9 @@ class SftpHandle:
         sample_file_list = {}
         # find out the index for file names
         config_json = ConfigJson()
-        meta_column_list = config_json.get_topic_data("lab_metadata","metadata_lab_heading")
+        meta_column_list = config_json.get_topic_data(
+            "lab_metadata", "metadata_lab_heading"
+        )
         index_fastq_r1 = meta_column_list.index("Sequence file R1 fastq")
         index_fastq_r2 = meta_column_list.index("Sequence file R2 fastq")
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):

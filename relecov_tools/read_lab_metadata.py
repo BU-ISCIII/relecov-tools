@@ -130,8 +130,8 @@ class RelecovMetadata:
         return m_data
 
     def adding_ontology_to_enum(self, m_data):
-        """Read the schema to get the properties enum and, for those fields 
-        which have an enum property value, replace the value for the one 
+        """Read the schema to get the properties enum and, for those fields
+        which have an enum property value, replace the value for the one
         that is defined in the schema
         """
         enum_dict = {}
@@ -168,9 +168,13 @@ class RelecovMetadata:
                     if str(error).lower() == "not provided":
                         log.error("Label was not provided, auto-completing columns")
                     else:
-                        log.error(f"Unknown map_field value for json data: \
-                            {str(map_field)}. Set as not provided")
-                    fields_to_add = {x:"Not Provided" for x in json_fields["adding_fields"]}
+                        log.error(
+                            f"Unknown map_field value for json data: \
+                            {str(map_field)}. Set as not provided"
+                        )
+                    fields_to_add = {
+                        x: "Not Provided" for x in json_fields["adding_fields"]
+                    }
                     m_data[idx].update(fields_to_add)
         elif isinstance(json_data, list):
             # to avoid searching for data for each row, its stored temporarily.
