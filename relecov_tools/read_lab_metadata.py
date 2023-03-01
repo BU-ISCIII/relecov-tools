@@ -130,9 +130,9 @@ class RelecovMetadata:
         return m_data
 
     def adding_ontology_to_enum(self, m_data):
-        """Read the schema to get the properties enum and for those fields
-        which has an enum property value then replace the value for the one it
-        is defined in the schema
+        """Read the schema to get the properties enum and, for those fields 
+        which have an enum property value, replace the value for the one 
+        that is defined in the schema
         """
         enum_dict = {}
         for prop, values in self.relecov_sch_json["properties"].items():
@@ -151,21 +151,29 @@ class RelecovMetadata:
                     if m_data[idx][key] in e_values:
                         m_data[idx][key] = e_values[m_data[idx][key]]
                     else:
+                        log.error("No ontology could be added")
                         continue
 
         return m_data
 
     def process_from_json(self, m_data, json_fields):
-        """ """
+        """Find the labels that are missing in the file to match the given schema."""
         map_field = json_fields["map_field"]
-
         json_data = json_fields["j_data"]
         if isinstance(json_data, dict):
             for idx in range(len(m_data)):
-                m_data[idx].update(json_data[m_data[idx][map_field]])
+                try:
+                    m_data[idx].update(json_data[m_data[idx][map_field]])
+                except KeyError as error:
+                    if str(error).lower() == "not provided":
+                        log.error("Label was not provided, auto-completing columns")
+                    else:
+                        log.error(f"Unknown map_field value for json data: \
+                            {str(map_field)}. Set as not provided")
+                    fields_to_add = {x:"Not Provided" for x in json_fields["adding_fields"]}
+                    m_data[idx].update(fields_to_add)
         elif isinstance(json_data, list):
-            # to avoid searching for data for each row, for the first time searchs
-            # it is stored temporary.
+            # to avoid searching for data for each row, its stored temporarily.
             tmp_data = {}
             for idx in range(len(m_data)):
                 if m_data[idx][map_field] not in tmp_data:
@@ -188,7 +196,7 @@ class RelecovMetadata:
 
     def adding_fields(self, metadata):
         """Add information that requires to handle json files to include in
-        the  fields"""
+        the fields"""
 
         for key, values in self.json_req_files.items():
             stderr.print(f"[blue] Processing {key}")
@@ -199,12 +207,12 @@ class RelecovMetadata:
             metadata = self.process_from_json(metadata, values)
             stderr.print(f"[green] Processed {key}")
 
-        # Because sample data file is comming in an input parameter it cannot
+        # As sample data file is comming in an input parameter, it cannot
         # be inside the configuration json file.
-        # Include Sample informatin data from sample json file
+        # Include Sample information data from sample json file
         stderr.print("[blue] Processing sample data file")
         s_json = {}
-        s_json["map_field"] = "sequencing_sample_id"
+        s_json["map_field"] = "collecting_lab_sample_id"
         s_json["adding_field"] = "__all__"
         s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
         metadata = self.process_from_json(metadata, s_json)
@@ -233,7 +241,7 @@ class RelecovMetadata:
         ws_metadata_lab = relecov_tools.utils.read_excel_file(
             self.metadata_file, "METADATA_LAB", heading_row_number, False
         )
-        metadata_values = []
+        valid_metadata_rows = []
         errors = {}
         row_number = heading_row_number
         for row in ws_metadata_lab:
@@ -251,10 +259,16 @@ class RelecovMetadata:
                 continue
             for key in row.keys():
                 # skip the first column of the Metadata lab file
-                if "Campo" in key:
+                if "campo" in key.lower():
                     continue
                 if "date" in key.lower():
-                    if row[key] is not None:
+                    if row[key] is None or str(row[key]).lower() == "not provided":
+                        log.info("Date was not provided")
+                        row[key] = "Not Provided"
+                    elif isinstance(row[key], int) or isinstance(row[key], float):
+                        log.info("Date given as an integer. Understood as a year")
+                        row[key] = str(row[key])
+                    else:
                         try:
                             row[key] = row[key].strftime("%Y-%m-%d")
                         except AttributeError:
@@ -286,16 +300,14 @@ class RelecovMetadata:
                     stderr.print(f"[red] Error when mapping the label {str(e)}")
                     continue
 
-            metadata_values.append(property_row)
-        return metadata_values, errors
+            valid_metadata_rows.append(property_row)
+        return valid_metadata_rows, errors
 
     def create_metadata_json(self):
-        # stderr.print("[blue] Reading configuration settings")
-        # conf_json_data = self.read_configuration_json_files()
         stderr.print("[blue] Reading Lab Metadata Excel File")
         valid_metadata_rows, errors = self.read_metadata_file()
         if len(errors) > 0:
-            stderr.print("[red] Stopped executing because the errors found")
+            stderr.print("[red] Stopped executing because errors were found")
             sys.exit(1)
         # Continue by adding extra information
         stderr.print("[blue] Including additional information")
