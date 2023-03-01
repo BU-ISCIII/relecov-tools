@@ -9,8 +9,44 @@
         "geo_loc_country": "Spain"
     },
     {
+        "collecting_institution": "Hospital Puerta del Mar",
+        "collecting_institution_address": "Av. Ana de Viya, 21",
+        "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Cadiz",
+        "geo_loc_city": "Cadiz",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "Hospital Costa del Sol",
+        "collecting_institution_address": "A-7, Km 187",
+        "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Malaga",
+        "geo_loc_city": "Marbella",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "Hospital Virgen de la Victoria",
+        "collecting_institution_address": "Campus de Teatinos, S/N",
+        "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Malaga",
+        "geo_loc_city": "Malaga",
+        "geo_loc_country": "Spain"
+    },
+    {
+        "collecting_institution": "Complejo Hospitalario Torrecardenas",
+        "collecting_institution_address": "C. Hermandad de Donantes de Sangre, s/n",
+        "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Almeria",
+        "geo_loc_city": "Almeria",
+        "geo_loc_country": "Spain"
+    },
+    {
         "collecting_institution": "Microbiología HUC San Cecilio",
-        "collecting_institution_address": "Av. del Conocimiento S/N,",
+        "collecting_institution_address": "Av. del Conocimiento S/N",
         "collecting_institution_email": "fegarcia@ugr.es",
         "geo_loc_state": "Andalucia",
         "geo_loc_region": "Granada",
