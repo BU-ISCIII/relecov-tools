@@ -57,9 +57,6 @@ def read_excel_file(f_name, sheet_name, heading_row, empty_value=True):
         l_row = list(row)
         data_row = {}
         # Ignore the empty rows
-        # guessing that row 1 and 2 with no data are empty rows
-        if l_row[0] is None and l_row[1] is None:
-            continue
         for idx in range(0, len(heading)):
             if l_row[idx] is None:
                 if empty_value:
