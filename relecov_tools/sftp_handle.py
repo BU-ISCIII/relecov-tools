@@ -101,7 +101,7 @@ class SftpHandle:
                 self.pp = config["allowed_sample_extensions"]
             except KeyError as e:
                 log.error("Invalid configuration file %s", e)
-                stderr.print("[red] Invalide configuration file {e} !")
+                stderr.print("[red] Invalid configuration file {e} !")
                 sys.exit(1)
         if self.sftp_user is None:
             self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the userid")
@@ -112,7 +112,7 @@ class SftpHandle:
         self.client = None
 
     def open_connection(self):
-        """Establish sftp connection"""
+        """Establishing sftp connection"""
         log.info("Setting credentials for SFTP connection with remote server")
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -125,7 +125,7 @@ class SftpHandle:
             look_for_keys=False,
         )
         try:
-            log.info("Trying to stablish SFTP connection")
+            log.info("Trying to establish SFTP connection")
             self.client = self.client.open_sftp()
             return True
         except paramiko.SSHException as e:
@@ -261,7 +261,7 @@ class SftpHandle:
             return False
         data = copy.deepcopy(file_list)
         for s_name, values in file_list.items():
-            for f_type, f_name in values.items():
+            for _, f_name in values.items():
                 if not f_name.endswith(tuple(self.allowed_sample_ext)):
                     stderr.print("[red] " + f_name + " has a not valid extension")
                 if "_R1_" in f_name:
@@ -311,11 +311,10 @@ class SftpHandle:
         ws_metadata_lab = wb_file["METADATA_LAB"]
         sample_file_list = {}
         # find out the index for file names
-        for col in ws_metadata_lab[4]:
-            if "Sequence file R1 fastq" == col.value:
-                index_fastq_r1 = col.column - 1
-            elif "Sequence file R2 fastq" == col.value:
-                index_fastq_r2 = col.column - 1
+        config_json = ConfigJson()
+        meta_column_list = config_json.get_topic_data("lab_metadata","metadata_lab_heading")
+        index_fastq_r1 = meta_column_list.index("Sequence file R1 fastq")
+        index_fastq_r2 = meta_column_list.index("Sequence file R2 fastq")
         for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
             if row[2] is not None:
                 try:
@@ -398,7 +397,7 @@ class SftpHandle:
             temp_folder, local_meta_file
         )
         samples_files_list = sorted(
-            sum([list(fi.values()) for sample, fi in samples_files_list.items()], [])
+            sum([list(fi.values()) for _, fi in samples_files_list.items()], [])
         )
         fetched_files_list = self.list_fetched_files(fetched_folder)
         filtered_files_list = sorted(
@@ -406,6 +405,7 @@ class SftpHandle:
         )
         if samples_files_list == filtered_files_list:
             log.info("Files in %s match with metadata file", fetched_folder)
+            stderr.print("Successfully validated files based on metadata")
             return True
         else:
             log.error("Files in %s do not match metadata file", fetched_folder)
@@ -414,27 +414,25 @@ class SftpHandle:
                 + fetched_folder
                 + " do not match the ones described in metadata"
             )
+            set_list = set(filtered_files_list)
+            mismatch_files = [fi for fi in samples_files_list if fi not in set_list]
+            if len(mismatch_files) < 10:
+                stderr.print(f"Files that mismatch: {str(mismatch_files)}")
+            else:
+                stderr.print(
+                    "Showing some of the mismatches, check logs to see all of them: %s",
+                    str(mismatch_files[0:9]),
+                )
+            log.error(f"List of files that mismatch: {str(mismatch_files)}")
             self.delete_local_folder(temp_folder)
             return False
 
-    def validate_download_files(self, sample_file_list, local_folder):
-        """Check if download sample files are the ones defined on metadata file"""
-        if not sample_file_list:
-            return False
-        for sample, files in sample_file_list.items():
-            for file in files.values():
-                if not os.path.isfile(os.path.join(local_folder, file)):
-                    log.error("File %s does not exist", file)
-                    stderr.print("[red] File " + file + " does not exist")
-                    return False
-        return True
-
-    def delete_remote_files(self, folder, files):
+    def delete_remote_files(self, fetched_folder, files):
         """Delete files from remote server"""
         self.open_connection()
         for file in files:
             try:
-                self.client.remove(file)
+                self.client.remove(os.path.join(fetched_folder, os.path.basename(file)))
                 log.info("%s Deleted from remote server", file)
             except FileNotFoundError:
                 continue
@@ -469,7 +467,7 @@ class SftpHandle:
             log.error("There are no folders under root directory")
             sys.exit(1)
         if self.target_folders == "ALL":
-            log.info("Showing folders from remote sftp for selection")
+            log.info("Showing folders from remote SFTP for user selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
                 msg="Select the folders that will be downloaded",
                 choices=sorted(root_directory_list),
@@ -525,21 +523,14 @@ class SftpHandle:
             sample_file_list = self.get_sample_fastq_file_names(
                 result_data["local_folder"], meta_file
             )
-            if self.validate_download_files(
-                sample_file_list, result_data["local_folder"]
-            ):
-                self.create_tmp_files_with_metadata_info(
-                    result_data["local_folder"], sample_file_list, md5_files, meta_file
-                )
-                # Collect data to send the request to relecov_platform
-                json_sample_data = self.create_json_with_downloaded_samples(
-                    sample_file_list, folder
-                )
-                for record in json_sample_data:
-                    pass
-            else:
-                log.info("Deleting local folder %s", result_data["local_folder"])
-                self.delete_local_folder(result_data["local_folder"])
-
+            self.create_tmp_files_with_metadata_info(
+                result_data["local_folder"], sample_file_list, md5_files, meta_file
+            )
+            # Collect data to send the request to relecov_platform
+            json_sample_data = self.create_json_with_downloaded_samples(
+                sample_file_list, folder
+            )
+            for record in json_sample_data:
+                pass
         self.close_connection()
         return
