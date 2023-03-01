@@ -271,7 +271,7 @@ class RelecovMetadata:
                         row[key] = "Not Provided"
                     elif isinstance(row[key], int) or isinstance(row[key], float):
                         log.info("Date given as an integer. Understood as a year")
-                        row[key] = str(row[key])
+                        row[key] = str(int(row[key]))
                     else:
                         try:
                             row[key] = row[key].strftime("%Y-%m-%d")
