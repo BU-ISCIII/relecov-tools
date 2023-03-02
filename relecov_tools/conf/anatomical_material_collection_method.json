@@ -1006,5 +1006,11 @@
         "collection_method": "Not Applicable",
         "body_product": "Not Applicable",
         "anatomical_material": "Placenta"
+    },
+    "Not Provided": {
+        "anatomical_part": "Not Provided",
+        "collection_method": "Not Provided",
+        "body_product": "Not Provided",
+        "anatomical_material": "Not Provided"
     }
 }
