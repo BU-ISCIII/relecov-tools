@@ -1,686 +1,849 @@
-[
-    {
-        "collecting_institution": "Instituto de Salud Carlos III",
+{
+    "Instituto de Salud Carlos III": {
         "collecting_institution_address": "Crta. Pozuelo Majadahonda S/N,",
         "collecting_institution_email": "info@isciii.es",
         "geo_loc_state": "Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Instituto de Salud Carlos III",
+        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N,",
+        "submitting_institution_email": "info@isciii.es"
     },
-    {
-        "collecting_institution": "Hospital Puerta del Mar",
+    "Hospital Puerta del Mar": {
         "collecting_institution_address": "Av. Ana de Viya, 21",
         "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "geo_loc_state": "Andalucia",
         "geo_loc_region": "Cadiz",
         "geo_loc_city": "Cadiz",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Puerta del Mar",
+        "submitting_institution_address": "Av. Ana de Viya, 21",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
     },
-    {
-        "collecting_institution": "Hospital Costa del Sol",
+    "Hospital Costa del Sol": {
         "collecting_institution_address": "A-7, Km 187",
         "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "geo_loc_state": "Andalucia",
         "geo_loc_region": "Malaga",
         "geo_loc_city": "Marbella",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Costa del Sol",
+        "submitting_institution_address": "A-7, Km 187",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
     },
-    {
-        "collecting_institution": "Hospital Virgen de la Victoria",
+    "Hospital Virgen de la Victoria": {
         "collecting_institution_address": "Campus de Teatinos, S/N",
         "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "geo_loc_state": "Andalucia",
         "geo_loc_region": "Malaga",
         "geo_loc_city": "Malaga",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Virgen de la Victoria",
+        "submitting_institution_address": "Campus de Teatinos, S/N",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
     },
-    {
-        "collecting_institution": "Complejo Hospitalario Torrecardenas",
+    "Complejo Hospitalario Torrecardenas": {
         "collecting_institution_address": "C. Hermandad de Donantes de Sangre, s/n",
         "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "geo_loc_state": "Andalucia",
         "geo_loc_region": "Almeria",
         "geo_loc_city": "Almeria",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Complejo Hospitalario Torrecardenas",
+        "submitting_institution_address": "C. Hermandad de Donantes de Sangre, s/n",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
     },
-    {
-        "collecting_institution": "Microbiología HUC San Cecilio",
+    "Hospital Universitario San Cecilio": {
         "collecting_institution_address": "Av. del Conocimiento S/N",
         "collecting_institution_email": "fegarcia@ugr.es",
         "geo_loc_state": "Andalucia",
         "geo_loc_region": "Granada",
         "geo_loc_city": "Granada",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario San Cecilio",
+        "submitting_institution_address": "Av. del Conocimiento S/N",
+        "submitting_institution_email": "fegarcia@ugr.es"
     },
-    {
-        "collecting_institution": "Microbiología. Hospital Universitario Virgen del Rocio",
+    "Microbiología HUC San Cecilio": {
+        "collecting_institution_address": "Av. del Conocimiento S/N",
+        "collecting_institution_email": "fegarcia@ugr.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Granada",
+        "geo_loc_city": "Granada",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Microbiología HUC San Cecilio",
+        "submitting_institution_address": "Av. del Conocimiento S/N",
+        "submitting_institution_email": "fegarcia@ugr.es"
+    },
+    "Microbiología. Hospital Universitario Virgen del Rocio": {
         "collecting_institution_address": "Avenida Manuel Siurot s/n",
         "collecting_institution_email": "josea.lepe.sspa@juntadeandalucia.es",
         "geo_loc_state": "Andalucia",
         "geo_loc_region": "Sevilla",
         "geo_loc_city": "Sevilla",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Microbiología. Hospital Universitario Virgen del Rocio",
+        "submitting_institution_address": "Avenida Manuel Siurot s/n",
+        "submitting_institution_email": "josea.lepe.sspa@juntadeandalucia.es"
     },
-    {
-        "collecting_institution": "Hospital Clínico Universitario Lozano Blesa",
+    "Hospital Universitario Virgen del Rocio": {
+        "collecting_institution_address": "Avenida Manuel Siurot s/n",
+        "collecting_institution_email": "josea.lepe.sspa@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Sevilla",
+        "geo_loc_city": "Sevilla",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Virgen del Rocio",
+        "submitting_institution_address": "Avenida Manuel Siurot s/n",
+        "submitting_institution_email": "josea.lepe.sspa@juntadeandalucia.es"
+    },
+    "Hospital Clínico Universitario Lozano Blesa": {
         "collecting_institution_address": "S. Juan Bosco, 15",
         "collecting_institution_email": "rbenito@salud.aragon.es",
-        "geo_loc_state": "Aragón",
+        "geo_loc_state": "Aragon",
         "geo_loc_region": "Zaragoza",
         "geo_loc_city": "Zaragoza",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Clínico Universitario Lozano Blesa",
+        "submitting_institution_address": "S. Juan Bosco, 15",
+        "submitting_institution_email": "rbenito@salud.aragon.es"
     },
-    {
-        "collecting_institution": "Hospital Universitario Miguel Servet",
+    "Hospital Universitario Miguel Servet": {
         "collecting_institution_address": "P.º Isabel la Católica, 1-3",
         "collecting_institution_email": "rbenito@salud.aragon.es",
-        "geo_loc_state": "Aragón",
+        "geo_loc_state": "Aragon",
         "geo_loc_region": "Zaragoza",
         "geo_loc_city": "Zaragoza",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Miguel Servet",
+        "submitting_institution_address": "P.º Isabel la Católica, 1-3",
+        "submitting_institution_email": "rbenito@salud.aragon.es"
     },
-    {
-        "collecting_institution": "Centro de Investigación Biomédica de Aragón",
+    "Centro de Investigación Biomédica de Aragón": {
         "collecting_institution_address": "Avenida San Juan Bosco 13",
         "collecting_institution_email": "mhpstrunk.iacs@aragon.es",
-        "geo_loc_state": "Aragón",
+        "geo_loc_state": "Aragon",
         "geo_loc_region": "Zaragoza",
         "geo_loc_city": "Zaragoza",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Centro de Investigación Biomédica de Aragón",
+        "submitting_institution_address": "Avenida San Juan Bosco 13",
+        "submitting_institution_email": "mhpstrunk.iacs@aragon.es"
     },
-    {
-        "collecting_institution": "Hospital Universitario Central de Asturias",
+    "Hospital Universitario Central de Asturias": {
         "collecting_institution_address": " Av. Roma, s/n,",
         "collecting_institution_email": "santiago.melon@sespa.es",
         "geo_loc_state": "Asturias",
         "geo_loc_region": "Asturias",
         "geo_loc_city": "Asturias",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Central de Asturias",
+        "submitting_institution_address": " Av. Roma, s/n,",
+        "submitting_institution_email": "santiago.melon@sespa.es"
     },
-    {
-        "collecting_institution": "Servicio de Microbiologia HU Son Espases",
+    "Servicio de Microbiologia HU Son Espases": {
         "collecting_institution_address": " Ctra. Valldemossa 79",
         "collecting_institution_email": "antonio.oliver@ssib.es",
         "geo_loc_state": "Islas Baleares",
         "geo_loc_region": "Palma de Mallorca",
         "geo_loc_city": "Palma de Mallorca",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Servicio de Microbiologia HU Son Espases",
+        "submitting_institution_address": " Ctra. Valldemossa 79",
+        "submitting_institution_email": "antonio.oliver@ssib.es"
     },
-    {
-        "collecting_institution": "Hospital Universitario Ntra. Sra de Candelaria",
+    "Hospital Universitario Ntra. Sra de Candelaria": {
         "collecting_institution_address": "Carretera del Rosario 145",
         "collecting_institution_email": "jalcflo@gobiernodecanarias.org",
         "geo_loc_state": "Islas Canarias",
         "geo_loc_region": "Santa Cruz de Tenerife",
         "geo_loc_city": "Santa Cruz de Tenerife",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Ntra. Sra de Candelaria",
+        "submitting_institution_address": "Carretera del Rosario 145",
+        "submitting_institution_email": "jalcflo@gobiernodecanarias.org"
     },
-    {
-        "collecting_institution": "Instituto Tecnológico y de Energías Renovables",
+    "Instituto Tecnológico y de Energías Renovables": {
         "collecting_institution_address": "Polígono Industrial de Granadilla, s/n",
         "collecting_institution_email": "jlorenzo@iter.es",
         "geo_loc_state": "Islas Canarias",
         "geo_loc_region": "Santa Cruz de Tenerife",
         "geo_loc_city": "Santa Cruz de Tenerife",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Instituto Tecnológico y de Energías Renovables",
+        "submitting_institution_address": "Polígono Industrial de Granadilla, s/n",
+        "submitting_institution_email": "jlorenzo@iter.es"
     },
-    {
-        "collecting_institution": "Hospital Universitario de Canarias",
+    "Hospital Universitario de Canarias": {
         "collecting_institution_address": "Carretera Ofra S/N, La Laguna",
         "collecting_institution_email": "",
         "geo_loc_state": "Islas Canarias",
         "geo_loc_region": "Santa Cruz de Tenerife",
         "geo_loc_city": "Santa Cruz de Tenerife",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario de Canarias",
+        "submitting_institution_address": "Carretera Ofra S/N, La Laguna",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario de Gran Canaria",
+    "Hospital Universitario de Gran Canaria": {
         "collecting_institution_address": "C. Pl. Barranco de la Ballena s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Islas Canarias",
         "geo_loc_region": "Las Palmas",
         "geo_loc_city": "Las Palmas",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario de Gran Canaria",
+        "submitting_institution_address": "C. Pl. Barranco de la Ballena s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Insular de Lanzarote",
+    "Hospital Insular de Lanzarote": {
         "collecting_institution_address": "C. Juan de Quesada, s/n, Arrecife",
         "collecting_institution_email": "",
         "geo_loc_state": "Islas Canarias",
         "geo_loc_region": "Las Palmas",
         "geo_loc_city": "Las Palmas",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Insular de Lanzarote",
+        "submitting_institution_address": "C. Juan de Quesada, s/n, Arrecife",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario Marqués de Valdecilla",
+    "Hospital Universitario Marqués de Valdecilla": {
         "collecting_institution_address": "Av. Valdecilla s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Cantabria",
         "geo_loc_region": "Cantabria",
         "geo_loc_city": "Santander",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Marqués de Valdecilla",
+        "submitting_institution_address": "Av. Valdecilla s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Sierrallana",
+    "Hospital Sierrallana": {
         "collecting_institution_address": "Bo. Ganzo, s/n, Torrelavega",
         "collecting_institution_email": "",
         "geo_loc_state": "Cantabria",
         "geo_loc_region": "Cantabria",
         "geo_loc_city": "Santander",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Sierrallana",
+        "submitting_institution_address": "Bo. Ganzo, s/n, Torrelavega",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital General Universitario de Ciudad Real",
-        "collecting_institution_address": "Calle Obispo Rafael Torija s/n",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Castilla-La Mancha",
-        "geo_loc_region": "Ciudad Real",
-        "geo_loc_city": "Ciudad Real",
-        "geo_loc_country": "Spain"
-    },
-    {
-        "collecting_institution": "Hospital General La Mancha Centro",
-        "collecting_institution_address": "Av. Constitución, 3, Alcázar de San Juan",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Castilla-La Mancha",
-        "geo_loc_region": "Ciudad Real",
-        "geo_loc_city": "Alcázar de San Juan",
-        "geo_loc_country": "Spain"
-    },
-    {
-        "collecting_institution": "Hospital Virgen de Altagracia",
-        "collecting_institution_address": "Avda. D. Emiliano García Roldán, s/n, Manzanares,",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Castilla-La Mancha",
-        "geo_loc_region": "Ciudad Real",
-        "geo_loc_city": "Manzanares",
-        "geo_loc_country": "Spain"
-    },
-    {
-        "collecting_institution": "Hospital General de Valdepeñas",
-        "collecting_institution_address": "Av. de los Estudiantes, s/n, Valdepeñas",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Castilla-La Mancha",
-        "geo_loc_region": "Ciudad Real",
-        "geo_loc_city": "Valdepeñas",
-        "geo_loc_country": "Spain"
-    },
-    {
-        "collecting_institution": "Hospital General Universitario de Ciudad Real",
+    "Hospital General Universitario de Ciudad Real": {
         "collecting_institution_address": "C. Obispo Rafael Torija, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla-La Mancha",
         "geo_loc_region": "Ciudad Real",
         "geo_loc_city": "Ciudad Real",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Universitario de Ciudad Real",
+        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Público Santa Bárbara",
+    "Hospital General La Mancha Centro": {
+        "collecting_institution_address": "Av. Constitución, 3, Alcázar de San Juan",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Ciudad Real",
+        "geo_loc_city": "Alcázar de San Juan",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General La Mancha Centro",
+        "submitting_institution_address": "Av. Constitución, 3, Alcázar de San Juan",
+        "submitting_institution_email": ""
+    },
+    "Hospital Virgen de Altagracia": {
+        "collecting_institution_address": "Avda. D. Emiliano García Roldán, s/n, Manzanares,",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Ciudad Real",
+        "geo_loc_city": "Manzanares",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Virgen de Altagracia",
+        "submitting_institution_address": "Avda. D. Emiliano García Roldán, s/n, Manzanares,",
+        "submitting_institution_email": ""
+    },
+    "Hospital General de Valdepeñas": {
+        "collecting_institution_address": "Av. de los Estudiantes, s/n, Valdepeñas",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Ciudad Real",
+        "geo_loc_city": "Valdepeñas",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General de Valdepeñas",
+        "submitting_institution_address": "Av. de los Estudiantes, s/n, Valdepeñas",
+        "submitting_institution_email": ""
+    },
+    "Hospital Público Santa Bárbara": {
         "collecting_institution_address": "C. Malagón s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla-La Mancha",
         "geo_loc_region": "Ciudad Real",
         "geo_loc_city": "Puertollano",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Público Santa Bárbara",
+        "submitting_institution_address": "C. Malagón s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Virgen de la Luz",
+    "Hospital Virgen de la Luz": {
         "collecting_institution_address": "Hermandad de Donantes de Sangre, 1",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla-La Mancha",
         "geo_loc_region": "Cuenca",
         "geo_loc_city": "Cuenca",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Virgen de la Luz",
+        "submitting_institution_address": "Hermandad de Donantes de Sangre, 1",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario de Guadalajara",
+    "Hospital Universitario de Guadalajara": {
         "collecting_institution_address": "C. Donante de Sangre, S/N",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla-La Mancha",
         "geo_loc_region": "Guadalajara",
         "geo_loc_city": "Guadalajara",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario de Guadalajara",
+        "submitting_institution_address": "C. Donante de Sangre, S/N",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Virgen de la Salud",
+    "Hospital Virgen de la Salud": {
         "collecting_institution_address": "Calle Barber 30",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla-La Mancha",
         "geo_loc_region": "Toledo",
         "geo_loc_city": "Toledo",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Virgen de la Salud",
+        "submitting_institution_address": "Calle Barber 30",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital General Nuestra Sra. del Prado",
+    "Hospital General Nuestra Sra. del Prado": {
         "collecting_institution_address": "CTRA. MADRID, Av. Extremadura, KM 114",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla-La Mancha",
         "geo_loc_region": "Toledo",
         "geo_loc_city": "Talavera de la Reina",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Nuestra Sra. del Prado",
+        "submitting_institution_address": "CTRA. MADRID, Av. Extremadura, KM 114",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Consejería de Sanidad",
+    "Consejería de Sanidad": {
         "collecting_institution_address": "Avda. de Francia, 4.",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla-La Mancha",
         "geo_loc_region": "Toledo",
         "geo_loc_city": "Toledo",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Consejería de Sanidad",
+        "submitting_institution_address": "Avda. de Francia, 4.",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital General Universitario de Albacete",
+    "Hospital General Universitario de Albacete": {
         "collecting_institution_address": "Calle Hermanos Falcó 37",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla-La Mancha",
         "geo_loc_region": "Albacete",
         "geo_loc_city": "Albacete",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Universitario de Albacete",
+        "submitting_institution_address": "Calle Hermanos Falcó 37",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)",
+    "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)": {
         "collecting_institution_address": "Paseo de Belen 19",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Valladolid",
         "geo_loc_city": "Valladolid",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)",
+        "submitting_institution_address": "Paseo de Belen 19",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Complejo Asistencial Universitario de Salamanca",
+    "Complejo Asistencial Universitario de Salamanca": {
         "collecting_institution_address": "P.º de San Vicente, 58",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Salamanca",
         "geo_loc_city": "Salamanca",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Complejo Asistencial Universitario de Salamanca",
+        "submitting_institution_address": "P.º de San Vicente, 58",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Gerencia de Salud de Area de Soria",
+    "Gerencia de Salud de Area de Soria": {
         "collecting_institution_address": "P.º el Espolón",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Soria",
         "geo_loc_city": "Soria",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Gerencia de Salud de Area de Soria",
+        "submitting_institution_address": "P.º el Espolón",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital General Río Carrión",
+    "Hospital General Río Carrión": {
         "collecting_institution_address": "Av. Donantes de Sangre, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Palencia",
         "geo_loc_city": "Palencia",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Río Carrión",
+        "submitting_institution_address": "Av. Donantes de Sangre, s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Nuestra Señora de Sonsoles",
+    "Hospital Nuestra Señora de Sonsoles": {
         "collecting_institution_address": " Av. Juan Carlos I, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Avila",
         "geo_loc_city": "Avila",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Nuestra Señora de Sonsoles",
+        "submitting_institution_address": " Av. Juan Carlos I, s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario de Burgos",
+    "Hospital Universitario de Burgos": {
         "collecting_institution_address": "Av. Islas Baleares, 3",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Burgos",
         "geo_loc_city": "Burgos",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario de Burgos",
+        "submitting_institution_address": "Av. Islas Baleares, 3",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitari Vall d’Hebron",
+    "Hospital Universitari Vall d’Hebron": {
         "collecting_institution_address": " Passeig de la Vall d’Hebron, 119-129",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Vall d’Hebron",
+        "submitting_institution_address": " Passeig de la Vall d’Hebron, 119-129",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitari Germans Trias i Pujol",
+    "Hospital Universitari Germans Trias i Pujol": {
         "collecting_institution_address": " Crta del Canyet s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Badalona",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Germans Trias i Pujol",
+        "submitting_institution_address": " Crta del Canyet s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Clínic de Barcelona",
+    "Hospital Clínic de Barcelona": {
         "collecting_institution_address": "C/Villarroel 170",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Clínic de Barcelona",
+        "submitting_institution_address": "C/Villarroel 170",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitari Bellvitge",
+    "Hospital Universitari Bellvitge": {
         "collecting_institution_address": "Carrer Feixa Llarga s/n ",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "L'Hospitalet de Llobregat",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Bellvitge",
+        "submitting_institution_address": "Carrer Feixa Llarga s/n ",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII",
+    "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII": {
         "collecting_institution_address": "c/ Dr. Mallafrè Guasch, 4,",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Tarragona",
         "geo_loc_city": "Tarragona",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII",
+        "submitting_institution_address": "c/ Dr. Mallafrè Guasch, 4,",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+    "LABORATORI DE REFERENCIA DE CATALUNYA": {
         "collecting_institution_address": "Carrer de la Selva, 10",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Banc de Sang i Teixits Catalunya",
+    "Banc de Sang i Teixits Catalunya": {
         "collecting_institution_address": "Passeig del Taulat, 116",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Banc de Sang i Teixits Catalunya",
+        "submitting_institution_address": "Passeig del Taulat, 116",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Laboratorio Echevarne Sant Cugat del Vallès",
+    "Laboratorio Echevarne Sant Cugat del Vallès": {
         "collecting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
-        "geo_loc_city": "Sant Cugat del Vallès",
-        "geo_loc_country": "Spain"
+        "geo_loc_city": "Sant Cugat del Valles",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Laboratorio Echevarne Sant Cugat del Vallès",
+        "submitting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Unitat de Genòmica i Medicina Personalitzada - Hospital Dr. Josep Trueta",
+    "Unitat de Genòmica i Medicina Personalitzada - Hospital Dr. Josep Trueta": {
         "collecting_institution_address": "Avinguda de França, S/N,",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Girona",
         "geo_loc_city": "Girona",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Unitat de Genòmica i Medicina Personalitzada - Hospital Dr. Josep Trueta",
+        "submitting_institution_address": "Avinguda de França, S/N,",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario San Jorge",
+    "Hospital Universitario San Jorge": {
         "collecting_institution_address": "Av. Martínez de Velasco, 36",
         "collecting_institution_email": "",
-        "geo_loc_state": "Aragón",
+        "geo_loc_state": "Aragon",
         "geo_loc_region": "Huesca",
         "geo_loc_city": "Huesca",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario San Jorge",
+        "submitting_institution_address": "Av. Martínez de Velasco, 36",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario de Ceuta",
+    "Hospital Universitario de Ceuta": {
         "collecting_institution_address": "Colmenar s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Ceuta",
         "geo_loc_region": "Ceuta",
         "geo_loc_city": "Ceuta",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario de Ceuta",
+        "submitting_institution_address": "Colmenar s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Comarcal de Melilla",
+    "Hospital Comarcal de Melilla": {
         "collecting_institution_address": "Remonta, 2",
         "collecting_institution_email": "",
         "geo_loc_state": "Melilla",
         "geo_loc_region": "Melilla",
         "geo_loc_city": "Melilla",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Comarcal de Melilla",
+        "submitting_institution_address": "Remonta, 2",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital de Mostoles",
+    "Hospital de Mostoles": {
         "collecting_institution_address": "C. Dr. Luis Montes, S/N",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Mostoles",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital de Mostoles",
+        "submitting_institution_address": "C. Dr. Luis Montes, S/N",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Clínico San Carlos",
+    "Hospital Clínico San Carlos": {
         "collecting_institution_address": "Calle del Prof Martín Lagos",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Clínico San Carlos",
+        "submitting_institution_address": "Calle del Prof Martín Lagos",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Centro Militar de Veterinaria de la Defensa",
+    "Centro Militar de Veterinaria de la Defensa": {
         "collecting_institution_address": "C. Darío Gazapo 3",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Centro Militar de Veterinaria de la Defensa",
+        "submitting_institution_address": "C. Darío Gazapo 3",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario Severo Ochoa",
+    "Hospital Universitario Severo Ochoa": {
         "collecting_institution_address": "Av. de Orellana, s/n, Leganés",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
         "geo_loc_region": "Madrid",
-        "geo_loc_city": "Leganés",
-        "geo_loc_country": "Spain"
+        "geo_loc_city": "Leganes",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Severo Ochoa",
+        "submitting_institution_address": "Av. de Orellana, s/n, Leganés",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario de Getafe",
+    "Hospital Universitario de Getafe": {
         "collecting_institution_address": "Carr. Madrid - Toledo, Km 12,500, Getafe",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Getafe",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario de Getafe",
+        "submitting_institution_address": "Carr. Madrid - Toledo, Km 12,500, Getafe",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Presidencia de Gobierno",
+    "Presidencia de Gobierno": {
         "collecting_institution_address": "",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Presidencia de Gobierno",
+        "submitting_institution_address": "",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Ministerio de Sanidad, Servicios Sociales e Igualdad",
+    "Ministerio de Sanidad, Servicios Sociales e Igualdad": {
         "collecting_institution_address": "P.º del Prado, 18",
         "collecting_institution_email": "",
         "geo_loc_state": "Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Ministerio de Sanidad, Servicios Sociales e Igualdad",
+        "submitting_institution_address": "P.º del Prado, 18",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "HU Virgen de la Arrixaca",
+    "HU Virgen de la Arrixaca": {
         "collecting_institution_address": "Ctra. Madrid-Cartagena, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Murcia",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "HU Virgen de la Arrixaca",
+        "submitting_institution_address": "Ctra. Madrid-Cartagena, s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario Reina Sofía",
+    "Hospital Universitario Reina Sofía": {
         "collecting_institution_address": "Av. Intendente Jorge Palacios, 1",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Murcia",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Reina Sofía",
+        "submitting_institution_address": "Av. Intendente Jorge Palacios, 1",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital General Universitario Santa Lucía",
+    "Hospital General Universitario Santa Lucía": {
         "collecting_institution_address": "C. Minarete, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Cartagena",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Universitario Santa Lucía",
+        "submitting_institution_address": "C. Minarete, s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital General Universitario Los Arcos del Mar Menor",
+    "Hospital General Universitario Los Arcos del Mar Menor": {
         "collecting_institution_address": "Paraje Torre Octavio, 54, Pozo Aledo",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Pozo Aledo",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Universitario Los Arcos del Mar Menor",
+        "submitting_institution_address": "Paraje Torre Octavio, 54, Pozo Aledo",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital General Universitario Morales Meseguer",
+    "Hospital General Universitario Morales Meseguer": {
         "collecting_institution_address": "Av. Marqués de Los Vélez, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Murcia",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Universitario Morales Meseguer",
+        "submitting_institution_address": "Av. Marqués de Los Vélez, s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Clínico Universitario Virgen de la Arrixaca",
+    "Hospital Clínico Universitario Virgen de la Arrixaca": {
         "collecting_institution_address": "Ctra. Madrid-Cartagena, s/n, El Palmar",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Murcia",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Clínico Universitario Virgen de la Arrixaca",
+        "submitting_institution_address": "Ctra. Madrid-Cartagena, s/n, El Palmar",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Rafael Méndez de Lorca",
+    "Hospital Rafael Méndez de Lorca": {
         "collecting_institution_address": "Ctra.N-340, Lorca",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Lorca",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Rafael Méndez de Lorca",
+        "submitting_institution_address": "Ctra.N-340, Lorca",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital de la Vega Lorenzo Guirao",
+    "Hospital de la Vega Lorenzo Guirao": {
         "collecting_institution_address": "Vereda de Morcillo, s/n, Cieza",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Cieza",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital de la Vega Lorenzo Guirao",
+        "submitting_institution_address": "Vereda de Morcillo, s/n, Cieza",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Univeristario Donostia",
+    "Hospital Univeristario Donostia": {
         "collecting_institution_address": "Begiristain Doktorea Pasealekua, s/n",
         "collecting_institution_email": "",
-        "geo_loc_state": "País Vasco",
+        "geo_loc_state": "Pais Vasco",
         "geo_loc_region": "Guipúzcoa",
         "geo_loc_city": "Donostia",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Univeristario Donostia",
+        "submitting_institution_address": "Begiristain Doktorea Pasealekua, s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario de Badajoz",
+    "Hospital Universitario de Badajoz": {
         "collecting_institution_address": "Av. de Elvas, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Extremadura",
         "geo_loc_region": "Badajoz",
         "geo_loc_city": "Badajoz",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario de Badajoz",
+        "submitting_institution_address": "Av. de Elvas, s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital de Mérida",
+    "Hospital de Mérida": {
         "collecting_institution_address": "Av. Don Antonio Campos Hoyos, 26, Mérida",
         "collecting_institution_email": "",
         "geo_loc_state": "Extremadura",
         "geo_loc_region": "Badajoz",
-        "geo_loc_city": "Mérida",
-        "geo_loc_country": "Spain"
+        "geo_loc_city": "Merida",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital de Mérida",
+        "submitting_institution_address": "Av. Don Antonio Campos Hoyos, 26, Mérida",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital San Pedro de Alcantara",
+    "Hospital San Pedro de Alcantara": {
         "collecting_institution_address": "Av. Pablo Naranjo Porras, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Extremadura",
         "geo_loc_region": "Caceres",
         "geo_loc_city": "Caceres",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital San Pedro de Alcantara",
+        "submitting_institution_address": "Av. Pablo Naranjo Porras, s/n",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Gerencia de Atención Primaria Pontevedra Sur",
+    "Gerencia de Atención Primaria Pontevedra Sur": {
         "collecting_institution_address": "Av. das Camelias, 109, Vigo",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
         "geo_loc_region": "Pontevedra",
         "geo_loc_city": "Vigo",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Gerencia de Atención Primaria Pontevedra Sur",
+        "submitting_institution_address": "Av. das Camelias, 109, Vigo",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario Lucus Augusti",
+    "Hospital Universitario Lucus Augusti": {
         "collecting_institution_address": " Rúa Dr. Ulises Romero, 1",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
         "geo_loc_region": "Lugp",
         "geo_loc_city": "Lugo",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Lucus Augusti",
+        "submitting_institution_address": " Rúa Dr. Ulises Romero, 1",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario de A Coruña",
+    "Hospital Universitario de A Coruña": {
         "collecting_institution_address": "As Xubias, 84",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
         "geo_loc_region": "A Coruña",
         "geo_loc_city": "A Coruña",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario de A Coruña",
+        "submitting_institution_address": "As Xubias, 84",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Clínico Universitario de Santiago",
+    "Hospital Clínico Universitario de Santiago": {
         "collecting_institution_address": "Rúa da Choupana, s/n, Santiago de Compostela",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
         "geo_loc_region": "A Coruña",
         "geo_loc_city": "Santiago de Compostela",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Clínico Universitario de Santiago",
+        "submitting_institution_address": "Rúa da Choupana, s/n, Santiago de Compostela",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario de Navarra",
+    "Hospital Universitario de Navarra": {
         "collecting_institution_address": "C. de Irunlarrea, 3, Pamplona",
         "collecting_institution_email": "",
         "geo_loc_state": "Navarra",
         "geo_loc_region": "Navarra",
         "geo_loc_city": "Pamplona",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario de Navarra",
+        "submitting_institution_address": "C. de Irunlarrea, 3, Pamplona",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital General Universitario de Elche",
+    "Hospital General Universitario de Elche": {
         "collecting_institution_address": "Carrer Almazara, 11, Elche",
         "collecting_institution_email": "",
         "geo_loc_state": "Valenciana",
         "geo_loc_region": "Alicante",
         "geo_loc_city": "Elche",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Universitario de Elche",
+        "submitting_institution_address": "Carrer Almazara, 11, Elche",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital San Pedro",
+    "Hospital San Pedro": {
         "collecting_institution_address": "C. Piqueras, 98",
         "collecting_institution_email": "",
         "geo_loc_state": "La Rioja",
         "geo_loc_region": "La Rioja",
         "geo_loc_city": "Logroño",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital San Pedro",
+        "submitting_institution_address": "C. Piqueras, 98",
+        "submitting_institution_email": ""
     },
-    {
-        "collecting_institution": "Hospital Universitario Txagorritxu",
+    "Hospital Universitario Txagorritxu": {
         "collecting_institution_address": " Jose Atxotegi Kalea, s/n",
         "collecting_institution_email": "",
-        "geo_loc_state": "País Vasco",
+        "geo_loc_state": "Pais Vasco",
         "geo_loc_region": "Alava",
         "geo_loc_city": "Gasteiz",
-        "geo_loc_country": "Spain"
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Txagorritxu",
+        "submitting_institution_address": " Jose Atxotegi Kalea, s/n",
+        "submitting_institution_email": ""
     }
-]
+}
