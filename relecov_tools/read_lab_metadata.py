@@ -160,42 +160,23 @@ class RelecovMetadata:
         """Find the labels that are missing in the file to match the given schema."""
         map_field = json_fields["map_field"]
         json_data = json_fields["j_data"]
-        if isinstance(json_data, dict):
-            for idx in range(len(m_data)):
-                try:
-                    m_data[idx].update(json_data[m_data[idx][map_field]])
-                except KeyError as error:
-                    if str(error).lower() == "not provided":
-                        log.error("Label was not provided, auto-completing columns")
-                    else:
-                        log.error(
-                            f"Unknown map_field value for json data: \
-                            {str(map_field)}. Set as not provided"
-                        )
-                    fields_to_add = {
-                        x: "Not Provided" for x in json_fields["adding_fields"]
-                    }
-                    m_data[idx].update(fields_to_add)
-        elif isinstance(json_data, list):
-            # to avoid searching for data for each row, its stored temporarily.
-            tmp_data = {}
-            for idx in range(len(m_data)):
-                if m_data[idx][map_field] not in tmp_data:
-                    for item in json_data:
-                        if m_data[idx][map_field] == item[map_field]:
-                            if json_fields["adding_fields"] == "__all__":
-                                m_data[idx].update(item)
-                                tmp_data[m_data[idx][map_field]] = item
-                            else:
-                                tmp_data[m_data[idx][map_field]] = {}
-                                for field in json_fields["adding_fields"]:
-                                    m_data[idx][field] = item[field]
-                                    tmp_data[m_data[idx][map_field]][field] = item[
-                                        field
-                                    ]
-                            break
+        for idx in range(len(m_data)):
+            try:
+                m_data[idx].update(json_data[m_data[idx][map_field]])
+            except KeyError as error:
+                if str(error).lower() == "not provided":
+                    log.error("Label was not provided, auto-completing columns")
                 else:
-                    m_data[idx].update(tmp_data[m_data[idx][map_field]])
+                    log.error(
+                        f"Unknown map_field value for json data: \
+                        {str(map_field)}. Set as not provided"
+                    )
+                    stderr.error(f"[red] Unknown value for: {map_field} aborting")
+                    sys.exit(1)
+                fields_to_add = {
+                    x: "Not Provided" for x in json_fields["adding_fields"]
+                }
+                m_data[idx].update(fields_to_add)
         return m_data
 
     def adding_fields(self, metadata):
@@ -217,7 +198,13 @@ class RelecovMetadata:
         stderr.print("[blue] Processing sample data file")
         s_json = {}
         s_json["map_field"] = "collecting_lab_sample_id"
-        s_json["adding_field"] = "__all__"
+        s_json["adding_field"] = [
+            "sequence_file_R1_fastq",
+            "sequence_file_R2_fastq" "sequence_file_R1_md5",
+            "sequence_file_R2_md5",
+            "r1_fastq_filepath",
+            "r2_fastq_filepath",
+        ]
         s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
         metadata = self.process_from_json(metadata, s_json)
         stderr.print("[green] Processed sample data file.")
