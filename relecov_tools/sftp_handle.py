@@ -109,6 +109,12 @@ class SftpHandle:
             self.sftp_passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password"
             )
+        self.allowed_R1_delimiters = config_json.get_configuration(
+            "allowed_R1_delimiters"
+        )
+        self.allowed_R2_delimiters = config_json.get_configuration(
+            "allowed_R2_delimiters"
+        )
         self.client = None
 
     def open_connection(self):
@@ -238,6 +244,22 @@ class SftpHandle:
             )
         return sftp_md5, required_retransmition
 
+    def validate_R1_R2_delimiters(self, f_name, orientation):
+        """Checks if file is R1 or R2 given a list of allowed delimiters"""
+        if orientation == "R1":
+            valid_delimiters = self.allowed_R1_delimiters
+        elif orientation == "R2":
+            valid_delimiters = self.allowed_R2_delimiters
+        else:
+            log.error("wrong direction parameter, aborting")
+            return False
+        matching = [True for x in valid_delimiters if x in f_name]
+        stderr.print(matching)
+        if len(matching) >= 1:
+            return True
+        else:
+            return False
+
     def create_tmp_files_with_metadata_info(
         self, local_folder, file_list, md5_data, metadata_file
     ):
@@ -260,14 +282,16 @@ class SftpHandle:
             stderr.print("[red] Unable to copy Metadata file")
             return False
         data = copy.deepcopy(file_list)
+        # valid_R1_extensions = ""
+        # valid_R2_extensions = ""
         for s_name, values in file_list.items():
             for _, f_name in values.items():
                 if not f_name.endswith(tuple(self.allowed_sample_ext)):
                     stderr.print("[red] " + f_name + " has a not valid extension")
-                if "_R1_" in f_name:
+                if self.validate_R1_R2_delimiters(f_name, "R1"):
                     data[s_name]["r1_fastq_filepath"] = md5_data[f_name][0]
                     data[s_name]["fastq_r1_md5"] = md5_data[f_name][1]
-                elif "_R2_" in f_name:
+                elif self.validate_R1_R2_delimiters(f_name, "R2"):
                     data[s_name]["r2_fastq_filepath"] = md5_data[f_name][0]
                     data[s_name]["fastq_r2_md5"] = md5_data[f_name][1]
                 else:
