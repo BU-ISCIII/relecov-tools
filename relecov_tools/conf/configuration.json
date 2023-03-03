@@ -170,37 +170,39 @@
         "ISCIII": "ISCIII.json",
         "HUGTiP": "HUGTiP.json"
     },
-    "sftp_connection": {
-        "sftp_server": "sftprelecov.isciii.es",
-        "sftp_port": "22"
+    "sftp_handle": {
+        "sftp_connection": {
+            "sftp_server": "sftprelecov.isciii.es",
+            "sftp_port": "22"
+        },
+        "abort_if_md5_mismatch": "False",
+        "storage_local_folder": "/tmp/relecov",
+        "tmp_folder_for_metadata": "/tmp/relecov/tmp",
+        "allowed_sample_extensions": [
+            "fastq.gz",
+            "fasta"
+        ],
+        "allowed_R1_delimiters": [
+            "_R1_",
+            "_R1.",
+            ".R1.",
+            "Forward",
+            "forward",
+            "_1_",
+            "_1.",
+            ".1."
+        ],
+        "allowed_R2_delimiters": [
+            "_R2_",
+            "_R2.",
+            ".R2.",
+            "Reverse",
+            "reverse",
+            "_2_",
+            "_2.",
+            ".2."
+        ]
     },
-    "abort_if_md5_mismatch": "False",
-    "storage_local_folder": "/tmp/relecov",
-    "tmp_folder_for_metadata": "/tmp/relecov/tmp",
-    "allowed_sample_extensions": [
-        "fastq.gz",
-        "fasta"
-    ],
-    "allowed_R1_delimiters": [
-      "_R1_",
-      "_R1.",
-      ".R1.",
-      "Forward",
-      "forward",
-      "_1_",
-      "_1.",
-      ".1."
-    ],
-    "allowed_R2_delimiters": [
-      "_R2_",
-      "_R2.",
-      ".R2.",
-      "Reverse",
-      "reverse",
-      "_2_",
-      "_2.",
-      ".2."
-    ],
     "GISAID_configuration": {
         "submitter": "GISAID_ID"
     },
