@@ -169,9 +169,9 @@ class RelecovMetadata:
                 else:
                     log.error(
                         f"Unknown map_field value for json data: \
-                        {str(map_field)}. Set as not provided"
+                        {str(map_field)}. Aborting"
                     )
-                    stderr.error(f"[red] Unknown value for: {map_field} aborting")
+                    stderr.error(f"[red] Unknown value for: {map_field}. Aborting")
                     sys.exit(1)
                 fields_to_add = {
                     x: "Not Provided" for x in json_fields["adding_fields"]
@@ -200,7 +200,8 @@ class RelecovMetadata:
         s_json["map_field"] = "collecting_lab_sample_id"
         s_json["adding_field"] = [
             "sequence_file_R1_fastq",
-            "sequence_file_R2_fastq" "sequence_file_R1_md5",
+            "sequence_file_R2_fastq",
+            "sequence_file_R1_md5",
             "sequence_file_R2_md5",
             "r1_fastq_filepath",
             "r2_fastq_filepath",
