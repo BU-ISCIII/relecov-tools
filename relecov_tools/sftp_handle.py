@@ -57,9 +57,8 @@ class SftpHandle:
             )
             self.abort_if_md5_mismatch = (
                 True
-                if config_json.get_topic_data(
-                    "sftp_handle", "abort_if_md5_mismatch"
-                    ) == "True"
+                if config_json.get_topic_data("sftp_handle", "abort_if_md5_mismatch")
+                == "True"
                 else False
             )
         else:
@@ -96,7 +95,8 @@ class SftpHandle:
                         True
                         if config_json.get_topic_data(
                             "sftp_handle", "abort_if_md5_mismatch"
-                            ) == "True"
+                        )
+                        == "True"
                         else False
                     )
                 self.sftp_user = config["sftp_user"]
