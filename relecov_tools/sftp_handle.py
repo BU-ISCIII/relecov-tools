@@ -38,8 +38,8 @@ class SftpHandle:
     ):
         """Initializes the sftp object"""
         config_json = ConfigJson()
-        self.allowed_sample_ext = config_json.get_configuration(
-            "allowed_sample_extensions"
+        self.allowed_sample_ext = config_json.get_topic_data(
+            "sftp_handle", "allowed_sample_extensions"
         )
         self.sftp_user = user
         self.sftp_passwd = passwd
@@ -48,16 +48,18 @@ class SftpHandle:
             self.sftp_server = config_json.get_topic_data(
                 "sftp_connection", "sftp_server"
             )
-            self.sftp_port = config_json.get_topic_data("sftp_connection", "sftp_port")
-            self.storage_local_folder = config_json.get_configuration(
-                "storage_local_folder"
+            self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
+            self.storage_local_folder = config_json.get_topic_data(
+                "sftp_handle", "storage_local_folder"
             )
-            self.metadata_tmp_folder = config_json.get_configuration(
-                "tmp_folder_for_metadata"
+            self.metadata_tmp_folder = config_json.get_topic_data(
+                "sftp_handle", "tmp_folder_for_metadata"
             )
             self.abort_if_md5_mismatch = (
                 True
-                if config_json.get_configuration("abort_if_md5_mismatch") == "True"
+                if config_json.get_topic_data(
+                    "sftp_handle", "abort_if_md5_mismatch"
+                    ) == "True"
                 else False
             )
         else:
@@ -76,14 +78,14 @@ class SftpHandle:
                 try:
                     self.storage_local_folder = config["storage_local_folder"]
                 except KeyError:
-                    self.storage_local_folder = config_json.get_configuration(
-                        "storage_local_folder"
+                    self.storage_local_folder = config_json.get_topic_data(
+                        "sftp_handle", "storage_local_folder"
                     )
                 try:
                     self.metadata_tmp_folder = config["tmp_metadata_folder"]
                 except KeyError:
-                    self.metadata_tmp_folder = config_json.get_configuration(
-                        "tmp_folder_for_metadata"
+                    self.metadata_tmp_folder = config_json.get_topic_data(
+                        "sftp_handle", "tmp_folder_for_metadata"
                     )
                 try:
                     self.abort_if_md5_mismatch = (
@@ -92,8 +94,9 @@ class SftpHandle:
                 except KeyError:
                     self.abort_if_md5_mismatch = (
                         True
-                        if config_json.get_configuration("abort_if_md5_mismatch")
-                        == "True"
+                        if config_json.get_topic_data(
+                            "sftp_handle", "abort_if_md5_mismatch"
+                            ) == "True"
                         else False
                     )
                 self.sftp_user = config["sftp_user"]
@@ -109,11 +112,11 @@ class SftpHandle:
             self.sftp_passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password"
             )
-        self.allowed_R1_delimiters = config_json.get_configuration(
-            "allowed_R1_delimiters"
+        self.allowed_R1_delimiters = config_json.get_topic_data(
+            "sftp_handle", "allowed_R1_delimiters"
         )
-        self.allowed_R2_delimiters = config_json.get_configuration(
-            "allowed_R2_delimiters"
+        self.allowed_R2_delimiters = config_json.get_topic_data(
+            "sftp_handle", "allowed_R2_delimiters"
         )
         self.client = None
 
