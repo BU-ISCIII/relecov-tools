@@ -107,7 +107,7 @@
             "label": "Host Age"
         },
         "covv_specimen": {
-            "Enums": [
+            "enum": [
                 "Blood [UBERON:0000178]",
                 "Fluid [UBERON:0006314]",
                 "Fluid (Cerebrospinal (CSF)) [UBERON:0001359]",
@@ -139,7 +139,7 @@
             "label": "Consensus sequence software name"
         },
         "covv_gender": {
-            "Enums": [
+            "enum": [
                 "Female [NCIT:C46110]",
                 "Male [NCIT:C46109]",
                 "Non-binary Gender [GSSO:000132]",
