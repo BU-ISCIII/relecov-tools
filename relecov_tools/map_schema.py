@@ -140,7 +140,7 @@ class MappingSchema:
                 "Invalid ontology for: %s", str([x for x in errors.keys()]).strip("[]")
             )
             stderr.print(
-                f"[red]Ontology values not found in relecov schema:\n", output_errs
+                f"[red]Ontology values not found in relecov schema:\n{output_errs}"
             )
         return mapped_dict
 
