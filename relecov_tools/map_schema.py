@@ -40,18 +40,20 @@ class MappingSchema:
                 config_json.get_topic_data("json_schemas", "relecov_schema"),
             )
         else:
-            if os.path.isfile(relecov_schema):
-                log.error("Relecov schema file %s does not exists", relecov_schema)
+            if not os.path.isfile(relecov_schema):
+                log.error("Relecov schema file %s does not exist", relecov_schema)
                 stderr.print(
-                    "[red] Relecov schema " + relecov_schema + "does not exists"
+                    "[red] Relecov schema " + relecov_schema + " does not exist"
                 )
                 exit(1)
         rel_schema_json = relecov_tools.utils.read_json_file(relecov_schema)
         try:
             Draft202012Validator.check_schema(rel_schema_json)
         except jsonschema.ValidationError:
-            log.error("Relecov schema does not fulfil Draft 202012 Validation ")
-            stderr.print("[red] Relecov schema does not fulfil Draft 202012 Validation")
+            log.error("Relecov schema does not fulfill Draft 202012 Validation ")
+            stderr.print(
+                "[red] Relecov schema does not fulfill Draft 202012 Validation"
+            )
             sys.exit(1)
         self.relecov_schema = rel_schema_json
 
@@ -91,7 +93,7 @@ class MappingSchema:
                 Draft202012Validator.check_schema(json_schema)
             except jsonschema.ValidationError:
                 stderr.print(
-                    "[red] Json schema does not fulfil Draft 202012 Validation"
+                    "[red] Json schema does not fulfill Draft 202012 Validation"
                 )
                 sys.exit(1)
         elif self.destination_schema == "ENA":
@@ -120,7 +122,7 @@ class MappingSchema:
         self.output_folder = output_folder
 
     def maping_schemas_based_on_geontology(self):
-        """Return a dictionnary with the properties of the mapped_to_schema as key and
+        """Return a dictionary with the properties of the mapped_to_schema as key and
         properties of Relecov Schema as value
         """
         mapped_dict = OrderedDict()
@@ -146,90 +148,36 @@ class MappingSchema:
 
                     map_sample_dict[item] = data[value]
                 except KeyError as e:
-                    log.warning("Property %s not set in the source data", e)
+                    log.info("Property %s not set in the source data", e)
             mapped_data.append(map_sample_dict)
         return mapped_data
 
     def additional_formating(self, mapped_json_data):
         """Update data like MD5 to split in two fields, one for R1 file and
-        second for R2
+        second for R2, and include fields with fixed values.
         """
+        config_json = ConfigJson()
+        additional_data = config_json.get_topic_data(
+            "ENA_fields", "additional_formating"
+        )
+        fixed_fields = config_json.get_topic_data("ENA_fields", "ena_fixed_fields")
+        not_provided_fields = config_json.get_configuration("ENA_fields")[
+            "map_not_provided_fields"
+        ]
         if self.destination_schema == "ENA":
             for idx in range(len(self.json_data)):
-                mapped_json_data[idx]["collector_name"] = "unknown"
-                mapped_json_data[idx]["file_format"] = "FASTQ"
-                mapped_json_data[idx]["study_type"] = "Whole Genome Sequencing"
-                mapped_json_data[idx][
-                    "study_title"
-                ] = "RELECOV Spanish Network for genomics surveillance"
-                mapped_json_data[idx]["study_abstract"] = mapped_json_data[idx][
-                    "study_title"
-                ]
-                mapped_json_data[idx]["broker_name"] = "Instituto de Salud Carlos III"
-                mapped_json_data[idx]["host health state"] = "not provided"
-                mapped_json_data[idx]["center_name"] = self.json_data[idx][
-                    "collecting_institution"
-                ]
-                mapped_json_data[idx]["library_name"] = self.json_data[idx][
-                    "library_preparation_kit"
-                ]
-                mapped_json_data[idx]["sample_title"] = self.json_data[idx][
-                    "sequencing_sample_id"
-                ]
-                mapped_json_data[idx]["sample_name"] = self.json_data[idx][
-                    "sequencing_sample_id"
-                ]
-                mapped_json_data[idx]["host subject id"] = self.json_data[idx][
-                    "sequencing_sample_id"
-                ]
-                mapped_json_data[idx]["study_alias"] = self.json_data[idx][
-                    "schema_name"
-                ]
-
-                mapped_json_data[idx]["sample_description"] = (
-                    self.json_data[idx]["anatomical_part"].split(" [", 1)[0]
-                    + " "
-                    + self.json_data[idx]["collection_method"].split(" [", 1)[0]
-                )
-                mapped_json_data[idx]["isolate"] = self.json_data[idx][
-                    "isolate_sample_id"
-                ]
-                mapped_json_data[idx]["platform"] = self.json_data[idx][
-                    "sequencing_instrument_platform"
-                ].upper()
-
-                mapped_json_data[idx]["authors"] = self.json_data[idx]["authors"]
-                mapped_json_data[idx]["design_description"] = (
-                    self.json_data[idx]["library_layout"].split(" [", 1)[0]
-                    + " "
-                    + self.json_data[idx]["library_preparation_kit"].split(" [", 1)[0]
-                    + " "
-                    + self.json_data[idx]["library_selection"].split(" [", 1)[0]
-                    + " "
-                    + self.json_data[idx]["library_source"].split(" [", 1)[0]
-                    + "  "
-                    + self.json_data[idx]["library_strategy"].split(" [", 1)[0]
-                )
-                mapped_json_data[idx]["insert_size"] = "0"
-                mapped_json_data[idx]["address"] = self.json_data[idx][
-                    "collecting_institution_address"
-                ]
-                "Adding all the 'not provided' fields that are not being captured"
-                config_json = ConfigJson()
-                fields = config_json.get_configuration("ENA_fields")[
-                    "map_not_provided_fields"
-                ]
-                mapped_json_data[idx]["r1_fastq_filepath"] = (
-                    self.json_data[idx]["r1_fastq_filepath"]
-                    + self.json_data[idx]["sequence_file_R1_fastq"]
-                )
-                mapped_json_data[idx]["r2_fastq_filepath"] = (
-                    self.json_data[idx]["r2_fastq_filepath"]
-                    + self.json_data[idx]["sequence_file_R2_fastq"]
-                )
-                for i, j in enumerate(fields):
-                    mapped_json_data[idx][j] = "not provided"
-
+                for key, value in fixed_fields.items():
+                    mapped_json_data[idx][key] = value
+                for key, _ in additional_data.items():
+                    formated_data = {
+                        x: " ".join(
+                            [self.json_data[idx][f].split(" [", 1)[0] for f in y]
+                        )
+                        for x, y in additional_data.items()
+                    }
+                    mapped_json_data[idx][key] = formated_data[key]
+                for _, value in enumerate(not_provided_fields):
+                    mapped_json_data[idx][value] = "Not Provided"
         return mapped_json_data
 
     def write_json_fo_file(self, mapped_json_data):
@@ -241,6 +189,7 @@ class MappingSchema:
             f_sub_name + "_" + time + "_" + self.destination_schema + "_mapped.json"
         )
         json_file = os.path.join(self.output_folder, file_name)
+        stderr.print("Writting mapped data to json file:", json_file)
         with open(json_file, "w", encoding="utf-8") as fh:
             fh.write(
                 json.dumps(
@@ -255,4 +204,7 @@ class MappingSchema:
         mapped_json_data = self.mapping_json_data(mapping_schema_dict)
         updated_json_data = self.additional_formating(mapped_json_data)
         self.write_json_fo_file(updated_json_data)
+        stderr.print(
+            f"[green]Mapping to {self.destination_schema} schema finished successfully"
+        )
         return
