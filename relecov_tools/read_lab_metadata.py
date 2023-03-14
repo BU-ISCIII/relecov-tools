@@ -5,6 +5,7 @@ import rich.console
 import os
 import sys
 import re
+from datetime import datetime
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 import relecov_tools.json_schema
@@ -318,9 +319,7 @@ class RelecovMetadata:
         extended_metadata = self.adding_fixed_fields(extended_metadata)
         completed_metadata = self.adding_ontology_to_enum(extended_metadata)
         file_name = (
-            "processed_"
-            + os.path.splitext(os.path.basename(self.metadata_file))[0]
-            + ".json"
+            "processed_metadata_lab_" + datetime.now().strftime("%Y_%m_%d") + ".json"
         )
         stderr.print("[blue] Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
