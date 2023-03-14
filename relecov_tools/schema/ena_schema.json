@@ -692,7 +692,7 @@
       "examples": [
         ""
       ],
-      "ontology": "NCIT:C14419",
+      "ontology": "GENEPIO:0001123",
       "type": "string",
       "description": "Name of the strain from which the sample was obtained..",
       "clasification": "Sample collection and processing",
@@ -1068,7 +1068,7 @@
       "examples": [
         "library_construction_protocol_1"
       ],
-      "ontology": "NCIT:C41111",
+      "ontology": "GENEPIO:0001450",
       "type": "string",
       "description": "",
       "clasification": "Sequencing",
