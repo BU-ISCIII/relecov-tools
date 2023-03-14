@@ -88,11 +88,8 @@ class RelecovMetadata:
     def adding_fixed_fields(self, m_data):
         """Include fixed data that are always the same for each samples"""
         p_data = self.configuration.get_topic_data("lab_metadata", "fixed_fields")
-        ena_data = self.configuration.get_topic_data("ENA_fields", "ena_fixed_fields")
         for idx in range(len(m_data)):
             for key, value in p_data.items():
-                m_data[idx][key] = value
-            for key, value in ena_data.items():
                 m_data[idx][key] = value
             m_data[idx]["schema_name"] = self.schema_name
             m_data[idx]["schema_version"] = self.schema_version
