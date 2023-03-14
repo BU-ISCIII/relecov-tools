@@ -127,7 +127,7 @@
       "label": "Numer of variants with effect"
     },
     "host_age_bin": {
-      "Enums": [
+      "enum": [
         "0 - 9 [GENEPIO:0100049]",
         "10 - 19 [GENEPIO:0100050]",
         "20 - 29 [GENEPIO:0100051]",
@@ -153,7 +153,7 @@
       ]
     },
     "anatomical_material": {
-      "Enums": [
+      "enum": [
         "Blood [UBERON:0000178]",
         "Fluid [UBERON:0006314]",
         "Fluid (Cerebrospinal (CSF)) [UBERON:0001359]",
@@ -208,7 +208,7 @@
       ]
     },
     "lab_host": {
-      "Enums": [
+      "enum": [
         "293/ACE2 Cell Line [GENEPIO:0100041]",
         "Caco2 Cell Line [BTO:0000195]",
         "Calu3 Cell Line [BTO:0002750]",
@@ -241,7 +241,7 @@
       "label": "Lab passage Host"
     },
     "anatomical_part": {
-      "Enums": [
+      "enum": [
         "Anus [UBERON:0001245]",
         "Duodenum [UBERON:0002114]",
         "Eye [UBERON:0000970]",
@@ -262,7 +262,7 @@
         "Esophagus [UBERON:0001043]",
         "Ethmoid sinus [UBERON:0002453]",
         "Nasal Cavity [UBERON:0001707]",
-        "Middle Nasal Turbinate [UBERON:0005921]",
+        "Middle Nasal Turbinate [UBERON:0001762]",
         "Inferior Nasal Turbinate [UBERON:0005922]",
         "Nasopharynx (NP) [UBERON:0001728]",
         "Oropharynx (OP) [UBERON:0001729]",
@@ -282,7 +282,7 @@
       "label": "Anatomical Structure"
     },
     "host_health_outcome": {
-      "Enums": [
+      "enum": [
         "Deceased [NCIT:C28554]",
         "Deteriorating [NCIT:C25254]",
         "Recovered [NCIT:C49498]",
@@ -459,7 +459,7 @@
       "label": "Commercial/Open-source/both"
     },
     "prior_sars_cov_2_antiviral_treatment": {
-      "Enums": [
+      "enum": [
         "Prior antiviral treatment [GENEPIO:0100037]",
         "No prior antiviral treatment [GENEPIO:0100233]",
         "Not Applicable [GENEPIO:0001619]",
@@ -476,7 +476,7 @@
       ]
     },
     "gene_name_2": {
-      "Enums": [
+      "enum": [
         "E gene (orf4) [GENEPIO:0100151]",
         "M gene (orf5) [GENEPIO:0100152]",
         "N gene (orf9) [GENEPIO:0100153]",
@@ -526,7 +526,7 @@
       "label": "Gene Name 2"
     },
     "body_product": {
-      "Enums": [
+      "enum": [
         "Breast Milk [UBERON:0001913]",
         "Feces [UBERON:0001988]",
         "Mucus [UBERON:0000912]",
@@ -576,9 +576,9 @@
       "label": "Host ethnicity"
     },
     "collection_device": {
-      "Enums": [
+      "enum": [
         "Air filter [ENVO:00003968]",
-        "Blood Collection Tube [OBI:0002859]",
+        "Blood Collection Tube [NCIT:C113122]",
         "Bronchoscope [OBI:0002826]",
         "Collection Container [OBI:0002088]",
         "Collection Cup [GENEPIO:0100026]",
@@ -610,7 +610,7 @@
       "label": "Collection Device"
     },
     "purpose_of_sequencing": {
-      "Enums": [
+      "enum": [
         "Baseline surveillance (random sampling) [GENEPIO:0100005]",
         "Targeted surveillance (non-random sampling) [GENEPIO:0100006]",
         "Priority surveillance projects [GENEPIO:0100007]",
@@ -681,7 +681,7 @@
       "label": "Depth of coverage threshold"
     },
     "specimen_processing": {
-      "Enums": [
+      "enum": [
         "Virus Passage [GENEPIO:0100039]",
         "RNA Re-Extraction (Post RT-PCR) [GENEPIO:0100040]",
         "Specimens Pooled [OBI:0600016]",
@@ -809,7 +809,7 @@
       "label": "Amplicon Version"
     },
     "host_vaccination_status": {
-      "Enums": [
+      "enum": [
         "Fully Vaccinated [GENEPIO:0100100]",
         "Partially Vaccinated [GENEPIO:0100101]",
         "Not Vaccinated [GENEPIO:0100102]",
@@ -887,7 +887,7 @@
       "label": "If lineage identification Is Other, Specify"
     },
     "location_of_exposure_geo_loc_name_country": {
-      "Enums": [
+      "enum": [
         "Afghanistan [GAZ:00006882]",
         "Albania [GAZ:00002953]",
         "Algeria [GAZ:00000563]",
@@ -1248,7 +1248,7 @@
       "label": "Diagnostic Pcr Ct Value 1"
     },
     "collection_method": {
-      "Enums": [
+      "enum": [
         "Amniocentesis [NCIT:C52009]",
         "Aspiration [NCIT:C15631]",
         "Suprapubic Aspiration [GENEPIO:0100028]",
@@ -1335,7 +1335,7 @@
       "examples": [
         "3/21/2020"
       ],
-      "ontology": "GENEPIO:0001179",
+      "ontology": "NCIT:C93644",
       "type": "string",
       "description": "The date on which the sample was received.",
       "format": "date",
@@ -1353,7 +1353,7 @@
       "label": "Quality control metrics "
     },
     "host_common_name": {
-      "Enums": [
+      "enum": [
         "Human [NCBITaxon:9606]",
         "Bat [NCBITaxon:9397]",
         "Cat [NCBITaxon:9685]",
@@ -1439,7 +1439,7 @@
       "label": "Authors"
     },
     "host_role": {
-      "Enums": [
+      "enum": [
         "Attendee [GENEPIO:0100249]",
         "Student [OMRSE:00000058]",
         "Patient [OMRSE:00000030]",
@@ -1534,7 +1534,7 @@
       "label": "GISAID Virus Name"
     },
     "geo_loc_name_country": {
-      "Enums": [
+      "enum": [
         "Afghanistan [GAZ:00006882]",
         "Albania [GAZ:00002953]",
         "Algeria [GAZ:00000563]",
@@ -1946,7 +1946,7 @@
       "format": "date"
     },
     "exposure_contact_level": {
-      "Enums": [
+      "enum": [
         "Direct (human-to-human contact) [TRANS:0000001]",
         "Indirect contact [GENEPIO:0100246]",
         "Close contact (face-to-face contact) [GENEPIO:0100247]",
@@ -1984,7 +1984,7 @@
       "label": "Sequencing Platforms "
     },
     "prior_sars_cov_2_infection": {
-      "Enums": [
+      "enum": [
         "Prior infection [GENEPIO:0100234]",
         "No prior infection [GENEPIO:0100236]",
         "Not Applicable [GENEPIO:0001619]",
@@ -2021,7 +2021,7 @@
       "label": "Sample ID given by originating laboratory"
     },
     "host_scientific_name": {
-      "Enums": [
+      "enum": [
         "Bos taurus [NCBITaxon:9913]",
         "Canis lupus familiaris [NCBITaxon:9615]",
         "Chiroptera [NCBITaxon:9397]",
@@ -2054,7 +2054,7 @@
       "label": "Host Scientific Name"
     },
     "host_disease": {
-      "Enums": [
+      "enum": [
         "COVID-19 [MONDO:0100096]",
         "Not Applicable [GENEPIO:0001619]",
         "Not Collected [GENEPIO:0001620]",
@@ -2169,7 +2169,7 @@
       "format": "date"
     },
     "exposure_event": {
-      "Enums": [
+      "enum": [
         "Mass Gathering [GENEPIO:0100237]",
         "Convention [GENEPIO:0100238]",
         "Convocation [GENEPIO:0100239]",
@@ -2217,7 +2217,7 @@
       ]
     },
     "host_gender": {
-      "Enums": [
+      "enum": [
         "Female [NCIT:C46110]",
         "Male [NCIT:C46109]",
         "Non-binary Gender [GSSO:000132]",
@@ -2275,7 +2275,7 @@
       ]
     },
     "exposure_setting": {
-      "Enums": [
+      "enum": [
         "Human Exposure [ECTO:3000005]",
         "Contact with Known COVID-19 Case [GENEPIO:0100184]",
         "Contact with Patient [GENEPIO:0100185]",
@@ -2360,7 +2360,7 @@
       ]
     },
     "gene_name_1": {
-      "Enums": [
+      "enum": [
         "E gene (orf4) [GENEPIO:0100151]",
         "M gene (orf5) [GENEPIO:0100152]",
         "N gene (orf9) [GENEPIO:0100153]",
@@ -2440,7 +2440,7 @@
       "label": "reference genome accession"
     },
     "host_residence_country": {
-      "Enums": [
+      "enum": [
         "Afghanistan [GAZ:00006882]",
         "Albania [GAZ:00002953]",
         "Algeria [GAZ:00000563]",
@@ -2745,7 +2745,7 @@
       "label": "Lineage/clade analysis software version"
     },
     "complications": {
-      "Enums": [
+      "enum": [
         "Abnormal blood oxygen level [HP:0500165]",
         "Acute kidney injury [HP:0001919]",
         "Acute lung injury [MONDO:0015796]",
@@ -2858,7 +2858,7 @@
       "label": "umbrella bioproject accession"
     },
     "biomaterial_extracted": {
-      "Enums": [
+      "enum": [
         "mRNA (cDNA) [OBI:0002754]",
         "RNA (Total) [OBI:0000895]",
         "RNA (Poly-A) [OBI:0000869]",
@@ -2879,7 +2879,7 @@
       "label": "Biomaterial Extracted"
     },
     "host_age_unit": {
-      "Enums": [
+      "enum": [
         "months [UO:0000035]",
         "years [UO:0000036]",
         "Not Applicable [GENEPIO:0001619]",
@@ -2906,7 +2906,7 @@
       "label": "Geo Loc Latitude"
     },
     "environmental_material": {
-      "Enums": [
+      "enum": [
         "Air vent [ENVO:03501208]",
         "Banknote [ENVO:00003896]",
         "Bed rail [ENVO:03501209]",
@@ -2966,7 +2966,7 @@
       "label": "Submitting Institution Email"
     },
     "environmental_site": {
-      "Enums": [
+      "enum": [
         "Acute care facility [ENVO:03501135]",
         "Animal house [ENVO:00003040]",
         "Bathroom [ENVO:01000422]",
@@ -3004,7 +3004,7 @@
       "label": "Anthropogenic Geographic Feature"
     },
     "pre_existing_conditions_and_risk_factors": {
-      "Enums": [
+      "enum": [
         "Age 60+ [VO:0004925]",
         "Anemia [HP:0001903]",
         "Anorexia [HP:0002039]",
@@ -3119,7 +3119,7 @@
       "format": "date"
     },
     "variant_designation": {
-      "Enums": [
+      "enum": [
         "Variant of Interest (VOI) [GENEPIO:0100082]",
         "Variant of Concern (VOC) [GENEPIO:0100083]",
         "Variant Under Monitoring (VUM) [GENEPIO:0100279]"
@@ -3164,7 +3164,7 @@
       "label": "Variant Calling params"
     },
     "sample_collected_in_quarantine": {
-      "Enums": [
+      "enum": [
         "Yes [NCIT:C49488]",
         "No [NCIT:C49487]",
         "Not Applicable [GENEPIO:0001619]",
@@ -3191,7 +3191,7 @@
       "label": "Originating Laboratory"
     },
     "sequencing_instrument": {
-      "Enums": [
+      "enum": [
         "Illumina sequencing instrument [GENEPIO:0100105]",
         "Illumina Genome Analyzer [GENEPIO:0100106]",
         "Illumina Genome Analyzer II [GENEPIO:0100107]",
@@ -3254,7 +3254,7 @@
       "label": "Sequencing Instrument Model"
     },
     "host_health_status_details": {
-      "Enums": [
+      "enum": [
         "Hospitalized [NCIT:C25179]",
         "Hospitalized (Non-ICU) [GENEPIO:0100045]",
         "Hospitalized (ICU) [GENEPIO:0100046]",
@@ -3287,7 +3287,7 @@
       "label": "Sample ID given by originating laboratory"
     },
     "host_health_state": {
-      "Enums": [
+      "enum": [
         "Asymptomatic [NCIT:C3833]",
         "Deceased [NCIT:C28554]",
         "Healthy [NCIT:C115935]",
@@ -3307,7 +3307,7 @@
       ]
     },
     "signs_and_symptoms": {
-      "Enums": [
+      "enum": [
         "Abnormal lung auscultation [HP:0030829]",
         "Ageusia (complete loss of taste) [HP:0041051]",
         "Parageusia (distorted sense of taste) [HP:0031249]",
@@ -3449,12 +3449,13 @@
       "ontology": "GENEPIO:0001461",
       "type": "string",
       "description": "The name of the consensus sequence file.",
+      "label": "Consensus sequence filename",
       "examples": [
         "ncov123assembly.fasta"
       ]
     },
     "purpose_of_sequencing_details": {
-      "Enums": [
+      "enum": [
         "Screened for S gene target failure (S dropout)",
         "Screened for mink variants",
         "Screened for B.1.1.7 variant",
@@ -3508,7 +3509,7 @@
       ]
     },
     "organism": {
-      "Enums": [
+      "enum": [
         "Coronaviridae [NCBITaxon:11118]",
         "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]",
         "Not Applicable [GENEPIO:0001619]",
@@ -3517,7 +3518,7 @@
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
-      "ontology": "GENEPIO:0001191",
+      "ontology": "NCIT:C43459",
       "type": "string",
       "description": "Taxonomic name of the organism.",
       "examples": [
@@ -3527,7 +3528,7 @@
       "label": "Organism"
     },
     "purpose_of_sampling": {
-      "Enums": [
+      "enum": [
         "Cluster/Outbreak Investigation [GENEPIO:0100001]",
         "Diagnostic Testing [GENEPIO:0100002]",
         "Research [GENEPIO:0100003]",
@@ -3539,7 +3540,7 @@
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
-      "ontology": "NCIT_C146997",
+      "ontology": "GENEPIO:0001198",
       "type": "string",
       "description": "The reason that the sample was collected.",
       "examples": [
