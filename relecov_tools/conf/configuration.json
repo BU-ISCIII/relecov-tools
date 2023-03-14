@@ -4,7 +4,8 @@
             "host_disease": "COVID-19",
             "tax_id": "2697049",
             "organism": "Severe acute respiratory syndrome coronavirus 2",
-            "study_type": "Whole Genome Sequencing"
+            "study_type": "Whole Genome Sequencing",
+            "collector_name": "Not Provided"
         },
         "metadata_lab_heading": [
             "Public Health sample id (SIVIES)",
@@ -449,7 +450,6 @@
             "host behaviour"
         ],
         "ena_fixed_fields": {
-          "collector_name": "unknown",
           "broker_name": "Instituto de Salud Carlos III",
           "file_format": "FASTQ",
           "study_title": "RELECOV Spanish Network for genomics surveillance",
