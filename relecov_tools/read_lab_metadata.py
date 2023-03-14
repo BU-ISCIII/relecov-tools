@@ -88,8 +88,11 @@ class RelecovMetadata:
     def adding_fixed_fields(self, m_data):
         """Include fixed data that are always the same for each samples"""
         p_data = self.configuration.get_topic_data("lab_metadata", "fixed_fields")
+        ena_data = self.configuration.get_topic_data("ENA_fields", "ena_fixed_fields")
         for idx in range(len(m_data)):
             for key, value in p_data.items():
+                m_data[idx][key] = value
+            for key, value in ena_data.items():
                 m_data[idx][key] = value
             m_data[idx]["schema_name"] = self.schema_name
             m_data[idx]["schema_version"] = self.schema_version
@@ -132,7 +135,7 @@ class RelecovMetadata:
     def adding_ontology_to_enum(self, m_data):
         """Read the schema to get the properties enum and, for those fields
         which have an enum property value, replace the value for the one
-        that is defined in the schema
+        that is defined in the schema.
         """
         enum_dict = {}
         for prop, values in self.relecov_sch_json["properties"].items():
@@ -151,7 +154,7 @@ class RelecovMetadata:
                     if m_data[idx][key] in e_values:
                         m_data[idx][key] = e_values[m_data[idx][key]]
                     else:
-                        log.error("No ontology could be added")
+                        log.error(f"No ontology could be added in {str(key)}")
                         continue
 
         return m_data
@@ -164,14 +167,21 @@ class RelecovMetadata:
             try:
                 m_data[idx].update(json_data[m_data[idx][map_field]])
             except KeyError as error:
-                if str(error).lower() == "not provided":
+                if str(error.args[0]).lower() == "not provided":
                     log.error("Label was not provided, auto-completing columns")
+                    stderr.print(
+                        f"Label {map_field} was not provided in sample {idx}, \
+                        auto-completing"
+                    )
                 else:
                     log.error(
-                        f"Unknown map_field value for json data: \
+                        f"Unknown map_field value {error} for json data: \
                         {str(map_field)}. Aborting"
                     )
-                    stderr.error(f"[red] Unknown value for: {map_field}. Aborting")
+                    stderr.print(
+                        f"[red] Unknown value {error} for: {map_field}\
+                        in sample {idx}. Aborting"
+                    )
                     sys.exit(1)
                 fields_to_add = {
                     x: "Not Provided" for x in json_fields["adding_fields"]
@@ -198,11 +208,11 @@ class RelecovMetadata:
         stderr.print("[blue] Processing sample data file")
         s_json = {}
         s_json["map_field"] = "collecting_lab_sample_id"
-        s_json["adding_field"] = [
+        s_json["adding_fields"] = [
+            "fastq_r1_md5",
+            "fastq_r2_md5",
             "sequence_file_R1_fastq",
             "sequence_file_R2_fastq",
-            "sequence_file_R1_md5",
-            "sequence_file_R2_md5",
             "r1_fastq_filepath",
             "r2_fastq_filepath",
         ]
