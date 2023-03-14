@@ -126,14 +126,22 @@ class MappingSchema:
         properties of Relecov Schema as value
         """
         mapped_dict = OrderedDict()
+        errors = {}
         for key, values in self.mapped_to_schema["properties"].items():
             if values["ontology"] == "0":
                 continue
             try:
                 mapped_dict[key] = self.ontology[values["ontology"]]
             except KeyError as e:
-                log.error("Invalid ontology for %s", key)
-                stderr.print(f"[red] Ontology value {e} not in relecov schema")
+                errors[key] = str(e)
+        if len(errors) >= 1:
+            output_errs = "\n".join(f"{k}:{v}" for k, v in errors.items())
+            log.error(
+                "Invalid ontology for: %s", str([x for x in errors.keys()]).strip("[]")
+            )
+            stderr.print(
+                f"[red]Ontology values not found in relecov schema:\n", output_errs
+            )
         return mapped_dict
 
     def mapping_json_data(self, mapping_schema_dict):
@@ -183,10 +191,9 @@ class MappingSchema:
     def write_json_fo_file(self, mapped_json_data):
         """Write metadata to json file"""
         os.makedirs(self.output_folder, exist_ok=True)
-        time = datetime.now().strftime("%Y_%m_%d_%H_%M")
-        f_sub_name = os.path.basename(self.json_file).split(".")[0]
+        time = datetime.now().strftime("%Y_%m_%d")
         file_name = (
-            f_sub_name + "_" + time + "_" + self.destination_schema + "_mapped.json"
+            "mapped_metadata" + "_" + self.destination_schema + "_" + time + ".json"
         )
         json_file = os.path.join(self.output_folder, file_name)
         stderr.print("Writting mapped data to json file:", json_file)
@@ -204,7 +211,5 @@ class MappingSchema:
         mapped_json_data = self.mapping_json_data(mapping_schema_dict)
         updated_json_data = self.additional_formating(mapped_json_data)
         self.write_json_fo_file(updated_json_data)
-        stderr.print(
-            f"[green]Mapping to {self.destination_schema} schema finished successfully"
-        )
+        stderr.print(f"[green]Finished mapping to {self.destination_schema} schema")
         return
