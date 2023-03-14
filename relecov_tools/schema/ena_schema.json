@@ -104,7 +104,7 @@
       ]
     },
     "geographic location (country and/or sea)": {
-      "Enums": [
+      "enum": [
         "Afghanistan [GAZ:00006882]",
         "Albania [GAZ:00002953]",
         "Algeria [GAZ:00000563]",
@@ -423,7 +423,7 @@
       "label": "Geo Loc Longitude"
     },
     "isolate": {
-      "ontology": "GENEPIO:0001123",
+      "ontology": "GENEPIO:0001644",
       "type": "string",
       "description": "Identifier of the specific isolate.",
       "examples": [
@@ -456,7 +456,7 @@
       "clasification": "Sample collection and processing"
     },
     "isolation source host-associated": {
-      "Enums": [
+      "enum": [
         "Blood [UBERON:0000178]",
         "Fluid [UBERON:0006314]",
         "Fluid (Cerebrospinal (CSF)) [UBERON:0001359]",
@@ -482,7 +482,7 @@
       "label": "Specimen source"
     },
     "isolation source non-host-associated": {
-      "Enums": [
+      "enum": [
         "Air vent [ENVO:03501208]",
         "Banknote [ENVO:00003896]",
         "Bed rail [ENVO:03501209]",
@@ -532,7 +532,7 @@
       "label": "Environmental Material"
     },
     "host common name": {
-      "Enums": [
+      "enum": [
         "Human [NCBITaxon:9606]",
         "Bat [NCBITaxon:9397]",
         "Cat [NCBITaxon:9685]",
@@ -563,7 +563,7 @@
       "table": "sample"
     },
     "host scientific name": {
-      "Enums": [
+      "enum": [
         "Bos taurus [NCBITaxon:9913]",
         "Canis lupus familiaris [NCBITaxon:9615]",
         "Chiroptera [NCBITaxon:9397]",
@@ -602,7 +602,7 @@
       "examples": [
         "e.g. #131"
       ],
-      "ontology": "GENEPIO:0001398",
+      "ontology": "GENEPIO:0000079",
       "type": "string",
       "description": "a unique identifier by which each subject can be referred to, de-identified.",
       "clasification": "Host information",
@@ -765,7 +765,7 @@
       ]
     },
     "host sex": {
-      "Enums": [
+      "enum": [
         "Female [NCIT:C46110]",
         "Male [NCIT:C46109]",
         "Non-binary Gender [GSSO:000132]",
@@ -800,7 +800,7 @@
       "label": "Additional Host Information"
     },
     "instrument_model": {
-      "Enums": [
+      "enum": [
         "Illumina sequencing instrument [GENEPIO:0100105]",
         "Illumina Genome Analyzer [GENEPIO:0100106]",
         "Illumina Genome Analyzer II [GENEPIO:0100107]",
@@ -940,7 +940,7 @@
       ]
     },
     "scientific_name": {
-      "Enums": [
+      "enum": [
         "Coronaviridae [NCBITaxon:11118]",
         "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]",
         "Not Applicable [GENEPIO:0001619]",
@@ -1057,7 +1057,7 @@
       "examples": [
         "RANDOM PCR"
       ],
-      "ontology": "GENPIO_0001940",
+      "ontology": "GENEPIO_0001940",
       "type": "string",
       "description": "Library capture method.",
       "classification": "Sequencing",
@@ -1079,31 +1079,31 @@
     },
     "library_strategy": {
       "enum": [
-        "Bisultife-Seq strategy [GENPIO:0001975]",
-        "CTS strategy [GENPIO:0001978]",
-        "ChIP-Seq strategy [GENPIO:0001979]",
-        "DNase-Hypersensitivity strategy [GENPIO:0001980]",
-        "EST strategy [GENPIO:0001981]",
-        "FL-cDNA strategy [GENPIO:0001983]",
-        "MB-Seq strategy [GENPIO:0001984]",
-        "MNase-Seq strategy [GENPIO:0001985]",
-        "MRE-Seq strategy [GENPIO:0001986]",
-        "MeDIP-Seq strategy [GENPIO:0001987]",
-        "RNA-Seq strategy [GENPIO:0001990]",
-        "WCS strategy [GENPIO:0001991]",
-        "WGS strategy [GENPIO:0001992]",
-        "WXS strategy [GENPIO:0001993]",
-        "Amplicon [GENPIO:0001974]",
-        "Clone end strategy [GENPIO:0001976]",
-        "Clone strategy [GENPIO:0001977]",
-        "Finishing strategy [GENPIO:0001982]",
-        "Other library strategy [GENPIO:0001988]",
-        "Pool clone strategy [GENPIO:0001989]"
+        "Bisultife-Seq strategy [GENEPIO:0001975]",
+        "CTS strategy [GENEPIO:0001978]",
+        "ChIP-Seq strategy [GENEPIO:0001979]",
+        "DNase-Hypersensitivity strategy [GENEPIO:0001980]",
+        "EST strategy [GENEPIO:0001981]",
+        "FL-cDNA strategy [GENEPIO:0001983]",
+        "MB-Seq strategy [GENEPIO:0001984]",
+        "MNase-Seq strategy [GENEPIO:0001985]",
+        "MRE-Seq strategy [GENEPIO:0001986]",
+        "MeDIP-Seq strategy [GENEPIO:0001987]",
+        "RNA-Seq strategy [GENEPIO:0001990]",
+        "WCS strategy [GENEPIO:0001991]",
+        "WGS strategy [GENEPIO:0001992]",
+        "WXS strategy [GENEPIO:0001993]",
+        "Amplicon [GENEPIO:0001974]",
+        "Clone end strategy [GENEPIO:0001976]",
+        "Clone strategy [GENEPIO:0001977]",
+        "Finishing strategy [GENEPIO:0001982]",
+        "Other library strategy [GENEPIO:0001988]",
+        "Pool clone strategy [GENEPIO:0001989]"
       ],
       "examples": [
         "WGS"
       ],
-      "ontology": "GENPIO_0001973",
+      "ontology": "GENEPIO_0001973",
       "type": "string",
       "description": "Overall sequencing strategy or approach.",
       "classification": "Sequencing",
@@ -1127,7 +1127,7 @@
       "examples": [
         "e.g PAIRED"
       ],
-      "ontology": "GENEPIO_0001995",
+      "ontology": "GENEPIO:0001450",
       "type": "string",
       "description": "The submitter's name for this library.",
       "clasification": "Sequencing",
@@ -1217,7 +1217,7 @@
       "examples": [
         "Whole-genome sequences of SARS-CoV-2 from oro-pharyngeal swabs obtained from Belgian Covid-19 patients."
       ],
-      "ontology": "NCIT:C93415",
+      "ontology": "OPMI:0000380",
       "type": "string",
       "description": " Briefly describes the goals, purpose, and scope of the Study.  This need not be listed if it can be inherited from a referenced publication.",
       "clasification": "Submission ENA",
@@ -1226,7 +1226,7 @@
         "study"
       ]
     },
-    "sample_alias": {
+    "sample_name": {
       "examples": [
         "s_20201007_026"
       ],
@@ -1234,7 +1234,7 @@
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
-      "label": "Sample alias",
+      "label": "Sample name",
       "table": [
         "sample"
       ]
@@ -1316,6 +1316,38 @@
       "description": "",
       "clasification": "Submission ENA",
       "label": "Broker Name"
+    },
+    "center_name": {
+      "examples": [
+        "P17157_1007"
+      ],
+      "ontology": "GENEPIO:0001153",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Originating Laboratory"
+    },
+    "authors": {
+      "examples": [
+          ""
+      ],
+      "ontology": "GENEPIO:0001517",
+      "type": "string",
+      "description": "",
+      "classification": "Public databases",
+      "label": "Authors",
+      "fill_mode": "batch"
+    },
+    "address": {
+      "examples": [
+          "655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"
+      ],
+      "ontology": "GENEPIO:0001158",
+      "type": "string",
+      "description": "The mailing address of the agency submitting the sample.",
+      "classification": "Sample collection and processing",
+      "label": "Originating Laboratory Address",
+      "fill_mode": "batch"
     }
   }
 }
