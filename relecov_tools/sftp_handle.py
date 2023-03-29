@@ -35,7 +35,7 @@ class SftpHandle:
         user_relecov=None,
         password_relecov=None,
         output_location=None,
-        target_folders=None
+        target_folders=None,
     ):
         """Initializes the sftp object"""
         config_json = ConfigJson()
@@ -46,9 +46,7 @@ class SftpHandle:
         self.sftp_passwd = passwd
         self.target_folders = target_folders
         if conf_file is None:
-            self.sftp_server = config_json.get_topic_data(
-                "sftp_handle", "sftp_server"
-            )
+            self.sftp_server = config_json.get_topic_data("sftp_handle", "sftp_server")
             self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
             self.storage_local_folder = config_json.get_topic_data(
                 "sftp_handle", "storage_local_folder"
