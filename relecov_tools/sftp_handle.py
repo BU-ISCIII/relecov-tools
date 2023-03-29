@@ -34,7 +34,8 @@ class SftpHandle:
         conf_file=None,
         user_relecov=None,
         password_relecov=None,
-        target_folders=None,
+        output_location=None,
+        target_folders=None
     ):
         """Initializes the sftp object"""
         config_json = ConfigJson()
@@ -46,7 +47,7 @@ class SftpHandle:
         self.target_folders = target_folders
         if conf_file is None:
             self.sftp_server = config_json.get_topic_data(
-                "sftp_connection", "sftp_server"
+                "sftp_handle", "sftp_server"
             )
             self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
             self.storage_local_folder = config_json.get_topic_data(
@@ -106,8 +107,10 @@ class SftpHandle:
                 log.error("Invalid configuration file %s", e)
                 stderr.print("[red] Invalid configuration file {e} !")
                 sys.exit(1)
+        if output_location is not None:
+            self.storage_local_folder = output_location
         if self.sftp_user is None:
-            self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the userid")
+            self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if self.sftp_passwd is None:
             self.sftp_passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password"
@@ -257,7 +260,6 @@ class SftpHandle:
             log.error("wrong direction parameter, aborting")
             return False
         matching = [True for x in valid_delimiters if x in f_name]
-        stderr.print(matching)
         if len(matching) >= 1:
             return True
         else:
@@ -285,8 +287,6 @@ class SftpHandle:
             stderr.print("[red] Unable to copy Metadata file")
             return False
         data = copy.deepcopy(file_list)
-        # valid_R1_extensions = ""
-        # valid_R2_extensions = ""
         for s_name, values in file_list.items():
             for _, f_name in values.items():
                 if not f_name.endswith(tuple(self.allowed_sample_ext)):
@@ -449,7 +449,7 @@ class SftpHandle:
                 stderr.print(f"Files that mismatch: {str(mismatch_files)}")
             else:
                 stderr.print(
-                    "Showing some of the mismatches, check logs to see all of them: %s",
+                    "Showing some of the mismatches, use --log-file to see all of them: %s",
                     str(mismatch_files[0:9]),
                 )
             log.error(f"List of files that mismatch: {str(mismatch_files)}")
@@ -545,7 +545,7 @@ class SftpHandle:
                 if len(corrupted) > 0 and self.abort_if_md5_mismatch:
                     log.error("Stopping because of corrupted files %s", corrupted)
                     stderr.print(
-                        f"[red] Stop processing folder {folder} because of corrupted files {corrupted}"
+                        f"[red] Stopped processing folder {folder} due to corrupted files {corrupted}"
                     )
                     continue
             meta_file = self.find_metadata_file(result_data["local_folder"])
