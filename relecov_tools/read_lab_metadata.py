@@ -87,7 +87,7 @@ class RelecovMetadata:
         self.schema_version = self.relecov_sch_json["version"]
 
     def adding_fixed_fields(self, m_data):
-        """Include fixed data that are always the same for each samples"""
+        """Include fixed data that are always the same for every sample"""
         p_data = self.configuration.get_topic_data("lab_metadata", "fixed_fields")
         for idx in range(len(m_data)):
             for key, value in p_data.items():
@@ -97,9 +97,7 @@ class RelecovMetadata:
         return m_data
 
     def adding_copy_from_other_field(self, m_data):
-        """Add in a new field the information that is already set in another
-        field.
-        """
+        """Add a new field with information based in another field."""
         p_data = self.configuration.get_topic_data(
             "lab_metadata", "required_copy_from_other_field"
         )
@@ -109,8 +107,7 @@ class RelecovMetadata:
         return m_data
 
     def adding_post_processing(self, m_data):
-        """Add the fields that requires to set based on the existing value
-        in other field
+        """Add fields which values require post processing
         """
         p_data = self.configuration.get_topic_data(
             "lab_metadata", "required_post_processing"
@@ -169,7 +166,7 @@ class RelecovMetadata:
                     log.error("Label was not provided, auto-completing columns")
                     stderr.print(
                         f"Label {map_field} was not provided in sample {idx}, \
-                        auto-completing"
+                        auto-completing with Not Provided"
                     )
                 else:
                     log.error(
@@ -188,8 +185,7 @@ class RelecovMetadata:
         return m_data
 
     def adding_fields(self, metadata):
-        """Add information that requires to handle json files to include in
-        the fields"""
+        """Add information located inside various json file as fields"""
 
         for key, values in self.json_req_files.items():
             stderr.print(f"[blue] Processing {key}")
@@ -232,10 +228,10 @@ class RelecovMetadata:
         return c_files
 
     def read_metadata_file(self):
-        """Read the input metadata file from row 4, changes the metadata heading
+        """Reads the input metadata file from row 4, changes the metadata heading
         with their property name values defined in schema.
         Convert the date colunms value to the dd/mm/yyyy format.
-        Return list of dict with data, and errors
+        Return list of dicts with data and errors
         """
         heading_row_number = 4
         ws_metadata_lab = relecov_tools.utils.read_excel_file(
