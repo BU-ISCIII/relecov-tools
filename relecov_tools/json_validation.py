@@ -36,12 +36,12 @@ class SchemaValidation:
 
         if json_data_file is None:
             json_data_file = relecov_tools.utils.prompt_path(
-                msg="Select the json file to validate"
+                msg="Select the json file to be validated"
             )
 
         if out_folder is None:
             self.out_folder = relecov_tools.utils.prompt_path(
-                msg="Select the folder where to save excel with invalid data"
+                msg="Select the folder where excel file with invalid data will be saved"
             )
         else:
             self.out_folder = out_folder
@@ -121,7 +121,7 @@ class SchemaValidation:
             stderr.print("[red] Some of the Samples are not validate")
             if metadata is None:
                 metadata = relecov_tools.utils.prompt_path(
-                    msg="Select the metadata file to select those samples not validated."
+                    msg="Select the metadata file to select those not-validated samples."
                 )
             if not os.path.isfile(metadata):
                 log.error("Metadata file %s does not exist", metadata)
@@ -179,6 +179,3 @@ class SchemaValidation:
         self.validate_schema()
         invalid_json = self.validate_instances()
         self.create_invalid_metadata(invalid_json, self.metadata, self.out_folder)
-
-        # Enviar los errores por correo
-        # logging.handlers.SMTPHandler(mailhost=("smtp.gmail.com", 465), fromaddr=correo_isciii, toaddrs=correo_usuario, subject="Validation errors", credentials=(usurario,contraseña), secure=None, timeout=1.0)
