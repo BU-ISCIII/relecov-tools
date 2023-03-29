@@ -107,8 +107,7 @@ class RelecovMetadata:
         return m_data
 
     def adding_post_processing(self, m_data):
-        """Add fields which values require post processing
-        """
+        """Add fields which values require post processing"""
         p_data = self.configuration.get_topic_data(
             "lab_metadata", "required_post_processing"
         )

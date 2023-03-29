@@ -155,10 +155,24 @@ def relecov_tools_cli(verbose, log_file):
     default=None,
     help="Flag: Select which folders will be downloaded giving [paths] or via prompt",
 )
-def download(user, password, conf_file, user_relecov, password_relecov, output_location, target_folders):
+def download(
+    user,
+    password,
+    conf_file,
+    user_relecov,
+    password_relecov,
+    output_location,
+    target_folders,
+):
     """Download files located in sftp server."""
     sftp_connection = relecov_tools.sftp_handle.SftpHandle(
-        user, password, conf_file, user_relecov, password_relecov, output_location, target_folders
+        user,
+        password,
+        conf_file,
+        user_relecov,
+        password_relecov,
+        output_location,
+        target_folders,
     )
     sftp_connection.download()
 
