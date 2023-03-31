@@ -145,7 +145,7 @@ def relecov_tools_cli(verbose, log_file):
     "-o",
     "--output_location",
     default=None,
-    help="Flag: Select location for downloaded files",
+    help="Flag: Select location for downloaded files, overrides config file location",
 )
 @click.option(
     "-t",
