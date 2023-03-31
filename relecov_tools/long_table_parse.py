@@ -93,23 +93,8 @@ class LongTableParse:
         for heading in self.long_table_heading:
             heading_index[heading] = headings_from_csv.index(heading)
 
-        aux_dict = {
-            "Chromosome": "CHROM",
-            "Variant": {"pos": "POS", "alt": "ALT", "ref": "REF"},
-            "Filter": "FILTER",
-            "VariantInSample": {
-                "dp": "DP",
-                "ref_dp": "REF_DP",
-                "alt_dp": "ALT_DP",
-                "af": "AF",
-            },
-            "Effect": "EFFECT",
-            "VariantAnnotation": {
-                "hgvs_c": "HGVS_C",
-                "hgvs_p": "HGVS_P",
-                "hgvs_p_1_letter": "HGVS_P_1LETTER",
-            },
-        }
+        config = ConfigJson()
+        aux_dict = config.get_configuration("long_table_parse_aux")
 
         samp_dict = {}
         for line in lines[1:]:
