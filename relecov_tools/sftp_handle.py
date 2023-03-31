@@ -51,9 +51,6 @@ class SftpHandle:
             self.storage_local_folder = config_json.get_topic_data(
                 "sftp_handle", "storage_local_folder"
             )
-            self.metadata_tmp_folder = config_json.get_topic_data(
-                "sftp_handle", "tmp_folder_for_metadata"
-            )
             self.abort_if_md5_mismatch = (
                 True
                 if config_json.get_topic_data("sftp_handle", "abort_if_md5_mismatch")
@@ -78,12 +75,6 @@ class SftpHandle:
                 except KeyError:
                     self.storage_local_folder = config_json.get_topic_data(
                         "sftp_handle", "storage_local_folder"
-                    )
-                try:
-                    self.metadata_tmp_folder = config["tmp_metadata_folder"]
-                except KeyError:
-                    self.metadata_tmp_folder = config_json.get_topic_data(
-                        "sftp_handle", "tmp_folder_for_metadata"
                     )
                 try:
                     self.abort_if_md5_mismatch = (
@@ -263,13 +254,13 @@ class SftpHandle:
         else:
             return False
 
-    def create_tmp_files_with_metadata_info(
+    def create_files_with_metadata_info(
         self, local_folder, file_list, md5_data, metadata_file
     ):
         """Copy metadata file from folder and create a file with the sample
         names
         """
-        out_folder = self.metadata_tmp_folder
+        out_folder = self.storage_local_folder
         os.makedirs(out_folder, exist_ok=True)
         prefix_file_name = "_".join(local_folder.split("/")[-2:])
         new_metadata_file = "metadata_lab_" + prefix_file_name + ".xlsx"
@@ -296,6 +287,13 @@ class SftpHandle:
                     data[s_name]["r2_fastq_filepath"] = md5_data[f_name][0]
                     data[s_name]["fastq_r2_md5"] = md5_data[f_name][1]
                 else:
+                    log.error(
+                        "Sample %s does not have a valid R1 or R2 delimiter", f_name
+                    )
+                    stderr.print(
+                        f"[red]Orientation for sample {s_name} could not be ensured. \
+                    Not included in metadata"
+                    )
                     pass
         with open(sample_data_path, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
@@ -340,12 +338,33 @@ class SftpHandle:
         meta_column_list = config_json.get_topic_data(
             "lab_metadata", "metadata_lab_heading"
         )
-        index_fastq_r1 = meta_column_list.index("Sequence file R1 fastq")
-        index_fastq_r2 = meta_column_list.index("Sequence file R2 fastq")
-        for row in islice(ws_metadata_lab.values, 4, ws_metadata_lab.max_row):
-            if row[2] is not None:
+        header_row = [
+            idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if "CAMPO" in x
+        ][0]
+        metadata_header = [x.value for x in ws_metadata_lab[header_row]]
+        if meta_column_list != metadata_header[1:]:
+            diffs = [
+                x
+                for x in (metadata_header[1:] + meta_column_list)
+                if x not in meta_column_list or x not in metadata_header
+            ]
+            log.error(
+                "Config field metadata_lab_heading is different from .xlsx header"
+            )
+            stderr.print(
+                "[red]Header in metadata file is different from config file, aborting"
+            )
+            stderr.print("[red]Differences: ", diffs)
+            sys.exit(1)
+        index_sampleID = metadata_header.index(
+            "Sample ID given by originating laboratory"
+        )
+        index_fastq_r1 = metadata_header.index("Sequence file R1 fastq")
+        index_fastq_r2 = metadata_header.index("Sequence file R2 fastq")
+        for row in islice(ws_metadata_lab.values, header_row, ws_metadata_lab.max_row):
+            if row[index_sampleID] is not None:
                 try:
-                    s_name = str(row[2])
+                    s_name = str(row[index_sampleID])
                 except ValueError as e:
                     stderr.print("[red] Unable to convert to string. ", e)
                 if s_name not in sample_file_list:
@@ -357,11 +376,14 @@ class SftpHandle:
                         index_fastq_r1
                     ]
                 else:
+                    # import pdb; pdb.set_trace()
                     log.error(
                         "Fastq_R1 not defined in Metadata file for sample %s", s_name
                     )
-                    stderr.print("[red] No fastq R1 file for sample " + s_name)
-                    return False
+                    stderr.print(
+                        "[red] No fastq R1 file for sample " + s_name + ". Aborting"
+                    )
+                    sys.exit(1)
                 if row[index_fastq_r2] is not None:
                     sample_file_list[s_name]["sequence_file_R2_fastq"] = row[
                         index_fastq_r2
@@ -391,9 +413,9 @@ class SftpHandle:
             stderr.print("[red] Too many metadata files on " + fetched_folder)
             return False
         target_meta_file = os.path.join(fetched_folder, meta_files[0])
-        temp_folder = self.metadata_tmp_folder
-        os.makedirs(temp_folder, exist_ok=True)
-        local_meta_file = os.path.join(temp_folder, os.path.basename(target_meta_file))
+        out_folder = self.storage_local_folder
+        os.makedirs(out_folder, exist_ok=True)
+        local_meta_file = os.path.join(out_folder, os.path.basename(target_meta_file))
         try:
             self.client.get(
                 target_meta_file,
@@ -412,16 +434,16 @@ class SftpHandle:
     def validate_fetched_files(self, fetched_folder):
         """Check if the files in the fetched folder are the ones defined in metadata file"""
         local_meta_file = self.validate_metadata_file(fetched_folder)
-        temp_folder = self.metadata_tmp_folder
+        out_folder = self.storage_local_folder
         if not local_meta_file:
-            log.error("Excel file for metadata not found %s", fetched_folder)
+            log.error("Excel file for metadata not found in %s", fetched_folder)
             stderr.print(
                 "[red] Metadata file could not be obtained from " + fetched_folder
             )
             return False
         allowed_extensions = self.allowed_sample_ext
         samples_files_list = self.get_sample_fastq_file_names(
-            temp_folder, local_meta_file
+            out_folder, local_meta_file
         )
         samples_files_list = sorted(
             sum([list(fi.values()) for _, fi in samples_files_list.items()], [])
@@ -433,6 +455,7 @@ class SftpHandle:
         if samples_files_list == filtered_files_list:
             log.info("Files in %s match with metadata file", fetched_folder)
             stderr.print("Successfully validated files based on metadata")
+            os.remove(local_meta_file)
             return True
         else:
             log.error("Files in %s do not match metadata file", fetched_folder)
@@ -451,7 +474,7 @@ class SftpHandle:
                     str(mismatch_files[0:9]),
                 )
             log.error(f"List of files that mismatch: {str(mismatch_files)}")
-            self.delete_local_folder(temp_folder)
+            self.delete_local_folder(out_folder)
             return False
 
     def delete_remote_files(self, fetched_folder, files):
@@ -550,7 +573,7 @@ class SftpHandle:
             sample_file_list = self.get_sample_fastq_file_names(
                 result_data["local_folder"], meta_file
             )
-            self.create_tmp_files_with_metadata_info(
+            self.create_files_with_metadata_info(
                 result_data["local_folder"], sample_file_list, md5_files, meta_file
             )
             # Collect data to send the request to relecov_platform
