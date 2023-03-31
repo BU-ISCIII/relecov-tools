@@ -44,14 +44,14 @@ class LongTableParse:
         if not os.path.exists(self.file_path):
             log.error("Variant long table file %s does not exist ", self.file_path)
             stderr.print(
-                f"[red] Variant long table file {self.file_path}  does not exist"
+                f"[red] Variant long table file {self.file_path} does not exist"
             )
             sys.exit(1)
 
         if not self.file_path.endswith(".csv"):
             log.error("Variant long table file %s is not a csv file ", self.file_path)
             stderr.print(
-                f"[red] Variant long table file  {self.file_path}  must be a csv file"
+                f"[red] Variant long table file {self.file_path} must be a csv file"
             )
             sys.exit(1)
 
@@ -153,9 +153,9 @@ class LongTableParse:
         if result_regex is None:
             log.error("Analysis date not found in filename, aborting")
             stderr.print(
-                f"[red]Error: filename must include analysis date in format YYYYMMDD"
+                "[red]Error: filename must include analysis date in format YYYYMMDD"
             )
-            stderr.print(f"[red]e.g. variants_long_table_20220830.csv")
+            stderr.print("[red]e.g. variants_long_table_20220830.csv")
             sys.exit(1)
         for key, values in samp_dict.items():
             j_dict = {"sample_name": key, "analysis_date": result_regex.group(1)}
