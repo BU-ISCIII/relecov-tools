@@ -31,7 +31,6 @@
             "Host Age",
             "Host Gender",
             "Sequencing Date",
-            "Purpose of Sequencing",
             "Nucleic acid extraction protocol",
             "Commercial All-in-one library kit",
             "Library Preparation Kit",
@@ -48,12 +47,10 @@
             "Capture method",
             "Sequencing technique",
             "Library Layout",
-            "Read Length",
             "Gene Name 1",
             "Diagnostic Pcr Ct Value 1",
             "Gene Name 2",
             "Diagnostic Pcr Ct Value-2",
-            "Broker Name",
             "Authors",
             "Sequence file R1 fastq",
             "Sequence file R2 fastq"
@@ -176,8 +173,7 @@
             "sftp_port": "22"
         },
         "abort_if_md5_mismatch": "False",
-        "storage_local_folder": "/tmp/relecov",
-        "tmp_folder_for_metadata": "/tmp/relecov/tmp",
+        "platform_storage_folder": "tmp/relecov",
         "allowed_sample_extensions": [
             "fastq.gz",
             "fasta"
