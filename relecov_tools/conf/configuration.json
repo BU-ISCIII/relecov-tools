@@ -129,6 +129,27 @@
         "CALLER",
         "LINEAGE"
     ],
+    "long_table_parse_aux": {
+        "Chromosome": "CHROM",
+        "Variant": {
+            "pos": "POS", 
+            "alt": "ALT", 
+            "ref": "REF"
+        },
+        "Filter": "FILTER",
+        "VariantInSample": {
+            "dp": "DP",
+            "ref_dp": "REF_DP",
+            "alt_dp": "ALT_DP",
+            "af": "AF"
+        },
+        "Effect": "EFFECT",
+        "VariantAnnotation": {
+            "hgvs_c": "HGVS_C",
+            "hgvs_p": "HGVS_P",
+            "hgvs_p_1_letter": "HGVS_P_1LETTER"
+        }
+    },
     "gisaid_csv_headers": [
         "submitter",
         "covv_virus_name",
