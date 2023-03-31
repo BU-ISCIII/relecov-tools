@@ -83,16 +83,33 @@ class LongTableParse:
         Validate the file by checking the header line
         """
 
-        with open(self.file_path) as fh:
+        with open(self.file_path, encoding="utf-8-sig") as fh:
             lines = fh.readlines()
 
-        self.validate_file(lines[0].strip().split(","))
         stderr.print("[green]Successful checking heading fields")
         stderr.print("[blue]Parsing the input file")
         heading_index = {}
         headings_from_csv = lines[0].strip().split(",")
         for heading in self.long_table_heading:
             heading_index[heading] = headings_from_csv.index(heading)
+
+        aux_dict = {
+            "Chromosome": "CHROM",
+            "Variant": {"pos": "POS", "alt": "ALT", "ref": "REF"},
+            "Filter": "FILTER",
+            "VariantInSample": {
+                "dp": "DP",
+                "ref_dp": "REF_DP",
+                "alt_dp": "ALT_DP",
+                "af": "AF",
+            },
+            "Effect": "EFFECT",
+            "VariantAnnotation": {
+                "hgvs_c": "HGVS_C",
+                "hgvs_p": "HGVS_P",
+                "hgvs_p_1_letter": "HGVS_P_1LETTER",
+            },
+        }
 
         samp_dict = {}
         for line in lines[1:]:
@@ -101,29 +118,14 @@ class LongTableParse:
             sample = line_s[heading_index["SAMPLE"]]
             if sample not in samp_dict:
                 samp_dict[sample] = []
-            variant_dict = {}
-            variant_dict["Chromosome"] = line_s[heading_index["CHROM"]]
 
-            variant_dict["Variant"] = {
-                "pos": line_s[heading_index["POS"]],
-                "alt": line_s[heading_index["ALT"]],
-                "ref": line_s[heading_index["REF"]],
-            }
-
-            variant_dict["Filter"] = line_s[heading_index["FILTER"]]
-
-            variant_dict["VariantInSample"] = {
-                "dp": line_s[heading_index["DP"]],
-                "ref_dp": line_s[heading_index["REF_DP"]],
-                "alt_dp": line_s[heading_index["ALT_DP"]],
-                "af": line_s[heading_index["AF"]],
-            }
-
-            variant_dict["Effect"] = line_s[heading_index["EFFECT"]]
-            variant_dict["VariantAnnotation"] = {
-                "hgvs_c": line_s[heading_index["HGVS_C"]],
-                "hgvs_p": line_s[heading_index["HGVS_P"]],
-                "hgvs_p_1_letter": line_s[heading_index["HGVS_P_1LETTER"]],
+            variant_dict = {
+                key: (
+                    {key2: line_s[heading_index[val2]] for key2, val2 in value.items()}
+                    if isinstance(value, dict)
+                    else line_s[heading_index[value]]
+                )
+                for key, value in aux_dict.items()
             }
 
             if re.search("&", line_s[heading_index["GENE"]]):
@@ -148,6 +150,13 @@ class LongTableParse:
         result_regex = re.search(
             "variants_long_table_(.*).csv", os.path.basename(self.file_path)
         )
+        if result_regex is None:
+            log.error("Analysis date not found in filename, aborting")
+            stderr.print(
+                f"[red]Error: filename must include analysis date in format YYYYMMDD"
+            )
+            stderr.print(f"[red]e.g. variants_long_table_20220830.csv")
+            sys.exit(1)
         for key, values in samp_dict.items():
             j_dict = {"sample_name": key, "analysis_date": result_regex.group(1)}
             j_dict["variants"] = values
