@@ -48,8 +48,8 @@ class SftpHandle:
         if conf_file is None:
             self.sftp_server = config_json.get_topic_data("sftp_handle", "sftp_server")
             self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
-            self.storage_local_folder = config_json.get_topic_data(
-                "sftp_handle", "storage_local_folder"
+            self.platform_storage_folder = config_json.get_topic_data(
+                "sftp_handle", "platform_storage_folder"
             )
             self.abort_if_md5_mismatch = (
                 True
@@ -71,10 +71,10 @@ class SftpHandle:
                 self.sftp_port = config["sftp_port"]
                 self.target_folders = config["target_folders"]
                 try:
-                    self.storage_local_folder = config["storage_local_folder"]
+                    self.platform_storage_folder = config["platform_storage_folder"]
                 except KeyError:
-                    self.storage_local_folder = config_json.get_topic_data(
-                        "sftp_handle", "storage_local_folder"
+                    self.platform_storage_folder = config_json.get_topic_data(
+                        "sftp_handle", "platform_storage_folder"
                     )
                 try:
                     self.abort_if_md5_mismatch = (
@@ -97,7 +97,7 @@ class SftpHandle:
                 stderr.print("[red] Invalid configuration file {e} !")
                 sys.exit(1)
         if output_location is not None:
-            self.storage_local_folder = output_location
+            self.platform_storage_folder = output_location
         if self.sftp_user is None:
             self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if self.sftp_passwd is None:
@@ -182,7 +182,7 @@ class SftpHandle:
         log.info("Creating folder %s to download files", folder)
         result_data = {"unable_to_fetch": [], "fetched_files": []}
         date = datetime.today().strftime("%Y%m%d")
-        local_folder_path = os.path.join(self.storage_local_folder, folder, date)
+        local_folder_path = os.path.join(self.platform_storage_folder, folder, date)
         result_data["local_folder"] = local_folder_path
         os.makedirs(local_folder_path, exist_ok=True)
         log.info("created the folder to download files %s", local_folder_path)
@@ -260,7 +260,7 @@ class SftpHandle:
         """Copy metadata file from folder and create a file with the sample
         names
         """
-        out_folder = self.storage_local_folder
+        out_folder = self.platform_storage_folder
         os.makedirs(out_folder, exist_ok=True)
         prefix_file_name = "_".join(local_folder.split("/")[-2:])
         new_metadata_file = "metadata_lab_" + prefix_file_name + ".xlsx"
@@ -305,7 +305,7 @@ class SftpHandle:
     def create_main_folders(self, root_directory_list):
         """Create the main folder structure if not exists"""
         for folder in root_directory_list:
-            full_folder = os.path.join(self.storage_local_folder, folder)
+            full_folder = os.path.join(self.platform_storage_folder, folder)
             os.makedirs(full_folder, exist_ok=True)
         log.info("Created main folder for process %s", full_folder)
         return True
@@ -413,9 +413,10 @@ class SftpHandle:
             stderr.print("[red] Too many metadata files on " + fetched_folder)
             return False
         target_meta_file = os.path.join(fetched_folder, meta_files[0])
-        out_folder = self.storage_local_folder
-        os.makedirs(out_folder, exist_ok=True)
-        local_meta_file = os.path.join(out_folder, os.path.basename(target_meta_file))
+        os.makedirs(self.platform_storage_folder, exist_ok=True)
+        local_meta_file = os.path.join(
+            self.platform_storage_folder, os.path.basename(target_meta_file)
+        )
         try:
             self.client.get(
                 target_meta_file,
@@ -434,7 +435,7 @@ class SftpHandle:
     def validate_fetched_files(self, fetched_folder):
         """Check if the files in the fetched folder are the ones defined in metadata file"""
         local_meta_file = self.validate_metadata_file(fetched_folder)
-        out_folder = self.storage_local_folder
+        out_folder = self.platform_storage_folder
         if not local_meta_file:
             log.error("Excel file for metadata not found in %s", fetched_folder)
             stderr.print(
@@ -503,11 +504,11 @@ class SftpHandle:
 
     def download(self):
         try:
-            os.makedirs(self.storage_local_folder, exist_ok=True)
+            os.makedirs(self.platform_storage_folder, exist_ok=True)
         except OSError as e:
             log.error("You do not have permissions to create folder %s", e)
             sys.exit(1)
-        os.chdir(self.storage_local_folder)
+        os.chdir(self.platform_storage_folder)
         if not self.open_connection():
             log.error("Unable to establish connection towards sftp server")
             stderr.print("[red] Unable to establish sftp connection")
