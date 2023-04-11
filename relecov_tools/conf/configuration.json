@@ -316,7 +316,7 @@
             "lineage_analysis_constellation_version": "constellation_version"
         },
         "mapping_stats": {
-            "analysis_date": "analysis date",
+            "analysis_date": "analysis_date",
             "depth_of_coverage_value": "medianDPcoveragevirus",
             "number_of_variants_in_consensus": "Variantsinconsensusx10",
             "number_of_variants_with_effect": "MissenseVariants",
@@ -326,7 +326,8 @@
             "per_reads_virus": "%readsvirus",
             "per_unmapped": "%unmapedreads",
             "qc_filtered": "totalreads",
-            "reference_genome_accession": "Virussequence"
+            "reference_genome_accession": "Virussequence",
+            "read_length": "read_length"
         },
         "mapping_variant_metrics": {
             "ns_per_100_kbp": "# Ns per 100kb consensus"
@@ -340,9 +341,6 @@
             },
             "dehosting_method_software_version": {
                 "KRAKEN2_KRAKEN2": "kraken2"
-            },
-            "mapping_software_version": {
-                "BOWTIE2_ALIGN": "bowtie2"
             },
             "mapping_software_version": {
                 "BOWTIE2_ALIGN": "bowtie2"
