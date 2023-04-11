@@ -149,9 +149,7 @@ class LongTableParse:
         return j_list
 
     def save_to_file(self, j_list):
-        """Transform the parsed data into a jsonf file, naming as
-        "long_table_" + "current date" + ".json"
-        """
+        """Transform the parsed data into a json file"""
         stderr.print("[blue]Saving parsed data to file")
         date_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         file_name = "long_table_" + date_now + ".json"
@@ -163,7 +161,7 @@ class LongTableParse:
 
     def parsing_csv(self):
         """
-        function called when using the relecov-tools long-table-parse function.
+        Function called when using the relecov-tools long-table-parse function.
         """
         stderr.print("[blue]Starting reading the input file")
         parsed_data = self.parse_file()
