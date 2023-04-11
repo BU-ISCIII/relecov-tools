@@ -376,7 +376,6 @@ class SftpHandle:
                         index_fastq_r1
                     ]
                 else:
-                    # import pdb; pdb.set_trace()
                     log.error(
                         "Fastq_R1 not defined in Metadata file for sample %s", s_name
                     )
