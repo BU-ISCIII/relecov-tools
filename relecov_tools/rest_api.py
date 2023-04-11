@@ -68,7 +68,7 @@ class RestApi:
                 req.status_code,
             )
             if req.status_code != 500:
-                stderr.print(f"[red] Unable to post data because  {req.text}")
+                stderr.print(f"[red] Unable to put data because  {req.text}")
             stderr.print(f"[red] Received error {req.status_code}")
             return {"ERROR": req.status_code}
         return {"Success": req.text}
