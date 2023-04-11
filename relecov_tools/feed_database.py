@@ -95,7 +95,6 @@ class FeedDatabase:
         """Map the values to the properties send to databasee
         in json schema based on label
         """
-        # collection_method = self.get_sample_type()
         sample_list = []
         s_fields = list(sample_fields.keys())
         for row in self.json_data:
@@ -107,17 +106,17 @@ class FeedDatabase:
                     value = found_ontology.group(1)
                 if key in s_project_fields:
                     s_dict[key] = value
-                elif key in s_fields:
+                if key in s_fields:
                     s_dict[sample_fields[key]] = value
-                else:
-                    # just for debug loginng write the fields that will not
-                    # be inlcuded in iSkyLIMS request
+                if key not in s_project_fields and key not in s_fields:
+                    # just for debugging, write the fields that will not
+                    # be included in iSkyLIMS request
                     log.info("not key %s in iSkyLIMS", key)
-            # include the fix value
+            # include the fixed value
             fixed_value = self.config_json.get_configuration("iskylims_fixed_values")
             for prop, val in fixed_value.items():
                 s_dict[prop] = val
-            # Adding tha specimen_source field for setting sampleType
+            # Adding tha specimen_source field to set sampleType
             s_dict["sampleType"] = row["specimen_source"]
             sample_list.append(s_dict)
         return sample_list
@@ -154,15 +153,14 @@ class FeedDatabase:
             if "ontology" in values:
                 try:
                     property = ontology_dict[values["ontology"]]
-                    # sample_fields has a key the label in metadata and value
-                    # the field name for sample
+                    # sample_fields has a key, the label in metadata, and as value
+                    # the field name for the sample
                     sample_fields[property] = values["field_name"]
                 except KeyError as e:
                     stderr.print(f"[red]Error in map ontology {e}")
             else:
-                # for the ones that do no have ontologuy label is the sample field
-                # and the value is empty
-                # sample_fields[key] = ""
+                # for the ones that do not have ontology label in the sample field
+                # and have an empty value: sample_fields[key] = ""
                 log.info("not ontology for item  %s", values["field_name"])
         # fetch label for sample Project
         s_project_url = self.database_settings["url_project_fields"]
@@ -182,7 +180,6 @@ class FeedDatabase:
             sys.exit(1)
         for field in s_project_fields_raw["DATA"]:
             s_project_fields.append(field["sampleProjectFieldName"])
-
         return [sample_fields, s_project_fields]
 
     def map_relecov_sample_data(self):
@@ -222,7 +219,6 @@ class FeedDatabase:
                 {"user": self.user, "pass": self.passwd},
                 self.database_settings[post_url],
             )
-
             if "ERROR" in result:
                 if result["ERROR"] == "Server not available":
                     # retry to connect to server
