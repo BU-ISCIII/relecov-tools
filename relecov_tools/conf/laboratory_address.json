@@ -10,6 +10,62 @@
         "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N,",
         "submitting_institution_email": "info@isciii.es"
     },
+    "Complejo Hospitalario de Jaen":{
+        "collecting_institution_address": "Avda. del Ejército Español nº10",
+        "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Jaen",
+        "geo_loc_city": "Jaen",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Complejo Hospitalario de Jaen",
+        "submitting_institution_address": "Avda. del Ejército Español nº10",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
+      
+    },
+    "Hospital de Poniente":{
+        "collecting_institution_address": "Ctra Almerimar, 31",
+        "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Almeria",
+        "geo_loc_city": "El Ejido",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital de Poniente",
+        "submitting_institution_address": "Ctra Almerimar, 31",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
+    },
+    "Hospital Juan Ramon Jimenez":{
+        "collecting_institution_address": "Ronda Norte, s/n",
+        "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Huelva",
+        "geo_loc_city": "Huelva",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Juan Ramon Jimenez",
+        "submitting_institution_address": "Ronda Norte, s/n",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
+    },
+    "Hospital Reina Sofia":{
+        "collecting_institution_address": "Av. Menendez Pidal, s/n",
+        "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Cordoba",
+        "geo_loc_city": "Cordoba",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Reina Sofia",
+        "submitting_institution_address": "Av. Menendez Pidal, s/n",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
+    },
+    "Plataforma de Medicina Computacional, Fundación Progreso y Salud"{
+        "collecting_institution_address": "Avda. Américo Vespucio, 15",
+        "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Sevilla",
+        "geo_loc_city": "Sevilla",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
+        "submitting_institution_address": "Avda. Américo Vespucio, 15",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
+    },
     "Hospital Puerta del Mar": {
         "collecting_institution_address": "Av. Ana de Viya, 21",
         "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
