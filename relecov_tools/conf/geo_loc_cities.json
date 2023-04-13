@@ -314,5 +314,9 @@
     "Almeria": {
         "geo_loc_latitude": "36.72016",
         "geo_loc_longitude": "-4.42034"
+    },
+    "El Ejido": {
+        "geo_loc_latitude": "36.772153",
+        "geo_loc_longitude": "-2.810602"
     }
 }
