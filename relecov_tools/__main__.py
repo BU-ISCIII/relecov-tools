@@ -142,6 +142,16 @@ def relecov_tools_cli(verbose, log_file):
     help="Configuration file (not params file)",
 )
 @click.option(
+    "-d",
+    "--download_option",
+    default=None,
+    multiple=False,
+    help="Select the download option: [download_only, download_clean, delete_only]. \
+        download_only will only download the files \
+        download_clean will remove files from sftp after download \
+        delete_only will only delete the files",
+)
+@click.option(
     "-o",
     "--output_location",
     default=None,
@@ -153,7 +163,7 @@ def relecov_tools_cli(verbose, log_file):
     is_flag=False,
     flag_value="ALL",
     default=None,
-    help="Flag: Select which folders will be downloaded giving [paths] or via prompt",
+    help="Flag: Select which folders will be targeted giving [paths] or via prompt",
 )
 def download(
     user,
@@ -161,8 +171,9 @@ def download(
     conf_file,
     user_relecov,
     password_relecov,
+    download_option,
     output_location,
-    target_folders,
+    target_folders
 ):
     """Download files located in sftp server."""
     sftp_connection = relecov_tools.sftp_handle.SftpHandle(
@@ -171,11 +182,11 @@ def download(
         conf_file,
         user_relecov,
         password_relecov,
+        download_option,
         output_location,
-        target_folders,
+        target_folders
     )
-    sftp_connection.download()
-
+    sftp_connection.execute_process()
 
 # metadata
 @relecov_tools_cli.command(help_priority=3)
