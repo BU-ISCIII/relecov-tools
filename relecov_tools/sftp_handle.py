@@ -34,6 +34,7 @@ class SftpHandle:
         conf_file=None,
         user_relecov=None,
         password_relecov=None,
+        download_option=None,
         output_location=None,
         target_folders=None,
     ):
@@ -45,6 +46,15 @@ class SftpHandle:
         self.sftp_user = user
         self.sftp_passwd = passwd
         self.target_folders = target_folders
+        self.allowed_download_options = config_json.get_topic_data(
+            "sftp_handle", "allowed_download_options"
+        )
+        if download_option not in self.allowed_download_options:
+            self.download_option = relecov_tools.utils.prompt_selection(
+                "Options", self.allowed_download_options
+            )
+        else:
+            self.download_option = download_option
         if conf_file is None:
             self.sftp_server = config_json.get_topic_data("sftp_handle", "sftp_server")
             self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
@@ -94,10 +104,15 @@ class SftpHandle:
                 self.pp = config["allowed_sample_extensions"]
             except KeyError as e:
                 log.error("Invalid configuration file %s", e)
-                stderr.print("[red] Invalid configuration file {e} !")
-                sys.exit(1)
+                stderr.print(f"[red] Invalid configuration file {e} !")
+                sys.exit(1)     
         if output_location is not None:
-            self.platform_storage_folder = output_location
+            if os.path.isdir(output_location):
+                self.platform_storage_folder = output_location
+            else:
+                log.error("Output location does not exist, aborting")
+                stderr.print("[red] Output location does not exist, aborting")
+                sys.exit(1)
         if self.sftp_user is None:
             self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if self.sftp_passwd is None:
@@ -434,13 +449,9 @@ class SftpHandle:
     def validate_fetched_files(self, fetched_folder):
         """Check if the files in the fetched folder are the ones defined in metadata file"""
         local_meta_file = self.validate_metadata_file(fetched_folder)
-        out_folder = self.platform_storage_folder
         if not local_meta_file:
-            log.error("Excel file for metadata not found in %s", fetched_folder)
-            stderr.print(
-                "[red] Metadata file could not be obtained from " + fetched_folder
-            )
             return False
+        out_folder = self.platform_storage_folder
         allowed_extensions = self.allowed_sample_ext
         samples_files_list = self.get_sample_fastq_file_names(
             out_folder, local_meta_file
@@ -469,11 +480,11 @@ class SftpHandle:
             if len(mismatch_files) < 10:
                 stderr.print(f"Files that mismatch: {str(mismatch_files)}")
             else:
-                stderr.print(
+                log.error(
                     "Showing some of the mismatches, use --log-file to see all of them: %s",
                     str(mismatch_files[0:9]),
                 )
-            log.error(f"List of files that mismatch: {str(mismatch_files)}")
+            log.info(f"Full list of files that mismatch: {str(mismatch_files)}")
             self.delete_local_folder(out_folder)
             return False
 
@@ -483,8 +494,10 @@ class SftpHandle:
         for file in files:
             try:
                 self.client.remove(os.path.join(fetched_folder, os.path.basename(file)))
-                log.info("%s Deleted from remote server", file)
-            except FileNotFoundError:
+                stderr.print("%s Deleted from remote server", file)
+            except Exception as e:
+                log.error("Could not delete file %s.", e)
+                stderr.print(f"Could not delete file {file}. Error: {e}")
                 continue
         return
 
@@ -501,25 +514,12 @@ class SftpHandle:
         shutil.rmtree(local_folder, ignore_errors=True)
         return True
 
-    def download(self):
-        try:
-            os.makedirs(self.platform_storage_folder, exist_ok=True)
-        except OSError as e:
-            log.error("You do not have permissions to create folder %s", e)
-            sys.exit(1)
-        os.chdir(self.platform_storage_folder)
-        if not self.open_connection():
-            log.error("Unable to establish connection towards sftp server")
-            stderr.print("[red] Unable to establish sftp connection")
-            sys.exit(1)
+    def select_target_folders(self):
         root_directory_list = self.list_folders(".")
-        if not root_directory_list:
-            log.error("There are no folders under root directory")
-            sys.exit(1)
         if self.target_folders == "ALL":
             log.info("Showing folders from remote SFTP for user selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
-                msg="Select the folders that will be downloaded",
+                msg="Select the folders that will be targeted",
                 choices=sorted(root_directory_list),
             )
         elif self.target_folders is None:
@@ -531,23 +531,45 @@ class SftpHandle:
         if not target_folders:
             log.error("There are no folders that match selection")
             sys.exit(1)
-        folders_to_download = {}
+        folders_to_process = {}
         # create_main_folders(root_directory_list)
         for folder in target_folders:
             list_files = self.get_file_list(folder)
             if len(list_files) > 0:
-                folders_to_download[folder] = list_files
-        if len(folders_to_download) == 0:
-            log.info("Exiting download.")
-            log.error("There are no files on sftp to dowload")
+                folders_to_process[folder] = list_files                  
+            else:
+                log.info("%s is empty")
+                continue
+        if len(folders_to_process) == 0:
+            log.info("Exiting process.")
+            log.error("There are no files in the selected folders")
             self.close_connection()
             sys.exit(0)
+        return folders_to_process
+    
+    def delete_targets(self, target_folders):
+        log.info("Initiating delete_only process")
+        folders_to_delete = target_folders
+        for folder, files in folders_to_delete.items():
+            self.delete_remote_files(folder, files)
+            stderr.print(f"Delete process finished in {folder}")
 
+    def download(self, target_folders, option="download"):
+        log.info("Initiating download process")
+        try:
+            os.makedirs(self.platform_storage_folder, exist_ok=True)
+        except OSError as e:
+            log.error("You do not have permissions to create folder %s", e)
+            sys.exit(1)
+        os.chdir(self.platform_storage_folder)
+        folders_to_download = target_folders
         for folder, files in folders_to_download.items():
             log.info("Processing folder %s", folder)
             stderr.print("Processing folder " + folder)
             # Validate that the files are the ones described in metadata.
             if not self.validate_fetched_files(folder):
+                log.error("Failed fetched files validation %s", folder)
+                stderr.print(f"[red]Invalid fetched files in {folder}, aborting")
                 continue
             # get the files in each folder
             result_data = self.get_files_from_sftp_folder(folder, files)
@@ -582,5 +604,21 @@ class SftpHandle:
             )
             for record in json_sample_data:
                 pass
-        self.close_connection()
+            if option == "clean": 
+                self.delete_targets(folder)
         return
+    
+    def execute_process(self):
+        if not self.open_connection():
+            log.error("Unable to establish connection towards sftp server")
+            stderr.print("[red] Unable to establish sftp connection")
+            sys.exit(1)
+        target_folders = self.select_target_folders()
+        if self.download_option == "download_only":
+            self.download(target_folders, option="download")
+        if self.download_option == "download_clean":
+            self.download(target_folders, option="clean")
+        if self.download_option == "delete_only":
+            self.delete_targets(target_folders)
+        self.close_connection()
+        stderr.print("Finished execution")
