@@ -218,6 +218,11 @@
             "_2_",
             "_2.",
             ".2."
+        ],
+        "allowed_download_options": [
+            "download_only",
+            "download_clean",
+            "delete_only"
         ]
     },
     "GISAID_configuration": {
