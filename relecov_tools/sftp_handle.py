@@ -105,7 +105,7 @@ class SftpHandle:
             except KeyError as e:
                 log.error("Invalid configuration file %s", e)
                 stderr.print(f"[red] Invalid configuration file {e} !")
-                sys.exit(1)     
+                sys.exit(1)
         if output_location is not None:
             if os.path.isdir(output_location):
                 self.platform_storage_folder = output_location
@@ -536,7 +536,7 @@ class SftpHandle:
         for folder in target_folders:
             list_files = self.get_file_list(folder)
             if len(list_files) > 0:
-                folders_to_process[folder] = list_files                  
+                folders_to_process[folder] = list_files
             else:
                 log.info("%s is empty")
                 continue
@@ -546,7 +546,7 @@ class SftpHandle:
             self.close_connection()
             sys.exit(0)
         return folders_to_process
-    
+
     def delete_targets(self, target_folders):
         log.info("Initiating delete_only process")
         folders_to_delete = target_folders
@@ -604,10 +604,10 @@ class SftpHandle:
             )
             for record in json_sample_data:
                 pass
-            if option == "clean": 
+            if option == "clean":
                 self.delete_targets(folder)
         return
-    
+
     def execute_process(self):
         if not self.open_connection():
             log.error("Unable to establish connection towards sftp server")
