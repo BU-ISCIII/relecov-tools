@@ -173,7 +173,7 @@ def download(
     password_relecov,
     download_option,
     output_location,
-    target_folders
+    target_folders,
 ):
     """Download files located in sftp server."""
     sftp_connection = relecov_tools.sftp_handle.SftpHandle(
@@ -184,7 +184,7 @@ def download(
         password_relecov,
         download_option,
         output_location,
-        target_folders
+        target_folders,
     )
     sftp_connection.execute_process()
 
