@@ -164,17 +164,17 @@ class RelecovMetadata:
                 if str(error.args[0]).lower() == "not provided":
                     log.error("Label was not provided, auto-completing columns")
                     stderr.print(
-                        f"Label {map_field} was not provided in sample {idx}, \
-                        auto-completing with Not Provided"
+                        f"Label {map_field} was not provided in sample {idx}, "
+                        + "auto-completing with Not Provided"
                     )
                 else:
                     log.error(
-                        f"Unknown map_field value {error} for json data: \
-                        {str(map_field)}. Aborting"
+                        f"Unknown map_field value {error} for json data: "
+                        + f"{str(map_field)}. Aborting"
                     )
                     stderr.print(
-                        f"[red] Unknown value {error} for: {map_field}\
-                        in sample {idx}. Aborting"
+                        f"[red] Unknown value {error} for: {map_field} "
+                        + f"in sample {idx}. Aborting"
                     )
                     sys.exit(1)
                 fields_to_add = {
@@ -200,7 +200,7 @@ class RelecovMetadata:
         # Include Sample information data from sample json file
         stderr.print("[blue] Processing sample data file")
         s_json = {}
-        s_json["map_field"] = "collecting_lab_sample_id"
+        s_json["map_field"] = "submitting_lab_sample_id"
         s_json["adding_fields"] = [
             "fastq_r1_md5",
             "fastq_r2_md5",
