@@ -73,6 +73,7 @@ class SchemaValidation:
         validated_json_data = []
         invalid_json = []
         errors = {}
+        error_keys = {}
         stderr.print("[blue] Start processing the json file")
         for item_row in self.json_data:
             # validate(instance=item_row, schema=json_schema)
@@ -81,11 +82,11 @@ class SchemaValidation:
             else:
                 # Count error types
                 for error in validator.iter_errors(item_row):
+                    error_keys[error.message] = error.absolute_path[0]
                     if error.message in errors.keys():
                         errors[error.message] += 1
                     else:
                         errors[error.message] = 1
-
                 # log.error("Invalid sample data %s", error.message)
                 # append row with errors
                 invalid_json.append(item_row)
@@ -98,7 +99,8 @@ class SchemaValidation:
             stderr.print(
                 "[red]"
                 + str(errors[error_type])
-                + " samples failed validation:\n"
+                + " samples failed validation for "
+                + f"{error_keys[error_type]}:\n"
                 + error_type
             )
             stderr.print("[red] --------------------")
