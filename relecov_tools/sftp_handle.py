@@ -197,7 +197,10 @@ class SftpHandle:
         log.info("Creating folder %s to download files", folder)
         result_data = {"unable_to_fetch": [], "fetched_files": []}
         date = datetime.today().strftime("%Y%m%d")
-        local_folder_path = os.path.join(self.platform_storage_folder, folder, date)
+        if self.platform_storage_folder == folder:
+            local_folder_path = os.path.join(self.platform_storage_folder, date)
+        else:
+            local_folder_path = os.path.join(self.platform_storage_folder, folder, date)
         result_data["local_folder"] = local_folder_path
         os.makedirs(local_folder_path, exist_ok=True)
         log.info("created the folder to download files %s", local_folder_path)
@@ -224,6 +227,7 @@ class SftpHandle:
         successful_files = []
         # fetch the md5 file if exists
         log.info("Searching for local md5 file")
+        stderr.print("[blue]Verifying file integrity in md5 hashes")
         sftp_md5 = relecov_tools.utils.get_md5_from_local_folder(local_folder)
         if len(sftp_md5) > 0:
             # check md5 checksum for eac file
@@ -241,7 +245,6 @@ class SftpHandle:
                 else:
                     required_retransmition.append(f_name)
                     log.error("%s requested file re-sending", f_name)
-
         if len(set(file_list)) != len(sftp_md5) * 2:
             # create the md5 file from the ones not upload to server
             req_create_md5 = [
@@ -317,14 +320,6 @@ class SftpHandle:
         )
         return True
 
-    def create_main_folders(self, root_directory_list):
-        """Create the main folder structure if not exists"""
-        for folder in root_directory_list:
-            full_folder = os.path.join(self.platform_storage_folder, folder)
-            os.makedirs(full_folder, exist_ok=True)
-        log.info("Created main folder for process %s", full_folder)
-        return True
-
     def find_metadata_file(self, local_folder):
         """Find excel extension file which contains metatada"""
         reg_for_xlsx = os.path.join(local_folder, "*.xlsx")
@@ -372,7 +367,7 @@ class SftpHandle:
             stderr.print("[red]Differences: ", diffs)
             sys.exit(1)
         index_sampleID = metadata_header.index(
-            "Sample ID given by originating laboratory"
+            "Sample ID given by the submitting laboratory"
         )
         index_fastq_r1 = metadata_header.index("Sequence file R1 fastq")
         index_fastq_r2 = metadata_header.index("Sequence file R2 fastq")
@@ -477,24 +472,24 @@ class SftpHandle:
             )
             set_list = set(filtered_files_list)
             mismatch_files = [fi for fi in samples_files_list if fi not in set_list]
-            if len(mismatch_files) < 10:
-                stderr.print(f"Files that mismatch: {str(mismatch_files)}")
-            else:
-                log.error(
-                    "Showing some of the mismatches, use --log-file to see all of them: %s",
-                    str(mismatch_files[0:9]),
-                )
-            log.info(f"Full list of files that mismatch: {str(mismatch_files)}")
-            self.delete_local_folder(out_folder)
+            mismatch_rev = [fi for fi in set_list if fi not in samples_files_list]
+            log.error(
+                "Files in metadata that are not present in folder: %s",
+                str(mismatch_files),
+            )
+            log.error(
+                "Files in folder that are not present in metadata %s", str(mismatch_rev)
+            )
             return False
 
     def delete_remote_files(self, fetched_folder, files):
         """Delete files from remote server"""
         self.open_connection()
+        stderr.print(f"[blue]Deleting files in {fetched_folder}...")
         for file in files:
             try:
                 self.client.remove(os.path.join(fetched_folder, os.path.basename(file)))
-                stderr.print("%s Deleted from remote server", file)
+                log.info("%s Deleted from remote server", file)
             except Exception as e:
                 log.error("Could not delete file %s.", e)
                 stderr.print(f"Could not delete file {file}. Error: {e}")
@@ -532,27 +527,19 @@ class SftpHandle:
             log.error("There are no folders that match selection")
             sys.exit(1)
         folders_to_process = {}
-        # create_main_folders(root_directory_list)
         for folder in target_folders:
             list_files = self.get_file_list(folder)
             if len(list_files) > 0:
                 folders_to_process[folder] = list_files
             else:
-                log.info("%s is empty")
+                log.info("%s is empty", folder)
                 continue
         if len(folders_to_process) == 0:
-            log.info("Exiting process.")
-            log.error("There are no files in the selected folders")
+            log.info("Exiting process, folders were empty.")
+            log.error("There are no files in the selected folders.")
             self.close_connection()
             sys.exit(0)
         return folders_to_process
-
-    def delete_targets(self, target_folders):
-        log.info("Initiating delete_only process")
-        folders_to_delete = target_folders
-        for folder, files in folders_to_delete.items():
-            self.delete_remote_files(folder, files)
-            stderr.print(f"Delete process finished in {folder}")
 
     def download(self, target_folders, option="download"):
         log.info("Initiating download process")
@@ -565,7 +552,7 @@ class SftpHandle:
         folders_to_download = target_folders
         for folder, files in folders_to_download.items():
             log.info("Processing folder %s", folder)
-            stderr.print("Processing folder " + folder)
+            stderr.print("[blue]Processing folder " + folder)
             # Validate that the files are the ones described in metadata.
             if not self.validate_fetched_files(folder):
                 log.error("Failed fetched files validation %s", folder)
@@ -573,6 +560,9 @@ class SftpHandle:
                 continue
             # get the files in each folder
             result_data = self.get_files_from_sftp_folder(folder, files)
+            log.info("Finished download for folder: %s", folder)
+            stderr.print(f"Finished download for folder {folder}")
+
             md5_files, req_retransmition = self.verify_md5_checksum(
                 result_data["local_folder"], result_data["fetched_files"]
             )
@@ -588,9 +578,12 @@ class SftpHandle:
                 if len(corrupted) > 0 and self.abort_if_md5_mismatch:
                     log.error("Stopping because of corrupted files %s", corrupted)
                     stderr.print(
-                        f"[red] Stopped processing folder {folder} due to corrupted files {corrupted}"
+                        f"[red] Stopped processing folder {folder} \
+                        due to corrupted files {corrupted}"
                     )
                     continue
+            log.info("Finished md5 check for folder: %s", folder)
+            stderr.print(f"Successful md5 verification for folder {folder}")
             meta_file = self.find_metadata_file(result_data["local_folder"])
             sample_file_list = self.get_sample_fastq_file_names(
                 result_data["local_folder"], meta_file
@@ -599,19 +592,17 @@ class SftpHandle:
                 result_data["local_folder"], sample_file_list, md5_files, meta_file
             )
             # Collect data to send the request to relecov_platform
-            json_sample_data = self.create_json_with_downloaded_samples(
-                sample_file_list, folder
-            )
-            for record in json_sample_data:
-                pass
+            self.create_json_with_downloaded_samples(sample_file_list, folder)
+            # If download_option is "download_clean", remove
+            # sftp folder content after download is finished
             if option == "clean":
-                self.delete_targets(folder)
+                self.delete_remote_files(folder, files)
         return
 
     def execute_process(self):
         if not self.open_connection():
             log.error("Unable to establish connection towards sftp server")
-            stderr.print("[red] Unable to establish sftp connection")
+            stderr.print("[red]Unable to establish sftp connection")
             sys.exit(1)
         target_folders = self.select_target_folders()
         if self.download_option == "download_only":
@@ -619,6 +610,9 @@ class SftpHandle:
         if self.download_option == "download_clean":
             self.download(target_folders, option="clean")
         if self.download_option == "delete_only":
-            self.delete_targets(target_folders)
+            log.info("Initiating delete_only process")
+            for folder, files in target_folders.items():
+                self.delete_remote_files(folder, files)
+                stderr.print(f"Delete process finished in {folder}")
         self.close_connection()
         stderr.print("Finished execution")
