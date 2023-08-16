@@ -217,7 +217,7 @@ class BioinfoMetadata:
             sys.exit(1)
         long_table = LongTableParse(table_path, output_folder)
 
-        long_table_parse = long_table.parsing_csv()
+        long_table.parsing_csv()
 
         return
 

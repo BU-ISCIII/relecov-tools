@@ -150,12 +150,12 @@ class RelecovMetadata:
                     else:
                         try:
                             ontology_errors[key] += 1
-                        except KeyError as e:
+                        except KeyError:
                             ontology_errors[key] = 1
                         continue
         if len(ontology_errors) >= 1:
             stderr.print(
-                f"[red] No ontology could be added in:",
+                "[red] No ontology could be added in:",
                 "\n".join({f"{x} - {y} samples" for x, y in ontology_errors.items()}),
             )
         return m_data

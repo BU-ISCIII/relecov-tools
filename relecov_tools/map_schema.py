@@ -13,7 +13,6 @@ import sys
 # import jsonschema
 import relecov_tools.utils
 
-
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
@@ -207,7 +206,6 @@ class MappingSchema:
                         continue
                     else:
                         mapped_json_data[idx][value] = "Not Provided"
-
         """This is a temporal solution for library_strategy. Once the values are also 
         mapped by the ontology (not only the fields) this should not be necessary"""
         for sample in mapped_json_data:
@@ -237,7 +235,8 @@ class MappingSchema:
                 for key, val in not_provided_fields.items()
             )
             stderr.print(
-                f"[red]\nSome required fields were Not Provided:\n", notprov_report
+                f"[red]\nSome required fields for {dest_schema} were Not Provided:\n",
+                notprov_report,
             )
         else:
             return
@@ -265,9 +264,7 @@ class MappingSchema:
         mapping_schema_dict = self.maping_schemas_based_on_geontology()
         mapped_json_data = self.mapping_json_data(mapping_schema_dict)
         updated_json_data = self.additional_formating(mapped_json_data)
-        validation = self.check_required_fields(
-            mapped_json_data, self.destination_schema
-        )
+        self.check_required_fields(mapped_json_data, self.destination_schema)
         self.write_json_fo_file(updated_json_data)
         stderr.print(f"[green]Finished mapping to {self.destination_schema} schema")
         return
