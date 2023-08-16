@@ -1831,6 +1831,29 @@
             "label": "Filepath R2 fastq",
             "fill_mode": "batch"
         },
+        "fastq_r1_md5": {
+            "examples": [
+                "b5242d60471e5a5a97b35531dbbe8c30"
+            ],
+            "ontology": "MS_1000568",
+            "type": "string",
+            "description": "Checksum value to validate successful file transmission",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Fastq md5 r1",
+            "fill_mode": "sample",
+            "minLenght": "1"
+        },
+        "fastq_r2_md5": {
+            "examples": [
+                "b5242d60471e5a5a97b35531dbbe8c30"
+            ],
+            "ontology": "MS_1000569",
+            "type": "string",
+            "description": "Checksum value to validate successful file transmission",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Sequence fastq R2 md5",
+            "fill_mode": "sample"
+        },
         "fast5_filename": {
             "examples": [
                 "batch1a_sequences.fast5"
@@ -1852,6 +1875,19 @@
             "classification": "Files info",
             "label": "Filepath fast5",
             "fill_mode": "batch"
+        },
+        "processing_date": {
+            "examples": [
+                "e.g 20220705"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "format": "date",
+            "description": "The time the processing of the data started",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Analysis date",
+            "fill_mode": "batch",
+            "minLenght": "1"
         },
         "analysis_date": {
             "examples": [
@@ -2447,9 +2483,6 @@
             "fill_mode": "batch"
         },
         "variant_name": {
-            "examples": [
-                "Alpha"
-            ],
             "ontology": "",
             "type": "string",
             "description": "The variant classification of the lineage/clade i.e. alpha, beta, etc.",
@@ -2731,6 +2764,20 @@
             "classification": "Public databases",
             "label": "Study title",
             "fill_mode": "batch"
+        },
+        "ena_study_alias": {
+            "examples": [
+              "e.g Sweden"
+            ],
+            "ontology": "SIO_001066",
+            "type": "string",
+            "description": "",
+            "clasification": "Submission ENA",
+            "label": "Study alias",
+            "table": [
+              "study",
+              "experiments"
+            ]
         },
         "broker_name": {
             "examples": [
