@@ -1,20 +1,9 @@
-# from distutils.errors import LibError
 import logging
-
-# from re import template
-
-# from pyparsing import col
-import xml.etree.ElementTree as ET
 import rich.console
 import json
-
-
 import pandas as pd
-
-
 import sys
 import os
-
 import ftplib
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
@@ -27,8 +16,6 @@ from ena_upload.ena_upload import process_receipt
 from ena_upload.ena_upload import update_table
 from ena_upload.ena_upload import update_table_simple
 
-import site
-
 pd.options.mode.chained_assignment = None
 
 log = logging.getLogger(__name__)
@@ -38,7 +25,6 @@ stderr = rich.console.Console(
     highlight=False,
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
-
 
 class EnaUpload:
     def __init__(
