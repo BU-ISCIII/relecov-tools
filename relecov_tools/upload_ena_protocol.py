@@ -260,7 +260,7 @@ class EnaUpload:
 
     def fastq_submission(self, json_data):
         """The fastq files are submitted apart from the metadata"""
-        stderr.print(f"Submitting fastq files")
+        stderr.print("Submitting fastq files")
         json_dataframe = pd.DataFrame(json_data)
         file_paths = {}
         file_paths_r2 = {}
@@ -294,5 +294,5 @@ class EnaUpload:
         self.xml_submission(schemas_dataframe)
         self.fastq_submission(self.json_data)
 
-        stderr.print(f"[green] Finished execution")
+        stderr.print("[green] Finished execution")
         return
