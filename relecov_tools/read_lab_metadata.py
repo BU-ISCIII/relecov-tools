@@ -141,16 +141,21 @@ class RelecovMetadata:
                         enum_dict[prop][go_match.group(1)] = enum
                     else:
                         enum_dict[prop][enum] = enum
-
+        ontology_errors = {}
         for idx in range(len(m_data)):
             for key, e_values in enum_dict.items():
                 if key in m_data[idx]:
                     if m_data[idx][key] in e_values:
                         m_data[idx][key] = e_values[m_data[idx][key]]
                     else:
-                        log.error(f"No ontology could be added in {str(key)}")
+                        try:
+                            ontology_errors[key] += 1
+                        except KeyError as e:
+                            ontology_errors[key] = 1
                         continue
-
+        if len(ontology_errors) >= 1:
+            stderr.print(f"[red] No ontology could be added in:",
+                "\n".join({f"{x} - {y} samples" for x,y in ontology_errors.items()}))
         return m_data
 
     def process_from_json(self, m_data, json_fields):
@@ -284,7 +289,6 @@ class RelecovMetadata:
                 elif "sample id" in key.lower():
                     if isinstance(row[key], float) or isinstance(row[key], int):
                         row[key] = str(int(row[key]))
-
                 else:
                     if isinstance(row[key], float) or isinstance(row[key], int):
                         row[key] = str(row[key])
