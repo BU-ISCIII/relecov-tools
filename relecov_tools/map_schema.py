@@ -33,6 +33,7 @@ class MappingSchema:
         output_folder=None,
     ):
         config_json = ConfigJson()
+        self.config_json = config_json
         if relecov_schema is None:
             relecov_schema = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
@@ -127,17 +128,21 @@ class MappingSchema:
         """
         mapped_dict = OrderedDict()
         errors = {}
+        not_provided_fields = self.config_json.get_configuration("ENA_fields")[
+            "common_missing_fields"
+        ]
         for key, values in self.mapped_to_schema["properties"].items():
             if values["ontology"] == "0":
                 continue
             try:
                 mapped_dict[key] = self.ontology[values["ontology"]]
             except KeyError as e:
-                errors[key] = str(e)
+                if key not in not_provided_fields:
+                    errors[key] = str(e)
         if len(errors) >= 1:
-            output_errs = "\n".join(f"{k}:{v}" for k, v in errors.items())
+            output_errs = "\n".join(f"{field}:{info}" for field, info in errors.items())
             log.error(
-                "Invalid ontology for: %s", str([x for x in errors.keys()]).strip("[]")
+                "Invalid ontology for: %s", str([field for field in errors.keys()]).strip("[]")
             )
             stderr.print(
                 f"[red]Ontology values not found in relecov schema:\n{output_errs}"
@@ -161,32 +166,69 @@ class MappingSchema:
         return mapped_data
 
     def additional_formating(self, mapped_json_data):
-        """Update data like MD5 to split in two fields, one for R1 file and
-        second for R2, and include fields with fixed values.
+        """Update data that needs additional formating such as 
+        word splitting and include fields with fixed values.
         """
-        config_json = ConfigJson()
-        additional_data = config_json.get_topic_data(
+        additional_data = self.config_json.get_topic_data(
             "ENA_fields", "additional_formating"
         )
-        fixed_fields = config_json.get_topic_data("ENA_fields", "ena_fixed_fields")
-        not_provided_fields = config_json.get_configuration("ENA_fields")[
-            "map_not_provided_fields"
+        fixed_fields = self.config_json.get_topic_data("ENA_fields", "ena_fixed_fields")
+        not_provided_fields = self.config_json.get_configuration("ENA_fields")[
+            "common_missing_fields"
         ]
+
         if self.destination_schema == "ENA":
             for idx in range(len(self.json_data)):
                 for key, value in fixed_fields.items():
                     mapped_json_data[idx][key] = value
                 for key, _ in additional_data.items():
+                    """
+                    Some fields in ENA need special formatting such as sample_id+date
+                    instead of directly merging them, -- is used as delimiter.
+                    Also, the Not Provided fields are skipped in this process
+                    """
                     formated_data = {
-                        x: " ".join(
-                            [self.json_data[idx][f].split(" [", 1)[0] for f in y]
+                        x: "--".join(
+                            [self.json_data[idx][f].split(" [", 1)[0] for f in y
+                             if "Not Provided" not in self.json_data[idx][f].split(" [", 1)[0]]
                         )
                         for x, y in additional_data.items()
                     }
+                    if "fastq_filepath" in key:
+                        formated_data[key] = formated_data[key].replace("--","/")
                     mapped_json_data[idx][key] = formated_data[key]
                 for _, value in enumerate(not_provided_fields):
-                    mapped_json_data[idx][value] = "Not Provided"
-        return mapped_json_data
+                    if value in mapped_json_data[idx]:
+                        continue
+                    else:
+                        mapped_json_data[idx][value] = "Not Provided"
+
+        """This is a temporal solution for library_strategy. Once the values are also 
+        mapped by the ontology (not only the fields) this should not be necessary"""
+        for sample in mapped_json_data:
+            sample["library_strategy"] = sample["library_strategy"].strip(" strategy")
+
+        return mapped_json_data        
+    
+    def check_required_fields(self, mapped_json_data, dest_schema):
+        """Checks which required fields are Not Provided"""
+        if dest_schema == "ENA":
+            required_fields = self.mapped_to_schema["required"]
+
+            try:
+                not_provided_fields = {
+                sample["isolate"]:[field for field in required_fields if 'Not Provided' in sample[field]]
+                for sample in mapped_json_data}
+            except KeyError as e:
+                print(f"Field {e} could not be found in json data, aborting")
+                sys.exit(1)
+            notprov_report = "\n".join(f"Sample {key}: {str(val).strip('[]')}" 
+                                       for key, val in not_provided_fields.items())   
+            stderr.print(f"[red]\nSome required fields were Not Provided:\n", notprov_report)
+        else:
+            return
+        return
+
 
     def write_json_fo_file(self, mapped_json_data):
         """Write metadata to json file"""
@@ -210,6 +252,7 @@ class MappingSchema:
         mapping_schema_dict = self.maping_schemas_based_on_geontology()
         mapped_json_data = self.mapping_json_data(mapping_schema_dict)
         updated_json_data = self.additional_formating(mapped_json_data)
+        validation = self.check_required_fields(mapped_json_data, self.destination_schema)
         self.write_json_fo_file(updated_json_data)
         stderr.print(f"[green]Finished mapping to {self.destination_schema} schema")
         return
