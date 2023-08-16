@@ -751,7 +751,7 @@
         "sample"
       ]
     },
-    "personal_protective_equipment": {
+    "personal protective equipment": {
       "examples": [
         ""
       ],
@@ -978,6 +978,17 @@
       "description": "The symptoms that have been reported in relation to the illness.  If multiple exposures are applicable, please state them separated by semicolon.",
       "clasification": "Sample collection and processing",
       "label": "Illness symptoms",
+      "table": "sample"
+    },
+    "sample_alias": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001148",
+      "type": "string",
+      "description": "Unique Identifier for the sample",
+      "clasification": "Sample collection and processing",
+      "label": "Sample ID given by submitting laboratory",
       "table": "sample"
     },
     "sample_description": {
