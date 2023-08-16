@@ -78,8 +78,9 @@
             },
             "submitting_data": {
                 "file": "laboratory_address.json",
-                "map_field": "submitting_institution",
+                "map_field": "collecting_institution",
                 "adding_fields": [
+                    "submitting_institution",
                     "submitting_institution_address",
                     "submitting_institution_email"
                 ]
@@ -371,60 +372,65 @@
             "design_description": "Design Description",
             "experiment_title": "Project for ENA submission RELECOV",
             "study_title": "RELECOV Spanish Network for genomics surveillance",
-            "study_type": "",
+            "study_type": "Whole Genome Sequencing",
             "study_id": "ERP137164",
             "ena_broker_name": "Instituto de Salud Carlos III"
         },
+        "checklist": "ERC000033",
+        "templates_path": "",
         "tool": {
             "tool_name": "ena-upload-cli",
             "tool_version": "0.5.3"
         },
-        "checklist": "ERC000033",
         "df_study_fields": [
-            "study_type",
-            "study_abstract",
             "study_alias",
-            "study_title"
+            "study_title",
+            "study_type",
+            "study_abstract"
         ],
-        "df_samples_fields": [
-            "sample_name",
+        "df_sample_fields": [
+            "sample_alias",
             "sample_title",
             "collection date",
             "geographic location (country and/or sea)",
+            "sample_description",
             "host common name",
             "host scientific name",
             "host sex",
             "scientific_name",
-            "collector_name",
+            "collector name",
             "collecting institution",
+            "address",
             "isolate",
             "host subject id",
             "host health state",
             "authors",
-            "taxon_id",
-            "sample_description",
-            "address"
+            "taxon_id"
         ],
         "df_run_fields": [
-            "r1_fastq_filepath",
-            "r2_fastq_filepath",
+            "run_alias",
+            "experiment_alias",
+            "file_name",
             "file_format",
-            "sequence_file_R1_md5",
-            "sequence_file_R2_md5",
+            "file_checksum",
             "collecting institution"
         ],
         "df_experiment_fields": [
+            "experiment_alias",
+            "experiment_title",
+            "sample_alias",
+            "study_alias",
+            "design_description",
             "library_name",
             "library_strategy",
             "library_source",
             "library_selection",
             "library_layout",
-            "instrument_model",
-            "design_description",
-            "collecting institution",
             "library_construction_protocol",
             "insert_size",
-            "platform"
+            "platform",
+            "instrument_model",
+            "collecting institution"
         ],
         "rename_sample_list_og": [
             "sample_name",
@@ -450,7 +456,7 @@
             "collector name",
             "collecting institution"
         ],
-        "map_not_provided_fields": [
+        "common_missing_fields": [
             "subject exposure",
             "subject exposure duration",
             "type exposure",
@@ -472,12 +478,14 @@
         "ena_fixed_fields": {
           "broker_name": "Instituto de Salud Carlos III",
           "file_format": "FASTQ",
+          "study_alias": "RELECOV",
           "study_title": "RELECOV Spanish Network for genomics surveillance",
-          "study_abstract": "RELECOV Spanish Network for genomics surveillance",
+          "study_abstract": "RELECOV is a Spanish Network for genomics surveillance",
           "insert_size": "0"
         },
         "additional_formating": {
             "sample_description": [
+                "host_common_name",
                 "anatomical_part",
                 "collection_method"
             ],
@@ -485,7 +493,6 @@
                 "library_layout",
                 "library_preparation_kit",
                 "library_selection",
-                "library_source",
                 "library_strategy"
             ],
             "r1_fastq_filepath": [
@@ -495,6 +502,26 @@
             "r2_fastq_filepath": [
                 "r2_fastq_filepath",
                 "sequence_file_R2_fastq"
+            ],
+            "experiment_alias": [
+                "isolate_sample_id",
+                "sample_collection_date"
+            ],
+            "run_alias": [
+                "isolate_sample_id",
+                "sample_collection_date"
+            ],
+            "experiment_title": [
+                "sequencing_instrument_model",
+                "isolate_sample_id"
+            ],
+            "file_name": [
+                "sequence_file_R1_fastq",
+                "sequence_file_R2_fastq"
+            ],
+            "file_checksum": [
+                "fastq_r1_md5",
+                "fastq_r2_md5"
             ]
         }
     }
