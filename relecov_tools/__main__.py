@@ -20,6 +20,7 @@ import relecov_tools.read_bioinfo_metadata
 import relecov_tools.long_table_parse
 import relecov_tools.metadata_homogeneizer
 import relecov_tools.gisaid_upload
+import relecov_tools.upload_ena_protocol
 
 log = logging.getLogger()
 
@@ -262,20 +263,25 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-c", "--center", help="center name")
 @click.option("-e", "--ena_json", help="where the validated json is")
-@click.option("-s", "--study", help="study/project name to include in xml files")
+@click.option("-t", "--template_path", help="folder where the ENA templates are located")
 @click.option(
     "-a",
     "--action",
-    type=click.Choice(["add", "modify", "cancel", "release"], case_sensitive=False),
+    type=click.Choice(["ADD", "MODIFY", "CANCEL", "RELEASE"], case_sensitive=False),
     help="select one of the available options",
 )
 @click.option("--dev", is_flag=True, default=False)
+@click.option("-s", 
+              "--accession", 
+              is_flag=False,
+              flag_value="empty",
+              default="False", 
+              help="Accession number given after submition, required for RELEASE action")
 @click.option("-o", "--output_path", help="output folder for the xml generated files")
-def upload_to_ena(user, password, center, ena_json, dev, study, action, output_path):
-    """parsed data to create xml files to upload to ena"""
-
-    upload_ena = relecov_tools.ena_upload.EnaUpload(
-        user, password, center, ena_json, dev, study, action, output_path
+def upload_to_ena(user, password, center, ena_json, template_path, dev, action, accession, output_path):
+    """parse data to create xml files to upload to ena"""
+    upload_ena = relecov_tools.upload_ena_protocol.EnaUpload(
+        user, password, center, ena_json, template_path, dev, action, accession, output_path
     )
     upload_ena.upload()
 
