@@ -142,7 +142,8 @@ class MappingSchema:
         if len(errors) >= 1:
             output_errs = "\n".join(f"{field}:{info}" for field, info in errors.items())
             log.error(
-                "Invalid ontology for: %s", str([field for field in errors.keys()]).strip("[]")
+                "Invalid ontology for: %s",
+                str([field for field in errors.keys()]).strip("[]"),
             )
             stderr.print(
                 f"[red]Ontology values not found in relecov schema:\n{output_errs}"
@@ -166,7 +167,7 @@ class MappingSchema:
         return mapped_data
 
     def additional_formating(self, mapped_json_data):
-        """Update data that needs additional formating such as 
+        """Update data that needs additional formating such as
         word splitting and include fields with fixed values.
         """
         additional_data = self.config_json.get_topic_data(
@@ -189,13 +190,17 @@ class MappingSchema:
                     """
                     formated_data = {
                         x: "--".join(
-                            [self.json_data[idx][f].split(" [", 1)[0] for f in y
-                             if "Not Provided" not in self.json_data[idx][f].split(" [", 1)[0]]
+                            [
+                                self.json_data[idx][f].split(" [", 1)[0]
+                                for f in y
+                                if "Not Provided"
+                                not in self.json_data[idx][f].split(" [", 1)[0]
+                            ]
                         )
                         for x, y in additional_data.items()
                     }
                     if "fastq_filepath" in key:
-                        formated_data[key] = formated_data[key].replace("--","/")
+                        formated_data[key] = formated_data[key].replace("--", "/")
                     mapped_json_data[idx][key] = formated_data[key]
                 for _, value in enumerate(not_provided_fields):
                     if value in mapped_json_data[idx]:
@@ -208,8 +213,8 @@ class MappingSchema:
         for sample in mapped_json_data:
             sample["library_strategy"] = sample["library_strategy"].strip(" strategy")
 
-        return mapped_json_data        
-    
+        return mapped_json_data
+
     def check_required_fields(self, mapped_json_data, dest_schema):
         """Checks which required fields are Not Provided"""
         if dest_schema == "ENA":
@@ -217,18 +222,26 @@ class MappingSchema:
 
             try:
                 not_provided_fields = {
-                sample["isolate"]:[field for field in required_fields if 'Not Provided' in sample[field]]
-                for sample in mapped_json_data}
+                    sample["isolate"]: [
+                        field
+                        for field in required_fields
+                        if "Not Provided" in sample[field]
+                    ]
+                    for sample in mapped_json_data
+                }
             except KeyError as e:
                 print(f"Field {e} could not be found in json data, aborting")
                 sys.exit(1)
-            notprov_report = "\n".join(f"Sample {key}: {str(val).strip('[]')}" 
-                                       for key, val in not_provided_fields.items())   
-            stderr.print(f"[red]\nSome required fields were Not Provided:\n", notprov_report)
+            notprov_report = "\n".join(
+                f"Sample {key}: {str(val).strip('[]')}"
+                for key, val in not_provided_fields.items()
+            )
+            stderr.print(
+                f"[red]\nSome required fields were Not Provided:\n", notprov_report
+            )
         else:
             return
         return
-
 
     def write_json_fo_file(self, mapped_json_data):
         """Write metadata to json file"""
@@ -252,7 +265,9 @@ class MappingSchema:
         mapping_schema_dict = self.maping_schemas_based_on_geontology()
         mapped_json_data = self.mapping_json_data(mapping_schema_dict)
         updated_json_data = self.additional_formating(mapped_json_data)
-        validation = self.check_required_fields(mapped_json_data, self.destination_schema)
+        validation = self.check_required_fields(
+            mapped_json_data, self.destination_schema
+        )
         self.write_json_fo_file(updated_json_data)
         stderr.print(f"[green]Finished mapping to {self.destination_schema} schema")
         return
