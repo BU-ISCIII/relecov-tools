@@ -100,8 +100,10 @@ class BioinfoMetadata:
                     row[field] = map_data[row["submitting_lab_sample_id"]][value]
                 except KeyError as e:
                     log.error("Field %s not found in mapping stats", e)
-                    stderr.print(f"[red]Field {e} not found in mapping stats for",
-                                 f"sample {sample_name}")
+                    stderr.print(
+                        f"[red]Field {e} not found in mapping stats for",
+                        f"sample {sample_name}",
+                    )
                     sys.exit(1)
         return j_data
 
@@ -196,7 +198,7 @@ class BioinfoMetadata:
                 row["number_of_base_pairs_sequenced"] = str(base_calculation)
 
         return j_data
-    
+
     def parse_long_table(self, long_table_path, output_folder):
         file_match = os.path.join(long_table_path, "variants_long_table*.csv")
         table_path = glob.glob(file_match)
@@ -204,19 +206,20 @@ class BioinfoMetadata:
             table_path = glob.glob(file_match)[0]
         else:
             log.error("variants_long_table files found = %s", len(table_path))
-            stderr.print(f"[red]Found {len(table_path)} variants_long_table files in ",
-                         f"[red]{long_table_path}, aborting")
+            stderr.print(
+                f"[red]Found {len(table_path)} variants_long_table files in ",
+                f"[red]{long_table_path}, aborting",
+            )
             sys.exit(1)
         if not os.path.isfile(table_path):
             log.error("variants_long_table given file is not a file")
             stderr.print("[red]Variants_long_table file, Aborting")
             sys.exit(1)
         long_table = LongTableParse(table_path, output_folder)
-        
+
         long_table_parse = long_table.parsing_csv()
 
         return
-
 
     def include_long_table_path(self, j_data):
         """Include the variant long table path by searchin the in input folder
@@ -249,8 +252,10 @@ class BioinfoMetadata:
                     row[field] = map_data[row["submitting_lab_sample_id"]][value]
                 except KeyError as e:
                     log.error("Field %s not found in mapping stats", e)
-                    stderr.print(f"[red]Field {e} not found in mapping stats for",
-                                 f"sample {sample_name}")
+                    stderr.print(
+                        f"[red]Field {e} not found in mapping stats for",
+                        f"sample {sample_name}",
+                    )
                     sys.exit(1)
         return j_data
 

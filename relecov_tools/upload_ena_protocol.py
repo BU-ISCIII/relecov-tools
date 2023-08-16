@@ -39,6 +39,7 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
+
 class EnaUpload:
     def __init__(
         self,
@@ -78,7 +79,7 @@ class EnaUpload:
             self.template_path = relecov_tools.utils.prompt_path(
                 msg="Select the folder containing ENA templates"
             )
-        #template_folder = "/home/user/git_repositories/relecov-tools/relecov_tools/templates"
+        # template_folder = "/home/user/git_repositories/relecov-tools/relecov_tools/templates"
         else:
             self.template_path = template_path
         if not os.path.exists(self.template_path):
@@ -124,7 +125,7 @@ class EnaUpload:
             log.error("json data file %s does not exist ", self.source_json_file)
             stderr.print(f"[red]json data file {self.source_json_file} does not exist")
             sys.exit(1)
-                
+
         with open(self.source_json_file, "r") as fh:
             json_data = json.loads(fh.read())
             self.json_data = json_data
@@ -139,9 +140,11 @@ class EnaUpload:
         formated_df = schemas_dataframe[source]
         formated_df.insert(3, "status", self.action)
         formated_df.rename(
-            columns = {(str(source)+"_alias"):"alias",
-                    (str(source)+"_title"):"title"},
-            inplace = True
+            columns={
+                (str(source) + "_alias"): "alias",
+                (str(source) + "_title"): "title",
+            },
+            inplace=True,
         )
         if source == "sample":
             formated_df.insert(4, "ENA_CHECKLIST", self.checklist)
@@ -154,9 +157,9 @@ class EnaUpload:
             formated_df["file_name"] = formated_df["file_name"].str.split("--")
             formated_df = formated_df.explode("file_name").reset_index(drop=True)
             formated_df["file_checksum"] = [
-                x[1].split("--")[0] if x[0]%2 == 0 else x[1].split("--")[1]
+                x[1].split("--")[0] if x[0] % 2 == 0 else x[1].split("--")[1]
                 for x in enumerate(formated_df["file_checksum"])
-                ]
+            ]
         if source == "study":
             formated_df = formated_df.drop_duplicates(subset=["alias"])
             stderr.print("study table:", formated_df)
@@ -173,23 +176,24 @@ class EnaUpload:
         schemas_dataframe_raw = {}
 
         for source in source_options:
-            source_topic = "_".join(["df",source,"fields"])
+            source_topic = "_".join(["df", source, "fields"])
             source_fields = self.config_json.get_topic_data("ENA_fields", source_topic)
-            source_dict = {field: [sample[field] for sample in json_data]
-                            for field in source_fields}
+            source_dict = {
+                field: [sample[field] for sample in json_data]
+                for field in source_fields
+            }
             schemas_dataframe_raw[source] = pd.DataFrame.from_dict(source_dict)
             schemas_dataframe = self.table_formatting(schemas_dataframe_raw, source)
 
         return schemas_dataframe
-    
+
     def save_tables(self, schemas_dataframe):
         """Save the dataframes into csv files"""
         stderr.print(f"Saving dataframes in {self.output_path}")
         for source, table in schemas_dataframe.items():
-            table_name = str(self.output_path+source+"_table.csv")
+            table_name = str(self.output_path + source + "_table.csv")
             table.to_csv(table_name, sep=",")
 
-    
     def xml_submission(self, schemas_dataframe):
         """The metadata is submitted in an xml format"""
 
@@ -202,14 +206,25 @@ class EnaUpload:
                 self.template_path, schema_targets, self.center, self.checklist, tool
             )
             submission_xml = construct_submission(
-                self.template_path, self.action, schema_xmls, self.center, self.checklist, tool
+                self.template_path,
+                self.action,
+                schema_xmls,
+                self.center,
+                self.checklist,
+                tool,
             )
-        elif self.action in ['CANCEL', 'RELEASE']:
-        # when CANCEL/RELEASE, only the accessions are needed
-        # schema_xmls is only used to record the following 'submission'
-            schema_xmls = {}    
-            submission_xml = construct_submission(self.template_path, self.action,
-                                    schema_targets, self.center, self.checklist, tool)
+        elif self.action in ["CANCEL", "RELEASE"]:
+            # when CANCEL/RELEASE, only the accessions are needed
+            # schema_xmls is only used to record the following 'submission'
+            schema_xmls = {}
+            submission_xml = construct_submission(
+                self.template_path,
+                self.action,
+                schema_targets,
+                self.center,
+                self.checklist,
+                tool,
+            )
 
         schema_xmls["submission"] = submission_xml
 
@@ -225,7 +240,7 @@ class EnaUpload:
         print(f"Printing receipt to {receipt_dir}")
 
         with open(f"{receipt_dir}", "w") as fw:
-                fw.write(receipt)
+            fw.write(receipt)
         try:
             schema_update = process_receipt(receipt.encode("utf-8"), self.action)
         except ValueError:
@@ -237,12 +252,12 @@ class EnaUpload:
                 schemas_dataframe, schema_targets, schema_update
             )
         else:
-            schemas_dataframe = update_table_simple(schemas_dataframe,
-                                               schema_targets,
-                                               self.action)
+            schemas_dataframe = update_table_simple(
+                schemas_dataframe, schema_targets, self.action
+            )
         self.save_tables(schemas_dataframe)
         return
-    
+
     def fastq_submission(self, json_data):
         """The fastq files are submitted apart from the metadata"""
         stderr.print(f"Submitting fastq files")

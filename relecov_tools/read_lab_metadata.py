@@ -154,8 +154,10 @@ class RelecovMetadata:
                             ontology_errors[key] = 1
                         continue
         if len(ontology_errors) >= 1:
-            stderr.print(f"[red] No ontology could be added in:",
-                "\n".join({f"{x} - {y} samples" for x,y in ontology_errors.items()}))
+            stderr.print(
+                f"[red] No ontology could be added in:",
+                "\n".join({f"{x} - {y} samples" for x, y in ontology_errors.items()}),
+            )
         return m_data
 
     def process_from_json(self, m_data, json_fields):
