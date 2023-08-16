@@ -12,7 +12,6 @@ import rich.traceback
 import relecov_tools.utils
 import relecov_tools.read_lab_metadata
 import relecov_tools.sftp_handle
-import relecov_tools.ena_upload
 import relecov_tools.json_validation
 import relecov_tools.map_schema
 import relecov_tools.feed_database
