@@ -11,6 +11,7 @@ from yaml import YAMLError
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
+from relecov_tools.long_table_parse import LongTableParse
 
 # import relecov_tools.json_schema
 
@@ -93,12 +94,14 @@ class BioinfoMetadata:
         )
 
         for row in j_data:
+            sample_name = row["submitting_lab_sample_id"]
             for field, value in mapping_fields.items():
                 try:
-                    row[field] = map_data[row["sequencing_sample_id"]][value]
+                    row[field] = map_data[row["submitting_lab_sample_id"]][value]
                 except KeyError as e:
                     log.error("Field %s not found in mapping stats", e)
-                    stderr.print(f"[red]Field {e} not found in mapping stats")
+                    stderr.print(f"[red]Field {e} not found in mapping stats for",
+                                 f"sample {sample_name}")
                     sys.exit(1)
         return j_data
 
@@ -108,10 +111,10 @@ class BioinfoMetadata:
             "bioinfo_analysis", "mapping_pangolin"
         )
         for row in j_data:
-            if "-" in row["sequencing_sample_id"]:
-                sample_name = row["sequencing_sample_id"].replace("-", "_")
+            if "-" in row["submitting_lab_sample_id"]:
+                sample_name = row["submitting_lab_sample_id"].replace("-", "_")
             else:
-                sample_name = row["sequencing_sample_id"]
+                sample_name = row["submitting_lab_sample_id"]
 
             f_name_regex = sample_name + ".pangolin.*.csv"
             f_path = os.path.join(self.input_folder, f_name_regex)
@@ -165,10 +168,10 @@ class BioinfoMetadata:
             "bioinfo_analysis", "mapping_consensus"
         )
         for row in j_data:
-            if "-" in row["sequencing_sample_id"]:
-                sample_name = row["sequencing_sample_id"].replace("-", "_")
+            if "-" in row["submitting_lab_sample_id"]:
+                sample_name = row["submitting_lab_sample_id"].replace("-", "_")
             else:
-                sample_name = row["sequencing_sample_id"]
+                sample_name = row["submitting_lab_sample_id"]
             f_name = sample_name + ".consensus.fa"
             f_path = os.path.join(self.input_folder, f_name)
             try:
@@ -187,12 +190,33 @@ class BioinfoMetadata:
             row["consensus_sequence_filename"] = f_name
             row["consensus_sequence_md5"] = relecov_tools.utils.calculate_md5(f_path)
             base_calculation = int(row["read_length"]) * len(record_fasta)
-            if row["sequencing_sample_id"] != "":
+            if row["submitting_lab_sample_id"] != "":
                 row["number_of_base_pairs_sequenced"] = str(base_calculation * 2)
             else:
                 row["number_of_base_pairs_sequenced"] = str(base_calculation)
 
         return j_data
+    
+    def parse_long_table(self, long_table_path, output_folder):
+        file_match = os.path.join(long_table_path, "variants_long_table*.csv")
+        table_path = glob.glob(file_match)
+        if len(table_path) == 1:
+            table_path = glob.glob(file_match)[0]
+        else:
+            log.error("variants_long_table files found = %s", len(table_path))
+            stderr.print(f"[red]Found {len(table_path)} variants_long_table files in ",
+                         f"[red]{long_table_path}, aborting")
+            sys.exit(1)
+        if not os.path.isfile(table_path):
+            log.error("variants_long_table given file is not a file")
+            stderr.print("[red]Variants_long_table file, Aborting")
+            sys.exit(1)
+        long_table = LongTableParse(table_path, output_folder)
+        
+        long_table_parse = long_table.parsing_csv()
+
+        return
+
 
     def include_long_table_path(self, j_data):
         """Include the variant long table path by searchin the in input folder
@@ -219,12 +243,14 @@ class BioinfoMetadata:
             "bioinfo_analysis", "mapping_variant_metrics"
         )
         for row in j_data:
+            sample_name = row["submitting_lab_sample_id"]
             for field, value in mapping_fields.items():
                 try:
-                    row[field] = map_data[row["sequencing_sample_id"]][value]
+                    row[field] = map_data[row["submitting_lab_sample_id"]][value]
                 except KeyError as e:
                     log.error("Field %s not found in mapping stats", e)
-                    stderr.print(f"[red]Field {e} not found in mapping stats")
+                    stderr.print(f"[red]Field {e} not found in mapping stats for",
+                                 f"sample {sample_name}")
                     sys.exit(1)
         return j_data
 
@@ -287,6 +313,8 @@ class BioinfoMetadata:
         j_data = self.include_pangolin_data(j_data)
         stderr.print("[blue]Adding consensus data")
         j_data = self.include_consensus_data(j_data)
+        stderr.print("[blue]Parsing variants_long_table info to json format...")
+        self.parse_long_table(self.input_folder, self.output_folder)
         stderr.print("[blue]Adding variant long table path")
         j_data = self.include_long_table_path(j_data)
         file_name = (
