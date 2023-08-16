@@ -206,8 +206,10 @@ class MappingSchema:
                         continue
                     else:
                         mapped_json_data[idx][value] = "Not Provided"
-        """This is a temporal solution for library_strategy. Once the values are also 
-        mapped by the ontology (not only the fields) this should not be necessary"""
+        """
+        This is a temporal solution for library_strategy. Once the values are also
+        mapped by the ontology (not only the fields) this should not be necessary
+        """
         for sample in mapped_json_data:
             sample["library_strategy"] = sample["library_strategy"].strip(" strategy")
 
