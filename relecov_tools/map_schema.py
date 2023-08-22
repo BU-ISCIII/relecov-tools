@@ -121,8 +121,8 @@ class MappingSchema:
             self.ontology[values["ontology"]] = key
         self.output_folder = output_folder
 
-        if os.path.exists(os.path.join(output_folder,"mapping_errors.log")):
-            os.remove(os.path.join(output_folder,"mapping_errors.log"))
+        if os.path.exists(os.path.join(output_folder, "mapping_errors.log")):
+            os.remove(os.path.join(output_folder, "mapping_errors.log"))
 
     def maping_schemas_based_on_geontology(self):
         """Return a dictionary with the properties of the mapped_to_schema as key and
@@ -141,7 +141,7 @@ class MappingSchema:
                 if key in required_fields:
                     stderr.print(
                         f"[red]Required field {key} ontology is missing in relecov schema"
-                        )
+                    )
                     sys.exit(1)
                 else:
                     errors[key] = str(e)
@@ -151,9 +151,9 @@ class MappingSchema:
                 "Invalid ontology for: %s",
                 str([field for field in errors.keys()]).strip("[]"),
             )
-            stderr.print("[yellow]Some ontologies failed mapping.Check mapping_errors.log")
+            stderr.print("\nSome ontologies failed mapping. Check mapping_errors.log")
             with open("mapping_errors.log", "w") as errs:
-                errs.write("Ontology mapping errors:\n"+output_errs+"\n")
+                errs.write("Ontology mapping errors:\n" + output_errs + "\n")
         return mapped_dict
 
     def mapping_json_data(self, mapping_schema_dict):
@@ -245,10 +245,10 @@ class MappingSchema:
             )
             stderr.print(
                 f"[red]\nSome required fields for {dest_schema} were Not Provided:\n",
-                "Check mapping_errors.log for more details"
+                "Check mapping_errors.log for more details",
             )
             with open("mapping_errors.log", "a") as errs:
-                errs.write("Required fields missing:\n"+notprov_report)
+                errs.write("Required fields missing:\n" + notprov_report)
         else:
             return
         return
