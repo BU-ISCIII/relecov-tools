@@ -2802,6 +2802,48 @@
             "label": "First created date",
             "fill_mode": "batch"
         },
+        "host health state": {
+            "examples": [
+              ""
+            ],
+            "ontology": "GENEPIO:0001388",
+            "type": "string",
+            "description": " Status of the host",
+            "clasification": "Host information",
+            "label": "Host health state",
+            "table": [
+              "sample"
+            ]
+        },
+        "ena_sample_description":{
+            "examples": [
+                "Sample from Belgian Covid-19 patient. Sample was obtained at the Hospital AZ Rivierenland, in Antwerp, Belgium."
+              ],
+              "ontology": "sep:00196",
+              "type": "string",
+              "description": "Free text description of the sample.",
+              "clasification": "Sample collection and processing",
+              "label": "Sample Description",
+              "table": "sample"
+        },
+        "file_format": {
+            "examples": [
+              "BAM,CRAM,FASTQ"
+            ],
+            "enum": [
+              "BAM [format:2572]",
+              "CRAM [format:3462]",
+              "FASTQ [format:1930]"
+            ],
+            "ontology": "NMR:1001459",
+            "type": "string",
+            "description": "The run data file model.",
+            "clasification": "Submission ENA",
+            "label": "File format",
+            "table": [
+              "experiments"
+            ]
+        },
         "collector_name": {
             "examples": [
               "John Smith, unknown"
