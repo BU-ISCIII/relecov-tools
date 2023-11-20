@@ -58,14 +58,15 @@ Options:
 --help                     Show this message and exit.
 
 Commands:
-    download          Download files located in sftp server.
-    read-metadata     Create the json compliant to the relecov schema from...
-    validate          Validate json file against schema.
-    map               Convert data between phage plus schema to ENA,...
-    upload-to-ena     parsed data to create xml files to upload to ena
-    upload-to-gisaid  parsed data to create files to upload to gisaid
-    launch            launch viralrecon in hpc
-    update-db         feed database with metadata jsons
+    download                Download files located in sftp server.
+    read-lab-metadata       Create the json compliant to the relecov schema from...
+    read-bioinfo-metadata   Create the json compliant to the relecov schema with Bioinfo Metadata.
+    validate                Validate json file against schema.
+    map                     Convert data between phage plus schema to ENA,...
+    upload-to-ena           parsed data to create xml files to upload to ena
+    upload-to-gisaid        parsed data to create files to upload to gisaid
+    update-db               feed database with metadata jsons
+    launch                  launch viralrecon in hpc
 ```
 #### download
 The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different available folders in the passed credentials. In addition, it checks if the files in the current folder match the files in the metadata file and also checks if there are md5sum for each file. Else, it creates one before storing in the final repository.
@@ -77,9 +78,15 @@ Usage: relecov-tools download [OPTIONS]
   Download files located in sftp server.
 
   Options:
-    -u, --user TEXT       User name for login to sftp server
-    -p, --password TEXT   password for the user to login
-    -f, --conf_file TEXT  Configuration file in yaml format (no params file)
+    -u, --user            User name for login to sftp server
+    -p, --password        Password for the user to login
+    -d, --download_option Select the download option: [download_only, download_clean, delete_only].
+        download_only will only download the files
+        download_clean will remove files from sftp after download
+        delete_only will only delete the files
+    -o, --output_location Flag: Select location for downloaded files, overrides config file location
+    -t, --target_folders  Flag: Select which sftp folders will be targeted giving [paths] or via prompt
+    -f, --conf_file       Configuration file in yaml format (no params file)
     --help                Show this message and exit.
 ```
 
@@ -100,11 +107,11 @@ allowed_sample_extensions:
     - .fasta
 ```
 
-#### read-metadata
-`read-metadata` command reads the excel file with laboratory metadata and processes it adding additional needed fields.
+#### read-lab-metadata
+`read-lab-metadata` command reads the excel file with laboratory metadata and processes it adding additional needed fields.
 
 ```
-$ relecov-tools read-metadata --help
+$ relecov-tools read-lab-metadata --help
 Usage: relecov-tools read-metadata [OPTIONS]
 
   Create the json compliant to the relecov schema from the Metadata file.
@@ -119,6 +126,21 @@ Usage: relecov-tools read-metadata [OPTIONS]
 
 
 An example for the metadata excel file can be found [here](./relecov_tools/example_data/METADATA_LAB_TEST.xlsx)
+
+#### read-bioinfo-metadata
+`read-bioinfo-metadata` Include the results from the Bioinformatics analysis (default: viralrecon) into the Json previously created with read-lab-metadata module.
+
+```
+$ relecov-tools read-bioinfo-metadata --help
+Usage: relecov-tools read-bioinfo-metadata [OPTIONS]
+
+   Create the json compliant to the relecov schema with Bioinfo Metadata.
+
+   Options:
+      -j, --json_file       Json file containing lab metadata
+      -i, --input_folder    Path to folder containing analysis results
+      -o, --out_dir         Path to save output file"
+```
 
 #### validate
 `validate` commands validate the data in json format outputted by `read-metadata` command against a json schema, in this case the relecov [schema specification](./relecov_tools/schema/relecov_schema.json).
@@ -166,24 +188,48 @@ Usage: relecov-tools upload-to-ena [OPTIONS]
   parsed data to create xml files to upload to ena
 
   Options:
-    -u, --user TEXT                          user name for login to ena
-    -p, --password TEXT                      password for the user to login
-    -e, --ena_json TEXT                      where the validated json is
-    -s, --study TEXT                         study/project name to include in xml files
-    -a, --action [add|modify|cancel|release] select one of the available options
-    --dev / --production
+    -u, --user                               user name for login to ena
+    -p, --password                           password for the user to login
+    -c, --center                             center name
+    -e, --ena_json                           where the validated json is
+    -t, --template_path                      path to folder containing ENA xml templates
+    -a, --action                             select one of the available options: [add|modify|cancel|release]
+    --dev                                    Flag: Test submission
+    --upload_fastq                           Flag: Upload fastq files. Mandatory for "add" action
+    -m", --metadata_types                    List of metadata xml types to submit [study,experiment,run,sample]
     -o, --output_path TEXT                   output folder for the xml generated files
     --help                                   Show this message and exit.
 
 ```
 
 #### upload-to-gisaid
-SOON
+`upload-to-gisaid` uses the json mapped to gisaid schema to upload raw data and metadata to GISAID db
 
-#### launch
-SOON
+```
+Usage: relecov-tools upload-to-gisaid [OPTIONS]
+
+  parsed data to create xml files to upload to ena
+
+  Options:
+    -u, --user            user name for login
+    -p, --password        password for the user to login
+    -c, --client_id       client-ID provided by clisupport@gisaid.org
+    -t, --token           path to athentication token
+    -e, --gisaid_json     path to validated json mapped to GISAID
+    -i, --input_path      path to fastas folder or multifasta file
+    -f, --frameshift      frameshift notification: ["catch_all", "catch_none", "catch_novel"]
+    -x, --proxy_config    introduce your proxy credentials as: username:password@proxy:port
+    --single              Flag: input is a folder with several fasta files.
+    --gzip                Flag: input fasta is gziped.
+```
 
 #### update-db
+    -u, --user                         user name for login
+    -p, --password                     password for the user to login
+    -t, --type                         Select the type of information to upload to database [sample,bioinfodata,variantdata]
+    -d, --databaseServer               Name of the database server receiving the data [iskylims,relecov]
+
+#### launch
 SOON
 
 ### Python package mode
