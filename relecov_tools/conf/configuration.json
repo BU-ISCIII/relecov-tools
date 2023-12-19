@@ -279,20 +279,20 @@
     ],
     "bioinfo_analysis": {
         "fixed_values": {
-            "assembly": "None",
-            "assembly_params": "None",
+            "assembly": "Not Provided [GENEPIO:0001668]",
+            "assembly_params": "Not Provided [GENEPIO:0001668]",
             "bioinformatics_protocol_software_name": "nf-core/viralrecon",
             "commercial_open_source_both": "Open Source",
             "consensus_params": "-p vcf -f",
             "consensus_sequence_software_name": "BCFTOOLS_CONSENSUS",
             "dehosting_method_software_name": "KRAKEN2_KRAKEN2",
             "depth_of_coverage_threshold": ">10x",
-            "if_assembly_other": "None",
-            "if_bioinformatic_protocol_is_other_specify": "None",
-            "if_consensus_other": "None",
-            "if_lineage_identification_other": "None",
-            "if_mapping_other": "None",
-            "if_preprocessing_other": "None",
+            "if_assembly_other": "Not Provided [GENEPIO:0001668]",
+            "if_bioinformatic_protocol_is_other_specify": "Not Provided [GENEPIO:0001668]",
+            "if_consensus_other": "Not Provided [GENEPIO:0001668]",
+            "if_lineage_identification_other": "Not Provided [GENEPIO:0001668]",
+            "if_mapping_other": "Not Provided [GENEPIO:0001668]",
+            "if_preprocessing_other": "Not Provided [GENEPIO:0001668]",
             "lineage_analysis_software_name": "pangolin",
             "mapping_params": "--seed 1",
             "mapping_software_name": "BOWTIE2_ALIGN",
@@ -300,6 +300,10 @@
             "preprocessing_software_name": "FASTP",
             "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20 -m 10",
             "variant_calling_software_name": "IVAR_VARIANTS"
+        },
+        "feed_empty_fields":{
+            "lineage_analysis_date": "Not Provided [GENEPIO:0001668]",
+            "consensus_sequence_name": "Not Provided [GENEPIO:0001668]"
         },
         "required_file": {
             "variants_metrics": "summary_variants_metrics_mqc.csv",
@@ -432,49 +436,6 @@
             "instrument_model",
             "collecting institution"
         ],
-        "rename_sample_list_og": [
-            "sample_name",
-            "sample_title",
-            "geographic_location_(country_and/or_sea)",
-            "host_subject_id",
-            "collection_date",
-            "host_common_name",
-            "host sex",
-            "host_scientific_name",
-            "collector_name",
-            "collecting institution"
-        ],
-        "rename_sample_list_final": [
-            "alias",
-            "title",
-            "geographic location (country and/or sea)",
-            "host subject id",
-            "collection date",
-            "host common name",
-            "host sex",
-            "host scientific name",
-            "collector name",
-            "collecting institution"
-        ],
-        "common_missing_fields": [
-            "subject exposure",
-            "subject exposure duration",
-            "type exposure",
-            "personal protective equipment",
-            "hospitalisation",
-            "illness duration",
-            "illness symptoms",
-            "host disease outcome",
-            "host health state",
-            "definition for seropositive sample",
-            "library_construction_protocol",
-            "serotype (required for a seropositive sample)",
-            "strain",
-            "host habitat",
-            "host description",
-            "gravidity",
-            "host behaviour"
-        ],
         "ena_fixed_fields": {
           "broker_name": "Instituto de Salud Carlos III",
           "file_format": "FASTQ",
@@ -483,6 +444,12 @@
           "study_abstract": "RELECOV is a Spanish Network for genomics surveillance",
           "insert_size": "0"
         },
+        "accession_fields": [
+            "ena_study_accession",
+            "ena_sample_accession",
+            "ena_experiment_accession",
+            "ena_run_accession"
+        ],
         "additional_formating": {
             "sample_description": [
                 "host_common_name",
