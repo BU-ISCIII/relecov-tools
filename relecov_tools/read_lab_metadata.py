@@ -76,7 +76,7 @@ class RelecovMetadata:
             except KeyError:
                 log.warning("Property %s does not have 'label' attribute", prop)
                 stderr.print(
-                    "[orange] Property " + prop + " does not have 'label' attribute"
+                    "[orange]Property " + prop + " does not have 'label' attribute"
                 )
                 continue
 
@@ -155,7 +155,7 @@ class RelecovMetadata:
                         continue
         if len(ontology_errors) >= 1:
             stderr.print(
-                "[red] No ontology could be added in:",
+                "[red] No ontology could be added in:\n",
                 "\n".join({f"{x} - {y} samples" for x, y in ontology_errors.items()}),
             )
         return m_data
@@ -168,10 +168,12 @@ class RelecovMetadata:
             try:
                 m_data[idx].update(json_data[m_data[idx][map_field]])
             except KeyError as error:
-                if str(error.args[0]).lower() == "not provided":
+                clean_error = re.sub('[\[].*?[\]]', '', str(error.args[0]))
+                if str(clean_error).lower().strip() == "not provided":
                     log.error("Label was not provided, auto-completing columns")
+                    sample_id = m_data[idx]["collecting_lab_sample_id"]
                     stderr.print(
-                        f"Label {map_field} was not provided in sample {idx}, "
+                        f"Label {map_field} was not provided in sample {sample_id}, "
                         + "auto-completing with Not Provided"
                     )
                 else:
@@ -185,7 +187,7 @@ class RelecovMetadata:
                     )
                     sys.exit(1)
                 fields_to_add = {
-                    x: "Not Provided" for x in json_fields["adding_fields"]
+                    x: "Not Provided [GENEPIO:0001668]" for x in json_fields["adding_fields"]
                 }
                 m_data[idx].update(fields_to_add)
         return m_data
@@ -194,18 +196,18 @@ class RelecovMetadata:
         """Add information located inside various json file as fields"""
 
         for key, values in self.json_req_files.items():
-            stderr.print(f"[blue] Processing {key}")
+            stderr.print(f"[blue]Processing {key}")
             f_path = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "conf", values["file"]
             )
             values["j_data"] = relecov_tools.utils.read_json_file(f_path)
             metadata = self.process_from_json(metadata, values)
-            stderr.print(f"[green] Processed {key}")
+            stderr.print(f"[green]Processed {key}")
 
         # As sample data file is comming in an input parameter, it cannot
         # be inside the configuration json file.
         # Include Sample information data from sample json file
-        stderr.print("[blue] Processing sample data file")
+        stderr.print("[blue]Processing sample data file")
         s_json = {}
         s_json["map_field"] = "submitting_lab_sample_id"
         s_json["adding_fields"] = [
@@ -218,7 +220,7 @@ class RelecovMetadata:
         ]
         s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
         metadata = self.process_from_json(metadata, s_json)
-        stderr.print("[green] Processed sample data file.")
+        stderr.print("[green]Processed sample data file.")
         return metadata
 
     def read_configuration_json_files(self):
@@ -241,7 +243,7 @@ class RelecovMetadata:
         """
         heading_row_number = 4
         ws_metadata_lab = relecov_tools.utils.read_excel_file(
-            self.metadata_file, "METADATA_LAB", heading_row_number, False
+            self.metadata_file, "METADATA_LAB", heading_row_number, leave_empty=False
         )
         valid_metadata_rows = []
         errors = {}
@@ -256,7 +258,7 @@ class RelecovMetadata:
                     "Sample ID given for sequencing not found in row  %s", row_number
                 )
                 stderr.print(
-                    f"[red] Sample ID given for sequencing not found in row {row_number}"
+                    f"[red]Sample ID given for sequencing not found in row {row_number}"
                 )
                 continue
             for key in row.keys():
@@ -266,7 +268,7 @@ class RelecovMetadata:
                 if "date" in key.lower():
                     if row[key] is None or str(row[key]).lower() == "not provided":
                         log.info("Date was not provided")
-                        row[key] = "Not Provided"
+                        row[key] = "Not Provided [GENEPIO:0001668]"
                     elif isinstance(row[key], int) or isinstance(row[key], float):
                         log.info("Date given as an integer. Understood as a year")
                         row[key] = str(int(row[key]))
@@ -286,7 +288,7 @@ class RelecovMetadata:
                                     "Invalid date format in sample %s", row_number
                                 )
                                 stderr.print(
-                                    f"[red] Invalid date format in sample {sample_number},  {key}"
+                                    f"[red]Invalid date format in sample {sample_number},  {key}"
                                 )
                 elif "sample id" in key.lower():
                     if isinstance(row[key], float) or isinstance(row[key], int):
@@ -298,23 +300,23 @@ class RelecovMetadata:
                     property_row[self.label_prop_dict[key]] = row[key]
                 except KeyError as e:
                     log.error("Error when mapping the label %s", e)
-                    stderr.print(f"[red] Error when mapping the label {str(e)}")
+                    stderr.print(f"[red]Error when mapping the label {str(e)}")
                     continue
 
             valid_metadata_rows.append(property_row)
         return valid_metadata_rows, errors
 
     def create_metadata_json(self):
-        stderr.print("[blue] Reading Lab Metadata Excel File")
+        stderr.print("[blue]Reading Lab Metadata Excel File")
         valid_metadata_rows, errors = self.read_metadata_file()
         if len(errors) > 0:
-            stderr.print("[red] Stopped executing because errors were found")
+            stderr.print("[red]Stopped executing because errors were found")
             sys.exit(1)
         # Continue by adding extra information
-        stderr.print("[blue] Including additional information")
+        stderr.print("[blue]Including additional information")
 
         extended_metadata = self.adding_fields(valid_metadata_rows)
-        stderr.print("[blue] Including post processing information")
+        stderr.print("[blue]Including post processing information")
         extended_metadata = self.adding_post_processing(extended_metadata)
         extended_metadata = self.adding_copy_from_other_field(extended_metadata)
         extended_metadata = self.adding_fixed_fields(extended_metadata)
@@ -322,7 +324,7 @@ class RelecovMetadata:
         file_name = (
             "processed_metadata_lab_" + datetime.now().strftime("%Y_%m_%d") + ".json"
         )
-        stderr.print("[blue] Writting output json file")
+        stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
         file_path = os.path.join(self.output_folder, file_name)
         relecov_tools.utils.write_json_fo_file(completed_metadata, file_path)
