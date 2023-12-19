@@ -168,7 +168,7 @@ class RelecovMetadata:
             try:
                 m_data[idx].update(json_data[m_data[idx][map_field]])
             except KeyError as error:
-                clean_error = re.sub('[\[].*?[\]]', '', str(error.args[0]))
+                clean_error = re.sub("[\[].*?[\]]", "", str(error.args[0]))
                 if str(clean_error).lower().strip() == "not provided":
                     log.error("Label was not provided, auto-completing columns")
                     sample_id = m_data[idx]["collecting_lab_sample_id"]
@@ -187,7 +187,8 @@ class RelecovMetadata:
                     )
                     sys.exit(1)
                 fields_to_add = {
-                    x: "Not Provided [GENEPIO:0001668]" for x in json_fields["adding_fields"]
+                    x: "Not Provided [GENEPIO:0001668]"
+                    for x in json_fields["adding_fields"]
                 }
                 m_data[idx].update(fields_to_add)
         return m_data

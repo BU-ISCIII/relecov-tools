@@ -101,10 +101,10 @@ class EnaUpload:
             )
         else:
             self.output_path = output_path
-        
-        self.upload_fastq_files = upload_fastq 
 
-        all_metadata_types = ["study","run","experiment","sample"]
+        self.upload_fastq_files = upload_fastq
+
+        all_metadata_types = ["study", "run", "experiment", "sample"]
         if metadata_types is None:
             # If not specified, all metadata xmls are generated and submitted
             self.metadata_types = all_metadata_types
@@ -113,8 +113,8 @@ class EnaUpload:
             if not all(xml in all_metadata_types for xml in self.metadata_types):
                 wrong_types = [
                     xml for xml in self.metadata_types if xml not in all_metadata_types
-                    ]
-                log.error("Unsupported metadata xml types: "+str(wrong_types))
+                ]
+                log.error("Unsupported metadata xml types: " + str(wrong_types))
                 stderr.print(f"[red]Unsupported metadata xml types: {wrong_types}")
                 sys.exit(1)
 
@@ -142,9 +142,8 @@ class EnaUpload:
         )
         if self.action in ["CANCEL", "MODIFY", "RELEASE"]:
             formated_df.rename(
-                columns={"ena_"+str(source) + "_accession": "accession"},
-                inplace=True
-                )
+                columns={"ena_" + str(source) + "_accession": "accession"}, inplace=True
+            )
         if source == "study":
             formated_df = formated_df.drop_duplicates(subset=["alias"])
         if source == "sample":
@@ -177,8 +176,10 @@ class EnaUpload:
         if self.action in ["CANCEL", "MODIFY", "RELEASE"]:
             for source in source_options:
                 missing_accessions = [
-                    samp["sample_name"] for samp in json_data for fd in 
-                    filtered_access_fields if (source in fd and fd not in samp.keys())
+                    samp["sample_name"]
+                    for samp in json_data
+                    for fd in filtered_access_fields
+                    if (source in fd and fd not in samp.keys())
                 ]
                 if missing_accessions:
                     log.error("Found samples in json without proper ena accessions")
@@ -186,18 +187,24 @@ class EnaUpload:
                 all_missing_accessions.extend(missing_accessions)
             if all_missing_accessions:
                 stderr.print(f"Not committed samples:\n", all_missing_accessions)
-            
+
         for source in source_options:
             source_topic = "_".join(["df", source, "fields"])
             source_fields = self.config_json.get_topic_data("ENA_fields", source_topic)
             if self.action in ["CANCEL", "MODIFY", "RELEASE"]:
-                source_fields.append(str("ena_"+source+"_accession"))
+                source_fields.append(str("ena_" + source + "_accession"))
             source_dict = {
-                fld: [sample[fld] for sample in json_data if sample["sample_name"]
-                      not in all_missing_accessions] for fld in source_fields
+                field: [
+                    sample[field]
+                    for sample in json_data
+                    if sample["sample_name"] not in all_missing_accessions
+                ]
+                for field in source_fields
             }
             schemas_dataframe_raw[source] = pd.DataFrame.from_dict(source_dict)
-            schemas_dataframe[source] = self.table_formatting(schemas_dataframe_raw, source)
+            schemas_dataframe[source] = self.table_formatting(
+                schemas_dataframe_raw, source
+            )
 
         return schemas_dataframe
 
@@ -218,14 +225,16 @@ class EnaUpload:
             if source == "run":
                 del access_dict[source][1::2]
         for source, acclist in access_dict.items():
-            accession_field_name = str("ena_"+source+"_accession")
+            accession_field_name = str("ena_" + source + "_accession")
             for sample, accession in zip(updated_json_data, acclist):
                 sample[accession_field_name] = accession
         return updated_json_data
 
     def xml_submission(self, json_data, schemas_dataframe, batch_index=None):
         """The metadata is submitted in an xml format"""
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         schema_targets = extract_targets(self.action, schemas_dataframe)
 
         tool = self.config_json.get_configuration("ENA_fields")["tool"]
@@ -257,12 +266,14 @@ class EnaUpload:
         schema_xmls["submission"] = submission_xml
 
         stderr.print(f"\nProcessing submission to ENA server: {self.url}")
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         receipt = send_schemas(schema_xmls, self.url, self.user, self.passwd).text
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
         date = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
-        receipt_name = "receipt_"+date+".xml"
+        receipt_name = "receipt_" + date + ".xml"
         receipt_dir = os.path.join(self.output_path, receipt_name)
         stderr.print(f"Printing receipt to {receipt_dir}")
 
@@ -284,11 +295,11 @@ class EnaUpload:
 
         updated_json = self.update_json(updated_schemas_df, json_data)
         if batch_index == None:
-            suffix = str("_"+date+".json")
+            suffix = str("_" + date + ".json")
         else:
-            suffix = str("_"+date+"_batch"+str(batch_index)+".json")
+            suffix = str("_" + date + "_batch" + str(batch_index) + ".json")
         updated_json_name = (
-            os.path.splitext(os.path.basename(self.source_json_file))[0]+suffix
+            os.path.splitext(os.path.basename(self.source_json_file))[0] + suffix
         )
         relecov_tools.utils.write_json_fo_file(updated_json, updated_json_name)
 
@@ -323,19 +334,19 @@ class EnaUpload:
         g2 = session.quit()
         stderr.print(g2)
         return
-    
+
     def large_json_upload(self, json_data):
         """
-            Split large json into smaller jsons of maximum size 20
-            due to limitations in submissions to ENA's API 
+        Split large json into smaller jsons of maximum size 20
+        due to limitations in submissions to ENA's API
         """
         ena_api_limit = 20
         number_of_batchs = len(range(0, len(json_data), ena_api_limit))
         stderr.print(f"Splitting the json data in {number_of_batchs} batchs...")
-        for index, x in range(0, len(json_data), ena_api_limit): 
-            batch_index = str(index+1)
+        for index, x in range(0, len(json_data), ena_api_limit):
+            batch_index = str(index + 1)
             stderr.print(f"[blue]Processing batch {batch_index}...")
-            self.standard_upload(json_data[x:x+ena_api_limit], batch_index) 
+            self.standard_upload(json_data[x : x + ena_api_limit], batch_index)
         return
 
     def standard_upload(self, json_data, batch_index=None):
@@ -357,6 +368,3 @@ class EnaUpload:
             self.large_json_upload(self.json_data)
         stderr.print("[green] Finished execution")
         return
-    
-
-
