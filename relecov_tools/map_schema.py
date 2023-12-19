@@ -140,18 +140,16 @@ class MappingSchema:
             except KeyError as e:
                 if key in required_fields:
                     stderr.print(
-                        f"[red]Required field {key} ontology is missing in relecov schema"
+                        f"[red]Required field {key} ontology missing in relecov schema"
                     )
                     sys.exit(1)
                 else:
                     errors[key] = str(e)
         if len(errors) >= 1:
             output_errs = "\n".join(f"{field}:{info}" for field, info in errors.items())
-            log.error(
-                "Invalid ontology for: %s",
-                str([field for field in errors.keys()]).strip("[]"),
-            )
-            stderr.print("\nSome ontologies failed mapping. Check mapping_errors.log")
+            invalid_ontologies = str([field for field in errors.keys()]).strip("[]")
+            log.error("Invalid ontology for: "+invalid_ontologies)
+            stderr.print("[yellow]\nGot unmapped ontologies. Check mapping_errors.log")
             with open("mapping_errors.log", "w") as errs:
                 errs.write("Ontology mapping errors:\n" + output_errs + "\n")
         return mapped_dict
@@ -180,9 +178,6 @@ class MappingSchema:
             "ENA_fields", "additional_formating"
         )
         fixed_fields = self.config_json.get_topic_data("ENA_fields", "ena_fixed_fields")
-        not_provided_fields = self.config_json.get_configuration("ENA_fields")[
-            "common_missing_fields"
-        ]
 
         if self.destination_schema == "ENA":
             for idx in range(len(self.json_data)):
@@ -190,8 +185,8 @@ class MappingSchema:
                     mapped_json_data[idx][key] = value
                 for key, _ in additional_data.items():
                     """
-                    Some fields in ENA need special formatting such as sample_id+date
-                    instead of directly merging them, -- is used as delimiter.
+                    Some fields in ENA need special formatting such as sample_id+date.
+                    Instead of directly merging them, -- is used as delimiter.
                     Also, the Not Provided fields are skipped in this process
                     """
                     formated_data = {
@@ -208,11 +203,6 @@ class MappingSchema:
                     if "fastq_filepath" in key:
                         formated_data[key] = formated_data[key].replace("--", "/")
                     mapped_json_data[idx][key] = formated_data[key]
-                for _, value in enumerate(not_provided_fields):
-                    if value in mapped_json_data[idx]:
-                        continue
-                    else:
-                        mapped_json_data[idx][value] = "Not Provided"
         """
         This is a temporal solution for library_strategy. Once the values are also
         mapped by the ontology (not only the fields) this should not be necessary
@@ -225,8 +215,12 @@ class MappingSchema:
     def check_required_fields(self, mapped_json_data, dest_schema):
         """Checks which required fields are Not Provided"""
         if dest_schema == "ENA":
+            # The block below can probably go into an auxiliar function
             required_fields = self.mapped_to_schema["required"]
-
+            for sample in mapped_json_data:
+                missing_required = [x for x in required_fields if x not in sample]
+                for field in missing_required:
+                    sample[field] = "Not Provided"
             try:
                 not_provided_fields = {
                     sample["isolate"]: [
@@ -237,21 +231,23 @@ class MappingSchema:
                     for sample in mapped_json_data
                 }
             except KeyError as e:
-                print(f"Field {e} could not be found in json data, aborting")
+                print(f"Field {e} could not be found in json data. Aborting")
+                print()
                 sys.exit(1)
             notprov_report = "\n".join(
                 f"Sample {key}: {str(val).strip('[]')}"
                 for key, val in not_provided_fields.items()
             )
             stderr.print(
-                f"[red]\nSome required fields for {dest_schema} were Not Provided:\n",
-                "Check mapping_errors.log for more details",
+                f"[yellow]\nSome required fields for {dest_schema} were Not Provided:",
+                "[yellow]\nCheck mapping_errors.log for more details",
             )
             with open("mapping_errors.log", "a") as errs:
-                errs.write("Required fields missing:\n" + notprov_report)
+                errs.write("Required fields Not Provided:\n" + notprov_report)
         else:
+            # Only ENA's schema is supported as yet
             return
-        return
+        return mapped_json_data
 
     def write_json_fo_file(self, mapped_json_data):
         """Write metadata to json file"""
