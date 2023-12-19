@@ -2,7 +2,6 @@
 
 import os
 import sys
-import re
 import logging
 import glob
 import rich.console
@@ -153,7 +152,7 @@ class BioinfoMetadata:
                         key=lambda dt: datetime.strptime(dt.split(".")[-2], "%Y%m%d"),
                     )
                     row["lineage_analysis_date"] = pango_files[0].split(".")[-2]
-                except ValueError as e:
+                except ValueError:
                     log.error("No date found in %s pangolin files", sample_name)
                     stderr.print(
                         f"[red]No date found in sample {sample_name}",

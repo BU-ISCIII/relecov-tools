@@ -84,7 +84,7 @@ class SchemaValidation:
                 for error in validator.iter_errors(item_row):
                     try:
                         error_keys[error.message] = error.absolute_path[0]
-                    except Exception as e:
+                    except Exception:
                         error_keys[error.message] = error.message
                     if error.message in errors:
                         errors[error.message] += 1

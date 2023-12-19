@@ -186,7 +186,7 @@ class EnaUpload:
                     stderr.print(f"[red]Found samples missing {source} accession ids:")
                 all_missing_accessions.extend(missing_accessions)
             if all_missing_accessions:
-                stderr.print(f"Not committed samples:\n", all_missing_accessions)
+                stderr.print("Not committed samples:\n", all_missing_accessions)
 
         for source in source_options:
             source_topic = "_".join(["df", source, "fields"])
@@ -294,7 +294,7 @@ class EnaUpload:
             )
 
         updated_json = self.update_json(updated_schemas_df, json_data)
-        if batch_index == None:
+        if batch_index is None:
             suffix = str("_" + date + ".json")
         else:
             suffix = str("_" + date + "_batch" + str(batch_index) + ".json")
