@@ -82,12 +82,14 @@ class SchemaValidation:
             else:
                 # Count error types
                 for error in validator.iter_errors(item_row):
-                    error_keys[error.message] = error.absolute_path[0]
-                    if error.message in errors.keys():
+                    try:
+                        error_keys[error.message] = error.absolute_path[0]
+                    except Exception as e:
+                        error_keys[error.message] = error.message
+                    if error.message in errors:
                         errors[error.message] += 1
                     else:
                         errors[error.message] = 1
-                # log.error("Invalid sample data %s", error.message)
                 # append row with errors
                 invalid_json.append(item_row)
 
@@ -136,7 +138,7 @@ class SchemaValidation:
 
             sample_list = []
 
-            stderr.print("[red] Start preparation of invalid samples")
+            stderr.print("Start preparation of invalid samples")
 
             for row in invalid_json:
                 sample_list.append(str(row["collecting_lab_sample_id"]))
@@ -153,7 +155,7 @@ class SchemaValidation:
                 if str(row[2].value) not in sample_list:
                     row_to_del.append(row[0].row)
 
-            stderr.print("[red] Collected rows to create the excel file")
+            stderr.print("Collected rows to create the excel file")
             if len(row_to_del) > 0:
                 row_to_del.sort(reverse=True)
                 for idx in row_to_del:
@@ -165,13 +167,13 @@ class SchemaValidation:
                             idx,
                             e,
                         )
-                        stderr.print("f[red] Unable to delete row {idx} becuase of {e}")
+                        stderr.print(f"[red] Unable to delete row {idx} becuase of {e}")
                         sys.exit(1)
 
             os.makedirs(out_folder, exist_ok=True)
             new_name = "invalid_" + os.path.basename(metadata)
             m_file = os.path.join(out_folder, new_name)
-            stderr.print("[red] Saving excel file with the invalid samples")
+            stderr.print("Saving excel file with the invalid samples")
             wb.save(m_file)
         return
 
