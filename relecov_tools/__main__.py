@@ -262,39 +262,41 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-c", "--center", help="center name")
 @click.option("-e", "--ena_json", help="where the validated json is")
-@click.option(
-    "-t", "--template_path", help="folder where the ENA templates are located"
-)
+@click.option("-t", "--template_path", help="Path to ENA templates folder")
 @click.option(
     "-a",
     "--action",
     type=click.Choice(["ADD", "MODIFY", "CANCEL", "RELEASE"], case_sensitive=False),
     help="select one of the available options",
 )
-@click.option("--dev", is_flag=True, default=False)
-@click.option(
-    "-s",
-    "--accession",
-    is_flag=False,
-    flag_value="empty",
-    default="False",
-    help="Accession number given after submition, required for RELEASE action",
-)
+@click.option("--dev", is_flag=True, default=False, help="Test submission")
+@click.option("--upload_fastq", is_flag=True, default=False, help="Upload fastq files")
+@click.option("-m", "--metadata_types", help="List of metadata xml types to submit")
 @click.option("-o", "--output_path", help="output folder for the xml generated files")
 def upload_to_ena(
-    user, password, center, ena_json, template_path, dev, action, accession, output_path
+    user, 
+    password, 
+    center, 
+    ena_json, 
+    template_path,
+    dev, 
+    action, 
+    metadata_types, 
+    upload_fastq,
+    output_path
 ):
     """parse data to create xml files to upload to ena"""
     upload_ena = relecov_tools.upload_ena_protocol.EnaUpload(
-        user,
-        password,
-        center,
-        ena_json,
-        template_path,
-        dev,
-        action,
-        accession,
-        output_path,
+        user=user,
+        passwd=password,
+        center=center,
+        source_json=ena_json,
+        template_path=template_path,
+        dev=dev,
+        action=action,
+        metadata_types=metadata_types,
+        upload_fastq=upload_fastq,
+        output_path=output_path,
     )
     upload_ena.upload()
 
