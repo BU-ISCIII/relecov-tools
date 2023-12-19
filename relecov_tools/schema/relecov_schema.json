@@ -1414,7 +1414,8 @@
                 "xGen  SC2 Midnight1200 Amplicon Panel",
                 "ViroKey SQ FLEX SARS-CoV-2 Primer Set",
                 "NEBNext VarSkip Short SARS-CoV-2 primers",
-                "Other"
+                "Not Provided [GENEPIO:0001668]",
+                "Other [NCIT:C17649]"
             ],
             "examples": [
                 "ARTIC"
@@ -1441,7 +1442,8 @@
                 "xGen  SC2 Midnight1200 Amplicon Panel",
                 "ViroKey SQ FLEX SARS-CoV-2 Primer Set",
                 "NEBNext VarSkip Short SARS-CoV-2 primers",
-                "Other"
+                "Not Provided [GENEPIO:0001668]",
+                "Other [NCIT:C17649]"
             ],
             "examples": [
                 "ARTIC v4"
@@ -1600,7 +1602,7 @@
                 "iSeq 100 i1 Reagent v2 (300-cycle) 4 pack",
                 "iSeq 100 i1 Reagent v2 (300-cycle) 8 pack",
                 "Not Provided [GENEPIO:0001668]",
-                "Other"
+                "Other [NCIT:C17649]"
             ],
             "examples": [
                 "iSeq 100 i1 Reagent v2 (300-cycle) 8 pack"
@@ -1631,7 +1633,7 @@
                 "PacBio [GENEPIO:0001927]",
                 "BGI",
                 "MGI",
-                "Other"
+                "Other [NCIT:C17649]"
             ],
             "examples": [
                 "Illumina"
@@ -1654,7 +1656,7 @@
                 "metatranscriptomic",
                 "synthetic",
                 "viral rna",
-                "other"
+                "other [NCIT:C17649]"
             ],
             "examples": [
                 "metagenomic"
@@ -1693,7 +1695,7 @@
                 "Oligo-dT",
                 "Inverse rRNA selection",
                 "ChIP-Seq [GENEPIO:0001947]",
-                "Other"
+                "Other [NCIT:C17649]"
             ],
             "examples": [
                 "RANDOM PCR"
