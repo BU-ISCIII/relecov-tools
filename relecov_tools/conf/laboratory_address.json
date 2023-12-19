@@ -2,7 +2,7 @@
     "Instituto de Salud Carlos III": {
         "collecting_institution_address": "Crta. Pozuelo Majadahonda S/N,",
         "collecting_institution_email": "info@isciii.es",
-        "geo_loc_state": "Madrid",
+        "geo_loc_state": "Comunidad de Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain",
@@ -685,7 +685,7 @@
     "Hospital de Mostoles": {
         "collecting_institution_address": "C. Dr. Luis Montes, S/N",
         "collecting_institution_email": "",
-        "geo_loc_state": "Madrid",
+        "geo_loc_state": "Comunidad de Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Mostoles",
         "geo_loc_country": "Spain",
@@ -696,7 +696,7 @@
     "Hospital Clínico San Carlos": {
         "collecting_institution_address": "Calle del Prof Martín Lagos",
         "collecting_institution_email": "",
-        "geo_loc_state": "Madrid",
+        "geo_loc_state": "Comunidad de Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain",
@@ -707,7 +707,7 @@
     "Centro Militar de Veterinaria de la Defensa": {
         "collecting_institution_address": "C. Darío Gazapo 3",
         "collecting_institution_email": "",
-        "geo_loc_state": "Madrid",
+        "geo_loc_state": "Comunidad de Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain",
@@ -718,7 +718,7 @@
     "Hospital Universitario Severo Ochoa": {
         "collecting_institution_address": "Av. de Orellana, s/n, Leganés",
         "collecting_institution_email": "",
-        "geo_loc_state": "Madrid",
+        "geo_loc_state": "Comunidad de Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Leganes",
         "geo_loc_country": "Spain",
@@ -729,7 +729,7 @@
     "Hospital Universitario de Getafe": {
         "collecting_institution_address": "Carr. Madrid - Toledo, Km 12,500, Getafe",
         "collecting_institution_email": "",
-        "geo_loc_state": "Madrid",
+        "geo_loc_state": "Comunidad de Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Getafe",
         "geo_loc_country": "Spain",
@@ -740,7 +740,7 @@
     "Presidencia de Gobierno": {
         "collecting_institution_address": "",
         "collecting_institution_email": "",
-        "geo_loc_state": "Madrid",
+        "geo_loc_state": "Comunidad de Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain",
@@ -751,7 +751,7 @@
     "Ministerio de Sanidad, Servicios Sociales e Igualdad": {
         "collecting_institution_address": "P.º del Prado, 18",
         "collecting_institution_email": "",
-        "geo_loc_state": "Madrid",
+        "geo_loc_state": "Comunidad de Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain",
@@ -949,7 +949,7 @@
     "Hospital General Universitario de Elche": {
         "collecting_institution_address": "Carrer Almazara, 11, Elche",
         "collecting_institution_email": "",
-        "geo_loc_state": "Valenciana",
+        "geo_loc_state": "Comunitat Valenciana",
         "geo_loc_region": "Alicante",
         "geo_loc_city": "Elche",
         "geo_loc_country": "Spain",
@@ -957,7 +957,7 @@
         "submitting_institution_address": "Carrer Almazara, 11, Elche",
         "submitting_institution_email": ""
     },
-    "Hospital San Pedro": {
+    "Hospital Universitario San Pedro": {
         "collecting_institution_address": "C. Piqueras, 98",
         "collecting_institution_email": "",
         "geo_loc_state": "La Rioja",
@@ -977,6 +977,61 @@
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Txagorritxu",
         "submitting_institution_address": " Jose Atxotegi Kalea, s/n",
+        "submitting_institution_email": ""
+    },
+    "Hospital Universitari Arnau de Vilanova": {
+        "collecting_institution_address": "Av. Alcalde Rovira Roure, 80",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Lleida",
+        "geo_loc_city": "Lleida",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Arnau de Vilanova",
+        "submitting_institution_address": "Av. Alcalde Rovira Roure, 80",
+        "submitting_institution_email": ""
+    },
+    "Hospital General Universitario de Castellon": {
+        "collecting_institution_address": "Avinguda de Benicassim, 128",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Comunitat Valenciana",
+        "geo_loc_region": "Castellon",
+        "geo_loc_city": "Castellon de la Plana",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Universitario de Castellon",
+        "submitting_institution_address": "Avinguda de Benicassim, 128",
+        "submitting_institution_email": ""
+    },
+    "Hospital Clínico de Valencia": {
+        "collecting_institution_address": "Av. de Blasco Ibañez, 17",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Comunitat Valenciana",
+        "geo_loc_region": "Valencia",
+        "geo_loc_city": "Valencia",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Universitario de Castellon",
+        "submitting_institution_address": "Av. de Blasco Ibañez, 17",
+        "submitting_institution_email": ""
+    },
+    "Hospital Universitario y Politecnico La Fe": {
+        "collecting_institution_address": "Avinguda de Fernando Abril Martorell, 106",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Comunitat Valenciana",
+        "geo_loc_region": "Valencia",
+        "geo_loc_city": "Valencia",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario y Politecnico La Fe",
+        "submitting_institution_address": "Avinguda de Fernando Abril Martorell, 106",
+        "submitting_institution_email": ""
+    },
+    "Hospital Universitario Doctor Peset": {
+        "collecting_institution_address": "Av. de Gaspar Aguilar, 90",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Comunitat Valenciana",
+        "geo_loc_region": "Valencia",
+        "geo_loc_city": "Valencia",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Universitario de Castellon",
+        "submitting_institution_address": "Av. de Gaspar Aguilar, 90",
         "submitting_institution_email": ""
     }
 }
