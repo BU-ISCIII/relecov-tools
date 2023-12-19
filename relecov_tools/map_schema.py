@@ -148,7 +148,7 @@ class MappingSchema:
         if len(errors) >= 1:
             output_errs = "\n".join(f"{field}:{info}" for field, info in errors.items())
             invalid_ontologies = str([field for field in errors.keys()]).strip("[]")
-            log.error("Invalid ontology for: "+invalid_ontologies)
+            log.error("Invalid ontology for: " + invalid_ontologies)
             stderr.print("[yellow]\nGot unmapped ontologies. Check mapping_errors.log")
             with open("mapping_errors.log", "w") as errs:
                 errs.write("Ontology mapping errors:\n" + output_errs + "\n")

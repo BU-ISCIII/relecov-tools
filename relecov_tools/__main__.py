@@ -274,16 +274,16 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
 @click.option("-m", "--metadata_types", help="List of metadata xml types to submit")
 @click.option("-o", "--output_path", help="output folder for the xml generated files")
 def upload_to_ena(
-    user, 
-    password, 
-    center, 
-    ena_json, 
+    user,
+    password,
+    center,
+    ena_json,
     template_path,
-    dev, 
-    action, 
-    metadata_types, 
+    dev,
+    action,
+    metadata_types,
     upload_fastq,
-    output_path
+    output_path,
 ):
     """parse data to create xml files to upload to ena"""
     upload_ena = relecov_tools.upload_ena_protocol.EnaUpload(

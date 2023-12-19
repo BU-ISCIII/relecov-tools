@@ -78,8 +78,8 @@ class BioinfoMetadata:
 
     def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
         """Auxiliar function to iterate over variants and mapping tables to map metadata"""
-        errors=[]
-        field_errors={}
+        errors = []
+        field_errors = {}
         for row in j_data:
             sample_name = row["submitting_lab_sample_id"]
             if sample_name in map_data:
@@ -87,7 +87,7 @@ class BioinfoMetadata:
                     try:
                         row[field] = map_data[sample_name][value]
                     except KeyError as e:
-                        field_errors[sample_name] = {field:e}
+                        field_errors[sample_name] = {field: e}
                         row[field] = "Not Provided [GENEPIO:0001668]"
                         continue
             else:
@@ -98,7 +98,7 @@ class BioinfoMetadata:
             lenerrs = len(errors)
             log.error(
                 "{0} samples missing in {1}:\n{2}".format(lenerrs, table_name, errors)
-                )
+            )
             stderr.print(f"[red]{lenerrs} samples missing in {table_name}:\n{errors}")
         if field_errors:
             log.error("Fields not found in {0}:\n{1}".format(table_name, field_errors))
@@ -131,7 +131,7 @@ class BioinfoMetadata:
         mapping_fields = self.configuration.get_topic_data(
             "bioinfo_analysis", "mapping_pangolin"
         )
-        missing_pango=[]
+        missing_pango = []
         for row in j_data:
             if "-" in row["submitting_lab_sample_id"]:
                 sample_name = row["submitting_lab_sample_id"].replace("-", "_")
@@ -150,15 +150,15 @@ class BioinfoMetadata:
                 try:
                     pango_files = sorted(
                         pango_files,
-                        key=lambda dt: datetime.strptime(
-                            dt.split(".")[-2], "%Y%m%d"
-                        ),
+                        key=lambda dt: datetime.strptime(dt.split(".")[-2], "%Y%m%d"),
                     )
                     row["lineage_analysis_date"] = pango_files[0].split(".")[-2]
                 except ValueError as e:
                     log.error("No date found in %s pangolin files", sample_name)
-                    stderr.print(f"[red]No date found in sample {sample_name}",
-                                 f"[red]pangolin filenames: {pango_files}")
+                    stderr.print(
+                        f"[red]No date found in sample {sample_name}",
+                        f"[red]pangolin filenames: {pango_files}",
+                    )
                     stderr.print("[Yellow] Using mapping analysis date instead")
                     # If no date in pangolin files, set date as analysis date
                     row["lineage_analysis_date"] = row["analysis_date"]
@@ -173,7 +173,9 @@ class BioinfoMetadata:
                 for field in mapping_fields.keys():
                     row[field] = "Not Provided [GENEPIO:0001668]"
         if len(missing_pango) >= 1:
-            stderr.print(f"[yellow]{len(missing_pango)} samples missing pangolin.csv file:")
+            stderr.print(
+                f"[yellow]{len(missing_pango)} samples missing pangolin.csv file:"
+            )
             stderr.print(f"[yellow]{missing_pango}")
         return j_data
 
@@ -218,8 +220,10 @@ class BioinfoMetadata:
             conserrs = len(missing_consens)
             if conserrs >= 1:
                 log.error(
-                    "{0} Consensus files missing:\n{1}".format(conserrs, missing_consens)
+                    "{0} Consensus files missing:\n{1}".format(
+                        conserrs, missing_consens
                     )
+                )
                 stderr.print(f"[yellow]{conserrs} samples missing consensus file:")
                 stderr.print(f"[yellow]\n{missing_consens}")
         return j_data
@@ -310,9 +314,9 @@ class BioinfoMetadata:
         stderr.print("[blue]Reading lab metadata json")
         j_data = self.collect_info_from_lab_json()
         stderr.print("[blue]Adding fixed values")
-        j_data = self.add_fixed_values(j_data,"fixed_values")
+        j_data = self.add_fixed_values(j_data, "fixed_values")
         # Creating empty fields that are not managed in case of missing data
-        j_data = self.add_fixed_values(j_data,"feed_empty_fields")
+        j_data = self.add_fixed_values(j_data, "feed_empty_fields")
         stderr.print("[blue]Adding data from mapping stats")
         j_data = self.include_data_from_mapping_stats(j_data)
         stderr.print("[blue]Adding software versions")
