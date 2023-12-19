@@ -45,7 +45,7 @@ def read_json_file(j_file):
     return data
 
 
-def read_excel_file(f_name, sheet_name, heading_row, empty_value=True):
+def read_excel_file(f_name, sheet_name, heading_row, leave_empty=True):
     """Read the input excel file and give the information in a list
     of dictionaries
     """
@@ -55,14 +55,16 @@ def read_excel_file(f_name, sheet_name, heading_row, empty_value=True):
     ws_data = []
     for row in islice(ws_metadata_lab.values, heading_row, ws_metadata_lab.max_row):
         l_row = list(row)
-        data_row = {}
         # Ignore the empty rows
+        if all(cell is None for cell in l_row):
+            continue
+        data_row = {}
         for idx in range(0, len(heading)):
             if l_row[idx] is None:
-                if empty_value:
+                if leave_empty:
                     data_row[heading[idx]] = ""
                 else:
-                    data_row[heading[idx]] = "Not Provided"
+                    data_row[heading[idx]] = "Not Provided [GENEPIO:0001668]"
             else:
                 data_row[heading[idx]] = l_row[idx]
         ws_data.append(data_row)
