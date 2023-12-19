@@ -6,6 +6,7 @@ import sys
 import os
 import ftplib
 import relecov_tools.utils
+from datetime import datetime
 from relecov_tools.config_json import ConfigJson
 
 from ena_upload.ena_upload import extract_targets
@@ -37,7 +38,8 @@ class EnaUpload:
         template_path=None,
         dev=None,
         action=None,
-        accession=None,
+        metadata_types=None,
+        upload_fastq=None,
         output_path=None,
     ):
         if user is None:
@@ -62,11 +64,15 @@ class EnaUpload:
             )
         else:
             self.source_json_file = source_json
+        if not os.path.exists(self.source_json_file):
+            log.error("json data file %s does not exist ", self.source_json_file)
+            stderr.print(f"[red]json data file {self.source_json_file} does not exist")
+            sys.exit(1)
         if template_path is None:
             self.template_path = relecov_tools.utils.prompt_path(
                 msg="Select the folder containing ENA templates"
             )
-        # template_folder = "/home/user/git_repositories/relecov-tools/relecov_tools/templates"
+        # e.g. template_folder = "/home/user/github_repositories/relecov-tools/relecov_tools/templates"
         else:
             self.template_path = template_path
         if not os.path.exists(self.template_path):
@@ -78,14 +84,6 @@ class EnaUpload:
             )
         else:
             self.dev = dev
-        if accession == "empty":
-            self.accession = relecov_tools.utils.prompt_yn_question(
-                msg="Select the accession number for the submission"
-            )
-        elif accession == "false":
-            self.accession = False
-        else:
-            self.accession = accession
         if action is None:
             self.action = relecov_tools.utils.prompt_selection(
                 msg="Select the action to upload to ENA",
@@ -96,35 +94,44 @@ class EnaUpload:
             sys.exit(1)
         else:
             self.action = action.upper()
+
         if output_path is None:
             self.output_path = relecov_tools.utils.prompt_path(
                 msg="Select the folder to store the xml files"
             )
         else:
             self.output_path = output_path
+        
+        self.upload_fastq_files = upload_fastq 
+
+        all_metadata_types = ["study","run","experiment","sample"]
+        if metadata_types is None:
+            # If not specified, all metadata xmls are generated and submitted
+            self.metadata_types = all_metadata_types
+        else:
+            self.metadata_types = metadata_types.split(",")
+            if not all(xml in all_metadata_types for xml in self.metadata_types):
+                wrong_types = [
+                    xml for xml in self.metadata_types if xml not in all_metadata_types
+                    ]
+                log.error("Unsupported metadata xml types: "+str(wrong_types))
+                stderr.print(f"[red]Unsupported metadata xml types: {wrong_types}")
+                sys.exit(1)
 
         config_json = ConfigJson()
         self.config_json = config_json
-
         self.checklist = self.config_json.get_configuration("ENA_fields")["checklist"]
-
-        if not os.path.isfile(self.source_json_file):
-            log.error("json data file %s does not exist ", self.source_json_file)
-            stderr.print(f"[red]json data file {self.source_json_file} does not exist")
-            sys.exit(1)
-
         with open(self.source_json_file, "r") as fh:
             json_data = json.loads(fh.read())
             self.json_data = json_data
-
         if self.dev:
             self.url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
         else:
             self.url = "https://www.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
 
-    def table_formatting(self, schemas_dataframe, source):
+    def table_formatting(self, schemas_dataframe_raw, source):
         """Some fields in the dataframe need special formatting"""
-        formated_df = schemas_dataframe[source]
+        formated_df = schemas_dataframe_raw[source]
         formated_df.insert(3, "status", self.action)
         formated_df.rename(
             columns={
@@ -133,6 +140,13 @@ class EnaUpload:
             },
             inplace=True,
         )
+        if self.action in ["CANCEL", "MODIFY", "RELEASE"]:
+            formated_df.rename(
+                columns={"ena_"+str(source) + "_accession": "accession"},
+                inplace=True
+                )
+        if source == "study":
+            formated_df = formated_df.drop_duplicates(subset=["alias"])
         if source == "sample":
             formated_df.insert(4, "ENA_CHECKLIST", self.checklist)
         """
@@ -144,46 +158,74 @@ class EnaUpload:
             formated_df["file_name"] = formated_df["file_name"].str.split("--")
             formated_df = formated_df.explode("file_name").reset_index(drop=True)
             formated_df["file_checksum"] = [
-                x[1].split("--")[0] if x[0] % 2 == 0 else x[1].split("--")[1]
-                for x in enumerate(formated_df["file_checksum"])
+                x.split("--")[0] if index % 2 == 0 else x.split("--")[1]
+                for index, x in enumerate(formated_df["file_checksum"])
             ]
-        if source == "study":
-            formated_df = formated_df.drop_duplicates(subset=["alias"])
-            stderr.print("study table:", formated_df)
 
-        if isinstance(self.accession, str):
-            formated_df["accession"] = self.accession
-
-        schemas_dataframe[source] = formated_df
-        return schemas_dataframe
+        return formated_df
 
     def dataframes_from_json(self, json_data):
         """The xml is built using a dictionary of dataframes as a base structure"""
-        source_options = ["study", "sample", "run", "experiment"]
+        source_options = self.metadata_types
+        schemas_dataframe = {}
         schemas_dataframe_raw = {}
-
+        acces_fields = self.config_json.get_topic_data("ENA_fields", "accession_fields")
+        filtered_access_fields = [
+            fd for fd in acces_fields if any(source in fd for source in source_options)
+        ]
+        all_missing_accessions = []
+        if self.action in ["CANCEL", "MODIFY", "RELEASE"]:
+            for source in source_options:
+                missing_accessions = [
+                    samp["sample_name"] for samp in json_data for fd in 
+                    filtered_access_fields if (source in fd and fd not in samp.keys())
+                ]
+                if missing_accessions:
+                    log.error("Found samples in json without proper ena accessions")
+                    stderr.print(f"[red]Found samples missing {source} accession ids:")
+                all_missing_accessions.extend(missing_accessions)
+            if all_missing_accessions:
+                stderr.print(f"Not committed samples:\n", all_missing_accessions)
+            
         for source in source_options:
             source_topic = "_".join(["df", source, "fields"])
             source_fields = self.config_json.get_topic_data("ENA_fields", source_topic)
+            if self.action in ["CANCEL", "MODIFY", "RELEASE"]:
+                source_fields.append(str("ena_"+source+"_accession"))
             source_dict = {
-                field: [sample[field] for sample in json_data]
-                for field in source_fields
+                fld: [sample[fld] for sample in json_data if sample["sample_name"]
+                      not in all_missing_accessions] for fld in source_fields
             }
             schemas_dataframe_raw[source] = pd.DataFrame.from_dict(source_dict)
-            schemas_dataframe = self.table_formatting(schemas_dataframe_raw, source)
+            schemas_dataframe[source] = self.table_formatting(schemas_dataframe_raw, source)
 
         return schemas_dataframe
 
-    def save_tables(self, schemas_dataframe):
+    def save_tables(self, schemas_dataframe, date):
         """Save the dataframes into csv files"""
         stderr.print(f"Saving dataframes in {self.output_path}")
         for source, table in schemas_dataframe.items():
-            table_name = str(self.output_path + source + "_table.csv")
+            table_name = str(self.output_path + source + date + "_table.csv")
             table.to_csv(table_name, sep=",")
 
-    def xml_submission(self, schemas_dataframe):
-        """The metadata is submitted in an xml format"""
+    def update_json(self, updated_schemas_df, json_data):
+        access_dict = {}
+        updated_json_data = json_data.copy()
+        for source, table in updated_schemas_df.items():
+            access_list = [x for x in table["accession"]]
+            access_dict[source] = access_list
+            """run accessions are duplicated for R1/R2 so they need to be removed"""
+            if source == "run":
+                del access_dict[source][1::2]
+        for source, acclist in access_dict.items():
+            accession_field_name = str("ena_"+source+"_accession")
+            for sample, accession in zip(updated_json_data, acclist):
+                sample[accession_field_name] = accession
+        return updated_json_data
 
+    def xml_submission(self, json_data, schemas_dataframe, batch_index=None):
+        """The metadata is submitted in an xml format"""
+        import pdb; pdb.set_trace()
         schema_targets = extract_targets(self.action, schemas_dataframe)
 
         tool = self.config_json.get_configuration("ENA_fields")["tool"]
@@ -212,19 +254,17 @@ class EnaUpload:
                 self.checklist,
                 tool,
             )
-
         schema_xmls["submission"] = submission_xml
 
-        """Tree writes an xml file for the run fields"""
-        """tree = ET.parse(schema_xmls["run"])
-        tree.write(schema_xmls["run"])"""
-
-        print(f"\nSubmitting XMLs to ENA server: {self.url}")
+        stderr.print(f"\nProcessing submission to ENA server: {self.url}")
+        import pdb; pdb.set_trace()
         receipt = send_schemas(schema_xmls, self.url, self.user, self.passwd).text
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
-        receipt_dir = os.path.join(self.output_path, "receipt.xml")
-        print(f"Printing receipt to {receipt_dir}")
+        date = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
+        receipt_name = "receipt_"+date+".xml"
+        receipt_dir = os.path.join(self.output_path, receipt_name)
+        stderr.print(f"Printing receipt to {receipt_dir}")
 
         with open(f"{receipt_dir}", "w") as fw:
             fw.write(receipt)
@@ -233,16 +273,26 @@ class EnaUpload:
         except ValueError:
             log.error("There was an ERROR during submission:")
             sys.exit(receipt)
-
         if str(self.action) in ["ADD", "MODIFY"]:
-            schemas_dataframe = update_table(
+            updated_schemas_df = update_table(
                 schemas_dataframe, schema_targets, schema_update
             )
         else:
-            schemas_dataframe = update_table_simple(
+            updated_schemas_df = update_table_simple(
                 schemas_dataframe, schema_targets, self.action
             )
-        self.save_tables(schemas_dataframe)
+
+        updated_json = self.update_json(updated_schemas_df, json_data)
+        if batch_index == None:
+            suffix = str("_"+date+".json")
+        else:
+            suffix = str("_"+date+"_batch"+str(batch_index)+".json")
+        updated_json_name = (
+            os.path.splitext(os.path.basename(self.source_json_file))[0]+suffix
+        )
+        relecov_tools.utils.write_json_fo_file(updated_json, updated_json_name)
+
+        self.save_tables(updated_schemas_df, date)
         return
 
     def fastq_submission(self, json_data):
@@ -261,25 +311,52 @@ class EnaUpload:
 
         session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd)
         for filename, path in file_paths.items():
-            print("Uploading path " + path + " and filename: " + filename)
+            stderr.print("Uploading path: " + path + " with filename: " + filename)
             try:
                 file = open(path, "rb")  # file to send
                 g = session.storbinary(f"STOR {filename}", file)
-                print(g)  # send the file
+                stderr.print(g)  # send the file
                 file.close()  # close file and FTP
             except BaseException as err:
-                print(f"ERROR: {err}")
+                stderr.print(f"ERROR: {err}")
                 # print("ERROR: If your connection times out at this stage, it propably is because of a firewall that is in place. FTP is used in passive mode and connection will be opened to one of the ports: 40000 and 50000.")
         g2 = session.quit()
-        print(g2)
+        stderr.print(g2)
+        return
+    
+    def large_json_upload(self, json_data):
+        """
+            Split large json into smaller jsons of maximum size 20
+            due to limitations in submissions to ENA's API 
+        """
+        ena_api_limit = 20
+        number_of_batchs = len(range(0, len(json_data), ena_api_limit))
+        stderr.print(f"Splitting the json data in {number_of_batchs} batchs...")
+        for index, x in range(0, len(json_data), ena_api_limit): 
+            batch_index = str(index+1)
+            stderr.print(f"[blue]Processing batch {batch_index}...")
+            self.standard_upload(json_data[x:x+ena_api_limit], batch_index) 
+        return
 
+    def standard_upload(self, json_data, batch_index=None):
+        """Create the required files and upload to ENA"""
+        schemas_dataframe = self.dataframes_from_json(json_data)
+        stderr.print("[blue]Successfull creation of dataframes")
+        if self.upload_fastq_files:
+            self.fastq_submission(json_data)
+        stderr.print("Preparing xml files for submission...")
+        self.xml_submission(json_data, schemas_dataframe, batch_index)
         return
 
     def upload(self):
-        """Create the required files and upload to ENA"""
-        schemas_dataframe = self.dataframes_from_json(self.json_data)
-        self.xml_submission(schemas_dataframe)
-        self.fastq_submission(self.json_data)
-
+        """Handle the data and upload it to ENA"""
+        if len(self.json_data) <= 50:
+            self.standard_upload(self.json_data)
+        else:
+            stderr.print("[yellow]Json is too large to be submitted. Splitting it...")
+            self.large_json_upload(self.json_data)
         stderr.print("[green] Finished execution")
         return
+    
+
+
