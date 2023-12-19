@@ -86,29 +86,15 @@ class SftpHandle:
                     self.platform_storage_folder = config_json.get_topic_data(
                         "sftp_handle", "platform_storage_folder"
                     )
-                try:
-                    self.abort_if_md5_mismatch = (
-                        True if config["abort_if_md5_mismatch"] == "True" else False
-                    )
-                except KeyError:
-                    self.abort_if_md5_mismatch = (
-                        True
-                        if config_json.get_topic_data(
-                            "sftp_handle", "abort_if_md5_mismatch"
-                        )
-                        == "True"
-                        else False
-                    )
                 self.sftp_user = config["sftp_user"]
                 self.sftp_passwd = config["sftp_passwd"]
-                self.pp = config["allowed_sample_extensions"]
             except KeyError as e:
                 log.error("Invalid configuration file %s", e)
                 stderr.print(f"[red] Invalid configuration file {e} !")
                 sys.exit(1)
         if output_location is not None:
             if os.path.isdir(output_location):
-                self.platform_storage_folder = output_location
+                self.platform_storage_folder = os.path.realpath(output_location)
             else:
                 log.error("Output location does not exist, aborting")
                 stderr.print("[red] Output location does not exist, aborting")
@@ -206,6 +192,7 @@ class SftpHandle:
         log.info("created the folder to download files %s", local_folder_path)
         self.open_connection()
         log.info("Trying to fetch files in remote server")
+        stderr.print(f"Fetching {len(files_list)} files from {folder}...")
         for file_list in files_list:
             try:
                 self.client.get(
