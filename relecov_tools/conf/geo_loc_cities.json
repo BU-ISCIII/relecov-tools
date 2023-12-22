@@ -326,5 +326,25 @@
     "Motril":{
         "geo_loc_latitude": "36.74611111",
         "geo_loc_longitude": "-3.515"
+    },
+    "Mataro":{
+        "geo_loc_latitude": "41.540444",
+        "geo_loc_longitude": "2.443782"
+    },
+    "Calella":{
+        "geo_loc_latitude": "41.612812",
+        "geo_loc_longitude": "2.653981"
+    },
+    "Blanes":{
+        "geo_loc_latitude": "41.675284",
+        "geo_loc_longitude": "2.789399"
+    },
+    "Reus":{
+        "geo_loc_latitude": "41.154857",
+        "geo_loc_longitude": "1.106481"
+    },
+    "Tortosa":{
+        "geo_loc_latitude": "40.814140",
+        "geo_loc_longitude": "0.522052"
     }
 }
