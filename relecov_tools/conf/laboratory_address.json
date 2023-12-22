@@ -964,7 +964,7 @@
         "geo_loc_region": "La Rioja",
         "geo_loc_city": "Logroño",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital San Pedro",
+        "submitting_institution": "Hospital Universitario San Pedro",
         "submitting_institution_address": "C. Piqueras, 98",
         "submitting_institution_email": ""
     },
@@ -1009,7 +1009,7 @@
         "geo_loc_city": "Valencia",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario de Castellon",
-        "submitting_institution_address": "Av. de Blasco Ibañez, 17",
+        "submitting_institution_address": "Avinguda de Benicassim, 128",
         "submitting_institution_email": ""
     },
     "Hospital Universitario y Politecnico La Fe": {
@@ -1031,7 +1031,106 @@
         "geo_loc_city": "Valencia",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario de Castellon",
-        "submitting_institution_address": "Av. de Gaspar Aguilar, 90",
+        "submitting_institution_address": "Avinguda de Benicassim, 128",
+        "submitting_institution_email": ""
+    },
+    "Hospital de l'Esperansa": {
+        "collecting_institution_address": "Ptge. de Sant Josep la Muntanya, 12",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Barcelona",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
+    },
+    "Centre Forum-Parc Salut Mar": {
+        "collecting_institution_address": "Carrer de Llull, 410",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Barcelona",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
+    },
+    "Hospital Municipal de Badalona": {
+        "collecting_institution_address": "Via Augusta, 9-13",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Badalona",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
+    },
+    "Hospital de Mataro": {
+        "collecting_institution_address": "Carrer de Cirera, 230",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Mataro",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
+    },
+    "Parc Sanitari Pere Virgili": {
+        "collecting_institution_address": "Carrer d'Esteve Terradas, 30",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Barcelona",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
+    },
+    "Hospital Comarcal Sant Jaume de Calella": {
+        "collecting_institution_address": "Carrer de Sant Jaume, 209-217",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Calella",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
+    },
+    "Hospital Comarcal de la Selva": {
+        "collecting_institution_address": "Carrer Acces Cala Sant Francesc, 5",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Blanes",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
+    },
+    "Hospital Universitari Sant Joan de Reus": {
+        "collecting_institution_address": "Avinguda del Doctor Josep Laporte, 2",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Tarragona",
+        "geo_loc_city": "Reus",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
+    },
+    "Clinica Terres de l'Ebre": {
+        "collecting_institution_address": "Plasa 1 d'octubre, 6-7",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Tarragona",
+        "geo_loc_city": "Tortosa",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": ""
     }
 }
