@@ -177,7 +177,7 @@ class SftpHandle:
             directory_list = [
                 item.filename for item in content_list if stat.S_ISDIR(item.st_mode)
             ]
-        except AttributeError as e:
+        except AttributeError:
             return False
         return directory_list
 
@@ -716,7 +716,7 @@ class SftpHandle:
                 )
                 # retrasmision of files in folder
                 if req_retransmition:
-                    stderr.print(f"[Orange] Error during download, trying again...")
+                    stderr.print("[Yellow] Error during download, trying again...")
                     self.get_remote_folder_files(
                         folder, local_folder, req_retransmition
                     )

@@ -12,6 +12,7 @@ import openpyxl
 import yaml
 import gzip
 import re
+import shutil
 from itertools import islice
 from Bio import SeqIO
 from rich.console import Console
