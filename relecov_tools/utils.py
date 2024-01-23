@@ -10,6 +10,8 @@ import questionary
 import json
 import openpyxl
 import yaml
+import gzip
+import re
 from itertools import islice
 from Bio import SeqIO
 from rich.console import Console
@@ -27,6 +29,14 @@ def file_exists(file_to_check):
     if os.path.isfile(file_to_check):
         return True
     return False
+
+
+def safe_remove(file_path):
+    try:
+        os.remove(file_path)
+    except OSError:
+        return False
+    return True
 
 
 def get_files_match_condition(condition):
@@ -75,9 +85,8 @@ def read_excel_file(f_name, sheet_name, heading_row, leave_empty=True):
 def read_csv_file_return_dict(file_name, sep, key_position=None):
     """Read csv or tsv file, according to separator, and return a dictionary
     where the main key is the first column, if key position is None otherwise
-    the index value of the kwy position is used as key
+    the index value of the key position is used as key
     """
-
     try:
         with open(file_name, "r") as fh:
             lines = fh.readlines()
@@ -126,7 +135,9 @@ def get_md5_from_local_folder(local_folder):
     reg_for_md5 = os.path.join(local_folder, "*.md5")
     # reg_for_non_md5 = os.path.join(local_folder, "*[!.md5]")
     md5_files = glob.glob(reg_for_md5)
-    if len(md5_files) > 0:
+    if not md5_files:
+        return False
+    else:
         for md5_file in md5_files:
             file_path_name, f_ext = os.path.splitext(md5_file)
             if not file_exists(file_path_name):
@@ -134,9 +145,48 @@ def get_md5_from_local_folder(local_folder):
                 continue
             file_name = os.path.basename(file_path_name)
             fh = open(md5_file, "r")
-            md5_results[file_name] = [local_folder, fh.read()]
+            md5_results[file_name] = fh.read()
             fh.close()
     return md5_results
+
+
+def read_md5_checksum(file_name, avoid_chars=list()):
+    """Read MD5_checksum file and return a dict of {file: md5_hash}
+
+    Args:
+        file_name (str): file containing "md5hash  file" in tab separated format
+        avoid_chars (list(str), optional): Lines with any of these elements
+        will be skipped. Defaults to list().
+
+    Returns:
+        hash_dict(dict): dictionary of {file: md5_hash}
+    """
+    try:
+        with open(file_name, "r") as file:
+            content = file.read()
+    except FileNotFoundError:
+        raise
+    clean_content = content.replace("*", "")
+    lines = clean_content.splitlines()
+    translation = str.maketrans("", "", "'\"")
+    if any("\t" in line for line in lines):
+        lines = [line.strip().translate(translation).split("\t") for line in lines]
+    else:
+        lines = [line.strip().translate(translation).split("  ") for line in lines]
+    clean_lines = [
+        x for x in lines if not any(ch in string for ch in avoid_chars for string in x)
+    ]
+    # md5sum should always have 2 columns: hash - path
+    md5_lines = [line for line in clean_lines if len(line) == 2]
+    hash_dict = {re.split(r"[\\/]", line[1])[-1]: line[0].lower() for line in md5_lines}
+    return hash_dict
+
+
+def delete_local_folder(folder):
+    """Delete download folder because files does not complain requisites"""
+    log.info("Deleting local folder %s", folder)
+    shutil.rmtree(folder, ignore_errors=True)
+    return True
 
 
 def calculate_md5(file_name):
@@ -180,28 +230,18 @@ def write_json_fo_file(data, file_name):
     return True
 
 
-def write_to_excel_file(data, f_name, sheet_name, post_process=None):
-    book = openpyxl.Workbook()
-    sheet = book.active
+def compress_file(file):
+    """compress a given file with gzip, adding .gz extension afterwards
 
-    for row in data:
-        sheet.append(row)
-    # adding one column with row number
-    if "insert_cols" in post_process:
-        sheet.insert_cols(post_process["insert_cols"])
-        sheet["A1"] = "Campo"
-        counter = 1
-        for i in range(len(data) - 1):
-            idx = "A" + str(counter + 1)
-            sheet[idx] = counter
-            counter += 1
-    # adding 3 empty rows
-    if "insert_rows" in post_process:
-        for x in range(post_process["insert_rows"]):
-            sheet.insert_rows(1)
-        sheet.title = sheet_name
-    book.save(f_name)
-    return
+    Args:
+        file (str): path to the given file
+    """
+    try:
+        with open(file, "rb") as raw, gzip.open(f"{file}.gz", "wb") as comp:
+            comp.writelines(raw)
+        return True
+    except FileNotFoundError:
+        return False
 
 
 def rich_force_colors():
