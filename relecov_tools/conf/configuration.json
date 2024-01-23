@@ -194,36 +194,29 @@
             "sftp_server": "sftprelecov.isciii.es",
             "sftp_port": "22"
         },
+        "metadata_processing": {
+            "header_flag": "CAMPO",
+            "excel_sheet": "METADATA_LAB"
+        },
         "abort_if_md5_mismatch": "False",
-        "platform_storage_folder": "tmp/relecov",
-        "allowed_sample_extensions": [
-            "fastq.gz",
-            "fasta"
-        ],
-        "allowed_R1_delimiters": [
-            "_R1_",
-            "_R1.",
-            ".R1.",
-            "Forward",
-            "forward",
-            "_1_",
-            "_1.",
-            ".1."
-        ],
-        "allowed_R2_delimiters": [
-            "_R2_",
-            "_R2.",
-            ".R2.",
-            "Reverse",
-            "reverse",
-            "_2_",
-            "_2.",
-            ".2."
+        "platform_storage_folder": "/tmp/relecov",
+        "allowed_file_extensions": [
+            ".fastq.gz",
+            ".fastq",
+            ".fq",
+            ".fq.gz",
+            ".fasta",
+            ".fasta.gz"
         ],
         "allowed_download_options": [
             "download_only",
             "download_clean",
             "delete_only"
+        ],
+        "skip_when_found": [
+            "#",
+            "Hash",
+            "Path"
         ]
     },
     "GISAID_configuration": {
@@ -369,7 +362,6 @@
             "sequencing_sample_id": "sequencing_sample_id"
         }
     },
-    "md5_file_name": "md5_check_file.csv",
     "ENA_fields": {
         "ENA_configuration": {
             "study_alias": "RELECOV",
