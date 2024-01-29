@@ -179,6 +179,9 @@ def read_md5_checksum(file_name, avoid_chars=list()):
     ]
     # md5sum should always have 2 columns: hash - path
     md5_lines = [line for line in clean_lines if len(line) == 2]
+    if not md5_lines:
+        return False
+    # split paths for both windows "\" and linux "/" using regex [\\/]
     hash_dict = {re.split(r"[\\/]", line[1])[-1]: line[0].lower() for line in md5_lines}
     return hash_dict
 
