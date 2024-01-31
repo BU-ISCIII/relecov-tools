@@ -419,9 +419,7 @@ class SftpHandle:
             )
             stderr.print("[red]Differences: ", diffs)
             sys.exit(1)
-        index_sampleID = metadata_header.index(
-            "Sample ID given for sequencing"
-        )
+        index_sampleID = metadata_header.index("Sample ID given for sequencing")
         index_fastq_r1 = metadata_header.index("Sequence file R1 fastq")
         index_fastq_r2 = metadata_header.index("Sequence file R2 fastq")
         for row in islice(ws_metadata_lab.values, header_row, ws_metadata_lab.max_row):
