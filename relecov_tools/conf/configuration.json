@@ -19,6 +19,7 @@
             "GISAID id",
             "Originating Laboratory",
             "Submitting Institution",
+            "Sequencing Institution",
             "Sample Collection Date",
             "Sample Received Date",
             "Purpose of sampling",
@@ -109,7 +110,15 @@
         },
         "required_copy_from_other_field": {
             "isolate_sample_id": "sequencing_sample_id"
-        }
+        },
+        "samples_json_fields": [
+            "fastq_r1_md5",
+            "fastq_r2_md5",
+            "sequence_file_R1_fastq",
+            "sequence_file_R2_fastq",
+            "r1_fastq_filepath",
+            "r2_fastq_filepath"
+        ]
     },
     "long_table_heading": [
         "SAMPLE",
