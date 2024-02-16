@@ -548,6 +548,7 @@ class SftpHandle:
         """
         local_meta_file = self.get_metadata_file(remote_folder, local_folder)
         out_folder = os.path.dirname(local_meta_file)
+        allowed_extensions = self.allowed_file_ext
         remote_files_list = [
             os.path.basename(file) for file in self.get_file_list(remote_folder)
         ]
