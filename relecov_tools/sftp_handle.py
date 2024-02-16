@@ -548,7 +548,6 @@ class SftpHandle:
         """
         local_meta_file = self.get_metadata_file(remote_folder, local_folder)
         out_folder = os.path.dirname(local_meta_file)
-        allowed_extensions = self.allowed_file_ext
         remote_files_list = [
             os.path.basename(file) for file in self.get_file_list(remote_folder)
         ]
@@ -585,18 +584,6 @@ class SftpHandle:
             sample_files_dict = self.process_filedict(
                 sample_files_dict, filtered_files_list
             )
-            """ext_dict = {}
-            for sample, values in sample_files_dict.items():
-                ext_dict[sample] = {
-                    key: (file if str(val) in file else None)
-                    for key, val in values.items()
-                    for file in filtered_files_list
-                }
-                # remove sample if it has missing files
-                if not all(x in filtered_files_list for x in ext_dict[sample].values()):
-                    log.warning("Sample %s skipped: missing files in sftp", sample)
-                    del ext_dict[sample]"""
-            """sample_files_dict = copy.deepcopy(ext_dict)"""
         if not any(value for value in sample_files_dict.values()):
             raise FileNotFoundError("No files from metadata found in ", remote_folder)
         return sample_files_dict, local_meta_file
@@ -711,11 +698,6 @@ class SftpHandle:
                 for file in clean_fetchlist:
                     if val in file:
                         processed_dict[sample][key] = file
-            """processed_dict[sample] = {
-                key: (file if str(val) in file else None)
-                    for key, val in vals.items()
-                    for file in clean_fetchlist
-                }"""
             # remove sample if it has missing files
             if not all(x in clean_fetchlist for x in processed_dict[sample].values()):
                 log.warning("Sample %s skipped: missing files in sftp", sample)
