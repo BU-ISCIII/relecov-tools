@@ -815,7 +815,7 @@ class SftpHandle:
                     if f_name in successful_files:
                         files_md5_dict[f_name] = hash_dict[f_name]
                     else:
-                        log.info("Generating md5 hash for %s", f_name)
+                        log.warning("File %s not found in md5sum. Creating it", f_name)
                         files_md5_dict[f_name] = relecov_tools.utils.calculate_md5(path)
             else:
                 md5_hashes = [
