@@ -103,7 +103,7 @@
         "geo_loc_latitude": "38.9956",
         "geo_loc_longitude": "-1.8558"
     },
-    "Castellon de la Plana": {
+    "Castellón de la Plana": {
         "geo_loc_latitude": "39.9831",
         "geo_loc_longitude": "-0.0331"
     },
@@ -251,11 +251,11 @@
         "geo_loc_latitude": "41.4667",
         "geo_loc_longitude": "2.0833"
     },
-    "Mostoles": {
+    "Móstoles": {
         "geo_loc_latitude": "40.3223",
         "geo_loc_longitude": "-3.865"
     },
-    "Leganes": {
+    "Leganés": {
         "geo_loc_latitude": "40.3281",
         "geo_loc_longitude": "-3.7644"
     },
@@ -324,10 +324,10 @@
         "geo_loc_longitude": "-4.100808"
     },
     "Motril":{
-        "geo_loc_latitude": "36.74611111",
+        "geo_loc_latitude": "36.746111",
         "geo_loc_longitude": "-3.515"
     },
-    "Mataro":{
+    "Mataró":{
         "geo_loc_latitude": "41.540444",
         "geo_loc_longitude": "2.443782"
     },
@@ -346,5 +346,74 @@
     "Tortosa":{
         "geo_loc_latitude": "40.814140",
         "geo_loc_longitude": "0.522052"
+    },
+    "Oviedo":{
+        "geo_loc_latitude": "43.36316",
+        "geo_loc_longitude": "-5.85352"
+    },
+    "Jarrio":{
+        "geo_loc_latitude": "43.54444",
+        "geo_loc_longitude": "-6.74722"
+    },
+    "Avilés":{
+        "geo_loc_latitude": "43.551944",
+        "geo_loc_longitude": "-5.936111"
+    },
+    "Gijón":{
+        "geo_loc_latitude": "43.5345709",
+        "geo_loc_longitude": "-5.6675865"
+    },
+    "Cangas del Narcea":{
+        "geo_loc_latitude": "43.165833",
+        "geo_loc_longitude": "-6.541666"
+    },
+    "Arriondas":{
+        "geo_loc_latitude": "43.381388",
+        "geo_loc_longitude": "-5.184444"
+    },
+    "Mieres":{
+        "geo_loc_latitude": "43.226388",
+        "geo_loc_longitude": "-5.781388"
+    },
+    "Langreo":{
+        "geo_loc_latitude": "43.165833",
+        "geo_loc_longitude": "-6.541666"
+    },
+    "Santa Coloma de Gramenet":{
+        "geo_loc_latitude": "41.448215",
+        "geo_loc_longitude": "2.211027"
+    },
+    "Montornès del Vallès":{
+        "geo_loc_latitude": "41.546434",
+        "geo_loc_longitude": "2.268351"
+    },
+    "Tudela":{
+        "geo_loc_latitude": "42.060165",
+        "geo_loc_longitude": "-1.608065"
+    },
+    "Estella":{
+        "geo_loc_latitude": "42.672969",
+        "geo_loc_longitude": "-2.032974"
+    },
+    "Viladecavalls":{
+        "geo_loc_latitude": "41.552843",
+        "geo_loc_longitude": "1.952722"
+    },
+    "Manresa":{
+        "geo_loc_latitude": "41.727944",
+        "geo_loc_longitude": "1.823089"
+    },
+    "Barakaldo":{
+        "geo_loc_latitude": "43.282025",
+        "geo_loc_longitude": "-2.984338"
+    },
+    "Gorliz":{
+        "geo_loc_latitude": "43.416987",
+        "geo_loc_longitude": "-2.9448381"
+    },
+    "Urdúliz":{
+        "geo_loc_latitude": "43.375278",
+        "geo_loc_longitude": "-2.960000"
     }
+
 }
