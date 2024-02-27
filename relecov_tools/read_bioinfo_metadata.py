@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import os
 import sys
 import logging
@@ -29,6 +28,8 @@ class BioinfoMetadata:
         json_file=None,
         input_folder=None,
         output_folder=None,
+        software='viralrecon', # default?
+        yaml_file=None,
     ):
         if json_file is None:
             json_file = relecov_tools.utils.prompt_path(
@@ -52,6 +53,26 @@ class BioinfoMetadata:
             )
         else:
             self.output_folder = output_folder
+
+        # TODO: Available software list can be retrieved from conf/bioinfo_search_patterns.yml
+        # TODO: Add error if software is not in the list (sys exit)
+        if software is None:
+            software = relecov_tools.utils.prompt_path(
+                msg="Select the software, pipeline or tool use in the bioinformatic analysis (available: 'viralrecon'): "
+            )
+        self.software_name = software
+
+        if yaml_file is None:
+            stderr.print(
+                "[grey] [INFO]: Applying default YAML bioinformatics configuration file."
+            )
+            yaml_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_search_patterns.yml")
+        else:
+            if not os.path.isfile(yaml_file):
+                log.error("yaml file %s does not exist ", yaml_file)
+                stderr.print(f"[red] file {yaml_file} does not exist")
+                sys.exit(1)
+        self.yaml_data = relecov_tools.utils.get_yaml_topic(yaml_file, self.software_name)
 
         config_json = ConfigJson()
         self.configuration = config_json

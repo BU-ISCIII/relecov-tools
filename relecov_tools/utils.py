@@ -129,6 +129,15 @@ def read_yml_file(file_name):
         except yaml.YAMLError:
             raise
 
+def get_yaml_topic(file_name, topic):
+    """Parse dict to retrieve scope properties"""
+    try:
+        yaml_file = read_yml_file(file_name)
+        return yaml_file.get(topic, {})
+    except AttributeError:
+        raise TypeError("file_name must be a dictionary-like object")
+    except Exception as e:
+        raise RuntimeError(f"An error occurred: {str(e)}")
 
 def get_md5_from_local_folder(local_folder):
     """Fetch the md5 values for each file in the file list"""
