@@ -1,0 +1,31 @@
+viralrecon:
+  version_info:
+    fn: software_versions.yml
+    required: true
+  mapping_stats:
+    fn: "mapping_illumina_stats.tab"
+    content: "analysis_date medianDPcoveragevirus  Variantsinconsensusx10  MissenseVariants    Coverage>10x(%)   %Ns10x   %readshost   %readsvirus  %unmapedreads   totalreads   Virussequence    read_length"
+    required: true
+    num_lines: 1
+  pangolin:
+    fn: ".pangolin.csv"
+    content:  "scorpio_call lineage  version pangolin_version scorpio_version  constellation_version"
+    num_lines: 1
+  vairants_long_table:
+    fn: "variants_long_table.csv"
+    content: "SAMPLE,CHROM,POS,REF,ALT,FILTER,DP,REF_DP,ALT_DP,AF,GENE,EFFECT,HGVS_C,HGVS_P,HGVS_P_1LETTER,CALLER,LINEAGE"
+    num_lines: 1
+    required: true
+  consensus:
+    fn: ".consensus.fa"
+    content: 
+      - "consensus_sequence_name"
+      - "consensus_genome_length"
+      - "consensus_sequence_filename"
+      - "consensus_sequence_filepath"
+      - "consensus_sequence_md5"
+      - "number_of_base_pairs_sequenced"
+  summary_mqc:
+    fn: "summary_variants_metrics_mqc.csv"
+    content: "# Ns per 100kb consensu"
+    required: true
