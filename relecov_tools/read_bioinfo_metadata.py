@@ -23,7 +23,8 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
-
+# TODO: add required fields to j_data (read_lab + read_bioinf)
+# TODO: Scan should work in multiple samples. Files found must detect N samples output files.  
 class BioinfoMetadata:
     def __init__(
         self,
@@ -116,6 +117,35 @@ class BioinfoMetadata:
                             required_files_found[target_file].append(file_path)
                     pbar.update(1) # FIXME: is not correctly processing each file
         return(required_files_found)
+
+    # TODO: This verification step might be executed for each sample since there are sample-specific files.
+    def validate_software_mandatory_files(self, files):
+        """Verify that all required files are present"""
+        missing = []
+        if len(files) == 0:
+            log.error("No mandatory files for %s found in folder: %s", 
+                    self.software_name,
+                    self.input_folder
+            )
+            stderr.print(
+                f"[red]\tValidation Failed: No mandatory files found in folder: {self.input_folder}. "
+            )
+            sys.exit(1)
+        for key, values in files.items():
+            if len(values)==0:
+                missing.append(key)
+        if len(missing) > 0:
+            stderr.print(
+                f"[red]\tValidation Failed: Missing files for {self.software_name}:"
+            )
+            for i in missing:
+                stderr.print(
+                    f"\t- {self.required_file_name[i]}"
+                )
+            sys.exit(1)
+        stderr.print(
+            f"[green]\tValidation Approved"
+        )
 
     def add_fixed_values(self, j_data, fixed_values):
         """include the fixed data defined in configuration or feed custom empty fields"""
@@ -361,8 +391,9 @@ class BioinfoMetadata:
         inside input directory
         """
         stderr.print(f"[blue]Sanning for {self.software_name} files..")
-        self.scann_directory()
-        
+        scanned_files_mapping = self.scann_directory()
+        stderr.print(f"[blue]Verifying {self.software_name} required files..")
+        self.validate_software_mandatory_files(scanned_files_mapping)
         stderr.print("[blue]Reading lab metadata json")
         j_data = self.collect_info_from_lab_json()
         stderr.print("[blue]Adding fixed values")
