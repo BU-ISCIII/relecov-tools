@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+# TODO: Add new dependencies to pkg
 import os
 import sys
 import logging
 import glob
 import rich.console
 from datetime import datetime
+from tqdm import tqdm
 from yaml import YAMLError
 
 import relecov_tools.utils
@@ -87,6 +89,33 @@ class BioinfoMetadata:
                 stderr.print(f"[red]File {file} does not exist")
                 sys.exit(1)
             self.req_files[key] = f_path
+
+    def get_software_required_files(self):
+        """Load required softwaew specific files and patterns from YAML."""
+        self.required_file_name = {}
+        self.required_file_content = {}
+
+        for key, value in self.yaml_data.items():
+            if 'required' in value and value['required']:
+                self.required_file_name[key] = value.get('fn','')
+                self.required_file_content[key] = value.get('content','')
+
+    def scann_directory(self):
+        """Scann bioinfo analysis directory and search for files"""
+        total_files = sum(len(files) for _, _, files in os.walk(self.input_folder))
+        self.get_software_required_files()
+        required_files_found = {key: [] for key in self.required_file_name}
+
+        with tqdm(total=total_files, desc=f'\tScanning...') as pbar:
+            for target_file, file_pattern in self.required_file_name.items():
+                for root, _, files in os.walk(self.input_folder, topdown=True):
+                    for file_name in files:
+                        # FIXME: might be better regex than endswith
+                        if file_name.endswith(file_pattern):
+                            file_path = os.path.join(root, file_name)
+                            required_files_found[target_file].append(file_path)
+                    pbar.update(1) # FIXME: is not correctly processing each file
+        return(required_files_found)
 
     def add_fixed_values(self, j_data, fixed_values):
         """include the fixed data defined in configuration or feed custom empty fields"""
@@ -331,6 +360,9 @@ class BioinfoMetadata:
         metadata json, mapping_stats, and more information from the files
         inside input directory
         """
+        stderr.print(f"[blue]Sanning for {self.software_name} files..")
+        self.scann_directory()
+        
         stderr.print("[blue]Reading lab metadata json")
         j_data = self.collect_info_from_lab_json()
         stderr.print("[blue]Adding fixed values")
