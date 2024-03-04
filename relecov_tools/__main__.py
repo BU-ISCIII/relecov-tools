@@ -418,12 +418,13 @@ def update_db(user, password, json, type, databaseServer):
 )
 @click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file")
-def read_bioinfo_metadata(json_file, input_folder, out_dir):
+@click.option("-s", "--software_name", help="Name of the software/pipeline used.")
+def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
     new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        json_file, input_folder, out_dir
+        json_file, input_folder, out_dir, software_name,
     )
 
     new_bioinfo_metadata.create_bioinfo_file()
