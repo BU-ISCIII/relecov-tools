@@ -113,6 +113,7 @@ class SftpHandle:
             self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
             self.target_folders = self.target_folders.split(",")
+        self.logs = {}
         if self.sftp_passwd is None:
             self.sftp_passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password"
@@ -282,6 +283,7 @@ class SftpHandle:
         Returns:
             fetched_files(list(str)): list of successfully downloaded files
         """
+
         fetched_files = list()
         log.info("Trying to fetch files in remote server")
         stderr.print(f"Fetching {len(file_list)} files from {folder}")
@@ -327,7 +329,9 @@ class SftpHandle:
         avoid_chars = self.avoidable_characters
         hash_dict = relecov_tools.utils.read_md5_checksum(fetched_md5, avoid_chars)
         if not hash_dict:
-            log.warning("md5sum file could not be read, md5 hashes won't be validated")
+            error_text = "md5sum file could not be read, md5 hashes won't be validated"
+            log.warning(error_text)
+            self.include_warning(error_text)
             return fetched_files, False
         # check md5 checksum for each file
         for f_name in hash_dict.keys():
@@ -362,10 +366,13 @@ class SftpHandle:
         sample_data_file = "samples_data_" + prefix_file_name + ".json"
         sample_data_path = os.path.join(local_folder, sample_data_file)
         os.rename(metadata_file, os.path.join(local_folder, new_metadata_file))
+        error_text = "Sample %s incomplete. Not added to final Json"
+
         data = copy.deepcopy(samples_dict)
         for sample, values in data.items():
             if not all(val for val in values):
-                log.warning("Sample %s incomplete. Not added to final Json", sample)
+                log.error(str(error_text % sample))
+                self.include_error(str(error_text % sample), sample)
                 samples_to_delete.append(sample)
                 continue
             # TODO: Move these keys to configuration.json
@@ -374,12 +381,11 @@ class SftpHandle:
             if values.get("sequence_file_R2_fastq"):
                 values["r2_fastq_filepath"] = local_folder
                 values["fastq_r2_md5"] = md5_dict.get(values["sequence_file_R2_fastq"])
-        data = {key: val for key, val in data.items() if key not in samples_to_delete}
+        if samples_to_delete:
+            data = {k: v for k, v in data.items() if k not in samples_to_delete}
         with open(sample_data_path, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
-        log.info(
-            "Successfully created file with sample names list %s", sample_data_path
-        )
+        log.info("Successfully created json file with samples %s", sample_data_path)
         return
 
     def remove_duplicated_values(self, sample_file_dict):
@@ -592,28 +598,27 @@ class SftpHandle:
             log.info("Files in %s match with metadata file", remote_folder)
             stderr.print("Successfully validated files based on metadata")
         else:
-            log.warning("Some files in %s do not match metadata file", remote_folder)
-            stderr.print(
-                "Some files in "
-                + remote_folder
-                + " do not match the ones described in metadata"
-            )
+            log_text = "Some files in %s do not match the ones described in metadata"
+            log.warning(log_text % remote_folder)
+            stderr.print(f"[gold1]{log_text % remote_folder}")
             set_list = set(metafiles_list)
             mismatch_files = [fi for fi in filtered_files_list if fi not in set_list]
             mismatch_rev = [fi for fi in set_list if fi not in filtered_files_list]
-            log.warning(
-                "Files in folder not present in metadata %s", str(mismatch_files)
-            )
-            log.warning(
-                "Files in metadata not present in folder: %s", str(mismatch_rev)
-            )
+            error_text1 = "Files in folder missing in metadata %s"
+            log.warning(error_text1 % str(mismatch_files))
+            self.include_warning(error_text1 % str(mismatch_files))
+            error_text2 = "Files in metadata missing in folder %s"
+            log.warning(error_text2 % str(mismatch_rev))
+            self.include_warning(error_text2 % str(mismatch_rev))
             # Try to check if the metadata filename lacks the proper extension
             log.info("Trying to match files without proper file extension")
             sample_files_dict = self.process_filedict(
                 sample_files_dict, filtered_files_list
             )
         if not any(value for value in sample_files_dict.values()):
-            raise FileNotFoundError("No files from metadata found in ", remote_folder)
+            raise FileNotFoundError(
+                "No files from metadata found in %s" % remote_folder
+            )
         return sample_files_dict, local_meta_file
 
     def delete_remote_files(self, remote_folder, files):
@@ -933,11 +938,11 @@ class SftpHandle:
         if not root_directory_list:
             log.error("Error while listing folders in remote. Aborting")
             sys.exit(1)
-        if self.target_folders == "ALL":
+        if self.target_folders[0] == "ALL":
             log.info("Showing folders from remote SFTP for user selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
                 msg="Select the folders that will be targeted",
-                choices=sorted(root_directory_list),
+                choices=sorted(clean_root_list),
             )
         elif self.target_folders[0] is None and len(self.target_folders) == 1:
             target_folders = clean_root_list
@@ -985,7 +990,9 @@ class SftpHandle:
             try:
                 relecov_tools.utils.compress_file(f_path)
             except FileNotFoundError:
-                log.error("Could not compress file %s", str(file))
+                error_text = "Could not compress file %s, file not found" % str(file)
+                log.error(error_text)
+                self.include_error(error_text, f_path)
                 continue
             # Remove file after compression is completed
             compressed_files.append(file)
@@ -1016,7 +1023,9 @@ class SftpHandle:
                         processed_dict[sample][key] = file
             # remove sample if it has missing files
             if not all(x in clean_fetchlist for x in processed_dict[sample].values()):
-                log.warning("Sample %s skipped: missing files in sftp", sample)
+                error_text = "Sample %s skipped: missing files in sftp" % sample
+                log.error(error_text)
+                self.include_error(error_text, sample)
                 del processed_dict[sample]
         return processed_dict
 
@@ -1038,6 +1047,7 @@ class SftpHandle:
         folders_to_download = target_folders
         date = datetime.today().strftime("%Y%m%d")
         for folder in folders_to_download.keys():
+            self.current_folder = folder.split("/")[0]
             # Close previously open connection to avoid timeouts
             try:
                 self.close_connection()
@@ -1048,14 +1058,16 @@ class SftpHandle:
             log.info("Processing folder %s", folder)
             stderr.print("[blue]Processing folder " + folder)
             # Validate that the files are the ones described in metadata.
+
             local_folder = self.create_local_folder(folder, date)
             try:
                 valid_filedict, meta_file = self.validate_remote_files(
                     folder, local_folder
                 )
-            except (FileNotFoundError, MetadataError) as failed_validation:
-                log.error(failed_validation)
-                stderr.print(f"[red]{failed_validation}, skipped")
+            except (FileNotFoundError, IOError, PermissionError, MetadataError) as fail:
+                log.error(fail)
+                stderr.print(f"[red]{fail}, skipped")
+                self.include_error(fail)
                 continue
             # Get the files in each folder
             files_to_download = [
@@ -1065,8 +1077,10 @@ class SftpHandle:
                 folder, local_folder, files_to_download
             )
             if not fetched_files:
-                log.warning("No files could be downloaded in folder %s", folder)
-                stderr.print(f"No files were downloaded process for {folder}")
+                error_text = "No files could be downloaded in folder %s" % str(folder)
+                log.warning(error_text)
+                stderr.print(f"{error_text}")
+                self.include_error(error_text)
                 continue
             log.info("Finished download for folder: %s", folder)
             stderr.print(f"Finished download for folder {folder}")
@@ -1222,6 +1236,7 @@ class SftpHandle:
             stderr.print("[red]Unable to establish sftp connection")
             sys.exit(1)
         target_folders = self.select_target_folders()
+        target_folders = self.merge_subfolders(target_folders)
         if self.download_option == "download_only":
             self.download(target_folders, option="download")
         if self.download_option == "download_clean":
@@ -1232,4 +1247,7 @@ class SftpHandle:
                 self.delete_remote_files(folder, files)
                 stderr.print(f"Delete process finished in {folder}")
         self.close_connection()
+        if self.logs:
+            log.info("Printing process summary to %s", self.platform_storage_folder)
+            self.create_error_summary()
         stderr.print("Finished execution")
