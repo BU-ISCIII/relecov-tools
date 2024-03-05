@@ -1077,39 +1077,56 @@ class SftpHandle:
                     local_folder, os.path.basename(remote_md5sum)
                 )
                 self.get_from_sftp(file=remote_md5sum, destination=fetched_md5)
-                successful_files, req_retransmition = self.verify_md5_checksum(
+                successful_files, corrupted = self.verify_md5_checksum(
                     local_folder, fetched_files, fetched_md5
                 )
-                # retrasmision of files in folder
-                if req_retransmition:
-                    stderr.print("[Yellow] Error during download, trying again...")
-                    self.get_remote_folder_files(
-                        folder, local_folder, req_retransmition
-                    )
+                # try to download the files again to discard errors during download
+                if corrupted:
+                    stderr.print("[gold1]Found md5 mismatches, downloading again...")
+                    self.get_remote_folder_files(folder, local_folder, corrupted)
                     saved_files, corrupted = self.verify_md5_checksum(
-                        local_folder, req_retransmition, fetched_md5
+                        local_folder, corrupted, fetched_md5
                     )
                     if saved_files:
                         successful_files.extend(saved_files)
                     if corrupted:
-                        log.warning("Found corrupted files: %s", str(corrupted))
-                        stderr.print(f"Found corrupted files: {str(corrupted)}")
+                        corr_fold = os.path.join(local_folder, "corrupted")
+                        os.mkdir(corr_fold)
+                        error_text = "Found corrupted files: %s. Moved to: %s"
+                        log.warning(error_text % (str(corrupted), corr_fold))
+                        stderr.print(f"[red]{error_text % (str(corrupted), corr_fold)}")
+                        self.include_warning(error_text % (str(corrupted), "/corrupt/"))
+                        [self.include_error("md5 mismatch", corr) for corr in corrupted]
+                        for corr_file in corrupted:
+                            path = os.path.join(local_folder, corr_file)
+                            try:
+                                os.rename(path, os.path.join(corr_fold, corr_file))
+                            except (FileNotFoundError, PermissionError, OSError) as e:
+                                error_text = (
+                                    "Could not move corrupted file %s to %s: %s"
+                                )
+                                log.error(error_text % (path, corr_fold, e))
+                                stderr.print(
+                                    f"[red]{error_text % (path, corr_fold, e)}"
+                                )
                         if self.abort_if_md5_mismatch:
-                            log.error("Aborting, corrupted files %s", str(corrupted))
-                            stderr.print(
-                                f"[red] Stopped processing folder {folder} \
-                                due to corrupted files {corrupted}"
-                            )
+                            error_text = "Stop processing %s due to corrupted files."
+                            log.error(error_text % folder)
+                            stderr.print(f"[red]{error_text % folder}")
+                            self.include_error(error_text % "folder")
                             relecov_tools.utils.delete_local_folder(local_folder)
                             continue
                 hash_dict = relecov_tools.utils.read_md5_checksum(
                     fetched_md5, self.avoidable_characters
                 )
                 log.info("Finished md5 check for folder: %s", folder)
-                stderr.print(f"Finished md5 verification for folder {folder}")
+                stderr.print(f"[blue]Finished md5 verification for folder {folder}")
             else:
-                log.warning("No single md5sum file could be found in %s", folder)
-                stderr.print(f"[red]No single md5sum could be found in {folder}")
+                error_text = "No single md5sum file could be found in %s" % folder
+                log.warning(error_text)
+                stderr.print(f"[red]{error_text}")
+                self.include_error(error_text)
+
             clean_fetchlist = [
                 fi for fi in fetched_files if fi.endswith(tuple(self.allowed_file_ext))
             ]
@@ -1130,8 +1147,13 @@ class SftpHandle:
                     f_name = os.path.basename(path)
                     if f_name in successful_files:
                         files_md5_dict[f_name] = hash_dict[f_name]
+                    elif f_name in corrupted:
+                        clean_fetchlist.remove(f_name)
                     else:
-                        log.warning("File %s not found in md5sum. Creating it", f_name)
+                        if not str(f_name).rstrip(".gz") in files_to_compress:
+                            error_text = "File %s not found in md5sum. Creating hash"
+                            log.warning(error_text % f_name)
+                            self.include_warning(str(error_text % f_name), f_name)
                         files_md5_dict[f_name] = relecov_tools.utils.calculate_md5(path)
             else:
                 md5_hashes = [
