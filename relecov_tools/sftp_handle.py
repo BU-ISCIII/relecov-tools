@@ -613,6 +613,294 @@ class SftpHandle:
                 continue
         return
 
+    def move_processing_fastqs(self, folders_with_metadata):
+        """Gather all the files from any subfolder into a processing folder
+
+        Args:
+            folders_with_metadata (dict(str:list)): Dictionary updated from merge_md5sums()
+
+        Returns:
+            folders_with_metadata (dict(str:list)): Same dict updated with files successfully moved
+        """
+        log.info("Moving remote files to each temporal processing folder")
+        stderr.print(f"[blue]Moving remote files to each temporal processing folder")
+        for folder, files in folders_with_metadata.items():
+            self.current_folder = folder.split("/")[0]
+            successful_files = []
+            for file in files:
+                if not file.endswith(tuple(self.allowed_file_ext)):
+                    continue
+                file_dest = os.path.join(folder, os.path.basename(file))
+                try:
+                    # Paramiko.SSHClient.sftp_open does not have a method to copy files
+                    self.client.rename(file, file_dest)
+                    successful_files.append(file_dest)
+                except OSError:
+                    if file in folders_with_metadata[folder]:
+                        error_text = "File named %s already in %s. Skipped"
+                        log.warning(error_text % (file, self.current_folder))
+                        self.include_warning(error_text % (file, self.current_folder))
+                    else:
+                        error_text = "Error while moving file %s"
+                        log.error(error_text % file)
+                        self.include_error(error_text % file)
+            folders_with_metadata[folder] = successful_files
+        return folders_with_metadata
+
+    def merge_md5sums(self, folders_with_metadata):
+        """Download the md5sums for each folder, merge them into a single one,
+        upload them to the remote processing folder.
+
+        Args:
+            folders_with_metadata (dict(str:list)): Dictionary with remote folders
+            and their files. All subfolder filenames are merged into a single key.
+
+        Raises:
+            FileNotFoundError: If no md5sum file is found in the folder
+
+        Returns:
+            folders_with_metadata: Same dict updated with the merged md5sum file
+        """
+        output_location = self.platform_storage_folder
+        log.info("Merging md5sum files from remote folders...")
+        stderr.print("[blue]Merging md5sum files from remote folders...")
+
+        # TODO: Include this function in relecov_tools.utils
+        def md5_merger(md5_filelist, avoid_chars=None):
+            md5dict_list = []
+            for md5sum in md5_filelist:
+                hash_dict = relecov_tools.utils.read_md5_checksum(md5sum, avoid_chars)
+                if hash_dict:
+                    md5dict_list.append(hash_dict)
+            # Sort hashes and files back to the original order.
+            merged_md5 = {
+                md5: file for mdict in md5dict_list for file, md5 in mdict.items()
+            }
+            return merged_md5
+
+        def md5_handler(md5sumlist, output_location):
+            downloaded_md5files = []
+            for md5sum in md5sumlist:
+                md5_name = "_".join([token_hex(nbytes=12), "md5_temp.md5"])
+                fetched_md5 = os.path.join(output_location, md5_name)
+                if self.get_from_sftp(file=md5sum, destination=fetched_md5):
+                    downloaded_md5files.append(fetched_md5)
+            merged_md5 = md5_merger(downloaded_md5files, self.avoidable_characters)
+            if merged_md5:
+                merged_name = "_".join([folder.split("/")[0], "md5sum.md5"])
+                merged_md5_path = os.path.join(output_location, merged_name)
+                with open(merged_md5_path, "w") as md5out:
+                    write_md5 = csv_writer(md5out, delimiter="\t")
+                    write_md5.writerows(merged_md5.items())
+                md5_dest = os.path.join(folder, os.path.basename(merged_md5_path))
+                self.client.put(localpath=merged_md5_path, remotepath=md5_dest)
+                # Remove local files once merged and uploaded
+                [os.remove(md5_file) for md5_file in downloaded_md5files]
+                return md5_dest
+            else:
+                error_text = "No md5sum could be processed in remote folder"
+                raise FileNotFoundError(error_text)
+
+        for folder in folders_with_metadata.keys():
+            self.current_folder = folder.split("/")[0]
+            md5flag = "md5sum"
+            md5sumlist = [fi for fi in folders_with_metadata[folder] if md5flag in fi]
+            if not md5sumlist:
+                error_text = "No md5sum could be found in remote folder"
+                log.warning(error_text)
+                stderr.print(f"[yellow]{error_text}")
+                self.include_warning(error_text)
+                continue
+            folders_with_metadata[folder] = [
+                fi for fi in folders_with_metadata[folder] if fi not in md5sumlist
+            ]
+            try:
+                uploaded_md5 = md5_handler(md5sumlist, output_location)
+            except (FileNotFoundError, OSError, PermissionError, CsvError) as e:
+                error_text = "Could not merge md5files for %s. Reason: %s"
+                log.warning(error_text % (self.current_folder, str(e)))
+                stderr.print(f"[yellow]{error_text % (self.current_folder, str(e))}")
+                self.include_warning(error_text % (self.current_folder, str(e)))
+                continue
+            if uploaded_md5:
+                folders_with_metadata[folder].append(uploaded_md5)
+
+        return folders_with_metadata
+
+    def merge_metadata(self, metadata_sheet=None, *metadata_tables):
+        """Merge a variable number of metadata dataframes to the first one. Merge them
+        only into a certain sheet from a multi-sheet excel file if sheetname is given.
+
+        Args:
+            metadata_sheet (str): Name of the sheet containing metadata in excel file
+            *metadata_tables (list(pandas.DataFrame)): Dataframes to be merged
+
+        Returns:
+            merged_df (pandas.DataFrame): A merged dataframe from the given tables
+        """
+        meta_sheet = metadata_sheet
+        for idx, table in enumerate(metadata_tables):
+            if idx == 0:
+                merged_df = table
+                continue
+            if meta_sheet:
+                merged_df[meta_sheet] = concat(
+                    [merged_df[meta_sheet], table[meta_sheet]], ignore_index=True
+                )
+            else:
+                merged_df = concat([merged_df, table], ignore_index=True)
+        return merged_df
+
+    def excel_to_df(self, excel_file, metadata_sheet, header_flag):
+        """Read an excel file, return a dict with a dataframe for each sheet in it.
+        Process the given sheet with metadata, removing all rows until header is found
+
+        Args:
+            excel_file (str): Path to the local excel file with metadata
+            metadata_sheet (str): Name of the sheet containing metadata in excel file
+            header_flag (str): Name of one of the columns from the metadata header
+
+        Raises:
+            MetadataError: If no header could be found matching header flag
+
+        Returns:
+            excel_df (dict(str:pandas.DataFrame)): Dict {name_of_excel_sheet:DataFrame}
+            containing all sheets in the excel file as pandas dataframes.
+        """
+        # Get every sheet from the first excel file
+        excel_df = read_excel(excel_file, sheet_name=None)  # index_col=None
+        meta_df = excel_df[metadata_sheet]
+        if header_flag in meta_df.columns:
+            return excel_df
+        header_row = None
+        for idx in range(len(meta_df)):
+            if any(meta_df.loc[idx, x] == header_flag for x in meta_df.columns):
+                header_row = idx
+        if not header_row:
+            error_text = "Header could not be found for excel file %s"
+            raise MetadataError(str(error_text % excel_file))
+        meta_df.columns = meta_df.iloc[header_row]
+        excel_df[metadata_sheet] = meta_df.drop(meta_df.index[: (header_row + 1)])
+        excel_df[metadata_sheet] = excel_df[metadata_sheet].reset_index(drop=True)
+        return excel_df
+
+    def merge_subfolders(self, target_folders):
+        """For each first-level folder in the sftp, merge all the subfolders within
+        it in a single one called '*_tmp_processing' by moving all the fastq files from
+        them. Merge the metadata excel and md5 files from each subfolder too.
+
+        Args:
+            target_folders (dict(str:list)): Dictionary with folders and their files
+
+        Returns:
+            clean_target_folders (dict(str:list)): Dict with '*_tmp_processing' folders
+            and their content. All subfolder filenames are merged into a single key.
+        """
+        """clean_folders = {
+            fd:v for fd,v in target_folders.items() if "tmp_processing" not in fd
+        }"""
+        clean_folders = target_folders
+        metadata_ws = self.metadata_processing.get("excel_sheet")
+        header_flag = self.metadata_processing.get("header_flag")
+        output_location = self.platform_storage_folder
+        date_and_time = datetime.today().strftime("%Y%m%d%-H%M%S")
+
+        def upload_merged_df(merged_excel_path, last_main_folder, merged_df):
+            self.client.mkdir(last_main_folder)
+            pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
+            for sheet in merged_df.keys():
+                format_sheet = merged_df[sheet].astype(str)[merged_df[sheet].notnull()]
+                format_sheet.to_excel(pd_writer, sheet_name=sheet, index=False)
+            pd_writer.close()
+            dest = os.path.join(last_main_folder, os.path.basename(merged_excel_path))
+            self.client.put(merged_excel_path, dest)
+            return
+
+        folders_with_metadata = {}
+        merged_df = None
+        log.info("Setting %s remote folders...", str(len(clean_folders.keys())))
+        stderr.print(f"[blue]Setting {len(clean_folders.keys())} remote folders...")
+        for folder in sorted(clean_folders.keys()):
+            self.current_folder = folder
+
+            try:
+                downloaded_metadata = self.get_metadata_file(folder, output_location)
+            except (FileNotFoundError, OSError, PermissionError, MetadataError) as err:
+                error_text = "Remote folder %s skipped. Reason: %s"
+                log.error(error_text % (folder, err))
+                self.include_error(error_text % (folder, err))
+                continue
+            try:
+                self.read_metadata_file(downloaded_metadata, return_data=False)
+            except MetadataError as header_error:
+                error_text = " Folder skipped: %s"
+                os.remove(downloaded_metadata)
+                log.error(str(folder, str(error_text % str(header_error))))
+                self.include_error(error_text % header_error)
+                continue
+            # Create a temporal name to avoid duplicated filenames
+            meta_filename = "_".join([folder.split("/")[-1], "metadata_temp.xlsx"])
+            local_meta = os.path.join(output_location, meta_filename)
+            os.rename(downloaded_metadata, local_meta)
+
+            # Taking the main folder for each lab as reference to merge
+            main_folder = folder.split("/")[0]
+            temporal_foldername = "_".join([date_and_time, "tmp_processing"])
+            temp_folder = os.path.join(main_folder, temporal_foldername)
+            # Get every file except the excel ones as they are going to be merged
+            filelist = [fi for fi in target_folders[folder] if not fi.endswith(".xlsx")]
+            if not folders_with_metadata.get(temp_folder):
+                log_text = "Trying to merge metadata from %s in %s"
+                log.info(log_text % (main_folder, temp_folder))
+                stderr.print(f"[blue]{log_text % (main_folder, temp_folder)}")
+                if merged_df:
+                    # Write the previous merged metadata df before overriding it
+                    try:
+                        upload_merged_df(merged_excel_path, last_main_folder, merged_df)
+                        folders_with_metadata[last_main_folder].append(excel_name)
+                    except OSError:
+                        error_text = "Error uploading merged metadata back to sftp"
+                        log.error(error_text)
+                        self.include_error(error_text)
+                        del folders_with_metadata[last_main_folder]
+                try:
+                    merged_df = self.excel_to_df(local_meta, metadata_ws, header_flag)
+                except (ParserError, EmptyDataError, MetadataError, KeyError) as e:
+                    meta_name = os.path.basename(downloaded_metadata)
+                    error_text = "%s skipped. Error while processing excel %s: %s"
+                    log.error(error_text % (main_folder, meta_name, str(e)))
+                    self.include_error(error_text % (main_folder, meta_name, str(e)))
+                    continue
+                folders_with_metadata[temp_folder] = []
+                folders_with_metadata[temp_folder].extend(filelist)
+                # rename metadata file to avoid filename duplications
+                excel_name = "_".join([folder.split("/")[0], "merged_metadata.xlsx"])
+                merged_excel_path = os.path.join(output_location, excel_name)
+                os.rename(local_meta, merged_excel_path)
+                # Keep a track of the main_folder for next iteration
+                last_main_folder = temp_folder
+            else:
+                # If temp_folder has subfolders in it, merge everything
+                folders_with_metadata[temp_folder].extend(filelist)
+                new_df = self.excel_to_df(local_meta, metadata_ws, header_flag)
+                merged_df = self.merge_metadata(metadata_ws, merged_df, new_df)
+        # End of loop
+
+        # Write last dataframe to file once loop is finished
+        if folders_with_metadata.get(last_main_folder):
+            if excel_name not in folders_with_metadata[last_main_folder]:
+                upload_merged_df(merged_excel_path, last_main_folder, merged_df)
+                folders_with_metadata[last_main_folder].append(excel_name)
+
+        # Merge md5files and upload them to tmp_processing folder
+        merged_md5_folders = self.merge_md5sums(folders_with_metadata)
+        # Move all the files from each subfolder into its tmp_processing folder
+        clean_target_folders = self.move_processing_fastqs(merged_md5_folders)
+        log_text = "Remote folders merged into %s folders. Proceed with processing"
+        log.info(log_text % len(clean_target_folders.keys()))
+        stderr.print(f"[green]{log_text % len(clean_target_folders.keys())}")
+        return clean_target_folders
+
     def select_target_folders(self):
         """Find the selected folders in remote if given, else select every folder
 
