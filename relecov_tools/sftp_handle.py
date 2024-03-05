@@ -181,7 +181,7 @@ class SftpHandle:
         if not subfolders:
             return [folder_name]
 
-        def recursive_list(folder_name, client):
+        def recursive_list(folder_name):
             try:
                 attribute_list = self.client.listdir_attr(folder_name)
             except (FileNotFoundError, OSError) as e:
@@ -194,13 +194,13 @@ class SftpHandle:
                 if stat.S_ISDIR(attribute.st_mode):
                     abspath = os.path.join(folder_name, attribute.filename)
                     directory_list.append(abspath)
-                    recursive_list(abspath, client)
+                    recursive_list(abspath)
                 else:
                     continue
             return directory_list
 
         if recursive:
-            directory_list = recursive_list(folder_name, self.client)
+            directory_list = recursive_list(folder_name)
             return directory_list
         try:
             directory_list = [
