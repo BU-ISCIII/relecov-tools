@@ -1128,6 +1128,50 @@ class SftpHandle:
             stderr.print(f"[green]Finished processing {folder}")
         return
 
+    def include_error(self, entry, sample=None):
+        self.update_summary(log_type="error", entry=entry, sample=sample)
+        return
+
+    def include_warning(self, entry, sample=None):
+        self.update_summary(log_type="warning", entry=entry, sample=sample)
+        return
+
+    def update_summary(self, log_type, entry, sample=None):
+        feed_dict = OrderedDict({"valid": False, "errors": [], "warnings": []})
+        current_folder = str(self.current_folder).replace("./", "").split("/")[0]
+        entry = str(entry)
+        sample = str(sample)
+        if current_folder not in self.logs.keys():
+            self.logs[current_folder] = feed_dict
+            self.logs[current_folder]["samples"] = OrderedDict()
+        if sample == "None":
+            if log_type == "error":
+                self.logs[current_folder]["errors"].append(entry)
+            elif log_type == "warning":
+                self.logs[current_folder]["warnings"].append(entry)
+        else:
+            if sample not in self.logs[current_folder]["samples"].keys():
+                self.logs[current_folder]["samples"][sample] = feed_dict
+            if log_type == "error":
+                self.logs[current_folder]["samples"][sample]["errors"].append(entry)
+            elif log_type == "warning":
+                self.logs[current_folder]["samples"][sample]["warnings"].append(entry)
+        return
+
+    def create_error_summary(self):
+        for folder in self.logs.keys():
+            if not self.logs[folder]["errors"]:
+                self.logs[folder]["valid"] = True
+            for sample in self.logs[folder]["samples"].keys():
+                if not self.logs[folder]["samples"][sample]["errors"]:
+                    self.logs[folder]["samples"][sample]["valid"] = True
+        filename = "_".join([datetime.today().strftime("%Y%m%d"), "log_summary.json"])
+        summary_path = os.path.join(self.platform_storage_folder, filename)
+        with open(summary_path, "w", encoding="utf-8") as f:
+            f.write(json.dumps(self.logs, indent=4, sort_keys=True, ensure_ascii=False))
+        stderr.print(f"Process summary printed in {summary_path}")
+        return
+
     def execute_process(self):
         """Executes different processes depending on the download_option"""
         if not self.open_connection():
