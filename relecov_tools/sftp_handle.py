@@ -408,11 +408,58 @@ class SftpHandle:
         }
         clean_sample_dict = {key: sample_file_dict[key] for key in non_duplicated_keys}
         if duplicated_keys:
-            log.warning("Found duplicated files in metadata")
-            stderr.print("[Orange]Found samples in metadata refering to the same file")
+            error_text = "Samples in metadata refering to the same file. "
+            log.warning(error_text + str(duplicated_keys))
+            stderr.print(f"[Orange]{error_text}")
             stderr.print("[Orange]These samples won't be processed: ", duplicated_keys)
+            [self.include_error(error_text, sample) for sample in duplicated_keys]
 
         return clean_sample_dict
+
+    def read_metadata_file(self, meta_f_path, return_data=True):
+        """Read excel file, check if the header matches with the one defined in config
+
+        Args:
+            meta_f_path (str): Path to the excel_file
+
+        Raises:
+            MetadataError: If the header in the excel is different from config
+
+        Returns:
+            ws_metadata_lab: openpyxl's workbook metadata sheet of the excel file
+            metadata_header: column names of the header
+            header_row: row where the header is located in the sheet
+        """
+        warnings.simplefilter(action="ignore", category=UserWarning)
+        wb_file = openpyxl_load_workbook(meta_f_path, data_only=True)
+        ws_metadata_lab = wb_file[self.metadata_processing.get("excel_sheet")]
+        # find out the index for file names
+        header_flag = self.metadata_processing.get("header_flag")
+        header_row = [
+            idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
+        ][0]
+        for cell in ws_metadata_lab[header_row]:
+            cell.value = cell.value.strip()
+        metadata_header = [x.value for x in ws_metadata_lab[header_row]]
+        meta_column_list = self.metadata_lab_heading
+        if meta_column_list != metadata_header[1:]:
+            diffs = [
+                x
+                for x in set(metadata_header[1:] + meta_column_list)
+                if x not in meta_column_list or x not in metadata_header
+            ]
+            log.error(
+                "Config field metadata_lab_heading is different from .xlsx header"
+            )
+            stderr.print(
+                "[red]Header in metadata file is different from config file, aborting"
+            )
+            stderr.print("[red]Differences: ", diffs)
+            raise MetadataError(f"Metadata header different from config: {diffs}")
+        if return_data:
+            return ws_metadata_lab, metadata_header, header_row
+        else:
+            return True
 
     def get_sample_fastq_file_names(self, local_folder, meta_f_path):
         """Read excel metadata template and create dictionary with files for each sample
@@ -431,76 +478,50 @@ class SftpHandle:
             log.error("Metadata file does not exist on %s", local_folder)
             stderr.print("[red] METADATA_LAB.xlsx do not exist in" + local_folder)
             return False
-        wb_file = openpyxl.load_workbook(meta_f_path, data_only=True)
-        ws_metadata_lab = wb_file[self.metadata_processing.get("excel_sheet")]
         sample_file_dict = {}
-        # find out the index for file names
-        meta_column_list = self.metadata_lab_heading
-        header_flag = self.metadata_processing.get("header_flag")
-        header_row = [
-            idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
-        ][0]
-        for cell in ws_metadata_lab[header_row]:
-            cell.value = cell.value.strip()
-        metadata_header = [x.value for x in ws_metadata_lab[header_row]]
-        if (
-            meta_column_list != metadata_header[1:]
-            and "Sequencing Institution" in metadata_header
-        ):
-            diffs = [
-                x
-                for x in (metadata_header[1:] + meta_column_list)
-                if x not in meta_column_list or x not in metadata_header
-            ]
-            log.error(
-                "Config field metadata_lab_heading is different from .xlsx header"
-            )
-            stderr.print(
-                "[red]Header in metadata file is different from config file, aborting"
-            )
-            stderr.print("[red]Differences: ", diffs)
-            raise MetadataError(f"Metadata header different from config: {diffs}")
-        index_sampleID = metadata_header.index("Sample ID given for sequencing")
-        index_layout = metadata_header.index("Library Layout")
-        index_fastq_r1 = metadata_header.index("Sequence file R1 fastq")
-        index_fastq_r2 = metadata_header.index("Sequence file R2 fastq")
-        for row in islice(ws_metadata_lab.values, header_row, ws_metadata_lab.max_row):
+        metadata_ws, meta_header, header_row = self.read_metadata_file(meta_f_path)
+        index_sampleID = meta_header.index("Sample ID given for sequencing")
+        index_layout = meta_header.index("Library Layout")
+        index_fastq_r1 = meta_header.index("Sequence file R1 fastq")
+        index_fastq_r2 = meta_header.index("Sequence file R2 fastq")
+        for row in islice(metadata_ws.values, header_row, metadata_ws.max_row):
             if row[index_sampleID] is not None:
+                row_complete = True
                 try:
                     s_name = str(row[index_sampleID])
                 except ValueError as e:
-                    stderr.print("[red] Unable to convert to string. ", e)
+                    stderr.print("[red]Unable to convert to string. ", e)
+                    continue
                 if s_name not in sample_file_dict:
                     sample_file_dict[s_name] = {}
                 else:
                     print("Found duplicated sample ", s_name)
+                    s_name = "_".join([s_name, str(token_hex(nbytes=8))])
                 if row[index_layout] == "paired" and row[index_fastq_r2] is None:
-                    log.error(
-                        "Sample %s is paired-end, but no R2 given", row[index_sampleID]
-                    )
-                    continue
+                    error_text = "Sample %s is paired-end, but no R2 given"
+                    log.error(str(error_text % str(row[index_sampleID])))
+                    self.include_error(error_text % str(row[index_sampleID]), s_name)
+                    row_complete = False
                 if row[index_layout] == "single" and row[index_fastq_r2] is not None:
-                    log.error(
-                        "Sample %s is single-end, but R1&R2 given", row[index_sampleID]
-                    )
-                    continue
-                if row[index_fastq_r1] is not None:
-                    # TODO: move these keys to configuration.json
-                    sample_file_dict[s_name]["sequence_file_R1_fastq"] = row[
-                        index_fastq_r1
-                    ]
-                else:
-                    log.error("Fastq_R1 not defined in Metadata for sample %s", s_name)
-                    stderr.print(
-                        "[red]No fastq R1 file for sample " + s_name + ". Skipping"
-                    )
-                    continue
-                if row[index_fastq_r2] is not None:
-                    sample_file_dict[s_name]["sequence_file_R2_fastq"] = row[
-                        index_fastq_r2
-                    ]
-                # if not self.check_sample_files(sample_file_dict[s_name]):
-
+                    error_text = "Sample %s is single-end, but R1&R2 given"
+                    log.error(str(error_text % str(row[index_sampleID])))
+                    self.include_error(error_text % str(row[index_sampleID]), s_name)
+                    row_complete = False
+                if row_complete:
+                    if row[index_fastq_r1] is not None:
+                        # TODO: move these keys to configuration.json
+                        sample_file_dict[s_name]["sequence_file_R1_fastq"] = row[
+                            index_fastq_r1
+                        ]
+                        if row[index_fastq_r2] is not None:
+                            sample_file_dict[s_name]["sequence_file_R2_fastq"] = row[
+                                index_fastq_r2
+                            ]
+                    else:
+                        error_text = "Fastq_R1 not defined in Metadata for sample %s"
+                        log.error(str(error_text % s_name))
+                        stderr.print(f"[red]{str(error_text % s_name)}")
+                        self.include_error(str(error_text % s_name), s_name)
         # Remove duplicated files
         clean_sample_dict = self.remove_duplicated_values(sample_file_dict)
         return clean_sample_dict
