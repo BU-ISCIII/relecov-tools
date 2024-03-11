@@ -63,9 +63,11 @@ class LongTableParse:
             self.output_directory = output_directory
         Path(self.output_directory).mkdir(parents=True, exist_ok=True)
 
-        config_json = ConfigJson()
-        self.long_table_heading = config_json.get_configuration("long_table_heading")
-
+        json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
+        config_json = ConfigJson(json_file)
+        #self.long_table_heading = config_json.get_configuration("long_table_heading")
+        self.software_config = config_json.get_configuration('viralrecon')
+        self.long_table_heading = self.software_config["variants_long_table"]["content"]
     def validate_file(self, heading):
         """Check if long table file has all mandatory fields defined in
         configuration file
@@ -90,11 +92,8 @@ class LongTableParse:
         stderr.print("[blue]Parsing the input file")
         heading_index = {}
         headings_from_csv = lines[0].strip().split(",")
-        for heading in self.long_table_heading:
+        for heading in self.long_table_heading.values():
             heading_index[heading] = headings_from_csv.index(heading)
-
-        config = ConfigJson()
-        aux_dict = config.get_configuration("long_table_parse_aux")
 
         samp_dict = {}
         for line in lines[1:]:
@@ -110,7 +109,7 @@ class LongTableParse:
                     if isinstance(value, dict)
                     else line_s[heading_index[value]]
                 )
-                for key, value in aux_dict.items()
+                for key, value in self.long_table_heading.items()
             }
 
             if re.search("&", line_s[heading_index["GENE"]]):
@@ -125,7 +124,6 @@ class LongTableParse:
             else:
                 variant_dict["Gene"] = line_s[heading_index["GENE"]]
                 samp_dict[sample].append(variant_dict)
-
         stderr.print("[green]Successful parsing data")
         return samp_dict
 

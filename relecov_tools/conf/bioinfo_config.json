@@ -1,9 +1,104 @@
-{    
+{
     "viralrecon": {
+        "version_info": {
+            "fn": "software_versions.yml",
+            "required": true
+        },
+        "mapping_stats": {
+            "fn": "mapping_illumina_stats.tab",
+            "ff": "tsv",
+            "sample_column": 1,
+            "num_lines": 1,
+            "required": true,
+            "content": {
+                "analysis_date": "analysis_date",
+                "depth_of_coverage_value": "medianDPcoveragevirus",
+                "number_of_variants_in_consensus": "Variantsinconsensusx10",
+                "number_of_variants_with_effect": "MissenseVariants",
+                "per_genome_greater_10x": "Coverage>10x(%)",
+                "per_Ns": "%Ns10x",
+                "per_reads_host": "%readshost",
+                "per_reads_virus": "%readsvirus",
+                "per_unmapped": "%unmapedreads",
+                "qc_filtered": "totalreads",
+                "reference_genome_accession": "Virussequence",
+                "read_length": "read_length"
+            }
+        },
+        "mapping_pangolin": {
+            "fn": ".pangolin.csv",
+            "ff": "tsv",
+            "sample_column": 1,
+            "num_lines": 1,
+            "required": false,
+            "content": {
+                "variant_name": "scorpio_call",
+                "lineage_name": "lineage",
+                "lineage_algorithm_software_version": "version",
+                "lineage_analysis_software_version": "pangolin_version",
+                "lineage_analysis_scorpio_version": "scorpio_version",
+                "lineage_analysis_constellation_version": "constellation_version"
+            }
+        },
+        "variants_long_table": {
+            "fn": "variants_long_table.csv",
+            "ff": "csv",
+            "num_lines": 1,
+            "required": true,
+            "content": {
+                "sample" : "SAMPLE",
+                "chromosome": "CHROM",
+                "pos": "POS", 
+                "alt": "ALT", 
+                "ref": "REF",
+                "Filter": "FILTER",
+                "dp": "DP",
+                "ref_dp": "REF_DP",
+                "alt_dp": "ALT_DP",
+                "af": "AF",
+                "effect": "EFFECT",
+                "hgvs_c": "HGVS_C",
+                "hgvs_p": "HGVS_P",
+                "hgvs_p_1_letter": "HGVS_P_1LETTER",
+                "caller" : "CALLER",
+                "lineage" : "LINEAGE",
+                "gene" : "GENE"
+            }
+        },
+        "mapping_consensus": {
+            "fn": ".consensus.fa",
+            "ff": "fasta",
+            "required": false,
+            "content": {
+                "consensus_sequence_name" : "Not Provided [GENEPIO:0001668]",
+                "consensus_genome_length" : "Not Provided [GENEPIO:0001668]",
+                "consensus_sequence_filename" : "Not Provided [GENEPIO:0001668]",
+                "consensus_sequence_filepath" : "Not Provided [GENEPIO:0001668]",
+                "consensus_sequence_md5" : "Not Provided [GENEPIO:0001668]",
+                "number_of_base_pairs_sequenced" : "Not Provided [GENEPIO:0001668]"
+            }
+        },
+        "summary_mqc": {
+            "fn": "summary_variants_metrics_mqc.csv",
+            "ff": "csv",
+            "num_lines": 1,
+            "required": true,
+            "content": {
+                "ns_per_100_kbp": "# Ns per 100kb consensus"
+            }
+        },
+        "workflow_summary": {
+            "fn": "multiqc_report.html",
+            "ff": "html",
+            "required": true,
+            "content": {
+                "bioinformatics_protocol_software_name": "nf-core/viralrecon Workflow Summary",
+                "variant_calling_software_name": "IVAR_VARIANTS"
+            }
+        },
         "fixed_values": {
             "assembly": "Not Provided [GENEPIO:0001668]",
             "assembly_params": "Not Provided [GENEPIO:0001668]",
-            "bioinformatics_protocol_software_name": "nf-core/viralrecon",
             "commercial_open_source_both": "Open Source",
             "consensus_params": "-p vcf -f",
             "consensus_sequence_software_name": "BCFTOOLS_CONSENSUS",
@@ -18,51 +113,11 @@
             "lineage_analysis_software_name": "pangolin",
             "mapping_params": "--seed 1",
             "mapping_software_name": "BOWTIE2_ALIGN",
-            "preprocessing_params": "--cut_front --cut_tail --trim_poly_x --cut_mean_quality 30 --qualified_quality_phred 30 --unqualified_percent_limit 10 --length_required 50",
+            "preprocessing_params": "--cut_front --cut_tail --trim_poly_x --cut_mean_quality 30 --qualified_quality_phred   30    --unqualified_percent_limit 10 --length_required 50",
             "preprocessing_software_name": "FASTP",
-            "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20 -m 10",
-            "variant_calling_software_name": "IVAR_VARIANTS"
-        },
-        "feed_empty_fields":{
+            "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20   -m10",
             "lineage_analysis_date": "Not Provided [GENEPIO:0001668]",
             "consensus_sequence_name": "Not Provided [GENEPIO:0001668]"
-        },
-        "required_file": {
-            "variants_metrics": "summary_variants_metrics_mqc.csv",
-            "versions": "software_versions.yml",
-            "mapping_stats": "mapping_illumina_stats.tab"
-        },
-        "mapping_consensus": [
-            "consensus_genome_length",
-            "consensus_sequence_filename",
-            "consensus_sequence_filepath",
-            "consensus_sequence_md5",
-            "number_of_base_pairs_sequenced"
-        ],
-        "mapping_pangolin": {
-            "variant_name": "scorpio_call",
-            "lineage_name": "lineage",
-            "lineage_algorithm_software_version": "version",
-            "lineage_analysis_software_version": "pangolin_version",
-            "lineage_analysis_scorpio_version": "scorpio_version",
-            "lineage_analysis_constellation_version": "constellation_version"
-        },
-        "mapping_stats": {
-            "analysis_date": "analysis_date",
-            "depth_of_coverage_value": "medianDPcoveragevirus",
-            "number_of_variants_in_consensus": "Variantsinconsensusx10",
-            "number_of_variants_with_effect": "MissenseVariants",
-            "per_genome_greater_10x": "Coverage>10x(%)",
-            "per_Ns": "%Ns10x",
-            "per_reads_host": "%readshost",
-            "per_reads_virus": "%readsvirus",
-            "per_unmapped": "%unmapedreads",
-            "qc_filtered": "totalreads",
-            "reference_genome_accession": "Virussequence",
-            "read_length": "read_length"
-        },
-        "mapping_variant_metrics": {
-            "ns_per_100_kbp": "# Ns per 100kb consensus"
         },
         "mapping_version": {
             "bioinformatics_protocol_software_version": {
@@ -83,12 +138,6 @@
             "variant_calling_software_version": {
                 "IVAR_VARIANTS": "ivar"
             }
-        },
-        "required_fields_from_lab_json": {
-            "read_length": "number_of_base_pairs_sequenced",
-            "schema_name": "schema_name",
-            "schema_version": "schema_version",
-            "sequencing_sample_id": "sequencing_sample_id"
         }
     }
 }
