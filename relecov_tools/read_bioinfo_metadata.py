@@ -54,6 +54,8 @@ class BioinfoMetadata:
         else:
             self.output_folder = output_folder
 
+        # TODO: Available software list can be retrieved from conf/bioinfo_search_patterns.yml
+        # TODO: Add error if software is not in the list (sys exit)
         if software is None:
             software = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis (available: 'viralrecon'): "
