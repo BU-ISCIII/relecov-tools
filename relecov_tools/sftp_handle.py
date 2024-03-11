@@ -843,7 +843,7 @@ class SftpHandle:
             return
 
         folders_with_metadata = {}
-        merged_df = None
+        merged_df = merged_excel_path = last_main_folder = excel_name = None
         log.info("Setting %s remote folders...", str(len(clean_folders.keys())))
         stderr.print(f"[blue]Setting {len(clean_folders.keys())} remote folders...")
         for folder in sorted(clean_folders.keys()):
