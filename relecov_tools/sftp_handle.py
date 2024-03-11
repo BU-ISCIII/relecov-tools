@@ -649,7 +649,7 @@ class SftpHandle:
             folders_with_metadata (dict(str:list)): Same dict updated with files successfully moved
         """
         log.info("Moving remote files to each temporal processing folder")
-        stderr.print(f"[blue]Moving remote files to each temporal processing folder")
+        stderr.print("[blue]Moving remote files to each temporal processing folder")
         for folder, files in folders_with_metadata.items():
             self.current_folder = folder.split("/")[0]
             successful_files = []
