@@ -1214,9 +1214,8 @@ class SftpHandle:
 
     def update_summary(self, log_type, entry, sample=None):
         feed_dict = OrderedDict({"valid": False, "errors": [], "warnings": []})
-        current_folder = str(self.current_folder).replace("./", "").split("/")[0]
-        entry = str(entry)
-        sample = str(sample)
+        current_folder = str(self.current_folder).replace("./", "")
+        entry, sample = tuple(str(entry), str(sample))
         if current_folder not in self.logs.keys():
             self.logs[current_folder] = feed_dict
             self.logs[current_folder]["samples"] = OrderedDict()
@@ -1241,7 +1240,7 @@ class SftpHandle:
             for sample in self.logs[folder]["samples"].keys():
                 if not self.logs[folder]["samples"][sample]["errors"]:
                     self.logs[folder]["samples"][sample]["valid"] = True
-        filename = "_".join([datetime.today().strftime("%Y%m%d"), "log_summary.json"])
+        filename = datetime.today().strftime("%Y%m%d%-H%M%S") + "_log_summary.json"
         summary_path = os.path.join(self.platform_storage_folder, filename)
         with open(summary_path, "w", encoding="utf-8") as f:
             f.write(json.dumps(self.logs, indent=4, sort_keys=True, ensure_ascii=False))
