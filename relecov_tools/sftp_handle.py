@@ -832,32 +832,33 @@ class SftpHandle:
         header_flag = self.metadata_processing.get("header_flag")
         output_location = self.platform_storage_folder
         date_and_time = datetime.today().strftime("%Y%m%d%-H%M%S")
+        exts = self.allowed_file_ext
 
         def upload_merged_df(merged_excel_path, last_main_folder, merged_df):
             self.client.mkdir(last_main_folder)
             pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
             for sheet in merged_df.keys():
-                format_sheet = merged_df[sheet].astype(str)[merged_df[sheet].notnull()]
+                format_sheet = merged_df[sheet].astype(str)
+                format_sheet.replace('nan', None, inplace=True)
                 format_sheet.to_excel(pd_writer, sheet_name=sheet, index=False)
             pd_writer.close()
             dest = os.path.join(last_main_folder, os.path.basename(merged_excel_path))
             self.client.put(merged_excel_path, dest)
             return
 
-        folders_with_metadata = {}
-        merged_df = merged_excel_path = last_main_folder = excel_name = None
-        log.info("Setting %s remote folders...", str(len(clean_folders.keys())))
-        stderr.print(f"[blue]Setting {len(clean_folders.keys())} remote folders...")
-        for folder in sorted(clean_folders.keys()):
-            self.current_folder = folder
-
+        def pre_validate_folder(folder, folder_files):
+            if not any(file.endswith(tuple(exts)) for file in folder_files):
+                error_text = "Remote folder %s skipped. No sequencing files found."
+                log.error(error_text % folder)
+                self.include_error(error_text % folder)
+                return
             try:
                 downloaded_metadata = self.get_metadata_file(folder, output_location)
             except (FileNotFoundError, OSError, PermissionError, MetadataError) as err:
                 error_text = "Remote folder %s skipped. Reason: %s"
                 log.error(error_text % (folder, err))
                 self.include_error(error_text % (folder, err))
-                continue
+                return
             try:
                 self.read_metadata_file(downloaded_metadata, return_data=False)
             except MetadataError as header_error:
@@ -865,14 +866,26 @@ class SftpHandle:
                 os.remove(downloaded_metadata)
                 log.error(str(folder, str(error_text % str(header_error))))
                 self.include_error(error_text % header_error)
+                return
+            return downloaded_metadata
+
+        folders_with_metadata = {}
+        merged_df = merged_excel_path = last_main_folder = excel_name = None
+        log.info("Setting %s remote folders...", str(len(clean_folders.keys())))
+        stderr.print(f"[blue]Setting {len(clean_folders.keys())} remote folders...")
+        for folder in sorted(clean_folders.keys()):
+            self.current_folder = folder
+            downloaded_metadata = pre_validate_folder(folder, clean_folders[folder])
+            if not downloaded_metadata:
                 continue
             # Create a temporal name to avoid duplicated filenames
             meta_filename = "_".join([folder.split("/")[-1], "metadata_temp.xlsx"])
             local_meta = os.path.join(output_location, meta_filename)
             os.rename(downloaded_metadata, local_meta)
 
-            # Taking the main folder for each lab as reference to merge
+            # Taking the main folder for each lab as reference for merge and logs
             main_folder = folder.split("/")[0]
+            self.current_folder = main_folder
             temporal_foldername = "_".join([date_and_time, "tmp_processing"])
             temp_folder = os.path.join(main_folder, temporal_foldername)
             # Get every file except the excel ones as they are going to be merged
@@ -887,9 +900,9 @@ class SftpHandle:
                         upload_merged_df(merged_excel_path, last_main_folder, merged_df)
                         folders_with_metadata[last_main_folder].append(excel_name)
                     except OSError:
-                        error_text = "Error uploading merged metadata back to sftp"
-                        log.error(error_text)
-                        self.include_error(error_text)
+                        error_text = "Error uploading merged metadata back to sftp: %s"
+                        log.error(error_text % last_main_folder)
+                        self.include_error(error_text % last_main_folder)
                         del folders_with_metadata[last_main_folder]
                 try:
                     merged_df = self.excel_to_df(local_meta, metadata_ws, header_flag)
