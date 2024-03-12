@@ -501,8 +501,10 @@ class SftpHandle:
                 if s_name not in sample_file_dict:
                     sample_file_dict[s_name] = {}
                 else:
-                    print("Found duplicated sample ", s_name)
+                    stderr.print("Found duplicated sample name: ", s_name)
                     s_name = "_".join([s_name, str(token_hex(nbytes=8))])
+                    stderr.print("Duplicated sample renamed to ", s_name)
+                    sample_file_dict[s_name] = {}
                 if row[index_layout] == "paired" and row[index_fastq_r2] is None:
                     error_text = "Sample %s is paired-end, but no R2 given"
                     log.error(str(error_text % str(row[index_sampleID])))
