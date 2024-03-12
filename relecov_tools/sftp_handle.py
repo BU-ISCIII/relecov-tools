@@ -839,7 +839,7 @@ class SftpHandle:
             pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
             for sheet in merged_df.keys():
                 format_sheet = merged_df[sheet].astype(str)
-                format_sheet.replace('nan', None, inplace=True)
+                format_sheet.replace("nan", None, inplace=True)
                 format_sheet.to_excel(pd_writer, sheet_name=sheet, index=False)
             pd_writer.close()
             dest = os.path.join(last_main_folder, os.path.basename(merged_excel_path))
