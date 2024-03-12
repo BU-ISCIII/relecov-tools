@@ -65,10 +65,10 @@ class BioinfoMetadata:
         json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
         config_json = ConfigJson(json_file)
         self.configuration = config_json
+        self.software_config = self.configuration.get_configuration(self.software_name)
 
     def get_software_required_files(self):
-        """Load required softwaew specific files and patterns"""
-        self.software_config = self.configuration.get_configuration(self.software_name)
+        """Load required software specific files and patterns"""
         self.required_file_name = {}
         self.required_file_content = {}
 
@@ -76,24 +76,46 @@ class BioinfoMetadata:
             if 'required' in value and value['required']:
                 self.required_file_name[key] = value.get('fn','')
                 self.required_file_content[key] = value.get('content','')
-        stderr.print(self.required_file_name)
         
     def scann_directory(self):
         """Scann bioinfo analysis directory and search for files"""
         total_files = sum(len(files) for _, _, files in os.walk(self.input_folder))
-        self.get_software_required_files()
-        required_files_found = {key: '' for key in self.required_file_name}
-
-        with tqdm(total=total_files, desc=f'\tScanning...') as pbar:
-            for key, value in self.required_file_name.items():
+        files_found = {}
+        with tqdm(total=total_files, desc='\tScanning...') as pbar:
+            for topic_key, topic_details  in self.software_config.items():
+                if not 'fn' in topic_details: #try/except fn
+                    continue
                 for root, _, files in os.walk(self.input_folder, topdown=True):
-                    for file_name in files:
-                        # FIXME: might be better regex than endswith
-                        if value.endswith(file_name):
-                            file_path = os.path.join(root, file_name)
-                            required_files_found[key]= file_path
-                    pbar.update(1) # FIXME: is not correctly processing each file
-        return required_files_found
+                    matching_files = [os.path.join(root, file_name) for file_name in files if file_name.endswith(topic_details['fn'])]
+                    if len(matching_files) == 1:
+                        # Only one file match found, add it as a string
+                        files_found[topic_key] = matching_files[0]
+                    elif len(matching_files) > 1:
+                        # Multiple file matches found, add them as a list
+                        files_found[topic_key] = matching_files
+                    for _ in matching_files:
+                        pbar.update(1)
+        if len(files_found) < 1:
+            log.error(
+                "No files found in %s.", self.output_folder
+            )
+            stderr.print(f"[red] No files found in {self.output_folder}.")
+            sys.exit(1)
+        else:
+            return files_found
+
+    def map_filesfound_to_bioinfo_json(self, dict):
+        """Integrate files found (outidr) and software config JSON data into a single mapped structure."""
+        integrated_json = self.software_config
+        for key, value in dict.items():
+            if key in integrated_json:
+                if isinstance(integrated_json[key], list):
+                    # If the existing value is a list, extend it with the new file paths
+                    integrated_json[key]['file_paths'].extend(value)
+                else:
+                    # If the existing value is not a list, create a new list with the file paths
+                    integrated_json[key]['file_paths'] = value
+        return integrated_json
 
 #    def validate_software_mandatory_files(self, files):
 #        """Verify that all required files are present"""
@@ -364,37 +386,36 @@ class BioinfoMetadata:
         metadata json, mapping_stats, and more information from the files
         inside input directory
         """
-        self.get_software_required_files()
         stderr.print(f"[blue]Sanning for {self.software_name} files..")
-        req_files = self.scann_directory()
+        files_dict = self.scann_directory()
         #stderr.print(f"[blue]Verifying {self.software_name} required #files..")
         #self.validate_software_mandatory_files(req_files)
-        stderr.print("[blue]Reading lab metadata json")
-        j_data = self.collect_info_from_lab_json()
-        stderr.print("[blue]Adding fixed values")
-        j_data = self.add_fixed_values(j_data, "fixed_values")
-        # Creating empty fields that are not managed in case of missing data
-        j_data = self.add_fixed_values(j_data, "feed_empty_fields")
-        stderr.print("[blue]Adding data from mapping stats")
-        j_data = self.include_data_from_mapping_stats(j_data, req_files)
-        stderr.print("[blue]Adding software versions")
-        j_data = self.include_software_versions(j_data)
-        stderr.print("[blue]Adding summary variant metrics")
-        j_data = self.include_variant_metrics(j_data, req_files)
-        stderr.print("[blue]Adding pangolin information")
-        j_data = self.include_pangolin_data(j_data)
-        stderr.print("[blue]Adding consensus data")
-        j_data = self.include_consensus_data(j_data)
-        stderr.print("[blue]Parsing variants_long_table info to json format...")
-        self.parse_long_table(self.input_folder, self.output_folder)
-        stderr.print("[blue]Adding variant long table path")
-        j_data = self.include_custom_data(j_data)
-        file_name = (
-            "bioinfo_" + os.path.splitext(os.path.basename(self.json_file))[0] + ".json"
-        )
-        stderr.print("[blue]Writting output json file")
-        os.makedirs(self.output_folder, exist_ok=True)
-        file_path = os.path.join(self.output_folder, file_name)
-        relecov_tools.utils.write_json_fo_file(j_data, file_path)
-        stderr.print("[green]Sucessful creation of bioinfo analyis file")
+        #stderr.print("[blue]Reading lab metadata json")
+        #j_data = self.collect_info_from_lab_json()
+        #stderr.print("[blue]Adding fixed values")
+        #j_data = self.add_fixed_values(j_data, "fixed_values")
+        ## Creating empty fields that are not managed in case #of missing data
+        #j_data = self.add_fixed_values(j_data, #"feed_empty_fields")
+        #stderr.print("[blue]Adding data from mapping stats")
+        #j_data = self.include_data_from_mapping_stats(j_data, #req_files)
+        #stderr.print("[blue]Adding software versions")
+        #j_data = self.include_software_versions(j_data)
+        #stderr.print("[blue]Adding summary variant metrics")
+        #j_data = self.include_variant_metrics(j_data, #req_files)
+        #stderr.print("[blue]Adding pangolin information")
+        #j_data = self.include_pangolin_data(j_data)
+        #stderr.print("[blue]Adding consensus data")
+        #j_data = self.include_consensus_data(j_data)
+        #stderr.print("[blue]Parsing variants_long_table info #to json format...")
+        #self.parse_long_table(self.input_folder, self.#output_folder)
+        #stderr.print("[blue]Adding variant long table path")
+        #j_data = self.include_custom_data(j_data)
+        #file_name = (
+        #    "bioinfo_" + os.path.splitext(os.path.basename#(self.json_file))[0] + ".json"
+        #)
+        #stderr.print("[blue]Writting output json file")
+        #os.makedirs(self.output_folder, exist_ok=True)
+        #file_path = os.path.join(self.output_folder, #file_name)
+        #relecov_tools.utils.write_json_fo_file(j_data, #file_path)
+        #stderr.print("[green]Sucessful creation of bioinfo #analyis file")
         return True
