@@ -1215,7 +1215,7 @@ class SftpHandle:
     def update_summary(self, log_type, entry, sample=None):
         feed_dict = OrderedDict({"valid": False, "errors": [], "warnings": []})
         current_folder = str(self.current_folder).replace("./", "")
-        entry, sample = tuple(str(entry), str(sample))
+        entry, sample = (str(entry), str(sample))
         if current_folder not in self.logs.keys():
             self.logs[current_folder] = feed_dict
             self.logs[current_folder]["samples"] = OrderedDict()
