@@ -615,7 +615,7 @@ class SftpHandle:
             # Try to check if the metadata filename lacks the proper extension
             log.info("Trying to match files without proper file extension")
             sample_files_dict = self.process_filedict(
-                sample_files_dict, filtered_files_list
+                sample_files_dict, filtered_files_list, processed=True
             )
         if not any(value for value in sample_files_dict.values()):
             raise FileNotFoundError(
@@ -1004,17 +1004,22 @@ class SftpHandle:
         ]
         return fetched_files
 
-    def process_filedict(self, valid_filedict, clean_fetchlist):
+    def process_filedict(self, valid_filedict, clean_fetchlist, processed=False):
         """Process the dictionary from validate_remote_files() to update filenames
         and remove samples that failed any validation process.
 
         Args:
             valid_filedict (dict{str:str}): same structure as validate_remote_files()
             clean_fetchlist (list(str)): List of files that passed validation process
+            processed (bool): Indicates if filedict has been processed previously
 
         Returns:
             processed(dict{str:str}): Updated valid_filedict
         """
+        if processed:
+            error_text = "Sample %s skipped: missing files in sftp"
+        else:
+            error_text = "Sample %s skipped: missing files after processing"
         processed_dict = {}
         for sample, vals in valid_filedict.items():
             processed_dict[sample] = {}
@@ -1025,9 +1030,8 @@ class SftpHandle:
                         processed_dict[sample][key] = file
             # remove sample if it has missing files
             if not all(x in clean_fetchlist for x in processed_dict[sample].values()):
-                error_text = "Sample %s skipped: missing files in sftp" % sample
-                log.error(error_text)
-                self.include_error(error_text, sample)
+                log.error(str(error_text % sample))
+                self.include_error(str(error_text % sample), sample)
                 del processed_dict[sample]
         return processed_dict
 
