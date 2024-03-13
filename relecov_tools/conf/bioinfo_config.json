@@ -1,14 +1,11 @@
 {
     "viralrecon": {
-        "version_info": {
-            "fn": "software_versions.yml",
-            "required": true
-        },
         "mapping_stats": {
             "fn": "mapping_illumina_stats.tab",
-            "ff": "tsv",
-            "sample_column": 1,
-            "num_lines": 1,
+            "ff": "\t",
+            "file_per_sample": false,
+            "sample_col_idx": 5,
+            "header_row_dix": 1,
             "required": true,
             "content": {
                 "analysis_date": "analysis_date",
@@ -27,9 +24,9 @@
         },
         "mapping_pangolin": {
             "fn": ".pangolin.csv",
-            "ff": "tsv",
-            "sample_column": 1,
-            "num_lines": 1,
+            "ff": ",",
+            "file_per_sample": true,
+            "header_row_dix": 1,
             "required": false,
             "content": {
                 "variant_name": "scorpio_call",
@@ -42,8 +39,10 @@
         },
         "variants_long_table": {
             "fn": "variants_long_table.csv",
-            "ff": "csv",
-            "num_lines": 1,
+            "ff": ",",
+            "file_per_sample": false,
+            "sample_col_idx": 1,
+            "header_row_dix": 1,
             "required": true,
             "content": {
                 "sample" : "SAMPLE",
@@ -68,6 +67,7 @@
         "mapping_consensus": {
             "fn": ".consensus.fa",
             "ff": "fasta",
+            "file_per_sample": true,
             "required": false,
             "content": {
                 "consensus_sequence_name" : "Not Provided [GENEPIO:0001668]",
@@ -80,8 +80,10 @@
         },
         "summary_mqc": {
             "fn": "summary_variants_metrics_mqc.csv",
-            "ff": "csv",
-            "num_lines": 1,
+            "ff": ",",
+            "file_per_sample": false,
+            "sample_col_idx": 1,
+            "header_row_dix": 1,
             "required": true,
             "content": {
                 "ns_per_100_kbp": "# Ns per 100kb consensus"
@@ -90,6 +92,7 @@
         "workflow_summary": {
             "fn": "multiqc_report.html",
             "ff": "html",
+            "file_per_sample": false,
             "required": true,
             "content": {
                 "bioinformatics_protocol_software_name": "nf-core/viralrecon Workflow Summary",
