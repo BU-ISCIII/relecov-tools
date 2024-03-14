@@ -560,7 +560,7 @@ class SftpHandle:
         try:
             self.get_from_sftp(target_meta_file, local_meta_file)
         except (IOError, PermissionError) as e:
-            raise type(e)(f"[red]Unable to fetch metadata file {e.name}")
+            raise type(e)(f"[red]Unable to fetch metadata file {e}")
         log.info(
             "Obtained metadata file %s from %s",
             local_meta_file,
@@ -800,7 +800,7 @@ class SftpHandle:
             containing all sheets in the excel file as pandas dataframes.
         """
         # Get every sheet from the first excel file
-        excel_df = read_excel(excel_file, sheet_name=None)  # index_col=None
+        excel_df = read_excel(excel_file, dtype=str, sheet_name=None)
         meta_df = excel_df[metadata_sheet]
         if header_flag in meta_df.columns:
             return excel_df
@@ -955,14 +955,14 @@ class SftpHandle:
         if not root_directory_list:
             log.error("Error while listing folders in remote. Aborting")
             sys.exit(1)
-        if self.target_folders[0] == "ALL":
+        if self.target_folders is None:
+            target_folders = clean_root_list
+        elif self.target_folders[0] == "ALL":
             log.info("Showing folders from remote SFTP for user selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
                 msg="Select the folders that will be targeted",
                 choices=sorted(clean_root_list),
             )
-        elif self.target_folders[0] is None and len(self.target_folders) == 1:
-            target_folders = clean_root_list
         else:
             target_folders = [tf for tf in self.target_folders if tf in clean_root_list]
         if not target_folders:
@@ -1234,7 +1234,7 @@ class SftpHandle:
         current_folder = str(self.current_folder).replace("./", "")
         entry, sample = (str(entry), str(sample))
         if current_folder not in self.logs.keys():
-            self.logs[current_folder] = feed_dict
+            self.logs[current_folder] = feed_dict.copy()
             self.logs[current_folder]["samples"] = OrderedDict()
         if sample == "None":
             if log_type == "error":
@@ -1243,7 +1243,7 @@ class SftpHandle:
                 self.logs[current_folder]["warnings"].append(entry)
         else:
             if sample not in self.logs[current_folder]["samples"].keys():
-                self.logs[current_folder]["samples"][sample] = feed_dict
+                self.logs[current_folder]["samples"][sample] = feed_dict.copy()
             if log_type == "error":
                 self.logs[current_folder]["samples"][sample]["errors"].append(entry)
             elif log_type == "warning":
