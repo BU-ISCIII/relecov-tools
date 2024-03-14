@@ -118,35 +118,31 @@ class BioinfoMetadata:
                     # If the existing value is not a list, create a new list with the file paths
                     integrated_json[key]['file_paths'] = value
         return integrated_json
-    
 
-#    def validate_software_mandatory_files(self, files):
-#        """Verify that all required files are present"""
-#        missing = []
-#        if len(files) == 0:
-#            log.error("No mandatory files for %s found in folder: %s", 
-#                    self.software_name,
-#                    self.input_folder
-#            )
-#            stderr.print(
-#                f"[red]\tValidation Failed: No mandatory files found in #folder: {self.input_folder}. "
-#            )
-#            sys.exit(1)
-#        for key, values in files.items():
-#            if len(values)==0:
-#                missing.append(key)
-#        if len(missing) > 0:
-#            stderr.print(
-#                f"[red]\tValidation Failed: Missing files for {self.#software_name}:"
-#            )
-#            for i in missing:
-#                stderr.print(
-#                    f"\t- {self.required_file_name[i]}"
-#                )
-#            sys.exit(1)
-#        stderr.print(
-#            f"[green]\tValidation Approved"
-#        )
+
+    # TODO: Add validation to master log file.
+    # TODO: Add checking file format based on config.
+    # TODO: ¿Add content validation?. This might be better to be implemented when geting metadata from input files.
+    def validate_software_mandatory_files(self, json):
+        missing_required = []
+        for key in json.keys():
+            if json[key].get('required') is True:
+                try:
+                    json[key]['file_paths']
+                except KeyError:
+                    missing_required.append(key)
+            else:
+                continue
+        if len(missing_required) >= 1:
+            log.error("\tMissing required files:")
+            stderr.print("[red]\tMissing required files:")
+            for i in missing_required:
+                log.error("[red]\t\t- %s", i)
+                stderr.print(f"\t\t- {i}")
+            sys.exit(1)
+        else:
+            stderr.print("[green]\tValidation passed :)")
+        return
 
     # TODO: we can make a rule in bioinfo_config.json where all software-properties must have a field callded "fixed_values". This way the second argument wont't be necessary
     def add_fixed_values(self, j_data, fixed_values):
@@ -392,11 +388,10 @@ class BioinfoMetadata:
         """
         stderr.print(f"[blue]Sanning input directory...")
         files_found = self.scann_directory()
-        stderr.print(f"[blue] Adding discovered files in {self.input_folder} to their corresponding JSON properties defined in {self.json_file}...")
+        stderr.print(f"[blue]Extending bioinfo config json with files found...")
         bioinfo_json_extended = self.inject_filesfound_to_bioinfo_json(files_found)
-        # TODO: Add here req-file parsin sysexit. Easy mode: if file_path not in item, sys.exit
-        #stderr.print(f"[blue]Verifying {self.software_name} required #files..")
-        #self.validate_software_mandatory_files(req_files)
+        stderr.print(f"[blue]Validating required files...")
+        self.validate_software_mandatory_files(bioinfo_json_extended)
         stderr.print("[blue]Reading lab metadata json")
         j_data = self.collect_info_from_lab_json()
         #stderr.print("[blue]Adding fixed values")
