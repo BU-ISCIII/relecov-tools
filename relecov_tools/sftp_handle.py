@@ -696,6 +696,7 @@ class SftpHandle:
 
         # TODO: Include this function in relecov_tools.utils
         def md5_merger(md5_filelist, avoid_chars=None):
+            """Merge all md5 files from a given list into a single multi-line md5sum"""
             md5dict_list = []
             for md5sum in md5_filelist:
                 hash_dict = relecov_tools.utils.read_md5_checksum(md5sum, avoid_chars)
@@ -708,6 +709,8 @@ class SftpHandle:
             return merged_md5
 
         def md5_handler(md5sumlist, output_location):
+            """Download all the remote md5sum files in a list, merge them
+            into a single md5checksum and upload it back to sftp"""
             downloaded_md5files = []
             for md5sum in md5sumlist:
                 md5_name = "_".join([token_hex(nbytes=12), "md5_temp.md5"])
@@ -825,10 +828,6 @@ class SftpHandle:
             clean_target_folders (dict(str:list)): Dict with '*_tmp_processing' folders
             and their content. All subfolder filenames are merged into a single key.
         """
-        """clean_folders = {
-            fd:v for fd,v in target_folders.items() if "tmp_processing" not in fd
-        }"""
-        clean_folders = target_folders
         metadata_ws = self.metadata_processing.get("excel_sheet")
         header_flag = self.metadata_processing.get("header_flag")
         output_location = self.platform_storage_folder
@@ -836,6 +835,7 @@ class SftpHandle:
         exts = self.allowed_file_ext
 
         def upload_merged_df(merged_excel_path, last_main_folder, merged_df):
+            """Upload metadata dataframe merged from all subfolders back to sftp"""
             self.client.mkdir(last_main_folder)
             pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
             for sheet in merged_df.keys():
@@ -848,6 +848,7 @@ class SftpHandle:
             return
 
         def pre_validate_folder(folder, folder_files):
+            """Check if remote folder has sequencing files and a valid metadata file"""
             if not any(file.endswith(tuple(exts)) for file in folder_files):
                 error_text = "Remote folder %s skipped. No sequencing files found."
                 log.error(error_text % folder)
@@ -872,11 +873,11 @@ class SftpHandle:
 
         folders_with_metadata = {}
         merged_df = merged_excel_path = last_main_folder = excel_name = None
-        log.info("Setting %s remote folders...", str(len(clean_folders.keys())))
-        stderr.print(f"[blue]Setting {len(clean_folders.keys())} remote folders...")
-        for folder in sorted(clean_folders.keys()):
+        log.info("Setting %s remote folders...", str(len(target_folders.keys())))
+        stderr.print(f"[blue]Setting {len(target_folders.keys())} remote folders...")
+        for folder in sorted(target_folders.keys()):
             self.current_folder = folder
-            downloaded_metadata = pre_validate_folder(folder, clean_folders[folder])
+            downloaded_metadata = pre_validate_folder(folder, target_folders[folder])
             if not downloaded_metadata:
                 continue
             # Create a temporal name to avoid duplicated filenames
