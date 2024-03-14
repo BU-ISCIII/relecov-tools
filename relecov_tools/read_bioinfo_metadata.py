@@ -106,18 +106,18 @@ class BioinfoMetadata:
             stderr.print("\tRetrieving files found ...")
             return files_found
 
-    def inject_filesfound_to_bioinfo_json(self, dict):
-        """Integrate files found (outidr) and software config JSON data into a single mapped structure."""
-        integrated_json = self.software_config
-        for key, value in dict.items():
-            if key in integrated_json:
-                if isinstance(integrated_json[key], list):
+    def extend_software_config(self, files_dict):
+        """Inject files found (input dir) into software config JSON"""
+        extended_json = self.software_config
+        for key, value in files_dict.items():
+            if key in extended_json:
+                if isinstance(extended_json[key], list):
                     # If the existing value is a list, extend it with the new file paths
-                    integrated_json[key]['file_paths'].extend(value)
+                    extended_json[key]['file_paths'].extend(value)
                 else:
                     # If the existing value is not a list, create a new list with the file paths
-                    integrated_json[key]['file_paths'] = value
-        return integrated_json
+                    extended_json[key]['file_paths'] = value
+        return extended_json
 
 
     # TODO: Add validation to master log file.
@@ -389,9 +389,9 @@ class BioinfoMetadata:
         stderr.print(f"[blue]Sanning input directory...")
         files_found = self.scann_directory()
         stderr.print(f"[blue]Extending bioinfo config json with files found...")
-        bioinfo_json_extended = self.inject_filesfound_to_bioinfo_json(files_found)
+        software_config_extended = self.extend_software_config(files_found)
         stderr.print(f"[blue]Validating required files...")
-        self.validate_software_mandatory_files(bioinfo_json_extended)
+        self.validate_software_mandatory_files(software_config_extended)
         stderr.print("[blue]Reading lab metadata json")
         j_data = self.collect_info_from_lab_json()
         #stderr.print("[blue]Adding fixed values")
