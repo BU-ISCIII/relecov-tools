@@ -763,18 +763,17 @@ class SftpHandle:
 
         return folders_with_metadata
 
-    def merge_metadata(self, metadata_sheet=None, *metadata_tables):
+    def merge_metadata(self, meta_sheet=None, *metadata_tables):
         """Merge a variable number of metadata dataframes to the first one. Merge them
         only into a certain sheet from a multi-sheet excel file if sheetname is given.
 
         Args:
-            metadata_sheet (str): Name of the sheet containing metadata in excel file
+            meta_sheet (str): Name of the sheet containing metadata in excel file
             *metadata_tables (list(pandas.DataFrame)): Dataframes to be merged
 
         Returns:
             merged_df (pandas.DataFrame): A merged dataframe from the given tables
         """
-        meta_sheet = metadata_sheet
         for idx, table in enumerate(metadata_tables):
             if idx == 0:
                 merged_df = table
