@@ -616,7 +616,7 @@ class SftpHandle:
             # Try to check if the metadata filename lacks the proper extension
             log.info("Trying to match files without proper file extension")
             sample_files_dict = self.process_filedict(
-                sample_files_dict, filtered_files_list, processed=True
+                sample_files_dict, filtered_files_list
             )
         if not any(value for value in sample_files_dict.values()):
             raise FileNotFoundError(
@@ -1003,22 +1003,26 @@ class SftpHandle:
         compressed_files = list()
         for file in files_to_compress:
             f_path = os.path.join(local_folder, file)
-            try:
-                relecov_tools.utils.compress_file(f_path)
-            except FileNotFoundError:
+            compressed = relecov_tools.utils.compress_file(f_path)
+            if not compressed:
                 error_text = "Could not compress file %s, file not found" % str(file)
                 log.error(error_text)
                 self.include_error(error_text, f_path)
                 continue
             # Remove file after compression is completed
             compressed_files.append(file)
-            os.remove(f_path)
+            try:
+                os.remove(f_path)
+            except (FileNotFoundError, PermissionError) as e:
+                log.warning(f"Could not delete file: {e}")
         fetched_files = [
             (fi + ".gz" if fi in compressed_files else fi) for fi in fetched_files
         ]
         return fetched_files
 
-    def process_filedict(self, valid_filedict, clean_fetchlist, processed=False):
+    def process_filedict(
+        self, valid_filedict, clean_fetchlist, corrupted=[], md5miss=[]
+    ):
         """Process the dictionary from validate_remote_files() to update filenames
         and remove samples that failed any validation process.
 
@@ -1030,22 +1034,26 @@ class SftpHandle:
         Returns:
             processed(dict{str:str}): Updated valid_filedict
         """
-        if processed:
-            error_text = "Sample %s skipped: missing files in sftp"
-        else:
-            error_text = "Sample %s skipped: missing files after processing"
         processed_dict = {}
+        error_text = "md5 mismatch for %s"
+        warning_text = "File %s not found in md5sum. Creating hash"
         for sample, vals in valid_filedict.items():
             processed_dict[sample] = {}
             for key, val in vals.items():
                 processed_dict[sample][key] = None
+                if val in corrupted:
+                    self.include_error(error_text % val, sample)
+                if val in md5miss:
+                    self.include_warning(warning_text % val, sample)
                 for file in clean_fetchlist:
                     if val in file:
                         processed_dict[sample][key] = file
             # remove sample if it has missing files
             if not all(x in clean_fetchlist for x in processed_dict[sample].values()):
+                if not corrupted:
+                    error_text = "Sample %s skipped: missing files in sftp"
+                    self.include_error(str(error_text % sample), sample)
                 log.error(str(error_text % sample))
-                self.include_error(str(error_text % sample), sample)
                 del processed_dict[sample]
         return processed_dict
 
@@ -1130,7 +1138,6 @@ class SftpHandle:
                         log.warning(error_text % (str(corrupted), corr_fold))
                         stderr.print(f"[red]{error_text % (str(corrupted), corr_fold)}")
                         self.include_warning(error_text % (str(corrupted), "/corrupt/"))
-                        [self.include_error("md5 mismatch", corr) for corr in corrupted]
                         for corr_file in corrupted:
                             path = os.path.join(local_folder, corr_file)
                             try:
@@ -1164,6 +1171,8 @@ class SftpHandle:
             clean_fetchlist = [
                 fi for fi in fetched_files if fi.endswith(tuple(self.allowed_file_ext))
             ]
+
+            clean_fetchlist = [fi for fi in clean_fetchlist if fi not in corrupted]
             # Checking for uncompressed files
             files_to_compress = [fi for fi in clean_fetchlist if not fi.endswith(".gz")]
             if files_to_compress:
@@ -1176,6 +1185,7 @@ class SftpHandle:
             clean_pathlist = [os.path.join(local_folder, fi) for fi in clean_fetchlist]
             if remote_md5sum:
                 # Get hashes from provided md5sum, create them for those not provided
+                not_md5sum = []
                 files_md5_dict = {}
                 for path in clean_pathlist:
                     f_name = os.path.basename(path)
@@ -1187,14 +1197,19 @@ class SftpHandle:
                         if not str(f_name).rstrip(".gz") in files_to_compress:
                             error_text = "File %s not found in md5sum. Creating hash"
                             log.warning(error_text % f_name)
-                            self.include_warning(str(error_text % f_name), f_name)
+                            not_md5sum.append(f_name)
+                        else:
+                            log.info("File %s was compressed, creating md5hash", f_name)
                         files_md5_dict[f_name] = relecov_tools.utils.calculate_md5(path)
             else:
                 md5_hashes = [
                     relecov_tools.utils.calculate_md5(path) for path in clean_pathlist
                 ]
                 files_md5_dict = dict(zip(clean_fetchlist, md5_hashes))
-            processed_filedict = self.process_filedict(valid_filedict, clean_fetchlist)
+
+            processed_filedict = self.process_filedict(
+                valid_filedict, clean_fetchlist, corrupted=corrupted, md5miss=not_md5sum
+            )
             self.create_files_with_metadata_info(
                 local_folder, processed_filedict, files_md5_dict, meta_file
             )
