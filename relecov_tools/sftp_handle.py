@@ -399,26 +399,27 @@ class SftpHandle:
         Returns:
             clean_sample_dict: sample_dictionary without duplications in values
         """
-        set_of_values = set()
-        duplicated_keys = set()
-        for sample, fastqs in sample_file_dict.items():
-            # Dictionary keys are immutable, so you cannot use a regular set for a dict
-            hashable_fastqs = frozenset(fastqs.items())
-
-            if hashable_fastqs in set_of_values:
-                duplicated_keys.add(sample)
-            else:
-                set_of_values.add(hashable_fastqs)
+        inverted_dict = {}
+        for sample, fastq_dict in sample_file_dict.items():
+            # Dictionary values are not hashable, so you need to create a tuple of them
+            samp_fastqs = tuple(fastq_dict.values())
+            # Setting values as keys to find those samples refering to the same file
+            for fastq in samp_fastqs:
+                inverted_dict[fastq] = inverted_dict.get(fastq, []) + [sample]
+        duplicated_dict = {k: v for k, v in inverted_dict.items() if len(v) > 1}
+        dup_samples_list = [samp for dups in duplicated_dict.values() for samp in dups]
         non_duplicated_keys = {
-            k: v for k, v in sample_file_dict.items() if k not in duplicated_keys
+            k: v for k, v in sample_file_dict.items() if k not in dup_samples_list
         }
         clean_sample_dict = {key: sample_file_dict[key] for key in non_duplicated_keys}
-        if duplicated_keys:
-            error_text = "Samples in metadata refering to the same file. "
-            log.warning(error_text + str(duplicated_keys))
+        if dup_samples_list:
+            error_text = "Multiple samples in metadata pointing to the same file: %s"
+            log.warning(error_text % duplicated_dict)
+            self.include_warning(error_text % duplicated_dict)
             stderr.print(f"[Orange]{error_text}")
-            stderr.print("[Orange]These samples won't be processed: ", duplicated_keys)
-            [self.include_error(error_text, sample) for sample in duplicated_keys]
+            stderr.print("[Orange]These samples won't be processed: ", dup_samples_list)
+            for fastq, samples in duplicated_dict.items():
+                [self.include_error(str(error_text % fastq), samp) for samp in samples]
 
         return clean_sample_dict
 
