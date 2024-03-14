@@ -22,7 +22,8 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
-# TODO: Create 2 master function that validates file presence/content and transfrom from csv,tsv,... to json. 
+# TODO: Create 2 master function that validates file presence/content and transfrom from csv,tsv,... to json.
+# TODO: Cosider eval py + func property in json to be able to discriminate between collated files and sample-specific files.  
 class BioinfoMetadata:
     def __init__(
         self,
@@ -55,18 +56,17 @@ class BioinfoMetadata:
             self.output_folder = output_folder
 
         # TODO: Available software list can be retrieved from conf/bioinfo_search_patterns.yml
-        # TODO: Add error if software is not in the list (sys exit)
+        # TODO: Add error if software is not in the list (sys exit). Add output to global log.
         if software is None:
             software = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis (available: 'viralrecon'): "
             )
         self.software_name = software
-
         json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
-        config_json = ConfigJson(json_file)
-        self.configuration = config_json
-        self.software_config = self.configuration.get_configuration(self.software_name)
+        config = ConfigJson(json_file)
+        self.software_config = config.get_configuration(self.software_name)
 
+    # FIXME: This must be refacored. not used so far. 
     def get_software_required_files(self):
         """Load required software specific files and patterns"""
         self.required_file_name = {}
@@ -76,7 +76,8 @@ class BioinfoMetadata:
             if 'required' in value and value['required']:
                 self.required_file_name[key] = value.get('fn','')
                 self.required_file_content[key] = value.get('content','')
-        
+
+    # TODO: Add report of files found/not-found to global log
     def scann_directory(self):
         """Scann bioinfo analysis directory and search for files"""
         total_files = sum(len(files) for _, _, files in os.walk(self.input_folder))
@@ -88,10 +89,10 @@ class BioinfoMetadata:
                 for root, _, files in os.walk(self.input_folder, topdown=True):
                     matching_files = [os.path.join(root, file_name) for file_name in files if file_name.endswith(topic_details['fn'])]
                     if len(matching_files) == 1:
-                        # Only one file match found, add it as a string
+                        # Only one file match found, add it as a string (collated files)
                         files_found[topic_key] = matching_files[0]
                     elif len(matching_files) > 1:
-                        # Multiple file matches found, add them as a list
+                        # Multiple file matches found, add them as a list (per sample files)
                         files_found[topic_key] = matching_files
                     for _ in matching_files:
                         pbar.update(1)
@@ -102,9 +103,10 @@ class BioinfoMetadata:
             stderr.print(f"[red] No files found in {self.output_folder}.")
             sys.exit(1)
         else:
+            stderr.print("\tRetrieving files found ...")
             return files_found
 
-    def map_filesfound_to_bioinfo_json(self, dict):
+    def inject_filesfound_to_bioinfo_json(self, dict):
         """Integrate files found (outidr) and software config JSON data into a single mapped structure."""
         integrated_json = self.software_config
         for key, value in dict.items():
@@ -116,6 +118,7 @@ class BioinfoMetadata:
                     # If the existing value is not a list, create a new list with the file paths
                     integrated_json[key]['file_paths'] = value
         return integrated_json
+    
 
 #    def validate_software_mandatory_files(self, files):
 #        """Verify that all required files are present"""
@@ -263,6 +266,7 @@ class BioinfoMetadata:
         """
         mapping_fields = self.software_config["mapping_consensus"]["content"]
         missing_consens = []
+        # FIXME: Replace  sequencing_sample_id
         for row in j_data:
             if "-" in row["submitting_lab_sample_id"]:
                 sample_name = row["submitting_lab_sample_id"].replace("-", "_")
@@ -386,12 +390,15 @@ class BioinfoMetadata:
         metadata json, mapping_stats, and more information from the files
         inside input directory
         """
-        stderr.print(f"[blue]Sanning for {self.software_name} files..")
-        files_dict = self.scann_directory()
+        stderr.print(f"[blue]Sanning input directory...")
+        files_found = self.scann_directory()
+        stderr.print(f"[blue] Adding discovered files in {self.input_folder} to their corresponding JSON properties defined in {self.json_file}...")
+        bioinfo_json_extended = self.inject_filesfound_to_bioinfo_json(files_found)
+        # TODO: Add here req-file parsin sysexit. Easy mode: if file_path not in item, sys.exit
         #stderr.print(f"[blue]Verifying {self.software_name} required #files..")
         #self.validate_software_mandatory_files(req_files)
-        #stderr.print("[blue]Reading lab metadata json")
-        #j_data = self.collect_info_from_lab_json()
+        stderr.print("[blue]Reading lab metadata json")
+        j_data = self.collect_info_from_lab_json()
         #stderr.print("[blue]Adding fixed values")
         #j_data = self.add_fixed_values(j_data, "fixed_values")
         ## Creating empty fields that are not managed in case #of missing data
