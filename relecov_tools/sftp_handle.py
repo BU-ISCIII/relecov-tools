@@ -442,9 +442,13 @@ class SftpHandle:
         ws_metadata_lab = wb_file[self.metadata_processing.get("excel_sheet")]
         # find out the index for file names
         header_flag = self.metadata_processing.get("header_flag")
-        header_row = [
-            idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
-        ][0]
+        try:
+            header_row = [
+                i + 1 for i, x in enumerate(ws_metadata_lab.values) if header_flag in x
+            ][0]
+        except IndexError:
+            error_text = "Header could not be found for excel file %s"
+            raise MetadataError(str(error_text % os.path.basename(meta_f_path)))
         for cell in ws_metadata_lab[header_row]:
             cell.value = cell.value.strip()
         metadata_header = [x.value for x in ws_metadata_lab[header_row]]
@@ -808,9 +812,6 @@ class SftpHandle:
         for idx in range(len(meta_df)):
             if any(meta_df.loc[idx, x] == header_flag for x in meta_df.columns):
                 header_row = idx
-        if not header_row:
-            error_text = "Header could not be found for excel file %s"
-            raise MetadataError(str(error_text % excel_file))
         meta_df.columns = meta_df.iloc[header_row]
         excel_df[metadata_sheet] = meta_df.drop(meta_df.index[: (header_row + 1)])
         excel_df[metadata_sheet] = excel_df[metadata_sheet].reset_index(drop=True)
