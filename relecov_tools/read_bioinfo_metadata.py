@@ -144,6 +144,65 @@ class BioinfoMetadata:
             stderr.print("[green]\tValidation passed :)")
         return
 
+    # TODO: also version's files shoudld be paresed independiently.
+    # TODO: Before arriving here we need to validate properties fiels on collated and persample files(~mandatory fields). 
+    def add_bioinfo_results_metadata(self, files_dict, j_data):
+        """Add bioinfo results metadata  to processed read lab metadata (j_data)"""
+        # TODO: add manatory fields: one for collated and one for sample-specific files
+        mandatory_fields = ['fn', 'ff', 'required', 'content', 'file_paths']
+        for key in files_dict.keys():
+            try:
+                files_dict[key].get('file_paths')
+            except KeyError:
+                continue
+            # TODO: in progress
+            # Parses sample-specific files (i.e: SAMPLE1.consensus.fa)
+            if isinstance(files_dict[key].get('file_paths'), list):
+                stderr.print("")
+                #self.map_metadata_persample_files()
+            # Parses collated files (i.e: mapping_illumina_stats.tab)
+            elif isinstance(files_dict[key].get('file_paths'), str):
+                j_data_mapped = self.map_metadata_collated_files(
+                        files_dict[key], 
+                        j_data
+                    )
+        return
+    
+    def map_metadata_collated_files(self, bioinfo_dict, j_data):
+        """Handles different file formats in collated files, reads their content, and maps it to j_data"""
+        # We will be able to add here as many handlers as we need
+        file_extension_handlers = {
+            "\t": self.handle_csv_file,
+            ",": self.handle_csv_file,
+            #"html": self.handle_multiqc_html_file,
+        }
+        file_format = bioinfo_dict['ff']
+        if file_format in file_extension_handlers:
+            handler_function = file_extension_handlers[file_format]
+            j_data_mapped = handler_function(bioinfo_dict, j_data)
+            return j_data_mapped
+        else:
+            stderr.print(f"[red]Unrecognized defined file format {bioinfo_dict['ff'] in {bioinfo_dict['fn']}}")
+            return None
+
+    def handle_csv_file(self, bioinfo_dict, j_data):
+        """handle csv/tsv file and map it with read lab metadata (j_data)"""
+        map_data = relecov_tools.utils.read_csv_file_return_dict(
+            file_name = bioinfo_dict['file_paths'],
+            sep = bioinfo_dict['ff'],
+            key_position = (bioinfo_dict['sample_col_idx']-1)
+        )
+        j_data_mapped = self.mapping_over_table(
+            j_data, 
+            map_data, 
+            bioinfo_dict['content'],
+            bioinfo_dict['file_paths']
+        )
+        return j_data_mapped
+    
+    #def handle_multiqc_html_file(self, bioinfo_dict, j_data):
+    #    """Reads multiqc_report html"""
+
     # TODO: we can make a rule in bioinfo_config.json where all software-properties must have a field callded "fixed_values". This way the second argument wont't be necessary
     def add_fixed_values(self, j_data, fixed_values):
         """include the fixed data defined in configuration or feed custom empty fields"""
@@ -394,8 +453,11 @@ class BioinfoMetadata:
         self.validate_software_mandatory_files(software_config_extended)
         stderr.print("[blue]Reading lab metadata json")
         j_data = self.collect_info_from_lab_json()
+        stderr.print(f"[blue]Adding metadata from {self.input_folder} into read lab metadata...")
+        j_data = self.add_bioinfo_results_metadata(software_config_extended, j_data)
         #stderr.print("[blue]Adding fixed values")
-        #j_data = self.add_fixed_values(j_data, "fixed_values")
+        #j_data = self.add_fixed_values(j_data, #"fixed_values")
+        #stderr.print(j_data)
         ## Creating empty fields that are not managed in case #of missing data
         #j_data = self.add_fixed_values(j_data, #"feed_empty_fields")
         #stderr.print("[blue]Adding data from mapping stats")
