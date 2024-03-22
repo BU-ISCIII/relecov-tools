@@ -7,6 +7,7 @@ import rich.console
 from datetime import datetime
 from tqdm import tqdm
 from yaml import YAMLError
+from bs4 import BeautifulSoup
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
@@ -149,7 +150,7 @@ class BioinfoMetadata:
     def add_bioinfo_results_metadata(self, files_dict, j_data):
         """Add bioinfo results metadata  to processed read lab metadata (j_data)"""
         # TODO: add manatory fields: one for collated and one for sample-specific files
-        mandatory_fields = ['fn', 'ff', 'required', 'content', 'file_paths']
+        # mandatory_fields = ['fn', 'ff', 'required', 'content', 'file_paths']
         for key in files_dict.keys():
             try:
                 files_dict[key].get('file_paths')
@@ -174,7 +175,7 @@ class BioinfoMetadata:
         file_extension_handlers = {
             "\t": self.handle_csv_file,
             ",": self.handle_csv_file,
-            #"html": self.handle_multiqc_html_file,
+            "html": self.handle_multiqc_html_file,
         }
         file_format = bioinfo_dict['ff']
         if file_format in file_extension_handlers:
@@ -185,6 +186,50 @@ class BioinfoMetadata:
             stderr.print(f"[red]Unrecognized defined file format {bioinfo_dict['ff'] in {bioinfo_dict['fn']}}")
             return None
 
+    def handle_multiqc_html_file(self, html_dict_scope, j_data):
+        """Reads html file, finds table containing programs info, and map it to j_data"""
+        program_versions = {}
+        with open(html_dict_scope['file_paths'], 'r') as html_file:
+            html_content = html_file.read()
+        # Load HTML
+        soup = BeautifulSoup(html_content, features="lxml")
+        # Get version's div id
+        div_id = "mqc-module-section-software_versions"
+        versions_div = soup.find('div', id=div_id)
+        # Get version's metadata data
+        if versions_div:
+            table = versions_div.find('table', class_='table')
+            if table:
+                rows = table.find_all('tr')
+                for row in rows[1:]: #skipping header
+                    columns = row.find_all('td')
+                    if len(columns) == 3:
+                        program_name = columns[1].text.strip()
+                        version = columns[2].text.strip()
+                        program_versions[program_name] = version
+                    else:
+                        stderr.print(f"[red] HTML entry error in {columns}. HTML table expected format should be \n<th> Process Name\n</th>\n<th> Software </th>\n.")
+            else:
+                stderr.print(f"[red] Missing table containing software versions in {html_dict_scope['file_paths']}.")
+                sys.exit(1)
+        else:
+            log.error(f"Required div section 'mqc-module-section-software_versions' not found in file {html_dict_scope['file_paths']}.")
+            stderr.print(f"[red] No div section  'mqc-module-section-software_versions' was found in {html_dict_scope['file_paths']}.")
+            sys.exit(1)
+                        
+        # Adding mqc sofware versions to j_data
+        field_errors = {}
+        for row in j_data:
+            sample_name = row["submitting_lab_sample_id"]
+            for field, values in html_dict_scope['content'].items():
+                try:
+                    row[field] = program_versions[values]
+                except KeyError as e:
+                    field_errors[sample_name] = {field: e}
+                    row[field] =  "Not Provided [GENEPIO:0001668]"
+                    continue
+        return j_data
+                
     def handle_csv_file(self, bioinfo_dict, j_data):
         """handle csv/tsv file and map it with read lab metadata (j_data)"""
         map_data = relecov_tools.utils.read_csv_file_return_dict(

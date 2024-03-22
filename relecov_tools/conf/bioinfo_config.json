@@ -95,8 +95,11 @@
             "file_per_sample": false,
             "required": true,
             "content": {
-                "bioinformatics_protocol_software_name": "nf-core/viralrecon Workflow Summary",
-                "variant_calling_software_name": "IVAR_VARIANTS"
+                "bioinformatics_protocol_software_version": "nf-core/viralrecon",
+                "consensus_sequence_software_version": "bcftools",
+                "dehosting_method_software_version": "kraken2",
+                "mapping_software_version":"bowtie2",
+                "preprocessing_software_version":"fastp",                "variant_calling_software_version":"ivar"
             }
         },
         "fixed_values": {
@@ -121,26 +124,6 @@
             "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20   -m10",
             "lineage_analysis_date": "Not Provided [GENEPIO:0001668]",
             "consensus_sequence_name": "Not Provided [GENEPIO:0001668]"
-        },
-        "mapping_version": {
-            "bioinformatics_protocol_software_version": {
-                "Workflow": "nf-core/viralrecon"
-            },
-            "consensus_sequence_software_version": {
-                "BCFTOOLS_CONSENSUS": "bcftools"
-            },
-            "dehosting_method_software_version": {
-                "KRAKEN2_KRAKEN2": "kraken2"
-            },
-            "mapping_software_version": {
-                "BOWTIE2_ALIGN": "bowtie2"
-            },
-            "preprocessing_software_version": {
-                "FASTP": "fastp"
-            },
-            "variant_calling_software_version": {
-                "IVAR_VARIANTS": "ivar"
-            }
         }
     }
 }
