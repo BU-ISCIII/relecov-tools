@@ -147,30 +147,32 @@ class BioinfoMetadata:
 
     # TODO: also version's files shoudld be paresed independiently.
     # TODO: Before arriving here we need to validate properties fiels on collated and persample files(~mandatory fields). 
-    def add_bioinfo_results_metadata(self, files_dict, j_data):
-        """Add bioinfo results metadata  to processed read lab metadata (j_data)"""
+    def add_bioinfo_results_metadata(self, bioinfo_dict, j_data):
+        """Iterates over each property in the bioinfo_dict"""
         # TODO: add manatory fields: one for collated and one for sample-specific files
         # mandatory_fields = ['fn', 'ff', 'required', 'content', 'file_paths']
-        for key in files_dict.keys():
+        for key in bioinfo_dict.keys():
             try:
-                files_dict[key].get('file_paths')
+                bioinfo_dict[key].get('file_paths')
             except KeyError:
                 continue
-            # TODO: in progress
             # Parses sample-specific files (i.e: SAMPLE1.consensus.fa)
-            if isinstance(files_dict[key].get('file_paths'), list):
+            if isinstance(bioinfo_dict[key].get('file_paths'), list):
                 stderr.print("")
-                #self.map_metadata_persample_files()
+                j_data_mapped = self.map_metadata_persample_files(
+                    bioinfo_dict[key],
+                    j_data
+                )
             # Parses collated files (i.e: mapping_illumina_stats.tab)
-            elif isinstance(files_dict[key].get('file_paths'), str):
+            elif isinstance(bioinfo_dict[key].get('file_paths'), str):
                 j_data_mapped = self.map_metadata_collated_files(
-                    files_dict[key], 
+                    bioinfo_dict[key], 
                     j_data
                     )
         return j_data_mapped
     
     # TODO: recover file format parsing errors
-    def map_metadata_collated_files(self, bioinfo_dict, j_data):
+    def map_metadata_collated_files(self, bioinfo_dict_scope, j_data):
         """Handles different file formats in collated files, reads their content, and maps it to j_data"""
         # We will be able to add here as many handlers as we need
         file_extension_handlers = {
@@ -178,19 +180,34 @@ class BioinfoMetadata:
             ",": self.handle_csv_file,
             "html": self.handle_multiqc_html_file,
         }
-        file_format = bioinfo_dict['ff']
+        file_format = bioinfo_dict_scope['ff']
         if file_format in file_extension_handlers:
             handler_function = file_extension_handlers[file_format]
-            j_data_mapped = handler_function(bioinfo_dict, j_data)
+            j_data_mapped = handler_function(bioinfo_dict_scope, j_data)
             return j_data_mapped
         else:
-            stderr.print(f"[red]Unrecognized defined file format {bioinfo_dict['ff'] in {bioinfo_dict['fn']}}")
+            stderr.print(f"[red]Unrecognized defined file format {bioinfo_dict_scope['ff'] in {bioinfo_dict_scope['fn']}}")
             return None
     
-    def handle_multiqc_html_file(self, html_dict_scope, j_data):
+    def handle_csv_file(self, bioinfo_dict_scope, j_data):
+        """handle csv/tsv file and map it with read lab metadata (j_data)"""
+        map_data = relecov_tools.utils.read_csv_file_return_dict(
+            file_name = bioinfo_dict_scope['file_paths'],
+            sep = bioinfo_dict_scope['ff'],
+            key_position = (bioinfo_dict_scope['sample_col_idx']-1)
+        )
+        j_data_mapped = self.mapping_over_table(
+            j_data, 
+            map_data, 
+            bioinfo_dict_scope['content'],
+            bioinfo_dict_scope['file_paths']
+        )
+        return j_data_mapped
+
+    def handle_multiqc_html_file(self, bioinfo_dict_scope, j_data):
         """Reads html file, finds table containing programs info, and map it to j_data"""
         program_versions = {}
-        with open(html_dict_scope['file_paths'], 'r') as html_file:
+        with open(bioinfo_dict_scope['file_paths'], 'r') as html_file:
             html_content = html_file.read()
         # Load HTML
         soup = BeautifulSoup(html_content, features="lxml")
@@ -211,18 +228,18 @@ class BioinfoMetadata:
                     else:
                         stderr.print(f"[red] HTML entry error in {columns}. HTML table expected format should be \n<th> Process Name\n</th>\n<th> Software </th>\n.")
             else:
-                stderr.print(f"[red] Missing table containing software versions in {html_dict_scope['file_paths']}.")
+                stderr.print(f"[red] Missing table containing software versions in {bioinfo_dict_scope['file_paths']}.")
                 sys.exit(1)
         else:
-            log.error(f"Required div section 'mqc-module-section-software_versions' not found in file {html_dict_scope['file_paths']}.")
-            stderr.print(f"[red] No div section  'mqc-module-section-software_versions' was found in {html_dict_scope['file_paths']}.")
+            log.error(f"Required div section 'mqc-module-section-software_versions' not found in file {bioinfo_dict_scope['file_paths']}.")
+            stderr.print(f"[red] No div section  'mqc-module-section-software_versions' was found in {bioinfo_dict_scope['file_paths']}.")
             sys.exit(1)
                         
         # Adding mqc sofware versions to j_data
         field_errors = {}
         for row in j_data:
             sample_name = row["submitting_lab_sample_id"]
-            for field, values in html_dict_scope['content'].items():
+            for field, values in bioinfo_dict_scope['content'].items():
                 try:
                     row[field] = program_versions[values]
                 except KeyError as e:
