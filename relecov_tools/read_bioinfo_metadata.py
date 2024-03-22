@@ -456,23 +456,6 @@ class BioinfoMetadata:
         )
         return j_data_with_variant_metrics
 
-    # TODO: fpath should be imported from req_file found.
-    def include_software_versions(self, j_data):
-        """Include versions from the yaml version file"""
-        version_fields =  self.software_config["mapping_version"]
-        f_path = os.path.join(self.input_folder, self.required_file_name["version_info"])
-        try:
-            versions = relecov_tools.utils.read_yml_file(f_path)
-        except YAMLError as e:
-            log.error("Unable to process version file return error %s", e)
-            stderr.print(f"[red]Unable to process version file {e}")
-            sys.exit(1)
-        for row in j_data:
-            for field, version_data in version_fields.items():
-                for key, value in version_data.items():
-                    row[field] = versions[key][value]
-        return j_data
-
     def collect_info_from_lab_json(self):
         """Create the list of dictionaries from the data that is on json lab
         metadata file. Return j_data that is used to add the rest of the fields
@@ -507,8 +490,6 @@ class BioinfoMetadata:
         #j_data = self.add_fixed_values(j_data, #"feed_empty_fields")
         #stderr.print("[blue]Adding data from mapping stats")
         #j_data = self.include_data_from_mapping_stats(j_data, #req_files)
-        #stderr.print("[blue]Adding software versions")
-        #j_data = self.include_software_versions(j_data)
         #stderr.print("[blue]Adding summary variant metrics")
         #j_data = self.include_variant_metrics(j_data, #req_files)
         #stderr.print("[blue]Adding pangolin information")
