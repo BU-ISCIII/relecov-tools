@@ -99,7 +99,7 @@
                 "consensus_sequence_software_version": "bcftools",
                 "dehosting_method_software_version": "kraken2",
                 "mapping_software_version":"bowtie2",
-                "preprocessing_software_version":"fastp",                "variant_calling_software_version":"ivar"
+                "preprocessing_software_version":"fastp","variant_calling_software_version":"ivar"
             }
         },
         "fixed_values": {

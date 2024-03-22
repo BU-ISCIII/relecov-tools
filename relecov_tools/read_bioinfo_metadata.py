@@ -78,14 +78,14 @@ class BioinfoMetadata:
                 self.required_file_name[key] = value.get('fn','')
                 self.required_file_content[key] = value.get('content','')
 
-    # TODO: Add report of files found/not-found to global log
+    # TODO: Add report of files found/not-found to master log
     def scann_directory(self):
-        """Scann bioinfo analysis directory and search for files"""
+        """Scann bioinfo analysis directory and search for files present in bioinfo json config"""
         total_files = sum(len(files) for _, _, files in os.walk(self.input_folder))
         files_found = {}
         with tqdm(total=total_files, desc='\tScanning...') as pbar:
             for topic_key, topic_details  in self.software_config.items():
-                if not 'fn' in topic_details: #try/except fn
+                if 'fn' not in topic_details: #try/except fn
                     continue
                 for root, _, files in os.walk(self.input_folder, topdown=True):
                     matching_files = [os.path.join(root, file_name) for file_name in files if file_name.endswith(topic_details['fn'])]
@@ -164,11 +164,12 @@ class BioinfoMetadata:
             # Parses collated files (i.e: mapping_illumina_stats.tab)
             elif isinstance(files_dict[key].get('file_paths'), str):
                 j_data_mapped = self.map_metadata_collated_files(
-                        files_dict[key], 
-                        j_data
+                    files_dict[key], 
+                    j_data
                     )
-        return
+        return j_data_mapped
     
+    # TODO: recover file format parsing errors
     def map_metadata_collated_files(self, bioinfo_dict, j_data):
         """Handles different file formats in collated files, reads their content, and maps it to j_data"""
         # We will be able to add here as many handlers as we need
@@ -185,7 +186,7 @@ class BioinfoMetadata:
         else:
             stderr.print(f"[red]Unrecognized defined file format {bioinfo_dict['ff'] in {bioinfo_dict['fn']}}")
             return None
-
+    
     def handle_multiqc_html_file(self, html_dict_scope, j_data):
         """Reads html file, finds table containing programs info, and map it to j_data"""
         program_versions = {}
@@ -456,6 +457,14 @@ class BioinfoMetadata:
         )
         return j_data_with_variant_metrics
 
+    def add_fixed_values(self, j_data):
+        """include the fixed data defined in configuration or feed custom empty fields"""
+        f_values = self.software_config["fixed_values"]
+        for row in j_data:
+            for field, value in f_values.items():
+                row[field] = value
+        return j_data
+
     def collect_info_from_lab_json(self):
         """Create the list of dictionaries from the data that is on json lab
         metadata file. Return j_data that is used to add the rest of the fields
@@ -473,21 +482,16 @@ class BioinfoMetadata:
         metadata json, mapping_stats, and more information from the files
         inside input directory
         """
-        stderr.print(f"[blue]Sanning input directory...")
+        stderr.print("[blue]Sanning input directory...")
         files_found = self.scann_directory()
-        stderr.print(f"[blue]Extending bioinfo config json with files found...")
+        stderr.print("[blue]Extending bioinfo config json with files found...")
         software_config_extended = self.extend_software_config(files_found)
-        stderr.print(f"[blue]Validating required files...")
+        stderr.print("[blue]Validating required files...")
         self.validate_software_mandatory_files(software_config_extended)
         stderr.print("[blue]Reading lab metadata json")
         j_data = self.collect_info_from_lab_json()
         stderr.print(f"[blue]Adding metadata from {self.input_folder} into read lab metadata...")
         j_data = self.add_bioinfo_results_metadata(software_config_extended, j_data)
-        #stderr.print("[blue]Adding fixed values")
-        #j_data = self.add_fixed_values(j_data, #"fixed_values")
-        #stderr.print(j_data)
-        ## Creating empty fields that are not managed in case #of missing data
-        #j_data = self.add_fixed_values(j_data, #"feed_empty_fields")
         #stderr.print("[blue]Adding data from mapping stats")
         #j_data = self.include_data_from_mapping_stats(j_data, #req_files)
         #stderr.print("[blue]Adding summary variant metrics")
@@ -500,6 +504,8 @@ class BioinfoMetadata:
         #self.parse_long_table(self.input_folder, self.#output_folder)
         #stderr.print("[blue]Adding variant long table path")
         #j_data = self.include_custom_data(j_data)
+        stderr.print("[blue]Adding fixed values")
+        j_data = self.add_fixed_values(j_data)
         #file_name = (
         #    "bioinfo_" + os.path.splitext(os.path.basename#(self.json_file))[0] + ".json"
         #)
