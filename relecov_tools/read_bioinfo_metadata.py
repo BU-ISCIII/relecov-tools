@@ -145,7 +145,6 @@ class BioinfoMetadata:
             stderr.print("[green]\tValidation passed :)")
         return
 
-    # TODO: also version's files shoudld be paresed independiently.
     # TODO: Before arriving here we need to validate properties fiels on collated and persample files(~mandatory fields). 
     def add_bioinfo_results_metadata(self, bioinfo_dict, j_data):
         """Iterates over each property in the bioinfo_dict"""

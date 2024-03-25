@@ -5,7 +5,7 @@
             "ff": "\t",
             "file_per_sample": false,
             "sample_col_idx": 5,
-            "header_row_dix": 1,
+            "header_row_idx": 1,
             "required": true,
             "content": {
                 "analysis_date": "analysis_date",
@@ -26,7 +26,7 @@
             "fn": ".pangolin.csv",
             "ff": ",",
             "file_per_sample": true,
-            "header_row_dix": 1,
+            "header_row_idx": 1,
             "required": false,
             "content": {
                 "variant_name": "scorpio_call",
@@ -42,7 +42,7 @@
             "ff": ",",
             "file_per_sample": false,
             "sample_col_idx": 1,
-            "header_row_dix": 1,
+            "header_row_idx": 1,
             "required": true,
             "content": {
                 "sample" : "SAMPLE",
@@ -83,7 +83,7 @@
             "ff": ",",
             "file_per_sample": false,
             "sample_col_idx": 1,
-            "header_row_dix": 1,
+            "header_row_idx": 1,
             "required": true,
             "content": {
                 "ns_per_100_kbp": "# Ns per 100kb consensus"
