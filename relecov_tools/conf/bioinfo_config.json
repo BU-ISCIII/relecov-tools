@@ -122,8 +122,7 @@
             "preprocessing_params": "--cut_front --cut_tail --trim_poly_x --cut_mean_quality 30 --qualified_quality_phred   30    --unqualified_percent_limit 10 --length_required 50",
             "preprocessing_software_name": "FASTP",
             "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20   -m10",
-            "lineage_analysis_date": "Not Provided [GENEPIO:0001668]",
-            "consensus_sequence_name": "Not Provided [GENEPIO:0001668]"
+            "lineage_analysis_date": "Not Provided [GENEPIO:0001668]"
         }
     }
 }
