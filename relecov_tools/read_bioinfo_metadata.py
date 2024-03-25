@@ -66,17 +66,6 @@ class BioinfoMetadata:
         config = ConfigJson(json_file)
         self.software_config = config.get_configuration(self.software_name)
 
-    # FIXME: This must be refacored. not used so far. 
-    def get_software_required_files(self):
-        """Load required software specific files and patterns"""
-        self.required_file_name = {}
-        self.required_file_content = {}
-
-        for key, value in self.software_config.items():
-            if 'required' in value and value['required']:
-                self.required_file_name[key] = value.get('fn','')
-                self.required_file_content[key] = value.get('content','')
-
     # TODO: Add report of files found/not-found to master log
     def scann_directory(self):
         """Scann bioinfo analysis directory and search for files present in bioinfo json config"""
@@ -105,8 +94,10 @@ class BioinfoMetadata:
             stderr.print(f"\t[green]\tScannig process succeed (total {total_files} found).")
             return files_found
 
-    def extend_software_config(self, files_dict):
-        """Inject files found (input dir) into software config JSON"""
+    def add_filepaths_to_software_config(self, files_dict):
+        """
+        Adds file paths to the software configuration JSON by creating the 'file_paths' property with files found during the scanning process.
+        """
         extended_json = self.software_config
         for key, value in files_dict.items():
             if key in extended_json:
@@ -117,7 +108,6 @@ class BioinfoMetadata:
                     # If the existing value is not a list, create a new list with the file paths
                     extended_json[key]['file_paths'] = value
         return extended_json
-
 
     # TODO: Add validation to master log file.
     # TODO: Add checking file format based on config.
@@ -429,9 +419,10 @@ class BioinfoMetadata:
         inside input directory
         """
         stderr.print("[blue]Sanning input directory...")
-        files_found = self.scann_directory()
-        stderr.print("[blue]Extending bioinfo config json with files found...")
-        software_config_extended = self.extend_software_config(files_found)
+        files_found_dict = self.scann_directory()
+        stderr.print("[blue]Adding files found to bioinfo config json...")
+        stderr.print(files_found_dict)
+        software_config_extended = self.add_filepaths_to_software_config(files_found_dict)
         stderr.print("[blue]Validating required files...")
         self.validate_software_mandatory_files(software_config_extended)
         stderr.print("[blue]Reading lab metadata json")
