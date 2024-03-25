@@ -54,17 +54,30 @@ class BioinfoMetadata:
             )
         else:
             self.output_folder = output_folder
-
-        # TODO: Available software list can be retrieved from conf/bioinfo_search_patterns.yml
-        # TODO: Add error if software is not in the list (sys exit). Add output to global log.
-        if software is None:
-            software = relecov_tools.utils.prompt_path(
-                msg="Select the software, pipeline or tool use in the bioinformatic analysis (available: 'viralrecon'): "
-            )
-        self.software_name = software
+        
         json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
         config = ConfigJson(json_file)
-        self.software_config = config.get_configuration(self.software_name)
+        if software is None:
+            software = relecov_tools.utils.prompt_path(
+                msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
+            )
+        self.software_name = software
+
+        available_software = self.get_available_software(json_file)
+        if self.software_name in available_software:
+            self.software_config = config.get_configuration(self.software_name)
+        else:
+            log.error(
+                "No configuration available for %s. Currently, the only available software options are: %s", self.software_name, ", ".join(available_software)
+            )
+            stderr.print(f"[red]No configuration available for {self.software_name}. Currently, the only available software options are:: {', '.join(available_software)}")
+            sys.exit(1)
+    
+    def get_available_software(self, json):
+        """Get list of available software in configuration"""
+        config = relecov_tools.utils.read_json_file(json)
+        available_software = list(config.keys())
+        return available_software
 
     # TODO: Add report of files found/not-found to master log
     def scann_directory(self):
@@ -421,7 +434,6 @@ class BioinfoMetadata:
         stderr.print("[blue]Sanning input directory...")
         files_found_dict = self.scann_directory()
         stderr.print("[blue]Adding files found to bioinfo config json...")
-        stderr.print(files_found_dict)
         software_config_extended = self.add_filepaths_to_software_config(files_found_dict)
         stderr.print("[blue]Validating required files...")
         self.validate_software_mandatory_files(software_config_extended)
