@@ -5,7 +5,6 @@ import logging
 import glob
 import rich.console
 from datetime import datetime
-from tqdm import tqdm
 from yaml import YAMLError
 from bs4 import BeautifulSoup
 
@@ -83,28 +82,27 @@ class BioinfoMetadata:
         """Scann bioinfo analysis directory and search for files present in bioinfo json config"""
         total_files = sum(len(files) for _, _, files in os.walk(self.input_folder))
         files_found = {}
-        with tqdm(total=total_files, desc='\tScanning...') as pbar:
-            for topic_key, topic_details  in self.software_config.items():
-                if 'fn' not in topic_details: #try/except fn
-                    continue
-                for root, _, files in os.walk(self.input_folder, topdown=True):
-                    matching_files = [os.path.join(root, file_name) for file_name in files if file_name.endswith(topic_details['fn'])]
-                    if len(matching_files) == 1:
-                        # Only one file match found, add it as a string (collated files)
-                        files_found[topic_key] = matching_files[0]
-                    elif len(matching_files) > 1:
-                        # Multiple file matches found, add them as a list (per sample files)
-                        files_found[topic_key] = matching_files
-                    for _ in matching_files:
-                        pbar.update(1)
+
+        for topic_key, topic_details  in self.software_config.items():
+            if 'fn' not in topic_details: #try/except fn
+                continue
+            for root, _, files in os.walk(self.input_folder, topdown=True):
+                matching_files = [os.path.join(root, file_name) for file_name in files if file_name.endswith(topic_details['fn'])]
+                if len(matching_files) == 1:
+                    # Only one file match found, add it as a string (collated files)
+                    files_found[topic_key] = matching_files[0]
+                elif len(matching_files) > 1:
+                    # Multiple file matches found, add them as a list (per sample files)
+                    files_found[topic_key] = matching_files
+
         if len(files_found) < 1:
             log.error(
-                "No files found in %s.", self.output_folder
+                "No files found in %s.", self.input_folder
             )
-            stderr.print(f"[red] No files found in {self.output_folder}.")
+            stderr.print(f"[red]\tNo files found in {self.input_folder}.")
             sys.exit(1)
         else:
-            stderr.print("\tRetrieving files found ...")
+            stderr.print(f"\t[green]\tScannig process succeed (total {total_files} found).")
             return files_found
 
     def extend_software_config(self, files_dict):
