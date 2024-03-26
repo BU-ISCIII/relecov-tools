@@ -55,15 +55,15 @@ class BioinfoMetadata:
         else:
             self.output_folder = output_folder
         
-        bioinfo_json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
+        self.bioinfo_json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
         if software is None:
             software = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
             )
         self.software_name = software
 
-        available_software = self.get_available_software(bioinfo_json_file)
-        bioinfo_config = ConfigJson(bioinfo_json_file)
+        available_software = self.get_available_software(self.bioinfo_json_file)
+        bioinfo_config = ConfigJson(self.bioinfo_json_file)
         if self.software_name in available_software:
             self.software_config = bioinfo_config.get_configuration(self.software_name)
         else:
@@ -72,16 +72,27 @@ class BioinfoMetadata:
             )
             stderr.print(f"[red]No configuration available for {self.software_name}. Currently, the only available software options are:: {', '.join(available_software)}")
             sys.exit(1)
+        self.log_report = {'error': {}, 'valid': {}, 'warning': {}}
     
     def get_available_software(self, json):
         """Get list of available software in configuration"""
         config = relecov_tools.utils.read_json_file(json)
         available_software = list(config.keys())
         return available_software
+    
+    def update_log_report(self, method_name, status, message):
+        if status == 'valid':
+            self.log_report['valid'].setdefault(method_name, []).append(message)
+        elif status == 'error':
+            self.log_report['error'].setdefault(method_name, []).append(message)
+        elif status == 'warning':
+            self.log_report['warning'].setdefault(method_name, []).append(message)
+        else:
+            raise ValueError("Invalid status provided.")
 
-    # TODO: Add report of files found/not-found to master log
+    # TODO: Add log report
     def scann_directory(self):
-        """Scann bioinfo analysis directory and search for files present in bioinfo json config"""
+        """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json."""
         total_files = sum(len(files) for _, _, files in os.walk(self.input_folder))
         files_found = {}
 
@@ -90,63 +101,87 @@ class BioinfoMetadata:
                 continue
             for root, _, files in os.walk(self.input_folder, topdown=True):
                 matching_files = [os.path.join(root, file_name) for file_name in files if file_name.endswith(topic_details['fn'])]
-                if len(matching_files) == 1:
-                    # Only one file match found, add it as a string (collated files)
-                    files_found[topic_key] = matching_files[0]
-                elif len(matching_files) > 1:
-                    # Multiple file matches found, add them as a list (per sample files)
+                if len(matching_files) >= 1:
                     files_found[topic_key] = matching_files
-
         if len(files_found) < 1:
-            log.error(
-                "No files found in %s.", self.input_folder
+            self.update_log_report(
+                self.scann_directory.__name__,
+                'error', 
+                f"No files found in {self.input_folder}"
             )
-            stderr.print(f"[red]\tNo files found in {self.input_folder}.")
+            log.error(
+                "\tNo files found in %s according to %s file name patterns..",
+                self.input_folder,
+                os.path.basename(self.bioinfo_json_file)
+            )
+            stderr.print(f"\t[red]No files found in {self.input_folder} according to {os.path.basename(self.bioinfo_json_file)} file name patterns.")
             sys.exit(1)
         else:
-            stderr.print(f"\t[green]\tScannig process succeed (total {total_files} found).")
+            self.update_log_report(
+                self.scann_directory.__name__,
+                'valid', 
+                "Scannig process succeed"
+            )
+            stderr.print(f"\t[green]Scannig process succeed (total scanned files: {total_files}).")
             return files_found
 
     def add_filepaths_to_software_config(self, files_dict):
         """
         Adds file paths to the software configuration JSON by creating the 'file_paths' property with files found during the scanning process.
         """
-        extended_json = self.software_config
+        cc = 0
+        extended_software_config = self.software_config
         for key, value in files_dict.items():
-            if key in extended_json:
-                if isinstance(extended_json[key], list):
-                    # If the existing value is a list, extend it with the new file paths
-                    extended_json[key]['file_paths'].extend(value)
-                else:
-                    # If the existing value is not a list, create a new list with the file paths
-                    extended_json[key]['file_paths'] = value
-        return extended_json
+            if key in extended_software_config:
+                if len(value) != 0 or value:
+                    extended_software_config[key]['file_paths'] = value
+                    cc+=1
+        if cc == 0:
+            self.update_log_report(
+                self.add_filepaths_to_software_config.__name__,
+                'error', 
+                "No files path added to configuration json"
+            )
+        else:
+            self.update_log_report(
+                self.add_filepaths_to_software_config.__name__,
+                'valid', 
+                "Files path added to configuration json"
+            )
+            stderr.print("\t[green]Files path added to their scope in bioinfo configuration file.")
+        return extended_software_config
 
-    # TODO: Add validation to master log file.
-    # TODO: Add checking file format based on config.
-    # TODO: ¿Add content validation?. This might be better to be implemented when geting metadata from input files.
     def validate_software_mandatory_files(self, json):
         missing_required = []
         for key in json.keys():
             if json[key].get('required') is True:
                 try:
                     json[key]['file_paths']
+                    self.update_log_report(
+                        self.validate_software_mandatory_files.__name__,
+                        'valid', 
+                        f"Found '{json[key]['fn']}'"
+                    )
                 except KeyError:
                     missing_required.append(key)
+                    self.update_log_report(
+                        self.validate_software_mandatory_files.__name__,
+                        'error', 
+                        f"Missing '{json[key]['fn']}'"
+                    )
             else:
                 continue
         if len(missing_required) >= 1:
             log.error("\tMissing required files:")
             stderr.print("[red]\tMissing required files:")
             for i in missing_required:
-                log.error("[red]\t\t- %s", i)
-                stderr.print(f"\t\t- {i}")
+                log.error("\t\t- %s", i)
+                stderr.print(f"[red]\t\t- {i} (file name expected pattern '{json[i]['fn']}')")
             sys.exit(1)
         else:
-            stderr.print("[green]\tValidation passed :)")
+            stderr.print("[green]\tValidation passed.")
         return
 
-    # TODO: Before arriving here we need to validate properties fiels on collated and persample files(~mandatory fields). 
     def add_bioinfo_results_metadata(self, bioinfo_dict, j_data):
         """Iterates over each property in the bioinfo_dict"""
         # TODO: add manatory fields: one for collated and one for sample-specific files
@@ -158,7 +193,6 @@ class BioinfoMetadata:
                 continue
             # Parses sample-specific files (i.e: SAMPLE1.consensus.fa)
             if isinstance(bioinfo_dict[key].get('file_paths'), list):
-                stderr.print("")
                 j_data_mapped = self.map_metadata_persample_files(
                     bioinfo_dict[key],
                     j_data
