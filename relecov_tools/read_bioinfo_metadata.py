@@ -27,20 +27,20 @@ stderr = rich.console.Console(
 class BioinfoMetadata:
     def __init__(
         self,
-        json_file=None,
+        readlabmeta_json_file=None,
         input_folder=None,
         output_folder=None,
         software='viralrecon',
     ):
-        if json_file is None:
-            json_file = relecov_tools.utils.prompt_path(
+        if readlabmeta_json_file is None:
+            readlabmeta_json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file that was created by the read-lab-metadata"
             )
-        if not os.path.isfile(json_file):
-            log.error("json file %s does not exist ", json_file)
-            stderr.print(f"[red] file {json_file} does not exist")
+        if not os.path.isfile(readlabmeta_json_file):
+            log.error("json file %s does not exist ", readlabmeta_json_file)
+            stderr.print(f"[red] file {readlabmeta_json_file} does not exist")
             sys.exit(1)
-        self.json_file = json_file
+        self.readlabmeta_json_file = readlabmeta_json_file
 
         if input_folder is None:
             self.input_folder = relecov_tools.utils.prompt_path(
@@ -55,17 +55,17 @@ class BioinfoMetadata:
         else:
             self.output_folder = output_folder
         
-        json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
-        config = ConfigJson(json_file)
+        bioinfo_json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
         if software is None:
             software = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
             )
         self.software_name = software
 
-        available_software = self.get_available_software(json_file)
+        available_software = self.get_available_software(bioinfo_json_file)
+        bioinfo_config = ConfigJson(bioinfo_json_file)
         if self.software_name in available_software:
-            self.software_config = config.get_configuration(self.software_name)
+            self.software_config = bioinfo_config.get_configuration(self.software_name)
         else:
             log.error(
                 "No configuration available for %s. Currently, the only available software options are: %s", self.software_name, ", ".join(available_software)
@@ -419,10 +419,10 @@ class BioinfoMetadata:
         metadata file. Return j_data that is used to add the rest of the fields
         """
         try:
-            json_lab_data = relecov_tools.utils.read_json_file(self.json_file)
+            json_lab_data = relecov_tools.utils.read_json_file(self.readlabmeta_json_file)
         except ValueError:
-            log.error("%s invalid json file", self.json_file)
-            stderr.print(f"[red] {self.json_file} invalid json file")
+            log.error("%s invalid json file", self.readlabmeta_json_file)
+            stderr.print(f"[red] {self.readlabmeta_json_file} invalid json file")
             sys.exit(1)
         return json_lab_data
 
@@ -447,11 +447,11 @@ class BioinfoMetadata:
         stderr.print("[blue]Adding fixed values")
         j_data = self.add_fixed_values(j_data)
         file_name = (
-            "bioinfo_" + os.path.splitext(os.path.basename(self.json_file))[0] + ".json"
+            "bioinfo_" + os.path.splitext(os.path.basename(self.readlabmeta_json_file))[0] + ".json"
         )
         stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
         file_path = os.path.join(self.output_folder, file_name)
         relecov_tools.utils.write_json_fo_file(j_data, file_path)
-        stderr.print("[green]Sucessful creation of bioinfo #analyis file")
+        stderr.print("[green]Sucessful creation of bioinfo analyis file")
         return True
