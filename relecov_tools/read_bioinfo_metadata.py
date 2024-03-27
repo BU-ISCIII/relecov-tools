@@ -183,26 +183,50 @@ class BioinfoMetadata:
         return
 
     def add_bioinfo_results_metadata(self, bioinfo_dict, j_data):
-        """Iterates over each property in the bioinfo_dict"""
-        # TODO: add manatory fields: one for collated and one for sample-specific files
-        # mandatory_fields = ['fn', 'ff', 'required', 'content', 'file_paths']
+        """
+        Adds metadata from bioinformatics results to the JSON data.
+        
+        This method iterates over each property in the provided bioinfo_dict, which contains information about file paths (discovered during the scanning process), along with their specific file configuration.
+        
+        If the property specifies files per sample, it maps metadata for each sample-specific file.
+        If the property specifies collated files.
+        """
         for key in bioinfo_dict.keys():
             try:
-                bioinfo_dict[key].get('file_paths')
+                bioinfo_dict[key]['file_paths']
             except KeyError:
+                self.update_log_report(
+                    self.add_bioinfo_results_metadata.__name__,
+                    'warning', 
+                    f"No file path found for '{self.software_name}.{key}'"
+                )
                 continue
             # Parses sample-specific files (i.e: SAMPLE1.consensus.fa)
-            if isinstance(bioinfo_dict[key].get('file_paths'), list):
+            if bioinfo_dict[key].get('file_per_sample') is True:
                 j_data_mapped = self.map_metadata_persample_files(
                     bioinfo_dict[key],
                     j_data
                 )
             # Parses collated files (i.e: mapping_illumina_stats.tab)
-            elif isinstance(bioinfo_dict[key].get('file_paths'), str):
-                j_data_mapped = self.map_metadata_collated_files(
-                    bioinfo_dict[key], 
-                    j_data
+            elif bioinfo_dict[key].get('file_per_sample') is False:
+                if len(bioinfo_dict[key].get('file_paths')) == 1:
+                    bioinfo_dict[key]['file_paths'] = bioinfo_dict[key]['file_paths'][0]
+                    j_data_mapped = self.map_metadata_collated_files(
+                        bioinfo_dict[key], 
+                        j_data
+                        )
+                else:
+                    stderr.print(f"\t[yellow]Ignoring {key}. See log_report.")
+                    self.update_log_report(
+                        self.add_bioinfo_results_metadata.__name__,
+                        'warning', 
+                        f"Collated files can't have more han one matching file. Please check {self.bioinfo_json_file} section: : '{self.software_name}.{key}'"
                     )
+            else:
+                if key != 'fixed_values':
+                    # TODO: update log file
+                    stderr.print(f"\t[yellow]Value 'file_per_sample' is missing in {self.bioinfo_json_file} section: '{self.software_name}.{key}'. This field is required to properly handle file configuration.")
+                    continue
         return j_data_mapped
 
     def map_metadata_persample_files(self, bioinfo_dict_scope, j_data):
