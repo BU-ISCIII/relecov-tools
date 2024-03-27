@@ -175,8 +175,8 @@ class BioinfoMetadata:
             log.error("\tMissing required files:")
             stderr.print("[red]\tMissing required files:")
             for i in missing_required:
-                log.error("\t\t- %s", i)
-                stderr.print(f"[red]\t\t- {i} (file name expected pattern '{json[i]['fn']}')")
+                log.error("\t- %s", i)
+                stderr.print(f"[red]\t- {i} (file name expected pattern '{json[i]['fn']}')")
             sys.exit(1)
         else:
             stderr.print("[green]\tValidation passed.")
@@ -230,7 +230,7 @@ class BioinfoMetadata:
         return j_data_mapped
 
     def map_metadata_persample_files(self, bioinfo_dict_scope, j_data):
-        """"""
+        """The method processes metadata associated with per sample files and integrates it into the JSON data."""
         file_name = bioinfo_dict_scope['fn']
         file_format = bioinfo_dict_scope['ff']
         file_paths = bioinfo_dict_scope['file_paths']
@@ -308,7 +308,7 @@ class BioinfoMetadata:
             stderr.print(f"[red] No div section  'mqc-module-section-software_versions' was found in {bioinfo_dict_scope['file_paths']}.")
             sys.exit(1)
                         
-        # Adding mqc sofware versions to j_data
+        # mapping mqc sofware versions to j_data
         field_errors = {}
         for row in j_data:
             sample_name = row["submitting_lab_sample_id"]
@@ -322,7 +322,7 @@ class BioinfoMetadata:
         return j_data
 
     def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
-        """Auxiliar function to iterate over variants and mapping tables to map metadata"""
+        """Auxiliar function to iterate over table's content and map it to metadata (j_data)"""
         errors = []
         field_errors = {}
         for row in j_data:
@@ -342,12 +342,12 @@ class BioinfoMetadata:
         if errors:
             lenerrs = len(errors)
             log.error(
-                "{0} samples missing in {1}:\n{2}".format(lenerrs, table_name, errors)
+                "\t{0} samples missing in {1}:\n\t{2}".format(lenerrs, table_name, errors)
             )
-            stderr.print(f"[red]{lenerrs} samples missing in {table_name}:\n{errors}")
+            stderr.print(f"\t[red]{lenerrs} samples missing in {table_name}:\n\t{errors}")
         if field_errors:
-            log.error("Fields not found in {0}:\n{1}".format(table_name, field_errors))
-            stderr.print(f"[red]Missing values in {table_name}\n:{field_errors}")
+            log.error("\tFields not found in {0}:\n\t{1}".format(table_name, field_errors))
+            stderr.print(f"\t[red]Missing values in {table_name}:\n\t{field_errors}")
         return j_data
 
     # TODO: haven't improved yet
@@ -379,12 +379,12 @@ class BioinfoMetadata:
                     )
                     row["lineage_analysis_date"] = pango_files[0].split(".")[-2]
                 except ValueError:
-                    log.error("No date found in %s pangolin files", sample_name)
+                    log.error("\tNo date found in %s pangolin files", sample_name)
                     stderr.print(
-                        f"[red]No date found in sample {sample_name}",
-                        f"[red]pangolin filenames: {pango_files}",
+                        f"\t[red]No date found in sample {sample_name}. Pangolin filenames:",
+                        f"\n\t[red]{pango_files}",
                     )
-                    stderr.print("[Yellow] Using mapping analysis date instead")
+                    stderr.print("\t[yellow]Using mapping analysis date instead")
                     # If no date in pangolin files, set date as analysis date
                     row["lineage_analysis_date"] = row["analysis_date"]
                 f_data = relecov_tools.utils.read_csv_file_return_dict(
@@ -399,9 +399,9 @@ class BioinfoMetadata:
                     row[field] = "Not Provided [GENEPIO:0001668]"
         if len(missing_pango) >= 1:
             stderr.print(
-                f"[yellow]{len(missing_pango)} samples missing pangolin.csv file:"
+                f"\t[yellow]{len(missing_pango)} samples missing pangolin.csv file:"
             )
-            stderr.print(f"[yellow]{missing_pango}")
+            stderr.print(f"\t[yellow]{missing_pango}")
         return j_data
 
     def handle_consensus_fasta(self, bioinfo_dict_scope, j_data):
@@ -444,12 +444,12 @@ class BioinfoMetadata:
         conserrs = len(missing_consens)
         if conserrs >= 1:
             log.error(
-                "{0} Consensus files missing:\n{1}".format(
+                "\t{0} Consensus files missing:\n\t{1}".format(
                     conserrs, missing_consens
                 )
             )
-            stderr.print(f"[yellow]{conserrs} samples missing consensus file:")
-            stderr.print(f"[yellow]\n{missing_consens}")
+            stderr.print(f"\t[yellow]{conserrs} samples missing consensus file:")
+            stderr.print(f"\n\t[yellow]{missing_consens}")
         return j_data
 
     def include_custom_data(self, j_data):
