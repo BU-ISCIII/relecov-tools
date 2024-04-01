@@ -2694,6 +2694,15 @@
             "label": "GISAID Virus Name",
             "fill_mode": "sample"
         },
+        "gisaid_covv_type": {
+            "examples": ["betacoronavirus"],
+            "ontology": "NCIT:C25284",
+            "type": "string",
+            "description": "default must remain 'betacoronavirus'",
+            "clasification": "Database Identifiers",
+            "label": "GISAID covv type",
+            "fill_mode": "sample"
+        },
         "ena_analysis_accession": {
             "examples": [
                 ""
