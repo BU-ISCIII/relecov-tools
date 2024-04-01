@@ -23,7 +23,7 @@
             }
         },
         "mapping_pangolin": {
-            "fn": ".pangolin.csv",
+            "fn": ".pangolin(?:.*?)?\\.csv$",
             "ff": ",",
             "file_per_sample": true,
             "header_row_idx": 1,

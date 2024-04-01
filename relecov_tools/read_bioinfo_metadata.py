@@ -90,7 +90,6 @@ class BioinfoMetadata:
         else:
             raise ValueError("Invalid status provided.")
 
-    # TODO: Add log report
     def scann_directory(self):
         """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json."""
         total_files = sum(len(files) for _, _, files in os.walk(self.input_folder))
@@ -100,7 +99,7 @@ class BioinfoMetadata:
             if 'fn' not in topic_details: #try/except fn
                 continue
             for root, _, files in os.walk(self.input_folder, topdown=True):
-                matching_files = [os.path.join(root, file_name) for file_name in files if file_name.endswith(topic_details['fn'])]
+                matching_files = [os.path.join(root, file_name) for file_name in files if re.search(topic_details['fn'], file_name)]
                 if len(matching_files) >= 1:
                     files_found[topic_key] = matching_files
         if len(files_found) < 1:
