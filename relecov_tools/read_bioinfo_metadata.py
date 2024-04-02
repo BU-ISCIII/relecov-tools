@@ -276,6 +276,44 @@ class BioinfoMetadata:
         )
         return j_data_mapped
 
+    def select_most_recent_files_per_sample(self, paths_list):
+        """Selects the most recent file for each sample among potentially duplicated files.
+            Input:
+                - paths_list: a list of sample's file paths.
+        """
+        filename_groups = {}
+        # Count occurrences of each filename and group files by sample names
+        for file in paths_list:
+            file_name = os.path.basename(file).split('.')[0]
+            if file_name in filename_groups :
+                filename_groups [file_name].append(file)
+            else:
+                filename_groups [file_name] = [file]
+        
+        # Filter out sample names with only one file
+        duplicated_files = [(sample_name, file_paths) for sample_name, file_paths in filename_groups.items() if len(file_paths) > 1]
+
+        # Iterate over duplicated files to select the most recent one for each sample
+        for sample_name, file_paths in duplicated_files:
+            stderr.print(f"More than one pangolin file found for sample {sample_name}. Selecting the most recent one.")
+
+            # Sort files by modification time (most recent first)
+            sorted_files = sorted(file_paths, key=lambda file_path: os.path.getmtime (file_path), reverse=True)
+
+            # Select the most recent file
+            selected_file = sorted_files[0]
+            stderr.print(f"Selected file for sample {sample_name}: {selected_file}")
+
+            # Remove other files for the same sample from the filtered_files dictionary
+            filename_groups[sample_name] = [selected_file]
+
+        # Update filename_groups with filtered files
+        filename_groups = [(sample_name, file_path) for sample_name, file_paths in filename_groups.items() for file_path in file_paths]
+
+        # Reformat variable to retrieve a list of file paths
+        file_path_list = [sample_file_path for _, sample_file_path in filename_groups]
+        return file_path_list
+
     def handle_multiqc_html_file(self, bioinfo_dict_scope, j_data):
         """Reads html file, finds table containing programs info, and map it to j_data"""
         program_versions = {}
