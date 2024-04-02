@@ -974,7 +974,7 @@
     "Blood": {
         "anatomical_part": "Not Applicable",
         "collection_method": "Not Applicable",
-        "body_product": "Blood",
+        "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
     "Cerebrospinal Fluid": {
