@@ -16,6 +16,7 @@ import shutil
 from itertools import islice
 from Bio import SeqIO
 from rich.console import Console
+from datetime import datetime
 
 log = logging.getLogger(__name__)
 
@@ -306,3 +307,18 @@ def prompt_skip_folder_creation():
 def prompt_checkbox(msg, choices):
     selected_options = questionary.checkbox(msg, choices=choices).unsafe_ask()
     return selected_options
+
+def get_file_date(file_path):
+    """Get the modification date of a file."""
+    try:
+        # Get the modification time of the file
+        mtime = os.path.getmtime(file_path)
+        # Convert the modification time to a datetime object
+        file_date = datetime.fromtimestamp(mtime)
+        # Format date
+        formatted_date = file_date.strftime("%Y/%m/%d")
+        return formatted_date
+    except FileNotFoundError:
+        # Handle file not found error
+        print(f"File not found: {file_path}")
+        return None

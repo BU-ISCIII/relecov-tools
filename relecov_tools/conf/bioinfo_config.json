@@ -29,13 +29,15 @@
             "file_per_sample": true,
             "header_row_idx": 1,
             "required": false,
+            "function": "handle_pangolin_data",
             "content": {
                 "variant_name": "scorpio_call",
                 "lineage_name": "lineage",
                 "lineage_algorithm_software_version": "version",
                 "lineage_analysis_software_version": "pangolin_version",
                 "lineage_analysis_scorpio_version": "scorpio_version",
-                "lineage_analysis_constellation_version": "constellation_version"
+                "lineage_analysis_constellation_version": "constellation_version",
+                "lineage_analysis_date":"Not Provided [GENEPIO:0001668]"
             }
         },
         "variants_long_table": {
@@ -71,13 +73,14 @@
             "ff": "fasta",
             "file_per_sample": true,
             "required": false,
+            "function": "handle_consensus_fasta",
             "content": {
-                "consensus_sequence_name" : "Not Provided [GENEPIO:0001668]",
-                "consensus_genome_length" : "Not Provided [GENEPIO:0001668]",
-                "consensus_sequence_filename" : "Not Provided [GENEPIO:0001668]",
-                "consensus_sequence_filepath" : "Not Provided [GENEPIO:0001668]",
-                "consensus_sequence_md5" : "Not Provided [GENEPIO:0001668]",
-                "number_of_base_pairs_sequenced" : "Not Provided [GENEPIO:0001668]"
+                "consensus_sequence_name" : "sequence_name",
+                "consensus_genome_length" : "genome_length",
+                "consensus_sequence_filename" : "sequence_filename",
+                "consensus_sequence_filepath" : "sequence_filepath",
+                "consensus_sequence_md5" : "sequence_md5", 
+                "number_of_base_pairs_sequenced" : "number_of_base_pairs_sequenced"
             }
         },
         "summary_mqc": {
