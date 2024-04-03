@@ -2,11 +2,12 @@
     "viralrecon": {
         "mapping_stats": {
             "fn": "mapping_illumina_stats.tab",
-            "ff": "\t",
+            "ff": "tsv",
             "file_per_sample": false,
             "sample_col_idx": 5,
             "header_row_idx": 1,
             "required": true,
+            "function": null,
             "content": {
                 "analysis_date": "analysis_date",
                 "depth_of_coverage_value": "medianDPcoveragevirus",
@@ -24,7 +25,7 @@
         },
         "mapping_pangolin": {
             "fn": ".pangolin(?:.*?)?\\.csv$",
-            "ff": ",",
+            "ff": "csv",
             "file_per_sample": true,
             "header_row_idx": 1,
             "required": false,
@@ -39,11 +40,12 @@
         },
         "variants_long_table": {
             "fn": "variants_long_table.csv",
-            "ff": ",",
+            "ff": "csv",
             "file_per_sample": false,
             "sample_col_idx": 1,
             "header_row_idx": 1,
             "required": true,
+            "function": null,
             "content": {
                 "sample" : "SAMPLE",
                 "chromosome": "CHROM",
@@ -80,11 +82,12 @@
         },
         "summary_mqc": {
             "fn": "summary_variants_metrics_mqc.csv",
-            "ff": ",",
+            "ff": "csv",
             "file_per_sample": false,
             "sample_col_idx": 1,
             "header_row_idx": 1,
             "required": true,
+            "function": null,
             "content": {
                 "ns_per_100_kbp": "# Ns per 100kb consensus"
             }
@@ -94,6 +97,7 @@
             "ff": "html",
             "file_per_sample": false,
             "required": true,
+            "function": null,
             "content": {
                 "bioinformatics_protocol_software_version": "nf-core/viralrecon",
                 "consensus_sequence_software_version": "bcftools",

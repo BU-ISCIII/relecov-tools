@@ -180,7 +180,8 @@ class BioinfoMetadata:
         else:
             stderr.print("[green]\tValidation passed.")
         return
-
+    
+    # TODO: ADD LOG REPORT
     def add_bioinfo_results_metadata(self, bioinfo_dict, j_data):
         """
         Adds metadata from bioinformatics results to the JSON data.
@@ -189,8 +190,13 @@ class BioinfoMetadata:
         
         If the property specifies files per sample, it maps metadata for each sample-specific file.
         If the property specifies collated files.
-        """
+        """  
         for key in bioinfo_dict.keys():
+            # This skip files that will be parsed with other methods
+            if key == 'workflow_summary' or key == "fixed_values":
+                continue
+            
+            # Verify files found are present in key[file_paths].
             try:
                 bioinfo_dict[key]['file_paths']
             except KeyError:
@@ -200,81 +206,76 @@ class BioinfoMetadata:
                     f"No file path found for '{self.software_name}.{key}'"
                 )
                 continue
-            # Parses sample-specific files (i.e: SAMPLE1.consensus.fa)
-            if bioinfo_dict[key].get('file_per_sample') is True:
-                j_data_mapped = self.map_metadata_persample_files(
-                    bioinfo_dict[key],
-                    j_data
+
+            # Handling files
+            data_to_map = self.handling_files(bioinfo_dict[key])
+            
+            # Adding data to j_data
+            if data_to_map:
+                j_data_mapped = self.mapping_over_table(
+                    j_data, 
+                    data_to_map, 
+                    bioinfo_dict[key]['content'],
+                    bioinfo_dict[key]['file_paths']
                 )
-            # Parses collated files (i.e: mapping_illumina_stats.tab)
-            elif bioinfo_dict[key].get('file_per_sample') is False:
-                if len(bioinfo_dict[key].get('file_paths')) == 1:
-                    bioinfo_dict[key]['file_paths'] = bioinfo_dict[key]['file_paths'][0]
-                    j_data_mapped = self.map_metadata_collated_files(
-                        bioinfo_dict[key], 
-                        j_data
-                        )
-                else:
-                    stderr.print(f"\t[yellow]Ignoring {key}. See log_report.")
-                    self.update_log_report(
-                        self.add_bioinfo_results_metadata.__name__,
-                        'warning', 
-                        f"Collated files can't have more han one matching file. Please check {self.bioinfo_json_file} section: : '{self.software_name}.{key}'"
-                    )
             else:
-                if key != 'fixed_values':
-                    # TODO: update log file
-                    stderr.print(f"\t[yellow]Value 'file_per_sample' is missing in {self.bioinfo_json_file} section: '{self.software_name}.{key}'. This field is required to properly handle file configuration.")
-                    continue
+                continue
         return j_data_mapped
 
-    def map_metadata_persample_files(self, bioinfo_dict_scope, j_data):
-        """The method processes metadata associated with per sample files and integrates it into the JSON data."""
+    # TODO: Add log report(recover file format parsing errors)
+    def handling_files(self, bioinfo_dict_scope):
+        """Handles different file formats (sourced from ./metadata_homogenizer.py)
+        """
         file_name = bioinfo_dict_scope['fn']
-        file_format = bioinfo_dict_scope['ff']
-        file_paths = bioinfo_dict_scope['file_paths']
-        if file_format == ',' and 'pangolin' in file_name:
-            pango_path = os.path.dirname(file_paths[0])
-            j_data_mapped = self.include_pangolin_data(pango_path, j_data)
-        elif file_format == 'fasta' and 'consensus' in file_name:
-            j_data_mapped = self.handle_consensus_fasta(bioinfo_dict_scope, j_data)
-        else:
-            stderr.warning(f"[red]No available methods to parse file format '{file_format}' and file name '{file_name}'.")
-            return
-        return j_data_mapped
+        file_extension = os.path.splitext(file_name)[1]
+
+        # Parsing key position
+        try:
+            bioinfo_dict_scope['sample_col_idx']
+            sample_idx_possition = bioinfo_dict_scope['sample_col_idx']-1
+        except KeyError:
+            sample_idx_possition = None
         
-    # TODO: recover file format parsing errors
-    def map_metadata_collated_files(self, bioinfo_dict_scope, j_data):
-        """Handles different file formats in collated files, reads their content, and maps it to j_data"""
-        # We will be able to add here as many handlers as we need
-        file_extension_handlers = {
-            "\t": self.handle_csv_file,
-            ",": self.handle_csv_file,
-            "html": self.handle_multiqc_html_file,
-        }
-        file_format = bioinfo_dict_scope['ff']
-        if file_format in file_extension_handlers:
-            handler_function = file_extension_handlers[file_format]
-            j_data_mapped = handler_function(bioinfo_dict_scope, j_data)
-            return j_data_mapped
+        # Parsing files
+        func_name = bioinfo_dict_scope["function"]
+        if func_name is None:
+            if file_name.endswith('.csv'):
+                data = relecov_tools.utils.read_csv_file_return_dict(
+                    file_name=bioinfo_dict_scope['file_paths'][0],
+                    sep=",",
+                    key_position=sample_idx_possition
+                )
+                return data
+            elif file_name.endswith('.tsv') or file_name.endswith('.tab'):
+                data = relecov_tools.utils.read_csv_file_return_dict(
+                    file_name=bioinfo_dict_scope['file_paths'][0],
+                    sep="\t",
+                    key_position=sample_idx_possition
+                )
+            else:
+                stderr.print(f"[red]Unrecognized defined file name extension {file_extension} in {bioinfo_dict_scope['fn']}")
+                sys.exit()
         else:
-            stderr.print(f"[red]Unrecognized defined file format {bioinfo_dict_scope['ff'] in {bioinfo_dict_scope['fn']}}")
-            return None
-    
-    def handle_csv_file(self, bioinfo_dict_scope, j_data):
+            try:
+                # TODO: ADD stdout to identify which data is being added. 
+                # Attempt to get the method by name
+                method_to_call = getattr(self, func_name)
+                data = method_to_call(bioinfo_dict_scope['file_paths'])
+            except AttributeError as e:
+                if "not found" in str(e):
+                    stderr.print(f"[red]Function '{func_name}' not found in class.")
+                return None
+        return data
+
+
+    def handle_csv_file(self, bioinfo_dict_scope):
         """handle csv/tsv file and map it with read lab metadata (j_data)"""
         map_data = relecov_tools.utils.read_csv_file_return_dict(
             file_name = bioinfo_dict_scope['file_paths'],
             sep = bioinfo_dict_scope['ff'],
             key_position = (bioinfo_dict_scope['sample_col_idx']-1)
         )
-        j_data_mapped = self.mapping_over_table(
-            j_data, 
-            map_data, 
-            bioinfo_dict_scope['content'],
-            bioinfo_dict_scope['file_paths']
-        )
-        return j_data_mapped
+        return map_data
 
     def select_most_recent_files_per_sample(self, paths_list):
         """Selects the most recent file for each sample among potentially duplicated files.
