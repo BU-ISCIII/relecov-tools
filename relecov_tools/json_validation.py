@@ -102,7 +102,9 @@ class SchemaValidation:
             field_with_error = error_keys[error_type]
             log.error(
                 "%s samples failed validation for %s:\n%s",
-                num_of_errors, field_with_error, error_type
+                num_of_errors,
+                field_with_error,
+                error_type,
             )
             stderr.print(
                 "[red]"
