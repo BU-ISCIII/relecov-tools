@@ -13,8 +13,6 @@ import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.long_table_parse import LongTableParse
 
-# import relecov_tools.json_schema
-
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
@@ -163,19 +161,15 @@ class BioinfoMetadata:
     # TODO: ADD LOG REPORT
     def add_bioinfo_results_metadata(self, files_dict, j_data):
         """
-        Adds metadata from bioinformatics results to the JSON data.
-        
-        This method iterates over each property in the provided bioinfo_dict, which contains information about file paths (discovered during the scanning process), along with their specific file configuration.
-        
-        If the property specifies files per sample, it maps metadata for each sample-specific file.
-        If the property specifies collated files.
+        Adds metadata from bioinformatics results to j_data.
+            1. Handles metadata in bioinformatic files found  
+            2. Mapping handled bioinfo metadata into j_data. 
         """  
         for key in self.software_config.keys():
             # This skip files that will be parsed with other methods
             if key == 'workflow_summary' or key == "fixed_values":
                 continue
             
-            # Verify files found are present in key[file_paths].
             try:
                 files_dict[key]
                 self.update_log_report(
@@ -252,15 +246,6 @@ class BioinfoMetadata:
                 return None
         return data
 
-
-    def handle_csv_file(self, bioinfo_dict_scope):
-        """handle csv/tsv file and map it with read lab metadata (j_data)"""
-        map_data = relecov_tools.utils.read_csv_file_return_dict(
-            file_name = bioinfo_dict_scope['file_paths'],
-            sep = bioinfo_dict_scope['ff'],
-            key_position = (bioinfo_dict_scope['sample_col_idx']-1)
-        )
-        return map_data
 
     # TODO: add log report
     def get_multiqc_software_versions(self, file_list, j_data):

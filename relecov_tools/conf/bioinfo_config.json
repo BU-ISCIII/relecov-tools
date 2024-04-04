@@ -2,8 +2,6 @@
     "viralrecon": {
         "mapping_stats": {
             "fn": "mapping_illumina_stats.tab",
-            "ff": "tsv",
-            "file_per_sample": false,
             "sample_col_idx": 5,
             "header_row_idx": 1,
             "required": true,
@@ -25,8 +23,6 @@
         },
         "mapping_pangolin": {
             "fn": ".pangolin(?:.*?)?\\.csv$",
-            "ff": "csv",
-            "file_per_sample": true,
             "header_row_idx": 1,
             "required": false,
             "function": "handle_pangolin_data",
@@ -42,8 +38,6 @@
         },
         "variants_long_table": {
             "fn": "variants_long_table.csv",
-            "ff": "csv",
-            "file_per_sample": false,
             "sample_col_idx": 1,
             "header_row_idx": 1,
             "required": true,
@@ -70,8 +64,6 @@
         },
         "mapping_consensus": {
             "fn": ".consensus.fa",
-            "ff": "fasta",
-            "file_per_sample": true,
             "required": false,
             "function": "handle_consensus_fasta",
             "content": {
@@ -85,8 +77,6 @@
         },
         "summary_mqc": {
             "fn": "summary_variants_metrics_mqc.csv",
-            "ff": "csv",
-            "file_per_sample": false,
             "sample_col_idx": 1,
             "header_row_idx": 1,
             "required": true,
@@ -97,8 +87,6 @@
         },
         "workflow_summary": {
             "fn": "multiqc_report.html",
-            "ff": "html",
-            "file_per_sample": false,
             "required": true,
             "function": null,
             "content": {
