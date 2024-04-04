@@ -421,7 +421,6 @@ class BioinfoMetadata:
             sys.exit()
         return pango_data_processed
 
-    # FIXME: only in item is saved in consensus_data_processed. but at least two are ok. 
     def handle_consensus_fasta(self, files_list):
         """Handling consensus fasta data (*.consensus.fa)"""
         consensus_data_processed = {}
@@ -436,33 +435,28 @@ class BioinfoMetadata:
                 continue
             sample_key = re.sub(self.software_config['mapping_consensus']['fn'], '', os.path.basename(consensus_file))
 
-            # Initialize dictionary for the consensus file if it doesn't exist
-            consensus_dict = {sample_key:{} }
-            if sample_key not in consensus_dict:
-                consensus_dict[sample_key] = {}
-            
-            consensus_dict[sample_key]['sequence_name'] = record_fasta.description
-            consensus_dict[sample_key]['genome_length'] = str(len(record_fasta))
-            consensus_dict[sample_key]['sequence_filepath'] = os.path.dirname(consensus_file)
-            consensus_dict[sample_key]['sequence_filename'] = sample_key + self.software_config['mapping_consensus']['fn']
-            consensus_dict[sample_key]['sequence_md5'] = relecov_tools.utils.calculate_md5(consensus_file)
-            consensus_data_processed.update(consensus_dict)
+            # Update consensus data for the sample key
+            consensus_data_processed[sample_key] = {
+                'sequence_name': record_fasta.description,
+                'genome_length': str(len(record_fasta)),
+                'sequence_filepath': os.path.dirname(consensus_file),
+                'sequence_filename': sample_key,
+                'sequence_md5': relecov_tools.utils.calculate_md5(consensus_file),
+                # TODO: Not sure this is correct. If not, recover previous version: https://github.com/BU-ISCIII/relecov-tools/blob/09c00c1ddd11f7489de7757841aff506ef4b7e1d/relecov_tools/read_bioinfo_metadata.py#L211-L218
+                'number_of_base_pairs_sequenced': len(record_fasta.seq)
+            }         
 
-
-            # TODO: Not sure this is correct. If not, recover previous version: https://github.com/BU-ISCIII/relecov-tools/blob/09c00c1ddd11f7489de7757841aff506ef4b7e1d/relecov_tools/read_bioinfo_metadata.py#L211-L218
-            consensus_dict[sample_key]['number_of_base_pairs_sequenced'] = len(record_fasta.seq)
-
-            # Report missing consensus
-            conserrs = len(missing_consens)
-            if conserrs >= 1:
-                log.error(
-                    "\t{0} Consensus files missing:\n\t{1}".format(
-                        conserrs, missing_consens
-                    )
+        # Report missing consensus
+        conserrs = len(missing_consens)
+        if conserrs >= 1:
+            log.error(
+                "\t{0} Consensus files missing:\n\t{1}".format(
+                    conserrs, missing_consens
                 )
-                stderr.print(f"\t[yellow]{conserrs} samples missing consensus file:")
-                stderr.print(f"\n\t[yellow]{missing_consens}")
-            return consensus_data_processed
+            )
+            stderr.print(f"\t[yellow]{conserrs} samples missing consensus file:")
+            stderr.print(f"\n\t[yellow]{missing_consens}")
+        return consensus_data_processed
 
     def include_custom_data(self, j_data):
         """Include custom fields like variant-long-table path"""
