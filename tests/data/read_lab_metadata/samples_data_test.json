@@ -1,0 +1,79 @@
+{
+    "33500056": {
+        "fastq_r1_md5": "69854e93a48df2e0bd77ab065518f284",
+        "fastq_r2_md5": "e723a5c4fefd200fb5cdef50fe93c02a",
+        "r1_fastq_filepath": "tests/20240320",
+        "r2_fastq_filepath": "tests/20240320",
+        "sequence_file_R1_fastq": "SAMPLE20_TEST2_R1.fastq.gz",
+        "sequence_file_R2_fastq": "SAMPLE20_TEST2_R2.fastq.gz"
+    },
+    "33597813": {
+        "fastq_r1_md5": "18fbfc8a0da49d63cfb43c8ea1fb63a5",
+        "fastq_r2_md5": "1bac23a364f256ee89583088547cd2d0",
+        "r1_fastq_filepath": "tests/20240320",
+        "r2_fastq_filepath": "tests/20240320",
+        "sequence_file_R1_fastq": "SAMPLE21_TEST2_R1.fastq.gz",
+        "sequence_file_R2_fastq": "SAMPLE21_TEST2_R2.fastq.gz"
+    },
+    "35184262": {
+        "fastq_r1_md5": "99ab59db60c96551ecd9067000cdbb2a",
+        "fastq_r2_md5": "c58920e0893dd51c25ab4ea0a1aee5c5",
+        "r1_fastq_filepath": "tests/20240320",
+        "r2_fastq_filepath": "tests/20240320",
+        "sequence_file_R1_fastq": "SAMPLE22_TEST2_R1.fastq.gz",
+        "sequence_file_R2_fastq": "SAMPLE22_TEST2_R2.fastq.gz"
+    },
+    "37145959EXT": {
+        "fastq_r1_md5": "dc340063a9f08257157ef4ead6c5b34c",
+        "fastq_r2_md5": "9a6eaf7e8f93963510cf756ba90ce524",
+        "r1_fastq_filepath": "tests/20240320",
+        "r2_fastq_filepath": "tests/20240320",
+        "sequence_file_R1_fastq": "SAMPLE23_TEST2_R1.fastq.gz",
+        "sequence_file_R2_fastq": "SAMPLE23_TEST2_R2.fastq.gz"
+    },
+    "39156982": {
+        "fastq_r1_md5": "81b05b2b94880749efc19af6ffeac7a6",
+        "fastq_r2_md5": "b2dcec994291f6b507ec06afe646069d",
+        "r1_fastq_filepath": "tests/20240320",
+        "r2_fastq_filepath": "tests/20240320",
+        "sequence_file_R1_fastq": "SAMPLE24_TEST2_R1.fastq.gz",
+        "sequence_file_R2_fastq": "SAMPLE24_TEST2_R2.fastq.gz"
+    },
+    "SINGLEID": {
+        "fastq_r1_md5": "112d5d2ff3845236576732f7c7dc8b06",
+        "r1_fastq_filepath": "tests/20240320",
+        "sequence_file_R1_fastq": "Singlesamp.fastq.gz"
+    },
+    "id1000": {
+        "fastq_r1_md5": "c1551cdf3d5e9849b80a082051907a72",
+        "fastq_r2_md5": "449407f85d7ed4388b7d8a51e28d97a8",
+        "r1_fastq_filepath": "tests/20240320",
+        "r2_fastq_filepath": "tests/20240320",
+        "sequence_file_R1_fastq": "SAMPLE1_R1.fastq.gz",
+        "sequence_file_R2_fastq": "SAMPLE1_R2.fastq.gz"
+    },
+    "id4000_BAD": {
+        "fastq_r1_md5": "5d838ce4a93bcf12d3031a5f9ffd4acf",
+        "fastq_r2_md5": "0a9b0a590b4773e5e4c90c391979a685",
+        "r1_fastq_filepath": "tests/20240320",
+        "r2_fastq_filepath": "tests/20240320",
+        "sequence_file_R1_fastq": "SAMPLE4_R1.fastq.gz",
+        "sequence_file_R2_fastq": "SAMPLE4_R2.fastq.gz"
+    },
+    "id5000GOOD": {
+        "fastq_r1_md5": "d04d32f14ca56f968d07f61d68598639",
+        "fastq_r2_md5": "66a057995ac925e3203ff1afdd5770ec",
+        "r1_fastq_filepath": "tests/20240320",
+        "r2_fastq_filepath": "tests/20240320",
+        "sequence_file_R1_fastq": "SAMPLE5_R1.fastq.gz",
+        "sequence_file_R2_fastq": "SAMPLE5_R2.fastq.gz"
+    },
+    "id6000GOOD": {
+        "fastq_r1_md5": "0d55b49614d1c38582b69ccded1b22c4",
+        "fastq_r2_md5": "50afab6751cce654b973bb336cf3b3eb",
+        "r1_fastq_filepath": "tests/20240320",
+        "r2_fastq_filepath": "tests/20240320",
+        "sequence_file_R1_fastq": "SAMPLE6_R1.fastq.gz",
+        "sequence_file_R2_fastq": "SAMPLE6_R2.fastq.gz"
+    }
+}
