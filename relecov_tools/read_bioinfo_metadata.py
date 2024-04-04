@@ -4,6 +4,7 @@ import sys
 import logging
 import glob
 import rich.console
+import re
 from datetime import datetime
 from yaml import YAMLError
 from bs4 import BeautifulSoup
@@ -22,8 +23,12 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
-# TODO: Create 2 master function that validates file presence/content and transfrom from csv,tsv,... to json.
-# TODO: Cosider eval py + func property in json to be able to discriminate between collated files and sample-specific files.  
+# FIXME: longtable parsing old method needs to be recovered. New implementation has errors while parsing it.
+# TODO: Add method to validate bioinfo_config.json file requirements.
+# TODO: Cosider eval py + func property in json to be able to discriminate between collated files and sample-specific files.
+# TODO: replace submitting_lab_id by sequencing_sample_id
+# TODO: manage bioinfo config and files_found paths in separate variables.
+# TODO: improve method's description (specifically 'handling_files')
 class BioinfoMetadata:
     def __init__(
         self,
@@ -223,6 +228,7 @@ class BioinfoMetadata:
         return j_data_mapped
 
     # TODO: Add log report(recover file format parsing errors)
+    # TODO: add better stdout/err to show which method is being called.
     def handling_files(self, bioinfo_dict_scope):
         """Handles different file formats (sourced from ./metadata_homogenizer.py)
         """
@@ -322,6 +328,7 @@ class BioinfoMetadata:
                     continue
         return j_data
 
+    # TODO: update log report
     def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
         """Auxiliar function to iterate over table's content and map it to metadata (j_data)"""
         errors = []
@@ -354,6 +361,7 @@ class BioinfoMetadata:
             stderr.print(f"\t[red]Missing values in {table_name}:\n\t{field_errors}")
         return j_data
 
+    # TODO: add log report
     def handle_pangolin_data(self, files_list):
         """Parse pangolin data (csv) into JSON and map it to each sample in the provided j_data.
         """
@@ -383,6 +391,7 @@ class BioinfoMetadata:
             sys.exit()
         return pango_data_processed
 
+    # TODO: add log report
     def handle_consensus_fasta(self, files_list):
         """Handling consensus fasta data (*.consensus.fa)"""
         consensus_data_processed = {}
@@ -420,6 +429,7 @@ class BioinfoMetadata:
             stderr.print(f"\n\t[yellow]{missing_consens}")
         return consensus_data_processed
 
+    # TODO: add log report
     def include_custom_data(self, j_data):
         """Include custom fields like variant-long-table path"""
         condition = os.path.join(self.input_folder, "*variants_long_table*.csv")
@@ -432,6 +442,7 @@ class BioinfoMetadata:
             row["long_table_path"] = long_table_path
         return j_data
 
+    # TODO: this is too harcoded. Find a way to add file's path of required files when calling handlers functions. 
     def add_fixed_values(self, j_data):
         """include the fixed data defined in configuration or feed custom empty fields"""
         f_values = self.software_config["fixed_values"]
