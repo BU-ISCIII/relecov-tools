@@ -27,7 +27,6 @@ stderr = rich.console.Console(
 # TODO: Add method to validate bioinfo_config.json file requirements.
 # TODO: Cosider eval py + func property in json to be able to discriminate between collated files and sample-specific files.
 # TODO: replace submitting_lab_id by sequencing_sample_id
-# TODO: manage bioinfo config and files_found paths in separate variables.
 # TODO: improve method's description (specifically 'handling_files')
 class BioinfoMetadata:
     def __init__(
@@ -129,65 +128,40 @@ class BioinfoMetadata:
             stderr.print(f"\t[green]Scannig process succeed (total scanned files: {total_files}).")
             return files_found
 
-    def add_filepaths_to_software_config(self, files_dict):
-        """
-        Adds file paths to the software configuration JSON by creating the 'file_paths' property with files found during the scanning process.
-        """
-        cc = 0
-        extended_software_config = self.software_config
-        for key, value in files_dict.items():
-            if key in extended_software_config:
-                if len(value) != 0 or value:
-                    extended_software_config[key]['file_paths'] = value
-                    cc+=1
-        if cc == 0:
-            self.update_log_report(
-                self.add_filepaths_to_software_config.__name__,
-                'error', 
-                "No files path added to configuration json"
-            )
-        else:
-            self.update_log_report(
-                self.add_filepaths_to_software_config.__name__,
-                'valid', 
-                "Files path added to configuration json"
-            )
-            stderr.print("\t[green]Files path added to their scope in bioinfo configuration file.")
-        return extended_software_config
-
-    def validate_software_mandatory_files(self, json):
+    def validate_software_mandatory_files(self, files_dict):
         missing_required = []
-        for key in json.keys():
-            if json[key].get('required') is True:
+        for key in self.software_config:
+            if self.software_config[key].get('required') is True:
                 try:
-                    json[key]['file_paths']
+                    files_dict[key]
                     self.update_log_report(
                         self.validate_software_mandatory_files.__name__,
                         'valid', 
-                        f"Found '{json[key]['fn']}'"
+                        f"Found {self.software_name}.{key}"
                     )
                 except KeyError:
                     missing_required.append(key)
                     self.update_log_report(
                         self.validate_software_mandatory_files.__name__,
                         'error', 
-                        f"Missing '{json[key]['fn']}'"
+                        f"Missing '{files_dict[key]['fn']}'"
                     )
             else:
                 continue
+
         if len(missing_required) >= 1:
             log.error("\tMissing required files:")
             stderr.print("[red]\tMissing required files:")
             for i in missing_required:
                 log.error("\t- %s", i)
-                stderr.print(f"[red]\t- {i} (file name expected pattern '{json[i]['fn']}')")
+                stderr.print(f"[red]\t- {i} (file name expected pattern '{files_dict[i]['fn']}')")
             sys.exit(1)
         else:
             stderr.print("[green]\tValidation passed.")
         return
     
     # TODO: ADD LOG REPORT
-    def add_bioinfo_results_metadata(self, bioinfo_dict, j_data):
+    def add_bioinfo_results_metadata(self, files_dict, j_data):
         """
         Adds metadata from bioinformatics results to the JSON data.
         
@@ -196,14 +170,19 @@ class BioinfoMetadata:
         If the property specifies files per sample, it maps metadata for each sample-specific file.
         If the property specifies collated files.
         """  
-        for key in bioinfo_dict.keys():
+        for key in self.software_config.keys():
             # This skip files that will be parsed with other methods
             if key == 'workflow_summary' or key == "fixed_values":
                 continue
             
             # Verify files found are present in key[file_paths].
             try:
-                bioinfo_dict[key]['file_paths']
+                files_dict[key]
+                self.update_log_report(
+                    self.add_bioinfo_results_metadata.__name__,
+                    'valid', 
+                    f"Start processing '{self.software_name}.{key}'"
+                )
             except KeyError:
                 self.update_log_report(
                     self.add_bioinfo_results_metadata.__name__,
@@ -213,15 +192,15 @@ class BioinfoMetadata:
                 continue
 
             # Handling files
-            data_to_map = self.handling_files(bioinfo_dict[key])
+            data_to_map = self.handling_files(files_dict[key], key)
             
             # Adding data to j_data
             if data_to_map:
                 j_data_mapped = self.mapping_over_table(
                     j_data, 
                     data_to_map, 
-                    bioinfo_dict[key]['content'],
-                    bioinfo_dict[key]['file_paths']
+                    self.software_config[key]['content'],
+                    files_dict[key]
                 )
             else:
                 continue
@@ -229,44 +208,44 @@ class BioinfoMetadata:
 
     # TODO: Add log report(recover file format parsing errors)
     # TODO: add better stdout/err to show which method is being called.
-    def handling_files(self, bioinfo_dict_scope):
+    def handling_files(self, file_list, file_key):
         """Handles different file formats (sourced from ./metadata_homogenizer.py)
         """
-        file_name = bioinfo_dict_scope['fn']
+        file_name = self.software_config[file_key].get('fn')
         file_extension = os.path.splitext(file_name)[1]
 
         # Parsing key position
         try:
-            bioinfo_dict_scope['sample_col_idx']
-            sample_idx_possition = bioinfo_dict_scope['sample_col_idx']-1
+            self.software_config[file_key]['sample_col_idx']
+            sample_idx_possition = self.software_config[file_key]['sample_col_idx']-1
         except KeyError:
             sample_idx_possition = None
         
         # Parsing files
-        func_name = bioinfo_dict_scope["function"]
+        func_name =  self.software_config[file_key]["function"]
         if func_name is None:
             if file_name.endswith('.csv'):
                 data = relecov_tools.utils.read_csv_file_return_dict(
-                    file_name=bioinfo_dict_scope['file_paths'][0],
+                    file_name=file_list[0],
                     sep=",",
                     key_position=sample_idx_possition
                 )
                 return data
             elif file_name.endswith('.tsv') or file_name.endswith('.tab'):
                 data = relecov_tools.utils.read_csv_file_return_dict(
-                    file_name=bioinfo_dict_scope['file_paths'][0],
+                    file_name=file_list[0],
                     sep="\t",
                     key_position=sample_idx_possition
                 )
             else:
-                stderr.print(f"[red]Unrecognized defined file name extension {file_extension} in {bioinfo_dict_scope['fn']}")
+                stderr.print(f"[red]Unrecognized defined file name extension {file_extension} in {file_name}")
                 sys.exit()
         else:
             try:
                 # TODO: ADD stdout to identify which data is being added. 
                 # Attempt to get the method by name
                 method_to_call = getattr(self, func_name)
-                data = method_to_call(bioinfo_dict_scope['file_paths'])
+                data = method_to_call(file_list)
             except AttributeError as e:
                 if "not found" in str(e):
                     stderr.print(f"[red]Function '{func_name}' not found in class.")
@@ -284,10 +263,10 @@ class BioinfoMetadata:
         return map_data
 
     # TODO: add log report
-    def get_multiqc_software_versions(self, bioinfo_dict_scope, j_data):
+    def get_multiqc_software_versions(self, file_list, j_data):
         """Reads html file, finds table containing programs info, and map it to j_data"""
         # Handle multiqc_report.html
-        f_path = bioinfo_dict_scope['file_paths'][0]
+        f_path = file_list[0]
         program_versions = {}
 
         with open(f_path, 'r') as html_file:
@@ -308,18 +287,18 @@ class BioinfoMetadata:
                     else:
                         stderr.print(f"[red] HTML entry error in {columns}. HTML table expected format should be \n<th> Process Name\n</th>\n<th> Software </th>\n.")
             else:
-                stderr.print(f"[red] Missing table containing software versions in {bioinfo_dict_scope['file_paths']}.")
+                stderr.print(f"[red] Missing table containing software versions in file {f_path}.")
                 sys.exit(1)
         else:
-            log.error(f"Required div section 'mqc-module-section-software_versions' not found in file {bioinfo_dict_scope['file_paths']}.")
-            stderr.print(f"[red] No div section  'mqc-module-section-software_versions' was found in {bioinfo_dict_scope['file_paths']}.")
+            log.error(f"Required div section 'mqc-module-section-software_versions' not found in file {f_path}.")
+            stderr.print(f"[red] No div section  'mqc-module-section-software_versions' was found in {f_path}.")
             sys.exit(1)
                         
         # Mapping multiqc sofware versions to j_data
         field_errors = {}
         for row in j_data:
             sample_name = row["submitting_lab_sample_id"]
-            for field, values in bioinfo_dict_scope['content'].items():
+            for field, values in self.software_config['workflow_summary'].get('content').items():
                 try:
                     row[field] = program_versions[values]
                 except KeyError as e:
@@ -470,16 +449,14 @@ class BioinfoMetadata:
         """
         stderr.print("[blue]Sanning input directory...")
         files_found_dict = self.scann_directory()
-        stderr.print("[blue]Adding files found to bioinfo config json...")
-        software_config_extended = self.add_filepaths_to_software_config(files_found_dict)
         stderr.print("[blue]Validating required files...")
-        self.validate_software_mandatory_files(software_config_extended)
+        self.validate_software_mandatory_files(files_found_dict)
         stderr.print("[blue]Reading lab metadata json")
         j_data = self.collect_info_from_lab_json()
         stderr.print(f"[blue]Adding metadata from {self.input_folder} into read lab metadata...")
-        j_data = self.add_bioinfo_results_metadata(software_config_extended, j_data)
+        j_data = self.add_bioinfo_results_metadata(files_found_dict, j_data)
         stderr.print("[blue]Adding software versions to read lab metadata...")
-        j_data = self.get_multiqc_software_versions(software_config_extended['workflow_summary'], j_data)
+        j_data = self.get_multiqc_software_versions(files_found_dict['workflow_summary'], j_data)       
         # FIXME: this isn't refactored and requires to be reimplemented from older version of this module
         ##stderr.print("[blue]Adding variant long table path")
         ##j_data = self.include_custom_data(j_data)
