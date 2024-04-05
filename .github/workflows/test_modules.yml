@@ -2,9 +2,9 @@ name: Python Package using Conda
 
 on: 
   push:
-    branches: [main, develop]
+    branches: "**"
   pull_request:
-    branches: [main, develop]
+    branches: "**"
 
 env:
   CONF_FILE: ${{ github.workspace }}/relecov_tools/conf/configuration.json
