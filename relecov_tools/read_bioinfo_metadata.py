@@ -23,10 +23,7 @@ stderr = rich.console.Console(
 
 # FIXME: longtable parsing old method needs to be recovered. New implementation has errors while parsing it.
 # TODO: Add method to validate bioinfo_config.json file requirements.
-# TODO: Cosider eval py + func property in json to be able to discriminate between collated files and sample-specific files.
 # TODO: replace submitting_lab_id by sequencing_sample_id
-# TODO: improve method's description (specifically 'handling_files')
-# TODO: fix/improve stdout missing values / fields not found in mapping-over-table
 class BioinfoMetadata:
     def __init__(
         self,
@@ -578,6 +575,28 @@ class BioinfoMetadata:
             )
         return consensus_data_processed
 
+    def parse_long_table(self, long_table_path, output_folder):
+        file_match = os.path.join(long_table_path, "variants_long_table*.csv")
+        table_path = glob.glob(file_match)
+        if len(table_path) == 1:
+            table_path = glob.glob(file_match)[0]
+        else:
+            log.error("variants_long_table files found = %s", len(table_path))
+            stderr.print(
+                f"[red]Found {len(table_path)} variants_long_table files in ",
+                f"[red]{long_table_path}, aborting",
+            )
+            sys.exit(1)
+        if not os.path.isfile(table_path):
+            log.error("variants_long_table given file is not a file")
+            stderr.print("[red]Variants_long_table file do not exist, Aborting")
+            sys.exit(1)
+        long_table = LongTableParse(table_path, output_folder)
+        
+        long_table.parsing_csv()
+        return None
+
+
     # TODO: add log report
     def include_custom_data(self, j_data):
         """Include custom fields like variant-long-table path"""
@@ -660,8 +679,9 @@ class BioinfoMetadata:
         ##j_data = self.include_custom_data(j_data)
         stderr.print("[blue]Adding fixed values")
         j_data = self.add_fixed_values(j_data)
-        # Show log report:
-        #relecov_tools.utils.print_log_report(self.log_report)
+        stderr.print("[blue]Parsing variants_long_table info to json format...")
+        self.parse_long_table(self.input_folder, self.output_folder)
+
         # Generate readlab + bioinfolab processed metadata.
         file_name = (
             "bioinfo_" 
