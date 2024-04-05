@@ -17,10 +17,10 @@ def main():
     args = parser.parse_args()
 
     val_dict = {
-        "user": os.getenv("TEST_USER"),
-        "password": os.getenv("TEST_PASSWORD"),
+        "user": os.environ["TEST_USER"],
+        "password": os.environ["TEST_PASSWORD"],
         "download_option": args.download_option,
-        "output_location": os.getenv("OUTPUT_LOCATION"),
+        "output_location": os.environ["OUTPUT_LOCATION"],
         "target_folders": args.target_folders,
     }
     prepare_remote_test(**val_dict)
@@ -40,7 +40,7 @@ def prepare_remote_test(**kwargs):
         target_folders=kwargs["target_folders"],
     )
     print("Openning connection to sftp")
-    sftp_connection.sftp_port = os.getenv("TEST_PORT")
+    sftp_connection.sftp_port = os.environ["TEST_PORT"]
     if not sftp_connection.open_connection():
         print("Could not open connection to remote sftp")
         sys.exit(1)
