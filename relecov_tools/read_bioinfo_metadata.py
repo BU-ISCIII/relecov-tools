@@ -32,7 +32,10 @@ class BioinfoMetadata:
         output_folder=None,
         software=None,
     ):
+        # Init process log
         self.log_report = {'error': {}, 'valid': {}, 'warning': {}}
+        
+        # Parse read-lab-meta-data 
         if readlabmeta_json_file is None:
             readlabmeta_json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file that was created by the read-lab-metadata"
@@ -52,6 +55,11 @@ class BioinfoMetadata:
             )
         self.readlabmeta_json_file = readlabmeta_json_file
 
+        # Initialize j_data object
+        stderr.print("[blue]Reading lab metadata json")
+        self.j_data = self.collect_info_from_lab_json()
+
+        # Parse input/output folder
         if input_folder is None:
             self.input_folder = relecov_tools.utils.prompt_path(
                 msg="Select the input folder"
@@ -65,13 +73,13 @@ class BioinfoMetadata:
         else:
             self.output_folder = output_folder
         
+        # Parse bioinfo configuration
         self.bioinfo_json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
         if software is None:
             software = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
             )
         self.software_name = software
-
         available_software = self.get_available_software(self.bioinfo_json_file)
         bioinfo_config = ConfigJson(self.bioinfo_json_file)
         if self.software_name in available_software:
@@ -186,6 +194,11 @@ class BioinfoMetadata:
                 'valid', 
                 "Successfull validation of mandatory files."
             )
+        relecov_tools.utils.print_log_report(
+            self.log_report,
+            method_name,
+            ['valid','waring']
+        )
         return
     
     def add_bioinfo_results_metadata(self, files_dict, j_data):
@@ -228,7 +241,7 @@ class BioinfoMetadata:
                 self.update_log_report(
                     method_name,
                     'warning', 
-                    f"No metadata to perform standard mapping while processing '{self.software_name}.{key}'"
+                    f"No metadata found to perform standard mapping when processing '{self.software_name}.{key}'"
                 )
                 continue
         relecov_tools.utils.print_log_report(
@@ -592,34 +605,19 @@ class BioinfoMetadata:
                         self.log_report, method_name, ['error']
                     )
                 )
-            long_table = LongTableParse(files_list_processed, self.output_folder, self.log_report)
+            long_table = LongTableParse(files_list_processed, self.output_folder, self.j_data)
+            # Parsing long table data and saving it
             long_table.parsing_csv()
+            # Adding custom long_table data to j_data
+            self.j_data = long_table.add_custom_longtable_data(self.j_data)
         elif len(files_list) >1:
             self.update_log_report(
                 method_name, 
                 'warning',
                 f"Found {len(files_list)} variants_long_table files. This version is unable to process more than one variants long table each time."
             )
-        
-        relecov_tools.utils.print_log_report(
-            self.log_report, method_name, ['valid', 'warning']
-        )
         # This needs to return none to avoid being parsed by method mapping-over-table  
         return None
-
-
-    # TODO: add log report
-    def include_custom_data(self, j_data):
-        """Include custom fields like variant-long-table path"""
-        condition = os.path.join(self.input_folder, "*variants_long_table*.csv")
-        f_path = relecov_tools.utils.get_files_match_condition(condition)
-        if len(f_path) == 0:
-            long_table_path = "Not Provided [GENEPIO:0001668]"
-        else:
-            long_table_path = f_path[0]
-        for row in j_data:
-            row["long_table_path"] = long_table_path
-        return j_data
 
     # TODO: this is too harcoded. Find a way to add file's path of required files when calling handlers functions. 
     def add_fixed_values(self, j_data):
@@ -679,17 +677,15 @@ class BioinfoMetadata:
         files_found_dict = self.scann_directory()
         stderr.print("[blue]Validating required files...")
         self.validate_software_mandatory_files(files_found_dict)
-        stderr.print("[blue]Reading lab metadata json")
-        j_data = self.collect_info_from_lab_json()
         stderr.print(f"[blue]Adding metadata from {self.input_folder} into read lab metadata...")
-        j_data = self.add_bioinfo_results_metadata(files_found_dict, j_data)
+        self.j_data = self.add_bioinfo_results_metadata(files_found_dict, self.j_data)
         stderr.print("[blue]Adding software versions to read lab metadata...")
-        j_data = self.get_multiqc_software_versions(files_found_dict['workflow_summary'], j_data)       
+        self.j_data = self.get_multiqc_software_versions(files_found_dict['workflow_summary'], self.j_data)       
         # FIXME: this isn't refactored and requires to be reimplemented from older version of this module
         ##stderr.print("[blue]Adding variant long table path")
         ##j_data = self.include_custom_data(j_data)
         stderr.print("[blue]Adding fixed values")
-        j_data = self.add_fixed_values(j_data)
+        self.j_data = self.add_fixed_values(self.j_data)
         # Generate readlab + bioinfolab processed metadata.
         file_name = (
             "bioinfo_" 
@@ -699,6 +695,6 @@ class BioinfoMetadata:
         stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
         file_path = os.path.join(self.output_folder, file_name)
-        relecov_tools.utils.write_json_fo_file(j_data, file_path)
+        relecov_tools.utils.write_json_fo_file(self.j_data, file_path)
         stderr.print("[green]Sucessful creation of bioinfo analyis file")
         return True

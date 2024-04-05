@@ -33,7 +33,7 @@ class LongTableParse:
 
     """
 
-    def __init__(self, file_path=None, output_directory=None):
+    def __init__(self, file_path=None, output_directory=None, j_data=None):
         if file_path is None:
             self.file_path = relecov_tools.utils.prompt_path(
                 msg="Select the csv file which contains variant long table information"
@@ -68,6 +68,13 @@ class LongTableParse:
         #self.long_table_heading = config_json.get_configuration("long_table_heading")
         self.software_config = config_json.get_configuration('viralrecon')
         self.long_table_heading = self.software_config["variants_long_table"]["content"]
+
+        if not j_data:
+            stderr.print("[red]\tError: No read lab metadata file found. Long-table-parsing aborted.")
+            sys.exit(1)
+        else:
+            self.j_data = j_data
+
     def validate_file(self, heading):
         """Check if long table file has all mandatory fields defined in
         configuration file
@@ -88,8 +95,7 @@ class LongTableParse:
         with open(self.file_path, encoding="utf-8-sig") as fh:
             lines = fh.readlines()
 
-        stderr.print("[green]Successful checking heading fields")
-        stderr.print("[blue]Parsing the input file")
+        stderr.print("[green]\tSuccessful checking heading fields")
         heading_index = {}
         headings_from_csv = lines[0].strip().split(",")
         for heading in self.long_table_heading.values():
@@ -124,7 +130,7 @@ class LongTableParse:
             else:
                 variant_dict["Gene"] = line_s[heading_index["GENE"]]
                 samp_dict[sample].append(variant_dict)
-        stderr.print("[green]Successful parsing data")
+        stderr.print("[green]\tSuccessful parsing data")
         return samp_dict
 
     def convert_to_json(self, samp_dict):
@@ -148,21 +154,35 @@ class LongTableParse:
 
     def save_to_file(self, j_list):
         """Transform the parsed data into a json file"""
-        stderr.print("[blue]Saving parsed data to file")
         date_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         file_name = "long_table_" + date_now + ".json"
         file_path = os.path.join(self.output_directory, file_name)
 
-        with open(file_path, "w") as fh:
-            fh.write(json.dumps(j_list, indent=4))
-        return
+        try:
+            with open(file_path, "w") as fh:
+                fh.write(json.dumps(j_list, indent=4))
+            stderr.print("[green]\tParsed data successfully saved to file:", file_path)
+        except Exception as e:
+            stderr.print("[red]\tError saving parsed data to file:", str(e))
+    
+    def add_custom_longtable_data(self, j_data):
+        """Auxiliary function to add custom fields likevariant-long-table into j_data"""
+        if len(self.file_path) == 0:
+            long_table_path = "Not Provided [GENEPIO:0001668]"
+        else:
+            long_table_path = self.file_path
+        for row in j_data:
+            row["long_table_path"] = str(long_table_path)
+        return j_data
 
     def parsing_csv(self):
         """
         Function called when using the relecov-tools long-table-parse function.
         """
-        stderr.print("[blue]Starting reading the input file")
+        # Parsing longtable file
         parsed_data = self.parse_file()
         j_list = self.convert_to_json(parsed_data)
+        # Saving long table data into a file
         self.save_to_file(j_list)
-        stderr.print("[green]Process completed")
+        stderr.print("[green]\tProcess completed")
+        return
