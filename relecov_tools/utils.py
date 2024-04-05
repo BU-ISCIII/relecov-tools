@@ -17,6 +17,7 @@ from itertools import islice
 from Bio import SeqIO
 from rich.console import Console
 from datetime import datetime
+from tabulate import tabulate
 
 log = logging.getLogger(__name__)
 
@@ -344,12 +345,12 @@ def select_most_recent_files_per_sample(paths_list):
 
     # Iterate over duplicated files to select the most recent one for each sample
     for sample_name, file_paths in duplicated_files:
-        stderr.print(f"More than one pangolin file found for sample {sample_name}. Selecting the most recent one.")
+        stderr.print(f"\tMore than one file found for sample {sample_name}. Selecting the most recent one.")
         # Sort files by modification time (most recent first)
         sorted_files = sorted(file_paths, key=lambda file_path: os.path.getmtime (file_path), reverse=True)
         # Select the most recent file
         selected_file = sorted_files[0]
-        stderr.print(f"Selected file for sample {sample_name}: {selected_file}")
+        stderr.print(f"\tSelected file for sample {sample_name}: {selected_file}")
         # Remove other files for the same sample from the filtered_files dictionary
         filename_groups[sample_name] = [selected_file]
 
@@ -359,3 +360,24 @@ def select_most_recent_files_per_sample(paths_list):
     # Reformat variable to retrieve a list of file paths
     file_path_list = [sample_file_path for _, sample_file_path in filename_groups]
     return file_path_list
+
+def print_log_report(log_report, categories=None, sections=["warning", "valid", "error"]):
+    color_codes = {
+        "error": "\033[91m",  # Red
+        "warning": "\033[93m",  # Orange
+        "valid": "\033[92m",  # Green
+        "reset": "\033[0m"  # Reset color
+    }
+
+    table_data = []
+    for section_name, section_data in log_report.items():
+        if section_name in sections:
+            for category, items in section_data.items():
+                if categories is None or category in categories:
+                    colored_category = f"{color_codes[section_name]}{category}{color_codes['reset']}"
+                    for item in items:
+                        colored_message = f"{color_codes[section_name]}{item}{color_codes['reset']}"
+                        table_data.append([section_name, colored_category, colored_message])
+
+    print(tabulate(table_data, headers=["Log type", "Category", "Message"], tablefmt="fancy_grid"))
+
