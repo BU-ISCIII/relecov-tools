@@ -33,7 +33,7 @@ class BioinfoMetadata:
         readlabmeta_json_file=None,
         input_folder=None,
         output_folder=None,
-        software='viralrecon',
+        software=None,
     ):
         self.log_report = {'error': {}, 'valid': {}, 'warning': {}}
         if readlabmeta_json_file is None:
@@ -100,6 +100,7 @@ class BioinfoMetadata:
         return available_software
     
     def update_log_report(self, method_name, status, message):
+        """Update progress log report"""
         if status == 'valid':
             self.log_report['valid'].setdefault(method_name, []).append(message)
         elif status == 'error':
@@ -156,7 +157,8 @@ class BioinfoMetadata:
             return files_found
 
     def validate_software_mandatory_files(self, files_dict):
-        method_name=f"self.validate_software_mandatory_files.__name__"
+        """"Validates the presence of all mandatory files as defined in the software configuration JSON."""
+        method_name=f"{self.validate_software_mandatory_files.__name__}"
         missing_required = []
         for key in self.software_config:
             if self.software_config[key].get('required') is True:
@@ -192,11 +194,12 @@ class BioinfoMetadata:
     def add_bioinfo_results_metadata(self, files_dict, j_data):
         """
         Adds metadata from bioinformatics results to j_data.
-            1. Handles metadata in bioinformatic files found  
+            1. Handles metadata in bioinformatic files found.
             2. Mapping handled bioinfo metadata into j_data. 
         """
         method_name=f"{self.add_bioinfo_results_metadata.__name__}"
         for key in self.software_config.keys():
+            # Update bioinfo cofiguration key/scope
             self.current_config_key = key
             # This skip files that will be parsed with other methods
             if key == 'workflow_summary' or key == "fixed_values":
@@ -214,7 +217,7 @@ class BioinfoMetadata:
                 continue
 
             # Handling files
-            data_to_map = self.handling_files(files_dict[key], key)
+            data_to_map = self.handling_files(files_dict[key])
             
             # Mapping data to j_data
             if data_to_map:
@@ -238,27 +241,51 @@ class BioinfoMetadata:
         )
         return j_data_mapped
 
-    def handling_files(self, file_list, file_key):
-        """Handles different file formats (sourced from ./metadata_homogenizer.py)
+    def handling_files(self, file_list):
+        """
+        (inspired from ./metadata_homogenizer.py)
+        Handles different file formats to extract data regardless of their structure. The goal is to extract the data contained in files specified in ${file_list}, using either 'standard' handlers defined in this class or pipeline-specific file handlers.
+
+        A file handler method must generate a data structure as follow:
+
+            {
+                'SAMPLE1': {
+                    'field1': 'value1'
+                    'field2': 'value2'
+                    'field3': 'value3'
+                },
+                SAMPLE2': {
+                    'field1': 'value1'
+                    'field2': 'value2'
+                    'field3': 'value3'
+                },
+                ...
+            }
+
+        Input:
+            file_list (list): A list of file path/s to be processed.
+
+        Returns:
+            dict: A single dictionary containing extracted data for each sample.
         """
         method_name=f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_files.__name__}"
-        file_name = self.software_config[file_key].get('fn')
+        file_name = self.software_config[self.current_config_key].get('fn')
         file_extension = os.path.splitext(file_name)[1]
 
         # Parsing key position
         try:
-            self.software_config[file_key]['sample_col_idx']
-            sample_idx_possition = self.software_config[file_key]['sample_col_idx']-1
+            self.software_config[self.current_config_key]['sample_col_idx']
+            sample_idx_possition = self.software_config[self.current_config_key]['sample_col_idx']-1
         except KeyError:
             sample_idx_possition = None
             self.update_log_report(
                 method_name,
                 'warning', 
-                f"No sample-index-column defined in '{self.software_name}.{file_key}'. Using default instead."
+                f"No sample-index-column defined in '{self.software_name}.{self.current_config_key}'. Using default instead."
             )
         
         # Parsing files
-        func_name =  self.software_config[file_key]["function"]
+        func_name =  self.software_config[self.current_config_key]["function"]
         if func_name is None:
             if file_name.endswith('.csv'):
                 data = relecov_tools.utils.read_csv_file_return_dict(
@@ -307,7 +334,7 @@ class BioinfoMetadata:
         return data
 
     def get_multiqc_software_versions(self, file_list, j_data):
-        """Reads html file, finds table containing programs info, and map it to j_data"""
+        """Reads multiqc html file, finds table containing software version info, and map it to j_data"""
         method_name=f"{self.get_multiqc_software_versions.__name__}"
         # Handle multiqc_report.html
         f_path = file_list[0]
@@ -400,9 +427,9 @@ class BioinfoMetadata:
         )
         return j_data
 
-    # TODO: update log report
     def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
-        """Auxiliar function to iterate over table's content and map it to metadata (j_data)"""
+        """
+        Function that maps structure data containing fields per sample into j_data.  """
         method_name=f"{self.mapping_over_table.__name__}:{self.software_name}.{self.current_config_key}"
         errors = []
         field_errors = {}
@@ -461,7 +488,7 @@ class BioinfoMetadata:
         return j_data
 
     def handle_pangolin_data(self, files_list):
-        """Parse pangolin data (csv) into JSON and map it to each sample in the provided j_data.
+        """File handler to parse pangolin data (csv) into JSON structured format.
         """
         method_name=f"{self.add_bioinfo_results_metadata.__name__}:{self.handle_pangolin_data.__name__}"
         # Handling pangolin data
@@ -516,7 +543,7 @@ class BioinfoMetadata:
         return pango_data_processed
 
     def handle_consensus_fasta(self, files_list):
-        """Handling consensus fasta data (*.consensus.fa)"""
+        """File handler to parse consensus fasta data (*.consensus.fa) into JSON structured format"""
         method_name=f"{self.add_bioinfo_results_metadata.__name__}:{self.handle_consensus_fasta.__name__}"
         consensus_data_processed = {}
         missing_consens = []
