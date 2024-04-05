@@ -21,9 +21,9 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
-# FIXME: longtable parsing old method needs to be recovered. New implementation has errors while parsing it.
 # TODO: Add method to validate bioinfo_config.json file requirements.
 # TODO: replace submitting_lab_id by sequencing_sample_id
+# TODO: mv pipeline-specific methods to future assets/pipeline_utils/
 class BioinfoMetadata:
     def __init__(
         self,
@@ -228,7 +228,7 @@ class BioinfoMetadata:
                 self.update_log_report(
                     method_name,
                     'warning', 
-                    f"No metadata generated while processing '{self.software_name}.{key}'"
+                    f"No metadata to perform standard mapping while processing '{self.software_name}.{key}'"
                 )
                 continue
         relecov_tools.utils.print_log_report(
@@ -575,25 +575,36 @@ class BioinfoMetadata:
             )
         return consensus_data_processed
 
-    def parse_long_table(self, long_table_path, output_folder):
-        file_match = os.path.join(long_table_path, "variants_long_table*.csv")
-        table_path = glob.glob(file_match)
-        if len(table_path) == 1:
-            table_path = glob.glob(file_match)[0]
-        else:
-            log.error("variants_long_table files found = %s", len(table_path))
-            stderr.print(
-                f"[red]Found {len(table_path)} variants_long_table files in ",
-                f"[red]{long_table_path}, aborting",
+    def parse_long_table(self, files_list):
+        method_name = f"{self.parse_long_table.__name__}"
+        # Hanfling long table data
+
+        if len(files_list) == 1:
+            files_list_processed = files_list[0]
+            if not os.path.isfile(files_list_processed):
+                self.update_log_report(
+                    method_name,
+                    'error',
+                    f"{files_list_processed} given file is not a file"
+                )
+                sys.exit(
+                    relecov_tools.utils.print_log_report(
+                        self.log_report, method_name, ['error']
+                    )
+                )
+            long_table = LongTableParse(files_list_processed, self.output_folder, self.log_report)
+            long_table.parsing_csv()
+        elif len(files_list) >1:
+            self.update_log_report(
+                method_name, 
+                'warning',
+                f"Found {len(files_list)} variants_long_table files. This version is unable to process more than one variants long table each time."
             )
-            sys.exit(1)
-        if not os.path.isfile(table_path):
-            log.error("variants_long_table given file is not a file")
-            stderr.print("[red]Variants_long_table file do not exist, Aborting")
-            sys.exit(1)
-        long_table = LongTableParse(table_path, output_folder)
         
-        long_table.parsing_csv()
+        relecov_tools.utils.print_log_report(
+            self.log_report, method_name, ['valid', 'warning']
+        )
+        # This needs to return none to avoid being parsed by method mapping-over-table  
         return None
 
 
@@ -679,9 +690,6 @@ class BioinfoMetadata:
         ##j_data = self.include_custom_data(j_data)
         stderr.print("[blue]Adding fixed values")
         j_data = self.add_fixed_values(j_data)
-        stderr.print("[blue]Parsing variants_long_table info to json format...")
-        self.parse_long_table(self.input_folder, self.output_folder)
-
         # Generate readlab + bioinfolab processed metadata.
         file_name = (
             "bioinfo_" 

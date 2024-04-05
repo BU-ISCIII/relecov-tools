@@ -29,7 +29,7 @@ class LongTableParse:
     - parse_a_list_of_dictionaries() : returns generated_JSON
     - saving_file(generated_JSON)
     - parsing_csv() : It manages all this proccess:
-       - calling first to parse_a_list_of_dictionaries() and then calling to saving_file()
+        - calling first to parse_a_list_of_dictionaries() and then calling to saving_file()
 
     """
 
