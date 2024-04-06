@@ -174,6 +174,8 @@ def read_md5_checksum(file_name, avoid_chars=list()):
     translation = str.maketrans("", "", "'\"")
     if any("\t" in line for line in lines):
         lines = [line.strip().translate(translation).split("\t") for line in lines]
+    elif any("," in line for line in lines):
+        lines = [line.strip().translate(translation).split(",") for line in lines]
     else:
         lines = [line.strip().translate(translation).split("  ") for line in lines]
     clean_lines = [

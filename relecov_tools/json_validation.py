@@ -98,11 +98,19 @@ class SchemaValidation:
         stderr.print("[blue] VALIDATION SUMMARY")
         stderr.print("[blue] --------------------")
         for error_type in errors.keys():
+            num_of_errors = str(errors[error_type])
+            field_with_error = error_keys[error_type]
+            log.error(
+                "%s samples failed validation for %s:\n%s",
+                num_of_errors,
+                field_with_error,
+                error_type,
+            )
             stderr.print(
                 "[red]"
-                + str(errors[error_type])
+                + num_of_errors
                 + " samples failed validation for "
-                + f"{error_keys[error_type]}:\n"
+                + f"{field_with_error}:\n"
                 + error_type
             )
             stderr.print("[red] --------------------")
@@ -141,7 +149,7 @@ class SchemaValidation:
             stderr.print("Start preparation of invalid samples")
 
             for row in invalid_json:
-                sample_list.append(str(row["collecting_lab_sample_id"]))
+                sample_list.append(str(row["sequencing_sample_id"]))
 
             wb = openpyxl.load_workbook(metadata)
             ws_sheet = wb["METADATA_LAB"]

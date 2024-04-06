@@ -192,10 +192,10 @@ class MappingSchema:
                     formated_data = {
                         x: "--".join(
                             [
-                                self.json_data[idx][f].split(" [", 1)[0]
+                                self.json_data[idx].get(f, "").split(" [", 1)[0]
                                 for f in y
                                 if "Not Provided"
-                                not in self.json_data[idx][f].split(" [", 1)[0]
+                                not in self.json_data[idx].get(f, "").split(" [", 1)[0]
                             ]
                         )
                         for x, y in additional_data.items()
@@ -203,11 +203,16 @@ class MappingSchema:
                     if "fastq_filepath" in key:
                         formated_data[key] = formated_data[key].replace("--", "/")
                     mapped_json_data[idx][key] = formated_data[key]
+        elif self.destination_schema == "GISAID":
+            for idx in range(len(self.json_data)):
+                mapped_json_data[idx]["covv_type"] = "betacoronavirus"
         """
         This is a temporal solution for library_strategy. Once the values are also
         mapped by the ontology (not only the fields) this should not be necessary
         """
         for sample in mapped_json_data:
+            if not sample.get("library_strategy"):
+                continue
             sample["library_strategy"] = sample["library_strategy"].strip(" strategy")
 
         return mapped_json_data

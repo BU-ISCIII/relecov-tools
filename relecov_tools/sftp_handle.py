@@ -1,17 +1,23 @@
 #!/usr/bin/env python
-from datetime import datetime
-from itertools import islice
 import copy
 import logging
 import json
-import rich.console
-import paramiko
 import sys
 import os
 import stat
 import yaml
-import openpyxl
+import warnings
+import rich.console
+import paramiko
 import relecov_tools.utils
+from datetime import datetime
+from itertools import islice
+from collections import OrderedDict
+from secrets import token_hex
+from csv import writer as csv_writer, Error as CsvError
+from openpyxl import load_workbook as openpyxl_load_workbook
+from pandas import read_excel, ExcelWriter, concat
+from pandas.errors import ParserError, EmptyDataError
 from relecov_tools.config_json import ConfigJson
 
 # from relecov_tools.rest_api import RestApi
@@ -107,6 +113,7 @@ class SftpHandle:
             self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
             self.target_folders = self.target_folders.split(",")
+        self.logs = {}
         if self.sftp_passwd is None:
             self.sftp_passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password"
@@ -175,7 +182,7 @@ class SftpHandle:
         if not subfolders:
             return [folder_name]
 
-        def recursive_list(folder_name, client):
+        def recursive_list(folder_name):
             try:
                 attribute_list = self.client.listdir_attr(folder_name)
             except (FileNotFoundError, OSError) as e:
@@ -188,13 +195,13 @@ class SftpHandle:
                 if stat.S_ISDIR(attribute.st_mode):
                     abspath = os.path.join(folder_name, attribute.filename)
                     directory_list.append(abspath)
-                    recursive_list(abspath, client)
+                    recursive_list(abspath)
                 else:
                     continue
             return directory_list
 
         if recursive:
-            directory_list = recursive_list(folder_name, self.client)
+            directory_list = recursive_list(folder_name)
             return directory_list
         try:
             directory_list = [
@@ -276,6 +283,7 @@ class SftpHandle:
         Returns:
             fetched_files(list(str)): list of successfully downloaded files
         """
+
         fetched_files = list()
         log.info("Trying to fetch files in remote server")
         stderr.print(f"Fetching {len(file_list)} files from {folder}")
@@ -321,7 +329,9 @@ class SftpHandle:
         avoid_chars = self.avoidable_characters
         hash_dict = relecov_tools.utils.read_md5_checksum(fetched_md5, avoid_chars)
         if not hash_dict:
-            log.warning("md5sum file could not be read, md5 hashes won't be validated")
+            error_text = "md5sum file could not be read, md5 hashes won't be validated"
+            log.warning(error_text)
+            self.include_warning(error_text)
             return fetched_files, False
         # check md5 checksum for each file
         for f_name in hash_dict.keys():
@@ -356,10 +366,13 @@ class SftpHandle:
         sample_data_file = "samples_data_" + prefix_file_name + ".json"
         sample_data_path = os.path.join(local_folder, sample_data_file)
         os.rename(metadata_file, os.path.join(local_folder, new_metadata_file))
+        error_text = "Sample %s incomplete. Not added to final Json"
+
         data = copy.deepcopy(samples_dict)
         for sample, values in data.items():
             if not all(val for val in values):
-                log.warning("Sample %s incomplete. Not added to final Json", sample)
+                log.error(str(error_text % sample))
+                self.include_error(str(error_text % sample), sample)
                 samples_to_delete.append(sample)
                 continue
             # TODO: Move these keys to configuration.json
@@ -368,12 +381,11 @@ class SftpHandle:
             if values.get("sequence_file_R2_fastq"):
                 values["r2_fastq_filepath"] = local_folder
                 values["fastq_r2_md5"] = md5_dict.get(values["sequence_file_R2_fastq"])
-        data = {key: val for key, val in data.items() if key not in samples_to_delete}
+        if samples_to_delete:
+            data = {k: v for k, v in data.items() if k not in samples_to_delete}
         with open(sample_data_path, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
-        log.info(
-            "Successfully created file with sample names list %s", sample_data_path
-        )
+        log.info("Successfully created json file with samples %s", sample_data_path)
         return
 
     def remove_duplicated_values(self, sample_file_dict):
@@ -387,26 +399,78 @@ class SftpHandle:
         Returns:
             clean_sample_dict: sample_dictionary without duplications in values
         """
-        set_of_values = set()
-        duplicated_keys = set()
-        for sample, fastqs in sample_file_dict.items():
-            # Dictionary keys are immutable, so you cannot use a regular set for a dict
-            hashable_fastqs = frozenset(fastqs.items())
-
-            if hashable_fastqs in set_of_values:
-                duplicated_keys.add(sample)
-            else:
-                set_of_values.add(hashable_fastqs)
+        inverted_dict = {}
+        for sample, fastq_dict in sample_file_dict.items():
+            # Dictionary values are not hashable, so you need to create a tuple of them
+            samp_fastqs = tuple(fastq_dict.values())
+            # Setting values as keys to find those samples refering to the same file
+            for fastq in samp_fastqs:
+                inverted_dict[fastq] = inverted_dict.get(fastq, []) + [sample]
+        duplicated_dict = {k: v for k, v in inverted_dict.items() if len(v) > 1}
+        dup_samples_list = [samp for dups in duplicated_dict.values() for samp in dups]
         non_duplicated_keys = {
-            k: v for k, v in sample_file_dict.items() if k not in duplicated_keys
+            k: v for k, v in sample_file_dict.items() if k not in dup_samples_list
         }
         clean_sample_dict = {key: sample_file_dict[key] for key in non_duplicated_keys}
-        if duplicated_keys:
-            log.warning("Found duplicated files in metadata")
-            stderr.print("[Orange]Found samples in metadata refering to the same file")
-            stderr.print("[Orange]These samples won't be processed: ", duplicated_keys)
+        if dup_samples_list:
+            error_text = "Multiple samples in metadata pointing to the same file: %s"
+            log.warning(error_text % duplicated_dict)
+            self.include_warning(error_text % duplicated_dict)
+            stderr.print(f"[Orange]{error_text}")
+            stderr.print("[Orange]These samples won't be processed: ", dup_samples_list)
+            for fastq, samples in duplicated_dict.items():
+                [self.include_error(str(error_text % fastq), samp) for samp in samples]
 
         return clean_sample_dict
+
+    def read_metadata_file(self, meta_f_path, return_data=True):
+        """Read excel file, check if the header matches with the one defined in config
+
+        Args:
+            meta_f_path (str): Path to the excel_file
+
+        Raises:
+            MetadataError: If the header in the excel is different from config
+
+        Returns:
+            ws_metadata_lab: openpyxl's workbook metadata sheet of the excel file
+            metadata_header: column names of the header
+            header_row: row where the header is located in the sheet
+        """
+        warnings.simplefilter(action="ignore", category=UserWarning)
+        wb_file = openpyxl_load_workbook(meta_f_path, data_only=True)
+        ws_metadata_lab = wb_file[self.metadata_processing.get("excel_sheet")]
+        # find out the index for file names
+        header_flag = self.metadata_processing.get("header_flag")
+        try:
+            header_row = [
+                i + 1 for i, x in enumerate(ws_metadata_lab.values) if header_flag in x
+            ][0]
+        except IndexError:
+            error_text = "Header could not be found for excel file %s"
+            raise MetadataError(str(error_text % os.path.basename(meta_f_path)))
+        for cell in ws_metadata_lab[header_row]:
+            cell.value = cell.value.strip()
+        metadata_header = [x.value for x in ws_metadata_lab[header_row]]
+        meta_column_list = self.metadata_lab_heading
+        if meta_column_list != metadata_header[1:]:
+            diffs = [
+                x
+                for x in set(metadata_header[1:] + meta_column_list)
+                if x not in meta_column_list or x not in metadata_header
+            ]
+            log.error(
+                "Config field metadata_lab_heading is different from .xlsx header"
+            )
+            stderr.print(
+                "[red]Header in metadata file is different from config file, aborting"
+            )
+            stderr.print("[red]Differences: ", diffs)
+            raise MetadataError(f"Metadata header different from config: {diffs}")
+        if return_data:
+            return ws_metadata_lab, metadata_header, header_row
+        else:
+            return True
 
     def get_sample_fastq_file_names(self, local_folder, meta_f_path):
         """Read excel metadata template and create dictionary with files for each sample
@@ -425,76 +489,52 @@ class SftpHandle:
             log.error("Metadata file does not exist on %s", local_folder)
             stderr.print("[red] METADATA_LAB.xlsx do not exist in" + local_folder)
             return False
-        wb_file = openpyxl.load_workbook(meta_f_path, data_only=True)
-        ws_metadata_lab = wb_file[self.metadata_processing.get("excel_sheet")]
         sample_file_dict = {}
-        # find out the index for file names
-        meta_column_list = self.metadata_lab_heading
-        header_flag = self.metadata_processing.get("header_flag")
-        header_row = [
-            idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
-        ][0]
-        for cell in ws_metadata_lab[header_row]:
-            cell.value = cell.value.strip()
-        metadata_header = [x.value for x in ws_metadata_lab[header_row]]
-        if (
-            meta_column_list != metadata_header[1:]
-            and "Sequencing Institution" in metadata_header
-        ):
-            diffs = [
-                x
-                for x in (metadata_header[1:] + meta_column_list)
-                if x not in meta_column_list or x not in metadata_header
-            ]
-            log.error(
-                "Config field metadata_lab_heading is different from .xlsx header"
-            )
-            stderr.print(
-                "[red]Header in metadata file is different from config file, aborting"
-            )
-            stderr.print("[red]Differences: ", diffs)
-            raise MetadataError(f"Metadata header different from config: {diffs}")
-        index_sampleID = metadata_header.index("Sample ID given for sequencing")
-        index_layout = metadata_header.index("Library Layout")
-        index_fastq_r1 = metadata_header.index("Sequence file R1 fastq")
-        index_fastq_r2 = metadata_header.index("Sequence file R2 fastq")
-        for row in islice(ws_metadata_lab.values, header_row, ws_metadata_lab.max_row):
+        metadata_ws, meta_header, header_row = self.read_metadata_file(meta_f_path)
+        index_sampleID = meta_header.index("Sample ID given for sequencing")
+        index_layout = meta_header.index("Library Layout")
+        index_fastq_r1 = meta_header.index("Sequence file R1 fastq")
+        index_fastq_r2 = meta_header.index("Sequence file R2 fastq")
+        for row in islice(metadata_ws.values, header_row, metadata_ws.max_row):
             if row[index_sampleID] is not None:
+                row_complete = True
                 try:
                     s_name = str(row[index_sampleID])
                 except ValueError as e:
-                    stderr.print("[red] Unable to convert to string. ", e)
+                    stderr.print("[red]Unable to convert to string. ", e)
+                    continue
                 if s_name not in sample_file_dict:
                     sample_file_dict[s_name] = {}
                 else:
-                    print("Found duplicated sample ", s_name)
+                    stderr.print("Found duplicated sample name: ", s_name)
+                    s_name = "_".join([s_name, str(token_hex(nbytes=8))])
+                    stderr.print("Duplicated sample renamed to ", s_name)
+                    sample_file_dict[s_name] = {}
                 if row[index_layout] == "paired" and row[index_fastq_r2] is None:
-                    log.error(
-                        "Sample %s is paired-end, but no R2 given", row[index_sampleID]
-                    )
-                    continue
+                    error_text = "Sample %s is paired-end, but no R2 given"
+                    log.error(str(error_text % str(row[index_sampleID])))
+                    self.include_error(error_text % str(row[index_sampleID]), s_name)
+                    row_complete = False
                 if row[index_layout] == "single" and row[index_fastq_r2] is not None:
-                    log.error(
-                        "Sample %s is single-end, but R1&R2 given", row[index_sampleID]
-                    )
-                    continue
-                if row[index_fastq_r1] is not None:
-                    # TODO: move these keys to configuration.json
-                    sample_file_dict[s_name]["sequence_file_R1_fastq"] = row[
-                        index_fastq_r1
-                    ]
-                else:
-                    log.error("Fastq_R1 not defined in Metadata for sample %s", s_name)
-                    stderr.print(
-                        "[red]No fastq R1 file for sample " + s_name + ". Skipping"
-                    )
-                    continue
-                if row[index_fastq_r2] is not None:
-                    sample_file_dict[s_name]["sequence_file_R2_fastq"] = row[
-                        index_fastq_r2
-                    ]
-                # if not self.check_sample_files(sample_file_dict[s_name]):
-
+                    error_text = "Sample %s is single-end, but R1&R2 given"
+                    log.error(str(error_text % str(row[index_sampleID])))
+                    self.include_error(error_text % str(row[index_sampleID]), s_name)
+                    row_complete = False
+                if row_complete:
+                    if row[index_fastq_r1] is not None:
+                        # TODO: move these keys to configuration.json
+                        sample_file_dict[s_name]["sequence_file_R1_fastq"] = row[
+                            index_fastq_r1
+                        ]
+                        if row[index_fastq_r2] is not None:
+                            sample_file_dict[s_name]["sequence_file_R2_fastq"] = row[
+                                index_fastq_r2
+                            ]
+                    else:
+                        error_text = "Fastq_R1 not defined in Metadata for sample %s"
+                        log.error(str(error_text % s_name))
+                        stderr.print(f"[red]{str(error_text % s_name)}")
+                        self.include_error(str(error_text % s_name), s_name)
         # Remove duplicated files
         clean_sample_dict = self.remove_duplicated_values(sample_file_dict)
         return clean_sample_dict
@@ -524,7 +564,7 @@ class SftpHandle:
         try:
             self.get_from_sftp(target_meta_file, local_meta_file)
         except (IOError, PermissionError) as e:
-            raise type(e)(f"[red]Unable to fetch metadata file {e.name}")
+            raise type(e)(f"[red]Unable to fetch metadata file {e}")
         log.info(
             "Obtained metadata file %s from %s",
             local_meta_file,
@@ -565,28 +605,27 @@ class SftpHandle:
             log.info("Files in %s match with metadata file", remote_folder)
             stderr.print("Successfully validated files based on metadata")
         else:
-            log.warning("Some files in %s do not match metadata file", remote_folder)
-            stderr.print(
-                "Some files in "
-                + remote_folder
-                + " do not match the ones described in metadata"
-            )
+            log_text = "Some files in %s do not match the ones described in metadata"
+            log.warning(log_text % remote_folder)
+            stderr.print(f"[gold1]{log_text % remote_folder}")
             set_list = set(metafiles_list)
             mismatch_files = [fi for fi in filtered_files_list if fi not in set_list]
             mismatch_rev = [fi for fi in set_list if fi not in filtered_files_list]
-            log.warning(
-                "Files in folder not present in metadata %s", str(mismatch_files)
-            )
-            log.warning(
-                "Files in metadata not present in folder: %s", str(mismatch_rev)
-            )
+            error_text1 = "Files in folder missing in metadata %s"
+            log.warning(error_text1 % str(mismatch_files))
+            self.include_warning(error_text1 % str(mismatch_files))
+            error_text2 = "Files in metadata missing in folder %s"
+            log.warning(error_text2 % str(mismatch_rev))
+            self.include_warning(error_text2 % str(mismatch_rev))
             # Try to check if the metadata filename lacks the proper extension
             log.info("Trying to match files without proper file extension")
             sample_files_dict = self.process_filedict(
                 sample_files_dict, filtered_files_list
             )
         if not any(value for value in sample_files_dict.values()):
-            raise FileNotFoundError("No files from metadata found in ", remote_folder)
+            raise FileNotFoundError(
+                "No files from metadata found in %s" % remote_folder
+            )
         return sample_files_dict, local_meta_file
 
     def delete_remote_files(self, remote_folder, files):
@@ -607,6 +646,304 @@ class SftpHandle:
                 continue
         return
 
+    def move_processing_fastqs(self, folders_with_metadata):
+        """Gather all the files from any subfolder into a processing folder
+
+        Args:
+            folders_with_metadata (dict(str:list)): Dictionary updated from merge_md5sums()
+
+        Returns:
+            folders_with_metadata (dict(str:list)): Same dict updated with files successfully moved
+        """
+        log.info("Moving remote files to each temporal processing folder")
+        stderr.print("[blue]Moving remote files to each temporal processing folder")
+        for folder, files in folders_with_metadata.items():
+            self.current_folder = folder.split("/")[0]
+            successful_files = []
+            for file in files:
+                if not file.endswith(tuple(self.allowed_file_ext)):
+                    continue
+                file_dest = os.path.join(folder, os.path.basename(file))
+                try:
+                    # Paramiko.SSHClient.sftp_open does not have a method to copy files
+                    self.client.rename(file, file_dest)
+                    successful_files.append(file_dest)
+                except OSError:
+                    if file in folders_with_metadata[folder]:
+                        error_text = "File named %s already in %s. Skipped"
+                        log.warning(error_text % (file, self.current_folder))
+                        self.include_warning(error_text % (file, self.current_folder))
+                    else:
+                        error_text = "Error while moving file %s"
+                        log.error(error_text % file)
+                        self.include_error(error_text % file)
+            folders_with_metadata[folder] = successful_files
+        return folders_with_metadata
+
+    def merge_md5sums(self, folders_with_metadata):
+        """Download the md5sums for each folder, merge them into a single one,
+        upload them to the remote processing folder.
+
+        Args:
+            folders_with_metadata (dict(str:list)): Dictionary with remote folders
+            and their files. All subfolder filenames are merged into a single key.
+
+        Raises:
+            FileNotFoundError: If no md5sum file is found in the folder
+
+        Returns:
+            folders_with_metadata: Same dict updated with the merged md5sum file
+        """
+        output_location = self.platform_storage_folder
+        log.info("Merging md5sum files from remote folders...")
+        stderr.print("[blue]Merging md5sum files from remote folders...")
+
+        # TODO: Include this function in relecov_tools.utils
+        def md5_merger(md5_filelist, avoid_chars=None):
+            """Merge all md5 files from a given list into a single multi-line md5sum"""
+            md5dict_list = []
+            for md5sum in md5_filelist:
+                hash_dict = relecov_tools.utils.read_md5_checksum(md5sum, avoid_chars)
+                if hash_dict:
+                    md5dict_list.append(hash_dict)
+            # Sort hashes and files back to the original order.
+            merged_md5 = {
+                md5: file for mdict in md5dict_list for file, md5 in mdict.items()
+            }
+            return merged_md5
+
+        def md5_handler(md5sumlist, output_location):
+            """Download all the remote md5sum files in a list, merge them
+            into a single md5checksum and upload it back to sftp"""
+            downloaded_md5files = []
+            for md5sum in md5sumlist:
+                md5_name = "_".join([token_hex(nbytes=12), "md5_temp.md5"])
+                fetched_md5 = os.path.join(output_location, md5_name)
+                if self.get_from_sftp(file=md5sum, destination=fetched_md5):
+                    downloaded_md5files.append(fetched_md5)
+            merged_md5 = md5_merger(downloaded_md5files, self.avoidable_characters)
+            if merged_md5:
+                merged_name = "_".join([folder.split("/")[0], "md5sum.md5"])
+                merged_md5_path = os.path.join(output_location, merged_name)
+                with open(merged_md5_path, "w") as md5out:
+                    write_md5 = csv_writer(md5out, delimiter="\t")
+                    write_md5.writerows(merged_md5.items())
+                md5_dest = os.path.join(folder, os.path.basename(merged_md5_path))
+                self.client.put(localpath=merged_md5_path, remotepath=md5_dest)
+                # Remove local files once merged and uploaded
+                [os.remove(md5_file) for md5_file in downloaded_md5files]
+                return md5_dest
+            else:
+                error_text = "No md5sum could be processed in remote folder"
+                raise FileNotFoundError(error_text)
+
+        for folder in folders_with_metadata.keys():
+            self.current_folder = folder.split("/")[0]
+            md5flag = "md5sum"
+            md5sumlist = [fi for fi in folders_with_metadata[folder] if md5flag in fi]
+            if not md5sumlist:
+                error_text = "No md5sum could be found in remote folder"
+                log.warning(error_text)
+                stderr.print(f"[yellow]{error_text}")
+                self.include_warning(error_text)
+                continue
+            folders_with_metadata[folder] = [
+                fi for fi in folders_with_metadata[folder] if fi not in md5sumlist
+            ]
+            try:
+                uploaded_md5 = md5_handler(md5sumlist, output_location)
+            except (FileNotFoundError, OSError, PermissionError, CsvError) as e:
+                error_text = "Could not merge md5files for %s. Reason: %s"
+                log.warning(error_text % (self.current_folder, str(e)))
+                stderr.print(f"[yellow]{error_text % (self.current_folder, str(e))}")
+                self.include_warning(error_text % (self.current_folder, str(e)))
+                continue
+            if uploaded_md5:
+                folders_with_metadata[folder].append(uploaded_md5)
+
+        return folders_with_metadata
+
+    def merge_metadata(self, meta_sheet=None, *metadata_tables):
+        """Merge a variable number of metadata dataframes to the first one. Merge them
+        only into a certain sheet from a multi-sheet excel file if sheetname is given.
+
+        Args:
+            meta_sheet (str): Name of the sheet containing metadata in excel file
+            *metadata_tables (list(pandas.DataFrame)): Dataframes to be merged
+
+        Returns:
+            merged_df (pandas.DataFrame): A merged dataframe from the given tables
+        """
+        for idx, table in enumerate(metadata_tables):
+            if idx == 0:
+                merged_df = table
+                continue
+            if meta_sheet:
+                merged_df[meta_sheet] = concat(
+                    [merged_df[meta_sheet], table[meta_sheet]], ignore_index=True
+                )
+            else:
+                merged_df = concat([merged_df, table], ignore_index=True)
+        return merged_df
+
+    def excel_to_df(self, excel_file, metadata_sheet, header_flag):
+        """Read an excel file, return a dict with a dataframe for each sheet in it.
+        Process the given sheet with metadata, removing all rows until header is found
+
+        Args:
+            excel_file (str): Path to the local excel file with metadata
+            metadata_sheet (str): Name of the sheet containing metadata in excel file
+            header_flag (str): Name of one of the columns from the metadata header
+
+        Raises:
+            MetadataError: If no header could be found matching header flag
+
+        Returns:
+            excel_df (dict(str:pandas.DataFrame)): Dict {name_of_excel_sheet:DataFrame}
+            containing all sheets in the excel file as pandas dataframes.
+        """
+        # Get every sheet from the first excel file
+        excel_df = read_excel(excel_file, dtype=str, sheet_name=None)
+        meta_df = excel_df[metadata_sheet]
+        if header_flag in meta_df.columns:
+            return excel_df
+        header_row = None
+        for idx in range(len(meta_df)):
+            if any(meta_df.loc[idx, x] == header_flag for x in meta_df.columns):
+                header_row = idx
+        meta_df.columns = meta_df.iloc[header_row]
+        excel_df[metadata_sheet] = meta_df.drop(meta_df.index[: (header_row + 1)])
+        excel_df[metadata_sheet] = excel_df[metadata_sheet].reset_index(drop=True)
+        return excel_df
+
+    def merge_subfolders(self, target_folders):
+        """For each first-level folder in the sftp, merge all the subfolders within
+        it in a single one called '*_tmp_processing' by moving all the fastq files from
+        them. Merge the metadata excel and md5 files from each subfolder too.
+
+        Args:
+            target_folders (dict(str:list)): Dictionary with folders and their files
+
+        Returns:
+            clean_target_folders (dict(str:list)): Dict with '*_tmp_processing' folders
+            and their content. All subfolder filenames are merged into a single key.
+        """
+        metadata_ws = self.metadata_processing.get("excel_sheet")
+        header_flag = self.metadata_processing.get("header_flag")
+        output_location = self.platform_storage_folder
+        date_and_time = datetime.today().strftime("%Y%m%d%-H%M%S")
+        exts = self.allowed_file_ext
+
+        def upload_merged_df(merged_excel_path, last_main_folder, merged_df):
+            """Upload metadata dataframe merged from all subfolders back to sftp"""
+            self.client.mkdir(last_main_folder)
+            pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
+            for sheet in merged_df.keys():
+                format_sheet = merged_df[sheet].astype(str)
+                format_sheet.replace("nan", None, inplace=True)
+                format_sheet.to_excel(pd_writer, sheet_name=sheet, index=False)
+            pd_writer.close()
+            dest = os.path.join(last_main_folder, os.path.basename(merged_excel_path))
+            self.client.put(merged_excel_path, dest)
+            return
+
+        def pre_validate_folder(folder, folder_files):
+            """Check if remote folder has sequencing files and a valid metadata file"""
+            if not any(file.endswith(tuple(exts)) for file in folder_files):
+                error_text = "Remote folder %s skipped. No sequencing files found."
+                log.error(error_text % folder)
+                self.include_error(error_text % folder)
+                return
+            try:
+                downloaded_metadata = self.get_metadata_file(folder, output_location)
+            except (FileNotFoundError, OSError, PermissionError, MetadataError) as err:
+                error_text = "Remote folder %s skipped. Reason: %s"
+                log.error(error_text % (folder, err))
+                self.include_error(error_text % (folder, err))
+                return
+            try:
+                self.read_metadata_file(downloaded_metadata, return_data=False)
+            except MetadataError as header_error:
+                error_text = " Folder skipped: %s"
+                os.remove(downloaded_metadata)
+                log.error(str(folder, str(error_text % str(header_error))))
+                self.include_error(error_text % header_error)
+                return
+            return downloaded_metadata
+
+        folders_with_metadata = {}
+        merged_df = merged_excel_path = last_main_folder = excel_name = None
+        log.info("Setting %s remote folders...", str(len(target_folders.keys())))
+        stderr.print(f"[blue]Setting {len(target_folders.keys())} remote folders...")
+        for folder in sorted(target_folders.keys()):
+            self.current_folder = folder
+            downloaded_metadata = pre_validate_folder(folder, target_folders[folder])
+            if not downloaded_metadata:
+                continue
+            # Create a temporal name to avoid duplicated filenames
+            meta_filename = "_".join([folder.split("/")[-1], "metadata_temp.xlsx"])
+            local_meta = os.path.join(output_location, meta_filename)
+            os.rename(downloaded_metadata, local_meta)
+
+            # Taking the main folder for each lab as reference for merge and logs
+            main_folder = folder.split("/")[0]
+            self.current_folder = main_folder
+            temporal_foldername = "_".join([date_and_time, "tmp_processing"])
+            temp_folder = os.path.join(main_folder, temporal_foldername)
+            # Get every file except the excel ones as they are going to be merged
+            filelist = [fi for fi in target_folders[folder] if not fi.endswith(".xlsx")]
+            if not folders_with_metadata.get(temp_folder):
+                log_text = "Trying to merge metadata from %s in %s"
+                log.info(log_text % (main_folder, temp_folder))
+                stderr.print(f"[blue]{log_text % (main_folder, temp_folder)}")
+                if merged_df:
+                    # Write the previous merged metadata df before overriding it
+                    try:
+                        upload_merged_df(merged_excel_path, last_main_folder, merged_df)
+                        folders_with_metadata[last_main_folder].append(excel_name)
+                    except OSError:
+                        error_text = "Error uploading merged metadata back to sftp: %s"
+                        log.error(error_text % last_main_folder)
+                        self.include_error(error_text % last_main_folder)
+                        del folders_with_metadata[last_main_folder]
+                try:
+                    merged_df = self.excel_to_df(local_meta, metadata_ws, header_flag)
+                except (ParserError, EmptyDataError, MetadataError, KeyError) as e:
+                    meta_name = os.path.basename(downloaded_metadata)
+                    error_text = "%s skipped. Error while processing excel %s: %s"
+                    log.error(error_text % (main_folder, meta_name, str(e)))
+                    self.include_error(error_text % (main_folder, meta_name, str(e)))
+                    continue
+                folders_with_metadata[temp_folder] = []
+                folders_with_metadata[temp_folder].extend(filelist)
+                # rename metadata file to avoid filename duplications
+                excel_name = "_".join([folder.split("/")[0], "merged_metadata.xlsx"])
+                merged_excel_path = os.path.join(output_location, excel_name)
+                os.rename(local_meta, merged_excel_path)
+                # Keep a track of the main_folder for next iteration
+                last_main_folder = temp_folder
+            else:
+                # If temp_folder has subfolders in it, merge everything
+                folders_with_metadata[temp_folder].extend(filelist)
+                new_df = self.excel_to_df(local_meta, metadata_ws, header_flag)
+                merged_df = self.merge_metadata(metadata_ws, merged_df, new_df)
+        # End of loop
+
+        # Write last dataframe to file once loop is finished
+        if folders_with_metadata.get(last_main_folder):
+            if excel_name not in folders_with_metadata[last_main_folder]:
+                upload_merged_df(merged_excel_path, last_main_folder, merged_df)
+                folders_with_metadata[last_main_folder].append(excel_name)
+
+        # Merge md5files and upload them to tmp_processing folder
+        merged_md5_folders = self.merge_md5sums(folders_with_metadata)
+        # Move all the files from each subfolder into its tmp_processing folder
+        clean_target_folders = self.move_processing_fastqs(merged_md5_folders)
+        log_text = "Remote folders merged into %s folders. Proceed with processing"
+        log.info(log_text % len(clean_target_folders.keys()))
+        stderr.print(f"[green]{log_text % len(clean_target_folders.keys())}")
+        return clean_target_folders
+
     def select_target_folders(self):
         """Find the selected folders in remote if given, else select every folder
 
@@ -618,14 +955,14 @@ class SftpHandle:
         if not root_directory_list:
             log.error("Error while listing folders in remote. Aborting")
             sys.exit(1)
-        if self.target_folders == "ALL":
+        if self.target_folders is None:
+            target_folders = clean_root_list
+        elif self.target_folders[0] == "ALL":
             log.info("Showing folders from remote SFTP for user selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
                 msg="Select the folders that will be targeted",
-                choices=sorted(root_directory_list),
+                choices=sorted(clean_root_list),
             )
-        elif self.target_folders[0] is None and len(self.target_folders) == 1:
-            target_folders = clean_root_list
         else:
             target_folders = [tf for tf in self.target_folders if tf in clean_root_list]
         if not target_folders:
@@ -667,41 +1004,57 @@ class SftpHandle:
         compressed_files = list()
         for file in files_to_compress:
             f_path = os.path.join(local_folder, file)
-            try:
-                relecov_tools.utils.compress_file(f_path)
-            except FileNotFoundError:
-                log.error("Could not compress file %s", str(file))
+            compressed = relecov_tools.utils.compress_file(f_path)
+            if not compressed:
+                error_text = "Could not compress file %s, file not found" % str(file)
+                log.error(error_text)
+                self.include_error(error_text, f_path)
                 continue
             # Remove file after compression is completed
             compressed_files.append(file)
-            os.remove(f_path)
+            try:
+                os.remove(f_path)
+            except (FileNotFoundError, PermissionError) as e:
+                log.warning(f"Could not delete file: {e}")
         fetched_files = [
             (fi + ".gz" if fi in compressed_files else fi) for fi in fetched_files
         ]
         return fetched_files
 
-    def process_filedict(self, valid_filedict, clean_fetchlist):
+    def process_filedict(
+        self, valid_filedict, clean_fetchlist, corrupted=[], md5miss=[]
+    ):
         """Process the dictionary from validate_remote_files() to update filenames
         and remove samples that failed any validation process.
 
         Args:
             valid_filedict (dict{str:str}): same structure as validate_remote_files()
             clean_fetchlist (list(str)): List of files that passed validation process
+            processed (bool): Indicates if filedict has been processed previously
 
         Returns:
             processed(dict{str:str}): Updated valid_filedict
         """
         processed_dict = {}
+        error_text = "md5 mismatch for %s"
+        warning_text = "File %s not found in md5sum. Creating hash"
         for sample, vals in valid_filedict.items():
             processed_dict[sample] = {}
             for key, val in vals.items():
                 processed_dict[sample][key] = None
+                if val in corrupted:
+                    self.include_error(error_text % val, sample)
+                if val in md5miss:
+                    self.include_warning(warning_text % val, sample)
                 for file in clean_fetchlist:
                     if val in file:
                         processed_dict[sample][key] = file
             # remove sample if it has missing files
             if not all(x in clean_fetchlist for x in processed_dict[sample].values()):
-                log.warning("Sample %s skipped: missing files in sftp", sample)
+                if not corrupted:
+                    error_text = "Sample %s skipped: missing files in sftp"
+                    self.include_error(str(error_text % sample), sample)
+                log.error(str(error_text % sample))
                 del processed_dict[sample]
         return processed_dict
 
@@ -723,6 +1076,7 @@ class SftpHandle:
         folders_to_download = target_folders
         date = datetime.today().strftime("%Y%m%d")
         for folder in folders_to_download.keys():
+            self.current_folder = folder.split("/")[0]
             # Close previously open connection to avoid timeouts
             try:
                 self.close_connection()
@@ -733,14 +1087,16 @@ class SftpHandle:
             log.info("Processing folder %s", folder)
             stderr.print("[blue]Processing folder " + folder)
             # Validate that the files are the ones described in metadata.
+
             local_folder = self.create_local_folder(folder, date)
             try:
                 valid_filedict, meta_file = self.validate_remote_files(
                     folder, local_folder
                 )
-            except (FileNotFoundError, MetadataError) as failed_validation:
-                log.error(failed_validation)
-                stderr.print(f"[red]{failed_validation}, skipped")
+            except (FileNotFoundError, IOError, PermissionError, MetadataError) as fail:
+                log.error(fail)
+                stderr.print(f"[red]{fail}, skipped")
+                self.include_error(fail)
                 continue
             # Get the files in each folder
             files_to_download = [
@@ -750,8 +1106,10 @@ class SftpHandle:
                 folder, local_folder, files_to_download
             )
             if not fetched_files:
-                log.warning("No files could be downloaded in folder %s", folder)
-                stderr.print(f"No files were downloaded process for {folder}")
+                error_text = "No files could be downloaded in folder %s" % str(folder)
+                log.warning(error_text)
+                stderr.print(f"{error_text}")
+                self.include_error(error_text)
                 continue
             log.info("Finished download for folder: %s", folder)
             stderr.print(f"Finished download for folder {folder}")
@@ -762,42 +1120,60 @@ class SftpHandle:
                     local_folder, os.path.basename(remote_md5sum)
                 )
                 self.get_from_sftp(file=remote_md5sum, destination=fetched_md5)
-                successful_files, req_retransmition = self.verify_md5_checksum(
+                successful_files, corrupted = self.verify_md5_checksum(
                     local_folder, fetched_files, fetched_md5
                 )
-                # retrasmision of files in folder
-                if req_retransmition:
-                    stderr.print("[Yellow] Error during download, trying again...")
-                    self.get_remote_folder_files(
-                        folder, local_folder, req_retransmition
-                    )
+                # try to download the files again to discard errors during download
+                if corrupted:
+                    stderr.print("[gold1]Found md5 mismatches, downloading again...")
+                    self.get_remote_folder_files(folder, local_folder, corrupted)
                     saved_files, corrupted = self.verify_md5_checksum(
-                        local_folder, req_retransmition, fetched_md5
+                        local_folder, corrupted, fetched_md5
                     )
                     if saved_files:
                         successful_files.extend(saved_files)
                     if corrupted:
-                        log.warning("Found corrupted files: %s", str(corrupted))
-                        stderr.print(f"Found corrupted files: {str(corrupted)}")
+                        corr_fold = os.path.join(local_folder, "corrupted")
+                        os.mkdir(corr_fold)
+                        error_text = "Found corrupted files: %s. Moved to: %s"
+                        log.warning(error_text % (str(corrupted), corr_fold))
+                        stderr.print(f"[red]{error_text % (str(corrupted), corr_fold)}")
+                        self.include_warning(error_text % (str(corrupted), "/corrupt/"))
+                        for corr_file in corrupted:
+                            path = os.path.join(local_folder, corr_file)
+                            try:
+                                os.rename(path, os.path.join(corr_fold, corr_file))
+                            except (FileNotFoundError, PermissionError, OSError) as e:
+                                error_text = (
+                                    "Could not move corrupted file %s to %s: %s"
+                                )
+                                log.error(error_text % (path, corr_fold, e))
+                                stderr.print(
+                                    f"[red]{error_text % (path, corr_fold, e)}"
+                                )
                         if self.abort_if_md5_mismatch:
-                            log.error("Aborting, corrupted files %s", str(corrupted))
-                            stderr.print(
-                                f"[red] Stopped processing folder {folder} \
-                                due to corrupted files {corrupted}"
-                            )
+                            error_text = "Stop processing %s due to corrupted files."
+                            log.error(error_text % folder)
+                            stderr.print(f"[red]{error_text % folder}")
+                            self.include_error(error_text % "folder")
                             relecov_tools.utils.delete_local_folder(local_folder)
                             continue
                 hash_dict = relecov_tools.utils.read_md5_checksum(
                     fetched_md5, self.avoidable_characters
                 )
                 log.info("Finished md5 check for folder: %s", folder)
-                stderr.print(f"Finished md5 verification for folder {folder}")
+                stderr.print(f"[blue]Finished md5 verification for folder {folder}")
             else:
-                log.warning("No single md5sum file could be found in %s", folder)
-                stderr.print(f"[red]No single md5sum could be found in {folder}")
+                error_text = "No single md5sum file could be found in %s" % folder
+                log.warning(error_text)
+                stderr.print(f"[red]{error_text}")
+                self.include_error(error_text)
+
             clean_fetchlist = [
                 fi for fi in fetched_files if fi.endswith(tuple(self.allowed_file_ext))
             ]
+
+            clean_fetchlist = [fi for fi in clean_fetchlist if fi not in corrupted]
             # Checking for uncompressed files
             files_to_compress = [fi for fi in clean_fetchlist if not fi.endswith(".gz")]
             if files_to_compress:
@@ -810,20 +1186,31 @@ class SftpHandle:
             clean_pathlist = [os.path.join(local_folder, fi) for fi in clean_fetchlist]
             if remote_md5sum:
                 # Get hashes from provided md5sum, create them for those not provided
+                not_md5sum = []
                 files_md5_dict = {}
                 for path in clean_pathlist:
                     f_name = os.path.basename(path)
                     if f_name in successful_files:
                         files_md5_dict[f_name] = hash_dict[f_name]
+                    elif f_name in corrupted:
+                        clean_fetchlist.remove(f_name)
                     else:
-                        log.warning("File %s not found in md5sum. Creating it", f_name)
+                        if not str(f_name).rstrip(".gz") in files_to_compress:
+                            error_text = "File %s not found in md5sum. Creating hash"
+                            log.warning(error_text % f_name)
+                            not_md5sum.append(f_name)
+                        else:
+                            log.info("File %s was compressed, creating md5hash", f_name)
                         files_md5_dict[f_name] = relecov_tools.utils.calculate_md5(path)
             else:
                 md5_hashes = [
                     relecov_tools.utils.calculate_md5(path) for path in clean_pathlist
                 ]
                 files_md5_dict = dict(zip(clean_fetchlist, md5_hashes))
-            processed_filedict = self.process_filedict(valid_filedict, clean_fetchlist)
+
+            processed_filedict = self.process_filedict(
+                valid_filedict, clean_fetchlist, corrupted=corrupted, md5miss=not_md5sum
+            )
             self.create_files_with_metadata_info(
                 local_folder, processed_filedict, files_md5_dict, meta_file
             )
@@ -834,6 +1221,49 @@ class SftpHandle:
             stderr.print(f"[green]Finished processing {folder}")
         return
 
+    def include_error(self, entry, sample=None):
+        self.update_summary(log_type="error", entry=entry, sample=sample)
+        return
+
+    def include_warning(self, entry, sample=None):
+        self.update_summary(log_type="warning", entry=entry, sample=sample)
+        return
+
+    def update_summary(self, log_type, entry, sample=None):
+        feed_dict = OrderedDict({"valid": False, "errors": [], "warnings": []})
+        current_folder = str(self.current_folder).replace("./", "")
+        entry, sample = (str(entry), str(sample))
+        if current_folder not in self.logs.keys():
+            self.logs[current_folder] = feed_dict.copy()
+            self.logs[current_folder]["samples"] = OrderedDict()
+        if sample == "None":
+            if log_type == "error":
+                self.logs[current_folder]["errors"].append(entry)
+            elif log_type == "warning":
+                self.logs[current_folder]["warnings"].append(entry)
+        else:
+            if sample not in self.logs[current_folder]["samples"].keys():
+                self.logs[current_folder]["samples"][sample] = feed_dict.copy()
+            if log_type == "error":
+                self.logs[current_folder]["samples"][sample]["errors"].append(entry)
+            elif log_type == "warning":
+                self.logs[current_folder]["samples"][sample]["warnings"].append(entry)
+        return
+
+    def create_error_summary(self):
+        for folder in self.logs.keys():
+            if not self.logs[folder]["errors"]:
+                self.logs[folder]["valid"] = True
+            for sample in self.logs[folder]["samples"].keys():
+                if not self.logs[folder]["samples"][sample]["errors"]:
+                    self.logs[folder]["samples"][sample]["valid"] = True
+        filename = datetime.today().strftime("%Y%m%d%-H%M%S") + "_log_summary.json"
+        summary_path = os.path.join(self.platform_storage_folder, filename)
+        with open(summary_path, "w", encoding="utf-8") as f:
+            f.write(json.dumps(self.logs, indent=4, sort_keys=True, ensure_ascii=False))
+        stderr.print(f"Process summary printed in {summary_path}")
+        return
+
     def execute_process(self):
         """Executes different processes depending on the download_option"""
         if not self.open_connection():
@@ -841,6 +1271,7 @@ class SftpHandle:
             stderr.print("[red]Unable to establish sftp connection")
             sys.exit(1)
         target_folders = self.select_target_folders()
+        target_folders = self.merge_subfolders(target_folders)
         if self.download_option == "download_only":
             self.download(target_folders, option="download")
         if self.download_option == "download_clean":
@@ -851,4 +1282,7 @@ class SftpHandle:
                 self.delete_remote_files(folder, files)
                 stderr.print(f"Delete process finished in {folder}")
         self.close_connection()
+        if self.logs:
+            log.info("Printing process summary to %s", self.platform_storage_folder)
+            self.create_error_summary()
         stderr.print("Finished execution")
