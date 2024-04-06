@@ -258,6 +258,7 @@ class BioinfoMetadata(BioinfoReportLog):
                 },
                 ...
             }
+        Note: ensure that 'field1','field2','field3' corresponds with the values especifies in the 'content' section of each software configuration scope (see: conf/bioinfo_config.json). 
 
         Input:
             file_list (list): A list of file path/s to be processed.
@@ -451,7 +452,6 @@ class BioinfoMetadata(BioinfoReportLog):
         self.log_report.print_log_report(method_name,["warning","valid"])
         return j_data
 
-    # TODO: this is too harcoded. Find a way to add file's path of required files when calling handlers functions. 
     def add_fixed_values(self, j_data):
         """include the fixed data defined in configuration or feed custom empty fields"""
         method_name=f"{self.add_fixed_values.__name__}"
@@ -504,9 +504,6 @@ class BioinfoMetadata(BioinfoReportLog):
         self.j_data = self.add_bioinfo_results_metadata(files_found_dict, self.j_data)
         stderr.print("[blue]Adding software versions to read lab metadata...")
         self.j_data = self.get_multiqc_software_versions(files_found_dict['workflow_summary'], self.j_data)       
-        # FIXME: this isn't refactored and requires to be reimplemented from older version of this module
-        ##stderr.print("[blue]Adding variant long table path")
-        ##j_data = self.include_custom_data(j_data)
         stderr.print("[blue]Adding fixed values")
         self.j_data = self.add_fixed_values(self.j_data)
         # Generate readlab + bioinfolab processed metadata.
