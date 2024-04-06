@@ -10,6 +10,7 @@ from datetime import datetime
 
 import relecov_tools
 from relecov_tools.config_json import ConfigJson
+import relecov_tools.utils
 
 
 # from relecov_tools.rest_api import RestApi
@@ -56,9 +57,15 @@ class LongTableParse:
             sys.exit(1)
 
         if output_directory is None:
-            self.output_directory = relecov_tools.utils.prompt_path(
-                msg="Select the output folder"
+            use_default = relecov_tools.utils.prompt_yn_question(
+                "Use default path?: "
             )
+            if use_default:
+                self.output_directory = os.getcwd()
+            else:
+                self.output_directory = relecov_tools.utils.prompt_path(
+                    msg="Select the output folder:"
+                )
         else:
             self.output_directory = output_directory
         Path(self.output_directory).mkdir(parents=True, exist_ok=True)
@@ -69,11 +76,12 @@ class LongTableParse:
         self.software_config = config_json.get_configuration('viralrecon')
         self.long_table_heading = self.software_config["variants_long_table"]["content"]
 
-        if not j_data:
-            stderr.print("[red]\tError: No read lab metadata file found. Long-table-parsing aborted.")
-            sys.exit(1)
-        else:
-            self.j_data = j_data
+        # FIXME: See fixme details in function parse_long_table relecov_tools.assets.pipeline_utils.viralrecon.  
+        #if not j_data:
+        #    stderr.print("[red]\tError: No read lab metadata file found. #Long-table-parsing aborted.")
+        #    sys.exit(1)
+        #else:
+        #    self.j_data = j_data
 
     def validate_file(self, heading):
         """Check if long table file has all mandatory fields defined in
@@ -165,15 +173,16 @@ class LongTableParse:
         except Exception as e:
             stderr.print("[red]\tError saving parsed data to file:", str(e))
     
-    def add_custom_longtable_data(self, j_data):
-        """Auxiliary function to add custom fields likevariant-long-table into j_data"""
-        if len(self.file_path) == 0:
-            long_table_path = "Not Provided [GENEPIO:0001668]"
-        else:
-            long_table_path = self.file_path
-        for row in j_data:
-            row["long_table_path"] = str(long_table_path)
-        return j_data
+    # FIXME: See fixme details in function parse_long_table relecov_tools.assets.pipeline_utils.viralrecon. 
+    #def add_custom_longtable_data(self, j_data):
+    #    """Auxiliary function to add custom fields likevariant-long-table #into j_data"""
+    #    if len(self.file_path) == 0:
+    #        long_table_path = "Not Provided [GENEPIO:0001668]"
+    #    else:
+    #        long_table_path = self.file_path
+    #    for row in j_data:
+    #        row["long_table_path"] = str(long_table_path)
+    #    return j_data
 
     def parsing_csv(self):
         """

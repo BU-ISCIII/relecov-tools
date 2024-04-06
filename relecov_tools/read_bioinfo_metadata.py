@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
-from relecov_tools.long_table_parse import LongTableParse
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -52,8 +51,6 @@ class BioinfoReportLog:
     
 # TODO: Add method to validate bioinfo_config.json file requirements.
 # TODO: replace submitting_lab_id by sequencing_sample_id
-# TODO: mv pipeline-specific methods to future assets/pipeline_utils/
-# fixme: INCOMING IMPLEMENTATION ---> REPORT LOG IS NOW A CLASS.
 class BioinfoMetadata(BioinfoReportLog):
     def __init__(
         self,
@@ -309,10 +306,14 @@ class BioinfoMetadata(BioinfoReportLog):
                 sys.exit(self.log_report.print_log_report(method_name,["error"]))
         else:
             try:
-                # Attempt to get the method by name
-                method_to_call = getattr(self, func_name)
-                data = method_to_call(file_list)
-            except AttributeError as e:
+                # Dynamically import the function from the specified module
+                utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                import_statement = f"from {utils_name} import {func_name}"
+                exec(import_statement)
+
+                # Get method name and execute it.
+                data = eval(func_name + "(file_list)")
+            except Exception as e:
                 self.log_report.update_log_report(
                     self.add_bioinfo_results_metadata.__name__,
                     'error', 
@@ -449,112 +450,6 @@ class BioinfoMetadata(BioinfoReportLog):
             )
         self.log_report.print_log_report(method_name,["warning","valid"])
         return j_data
-
-    def handle_pangolin_data(self, files_list):
-        """File handler to parse pangolin data (csv) into JSON structured format.
-        """
-        method_name=f"{self.add_bioinfo_results_metadata.__name__}:{self.handle_pangolin_data.__name__}"
-        # Handling pangolin data
-        pango_data_processed = {}
-        try:
-            files_list_processed = relecov_tools.utils.select_most_recent_files_per_sample(files_list)
-            for pango_file in files_list_processed:
-                try:
-                    pango_data = relecov_tools.utils.read_csv_file_return_dict(
-                        pango_file, sep=","
-                    )
-                    # Add custom content in pangolin
-                    pango_data_key = next(iter(pango_data))
-                    pango_data[pango_data_key]['lineage_analysis_date'] = relecov_tools.utils.get_file_date(
-                        pango_file
-                    )
-
-                    # Rename key in f_data
-                    pango_data_updated = {key.split()[0]: value for key, value in pango_data.items()}
-                    pango_data_processed.update(pango_data_updated)
-                    self.log_report.update_log_report(
-                        method_name,
-                        'valid', 
-                        f"Successfully handled data in {pango_file}."
-                    )
-                except (FileNotFoundError, IndexError) as e:
-                    self.log_report.update_log_report(
-                        method_name,
-                        'error', 
-                        f"Error processing file {pango_file}: {e}"
-                    )
-                    sys.exit(self.log_report.print_log_report(method_name,["error"]))
-        except Exception as e:
-            self.log_report.update_log_report(
-                method_name,
-                'error'
-                f"Error occurred while processing files: {e}"
-            )
-            sys.exit(self.log_report.print_log_report(method_name,["error"]))
-        return pango_data_processed
-
-    def handle_consensus_fasta(self, files_list):
-        """File handler to parse consensus fasta data (*.consensus.fa) into JSON structured format"""
-        method_name=f"{self.add_bioinfo_results_metadata.__name__}:{self.handle_consensus_fasta.__name__}"
-        consensus_data_processed = {}
-        missing_consens = []
-        for consensus_file in files_list:
-            try:
-                record_fasta = relecov_tools.utils.read_fasta_return_SeqIO_instance(
-                    consensus_file
-                )
-            except FileNotFoundError as e:
-                missing_consens.append(e.filename)
-                continue
-            sample_key = re.sub(self.software_config['mapping_consensus']['fn'], '', os.path.basename(consensus_file))
-
-            # Update consensus data for the sample key
-            consensus_data_processed[sample_key] = {
-                'sequence_name': record_fasta.description,
-                'genome_length': str(len(record_fasta)),
-                'sequence_filepath': os.path.dirname(consensus_file),
-                'sequence_filename': sample_key,
-                'sequence_md5': relecov_tools.utils.calculate_md5(consensus_file),
-                # TODO: Not sure this is correct. If not, recover previous version: https://github.com/BU-ISCIII/relecov-tools/blob/09c00c1ddd11f7489de7757841aff506ef4b7e1d/relecov_tools/read_bioinfo_metadata.py#L211-L218
-                'number_of_base_pairs_sequenced': len(record_fasta.seq)
-            }         
-
-        # Report missing consensus
-        conserrs = len(missing_consens)
-        if conserrs >= 1:
-            self.log_report.update_log_report(
-                method_name,
-                'warning', 
-                f"{conserrs} samples missing in consensus file: {missing_consens}"
-            )
-        return consensus_data_processed
-
-    def parse_long_table(self, files_list):
-        method_name = f"{self.parse_long_table.__name__}"
-        # Hanfling long table data
-
-        if len(files_list) == 1:
-            files_list_processed = files_list[0]
-            if not os.path.isfile(files_list_processed):
-                self.log_report.update_log_report(
-                    method_name,
-                    'error',
-                    f"{files_list_processed} given file is not a file"
-                )
-                sys.exit(self.log_report.print_log_report(method_name,["error"]))
-            long_table = LongTableParse(files_list_processed, self.output_folder, self.j_data)
-            # Parsing long table data and saving it
-            long_table.parsing_csv()
-            # Adding custom long_table data to j_data
-            self.j_data = long_table.add_custom_longtable_data(self.j_data)
-        elif len(files_list) >1:
-            self.log_report.update_log_report(
-                method_name, 
-                'warning',
-                f"Found {len(files_list)} variants_long_table files. This version is unable to process more than one variants long table each time."
-            )
-        # This needs to return none to avoid being parsed by method mapping-over-table  
-        return None
 
     # TODO: this is too harcoded. Find a way to add file's path of required files when calling handlers functions. 
     def add_fixed_values(self, j_data):
