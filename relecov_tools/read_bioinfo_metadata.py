@@ -46,7 +46,6 @@ class BioinfoReportLog:
 
 # TODO: Add method to validate bioinfo_config.json file requirements.
 # TODO: replace submitting_lab_id by sequencing_sample_id
-# FIXME: Method include custom data.
 class BioinfoMetadata(BioinfoReportLog):
     def __init__(
         self,
@@ -457,6 +456,24 @@ class BioinfoMetadata(BioinfoReportLog):
         self.log_report.print_log_report(method_name, ["valid", "waring"])
         return j_data
 
+    def add_bioinfo_files_path(self, files_found_dict, j_data):
+        """Adds file paths (essential for handlers and mapping methods to process bioinformatics metadata) to the j_data. In instances where multiple files are identified per configuration item (e.g., viralrecon.mapping_consensus → *.consensus.fa), each sample in j_data receives its respective file path. If no file path is located, the function appends "Not Provided [GENEPIO:0001668]" to indicate missing data.g file. If no file path is found, then adds "Not Provided [GENEPIO:0001668]"""
+        for row in j_data:
+            sample_name = row["submitting_lab_sample_id"]
+            for key, value in files_found_dict.items():
+                file_path = "Not Provided [GENEPIO:0001668]"
+                if value:  # Check if value is not empty
+                    if len(value) > 1:
+                        for file in value:
+                            if sample_name in file:
+                                file_path = file
+                                break  # Exit loop if match found
+                    else:
+                        file_path = value[0]
+                path_key = f"{self.software_name}_filepath_{key}"
+                row[path_key] = file_path
+        return j_data
+
     def collect_info_from_lab_json(self):
         """Create the list of dictionaries from the data that is on json lab
         metadata file. Return j_data that is used to add the rest of the fields
@@ -485,10 +502,8 @@ class BioinfoMetadata(BioinfoReportLog):
         files_found_dict = self.scann_directory()
         stderr.print("[blue]Validating required files...")
         self.validate_software_mandatory_files(files_found_dict)
-        stderr.print(
-            f"[blue]Adding metadata from {self.input_folder} into read lab metadata..."
-        )
         # Add bioinfo metadata to j_data
+        stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
         self.j_data = self.add_bioinfo_results_metadata(files_found_dict, self.j_data)
         stderr.print("[blue]Adding software versions to read lab metadata...")
         self.j_data = self.get_multiqc_software_versions(
@@ -496,6 +511,9 @@ class BioinfoMetadata(BioinfoReportLog):
         )
         stderr.print("[blue]Adding fixed values")
         self.j_data = self.add_fixed_values(self.j_data)
+        # Adding files path
+        stderr.print("[blue]Adding files path to read lab metadata")
+        self.j_data = self.add_bioinfo_files_path(files_found_dict, self.j_data)
         # Generate readlab + bioinfolab processed metadata.
         file_name = (
             "bioinfo_"

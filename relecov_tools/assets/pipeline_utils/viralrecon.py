@@ -33,7 +33,7 @@ class LongTableParse:
 
     """
 
-    def __init__(self, file_path=None, output_directory=None, j_data=None):
+    def __init__(self, file_path=None, output_directory=None):
         if file_path is None:
             self.file_path = relecov_tools.utils.prompt_path(
                 msg="Select the csv file which contains variant long table information"
@@ -73,13 +73,6 @@ class LongTableParse:
         config_json = ConfigJson(json_file)
         self.software_config = config_json.get_configuration("viralrecon")
         self.long_table_heading = self.software_config["variants_long_table"]["content"]
-
-        # FIXME: See fixme details in function parse_long_table relecov_tools.assets.pipeline_utils.viralrecon.
-        # if not j_data:
-        #     stderr.print("[red]\tError: No read lab metadata file found. #Long-table-parsing aborted.")
-        #     sys.exit(1)
-        # else:
-        #     self.j_data = j_data
 
     def validate_file(self, heading):
         """Check if long table file has all mandatory fields defined in
@@ -171,17 +164,6 @@ class LongTableParse:
         except Exception as e:
             stderr.print("[red]\tError saving parsed data to file:", str(e))
 
-    # FIXME: See fixme details in function parse_long_table relecov_tools.assets.pipeline_utils.viralrecon.
-    # def add_custom_longtable_data(self, j_data):
-    #     """Auxiliary function to add custom fields likevariant-long-table #into j_data"""
-    #     if len(self.file_path) == 0:
-    #         long_table_path = "Not Provided [GENEPIO:0001668]"
-    #     else:
-    #         long_table_path = self.file_path
-    #     for row in j_data:
-    #         row["long_table_path"] = str(long_table_path)
-    #     return j_data
-
     def parsing_csv(self):
         """
         Function called when using the relecov-tools long-table-parse function.
@@ -246,7 +228,7 @@ def parse_long_table(files_list):
     method_name = f"{parse_long_table.__name__}"
     method_log_report = BioinfoReportLog()
 
-    # Hanfling long table data
+    # Handling long table data
     if len(files_list) == 1:
         files_list_processed = files_list[0]
         if not os.path.isfile(files_list_processed):
@@ -257,9 +239,6 @@ def parse_long_table(files_list):
         long_table = LongTableParse(files_list_processed)
         # Parsing long table data and saving it
         long_table.parsing_csv()
-        # FIXME: cannot write over j_data when this function is invoked from a differnt file.
-        # Adding custom long_table data to j_data
-        # self.j_data = long_table.add_custom_longtable_data(self.j_data)
     elif len(files_list) > 1:
         method_log_report.update_log_report(
             method_name,
