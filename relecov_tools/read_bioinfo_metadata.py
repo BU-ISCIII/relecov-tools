@@ -45,7 +45,6 @@ class BioinfoReportLog:
 
 
 # TODO: Add method to validate bioinfo_config.json file requirements.
-# TODO: replace submitting_lab_id by sequencing_sample_id
 class BioinfoMetadata(BioinfoReportLog):
     def __init__(
         self,
@@ -318,7 +317,7 @@ class BioinfoMetadata(BioinfoReportLog):
         field_errors = {}
         field_vaild = {}
         for row in j_data:
-            sample_name = row["submitting_lab_sample_id"].replace("-", "_")
+            sample_name = row["sequencing_sample_id"].replace("-", "_")
             if sample_name in map_data.keys():
                 for field, value in mapping_fields.items():
                     try:
@@ -412,7 +411,7 @@ class BioinfoMetadata(BioinfoReportLog):
         # Mapping multiqc sofware versions to j_data
         field_errors = {}
         for row in j_data:
-            sample_name = row["submitting_lab_sample_id"]
+            sample_name = row["sequencing_sample_id"]
             for field, values in (
                 self.software_config["workflow_summary"].get("content").items()
             ):
@@ -459,7 +458,7 @@ class BioinfoMetadata(BioinfoReportLog):
     def add_bioinfo_files_path(self, files_found_dict, j_data):
         """Adds file paths (essential for handlers and mapping methods to process bioinformatics metadata) to the j_data. In instances where multiple files are identified per configuration item (e.g., viralrecon.mapping_consensus → *.consensus.fa), each sample in j_data receives its respective file path. If no file path is located, the function appends "Not Provided [GENEPIO:0001668]" to indicate missing data.g file. If no file path is found, then adds "Not Provided [GENEPIO:0001668]"""
         for row in j_data:
-            sample_name = row["submitting_lab_sample_id"]
+            sample_name = row["sequencing_sample_id"]
             for key, value in files_found_dict.items():
                 file_path = "Not Provided [GENEPIO:0001668]"
                 if value:  # Check if value is not empty
