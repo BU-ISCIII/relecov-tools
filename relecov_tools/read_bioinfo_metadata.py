@@ -46,6 +46,7 @@ class BioinfoReportLog:
 
 # TODO: Add method to validate bioinfo_config.json file requirements.
 # TODO: replace submitting_lab_id by sequencing_sample_id
+# FIXME: Method include custom data.
 class BioinfoMetadata(BioinfoReportLog):
     def __init__(
         self,
@@ -309,6 +310,60 @@ class BioinfoMetadata(BioinfoReportLog):
                 sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
 
+    def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
+        """
+        Function that maps structure data containing fields per sample into j_data.
+        """
+        method_name = f"{self.mapping_over_table.__name__}:{self.software_name}.{self.current_config_key}"
+        errors = []
+        field_errors = {}
+        field_vaild = {}
+        for row in j_data:
+            sample_name = row["submitting_lab_sample_id"].replace("-", "_")
+            if sample_name in map_data.keys():
+                for field, value in mapping_fields.items():
+                    try:
+                        row[field] = map_data[sample_name][value]
+                        field_vaild[sample_name] = {field: value}
+                    except KeyError as e:
+                        field_errors[sample_name] = {field: e}
+                        row[field] = "Not Provided [GENEPIO:0001668]"
+                        continue
+            else:
+                errors.append(sample_name)
+                for field in mapping_fields.keys():
+                    row[field] = "Not Provided [GENEPIO:0001668]"
+        if errors:
+            lenerrs = len(errors)
+            # work around when map_data comes from several per-sample tables/files instead of single table (from list to str)
+            if len(table_name) > 1:
+                table_name = os.path.dirname(table_name[0])
+            else:
+                table_name = table_name[0]
+            self.log_report.update_log_report(
+                method_name,
+                "warning",
+                f"{lenerrs} samples missing in '{table_name}': {', '.join(errors)}.",
+            )
+        else:
+            self.log_report.update_log_report(
+                method_name, "valid", "Successfully mapped data."
+            )
+        if len(field_errors) > 0:
+            self.log_report.update_log_report(
+                method_name,
+                "warning",
+                f"Missing fields in {table_name}:\n\t{field_errors}",
+            )
+        else:
+            self.log_report.update_log_report(
+                method_name,
+                "valid",
+                f"Successfully mapped fields in {', '.join(field_vaild.keys())} - {table_name}.",
+            )
+        self.log_report.print_log_report(method_name, ["valid", "warning"])
+        return j_data
+
     def get_multiqc_software_versions(self, file_list, j_data):
         """Reads multiqc html file, finds table containing software version info, and map it to j_data"""
         method_name = f"{self.get_multiqc_software_versions.__name__}"
@@ -383,60 +438,6 @@ class BioinfoMetadata(BioinfoReportLog):
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
-    def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
-        """
-        Function that maps structure data containing fields per sample into j_data.
-        """
-        method_name = f"{self.mapping_over_table.__name__}:{self.software_name}.{self.current_config_key}"
-        errors = []
-        field_errors = {}
-        field_vaild = {}
-        for row in j_data:
-            sample_name = row["submitting_lab_sample_id"].replace("-", "_")
-            if sample_name in map_data.keys():
-                for field, value in mapping_fields.items():
-                    try:
-                        row[field] = map_data[sample_name][value]
-                        field_vaild[sample_name] = {field: value}
-                    except KeyError as e:
-                        field_errors[sample_name] = {field: e}
-                        row[field] = "Not Provided [GENEPIO:0001668]"
-                        continue
-            else:
-                errors.append(sample_name)
-                for field in mapping_fields.keys():
-                    row[field] = "Not Provided [GENEPIO:0001668]"
-        if errors:
-            lenerrs = len(errors)
-            # work around when map_data comes from several per-sample tables/files instead of single table (from list to str)
-            if len(table_name) > 1:
-                table_name = os.path.dirname(table_name[0])
-            else:
-                table_name = table_name[0]
-            self.log_report.update_log_report(
-                method_name,
-                "warning",
-                f"{lenerrs} samples missing in '{table_name}': {', '.join(errors)}.",
-            )
-        else:
-            self.log_report.update_log_report(
-                method_name, "valid", "Successfully mapped data."
-            )
-        if len(field_errors) > 0:
-            self.log_report.update_log_report(
-                method_name,
-                "warning",
-                f"Missing fields in {table_name}:\n\t{field_errors}",
-            )
-        else:
-            self.log_report.update_log_report(
-                method_name,
-                "valid",
-                f"Successfully mapped fields in {', '.join(field_vaild.keys())} - {table_name}.",
-            )
-        self.log_report.print_log_report(method_name, ["valid", "warning"])
-        return j_data
-
     def add_fixed_values(self, j_data):
         """include the fixed data defined in configuration or feed custom empty fields"""
         method_name = f"{self.add_fixed_values.__name__}"
@@ -479,6 +480,7 @@ class BioinfoMetadata(BioinfoReportLog):
         metadata json, mapping_stats, and more information from the files
         inside input directory
         """
+        # Find and validate bioinfo files
         stderr.print("[blue]Sanning input directory...")
         files_found_dict = self.scann_directory()
         stderr.print("[blue]Validating required files...")
@@ -486,6 +488,7 @@ class BioinfoMetadata(BioinfoReportLog):
         stderr.print(
             f"[blue]Adding metadata from {self.input_folder} into read lab metadata..."
         )
+        # Add bioinfo metadata to j_data
         self.j_data = self.add_bioinfo_results_metadata(files_found_dict, self.j_data)
         stderr.print("[blue]Adding software versions to read lab metadata...")
         self.j_data = self.get_multiqc_software_versions(
