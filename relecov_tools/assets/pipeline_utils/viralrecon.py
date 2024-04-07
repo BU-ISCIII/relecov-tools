@@ -264,7 +264,7 @@ def handle_consensus_fasta(files_list):
         except FileNotFoundError as e:
             missing_consens.append(e.filename)
             continue
-        sample_key = os.path.splitext(os.path.basename(consensus_file))[0]
+        sample_key = os.path.basename(consensus_file).split(".")[0]
 
         # Update consensus data for the sample key
         consensus_data_processed[sample_key] = {
@@ -285,5 +285,5 @@ def handle_consensus_fasta(files_list):
             "warning",
             f"{conserrs} samples missing in consensus file: {missing_consens}",
         )
-    method_log_report.print_log_report(method_name, ["valid", "warning"])
+        method_log_report.print_log_report(method_name, ["valid", "warning"])
     return consensus_data_processed
