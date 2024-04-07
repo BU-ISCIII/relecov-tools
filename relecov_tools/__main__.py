@@ -10,6 +10,7 @@ import rich.logging
 import rich.traceback
 
 import relecov_tools.utils
+import relecov_tools.assets.pipeline_utils.viralrecon
 import relecov_tools.read_lab_metadata
 import relecov_tools.sftp_handle
 import relecov_tools.json_validation
@@ -443,7 +444,7 @@ def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
 )
 @click.option("-o", "--output", type=click.Path(), help="Path to save json output")
 def long_table_parse(longtable_file, output):
-    new_json_parse = relecov_tools.long_table_parse.LongTableParse(
+    new_json_parse = relecov_tools.assets.pipeline_utils.viralrecon.LongTableParse(
         longtable_file, output
     )
     """Create Json file from long table"""
