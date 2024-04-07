@@ -11,15 +11,16 @@ log = logging.getLogger(__name__)
 
 
 def handle_pangolin_data(files_list):
-    """File handler to parse pangolin data (csv) into JSON structured format.
-    """
+    """File handler to parse pangolin data (csv) into JSON structured format."""
     method_name = f"{handle_pangolin_data.__name__}"
     method_log_report = BioinfoReportLog()
 
     # Handling pangolin data
     pango_data_processed = {}
     try:
-        files_list_processed = relecov_tools.utils.select_most_recent_files_per_sample(files_list)
+        files_list_processed = relecov_tools.utils.select_most_recent_files_per_sample(
+            files_list
+        )
         for pango_file in files_list_processed:
             try:
                 pango_data = relecov_tools.utils.read_csv_file_return_dict(
@@ -27,36 +28,28 @@ def handle_pangolin_data(files_list):
                 )
                 # Add custom content in pangolin
                 pango_data_key = next(iter(pango_data))
-                pango_data[pango_data_key]['lineage_analysis_date'] = relecov_tools.utils.get_file_date(
-                    pango_file
+                pango_data[pango_data_key]["lineage_analysis_date"] = (
+                    relecov_tools.utils.get_file_date(pango_file)
                 )
 
                 # Rename key in f_data
-                pango_data_updated = {key.split()[0]: value for key, value in pango_data.items()}
+                pango_data_updated = {
+                    key.split()[0]: value for key, value in pango_data.items()
+                }
                 pango_data_processed.update(pango_data_updated)
                 method_log_report.update_log_report(
-                    method_name,
-                    'valid',
-                    f"Successfully handled data in {pango_file}."
+                    method_name, "valid", f"Successfully handled data in {pango_file}."
                 )
             except (FileNotFoundError, IndexError) as e:
                 method_log_report.update_log_report(
-                    method_name,
-                    'error',
-                    f"Error processing file {pango_file}: {e}"
+                    method_name, "error", f"Error processing file {pango_file}: {e}"
                 )
-                sys.exit(
-                    method_log_report.print_log_report(method_name, ['error'])
-                )
+                sys.exit(method_log_report.print_log_report(method_name, ["error"]))
     except Exception as e:
         method_log_report.update_log_report(
-            method_name,
-            'error',
-            f"Error occurred while processing files: {e}"
+            method_name, "error", f"Error occurred while processing files: {e}"
         )
-        sys.exit(
-            method_log_report.print_log_report(method_name, ['error'])
-        )
+        sys.exit(method_log_report.print_log_report(method_name, ["error"]))
     return pango_data_processed
 
 
@@ -69,9 +62,7 @@ def parse_long_table(files_list):
         files_list_processed = files_list[0]
         if not os.path.isfile(files_list_processed):
             method_log_report.update_log_report(
-                method_name,
-                'error',
-                f"{files_list_processed} given file is not a file"
+                method_name, "error", f"{files_list_processed} given file is not a file"
             )
             sys.exit(method_log_report.print_log_report(method_name, ["error"]))
         long_table = LongTableParse(files_list_processed)
@@ -83,8 +74,8 @@ def parse_long_table(files_list):
     elif len(files_list) > 1:
         method_log_report.update_log_report(
             method_name,
-            'warning',
-            f"Found {len(files_list)} variants_long_table files. This version is unable to process more than one variants long table each time."
+            "warning",
+            f"Found {len(files_list)} variants_long_table files. This version is unable to process more than one variants long table each time.",
         )
     # This needs to return none to avoid being parsed by method mapping-over-table
     return None
@@ -109,13 +100,13 @@ def handle_consensus_fasta(files_list):
 
         # Update consensus data for the sample key
         consensus_data_processed[sample_key] = {
-            'sequence_name': record_fasta.description,
-            'genome_length': str(len(record_fasta)),
-            'sequence_filepath': os.path.dirname(consensus_file),
-            'sequence_filename': sample_key,
-            'sequence_md5': relecov_tools.utils.calculate_md5(consensus_file),
+            "sequence_name": record_fasta.description,
+            "genome_length": str(len(record_fasta)),
+            "sequence_filepath": os.path.dirname(consensus_file),
+            "sequence_filename": sample_key,
+            "sequence_md5": relecov_tools.utils.calculate_md5(consensus_file),
             # TODO: Not sure this is correct. If not, recover previous version: https://github.com/BU-ISCIII/relecov-tools/blob/09c00c1ddd11f7489de7757841aff506ef4b7e1d/relecov_tools/read_bioinfo_metadata.py#L211-L218
-            'number_of_base_pairs_sequenced': len(record_fasta.seq)
+            "number_of_base_pairs_sequenced": len(record_fasta.seq),
         }
 
     # Report missing consensus
@@ -123,8 +114,8 @@ def handle_consensus_fasta(files_list):
     if conserrs >= 1:
         method_log_report.update_log_report(
             method_name,
-            'warning',
-            f"{conserrs} samples missing in consensus file: {missing_consens}"
+            "warning",
+            f"{conserrs} samples missing in consensus file: {missing_consens}",
         )
-    method_log_report.print_log_report(method_name, ['valid', 'warning'])
+    method_log_report.print_log_report(method_name, ["valid", "warning"])
     return consensus_data_processed

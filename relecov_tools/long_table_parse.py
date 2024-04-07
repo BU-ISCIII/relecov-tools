@@ -57,9 +57,7 @@ class LongTableParse:
             sys.exit(1)
 
         if output_directory is None:
-            use_default = relecov_tools.utils.prompt_yn_question(
-                "Use default path?: "
-            )
+            use_default = relecov_tools.utils.prompt_yn_question("Use default path?: ")
             if use_default:
                 self.output_directory = os.getcwd()
             else:
@@ -70,10 +68,12 @@ class LongTableParse:
             self.output_directory = output_directory
         Path(self.output_directory).mkdir(parents=True, exist_ok=True)
 
-        json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
+        json_file = os.path.join(
+            os.path.dirname(__file__), "conf", "bioinfo_config.json"
+        )
         config_json = ConfigJson(json_file)
         # self.long_table_heading = config_json.get_configuration("long_table_heading")
-        self.software_config = config_json.get_configuration('viralrecon')
+        self.software_config = config_json.get_configuration("viralrecon")
         self.long_table_heading = self.software_config["variants_long_table"]["content"]
 
         # FIXME: See fixme details in function parse_long_table relecov_tools.assets.pipeline_utils.viralrecon.

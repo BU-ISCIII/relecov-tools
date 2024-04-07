@@ -424,7 +424,10 @@ def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
     Create the json compliant  from the Bioinfo Metadata.
     """
     new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        json_file, input_folder, out_dir, software_name,
+        json_file,
+        input_folder,
+        out_dir,
+        software_name,
     )
 
     new_bioinfo_metadata.create_bioinfo_file()
