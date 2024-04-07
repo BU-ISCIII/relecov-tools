@@ -311,6 +311,7 @@ def prompt_checkbox(msg, choices):
     selected_options = questionary.checkbox(msg, choices=choices).unsafe_ask()
     return selected_options
 
+
 def get_file_date(file_path):
     """Get the modification date of a file."""
     try:
@@ -326,6 +327,7 @@ def get_file_date(file_path):
         print(f"File not found: {file_path}")
         return None
 
+
 def select_most_recent_files_per_sample(paths_list):
     """Selects the most recent file for each sample among potentially duplicated files.
         Input:
@@ -336,33 +338,30 @@ def select_most_recent_files_per_sample(paths_list):
     filename_groups = {}
     # Count occurrences of each filename and group files by sample names
     for file in paths_list:
-        # TODO: So far, it uses split method to identify this pattern: [sample1.pangolin.csv, sample1.pangolin_20240310.csv]. It should be improve to parse files based on a different character matching field. 
+        # TODO: So far, it uses split method to identify this pattern: [sample1.pangolin.csv, sample1.pangolin_20240310.csv]. It should be improve to parse files based on a different character matching field.
         file_name = os.path.basename(file).split('.')[0]
         if file_name in filename_groups :
             filename_groups[file_name].append(file)
         else:
             filename_groups[file_name] = [file]
-        
     # Filter out sample names with only one file
     duplicated_files = [(sample_name, file_paths) for sample_name, file_paths in filename_groups.items() if len(file_paths) > 1]
-
     # Iterate over duplicated files to select the most recent one for each sample
     for sample_name, file_paths in duplicated_files:
         stderr.print(f"\tMore than one file found for sample {sample_name}. Selecting the most recent one.")
         # Sort files by modification time (most recent first)
-        sorted_files = sorted(file_paths, key=lambda file_path: os.path.getmtime (file_path), reverse=True)
+        sorted_files = sorted(file_paths, key=lambda file_path: os.path.getmtime(file_path), reverse=True)
         # Select the most recent file
         selected_file = sorted_files[0]
         stderr.print(f"\tSelected file for sample {sample_name}: {selected_file}")
         # Remove other files for the same sample from the filtered_files dictionary
         filename_groups[sample_name] = [selected_file]
-
     # Update filename_groups with filtered files
     filename_groups = [(sample_name, file_path) for sample_name, file_paths in filename_groups.items() for file_path in file_paths]
-    
     # Reformat variable to retrieve a list of file paths
     file_path_list = [sample_file_path for _, sample_file_path in filename_groups]
     return file_path_list
+
 
 def print_log_report(log_report, categories=None, sections=["warning", "valid", "error"]):
     color_codes = {
@@ -371,7 +370,6 @@ def print_log_report(log_report, categories=None, sections=["warning", "valid", 
         "valid": "\033[92m",  # Green
         "reset": "\033[0m"  # Reset color
     }
-
     table_data = []
     for section_name, section_data in log_report.items():
         if section_name in sections:
@@ -381,6 +379,4 @@ def print_log_report(log_report, categories=None, sections=["warning", "valid", 
                     for item in items:
                         colored_message = f"{color_codes[section_name]}{item}{color_codes['reset']}"
                         table_data.append([section_name, colored_category, colored_message])
-
     print(tabulate(table_data, headers=["Log type", "Category", "Message"], tablefmt="fancy_grid"))
-

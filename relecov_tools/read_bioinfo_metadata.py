@@ -4,8 +4,6 @@ import sys
 import logging
 import rich.console
 import re
-from datetime import datetime
-from yaml import YAMLError
 from bs4 import BeautifulSoup
 
 import relecov_tools.utils
@@ -19,13 +17,14 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
+
 class BioinfoReportLog:
     def __init__(self, log_report=None):
         if not log_report:
             self.report = {'error': {}, 'valid': {}, 'warning': {}}
         else:
             self.report = log_report
-    
+
     def update_log_report(self, method_name, status, message):
         """Update progress log report"""
         if status == 'valid':
@@ -39,7 +38,7 @@ class BioinfoReportLog:
             return self.report
         else:
             raise ValueError("Invalid status provided.")
-    
+
     def print_log_report(self, name, sections):
         """Calls log report printer."""
         relecov_tools.utils.print_log_report(
@@ -48,7 +47,7 @@ class BioinfoReportLog:
             sections
         )
 
-    
+
 # TODO: Add method to validate bioinfo_config.json file requirements.
 # TODO: replace submitting_lab_id by sequencing_sample_id
 class BioinfoMetadata(BioinfoReportLog):
@@ -60,10 +59,10 @@ class BioinfoMetadata(BioinfoReportLog):
         software=None,
     ):
         # Init process log
-        super().__init__() 
+        super().__init__()
         self.log_report = BioinfoReportLog()
-        
-        # Parse read-lab-meta-data 
+
+        # Parse read-lab-meta-data
         if readlabmeta_json_file is None:
             readlabmeta_json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file that was created by the read-lab-metadata"
@@ -96,7 +95,7 @@ class BioinfoMetadata(BioinfoReportLog):
             )
         else:
             self.output_folder = output_folder
-        
+
         # Parse bioinfo configuration
         self.bioinfo_json_file = os.path.join(os.path.dirname(__file__), "conf", "bioinfo_config.json")
         if software is None:
@@ -117,7 +116,7 @@ class BioinfoMetadata(BioinfoReportLog):
             sys.exit(
                 self.log_report.print_log_report(self.__init__.__name__, ['error'])
             )
-    
+
     def get_available_software(self, json):
         """Get list of available software in configuration"""
         config = relecov_tools.utils.read_json_file(json)
@@ -126,15 +125,15 @@ class BioinfoMetadata(BioinfoReportLog):
 
     def scann_directory(self):
         """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json."""
-        method_name=f"{self.scann_directory.__name__}"
+        method_name = f"{self.scann_directory.__name__}"
         total_files = sum(len(files) for _, _, files in os.walk(self.input_folder))
         files_found = {}
 
-        for topic_key, topic_scope  in self.software_config.items():
-            if 'fn' not in topic_scope: #try/except fn
+        for topic_key, topic_scope in self.software_config.items():
+            if 'fn' not in topic_scope:  # try/except fn
                 self.log_report.update_log_report(
                     method_name,
-                    'warning', 
+                    'warning',
                     f"No 'fn' (file pattern) found in '{self.software_name}.{topic_key}'."
                 )
                 continue
@@ -142,11 +141,10 @@ class BioinfoMetadata(BioinfoReportLog):
                 matching_files = [os.path.join(root, file_name) for file_name in files if re.search(topic_scope['fn'], file_name)]
                 if len(matching_files) >= 1:
                     files_found[topic_key] = matching_files
-
         if len(files_found) < 1:
             self.log_report.update_log_report(
                 method_name,
-                'error', 
+                'error',
                 f"No files found in '{self.input_folder}' according to '{os.path.basename(self.bioinfo_json_file)}' file name patterns."
             )
             sys.exit(
@@ -155,15 +153,15 @@ class BioinfoMetadata(BioinfoReportLog):
         else:
             self.log_report.update_log_report(
                 self.scann_directory.__name__,
-                'valid', 
+                'valid',
                 f"Scannig process succeed. Scanned {total_files} files."
             )
-            self.log_report.print_log_report(method_name, ['valid','warning'])
+            self.log_report.print_log_report(method_name, ['valid', 'warning'])
             return files_found
 
     def validate_software_mandatory_files(self, files_dict):
         """"Validates the presence of all mandatory files as defined in the software configuration JSON."""
-        method_name=f"{self.validate_software_mandatory_files.__name__}"
+        method_name = f"{self.validate_software_mandatory_files.__name__}"
         missing_required = []
         for key in self.software_config:
             if self.software_config[key].get('required') is True:
@@ -174,68 +172,63 @@ class BioinfoMetadata(BioinfoReportLog):
                     continue
             else:
                 continue
-
         if len(missing_required) >= 1:
             self.log_report.update_log_report(
                 method_name,
-                'error', 
+                'error',
                 f"Missing mandatory files in {self.software_name}.{key}:{', '.join(missing_required)}"
             )
-            sys.exit(self.log_report.print_log_report(method_name,["error"]))
+            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         else:
             self.log_report.update_log_report(
                 method_name,
-                'valid', 
+                'valid',
                 "Successfull validation of mandatory files."
             )
-        
         self.log_report.print_log_report(method_name, ['valid', 'waring'])
         return
-    
+
     def add_bioinfo_results_metadata(self, files_dict, j_data):
         """
         Adds metadata from bioinformatics results to j_data.
             1. Handles metadata in bioinformatic files found.
-            2. Mapping handled bioinfo metadata into j_data. 
+            2. Mapping handled bioinfo metadata into j_data.
         """
-        method_name=f"{self.add_bioinfo_results_metadata.__name__}"
+        method_name = f"{self.add_bioinfo_results_metadata.__name__}"
         for key in self.software_config.keys():
             # Update bioinfo cofiguration key/scope
             self.current_config_key = key
             # This skip files that will be parsed with other methods
             if key == 'workflow_summary' or key == "fixed_values":
                 continue
-            
             try:
                 files_dict[key]
                 stderr.print(f"[blue]Start processing {self.software_name}.{key}")
             except KeyError:
                 self.log_report.update_log_report(
                     method_name,
-                    'warning', 
+                    'warning',
                     f"No file path found for '{self.software_name}.{key}'"
                 )
                 continue
-
             # Handling files
             data_to_map = self.handling_files(files_dict[key])
-            
             # Mapping data to j_data
             if data_to_map:
                 j_data_mapped = self.mapping_over_table(
-                    j_data=j_data, 
-                    map_data=data_to_map, 
+                    j_data=j_data,
+                    map_data=data_to_map,
                     mapping_fields=self.software_config[key]['content'],
                     table_name=files_dict[key]
                 )
             else:
                 self.log_report.update_log_report(
                     method_name,
-                    'warning', 
+                    'warning',
                     f"No metadata found to perform standard mapping when processing '{self.software_name}.{key}'"
                 )
                 continue
-        self.log_report.print_log_report(method_name, ['valid','waring'])
+        self.log_report.print_log_report(method_name, ['valid', 'waring'])
         return j_data_mapped
 
     def handling_files(self, file_list):
@@ -244,7 +237,6 @@ class BioinfoMetadata(BioinfoReportLog):
         Handles different file formats to extract data regardless of their structure. The goal is to extract the data contained in files specified in ${file_list}, using either 'standard' handlers defined in this class or pipeline-specific file handlers.
 
         A file handler method must generate a data structure as follow:
-
             {
                 'SAMPLE1': {
                     'field1': 'value1'
@@ -258,7 +250,7 @@ class BioinfoMetadata(BioinfoReportLog):
                 },
                 ...
             }
-        Note: ensure that 'field1','field2','field3' corresponds with the values especifies in the 'content' section of each software configuration scope (see: conf/bioinfo_config.json). 
+        Note: ensure that 'field1','field2','field3' corresponds with the values especifies in the 'content' section of each software configuration scope (see: conf/bioinfo_config.json).
 
         Input:
             file_list (list): A list of file path/s to be processed.
@@ -266,24 +258,22 @@ class BioinfoMetadata(BioinfoReportLog):
         Returns:
             dict: A single dictionary containing extracted data for each sample.
         """
-        method_name=f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_files.__name__}"
+        method_name = f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_files.__name__}"
         file_name = self.software_config[self.current_config_key].get('fn')
         file_extension = os.path.splitext(file_name)[1]
-
         # Parsing key position
         try:
             self.software_config[self.current_config_key]['sample_col_idx']
-            sample_idx_possition = self.software_config[self.current_config_key]['sample_col_idx']-1
+            sample_idx_possition = self.software_config[self.current_config_key]['sample_col_idx'] - 1
         except KeyError:
             sample_idx_possition = None
             self.log_report.update_log_report(
                 method_name,
-                'warning', 
+                'warning',
                 f"No sample-index-column defined in '{self.software_name}.{self.current_config_key}'. Using default instead."
             )
-        
         # Parsing files
-        func_name =  self.software_config[self.current_config_key]["function"]
+        func_name = self.software_config[self.current_config_key]["function"]
         if func_name is None:
             if file_name.endswith('.csv'):
                 data = relecov_tools.utils.read_csv_file_return_dict(
@@ -301,10 +291,10 @@ class BioinfoMetadata(BioinfoReportLog):
             else:
                 self.log_report.update_log_report(
                     method_name,
-                    'error', 
+                    'error',
                     f"Unrecognized defined file name extension '{file_extension}' in '{file_name}'."
                 )
-                sys.exit(self.log_report.print_log_report(method_name,["error"]))
+                sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         else:
             try:
                 # Dynamically import the function from the specified module
@@ -317,15 +307,15 @@ class BioinfoMetadata(BioinfoReportLog):
             except Exception as e:
                 self.log_report.update_log_report(
                     self.add_bioinfo_results_metadata.__name__,
-                    'error', 
+                    'error',
                     f"Error occurred while parsing '{func_name}': {e}."
                 )
-                sys.exit(self.log_report.print_log_report(method_name,["error"]))
+                sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
 
     def get_multiqc_software_versions(self, file_list, j_data):
         """Reads multiqc html file, finds table containing software version info, and map it to j_data"""
-        method_name=f"{self.get_multiqc_software_versions.__name__}"
+        method_name = f"{self.get_multiqc_software_versions.__name__}"
         # Handle multiqc_report.html
         f_path = file_list[0]
         program_versions = {}
@@ -339,7 +329,7 @@ class BioinfoMetadata(BioinfoReportLog):
             table = versions_div.find('table', class_='table')
             if table:
                 rows = table.find_all('tr')
-                for row in rows[1:]: #skipping header
+                for row in rows[1:]:  # skipping header
                     columns = row.find_all('td')
                     if len(columns) == 3:
                         program_name = columns[1].text.strip()
@@ -348,24 +338,24 @@ class BioinfoMetadata(BioinfoReportLog):
                     else:
                         self.log_report.update_log_report(
                             method_name,
-                            'error', 
+                            'error',
                             f"HTML entry error in {columns}. HTML table expected format should be \n<th> Process Name\n</th>\n<th> Software </th>\n."
                         )
-                        sys.exit(self.log_report.print_log_report(method_name,["error"]))
+                        sys.exit(self.log_report.print_log_report(method_name, ["error"]))
             else:
                 self.log_report.update_log_report(
                     method_name,
-                    'error', 
+                    'error',
                     f"Unable to locate the table containing software versions in file {f_path} under div section {div_id}."
                 )
-                sys.exit(self.log_report.print_log_report(method_name,["error"]))
+                sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         else:
             self.log_report.update_log_report(
                 self.get_multiqc_software_versions.__name__,
-                'error', 
+                'error',
                 f"Failed to locate the required '{div_id}' div section in the '{f_path}' file."
             )
-            sys.exit(self.log_report.print_log_report(method_name,["error"]))
+            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
 
         # Mapping multiqc sofware versions to j_data
         field_errors = {}
@@ -376,30 +366,30 @@ class BioinfoMetadata(BioinfoReportLog):
                     row[field] = program_versions[values]
                 except KeyError as e:
                     field_errors[sample_name] = {field: e}
-                    row[field] =  "Not Provided [GENEPIO:0001668]"
+                    row[field] = "Not Provided [GENEPIO:0001668]"
                     continue
 
         # update progress log
         if len(field_errors) > 0:
             self.log_report.update_log_report(
                 method_name,
-                'warning', 
+                'warning',
                 f"Encountered field errors while mapping data: {field_errors}"
             )
         else:
             self.log_report.update_log_report(
                 method_name,
-                'valid', 
+                'valid',
                 "Successfully mapped data."
             )
-        self.log_report.print_log_report(method_name,["valid","warning"])
+        self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
     def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
         """
         Function that maps structure data containing fields per sample into j_data.
         """
-        method_name=f"{self.mapping_over_table.__name__}:{self.software_name}.{self.current_config_key}"
+        method_name = f"{self.mapping_over_table.__name__}:{self.software_name}.{self.current_config_key}"
         errors = []
         field_errors = {}
         field_vaild = {}
@@ -409,7 +399,7 @@ class BioinfoMetadata(BioinfoReportLog):
                 for field, value in mapping_fields.items():
                     try:
                         row[field] = map_data[sample_name][value]
-                        field_vaild[sample_name] = {field:value}
+                        field_vaild[sample_name] = {field: value}
                     except KeyError as e:
                         field_errors[sample_name] = {field: e}
                         row[field] = "Not Provided [GENEPIO:0001668]"
@@ -427,34 +417,33 @@ class BioinfoMetadata(BioinfoReportLog):
                 table_name = table_name[0]
             self.log_report.update_log_report(
                 method_name,
-                'warning', 
+                'warning',
                 f"{lenerrs} samples missing in '{table_name}': {', '.join(errors)}."
             )
         else:
             self.log_report.update_log_report(
                 method_name,
-                'valid', 
+                'valid',
                 "Successfully mapped data."
             )
-
         if len(field_errors) > 0:
             self.log_report.update_log_report(
                 method_name,
-                'warning', 
+                'warning',
                 f"Missing fields in {table_name}:\n\t{field_errors}"
             )
         else:
             self.log_report.update_log_report(
                 method_name,
-                'valid', 
+                'valid',
                 f"Successfully mapped fields in {', '.join(field_vaild.keys())} - {table_name}."
             )
-        self.log_report.print_log_report(method_name,["warning","valid"])
+        self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
     def add_fixed_values(self, j_data):
         """include the fixed data defined in configuration or feed custom empty fields"""
-        method_name=f"{self.add_fixed_values.__name__}"
+        method_name = f"{self.add_fixed_values.__name__}"
         try:
             f_values = self.software_config["fixed_values"]
             for row in j_data:
@@ -472,14 +461,14 @@ class BioinfoMetadata(BioinfoReportLog):
                 f"Error found while adding fixed values: {e}"
             )
             pass
-        self.log_report.print_log_report(method_name,["valid","waring"])
+        self.log_report.print_log_report(method_name, ["valid", "waring"])
         return j_data
 
     def collect_info_from_lab_json(self):
         """Create the list of dictionaries from the data that is on json lab
         metadata file. Return j_data that is used to add the rest of the fields
         """
-        method_name=f"{self.collect_info_from_lab_json.__name__}"
+        method_name = f"{self.collect_info_from_lab_json.__name__}"
         try:
             json_lab_data = relecov_tools.utils.read_json_file(self.readlabmeta_json_file)
         except ValueError:
@@ -488,7 +477,7 @@ class BioinfoMetadata(BioinfoReportLog):
                 'error',
                 f"Invalid lab-metadata json file: self.{self.readlabmeta_json_file}"
             )
-            sys.exit(self.log_report.print_log_report(method_name,["error"]))
+            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return json_lab_data
 
     def create_bioinfo_file(self):
@@ -503,13 +492,13 @@ class BioinfoMetadata(BioinfoReportLog):
         stderr.print(f"[blue]Adding metadata from {self.input_folder} into read lab metadata...")
         self.j_data = self.add_bioinfo_results_metadata(files_found_dict, self.j_data)
         stderr.print("[blue]Adding software versions to read lab metadata...")
-        self.j_data = self.get_multiqc_software_versions(files_found_dict['workflow_summary'], self.j_data)       
+        self.j_data = self.get_multiqc_software_versions(files_found_dict['workflow_summary'], self.j_data)
         stderr.print("[blue]Adding fixed values")
         self.j_data = self.add_fixed_values(self.j_data)
         # Generate readlab + bioinfolab processed metadata.
         file_name = (
-            "bioinfo_" 
-            + os.path.splitext(os.path.basename(self.readlabmeta_json_file))[0] 
+            "bioinfo_"
+            + os.path.splitext(os.path.basename(self.readlabmeta_json_file))[0]
             + ".json"
         )
         stderr.print("[blue]Writting output json file")

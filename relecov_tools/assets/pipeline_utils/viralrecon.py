@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 import os
 import sys
-import re
 import logging
 
 import relecov_tools.utils
 from relecov_tools.read_bioinfo_metadata import BioinfoReportLog
-from relecov_tools.read_bioinfo_metadata import BioinfoMetadata
 from relecov_tools.long_table_parse import LongTableParse
 
 log = logging.getLogger(__name__)
+
 
 def handle_pangolin_data(files_list):
     """File handler to parse pangolin data (csv) into JSON structured format.
@@ -37,13 +36,13 @@ def handle_pangolin_data(files_list):
                 pango_data_processed.update(pango_data_updated)
                 method_log_report.update_log_report(
                     method_name,
-                    'valid', 
+                    'valid',
                     f"Successfully handled data in {pango_file}."
                 )
             except (FileNotFoundError, IndexError) as e:
                 method_log_report.update_log_report(
                     method_name,
-                    'error', 
+                    'error',
                     f"Error processing file {pango_file}: {e}"
                 )
                 sys.exit(
@@ -60,6 +59,7 @@ def handle_pangolin_data(files_list):
         )
     return pango_data_processed
 
+
 def parse_long_table(files_list):
     method_name = f"{parse_long_table.__name__}"
     method_log_report = BioinfoReportLog()
@@ -73,7 +73,7 @@ def parse_long_table(files_list):
                 'error',
                 f"{files_list_processed} given file is not a file"
             )
-            sys.exit(method_log_report.print_log_report(method_name,["error"]))
+            sys.exit(method_log_report.print_log_report(method_name, ["error"]))
         long_table = LongTableParse(files_list_processed)
         # Parsing long table data and saving it
         long_table.parsing_csv()
@@ -82,12 +82,13 @@ def parse_long_table(files_list):
         # self.j_data = long_table.add_custom_longtable_data(self.j_data)
     elif len(files_list) > 1:
         method_log_report.update_log_report(
-            method_name, 
+            method_name,
             'warning',
             f"Found {len(files_list)} variants_long_table files. This version is unable to process more than one variants long table each time."
         )
-    # This needs to return none to avoid being parsed by method mapping-over-table  
+    # This needs to return none to avoid being parsed by method mapping-over-table
     return None
+
 
 def handle_consensus_fasta(files_list):
     """File handler to parse consensus fasta data (*.consensus.fa) into JSON structured format"""
@@ -115,15 +116,15 @@ def handle_consensus_fasta(files_list):
             'sequence_md5': relecov_tools.utils.calculate_md5(consensus_file),
             # TODO: Not sure this is correct. If not, recover previous version: https://github.com/BU-ISCIII/relecov-tools/blob/09c00c1ddd11f7489de7757841aff506ef4b7e1d/relecov_tools/read_bioinfo_metadata.py#L211-L218
             'number_of_base_pairs_sequenced': len(record_fasta.seq)
-        }         
+        }
 
     # Report missing consensus
     conserrs = len(missing_consens)
     if conserrs >= 1:
         method_log_report.update_log_report(
             method_name,
-            'warning', 
+            'warning',
             f"{conserrs} samples missing in consensus file: {missing_consens}"
         )
-    method_log_report.print_log_report(method_name, ['valid','warning'])
+    method_log_report.print_log_report(method_name, ['valid', 'warning'])
     return consensus_data_processed
