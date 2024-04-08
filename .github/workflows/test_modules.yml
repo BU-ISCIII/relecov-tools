@@ -4,8 +4,7 @@ on:
   push:
     branches: "**"
   pull_request_target:
-    types:
-      - [opened, reopened, synchronize, closed]
+    types: [opened, reopened, synchronize, closed]
     branches: "**"
 
 jobs:
