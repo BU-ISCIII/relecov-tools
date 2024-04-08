@@ -1023,7 +1023,7 @@
         "submitting_institution_address": "Av. Roma, s/n",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
-    "Hospital de l'Esperansa": {
+    "Hospital de l'Esperança": {
         "collecting_institution_address": "Ptge. de Sant Josep la Muntanya, 12",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -1117,6 +1117,17 @@
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Tarragona",
         "geo_loc_city": "Tortosa",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
+    },
+    "Hospital del Mar": {
+        "collecting_institution_address": "Passeig Marítim, 25-29",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain",
         "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
         "submitting_institution_address": "Carrer de la Selva, 10",
