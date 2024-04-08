@@ -972,7 +972,7 @@
         "anatomical_material": "Not Applicable"
     },
     "Blood": {
-        "anatomical_part": "Not Applicable",
+        "anatomical_part": "Blood",
         "collection_method": "Not Applicable",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"

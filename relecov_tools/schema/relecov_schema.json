@@ -944,7 +944,7 @@
                 "Missing [GENEPIO:0001618]",
                 "Restricted Access [GENEPIO:0001810]"
             ],
-            "ontology": "SNOMED:364684009",
+            "ontology": "GENEPIO:0001216",
             "type": "string",
             "description": "",
             "examples": [
