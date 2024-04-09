@@ -1,7 +1,7 @@
 {
     "viralrecon": {
         "mapping_stats": {
-            "fn": "mapping_illumina_stats.tab",
+            "fn": "mapping_illumina_stats(?:_\\d{8})?\\.tab",
             "sample_col_idx": 5,
             "header_row_idx": 1,
             "required": true,
@@ -37,7 +37,7 @@
             }
         },
         "variants_long_table": {
-            "fn": "variants_long_table(?:_\\d{8})?\\.csv$",
+            "fn": "variants_long_table(?:_\\d{8})?\\.csv",
             "sample_col_idx": 1,
             "header_row_idx": 1,
             "required": true,

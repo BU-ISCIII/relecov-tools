@@ -26,7 +26,19 @@ class BioinfoReportLog:
             self.report = log_report
 
     def update_log_report(self, method_name, status, message):
-        """Update progress log report"""
+        """Update the progress log report with the given method name, status, and message.
+
+        Args:
+            method_name (str): The name of the method being logged.
+            status (str): The status of the log message, can be one of 'valid', 'error', or 'warning'.
+            message (str): The message to be logged.
+
+        Returns:
+            dict: The updated progress log report.
+
+        Raises:
+            ValueError: If an invalid status is provided.
+        """
         if status == "valid":
             self.report["valid"].setdefault(method_name, []).append(message)
             return self.report
@@ -40,7 +52,15 @@ class BioinfoReportLog:
             raise ValueError("Invalid status provided.")
 
     def print_log_report(self, name, sections):
-        """Calls log report printer."""
+        """Prints the log report by calling util's function.
+
+        Args:
+            name (str): The name of the log report.
+            sections (list of str): The sections of the log report to be printed.
+
+        Returns:
+            None
+        """
         relecov_tools.utils.print_log_report(self.report, name, sections)
 
 
@@ -115,13 +135,24 @@ class BioinfoMetadata(BioinfoReportLog):
             )
 
     def get_available_software(self, json):
-        """Get list of available software in configuration"""
+        """Get list of available software in configuration
+
+        Args:
+            json (str): Path to bioinfo configuration json file.
+
+        Returns:
+            available_software: List containing available software defined in json.
+        """
         config = relecov_tools.utils.read_json_file(json)
         available_software = list(config.keys())
         return available_software
 
     def scann_directory(self):
-        """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json."""
+        """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json.
+
+        Returns:
+            files_found: A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
+        """
         method_name = f"{self.scann_directory.__name__}"
         total_files = sum(len(files) for _, _, files in os.walk(self.input_folder))
         files_found = {}
@@ -159,7 +190,11 @@ class BioinfoMetadata(BioinfoReportLog):
             return files_found
 
     def validate_software_mandatory_files(self, files_dict):
-        """ "Validates the presence of all mandatory files as defined in the software configuration JSON."""
+        """Validates the presence of all mandatory files as defined in the software configuration JSON.
+
+        Args:
+            files_dict (dict{str:str}): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
+        """
         method_name = f"{self.validate_software_mandatory_files.__name__}"
         missing_required = []
         for key in self.software_config:
@@ -182,14 +217,21 @@ class BioinfoMetadata(BioinfoReportLog):
             self.log_report.update_log_report(
                 method_name, "valid", "Successfull validation of mandatory files."
             )
-        self.log_report.print_log_report(method_name, ["valid", "waring"])
+        self.log_report.print_log_report(method_name, ["valid", "warning"])
         return
 
     def add_bioinfo_results_metadata(self, files_dict, j_data):
-        """
-        Adds metadata from bioinformatics results to j_data.
-            1. Handles metadata in bioinformatic files found.
-            2. Mapping handled bioinfo metadata into j_data.
+        """Adds metadata from bioinformatics results to j_data.
+        It first calls file_handlers and then maps the handled
+        data into j_data.
+
+        Args:
+            files_dict (dict{str:str}): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
+
+            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (list item per sample).
+
+        Returns:
+            j_data_mapped: A list of dictionaries with bioinformatics metadata mapped into j_data.
         """
         method_name = f"{self.add_bioinfo_results_metadata.__name__}"
         for key in self.software_config.keys():
@@ -225,13 +267,12 @@ class BioinfoMetadata(BioinfoReportLog):
                     f"No metadata found to perform standard mapping when processing '{self.software_name}.{key}'",
                 )
                 continue
-        self.log_report.print_log_report(method_name, ["valid", "waring"])
+        self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data_mapped
 
     def handling_files(self, file_list):
-        """
+        """Handles different file formats to extract data regardless of their structure. The goal is to extract the data contained in files specified in ${file_list}, using either 'standard' handlers defined in this class or pipeline-specific file handlers.
         (inspired from ./metadata_homogenizer.py)
-        Handles different file formats to extract data regardless of their structure. The goal is to extract the data contained in files specified in ${file_list}, using either 'standard' handlers defined in this class or pipeline-specific file handlers.
 
         A file handler method must generate a data structure as follow:
             {
@@ -249,11 +290,11 @@ class BioinfoMetadata(BioinfoReportLog):
             }
         Note: ensure that 'field1','field2','field3' corresponds with the values especifies in the 'content' section of each software configuration scope (see: conf/bioinfo_config.json).
 
-        Input:
+        Args:
             file_list (list): A list of file path/s to be processed.
 
         Returns:
-            dict: A single dictionary containing extracted data for each sample.
+            data: A dictionary containing bioinfo metadata handled for each sample.
         """
         method_name = f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_files.__name__}"
         file_name = self.software_config[self.current_config_key].get("fn")
@@ -309,20 +350,28 @@ class BioinfoMetadata(BioinfoReportLog):
         return data
 
     def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
-        """
-        Function that maps structure data containing fields per sample into j_data.
+        """Maps bioinformatics metadata from map_data to j_data based on the mapping_fields.
+
+        Args:
+            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
+            map_data (dict(dict{str:str})): A dictionary containing bioinfo metadata handled by the method handling_files().
+            mapping_fields (dict{str:str}): A dictionary of mapping fields defined in the 'content' definition under each software scope (see conf/bioinfo.config).
+            table_name (str): Path to the mapping file/table.
+
+        Returns:
+            j_data: updated j_data with bioinformatic metadata mapped in it.
         """
         method_name = f"{self.mapping_over_table.__name__}:{self.software_name}.{self.current_config_key}"
         errors = []
         field_errors = {}
-        field_vaild = {}
+        field_valid = {}
         for row in j_data:
-            sample_name = row["sequencing_sample_id"].replace("-", "_")
+            sample_name = row["sequencing_sample_id"]
             if sample_name in map_data.keys():
                 for field, value in mapping_fields.items():
                     try:
                         row[field] = map_data[sample_name][value]
-                        field_vaild[sample_name] = {field: value}
+                        field_valid[sample_name] = {field: value}
                     except KeyError as e:
                         field_errors[sample_name] = {field: e}
                         row[field] = "Not Provided [GENEPIO:0001668]"
@@ -357,13 +406,21 @@ class BioinfoMetadata(BioinfoReportLog):
             self.log_report.update_log_report(
                 method_name,
                 "valid",
-                f"Successfully mapped fields in {', '.join(field_vaild.keys())} - {table_name}.",
+                f"Successfully mapped fields in {', '.join(field_valid.keys())} - {table_name}.",
             )
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
     def get_multiqc_software_versions(self, file_list, j_data):
-        """Reads multiqc html file, finds table containing software version info, and map it to j_data"""
+        """Reads multiqc html file, finds table containing software version info, and map it to j_data
+
+        Args:
+            file_list (list): A list containing the path to file multiqc_report.html.
+            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
+
+        Returns:
+            j_data: updated j_data with software version's info mapped in it.
+        """
         method_name = f"{self.get_multiqc_software_versions.__name__}"
         # Handle multiqc_report.html
         f_path = file_list[0]
@@ -437,7 +494,14 @@ class BioinfoMetadata(BioinfoReportLog):
         return j_data
 
     def add_fixed_values(self, j_data):
-        """include the fixed data defined in configuration or feed custom empty fields"""
+        """Add fixed values to j_data as defined in the bioinformatics configuration (definition: "fixed values")
+
+        Args:
+            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
+
+        Returns:
+            j_data: updated j_data with fixxed values added in it.
+        """
         method_name = f"{self.add_fixed_values.__name__}"
         try:
             f_values = self.software_config["fixed_values"]
@@ -452,13 +516,37 @@ class BioinfoMetadata(BioinfoReportLog):
                 method_name, "warning", f"Error found while adding fixed values: {e}"
             )
             pass
-        self.log_report.print_log_report(method_name, ["valid", "waring"])
+        self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
     def add_bioinfo_files_path(self, files_found_dict, j_data):
-        """Adds file paths (essential for handlers and mapping methods to process bioinformatics metadata) to the j_data. In instances where multiple files are identified per configuration item (e.g., viralrecon.mapping_consensus → *.consensus.fa), each sample in j_data receives its respective file path. If no file path is located, the function appends "Not Provided [GENEPIO:0001668]" to indicate missing data.g file. If no file path is found, then adds "Not Provided [GENEPIO:0001668]"""
+        """Adds file paths essential for handling and mapping bioinformatics metadata to the j_data.
+        For each sample in j_data, the function assigns the corresponding file path based on the identified files in files_found_dict.
+        If multiple files are identified per configuration item (e.g., viralrecon.mapping_consensus → *.consensus.fa), each sample in j_data receives its respective file path.
+        If no file path is located, the function appends "Not Provided [GENEPIO:0001668]" to indicate missing data.
+
+        Args:
+            files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
+            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
+
+        Returns:
+            j_data: Updated j_data with file paths mapped for bioinformatic metadata.
+        """
+        method_name = f"{self.add_bioinfo_files_path.__name__}"
+        sample_error = 0
         for row in j_data:
-            sample_name = row["sequencing_sample_id"]
+            try:
+                sample_name = re.match(
+                    r"^(.*?)_R1\.fastq\.gz", row["sequence_file_R1_fastq"]
+                ).group(1)
+            except AttributeError as e:
+                sample_error += 1
+                self.log_report.update_log_report(
+                    method_name,
+                    "warning",
+                    f" {row['sequence_file_R1_fastq']} doesn't match pattern '*_R1.fastq.gz'. Cannot add file paths (error: {e})",
+                )
+                continue
             for key, value in files_found_dict.items():
                 file_path = "Not Provided [GENEPIO:0001668]"
                 if value:  # Check if value is not empty
@@ -471,11 +559,21 @@ class BioinfoMetadata(BioinfoReportLog):
                         file_path = value[0]
                 path_key = f"{self.software_name}_filepath_{key}"
                 row[path_key] = file_path
+        self.log_report.print_log_report(method_name, ["warning"])
+        if sample_error == 0:
+            self.log_report.update_log_report(
+                method_name, "valid", "File paths added successfully."
+            )
+            self.log_report.print_log_report(method_name, ["valid"])
         return j_data
 
     def collect_info_from_lab_json(self):
-        """Create the list of dictionaries from the data that is on json lab
-        metadata file. Return j_data that is used to add the rest of the fields
+        """Reads lab metadata from a JSON file and creates a list of dictionaries.
+        Reads lab metadata from the specified JSON file and converts it into a list of dictionaries.
+        This list is used to add the rest of the fields.
+
+        Returns:
+            json_lab_data: A list of dictionaries containing lab metadata (aka j_data).
         """
         method_name = f"{self.collect_info_from_lab_json.__name__}"
         try:
@@ -494,7 +592,10 @@ class BioinfoMetadata(BioinfoReportLog):
     def create_bioinfo_file(self):
         """Create the bioinfodata json with collecting information from lab
         metadata json, mapping_stats, and more information from the files
-        inside input directory
+        inside input directory.
+
+        Returns:
+            bool: True if the bioinfo file creation process was successful.
         """
         # Find and validate bioinfo files
         stderr.print("[blue]Sanning input directory...")

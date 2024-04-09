@@ -30,7 +30,6 @@ class LongTableParse:
     - saving_file(generated_JSON)
     - parsing_csv() : It manages all this proccess:
         - calling first to parse_a_list_of_dictionaries() and then calling to saving_file()
-
     """
 
     def __init__(self, file_path=None, output_directory=None):
@@ -136,17 +135,32 @@ class LongTableParse:
         j_list = []
         # Grab date from filename
         result_regex = re.search(
-            "variants_long_table_(.*).csv", os.path.basename(self.file_path)
+            "variants_long_table(?:_\d{8})?\.csv", os.path.basename(self.file_path)
         )
+        stderr.print(result_regex.group(0))
         if result_regex is None:
-            log.error("Analysis date not found in filename, aborting")
             stderr.print(
-                "[red]Error: filename must include analysis date in format YYYYMMDD"
+                "[red]\tWARN: Couldn't find variants long table file. Expected file name is:"
             )
-            stderr.print("[red]e.g. variants_long_table_20220830.csv")
+            stderr.print(
+                "[red]\t\t- variants_long_table.csv or variants_long_table_YYYYMMDD.csv. Aborting..."
+            )
             sys.exit(1)
+        else:
+            date_regex = re.search(r"(\d{8})", result_regex.group())
+            if date_regex is not None:
+                analysis_date = date_regex
+                stderr.print(
+                    f"[green]\tDate {analysis_date.group()} found in {self.file_path}"
+                )
+            else:
+                analysis_date = "Not Provided [GENEPIO:0001668]"
+                stderr.print(
+                    f"[yellow]\tWARN:No analysis date found in long table: {self.file_path}"
+                )
+
         for key, values in samp_dict.items():
-            j_dict = {"sample_name": key, "analysis_date": result_regex.group(1)}
+            j_dict = {"sample_name": key, "analysis_date": analysis_date.group()}
             j_dict["variants"] = values
             j_list.append(j_dict)
         return j_list
@@ -182,12 +196,20 @@ class LongTableParse:
 
 # START util functions
 def handle_pangolin_data(files_list):
-    """File handler to parse pangolin data (csv) into JSON structured format."""
+    """File handler to parse pangolin data (csv) into JSON structured format.
+
+    Args:
+        files_list (list): A list with paths to pangolin files.
+
+    Returns:
+        pango_data_processed: A dictionary containing pangolin data handled.
+    """
     method_name = f"{handle_pangolin_data.__name__}"
     method_log_report = BioinfoReportLog()
 
     # Handling pangolin data
     pango_data_processed = {}
+    valid_samples = []
     try:
         files_list_processed = relecov_tools.utils.select_most_recent_files_per_sample(
             files_list
@@ -208,23 +230,39 @@ def handle_pangolin_data(files_list):
                     key.split()[0]: value for key, value in pango_data.items()
                 }
                 pango_data_processed.update(pango_data_updated)
-                method_log_report.update_log_report(
-                    method_name, "valid", f"Successfully handled data in {pango_file}."
-                )
+                valid_samples.append(pango_data_key.split()[0])
             except (FileNotFoundError, IndexError) as e:
                 method_log_report.update_log_report(
-                    method_name, "error", f"Error processing file {pango_file}: {e}"
+                    method_name,
+                    "warning",
+                    f"Error occurred while processing file {pango_file}: {e}",
                 )
-                sys.exit(method_log_report.print_log_report(method_name, ["error"]))
+                continue
     except Exception as e:
         method_log_report.update_log_report(
-            method_name, "error", f"Error occurred while processing files: {e}"
+            method_name, "warning", f"Error occurred while processing files: {e}"
         )
-        sys.exit(method_log_report.print_log_report(method_name, ["error"]))
+    if len(valid_samples) > 0:
+        method_log_report.update_log_report(
+            method_name,
+            "valid",
+            f"Successfully handled data in samples: {', '.join(valid_samples)}",
+        )
+    method_log_report.print_log_report(method_name, ["valid", "warning"])
     return pango_data_processed
 
 
 def parse_long_table(files_list):
+    """File handler to retrieve data from long table files and convert it into a JSON structured format.
+    This function utilizes the LongTableParse class to parse the long table data.
+    Since this utility handles and maps data using a custom way, it returns None to be avoid being  transferred to method read_bioinfo_metadata.BioinfoMetadata.mapping_over_table().
+
+    Args:
+        files_list (list): A list of paths to long table files.
+
+    Returns:
+        None: Indicates that the function does not return any meaningful value.
+    """
     method_name = f"{parse_long_table.__name__}"
     method_log_report = BioinfoReportLog()
 
@@ -250,7 +288,14 @@ def parse_long_table(files_list):
 
 
 def handle_consensus_fasta(files_list):
-    """File handler to parse consensus fasta data (*.consensus.fa) into JSON structured format"""
+    """File handler to parse consensus data (fasta) into JSON structured format.
+
+    Args:
+        files_list (list): A list with paths to condensus files.
+
+    Returns:
+        consensus_data_processed: A dictionary containing consensus data handled.
+    """
     method_name = f"{handle_consensus_fasta.__name__}"
     method_log_report = BioinfoReportLog()
 

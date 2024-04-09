@@ -17,7 +17,6 @@ import relecov_tools.json_validation
 import relecov_tools.map_schema
 import relecov_tools.feed_database
 import relecov_tools.read_bioinfo_metadata
-import relecov_tools.long_table_parse
 import relecov_tools.metadata_homogeneizer
 import relecov_tools.gisaid_upload
 import relecov_tools.upload_ena_protocol
