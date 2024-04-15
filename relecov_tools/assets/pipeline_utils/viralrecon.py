@@ -137,7 +137,6 @@ class LongTableParse:
         result_regex = re.search(
             "variants_long_table(?:_\d{8})?\.csv", os.path.basename(self.file_path)
         )
-        stderr.print(result_regex.group(0))
         if result_regex is None:
             stderr.print(
                 "[red]\tWARN: Couldn't find variants long table file. Expected file name is:"

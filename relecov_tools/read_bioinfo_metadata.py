@@ -274,7 +274,7 @@ class BioinfoMetadata(BioinfoReportLog):
         """Handles different file formats to extract data regardless of their structure. The goal is to extract the data contained in files specified in ${file_list}, using either 'standard' handlers defined in this class or pipeline-specific file handlers.
         (inspired from ./metadata_homogenizer.py)
 
-        A file handler method must generate a data structure as follow:
+            A file handler method must generate a data structure as follow:
             {
                 'SAMPLE1': {
                     'field1': 'value1'
@@ -288,7 +288,7 @@ class BioinfoMetadata(BioinfoReportLog):
                 },
                 ...
             }
-        Note: ensure that 'field1','field2','field3' corresponds with the values especifies in the 'content' section of each software configuration scope (see: conf/bioinfo_config.json).
+            Note: ensure that 'field1','field2','field3' corresponds with the values especifies in the 'content' section of each software configuration scope (see: conf/bioinfo_config.json).
 
         Args:
             file_list (list): A list of file path/s to be processed.
@@ -366,7 +366,15 @@ class BioinfoMetadata(BioinfoReportLog):
         field_errors = {}
         field_valid = {}
         for row in j_data:
-            sample_name = row["sequencing_sample_id"]
+            # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
+            #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
+            sample_match = re.match(
+                r"^(.*?)_R1\.fastq\.gz", row["sequence_file_R1_fastq"]
+            )
+            if sample_match:
+                sample_name = sample_match.group(1)
+            else:
+                continue
             if sample_name in map_data.keys():
                 for field, value in mapping_fields.items():
                     try:
@@ -380,13 +388,14 @@ class BioinfoMetadata(BioinfoReportLog):
                 errors.append(sample_name)
                 for field in mapping_fields.keys():
                     row[field] = "Not Provided [GENEPIO:0001668]"
+        # work around when map_data comes from several per-sample tables/files instead of single table
+        if len(table_name) > 2:
+            table_name = os.path.dirname(table_name[0])
+        else:
+            table_name = table_name[0]
+        # Parse missing sample errors
         if errors:
             lenerrs = len(errors)
-            # work around when map_data comes from several per-sample tables/files instead of single table (from list to str)
-            if len(table_name) > 1:
-                table_name = os.path.dirname(table_name[0])
-            else:
-                table_name = table_name[0]
             self.log_report.update_log_report(
                 method_name,
                 "warning",
@@ -394,8 +403,12 @@ class BioinfoMetadata(BioinfoReportLog):
             )
         else:
             self.log_report.update_log_report(
-                method_name, "valid", "Successfully mapped data."
+                method_name,
+                "valid",
+                f"All samples were successfully found in {table_name}.",
             )
+        # Parse missing fields errors
+        # TODO: this stdout can be improved
         if len(field_errors) > 0:
             self.log_report.update_log_report(
                 method_name,
@@ -406,8 +419,9 @@ class BioinfoMetadata(BioinfoReportLog):
             self.log_report.update_log_report(
                 method_name,
                 "valid",
-                f"Successfully mapped fields in {', '.join(field_valid.keys())} - {table_name}.",
+                f"Successfully mapped fields in {', '.join(field_valid.keys())}.",
             )
+        # Print report
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
@@ -468,7 +482,13 @@ class BioinfoMetadata(BioinfoReportLog):
         # Mapping multiqc sofware versions to j_data
         field_errors = {}
         for row in j_data:
-            sample_name = row["sequencing_sample_id"]
+            sample_match = re.match(
+                r"^(.*?)_R1\.fastq\.gz", row["sequence_file_R1_fastq"]
+            )
+            if sample_match:
+                sample_name = sample_match.group(1)
+            else:
+                continue
             for field, values in (
                 self.software_config["workflow_summary"].get("content").items()
             ):
@@ -488,7 +508,7 @@ class BioinfoMetadata(BioinfoReportLog):
             )
         else:
             self.log_report.update_log_report(
-                method_name, "valid", "Successfully mapped data."
+                method_name, "valid", "Successfully field mapped data."
             )
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
@@ -533,38 +553,32 @@ class BioinfoMetadata(BioinfoReportLog):
             j_data: Updated j_data with file paths mapped for bioinformatic metadata.
         """
         method_name = f"{self.add_bioinfo_files_path.__name__}"
-        sample_error = 0
+        sample_name_error = 0
         for row in j_data:
-            try:
-                sample_name = re.match(
-                    r"^(.*?)_R1\.fastq\.gz", row["sequence_file_R1_fastq"]
-                ).group(1)
-            except AttributeError as e:
-                sample_error += 1
-                self.log_report.update_log_report(
-                    method_name,
-                    "warning",
-                    f" {row['sequence_file_R1_fastq']} doesn't match pattern '*_R1.fastq.gz'. Cannot add file paths (error: {e})",
-                )
+            sample_match = re.match(
+                r"^(.*?)_R1\.fastq\.gz", row["sequence_file_R1_fastq"]
+            )
+            if sample_match:
+                sample_name = sample_match.group(1)
+            else:
                 continue
             for key, value in files_found_dict.items():
                 file_path = "Not Provided [GENEPIO:0001668]"
                 if value:  # Check if value is not empty
-                    if len(value) > 1:
-                        for file in value:
-                            if sample_name in file:
-                                file_path = file
-                                break  # Exit loop if match found
-                    else:
-                        file_path = value[0]
+                    for file in value:
+                        if sample_name in file:
+                            file_path = file
+                            break  # Exit loop if match found
+                else:
+                    file_path = value[0]
                 path_key = f"{self.software_name}_filepath_{key}"
                 row[path_key] = file_path
         self.log_report.print_log_report(method_name, ["warning"])
-        if sample_error == 0:
+        if sample_name_error == 0:
             self.log_report.update_log_report(
                 method_name, "valid", "File paths added successfully."
             )
-            self.log_report.print_log_report(method_name, ["valid"])
+        self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
     def collect_info_from_lab_json(self):

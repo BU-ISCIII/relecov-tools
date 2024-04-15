@@ -33,7 +33,7 @@
                 "lineage_analysis_software_version": "pangolin_version",
                 "lineage_analysis_scorpio_version": "scorpio_version",
                 "lineage_analysis_constellation_version": "constellation_version",
-                "lineage_analysis_date":"Not Provided [GENEPIO:0001668]"
+                "lineage_analysis_date":"lineage_analysis_date"
             }
         },
         "variants_long_table": {
