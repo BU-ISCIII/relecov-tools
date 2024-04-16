@@ -478,7 +478,6 @@ class BioinfoMetadata(BioinfoReportLog):
                 f"Failed to locate the required '{div_id}' div section in the '{f_path}' file.",
             )
             sys.exit(self.log_report.print_log_report(method_name, ["error"]))
-
         # Mapping multiqc sofware versions to j_data
         field_errors = {}
         for row in j_data:
