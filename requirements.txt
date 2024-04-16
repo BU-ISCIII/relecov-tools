@@ -11,3 +11,5 @@ openpyxl>=3.1.2
 ena-upload-cli
 bio==1.4.0 
 xlsxwriter
+bs4==0.0.2
+tabulate

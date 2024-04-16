@@ -10,13 +10,13 @@ import rich.logging
 import rich.traceback
 
 import relecov_tools.utils
+import relecov_tools.assets.pipeline_utils.viralrecon
 import relecov_tools.read_lab_metadata
 import relecov_tools.sftp_handle
 import relecov_tools.json_validation
 import relecov_tools.map_schema
 import relecov_tools.feed_database
 import relecov_tools.read_bioinfo_metadata
-import relecov_tools.long_table_parse
 import relecov_tools.metadata_homogeneizer
 import relecov_tools.gisaid_upload
 import relecov_tools.upload_ena_protocol
@@ -418,12 +418,16 @@ def update_db(user, password, json, type, databaseServer):
 )
 @click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file")
-def read_bioinfo_metadata(json_file, input_folder, out_dir):
+@click.option("-s", "--software_name", help="Name of the software/pipeline used.")
+def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
     new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        json_file, input_folder, out_dir
+        json_file,
+        input_folder,
+        out_dir,
+        software_name,
     )
 
     new_bioinfo_metadata.create_bioinfo_file()
@@ -439,7 +443,7 @@ def read_bioinfo_metadata(json_file, input_folder, out_dir):
 )
 @click.option("-o", "--output", type=click.Path(), help="Path to save json output")
 def long_table_parse(longtable_file, output):
-    new_json_parse = relecov_tools.long_table_parse.LongTableParse(
+    new_json_parse = relecov_tools.assets.pipeline_utils.viralrecon.LongTableParse(
         longtable_file, output
     )
     """Create Json file from long table"""
