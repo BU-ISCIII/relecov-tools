@@ -11,7 +11,8 @@ relecov-tools is a set of helper tools for the assembly of the different element
 * [Installation](#installation)
 * [Usage](#usage)
     * [download](#download)
-    * [read-metadata](#read-metadata)
+    * [read-lab-metadata](#read-lab-metadata)
+    * [read-bioinfo-metadata](#read-bioinfo-metadata)
     * [validate](#validate)
     * [map](#map)
     * [upload-to-ena](#upload-to-ena)
@@ -128,7 +129,7 @@ Usage: relecov-tools read-metadata [OPTIONS]
 An example for the metadata excel file can be found [here](./relecov_tools/example_data/METADATA_LAB_TEST.xlsx)
 
 #### read-bioinfo-metadata
-`read-bioinfo-metadata` Include the results from the Bioinformatics analysis (default: viralrecon) into the Json previously created with read-lab-metadata module.
+`read-bioinfo-metadata` Include the results from the Bioinformatics analysis into the Json previously created with read-lab-metadata module.
 
 ```
 $ relecov-tools read-bioinfo-metadata --help
@@ -139,8 +140,10 @@ Usage: relecov-tools read-bioinfo-metadata [OPTIONS]
    Options:
       -j, --json_file       Json file containing lab metadata
       -i, --input_folder    Path to folder containing analysis results
+      -s, --software_name   Name of the software employed in the bioinformatics analysis (default: viralrecon).
       -o, --out_dir         Path to save output file"
 ```
+- Note: Software-specific configurations are available in [bioinfo_config.json](./relecov_tools/conf/bioinfo_config.json).
 
 #### validate
 `validate` commands validate the data in json format outputted by `read-metadata` command against a json schema, in this case the relecov [schema specification](./relecov_tools/schema/relecov_schema.json).
