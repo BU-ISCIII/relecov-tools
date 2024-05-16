@@ -1,6 +1,6 @@
 name: Python Package using Conda
 
-on: 
+on:
   push:
     branches: "**"
   pull_request_target:
@@ -26,6 +26,10 @@ jobs:
         exit 1
 
   test_sftp_handle:
+    needs: security_check
+    concurrency:
+      group: ${{ github.repository }}-test_sftp_handle
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
@@ -87,7 +91,7 @@ jobs:
       with:
         name: test-output
         path: output.txt
-    
+
   test_all_modules:
     runs-on: ubuntu-latest
     strategy:
@@ -95,18 +99,22 @@ jobs:
       matrix:
         modules: ["read-lab-metadata", "read-bioinfo-metadata", "validate"]
     steps:
+
     - name: Set up Python 3.9.16
       uses: actions/setup-python@v3
       with:
         python-version: '3.9.16'
+
     - name: Checkout code
       uses: actions/checkout@v3
       with:
         path: .
+
     - name: Install package and dependencies
       run: |
         pip install -r requirements.txt
         pip install .
+
     - name: Run each module tests
       run: |
         if [ "${{ matrix.modules }}" == "read-lab-metadata" ]; then
