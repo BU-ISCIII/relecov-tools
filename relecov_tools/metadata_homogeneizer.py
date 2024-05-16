@@ -164,9 +164,9 @@ class MetadataHomogeneizer:
             elif f_name.endswith(".csv"):
                 data = relecov_tools.utils.read_csv_file_return_dict(f_name, ",")
             elif f_name.endswith(".xlsx"):
-                heading_row_number = 1
+                header_flag = self.metadata_processing.get("header_flag")
                 data = relecov_tools.utils.read_excel_file(
-                    f_name, "Sheet", heading_row_number
+                    f_name, "Sheet", header_flag, leave_empty=True
                 )
             else:
                 log.error("Additional file extension %s is not supported ", f_name)
