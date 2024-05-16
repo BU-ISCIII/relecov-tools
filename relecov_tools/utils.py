@@ -58,13 +58,16 @@ def read_json_file(j_file):
     return data
 
 
-def read_excel_file(f_name, sheet_name, heading_row, leave_empty=True):
+def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
     """Read the input excel file and give the information in a list
     of dictionaries
     """
     wb_file = openpyxl.load_workbook(f_name, data_only=True)
     ws_metadata_lab = wb_file[sheet_name]
-    heading = [i.value.strip() for i in ws_metadata_lab[heading_row] if i.value]
+    heading_row = [
+        idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
+    ][0]
+    heading = [str(i.value).strip() for i in ws_metadata_lab[heading_row] if i.value]
     ws_data = []
     for row in islice(ws_metadata_lab.values, heading_row, ws_metadata_lab.max_row):
         l_row = list(row)
@@ -75,14 +78,14 @@ def read_excel_file(f_name, sheet_name, heading_row, leave_empty=True):
         for idx in range(0, len(heading)):
             if l_row[idx] is None:
                 if leave_empty:
-                    data_row[heading[idx]] = ""
+                    data_row[heading[idx]] = None
                 else:
                     data_row[heading[idx]] = "Not Provided [GENEPIO:0001668]"
             else:
                 data_row[heading[idx]] = l_row[idx]
         ws_data.append(data_row)
 
-    return ws_data
+    return ws_data, heading_row
 
 
 def read_csv_file_return_dict(file_name, sep, key_position=None):
@@ -177,7 +180,7 @@ def read_md5_checksum(file_name, avoid_chars=list()):
     elif any("," in line for line in lines):
         lines = [line.strip().translate(translation).split(",") for line in lines]
     else:
-        lines = [line.strip().translate(translation).split("  ") for line in lines]
+        lines = [line.strip().translate(translation).split() for line in lines]
     clean_lines = [
         x for x in lines if not any(ch in string for ch in avoid_chars for string in x)
     ]
