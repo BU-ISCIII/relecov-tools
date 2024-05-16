@@ -809,21 +809,21 @@
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Pharynx Swabbing": {
+    "Pharynx Swab": {
         "anatomical_part": "Pharynx",
-        "collection_method": "Swabbing",
+        "collection_method": "Swab",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Nasopharynx Swabbing": {
+    "Nasopharynx Swab": {
         "anatomical_part": "Nasopharynx",
-        "collection_method": "Swabbing",
+        "collection_method": "Swab",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
-    "Oropharynx Swabbing": {
+    "Oropharynx Swab": {
         "anatomical_part": "Oropharynx",
-        "collection_method": "Swabbing",
+        "collection_method": "Swab",
         "body_product": "Not Applicable",
         "anatomical_material": "Not Applicable"
     },
