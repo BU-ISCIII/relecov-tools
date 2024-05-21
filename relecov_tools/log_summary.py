@@ -63,9 +63,9 @@ class LogSum:
         feed_dict = OrderedDict({"valid": True, "errors": [], "warnings": []})
         # Removing strange characters
         current_key = str(key).replace("./", "")
-        if self.only_samples and sample != None:
+        if self.only_samples and sample is not None:
             log.warning(
-                f"No samples record can be added if only_samples is set to True. "
+                "No samples record can be added if only_samples is set to True. "
                 + f"Record will be added to {current_key}"
             )
             sample = None
