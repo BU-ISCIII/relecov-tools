@@ -688,6 +688,7 @@ class SftpHandle:
             files (list(str)): list of file basenames in remote repository
         """
         stderr.print(f"[blue]Deleting files in {remote_folder}...")
+        empty_folder = True
         for file in files:
             try:
                 self.client.remove(os.path.join(remote_folder, os.path.basename(file)))
@@ -695,7 +696,15 @@ class SftpHandle:
             except (IOError, PermissionError) as e:
                 log.error("Could not delete file %s.", str(e))
                 stderr.print(f"Could not delete file {file}. Error: {e}")
+                empty_folder = False
                 continue
+        if empty_folder:
+            if len(remote_folder.replace("./", "").split("/")) >= 2:
+                try:
+                    self.client.rmdir(remote_folder)
+                except (OSError, PermissionError) as e:
+                    log.error("Could not delete folder %s.", str(e))
+                    stderr.print(f"Could not delete folder {remote_folder}. Error: {e}")
         return
 
     def move_processing_fastqs(self, folders_with_metadata):
@@ -783,25 +792,24 @@ class SftpHandle:
                 md5_dest = os.path.join(folder, os.path.basename(merged_md5_path))
                 self.client.put(localpath=merged_md5_path, remotepath=md5_dest)
                 # Remove local files once merged and uploaded
+                os.remove(merged_md5_path)
                 [os.remove(md5_file) for md5_file in downloaded_md5files]
                 return md5_dest
             else:
                 error_text = "No md5sum could be processed in remote folder"
                 raise FileNotFoundError(error_text)
 
-        for folder in folders_with_metadata.keys():
+        for folder, files in folders_with_metadata.items():
             self.current_folder = folder.split("/")[0]
-            md5flag = "md5sum"
-            md5sumlist = [fi for fi in folders_with_metadata[folder] if md5flag in fi]
+            md5flags = [".md5", "md5sum", "md5checksum"]
+            md5sumlist = [fi for fi in files if any(flag in fi for flag in md5flags)]
             if not md5sumlist:
                 error_text = "No md5sum could be found in remote folder"
                 log.warning(error_text)
                 stderr.print(f"[yellow]{error_text}")
                 self.include_warning(error_text)
                 continue
-            folders_with_metadata[folder] = [
-                fi for fi in folders_with_metadata[folder] if fi not in md5sumlist
-            ]
+            folders_with_metadata[folder] = [fi for fi in files if fi not in md5sumlist]
             try:
                 uploaded_md5 = md5_handler(md5sumlist, output_location)
             except (FileNotFoundError, OSError, PermissionError, CsvError) as e:
@@ -1216,6 +1224,7 @@ class SftpHandle:
                 log.info("Finished md5 check for folder: %s", folder)
                 stderr.print(f"[blue]Finished md5 verification for folder {folder}")
             else:
+                corrupted = []
                 error_text = "No single md5sum file could be found in %s" % folder
                 log.warning(error_text)
                 stderr.print(f"[red]{error_text}")
@@ -1236,9 +1245,9 @@ class SftpHandle:
                     clean_fetchlist, files_to_compress, local_folder
                 )
             clean_pathlist = [os.path.join(local_folder, fi) for fi in clean_fetchlist]
+            not_md5sum = []
             if remote_md5sum:
                 # Get hashes from provided md5sum, create them for those not provided
-                not_md5sum = []
                 files_md5_dict = {}
                 for path in clean_pathlist:
                     f_name = os.path.basename(path)
