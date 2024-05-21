@@ -207,7 +207,7 @@ class RelecovMetadata:
                 except KeyError as error:
                     clean_error = re.sub("[\[].*?[\]]", "", str(error.args[0]))
                     if str(clean_error).lower().strip() == "not provided":
-                        log_text(
+                        log_text = (
                             f"Label {map_field} was not provided in sample "
                             + f"{sample_id}, auto-completing with Not Provided"
                         )
