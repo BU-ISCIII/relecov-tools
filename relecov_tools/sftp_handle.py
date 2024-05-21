@@ -553,29 +553,71 @@ class SftpHandle:
             local_folder (str): path to the local folder
 
         Raises:
-            FileNotFoundError: If more than 1 metadata excel file or missing
+            FileNotFoundError: If missing metadata excel file or merging error.
 
         Returns:
-            local_meta_file: Path to downloaded metadata file.
+            local_meta_file: Path to downloaded metadata file / merged metadata file.
         """
         remote_files_list = self.get_file_list(remote_folder)
         meta_files = [fi for fi in remote_files_list if fi.endswith(".xlsx")]
+
+        def download_remote_metafile(target_meta_file):
+            local_meta_file = os.path.join(
+                local_folder, os.path.basename(target_meta_file)
+            )
+            try:
+                self.get_from_sftp(target_meta_file, local_meta_file)
+            except (IOError, PermissionError) as e:
+                raise type(e)(f"[red]Unable to fetch metadata file {e}")
+            log.info(
+                "Obtained metadata file %s from %s",
+                local_meta_file,
+                remote_folder,
+            )
+            return local_meta_file
+
         if not meta_files:
             raise FileNotFoundError(f"Missing metadata file for {remote_folder}")
-        if len(meta_files) > 1:
-            raise MetadataError(f"[red]Too many metadata files in {remote_folder}")
-        target_meta_file = meta_files[0]
         os.makedirs(self.platform_storage_folder, exist_ok=True)
-        local_meta_file = os.path.join(local_folder, os.path.basename(target_meta_file))
-        try:
-            self.get_from_sftp(target_meta_file, local_meta_file)
-        except (IOError, PermissionError) as e:
-            raise type(e)(f"[red]Unable to fetch metadata file {e}")
-        log.info(
-            "Obtained metadata file %s from %s",
-            local_meta_file,
-            remote_folder,
-        )
+        if len(meta_files) > 1:
+            # Merging multiple excel files into a single one
+            log.warning(f"[yellow]Merging multiple metadata files in {remote_folder}")
+            metadata_ws = self.metadata_processing.get("excel_sheet")
+            header_flag = self.metadata_processing.get("header_flag")
+            local_meta_list = []
+            for remote_metafile in meta_files:
+                local_meta_file = download_remote_metafile(remote_metafile)
+                local_meta_list.append(local_meta_file)
+            meta_df_list = []
+            for loc_meta in local_meta_list:
+                try:
+                    loc_meta_df = self.excel_to_df(loc_meta, metadata_ws, header_flag)
+                    meta_df_list.append(loc_meta_df)
+                except (ParserError, EmptyDataError, MetadataError, KeyError) as e:
+                    error_text = f"Could not process {os.path.basename(loc_meta)}: {e}"
+                    log.error(error_text)
+                    self.include_error(error_text)
+                os.remove(loc_meta)
+            if meta_df_list:
+                merged_df = meta_df_list[0]
+            else:
+                raise MetadataError("No single metadata file could be merged")
+            for meta_df in meta_df_list[1:]:
+                merged_df = self.merge_metadata(metadata_ws, merged_df, meta_df)
+            folder_name = os.path.dirname(local_meta_file)
+            excel_name = str(folder_name.split("/")[-1]) + "merged_metadata.xlsx"
+            merged_excel_path = os.path.join(folder_name, excel_name)
+            pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
+            for sheet in merged_df.keys():
+                format_sheet = merged_df[sheet].astype(str)
+                format_sheet.replace("nan", None, inplace=True)
+                format_sheet.to_excel(pd_writer, sheet_name=sheet, index=False)
+            pd_writer.close()
+            local_meta_file = merged_excel_path
+            return merged_excel_path
+        else:
+            target_meta_file = meta_files[0]
+            local_meta_file = download_remote_metafile(target_meta_file)
         return local_meta_file
 
     def validate_remote_files(self, remote_folder, local_folder):
