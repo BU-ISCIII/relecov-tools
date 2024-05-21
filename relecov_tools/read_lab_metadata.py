@@ -5,10 +5,11 @@ import rich.console
 import os
 import sys
 import re
-from datetime import datetime
+from datetime import datetime as dtime
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 import relecov_tools.json_schema
+from relecov_tools.log_summary import LogSum
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -17,7 +18,6 @@ stderr = rich.console.Console(
     highlight=False,
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
-#
 
 
 class RelecovMetadata:
@@ -79,12 +79,42 @@ class RelecovMetadata:
                     "[orange]Property " + prop + " does not have 'label' attribute"
                 )
                 continue
-
+        self.logsum = LogSum(output_location=self.output_folder, only_samples=True)
         self.json_req_files = config_json.get_topic_data(
             "lab_metadata", "lab_metadata_req_json"
         )
         self.schema_name = self.relecov_sch_json["title"]
         self.schema_version = self.relecov_sch_json["version"]
+        self.metadata_processing = config_json.get_topic_data(
+            "sftp_handle", "metadata_processing"
+        )
+        self.samples_json_fields = config_json.get_topic_data(
+            "lab_metadata", "samples_json_fields"
+        )
+
+    def match_to_json(self, valid_metadata_rows):
+        """Keep only the rows from samples present in the input file samples.json
+
+        Args:
+            valid_metadata_rows (list(dict)): List of rows from metadata_lab.xlsx file
+
+        Returns:
+            clean_metadata_rows(list(dict)): _description_
+            missing_samples(list(str)):
+        """
+        samples_json = relecov_tools.utils.read_json_file(self.sample_list_file)
+        clean_metadata_rows = []
+        missing_samples = []
+        for row in valid_metadata_rows:
+            sample_id = str(row["sequencing_sample_id"]).strip()
+            self.logsum.feed_key(sample_id)
+            if sample_id in samples_json.keys():
+                clean_metadata_rows.append(row)
+            else:
+                log_text = "Sample missing in samples data Json file"
+                self.logsum.add_error(key=sample_id, log_type="error", entry=log_text)
+                missing_samples.append(sample_id)
+        return clean_metadata_rows, missing_samples
 
     def adding_fixed_fields(self, m_data):
         """Include fixed data that are always the same for every sample"""
@@ -148,6 +178,9 @@ class RelecovMetadata:
                     if m_data[idx][key] in e_values:
                         m_data[idx][key] = e_values[m_data[idx][key]]
                     else:
+                        sample_id = m_data[idx]["sequencing_sample_id"]
+                        log_text = f"No ontology found for {m_data[idx][key]} in {key}"
+                        self.logsum.add_warning(sample_id, log_text)
                         try:
                             ontology_errors[key] += 1
                         except KeyError:
@@ -165,32 +198,30 @@ class RelecovMetadata:
         map_field = json_fields["map_field"]
         json_data = json_fields["j_data"]
         for idx in range(len(m_data)):
-            try:
-                m_data[idx].update(json_data[m_data[idx][map_field]])
-            except KeyError as error:
-                clean_error = re.sub("[\[].*?[\]]", "", str(error.args[0]))
-                if str(clean_error).lower().strip() == "not provided":
-                    log.error("Label was not provided, auto-completing columns")
-                    sample_id = m_data[idx]["collecting_lab_sample_id"]
-                    stderr.print(
-                        f"Label {map_field} was not provided in sample {sample_id}, "
-                        + "auto-completing with Not Provided"
-                    )
-                else:
-                    log.error(
-                        f"Unknown map_field value {error} for json data: "
-                        + f"{str(map_field)}. Aborting"
-                    )
-                    stderr.print(
-                        f"[red] Unknown value {error} for: {map_field} "
-                        + f"in sample {idx}. Aborting"
-                    )
-                    sys.exit(1)
-                fields_to_add = {
-                    x: "Not Provided [GENEPIO:0001668]"
-                    for x in json_fields["adding_fields"]
-                }
-                m_data[idx].update(fields_to_add)
+            sample_id = str(m_data[idx].get("sequencing_sample_id"))
+            if m_data[idx].get(map_field):
+                try:
+                    m_data[idx].update(json_data[m_data[idx][map_field]])
+                except KeyError as error:
+                    clean_error = re.sub("[\[].*?[\]]", "", str(error.args[0]))
+                    if str(clean_error).lower().strip() == "not provided":
+                        log_text(
+                            f"Label {map_field} was not provided in sample "
+                            + f"{sample_id}, auto-completing with Not Provided"
+                        )
+                        self.logsum.add_warning(key=sample_id, entry=log_text)
+                    else:
+                        log_text = (
+                            f"Unknown map_field value {error} for json data: "
+                            + f"{str(map_field)} in sample {sample_id}. Skipped"
+                        )
+                        self.logsum.add_warning(key=sample_id, entry=log_text)
+                        continue
+                    fields_to_add = {
+                        x: "Not Provided [GENEPIO:0001668]"
+                        for x in json_fields["adding_fields"]
+                    }
+                    m_data[idx].update(fields_to_add)
         return m_data
 
     def adding_fields(self, metadata):
@@ -237,96 +268,98 @@ class RelecovMetadata:
         return c_files
 
     def read_metadata_file(self):
-        """Reads the input metadata file from row 4, changes the metadata heading
-        with their property name values defined in schema.
-        Convert the date colunms value to the dd/mm/yyyy format.
-        Return list of dicts with data and errors
+        """Reads the input metadata file from header row, changes the metadata heading
+        with their property name values defined in schema. Convert the date columns
+        value to the yyyy/mm/dd format. Return list of dicts with data
         """
-        heading_row_number = 4
-        ws_metadata_lab = relecov_tools.utils.read_excel_file(
-            self.metadata_file, "METADATA_LAB", heading_row_number, leave_empty=False
+        meta_sheet = self.metadata_processing.get("excel_sheet")
+        header_flag = self.metadata_processing.get("header_flag")
+        ws_metadata_lab, heading_row_number = relecov_tools.utils.read_excel_file(
+            self.metadata_file, meta_sheet, header_flag, leave_empty=False
         )
         valid_metadata_rows = []
-        errors = {}
         row_number = heading_row_number
         for row in ws_metadata_lab:
             row_number += 1
             property_row = {}
             try:
-                sample_number = row["Sample ID given for sequencing"]
+                sample_id = str(row["Sample ID given for sequencing"]).strip()
             except KeyError:
-                log.error(
-                    "Sample ID given for sequencing not found in row  %s", row_number
-                )
-                stderr.print(
-                    f"[red]Sample ID given for sequencing not found in row {row_number}"
-                )
+                log_text = f"Sample ID given for sequencing empty in row {row_number}"
+                log.error(log_text)
+                stderr.print(f"[red]{log_text}")
                 continue
             for key in row.keys():
                 # skip the first column of the Metadata lab file
-                if "campo" in key.lower():
+                if header_flag in key:
+                    continue
+                if row[key] is None or "not provided" in str(row[key]).lower():
+                    log_text = f"{key} not provided for sample {sample_id}"
+                    self.logsum.add_warning(sample_id, log_text)
                     continue
                 if "date" in key.lower():
-                    if row[key] is None or str(row[key]).lower() == "not provided":
-                        log.info("Date was not provided")
-                        row[key] = "Not Provided [GENEPIO:0001668]"
-                    elif isinstance(row[key], int) or isinstance(row[key], float):
+                    # Check if date is a string. Format YYYY-MM-DD to YYYY/MM/DD
+                    if re.match(r"^\d{4}[-/]\d{2}[-/]\d{2}$", str(row[key])):
+                        row[key] = row[key].replace("/", "-")
+                    if isinstance(row[key], int) or isinstance(row[key], float):
                         log.info("Date given as an integer. Understood as a year")
                         row[key] = str(int(row[key]))
                     else:
                         try:
-                            row[key] = row[key].strftime("%Y-%m-%d")
-                        except AttributeError:
-                            # check if date is in string format
-                            str_date = re.search(r"(\d{4}-\d{2}-\d{2}).*", row[key])
-                            if str_date:
-                                row[key] = str_date.group(1)
-                            else:
-                                if sample_number not in errors:
-                                    errors[sample_number] = {}
-                                errors[sample_number][key] = "Invalid date format"
-                                log.error(
-                                    "Invalid date format in sample %s", row_number
-                                )
-                                stderr.print(
-                                    f"[red]Invalid date format in sample {sample_number},  {key}"
-                                )
+                            row[key] = str(
+                                dtime.strptime(str(row[key]), "%Y-%m-%d").date()
+                            )
+                        except ValueError:
+                            log_text = f"Invalid date format in sample {str(key)}"
+                            self.logsum.add_error(sample_id, log_text)
+                            stderr.print(f"[red]{log_text}")
+                            row[key] = None
                 elif "sample id" in key.lower():
                     if isinstance(row[key], float) or isinstance(row[key], int):
                         row[key] = str(int(row[key]))
                 else:
                     if isinstance(row[key], float) or isinstance(row[key], int):
                         row[key] = str(row[key])
-                try:
-                    property_row[self.label_prop_dict[key]] = row[key]
-                except KeyError as e:
-                    log.error("Error when mapping the label %s", e)
-                    stderr.print(f"[red]Error when mapping the label {str(e)}")
-                    continue
+                if row[key] is not None or "not provided" not in str(row[key]).lower():
+                    try:
+                        property_row[self.label_prop_dict[key]] = row[key]
+                    except KeyError as e:
+                        log_text = f"Error when mapping the label {str(e)}"
+                        self.logsum.add_error(sample_id, log_text)
+                        stderr.print(f"[red]{log_text}")
 
+                        continue
             valid_metadata_rows.append(property_row)
-        return valid_metadata_rows, errors
+        return valid_metadata_rows
 
     def create_metadata_json(self):
         stderr.print("[blue]Reading Lab Metadata Excel File")
-        valid_metadata_rows, errors = self.read_metadata_file()
-        if len(errors) > 0:
-            stderr.print("[red]Stopped executing because errors were found")
-            sys.exit(1)
+        valid_metadata_rows = self.read_metadata_file()
+        clean_metadata_rows, missing_samples = self.match_to_json(valid_metadata_rows)
+        if missing_samples:
+            num_miss = len(missing_samples)
+            log.warning(
+                "%s samples from metadata were not found: %s", num_miss, missing_samples
+            )
+            stderr.print(f"[yellow]{num_miss} samples missing:\n{missing_samples}")
         # Continue by adding extra information
         stderr.print("[blue]Including additional information")
 
-        extended_metadata = self.adding_fields(valid_metadata_rows)
+        extended_metadata = self.adding_fields(clean_metadata_rows)
         stderr.print("[blue]Including post processing information")
         extended_metadata = self.adding_post_processing(extended_metadata)
         extended_metadata = self.adding_copy_from_other_field(extended_metadata)
         extended_metadata = self.adding_fixed_fields(extended_metadata)
         completed_metadata = self.adding_ontology_to_enum(extended_metadata)
+        if not completed_metadata:
+            stderr.print("Metadata was completely empty. No output file generated")
+            sys.exit(1)
         file_name = (
-            "processed_metadata_lab_" + datetime.now().strftime("%Y_%m_%d") + ".json"
+            "processed_metadata_lab_" + dtime.now().strftime("%Y_%m_%d") + ".json"
         )
         stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
+        self.logsum.create_error_summary()
         file_path = os.path.join(self.output_folder, file_name)
         relecov_tools.utils.write_json_fo_file(completed_metadata, file_path)
         return True
