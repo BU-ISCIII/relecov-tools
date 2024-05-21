@@ -12,13 +12,13 @@ import paramiko
 import relecov_tools.utils
 from datetime import datetime
 from itertools import islice
-from collections import OrderedDict
 from secrets import token_hex
 from csv import writer as csv_writer, Error as CsvError
 from openpyxl import load_workbook as openpyxl_load_workbook
 from pandas import read_excel, ExcelWriter, concat
 from pandas.errors import ParserError, EmptyDataError
 from relecov_tools.config_json import ConfigJson
+from relecov_tools.log_summary import LogSum
 
 # from relecov_tools.rest_api import RestApi
 
@@ -113,7 +113,7 @@ class SftpHandle:
             self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
             self.target_folders = self.target_folders.split(",")
-        self.logs = {}
+        self.logsum = LogSum(output_location=self.platform_storage_folder)
         if self.sftp_passwd is None:
             self.sftp_passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password"
@@ -202,6 +202,7 @@ class SftpHandle:
 
         if recursive:
             directory_list = recursive_list(folder_name)
+            directory_list.append(folder_name)
             return directory_list
         try:
             directory_list = [
@@ -491,25 +492,28 @@ class SftpHandle:
             return False
         sample_file_dict = {}
         metadata_ws, meta_header, header_row = self.read_metadata_file(meta_f_path)
+        # TODO Include these columns in config
         index_sampleID = meta_header.index("Sample ID given for sequencing")
         index_layout = meta_header.index("Library Layout")
         index_fastq_r1 = meta_header.index("Sequence file R1 fastq")
         index_fastq_r2 = meta_header.index("Sequence file R2 fastq")
+        counter = header_row
         for row in islice(metadata_ws.values, header_row, metadata_ws.max_row):
+            counter += 1
             if row[index_sampleID] is not None:
                 row_complete = True
                 try:
-                    s_name = str(row[index_sampleID])
+                    s_name = str(row[index_sampleID]).strip()
                 except ValueError as e:
                     stderr.print("[red]Unable to convert to string. ", e)
                     continue
                 if s_name not in sample_file_dict:
                     sample_file_dict[s_name] = {}
                 else:
-                    stderr.print("Found duplicated sample name: ", s_name)
-                    s_name = "_".join([s_name, str(token_hex(nbytes=8))])
-                    stderr.print("Duplicated sample renamed to ", s_name)
-                    sample_file_dict[s_name] = {}
+                    log_text = f"Found duplicated sample name: {s_name}. Skipped."
+                    stderr.print(log_text)
+                    self.include_warning(log_text, sample=s_name)
+                    continue
                 if row[index_layout] == "paired" and row[index_fastq_r2] is None:
                     error_text = "Sample %s is paired-end, but no R2 given"
                     log.error(str(error_text % str(row[index_sampleID])))
@@ -525,16 +529,18 @@ class SftpHandle:
                         # TODO: move these keys to configuration.json
                         sample_file_dict[s_name]["sequence_file_R1_fastq"] = row[
                             index_fastq_r1
-                        ]
+                        ].strip()
                         if row[index_fastq_r2] is not None:
                             sample_file_dict[s_name]["sequence_file_R2_fastq"] = row[
                                 index_fastq_r2
-                            ]
+                            ].strip()
                     else:
-                        error_text = "Fastq_R1 not defined in Metadata for sample %s"
-                        log.error(str(error_text % s_name))
-                        stderr.print(f"[red]{str(error_text % s_name)}")
-                        self.include_error(str(error_text % s_name), s_name)
+                        log_text = "Fastq_R1 not defined in Metadata for sample %s"
+                        log.error(str(log_text % s_name))
+                        stderr.print(f"[red]{str(log_text % s_name)}")
+                        self.include_error(entry=str(log_text % s_name), sample=s_name)
+            else:
+                self.include_warning(entry=f"Row {counter} skipped. No sample ID given")
         # Remove duplicated files
         clean_sample_dict = self.remove_duplicated_values(sample_file_dict)
         return clean_sample_dict
@@ -598,6 +604,9 @@ class SftpHandle:
         sample_files_dict = self.get_sample_fastq_file_names(
             out_folder, local_meta_file
         )
+        # Include the samples in the process log summary
+        for sample in sample_files_dict.keys():
+            self.include_new_key(sample=sample)
         metafiles_list = sorted(
             sum([list(fi.values()) for _, fi in sample_files_dict.items()], [])
         )
@@ -611,6 +620,7 @@ class SftpHandle:
             set_list = set(metafiles_list)
             mismatch_files = [fi for fi in filtered_files_list if fi not in set_list]
             mismatch_rev = [fi for fi in set_list if fi not in filtered_files_list]
+
             error_text1 = "Files in folder missing in metadata %s"
             log.warning(error_text1 % str(mismatch_files))
             self.include_warning(error_text1 % str(mismatch_files))
@@ -845,29 +855,27 @@ class SftpHandle:
             pd_writer.close()
             dest = os.path.join(last_main_folder, os.path.basename(merged_excel_path))
             self.client.put(merged_excel_path, dest)
+            os.remove(merged_excel_path)
             return
 
         def pre_validate_folder(folder, folder_files):
             """Check if remote folder has sequencing files and a valid metadata file"""
             if not any(file.endswith(tuple(exts)) for file in folder_files):
                 error_text = "Remote folder %s skipped. No sequencing files found."
-                log.error(error_text % folder)
                 self.include_error(error_text % folder)
                 return
             try:
                 downloaded_metadata = self.get_metadata_file(folder, output_location)
             except (FileNotFoundError, OSError, PermissionError, MetadataError) as err:
                 error_text = "Remote folder %s skipped. Reason: %s"
-                log.error(error_text % (folder, err))
                 self.include_error(error_text % (folder, err))
                 return
             try:
                 self.read_metadata_file(downloaded_metadata, return_data=False)
-            except MetadataError as header_error:
-                error_text = " Folder skipped: %s"
+            except (MetadataError, KeyError) as excel_error:
+                error_text = f"Folder {self.current_folder} skipped: %s"
                 os.remove(downloaded_metadata)
-                log.error(str(folder, str(error_text % str(header_error))))
-                self.include_error(error_text % header_error)
+                self.include_error(error_text % excel_error)
                 return
             return downloaded_metadata
 
@@ -877,6 +885,8 @@ class SftpHandle:
         stderr.print(f"[blue]Setting {len(target_folders.keys())} remote folders...")
         for folder in sorted(target_folders.keys()):
             self.current_folder = folder
+            # Include the folder in the final process log summary
+            self.include_new_key()
             downloaded_metadata = pre_validate_folder(folder, target_folders[folder])
             if not downloaded_metadata:
                 continue
@@ -1043,9 +1053,9 @@ class SftpHandle:
             for key, val in vals.items():
                 processed_dict[sample][key] = None
                 if val in corrupted:
-                    self.include_error(error_text % val, sample)
+                    self.include_error(error_text % val, sample=sample)
                 if val in md5miss:
-                    self.include_warning(warning_text % val, sample)
+                    self.include_warning(warning_text % val, sample=sample)
                 for file in clean_fetchlist:
                     if val in file:
                         processed_dict[sample][key] = file
@@ -1053,7 +1063,7 @@ class SftpHandle:
             if not all(x in clean_fetchlist for x in processed_dict[sample].values()):
                 if not corrupted:
                     error_text = "Sample %s skipped: missing files in sftp"
-                    self.include_error(str(error_text % sample), sample)
+                    self.include_error(str(error_text % sample), sample=sample)
                 log.error(str(error_text % sample))
                 del processed_dict[sample]
         return processed_dict
@@ -1221,47 +1231,16 @@ class SftpHandle:
             stderr.print(f"[green]Finished processing {folder}")
         return
 
+    def include_new_key(self, sample=None):
+        self.logsum.feed_key(key=self.current_folder, sample=sample)
+        return
+
     def include_error(self, entry, sample=None):
-        self.update_summary(log_type="error", entry=entry, sample=sample)
+        self.logsum.add_error(key=self.current_folder, entry=entry, sample=sample)
         return
 
     def include_warning(self, entry, sample=None):
-        self.update_summary(log_type="warning", entry=entry, sample=sample)
-        return
-
-    def update_summary(self, log_type, entry, sample=None):
-        feed_dict = OrderedDict({"valid": False, "errors": [], "warnings": []})
-        current_folder = str(self.current_folder).replace("./", "")
-        entry, sample = (str(entry), str(sample))
-        if current_folder not in self.logs.keys():
-            self.logs[current_folder] = feed_dict.copy()
-            self.logs[current_folder]["samples"] = OrderedDict()
-        if sample == "None":
-            if log_type == "error":
-                self.logs[current_folder]["errors"].append(entry)
-            elif log_type == "warning":
-                self.logs[current_folder]["warnings"].append(entry)
-        else:
-            if sample not in self.logs[current_folder]["samples"].keys():
-                self.logs[current_folder]["samples"][sample] = feed_dict.copy()
-            if log_type == "error":
-                self.logs[current_folder]["samples"][sample]["errors"].append(entry)
-            elif log_type == "warning":
-                self.logs[current_folder]["samples"][sample]["warnings"].append(entry)
-        return
-
-    def create_error_summary(self):
-        for folder in self.logs.keys():
-            if not self.logs[folder]["errors"]:
-                self.logs[folder]["valid"] = True
-            for sample in self.logs[folder]["samples"].keys():
-                if not self.logs[folder]["samples"][sample]["errors"]:
-                    self.logs[folder]["samples"][sample]["valid"] = True
-        filename = datetime.today().strftime("%Y%m%d%-H%M%S") + "_log_summary.json"
-        summary_path = os.path.join(self.platform_storage_folder, filename)
-        with open(summary_path, "w", encoding="utf-8") as f:
-            f.write(json.dumps(self.logs, indent=4, sort_keys=True, ensure_ascii=False))
-        stderr.print(f"Process summary printed in {summary_path}")
+        self.logsum.add_warning(key=self.current_folder, entry=entry, sample=sample)
         return
 
     def execute_process(self):
@@ -1282,7 +1261,10 @@ class SftpHandle:
                 self.delete_remote_files(folder, files)
                 stderr.print(f"Delete process finished in {folder}")
         self.close_connection()
-        if self.logs:
+        if self.logsum.logs:
             log.info("Printing process summary to %s", self.platform_storage_folder)
-            self.create_error_summary()
+            self.logsum.create_error_summary()
+        else:
+            log.info("Process log summary was empty. Not generated.")
         stderr.print("Finished execution")
+        return
