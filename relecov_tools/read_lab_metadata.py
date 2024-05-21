@@ -143,7 +143,9 @@ class RelecovMetadata:
         )
         for idx in range(len(m_data)):
             for key, p_values in p_data.items():
-                value = m_data[idx][key]
+                value = m_data[idx].get(key)
+                if not value:
+                    continue
                 if value in p_values:
                     p_field, p_set = p_values[value].split("::")
                     m_data[idx][p_field] = p_set
@@ -236,20 +238,12 @@ class RelecovMetadata:
             metadata = self.process_from_json(metadata, values)
             stderr.print(f"[green]Processed {key}")
 
-        # As sample data file is comming in an input parameter, it cannot
-        # be inside the configuration json file.
         # Include Sample information data from sample json file
         stderr.print("[blue]Processing sample data file")
         s_json = {}
-        s_json["map_field"] = "submitting_lab_sample_id"
-        s_json["adding_fields"] = [
-            "fastq_r1_md5",
-            "fastq_r2_md5",
-            "sequence_file_R1_fastq",
-            "sequence_file_R2_fastq",
-            "r1_fastq_filepath",
-            "r2_fastq_filepath",
-        ]
+        # TODO: Change sequencing_sample_id for some unique ID used in RELECOV database
+        s_json["map_field"] = "sequencing_sample_id"
+        s_json["adding_fields"] = self.samples_json_fields
         s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
         metadata = self.process_from_json(metadata, s_json)
         stderr.print("[green]Processed sample data file.")
