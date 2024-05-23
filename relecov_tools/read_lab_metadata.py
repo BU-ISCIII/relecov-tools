@@ -112,7 +112,7 @@ class RelecovMetadata:
                 clean_metadata_rows.append(row)
             else:
                 log_text = "Sample missing in samples data Json file"
-                self.logsum.add_error(key=sample_id, log_type="error", entry=log_text)
+                self.logsum.add_error(sample_id, log_text)
                 missing_samples.append(sample_id)
         return clean_metadata_rows, missing_samples
 
