@@ -1,11 +1,11 @@
 name: test_sftp_handle
 
 on:
-    push:
-      branches: "**"
-    pull_request_target:
-      types: [opened, reopened, synchronize, closed]
-      branches: "**"
+  push:
+    branches: "**"
+  pull_request_target:
+    types: [opened, reopened, synchronize, closed]
+    branches: "**"
     
 jobs:
   security_check:
