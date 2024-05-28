@@ -232,9 +232,6 @@ class EnaUpload:
 
     def xml_submission(self, json_data, schemas_dataframe, batch_index=None):
         """The metadata is submitted in an xml format"""
-        import pdb
-
-        pdb.set_trace()
         schema_targets = extract_targets(self.action, schemas_dataframe)
 
         tool = self.config_json.get_configuration("ENA_fields")["tool"]
@@ -266,9 +263,7 @@ class EnaUpload:
         schema_xmls["submission"] = submission_xml
 
         stderr.print(f"\nProcessing submission to ENA server: {self.url}")
-        import pdb
 
-        pdb.set_trace()
         receipt = send_schemas(schema_xmls, self.url, self.user, self.passwd).text
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
