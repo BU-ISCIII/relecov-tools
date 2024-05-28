@@ -202,7 +202,8 @@ class SftpHandle:
 
         if recursive:
             directory_list = recursive_list(folder_name)
-            directory_list.append(folder_name)
+            if "." != folder_name:
+                directory_list.append(folder_name)
             return directory_list
         try:
             directory_list = [
