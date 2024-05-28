@@ -64,9 +64,12 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
     """
     wb_file = openpyxl.load_workbook(f_name, data_only=True)
     ws_metadata_lab = wb_file[sheet_name]
-    heading_row = [
-        idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
-    ][0]
+    try:
+        heading_row = [
+            idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
+        ][0]
+    except IndexError:
+        raise KeyError(f"Header flag '{header_flag}' could not be found in {f_name}")
     heading = [str(i.value).strip() for i in ws_metadata_lab[heading_row] if i.value]
     ws_data = []
     for row in islice(ws_metadata_lab.values, heading_row, ws_metadata_lab.max_row):
