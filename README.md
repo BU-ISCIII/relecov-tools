@@ -8,18 +8,25 @@ relecov-tools is a set of helper tools for the assembly of the different element
 
 ## Table of contents
 
-* [Installation](#installation)
-* [Usage](#usage)
-    * [download](#download)
-    * [read-lab-metadata](#read-lab-metadata)
-    * [read-bioinfo-metadata](#read-bioinfo-metadata)
-    * [validate](#validate)
-    * [map](#map)
-    * [upload-to-ena](#upload-to-ena)
-    * [upload-to-gisaid](#upload-to-gisaid)
-    * [launch](#launch)
-    * [update-db](#update-db)
-* [Aknowledgements](#aknowledgements)
+- [relecov-tools](#relecov-tools)
+  - [Table of contents](#table-of-contents)
+  - [Installation](#installation)
+    - [Bioconda](#bioconda)
+    - [Pip](#pip)
+    - [Development version](#development-version)
+  - [Usage](#usage)
+    - [Command-line](#command-line)
+      - [download](#download)
+      - [read-lab-metadata](#read-lab-metadata)
+      - [read-bioinfo-metadata](#read-bioinfo-metadata)
+      - [validate](#validate)
+      - [map](#map)
+      - [upload-to-ena](#upload-to-ena)
+      - [upload-to-gisaid](#upload-to-gisaid)
+      - [update-db](#update-db)
+      - [launch](#launch)
+    - [Python package mode](#python-package-mode)
+  - [Acknowledgements](#acknowledgements)
 
 ## Installation
 
@@ -255,3 +262,5 @@ DOCs soon!!
 
 ## Acknowledgements
 Python package idea and design is really inspired in [nf-core/tools](https://github.com/nf-core/tools).
+
+test
