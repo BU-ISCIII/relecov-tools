@@ -65,35 +65,42 @@ class SchemaValidation:
         except jsonschema.ValidationError:
             stderr.print("[red] Json schema does not fulfill Draft 202012 Validation")
             sys.exit(1)
-    
+
     def register_custom_validators(self):
         """Register custom JSON schema validators based on configuration."""
 
         # Get custom validators utils
         stderr.print("Loading configuration for custom JSON schema validators.")
         conf = ConfigJson()
-        conf_path = os.path.join(os.path.dirname(__file__), "conf", "configuration.json")
-        
+        conf_path = os.path.join(
+            os.path.dirname(__file__), "conf", "configuration.json"
+        )
+
         custom_validator_list = conf.get_configuration("json_schema_valiators")
         if custom_validator_list is None:
             stderr.print(f"No 'json_schema_validators' key found in {conf_path}")
             return
-        
+
         if not len(custom_validator_list) > 0:
-            stderr.print(f"No validators defined yet under 'json_schema_validators' key in {conf_path}")
+            stderr.print(
+                f"No validators defined yet under 'json_schema_validators' key in {conf_path}"
+            )
             return
 
         # Append custom validators to Draft202012Validator
         stderr.print("Registering custom validators.")
-        available_validators = relecov_tools.assets.schema_utils.custom_validators.available
+        available_validators = (
+            relecov_tools.assets.schema_utils.custom_validators.available
+        )
         for validator_name in custom_validator_list:
             if validator_name in available_validators:
-                Draft202012Validator.VALIDATORS[validator_name] = available_validators[validator_name]
+                Draft202012Validator.VALIDATORS[validator_name] = available_validators[
+                    validator_name
+                ]
                 stderr.print(f"Custom validator '{validator_name}' successfully added.")
             else:
                 stderr.print(f"No validator found for '{validator_name}'. Exiting.")
                 sys.exit(1)
-
 
     def validate_instances(self):
         """Validate data instances against a validated json schema"""
