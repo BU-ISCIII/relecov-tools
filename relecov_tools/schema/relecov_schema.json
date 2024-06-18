@@ -18,7 +18,8 @@
         "sequencing_instrument_model",
         "sequencing_instrument_platform",
         "enrichment_panel",
-        "enrichment_panel_version"
+        "enrichment_panel_version",
+        "amr_genes"
     ],
     "type": "object",
     "properties": {
@@ -2899,6 +2900,18 @@
             "description": "",
             "clasification": "Submission ENA",
             "label": "Run Alias"
+        },
+        "tmp-amr_genes": { "$ref": "#/$defs/gene_name"}
+    },
+    "amr_genes_validation": true,
+    "$defs": {
+        "gene_name" : {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["geneA", "geneB", "geneC", "geneD", "geneE", "geneF", "geneG", "geneH", "geneI", "geneJ"],
+                "uniqueItems": true
+            }
         }
     }
 }
