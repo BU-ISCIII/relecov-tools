@@ -400,5 +400,8 @@
                 "fastq_r2_md5"
             ]
         }
-    }
+    },
+    "json_schema_validators": [
+        "amr_genes_validator"
+    ]
 }
