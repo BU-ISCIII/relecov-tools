@@ -21,7 +21,11 @@ import relecov_tools.read_bioinfo_metadata
 import relecov_tools.metadata_homogeneizer
 import relecov_tools.gisaid_upload
 import relecov_tools.upload_ena_protocol
+<<<<<<< HEAD
 import relecov_tools.pipeline_manager
+=======
+import relecov_tools.build_schema
+>>>>>>> baa2c36 (init skeleton for build_schema module)
 
 log = logging.getLogger()
 
@@ -507,6 +511,33 @@ def launch_pipeline(input, template, output, config):
         input, template, output, config
     )
     new_launch.pipeline_exc()
+
+# schema builder
+@relecov_tools_cli.command(help_priority=13)
+@click.option(
+    "-i"
+    "--input_file",
+    type=click.Path(),
+    help="Path to the Excel document containing the database definition."
+)
+@click.option(
+    "-p",
+    "--print_diff",
+    type=click.BOOL,
+    help="Prints a changelog/diff between the current and incoming versions of the schema schema_relecov.json."
+)
+@click.option(
+    "-o",
+    "--out_dir",
+    type=click.Path(),
+    help="Path to save output file"
+)
+def build_schema(input_file, print_diff, out_dir):
+    """"""
+    schema_update = relecov_tools.build_schema.SchemaBuilder(
+        input_file, print_diff, out_dir
+    )
+    #schema_update.<caller>()
 
 
 if __name__ == "__main__":
