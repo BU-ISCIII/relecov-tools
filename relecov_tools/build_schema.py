@@ -50,7 +50,7 @@ class SchemaBuilder:
         # Convert database to json format
         json_data = {}
         for _, row in df.iterrows():
-            property_name = row[0]
+            property_name = row.iloc[0]
             values=row.drop(df.columns[0]).to_dict()
             json_data[property_name] = values
         
@@ -58,6 +58,7 @@ class SchemaBuilder:
         if len(json_data) == 0:
             stderr.print("[red]No data found in  xlsx database")
             sys.exit(1)
+        return(json_data)
 
 
         return(json_data)
