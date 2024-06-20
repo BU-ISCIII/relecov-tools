@@ -14,14 +14,17 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
+
 def create_draft(draft_version, required=None):
     """Creates a JSON Schema Draft template with required fields."""
     available_schemas = ["2020-12"]
 
     if draft_version not in available_schemas:
-        stderr.print(f"[red] {draft_version} not found. Available schemas are: {', '.join(available_schemas)}")
+        stderr.print(
+            f"[red] {draft_version} not found. Available schemas are: {', '.join(available_schemas)}"
+        )
         sys.exit(1)
-    
+
     url_str = f"https://json-schema.org/draft/{draft_version}/schema"
     id_str = "https://github.com/BU-ISCIII/relecov-tools/blob/develop/relecov_tools/schema/relecov_schema.json"
     description_str = "Json schema that specifies the structure, content, and validation rules for RELECOV metadata"
@@ -35,8 +38,7 @@ def create_draft(draft_version, required=None):
         "description": description_str,
         "version": pakage_version_str,
         "type": "object",
-        "properties": {
-        }
+        "properties": {},
     }
 
     # Include required fields if specified

@@ -518,32 +518,28 @@ def launch_pipeline(input, template, output, config):
     "-i",
     "--input_file",
     type=click.Path(),
-    help="Path to the Excel document containing the database definition."
+    help="Path to the Excel document containing the database definition.",
 )
 @click.option(
     "-s",
     "--schema_base",
     type=click.Path(),
-    help="Path to the Excel document containing the database definition."
+    help="Path to the Excel document containing the database definition.",
 )
 @click.option(
     "-d",
     "--diff",
     type=click.BOOL,
-    help="Prints a changelog/diff between the current and incoming versions of the schema schema_relecov.json."
+    help="Prints a changelog/diff between the current and incoming versions of the schema schema_relecov.json.",
 )
-@click.option(
-    "-o",
-    "--out_dir",
-    type=click.Path(),
-    help="Path to save output file"
-)
+@click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file")
 def build_schema(input_file, schema_base, diff, out_dir):
     """"""
     schema_update = relecov_tools.build_schema.SchemaBuilder(
         input_file, schema_base, diff, out_dir
     )
     schema_update.handle_build_schema()
+
 
 if __name__ == "__main__":
     run_relecov_tools()

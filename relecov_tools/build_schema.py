@@ -2,7 +2,6 @@
 import logging
 import rich.console
 import pandas as pd
-import json
 import os
 import sys
 
@@ -24,7 +23,7 @@ class SchemaBuilder:
         excel_file_path=None,
         base_schema_path=None,
         print_diff=False,
-        out_dir=None
+        out_dir=None,
     ):
         """
         Initialize the SchemaBuilder with paths to the Excel file containing the database definitions
@@ -40,7 +39,7 @@ class SchemaBuilder:
         # Validate the Excel file path
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
             raise ValueError("A valid Excel file path must be provided.")
-        if not self.excel_file_path.endswith('.xlsx'):
+        if not self.excel_file_path.endswith(".xlsx"):
             raise ValueError("The Excel file must have a .xlsx extension.")
 
     def read_database_definition(self):
@@ -52,19 +51,23 @@ class SchemaBuilder:
         json_data = {}
         for _, row in df.iterrows():
             property_name = row.iloc[0]
-            values=row.drop(df.columns[0]).to_dict()
+            values = row.drop(df.columns[0]).to_dict()
             json_data[property_name] = values
-        
+
         # Check json is not empty
         if len(json_data) == 0:
             stderr.print("[red]No data found in  xlsx database")
             sys.exit(1)
-        return(json_data)
+        return json_data
 
     def create_schema_draft_template(self, draft_version):
         "Loads JsonSchema template based on draft name: Available drafts: [2020-12]"
-        draft_template = relecov_tools.assets.schema_utils.jsonschema_draft.create_draft(draft_version)
-        return(draft_template)
+        draft_template = (
+            relecov_tools.assets.schema_utils.jsonschema_draft.create_draft(
+                draft_version
+            )
+        )
+        return draft_template
 
     def build_new_schema(self, template, json_data):
         """
@@ -96,12 +99,11 @@ class SchemaBuilder:
         # TODO: Load the updated schema_input.json after calling update_schema().
 
         # TODO: Compare the two versions and print/save the differences.
+
     def handle_build_schema(self):
-        
         # Load xlsx database and convert into json format
-        json_db = self.read_database_definition()
-        
+        self.read_database_definition()
+
         # Create schema template based on version draft specification.
         # TODO: this method should show a prompt to mannually select the desired draft version.
-        draft_template = self.create_schema_draft_template("2020-12")
-
+        self.create_schema_draft_template("2020-12")
