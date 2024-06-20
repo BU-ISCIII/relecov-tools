@@ -7,6 +7,7 @@ import os
 import sys
 
 import relecov_tools.utils
+import relecov_tools.assets.schema_utils.jsonschema_draft
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -60,9 +61,12 @@ class SchemaBuilder:
             sys.exit(1)
         return(json_data)
 
+    def create_schema_draft_template(self, draft_version):
+        "Loads JsonSchema template based on draft name: Available drafts: [2020-12]"
+        draft_template = relecov_tools.assets.schema_utils.jsonschema_draft.create_draft(draft_version)
+        return(draft_template)
 
-        return(json_data)
-    def create_schema(self):
+    def build_new_schema(self, template, json_data):
         """
         Create schema_input.json when no schema is already present.
         """
@@ -93,4 +97,11 @@ class SchemaBuilder:
 
         # TODO: Compare the two versions and print/save the differences.
     def handle_build_schema(self):
-        self.read_database_definition()
+        
+        # Load xlsx database and convert into json format
+        json_db = self.read_database_definition()
+        
+        # Create schema template based on version draft specification.
+        # TODO: this method should show a prompt to mannually select the desired draft version.
+        draft_template = self.create_schema_draft_template("2020-12")
+
