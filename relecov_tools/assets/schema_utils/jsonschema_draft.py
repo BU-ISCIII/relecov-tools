@@ -1,5 +1,4 @@
 import logging
-import sys
 
 import rich.console
 
@@ -20,9 +19,14 @@ def create_draft(draft_version=None, required=None):
     available_schemas = ["2020-12"]
 
     if not draft_version:
-        draft_version = relecov_tools.utils.prompt_checkbox("Choose a Json Schema valid version:", available_schemas)
+        draft_version = relecov_tools.utils.prompt_checkbox(
+            "Choose a Json Schema valid version:", available_schemas
+        )
     elif draft_version not in available_schemas:
-        draft_version = relecov_tools.utils.prompt_checkbox(f"Draft version '{draft_version}' not found. Choose a valid Json Schema version:", available_schemas)
+        draft_version = relecov_tools.utils.prompt_checkbox(
+            f"Draft version '{draft_version}' not found. Choose a valid Json Schema version:",
+            available_schemas,
+        )
 
     url_str = f"https://json-schema.org/draft/{draft_version}/schema"
     id_str = "https://github.com/BU-ISCIII/relecov-tools/blob/develop/relecov_tools/schema/relecov_schema.json"

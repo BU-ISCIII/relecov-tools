@@ -49,14 +49,15 @@ class SchemaBuilder:
             )
         else:
             if not os.path.exists(out_dir):
-                stderr.print(f"[red]The directory {out_dir} does not exist. Please, try again. Bye")
+                stderr.print(
+                    f"[red]The directory {out_dir} does not exist. Please, try again. Bye"
+                )
                 sys.exit(1)
             if not os.path.isdir(out_dir):
                 stderr.print("[red]The provided path is not a directory.")
                 sys.exit(1)
             else:
                 self.out_dir = out_dir
-
 
     def read_database_definition(self):
         """Reads the database definition and converts it into json format."""
@@ -84,7 +85,7 @@ class SchemaBuilder:
             )
         )
         return draft_template
-    
+
     def get_current_schema(self):
         """
         Check if the current RELECOV schema is available in the configuration file.
@@ -92,7 +93,7 @@ class SchemaBuilder:
         try:
             conf = ConfigJson()
             schemas = conf.get_configuration("json_schemas")
-            
+
             if "relecov_schema" in schemas:
                 current_schema = schemas["relecov_schema"]
                 stderr.print("[green]RELECOV schema found in the configuration.")
@@ -112,7 +113,6 @@ class SchemaBuilder:
         except Exception as e:
             stderr.print(f"An unexpected error occurred: {e}")
             return None
-
 
     def build_new_schema(self, schema_draft, json_data):
         """
@@ -152,10 +152,10 @@ class SchemaBuilder:
         # Verify current schema used by relecov-tools:
         current_schema = self.get_current_schema()
         # TODO: if schema not found do something
-        #if not current_schema:
-        
+        # if not current_schema:
+
         # Create schema draft template (leave empty to be prompted to list of available schema versions)
         schema_draft_template = self.create_schema_draft_template("2020-2")
 
-        # build new schema draft based on database definition. 
+        # build new schema draft based on database definition.
         # TODO: Compare current vs new schema
