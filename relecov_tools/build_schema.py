@@ -7,6 +7,7 @@ import sys
 
 import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
+from relecov_tools.config_json import ConfigJson
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -83,8 +84,37 @@ class SchemaBuilder:
             )
         )
         return draft_template
+    
+    def get_current_schema(self):
+        """
+        Check if the current RELECOV schema is available in the configuration file.
+        """
+        try:
+            conf = ConfigJson()
+            schemas = conf.get_configuration("json_schemas")
+            
+            if "relecov_schema" in schemas:
+                current_schema = schemas["relecov_schema"]
+                stderr.print("[green]RELECOV schema found in the configuration.")
+                return current_schema
+            else:
+                stderr.print("[orange]RELECOV schema not found in the configuration.")
+                return None
 
-    def build_new_schema(self, template, json_data):
+        except FileNotFoundError as fnf_error:
+            stderr.print(f"[red]Configuration file not found: {fnf_error}")
+            return None
+
+        except KeyError as key_error:
+            stderr.print(f"[orange]Configuration key error: {key_error}")
+            return None
+
+        except Exception as e:
+            stderr.print(f"An unexpected error occurred: {e}")
+            return None
+
+
+    def build_new_schema(self, schema_draft, json_data):
         """
         Create schema_input.json when no schema is already present.
         """
@@ -119,6 +149,13 @@ class SchemaBuilder:
         # Load xlsx database and convert into json format
         self.read_database_definition()
 
-        # Create schema template based on version draft specification.
-        # TODO: this method should show a prompt to mannually select the desired draft version.
-        self.create_schema_draft_template("2020-12")
+        # Verify current schema used by relecov-tools:
+        current_schema = self.get_current_schema()
+        # TODO: if schema not found do something
+        #if not current_schema:
+        
+        # TODO: build new schema draft based on database definition. 
+        # TODO: create_schema_draft_template  should show a prompt to mannually select the desired draft version.
+        schema_draft_template = self.create_schema_draft_template()
+
+        # TODO: Compare current vs new schema
