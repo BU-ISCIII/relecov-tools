@@ -15,7 +15,7 @@ stderr = rich.console.Console(
 )
 
 
-def create_draft(draft_version, required=None):
+def create_draft(draft_version=None, required=None):
     """Creates a JSON Schema Draft template with required fields."""
     available_schemas = ["2020-12"]
 
