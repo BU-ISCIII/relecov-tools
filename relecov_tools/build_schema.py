@@ -22,7 +22,7 @@ class SchemaBuilder:
         self,
         excel_file_path=None,
         base_schema_path=None,
-        print_diff=False,
+        show_diff=False,
         out_dir=None,
     ):
         """
@@ -35,12 +35,27 @@ class SchemaBuilder:
         """
         self.excel_file_path = excel_file_path
         self.schema_file_path = base_schema_path
+        self.show_diff = show_diff
 
-        # Validate the Excel file path
+        # Validate input variables
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
             raise ValueError("A valid Excel file path must be provided.")
         if not self.excel_file_path.endswith(".xlsx"):
             raise ValueError("The Excel file must have a .xlsx extension.")
+        if not out_dir:
+            self.output_folder = relecov_tools.utils.prompt_path(
+                msg="Select the output folder:"
+            )
+        else:
+            if not os.path.exists(out_dir):
+                stderr.print(f"[red]The directory {out_dir} does not exist. Please, try again. Bye")
+                sys.exit(1)
+            if not os.path.isdir(out_dir):
+                stderr.print("[red]The provided path is not a directory.")
+                sys.exit(1)
+            else:
+                self.out_dir = out_dir
+
 
     def read_database_definition(self):
         """Reads the database definition and converts it into json format."""
