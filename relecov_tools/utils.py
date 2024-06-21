@@ -3,6 +3,7 @@
 Common utility function used for relecov_tools package.
 """
 import os
+import sys
 import glob
 import hashlib
 import logging
@@ -412,3 +413,37 @@ def print_log_report(
             tablefmt="fancy_grid",
         )
     )
+
+# TODO: not used so far but can help to handle output folder creation.
+def prompt_create_outdir(path, folder_name=None, prompt_message="Define path to store the output:"):
+    """Ensure the directory exists or prompt the user to define and create it."""
+    # Check path
+    if not path:
+        path = prompt_path("Define path to store the output:")
+        stderr.print(f"Chosen directory: {path}")
+
+    # Check folder_name
+    if not folder_name:
+        default_folder = prompt_yn_question("Do you want to use default directory ('results') to store the results? (yes/no):")
+        if not default_folder:
+            folder_name = prompt_text("Write your output directory: ")
+        else:
+            folder_name = 'results'
+    
+    global_path = os.path.join(path, folder_name)
+
+    if not os.path.exists(global_path):
+        create_folder = prompt_yn_question(f"The directory does not exist. Do you want to create '{folder_name}' folder in this path? (yes/no):")
+        if create_folder:
+            os.makedirs(global_path)
+            stderr.print(f"[green]Folder '{folder_name}' created at {path}")
+        else:
+            stderr.print("[red]Directory creation aborted.")
+            sys.exit(1)
+    elif os.path.isdir(global_path):
+        os.makedirs(global_path, exist_ok=True)
+        stderr.print(f"[green]Folder '{folder_name}' created at {path}")
+    else:
+        stderr.print("[red]The provided path is not a directory.")
+        sys.exit(1)
+    return (global_path)
