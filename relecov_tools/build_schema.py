@@ -76,7 +76,7 @@ class SchemaBuilder:
             sys.exit(1)
         return json_data
 
-    def create_schema_draft_template(self, draft_version):
+    def create_schema_draft_template(self, draft_version=None):
         "Loads JsonSchema template based on draft name: Available drafts: [2020-12]"
         draft_template = (
             relecov_tools.assets.schema_utils.jsonschema_draft.create_draft(
@@ -155,7 +155,6 @@ class SchemaBuilder:
         #if not current_schema:
         
         # TODO: build new schema draft based on database definition. 
-        # TODO: create_schema_draft_template  should show a prompt to mannually select the desired draft version.
-        schema_draft_template = self.create_schema_draft_template()
+        schema_draft_template = self.create_schema_draft_template('2020-2')
 
         # TODO: Compare current vs new schema
