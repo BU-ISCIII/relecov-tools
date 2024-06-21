@@ -154,7 +154,8 @@ class SchemaBuilder:
         # TODO: if schema not found do something
         #if not current_schema:
         
-        # TODO: build new schema draft based on database definition. 
-        schema_draft_template = self.create_schema_draft_template('2020-2')
+        # Create schema draft template (leave empty to be prompted to list of available schema versions)
+        schema_draft_template = self.create_schema_draft_template("2020-2")
 
+        # build new schema draft based on database definition. 
         # TODO: Compare current vs new schema
