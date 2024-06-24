@@ -114,11 +114,52 @@ class SchemaBuilder:
             stderr.print(f"An unexpected error occurred: {e}")
             return None
 
-    def build_new_schema(self, schema_draft, json_data):
+    def build_new_schema(self, json_data, schema_draft):
         """
-        Create schema_input.json when no schema is already present.
+        Create a json schema file based on input data and draf skeleton..
         """
-        # TODO: Read the Excel file and extract the database definitions.
+        try:
+            # List of properties to check in the features dictionary:
+            #       key[database_key]: value[schema_key]
+            properties_to_check = {
+                'which enums': 'enum',
+                'examples': 'examples',
+                'ontology_id': 'ontology',
+                'Object type': 'type',  # replace 'type' with 'Object type'
+                'description': 'description',
+                'classification': 'classification',
+                'label_name': 'label',
+                'fill_mode': 'fill_mode',
+                'minLength': 'minLength'  # replace 'minLenght' with 'minLength'
+            }
+
+            for property_id, features in json_data.items():
+                schema_property = {}
+
+                for feature_key, schema_key in properties_to_check.items():
+                    if feature_key in features:
+                        # For enum and examples, wrap the value in a list
+                        if schema_key in ['enum', 'examples']:
+                            value = str(features[feature_key])
+                            # if no value, json key wont be necessary, then avoid adding it
+                            if len(value) > 0 and not value == 'nan':
+                                schema_property[schema_key] = value
+                        else:
+                            schema_property[schema_key] = features[feature_key]
+
+                # Set default values if not provided
+                if 'fill_mode' not in schema_property:
+                    schema_property['fill_mode'] = None  # FIXME: this does not appear in database definition
+                if 'minLength' not in schema_property:
+                    schema_property['minLength'] = 1  # FIXME: this does not appear in database definition
+
+                schema_draft['properties'][property_id] = schema_property
+
+            return schema_draft
+
+        except Exception as e:
+            stderr.print(f"[red]Error building schema: {str(e)}")
+            raise
 
         # TODO: Check if schema_input.json already exists.
 
@@ -147,7 +188,7 @@ class SchemaBuilder:
 
     def handle_build_schema(self):
         # Load xlsx database and convert into json format
-        self.read_database_definition()
+        database_dic = self.read_database_definition()
 
         # Verify current schema used by relecov-tools:
         current_schema = self.get_current_schema()
@@ -155,7 +196,11 @@ class SchemaBuilder:
         # if not current_schema:
 
         # Create schema draft template (leave empty to be prompted to list of available schema versions)
-        schema_draft_template = self.create_schema_draft_template("2020-2")
+        schema_draft_template = self.create_schema_draft_template("2020-12")
 
         # build new schema draft based on database definition.
+        res = self.build_new_schema(database_dic, schema_draft_template)
+
         # TODO: Compare current vs new schema
+
+        # TODO: add method to add new schema via input file instead of building new (encompases validation checks). 
