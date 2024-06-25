@@ -97,18 +97,18 @@ class SchemaBuilder:
         )
         return draft_template
 
-    def get_current_schema(self):
+    def get_base_schema(self):
         """
-        Check if the current RELECOV schema is available in the configuration file.
+        Check if the current ('base') RELECOV schema is available in the configuration file.
         """
         try:
             conf = ConfigJson()
             schemas = conf.get_configuration("json_schemas")
 
             if "relecov_schema" in schemas:
-                current_schema = schemas["relecov_schema"]
+                base_schema = schemas["relecov_schema"]
                 stderr.print("[green]RELECOV schema found in the configuration.")
-                return current_schema
+                return base_schema
             else:
                 stderr.print("[orange]RELECOV schema not found in the configuration.")
                 return None
@@ -213,16 +213,16 @@ class SchemaBuilder:
         """
         # TODO: Read the Excel file and extract the database definitions.
 
-        # TODO: Compare the extracted definitions with the current schema_input.json.
+        # TODO: Compare the extracted definitions with the base schema_input.json.
 
         # TODO: Update the schema_input.json with the new definitions.
 
     def print_schema_diff(self):
         """
-        Print the differences between the current version of schema_input.json
+        Print the differences between the base version of schema_input.json
         and the updated version after calling update_schema().
         """
-        # TODO: Load the current schema_input.json.
+        # TODO: Load the base schema_input.json.
 
         # TODO: Load the updated schema_input.json after calling update_schema().
 
@@ -233,9 +233,10 @@ class SchemaBuilder:
         database_dic = self.read_database_definition()
 
         # Verify current schema used by relecov-tools:
-        self.get_current_schema()
+        self.get_base_schema()
+        
         # TODO: if schema not found do something
-        # if not current_schema:
+        # if not base_schema:
 
         # Create schema draft template (leave empty to be prompted to list of available schema versions)
         schema_draft_template = self.create_schema_draft_template()
@@ -246,6 +247,6 @@ class SchemaBuilder:
         # Verify new schema follows json schema specification rules.
         self.verify_schema(new_schema)
 
-        # TODO: Compare current vs new schema
+        # TODO: Compare base vs new schema
 
         # TODO: add method to add new schema via input file instead of building new (encompases validation checks).
