@@ -26,6 +26,7 @@ class SchemaBuilder:
         show_diff=False,
         out_dir=None,
     ):
+        # TODO: Fix old description
         """
         Initialize the SchemaBuilder with paths to the Excel file containing the database definitions
         and the schema_input.json file.
@@ -131,12 +132,14 @@ class SchemaBuilder:
                 'label_name': 'label',
                 'fill_mode': 'fill_mode',
                 'minLength': 'minLength',
-                'required': 'required'
+                'required (Y/N )': 'required'
             }
+            schema_required_unique = []
 
             # Filling properties
             for property_id, features in json_data.items():
                 schema_property = {}
+                schema_required = {}
 
                 for feature_key, schema_key in properties_to_check.items():
                     if feature_key in features:
@@ -150,6 +153,12 @@ class SchemaBuilder:
                                     schema_property[schema_key] = value.split(', ')
                                 elif schema_key == 'examples':
                                     schema_property[schema_key] = [value]
+                        # Recover 'required' properties from database definition.
+                        elif schema_key == 'required':
+                            value = str(features[feature_key])
+                            if value != 'nan':
+                                schema_required[property_id] = value
+
                         else:
                             schema_property[schema_key] = features[feature_key]
 
@@ -158,9 +167,17 @@ class SchemaBuilder:
                     schema_property['fill_mode'] = None  # FIXME: this does not appear in database definition
                 if 'minLength' not in schema_property:
                     schema_property['minLength'] = 1  # FIXME: this does not appear in database definition
-
+                
+                # Finally, send schema_property object to new json schema.
                 schema_draft['properties'][property_id] = schema_property
 
+            # Finally, send schema_required object to new json schema.
+                for key, values in schema_required.items():
+                    if value == 'Y':
+                        schema_required_unique.append(key)
+            schema_draft['required'] = schema_required_unique
+
+            # Return new schema
             return schema_draft
 
         except Exception as e:

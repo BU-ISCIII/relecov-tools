@@ -59,7 +59,7 @@ def check_schema_draft(schema_draft, version="2020-12"):
     """Validates the schema_draft against the JSON Schema Draft 2020-12 meta-schema."""
     try:
         Draft202012Validator.check_schema(schema_draft)
-        stderr.print("Schema is valid.")
+        stderr.print("[green] New schema is valid based on JSON Specification rules.")
     except exceptions.SchemaError as e:
         stderr.print(f"[red]Schema validation error: {e.message}")
     except Exception as e:
