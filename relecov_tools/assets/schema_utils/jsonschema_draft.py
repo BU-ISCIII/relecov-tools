@@ -4,7 +4,7 @@ import rich.console
 
 import relecov_tools.utils
 import pkg_resources
-from jsonschema import Draft202012Validator, ValidationError, exceptions
+from jsonschema import Draft202012Validator, exceptions
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -43,7 +43,7 @@ def create_draft(draft_version=None, required=None):
         "version": pakage_version_str,
         "type": "object",
         "required": [],
-        "properties": {}
+        "properties": {},
     }
 
     # Include required fields if specified
