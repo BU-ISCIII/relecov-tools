@@ -123,16 +123,16 @@ class SchemaBuilder:
             # List of properties to check in the features dictionary:
             #       key[database_key]: value[schema_key]
             properties_to_check = {
-                'enum': 'enum',
-                'examples': 'examples',
-                'ontology_id': 'ontology',
-                'type': 'type',
-                'description': 'description',
-                'classification': 'classification',
-                'label_name': 'label',
-                'fill_mode': 'fill_mode',
-                'minLength': 'minLength',
-                'required (Y/N )': 'required'
+                "enum": "enum",
+                "examples": "examples",
+                "ontology_id": "ontology",
+                "type": "type",
+                "description": "description",
+                "classification": "classification",
+                "label_name": "label",
+                "fill_mode": "fill_mode",
+                "minLength": "minLength",
+                "required (Y/N )": "required",
             }
             schema_required_unique = []
 
@@ -144,38 +144,42 @@ class SchemaBuilder:
                 for feature_key, schema_key in properties_to_check.items():
                     if feature_key in features:
                         # For enum and examples, wrap the value in a list
-                        if schema_key in ['enum', 'examples']:
+                        if schema_key in ["enum", "examples"]:
                             value = str(features[feature_key])
                             # if no value, json key wont be necessary, then avoid adding it
-                            if len(value) > 0 and not value == 'nan':
+                            if len(value) > 0 and not value == "nan":
                                 # Enum is an array like object
-                                if schema_key == 'enum':
-                                    schema_property[schema_key] = value.split(', ')
-                                elif schema_key == 'examples':
+                                if schema_key == "enum":
+                                    schema_property[schema_key] = value.split(", ")
+                                elif schema_key == "examples":
                                     schema_property[schema_key] = [value]
                         # Recover 'required' properties from database definition.
-                        elif schema_key == 'required':
+                        elif schema_key == "required":
                             value = str(features[feature_key])
-                            if value != 'nan':
+                            if value != "nan":
                                 schema_required[property_id] = value
 
                         else:
                             schema_property[schema_key] = features[feature_key]
 
                 # Set default values if not provided
-                if 'fill_mode' not in schema_property:
-                    schema_property['fill_mode'] = None  # FIXME: this does not appear in database definition
-                if 'minLength' not in schema_property:
-                    schema_property['minLength'] = 1  # FIXME: this does not appear in database definition
-                
-                # Finally, send schema_property object to new json schema.
-                schema_draft['properties'][property_id] = schema_property
+                if "fill_mode" not in schema_property:
+                    schema_property["fill_mode"] = (
+                        None  # FIXME: this does not appear in database definition
+                    )
+                if "minLength" not in schema_property:
+                    schema_property["minLength"] = (
+                        1  # FIXME: this does not appear in database definition
+                    )
 
-            # Finally, send schema_required object to new json schema.
+                # Finally, send schema_property object to new json schema.
+                schema_draft["properties"][property_id] = schema_property
+
+                # Finally, send schema_required object to new json schema.
                 for key, values in schema_required.items():
-                    if value == 'Y':
+                    if value == "Y":
                         schema_required_unique.append(key)
-            schema_draft['required'] = schema_required_unique
+            schema_draft["required"] = schema_required_unique
 
             # Return new schema
             return schema_draft
@@ -189,8 +193,6 @@ class SchemaBuilder:
         """Verify the schema_draft follows the JSON Schema specification [XXXX] meta-schema."""
         relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(schema)
         # TODO: specification version should be added to input params and self.
-
-
 
     def update_schema(self):
         """
@@ -218,7 +220,7 @@ class SchemaBuilder:
         database_dic = self.read_database_definition()
 
         # Verify current schema used by relecov-tools:
-        current_schema = self.get_current_schema()
+        self.get_current_schema()
         # TODO: if schema not found do something
         # if not current_schema:
 
@@ -228,8 +230,9 @@ class SchemaBuilder:
         # build new schema draft based on database definition.
         new_schema = self.build_new_schema(database_dic, schema_draft_template)
 
-        # Check new schema follows json schema specification rules. 
+        # Verify new schema follows json schema specification rules.
         self.verify_schema(new_schema)
+
         # TODO: Compare current vs new schema
 
-        # TODO: add method to add new schema via input file instead of building new (encompases validation checks). 
+        # TODO: add method to add new schema via input file instead of building new (encompases validation checks).
