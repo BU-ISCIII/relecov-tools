@@ -168,7 +168,11 @@ class SchemaBuilder:
             raise
         # Once json schema is created, it requires validation
 
-        # TODO: add validation chek
+    def verify_schema(self, schema):
+        """Verify the schema_draft follows the JSON Schema specification [XXXX] meta-schema."""
+        relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(schema)
+        # TODO: specification version should be added to input params and self.
+
 
 
     def update_schema(self):
@@ -207,6 +211,8 @@ class SchemaBuilder:
         # build new schema draft based on database definition.
         new_schema = self.build_new_schema(database_dic, schema_draft_template)
 
+        # Check new schema follows json schema specification rules. 
+        self.verify_schema(new_schema)
         # TODO: Compare current vs new schema
 
         # TODO: add method to add new schema via input file instead of building new (encompases validation checks). 
