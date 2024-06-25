@@ -122,17 +122,19 @@ class SchemaBuilder:
             # List of properties to check in the features dictionary:
             #       key[database_key]: value[schema_key]
             properties_to_check = {
-                'which enums': 'enum',
+                'enum': 'enum',
                 'examples': 'examples',
                 'ontology_id': 'ontology',
-                'Object type': 'type',  # replace 'type' with 'Object type'
+                'type': 'type',
                 'description': 'description',
                 'classification': 'classification',
                 'label_name': 'label',
                 'fill_mode': 'fill_mode',
-                'minLength': 'minLength'  # replace 'minLenght' with 'minLength'
+                'minLength': 'minLength',
+                'required': 'required'
             }
 
+            # Filling properties
             for property_id, features in json_data.items():
                 schema_property = {}
 
@@ -143,7 +145,11 @@ class SchemaBuilder:
                             value = str(features[feature_key])
                             # if no value, json key wont be necessary, then avoid adding it
                             if len(value) > 0 and not value == 'nan':
-                                schema_property[schema_key] = value
+                                # Enum is an array like object
+                                if schema_key == 'enum':
+                                    schema_property[schema_key] = value.split(', ')
+                                elif schema_key == 'examples':
+                                    schema_property[schema_key] = [value]
                         else:
                             schema_property[schema_key] = features[feature_key]
 
@@ -160,10 +166,10 @@ class SchemaBuilder:
         except Exception as e:
             stderr.print(f"[red]Error building schema: {str(e)}")
             raise
+        # Once json schema is created, it requires validation
 
-        # TODO: Check if schema_input.json already exists.
+        # TODO: add validation chek
 
-        # TODO: If schema_input.json does not exist, create it and populate with the extracted definitions.
 
     def update_schema(self):
         """
@@ -199,7 +205,7 @@ class SchemaBuilder:
         schema_draft_template = self.create_schema_draft_template("2020-12")
 
         # build new schema draft based on database definition.
-        res = self.build_new_schema(database_dic, schema_draft_template)
+        new_schema = self.build_new_schema(database_dic, schema_draft_template)
 
         # TODO: Compare current vs new schema
 
