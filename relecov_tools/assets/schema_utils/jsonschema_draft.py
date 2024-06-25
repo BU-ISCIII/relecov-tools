@@ -28,7 +28,7 @@ def create_draft(draft_version=None, required=None):
             available_schemas,
         )
 
-    url_str = f"https://json-schema.org/draft/{draft_version}/schema"
+    url_str = Draft202012Validator.META_SCHEMA["$id"]
     id_str = "https://github.com/BU-ISCIII/relecov-tools/blob/develop/relecov_tools/schema/relecov_schema.json"
     description_str = "Json schema that specifies the structure, content, and validation rules for RELECOV metadata"
     pakage_version_str = pkg_resources.get_distribution("relecov_tools").version
@@ -41,7 +41,8 @@ def create_draft(draft_version=None, required=None):
         "description": description_str,
         "version": pakage_version_str,
         "type": "object",
-        "properties": {},
+        "required": [],
+        "properties": {}
     }
 
     # Include required fields if specified
