@@ -524,7 +524,7 @@ def launch_pipeline(input, template, output, config):
     "-s",
     "--schema_base",
     type=click.Path(),
-    help="Path to the Excel document containing the database definition.",
+    help="Path to in use json schema (optional).",
 )
 @click.option(
     "-v",
