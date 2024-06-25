@@ -4,6 +4,7 @@ import rich.console
 
 import relecov_tools.utils
 import pkg_resources
+from jsonschema import Draft202012Validator, ValidationError, exceptions
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -53,3 +54,13 @@ def create_draft(draft_version=None, required=None):
 
 
 # TODO: draft202012Validator should be implemented here
+# TODO: this should be able to check_schema based on supported versions.
+def check_schema_draft(schema_draft, version="2020-12"):
+    """Validates the schema_draft against the JSON Schema Draft 2020-12 meta-schema."""
+    try:
+        Draft202012Validator.check_schema(schema_draft)
+        stderr.print("Schema is valid.")
+    except exceptions.SchemaError as e:
+        stderr.print(f"[red]Schema validation error: {e.message}")
+    except Exception as e:
+        stderr.print(f"An error occurred during schema validation: {str(e)}")
