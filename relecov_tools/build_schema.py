@@ -18,11 +18,13 @@ stderr = rich.console.Console(
 )
 
 
+# TODO: user should be able to provide a custom schema as a file in order to replace the current one.
 class SchemaBuilder:
     def __init__(
         self,
         excel_file_path=None,
         base_schema_path=None,
+        draft_version=None,
         show_diff=False,
         out_dir=None,
     ):
@@ -37,6 +39,7 @@ class SchemaBuilder:
         """
         self.excel_file_path = excel_file_path
         self.schema_file_path = base_schema_path
+        self.draft_version = draft_version
         self.show_diff = show_diff
 
         # Validate input variables
@@ -60,6 +63,13 @@ class SchemaBuilder:
             else:
                 self.out_dir = out_dir
 
+        # Validate json schema draft version
+        self.draft_version = (
+            relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(
+                draft_version
+            )
+        )
+
     def read_database_definition(self):
         """Reads the database definition and converts it into json format."""
         # Read excel file
@@ -78,11 +88,11 @@ class SchemaBuilder:
             sys.exit(1)
         return json_data
 
-    def create_schema_draft_template(self, draft_version=None):
+    def create_schema_draft_template(self):
         "Loads JsonSchema template based on draft name: Available drafts: [2020-12]"
         draft_template = (
             relecov_tools.assets.schema_utils.jsonschema_draft.create_draft(
-                draft_version
+                self.draft_version, True
             )
         )
         return draft_template
@@ -115,6 +125,7 @@ class SchemaBuilder:
             stderr.print(f"An unexpected error occurred: {e}")
             return None
 
+    # TODO: add strategy to deal with json schema objects, defs and refs
     def build_new_schema(self, json_data, schema_draft):
         """
         Create a json schema file based on input data and draf skeleton..
@@ -172,12 +183,12 @@ class SchemaBuilder:
                         1  # FIXME: this does not appear in database definition
                     )
 
-                # Finally, send schema_property object to new json schema.
+                # Finally, send schema_property object to the new json schema.
                 schema_draft["properties"][property_id] = schema_property
 
-                # Finally, send schema_required object to new json schema.
+                # Finally, send schema_required object to the new json schema.
                 for key, values in schema_required.items():
-                    if value == "Y":
+                    if values == "Y":
                         schema_required_unique.append(key)
             schema_draft["required"] = schema_required_unique
 
@@ -191,7 +202,9 @@ class SchemaBuilder:
 
     def verify_schema(self, schema):
         """Verify the schema_draft follows the JSON Schema specification [XXXX] meta-schema."""
-        relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(schema)
+        relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(
+            schema, self.draft_version
+        )
         # TODO: specification version should be added to input params and self.
 
     def update_schema(self):
@@ -225,7 +238,7 @@ class SchemaBuilder:
         # if not current_schema:
 
         # Create schema draft template (leave empty to be prompted to list of available schema versions)
-        schema_draft_template = self.create_schema_draft_template("2020-12")
+        schema_draft_template = self.create_schema_draft_template()
 
         # build new schema draft based on database definition.
         new_schema = self.build_new_schema(database_dic, schema_draft_template)
