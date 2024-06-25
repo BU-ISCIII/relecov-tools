@@ -77,10 +77,10 @@ class SchemaBuilder:
 
         # Convert database to json format
         json_data = {}
-        for _, row in df.iterrows():
-            property_name = row.iloc[0]
-            values = row.drop(df.columns[0]).to_dict()
-            json_data[property_name] = values
+        for row in df.itertuples(index=False):
+            property_name = row[0]
+            values = row[1:]
+            json_data[property_name] = dict(zip(df.columns[1:], values))
 
         # Check json is not empty
         if len(json_data) == 0:
