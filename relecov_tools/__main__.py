@@ -527,16 +527,22 @@ def launch_pipeline(input, template, output, config):
     help="Path to the Excel document containing the database definition.",
 )
 @click.option(
+    "-v",
+    "--draft_version",
+    type=click.STRING,
+    help="Version of the JSON schema specification to be used. Example: '2020-12. See: https://json-schema.org/specification-links",
+)
+@click.option(
     "-d",
     "--diff",
     type=click.BOOL,
     help="Prints a changelog/diff between the current and incoming versions of the schema schema_relecov.json.",
 )
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file/s")
-def build_schema(input_file, schema_base, diff, out_dir):
+def build_schema(input_file, schema_base, draft_version, diff, out_dir):
     """"""
     schema_update = relecov_tools.build_schema.SchemaBuilder(
-        input_file, schema_base, diff, out_dir
+        input_file, schema_base, draft_version, diff, out_dir
     )
     schema_update.handle_build_schema()
 
