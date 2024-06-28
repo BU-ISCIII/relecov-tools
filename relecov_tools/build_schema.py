@@ -4,6 +4,8 @@ import rich.console
 import pandas as pd
 import os
 import sys
+import json
+import difflib
 
 import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
@@ -103,20 +105,27 @@ class SchemaBuilder:
         """
         try:
             conf = ConfigJson()
-            schemas = conf.get_configuration("json_schemas")
+            relecov_schema_conf = conf.get_topic_data("json_schemas", "relecov_schema")
 
-            if "relecov_schema" in schemas:
-                base_schema = schemas["relecov_schema"]
-                stderr.print("[green]RELECOV schema found in the configuration.")
-                return base_schema
+            if relecov_schema_conf:
+                try:
+                    base_schema_path = os.path.join(
+                        os.path.dirname(os.path.realpath(__file__)),
+                        "schema",
+                        relecov_schema_conf,
+                    )
+                    os.path.isfile(base_schema_path)
+                    stderr.print("[green]RELECOV schema found in the configuration.")
+                    base_schema_json = relecov_tools.utils.read_json_file(
+                        base_schema_path
+                    )
+                    return base_schema_json
+                except FileNotFoundError as fnf_error:
+                    stderr.print(f"[red]Configuration file not found: {fnf_error}")
+                    return None
             else:
                 stderr.print("[orange]RELECOV schema not found in the configuration.")
                 return None
-
-        except FileNotFoundError as fnf_error:
-            stderr.print(f"[red]Configuration file not found: {fnf_error}")
-            return None
-
         except KeyError as key_error:
             stderr.print(f"[orange]Configuration key error: {key_error}")
             return None
@@ -207,6 +216,53 @@ class SchemaBuilder:
         )
         # TODO: specification version should be added to input params and self.
 
+    def print_schema_diff(self, base_schema, new_schema):
+        """
+        Print the differences between the base version of schema_input.json
+        and the updated version.
+        """
+        # Set diff input
+        base_schema_lines = json.dumps(base_schema, indent=4).splitlines()
+        new_schema_lines = json.dumps(new_schema, indent=4).splitlines()
+
+        # Get diff lines
+        diff_lines = list(
+            difflib.unified_diff(
+                base_schema_lines,
+                new_schema_lines,
+                fromfile="base_schema.json",
+                tofile="new_schema.json",
+            )
+        )
+
+        if not diff_lines:
+            stderr.print(
+                "[orange]No differencess were found between already installed and new generated schema. Exiting. No changes made"
+            )
+            return None
+        else:
+            stderr.print(
+                "Differences found between the existing schema and the newly generated schema."
+            )
+            # Set user's choices
+            choices = ["Print to sandard output (stdout)", "Save to file", "Both"]
+            diff_output_choice = relecov_tools.utils.prompt_selection(
+                "How would you like to print the diff between schemes?:", choices
+            )
+            if diff_output_choice in ["Print to sandard output (stdout)", "Both"]:
+                for line in diff_lines:
+                    print(line)
+                return True
+            if diff_output_choice in ["Save to file", "Both"]:
+                stderr.print(self.out_dir)
+                diff_filepath = os.path.join(
+                    os.path.realpath(self.out_dir) + "/build_schema_diff.txt"
+                )
+                with open(diff_filepath, "w") as diff_file:
+                    diff_file.write("\n".join(diff_lines))
+                stderr.print(f"[green]Schema differences saved to {diff_filepath}")
+                return True
+
     def update_schema(self):
         """
         Update the schema_input.json based on the definitions in the Excel file.
@@ -217,24 +273,16 @@ class SchemaBuilder:
 
         # TODO: Update the schema_input.json with the new definitions.
 
-    def print_schema_diff(self):
-        """
-        Print the differences between the base version of schema_input.json
-        and the updated version after calling update_schema().
-        """
-        # TODO: Load the base schema_input.json.
-
-        # TODO: Load the updated schema_input.json after calling update_schema().
-
-        # TODO: Compare the two versions and print/save the differences.
-
     def handle_build_schema(self):
         # Load xlsx database and convert into json format
         database_dic = self.read_database_definition()
 
         # Verify current schema used by relecov-tools:
-        self.get_base_schema()
-        
+        base_schema = self.get_base_schema()
+        if not base_schema:
+            stderr.print("[red]Couldn't find relecov base schema. Exiting...)")
+            sys.exit()
+
         # TODO: if schema not found do something
         # if not base_schema:
 
@@ -248,5 +296,9 @@ class SchemaBuilder:
         self.verify_schema(new_schema)
 
         # TODO: Compare base vs new schema
+        schema_diff = self.print_schema_diff(base_schema, new_schema)
+        if schema_diff:
+            # TODO: If diff ask user to update schema (allow a preview). Else exit. ¿bump version?
+            self.update_schema()
 
         # TODO: add method to add new schema via input file instead of building new (encompases validation checks).
