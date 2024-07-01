@@ -32,12 +32,8 @@ class SchemaBuilder:
     ):
         # TODO: Fix old description
         """
-        Initialize the SchemaBuilder with paths to the Excel file containing the database definitions
-        and the schema_input.json file.
-
-        Args:
-            excel_file_path (str): Path to the Excel file containing the database definitions.
-            schema_file_path (str): Path to the schema_input.json file.
+        Initialize the SchemaBuilder class. This class generates a JSON Schema file based on the provided draft version.
+        It reads the database definition from an Excel file and allows customization of the schema generation process.
         """
         self.excel_file_path = excel_file_path
         self.schema_file_path = base_schema_path
@@ -185,11 +181,11 @@ class SchemaBuilder:
                 # Set default values if not provided
                 if "fill_mode" not in schema_property:
                     schema_property["fill_mode"] = (
-                        None  # FIXME: this does not appear in database definition
+                        None
                     )
                 if "minLength" not in schema_property:
                     schema_property["minLength"] = (
-                        1  # FIXME: this does not appear in database definition
+                        1
                     )
 
                 # Finally, send schema_property object to the new json schema.
@@ -302,3 +298,6 @@ class SchemaBuilder:
             self.update_schema()
 
         # TODO: add method to add new schema via input file instead of building new (encompases validation checks).
+        # TODO: Add versioning of schema when it is updated.
+        # TODO: Add method to register logs any time schema is updated
+        # TODO: After updating schema, generate the excell template.
