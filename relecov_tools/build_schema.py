@@ -30,14 +30,11 @@ class SchemaBuilder:
         show_diff=False,
         out_dir=None,
     ):
-        # TODO: Fix old description
         """
         Initialize the SchemaBuilder class. This class generates a JSON Schema file based on the provided draft version.
         It reads the database definition from an Excel file and allows customization of the schema generation process.
         """
         self.excel_file_path = excel_file_path
-        self.schema_file_path = base_schema_path
-        self.draft_version = draft_version
         self.show_diff = show_diff
 
         # Validate input variables
@@ -68,6 +65,26 @@ class SchemaBuilder:
             )
         )
 
+        # Validate base schema
+        if not base_schema_path:
+            try:
+                config_json = ConfigJson()
+                relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
+                try:
+                    self.base_schema_path = os.path.join(
+                        os.path.dirname(os.path.realpath(__file__)),
+                        "schema",
+                        relecov_schema,
+                    )
+                    os.path.isfile(self.base_schema_path)
+                    stderr.print("[green]RELECOV schema found in the configuration.")
+                except FileNotFoundError as fnf_error:
+                    stderr.print(f"[red]Configuration file not found: {fnf_error}")
+                    sys.exit(1)
+            except KeyError as key_error:
+                stderr.print(f"[orange]Configuration key error: {key_error}")
+                sys.exit(1)
+
     def read_database_definition(self):
         """Reads the database definition and converts it into json format."""
         # Read excel file
@@ -94,41 +111,6 @@ class SchemaBuilder:
             )
         )
         return draft_template
-
-    def get_base_schema(self):
-        """
-        Check if the current ('base') RELECOV schema is available in the configuration file.
-        """
-        try:
-            conf = ConfigJson()
-            relecov_schema_conf = conf.get_topic_data("json_schemas", "relecov_schema")
-
-            if relecov_schema_conf:
-                try:
-                    base_schema_path = os.path.join(
-                        os.path.dirname(os.path.realpath(__file__)),
-                        "schema",
-                        relecov_schema_conf,
-                    )
-                    os.path.isfile(base_schema_path)
-                    stderr.print("[green]RELECOV schema found in the configuration.")
-                    base_schema_json = relecov_tools.utils.read_json_file(
-                        base_schema_path
-                    )
-                    return base_schema_json
-                except FileNotFoundError as fnf_error:
-                    stderr.print(f"[red]Configuration file not found: {fnf_error}")
-                    return None
-            else:
-                stderr.print("[orange]RELECOV schema not found in the configuration.")
-                return None
-        except KeyError as key_error:
-            stderr.print(f"[orange]Configuration key error: {key_error}")
-            return None
-
-        except Exception as e:
-            stderr.print(f"An unexpected error occurred: {e}")
-            return None
 
     # TODO: add strategy to deal with json schema objects, defs and refs
     def build_new_schema(self, json_data, schema_draft):
@@ -210,7 +192,6 @@ class SchemaBuilder:
         relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(
             schema, self.draft_version
         )
-        # TODO: specification version should be added to input params and self.
 
     def print_schema_diff(self, base_schema, new_schema):
         """
@@ -259,7 +240,7 @@ class SchemaBuilder:
                 stderr.print(f"[green]Schema differences saved to {diff_filepath}")
                 return True
 
-    def update_schema(self):
+    def update_schema(self, ):
         """
         Update the schema_input.json based on the definitions in the Excel file.
         """
@@ -274,28 +255,33 @@ class SchemaBuilder:
         database_dic = self.read_database_definition()
 
         # Verify current schema used by relecov-tools:
-        base_schema = self.get_base_schema()
-        if not base_schema:
+        base_schema_json = relecov_tools.utils.read_json_file(
+            self.base_schema_path
+        )
+        if not base_schema_json:
             stderr.print("[red]Couldn't find relecov base schema. Exiting...)")
-            sys.exit()
-
-        # TODO: if schema not found do something
-        # if not base_schema:
+            sys.exit(1)
 
         # Create schema draft template (leave empty to be prompted to list of available schema versions)
         schema_draft_template = self.create_schema_draft_template()
 
         # build new schema draft based on database definition.
-        new_schema = self.build_new_schema(database_dic, schema_draft_template)
+        new_schema_json = self.build_new_schema(database_dic, schema_draft_template)
 
         # Verify new schema follows json schema specification rules.
-        self.verify_schema(new_schema)
+        self.verify_schema(new_schema_json)
 
-        # TODO: Compare base vs new schema
-        schema_diff = self.print_schema_diff(base_schema, new_schema)
+        # Compare base vs new schema
+        schema_diff = self.print_schema_diff(base_schema_json, new_schema_json)
         if schema_diff:
             # TODO: If diff ask user to update schema (allow a preview). Else exit. ¿bump version?
-            self.update_schema()
+            # TODO: Register / update version
+            call_update_schema = relecov_tools.utils.prompt_yn_question("Do you want to update the schema?: ")
+            if call_update_schema:
+                self.update_schema(new_schema_json)
+            else:
+                stderr.print("[green]No changes made. Exiting...")
+                sys.exit(1)                
 
         # TODO: add method to add new schema via input file instead of building new (encompases validation checks).
         # TODO: Add versioning of schema when it is updated.
