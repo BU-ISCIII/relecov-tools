@@ -42,21 +42,10 @@ class SchemaBuilder:
             raise ValueError("A valid Excel file path must be provided.")
         if not self.excel_file_path.endswith(".xlsx"):
             raise ValueError("The Excel file must have a .xlsx extension.")
-        if not out_dir:
-            self.output_folder = relecov_tools.utils.prompt_path(
-                msg="Select the output folder:"
-            )
-        else:
-            if not os.path.exists(out_dir):
-                stderr.print(
-                    f"[red]The directory {out_dir} does not exist. Please, try again. Bye"
-                )
-                sys.exit(1)
-            if not os.path.isdir(out_dir):
-                stderr.print("[red]The provided path is not a directory.")
-                sys.exit(1)
-            else:
-                self.out_dir = out_dir
+
+        # Validate output folder
+        relecov_tools.utils.prompt_create_outdir(os.getcwd(), out_dir)
+        self.output_folder = os.path.join(os.getcwd(), out_dir)
 
         # Validate json schema draft version
         self.draft_version = (
@@ -231,9 +220,9 @@ class SchemaBuilder:
                     print(line)
                 return True
             if diff_output_choice in ["Save to file", "Both"]:
-                stderr.print(self.out_dir)
+                stderr.print(self.output_folder)
                 diff_filepath = os.path.join(
-                    os.path.realpath(self.out_dir) + "/build_schema_diff.txt"
+                    os.path.realpath(self.output_folder) + "/build_schema_diff.txt"
                 )
                 with open(diff_filepath, "w") as diff_file:
                     diff_file.write("\n".join(diff_lines))
