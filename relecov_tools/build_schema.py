@@ -78,6 +78,38 @@ class SchemaBuilder:
                 stderr.print(f"[orange]Configuration key error: {key_error}")
                 sys.exit(1)
 
+    def validate_database_definition(self, json_data):
+        """Validate the mandatory features of each property in json_data."""
+        # Check mandatory key features to build a json schema
+        notvalid_properties = {}
+        mandatory_features = [
+            "enum",
+            "examples",
+            "ontology_id",
+            "type",
+            "description",
+            "classification",
+            "label_name",
+            "fill_mode",
+            "minLength",
+            "required (Y/N)",
+        ]
+        # Iterate over each property in json_data
+        for j_key, j_value in json_data.items():
+            missing_features = []
+            for feature in mandatory_features:
+                if feature not in j_value:
+                    missing_features.append(feature)
+
+            if missing_features:
+                notvalid_properties[j_key] = missing_features
+
+        # Summarize validation
+        if notvalid_properties:
+            return notvalid_properties
+        else:
+            return None
+
     def read_database_definition(self):
         """Reads the database definition and converts it into json format."""
         # Read excel file
@@ -94,7 +126,18 @@ class SchemaBuilder:
         if len(json_data) == 0:
             stderr.print("[red]No data found in  xlsx database")
             sys.exit(1)
-        return json_data
+
+        # Perform validation of database content
+        validation_out = self.validate_database_definition(json_data)
+
+        if validation_out:
+            stderr.print(
+                f"[red]Validation of database content falied. Missing mandatory features in: {validation_out}"
+            )
+            sys.exit(1)
+        else:
+            stderr.print("[green]Validation of database content passed.")
+            return json_data
 
     def create_schema_draft_template(self):
         "Loads JsonSchema template based on draft name: Available drafts: [2020-12]"
@@ -123,7 +166,7 @@ class SchemaBuilder:
                 "label_name": "label",
                 "fill_mode": "fill_mode",
                 "minLength": "minLength",
-                "required (Y/N )": "required",
+                "required (Y/N)": "required",
             }
             schema_required_unique = []
 
