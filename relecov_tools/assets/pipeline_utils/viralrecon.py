@@ -148,18 +148,17 @@ class LongTableParse:
         else:
             date_regex = re.search(r"(\d{8})", result_regex.group())
             if date_regex is not None:
-                analysis_date = date_regex
+                analysis_date = date_regex.group()
                 stderr.print(
-                    f"[green]\tDate {analysis_date.group()} found in {self.file_path}"
+                    f"[green]\tDate {analysis_date} found in {self.file_path}"
                 )
             else:
                 analysis_date = "Not Provided [GENEPIO:0001668]"
                 stderr.print(
                     f"[yellow]\tWARN:No analysis date found in long table: {self.file_path}"
                 )
-
         for key, values in samp_dict.items():
-            j_dict = {"sample_name": key, "analysis_date": analysis_date.group()}
+            j_dict = {"sample_name": key, "analysis_date": analysis_date}
             j_dict["variants"] = values
             j_list.append(j_dict)
         return j_list
