@@ -90,11 +90,14 @@
             "required": true,
             "function": null,
             "content": {
-                "bioinformatics_protocol_software_version": "nf-core/viralrecon",
-                "consensus_sequence_software_version": "bcftools",
-                "dehosting_method_software_version": "kraken2",
-                "mapping_software_version":"bowtie2",
-                "preprocessing_software_version":"fastp","variant_calling_software_version":"ivar"
+                "software_version": {
+                    "bioinformatics_protocol_software_version": "nf-core/viralrecon",
+                    "consensus_sequence_software_version": "bcftools",
+                    "dehosting_method_software_version": "kraken2",
+                    "mapping_software_version":"bowtie2",
+                    "preprocessing_software_version":"fastp",
+                    "variant_calling_software_version":"ivar"
+                }
             }
         },
         "fixed_values": {
