@@ -432,7 +432,7 @@ class BioinfoMetadata(BioinfoReportLog):
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
 
         Returns:
-            j_data: updated j_data with software version's info mapped in it.
+            j_data: updated j_data with software details mapped in it.
         """
         method_name = f"{self.get_multiqc_software_versions.__name__}"
         # Handle multiqc_report.html
@@ -494,16 +494,26 @@ class BioinfoMetadata(BioinfoReportLog):
                 )
                 continue
 
-            # Append software versions
-            software_version_config = self.software_config["workflow_summary"].get("content").get("software_version")
-            for field, values in (software_version_config.items()
-            ):
-                try:
-                    row[field] = program_versions[values]
-                except KeyError as e:
-                    field_errors[sample_name] = {field: e}
-                    row[field] = "Not Provided [GENEPIO:0001668]"
-                    continue
+            # Append software version and name
+            software_content_details = self.software_config["workflow_summary"].get("content")
+            for content_key, content_value in software_content_details.items():
+                for key, value in content_value.items():
+                    # Add software versions
+                    if "software_version" in content_key:
+                        try:
+                            row[key] = program_versions[value]
+                        except KeyError as e:
+                            field_errors[sample_name] = {value: e}
+                            row[key] = "Not Provided [GENEPIO:0001668]"
+                        continue
+                    # Add software name
+                    elif "software_name" in content_key:
+                        try:
+                            row[key] = value
+                        except KeyError as e:
+                            field_errors[sample_name] = {value: e}
+                            row[key] = "Not Provided [GENEPIO:0001668]"
+                        continue
 
         # update progress log
         if len(field_errors) > 0:
