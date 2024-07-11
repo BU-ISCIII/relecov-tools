@@ -319,6 +319,11 @@ class SchemaBuilder:
             sys.exit(1)
 
         # TODO: add method to add new schema via input file instead of building new (encompases validation checks).
+        #       - if user adds its own schema dile
+        #       --> check it follows json schema specification rules
+        #       --> check diff
+        #       --> if diff --> save diffs
+        #       --> generae excell?
         # TODO: Add versioning of schema when it is updated.
         # TODO: Add method to register logs any time schema is updated
         # TODO: After updating schema, generate the excell template.
