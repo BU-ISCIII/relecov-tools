@@ -149,9 +149,7 @@ class LongTableParse:
             date_regex = re.search(r"(\d{8})", result_regex.group())
             if date_regex is not None:
                 analysis_date = date_regex.group()
-                stderr.print(
-                    f"[green]\tDate {analysis_date} found in {self.file_path}"
-                )
+                stderr.print(f"[green]\tDate {analysis_date} found in {self.file_path}")
             else:
                 analysis_date = "Not Provided [GENEPIO:0001668]"
                 stderr.print(

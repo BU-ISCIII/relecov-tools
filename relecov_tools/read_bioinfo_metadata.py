@@ -367,9 +367,7 @@ class BioinfoMetadata(BioinfoReportLog):
         for row in j_data:
             # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
             #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
-            sample_match = re.match(
-                r"^[^_]+", row["sequence_file_R1_fastq"]
-            )
+            sample_match = re.match(r"^[^_]+", row["sequence_file_R1_fastq"])
             if sample_match:
                 sample_name = sample_match.group()
             else:
@@ -487,9 +485,7 @@ class BioinfoMetadata(BioinfoReportLog):
         field_errors = {}
         for row in j_data:
             # Get sample name to track whether version assignment was successful or not.
-            sample_match = re.match(
-                r"^[^_]+", row["sequence_file_R1_fastq"]
-            )
+            sample_match = re.match(r"^[^_]+", row["sequence_file_R1_fastq"])
             if sample_match:
                 sample_name = sample_match.group()
             else:
@@ -501,7 +497,9 @@ class BioinfoMetadata(BioinfoReportLog):
                 continue
 
             # Append software version and name
-            software_content_details = self.software_config["workflow_summary"].get("content")
+            software_content_details = self.software_config["workflow_summary"].get(
+                "content"
+            )
             for content_key, content_value in software_content_details.items():
                 for key, value in content_value.items():
                     # Add software versions
@@ -578,9 +576,7 @@ class BioinfoMetadata(BioinfoReportLog):
         method_name = f"{self.add_bioinfo_files_path.__name__}"
         sample_name_error = 0
         for row in j_data:
-            sample_match = re.match(
-                r"^[^_]+", row["sequence_file_R1_fastq"]
-            )
+            sample_match = re.match(r"^[^_]+", row["sequence_file_R1_fastq"])
             if sample_match:
                 sample_name = sample_match.group()
             else:
