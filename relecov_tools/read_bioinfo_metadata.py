@@ -368,16 +368,22 @@ class BioinfoMetadata(BioinfoReportLog):
             # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
             #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
             sample_match = re.match(
-                r"^(.*?)_R1\.fastq\.gz", row["sequence_file_R1_fastq"]
+                r"^[^_]+", row["sequence_file_R1_fastq"]
             )
             if sample_match:
-                sample_name = sample_match.group(1)
+                sample_name = sample_match.group()
             else:
+                self.log_report.update_log_report(
+                    method_name,
+                    "warning",
+                    f'Regex failed to find extract sample name from: {row["sequence_file_R1_fastq"]}. Skipping...',
+                )
                 continue
             if sample_name in map_data.keys():
                 for field, value in mapping_fields.items():
                     try:
-                        row[field] = map_data[sample_name][value]
+                        # FIXME: we have to allow more than one data type to make json validation module work.
+                        row[field] = str(map_data[sample_name][value])
                         field_valid[sample_name] = {field: value}
                     except KeyError as e:
                         field_errors[sample_name] = {field: e}
@@ -558,6 +564,7 @@ class BioinfoMetadata(BioinfoReportLog):
     def add_bioinfo_files_path(self, files_found_dict, j_data):
         """Adds file paths essential for handling and mapping bioinformatics metadata to the j_data.
         For each sample in j_data, the function assigns the corresponding file path based on the identified files in files_found_dict.
+
         If multiple files are identified per configuration item (e.g., viralrecon.mapping_consensus → *.consensus.fa), each sample in j_data receives its respective file path.
         If no file path is located, the function appends "Not Provided [GENEPIO:0001668]" to indicate missing data.
 
@@ -572,11 +579,16 @@ class BioinfoMetadata(BioinfoReportLog):
         sample_name_error = 0
         for row in j_data:
             sample_match = re.match(
-                r"^(.*?)_R1\.fastq\.gz", row["sequence_file_R1_fastq"]
+                r"^[^_]+", row["sequence_file_R1_fastq"]
             )
             if sample_match:
-                sample_name = sample_match.group(1)
+                sample_name = sample_match.group()
             else:
+                self.log_report.update_log_report(
+                    method_name,
+                    "warning",
+                    f'Regex failed to find extract sample name from: {row["sequence_file_R1_fastq"]}. Skipping...',
+                )
                 continue
             for key, value in files_found_dict.items():
                 file_path = "Not Provided [GENEPIO:0001668]"
