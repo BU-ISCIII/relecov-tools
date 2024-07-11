@@ -337,7 +337,6 @@ class BioinfoMetadata(BioinfoReportLog):
                 utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
                 import_statement = f"from {utils_name} import {func_name}"
                 exec(import_statement)
-
                 # Get method name and execute it.
                 data = eval(func_name + "(file_list)")
             except Exception as e:
@@ -481,15 +480,23 @@ class BioinfoMetadata(BioinfoReportLog):
         # Mapping multiqc sofware versions to j_data
         field_errors = {}
         for row in j_data:
+            # Get sample name to track whether version assignment was successful or not.
             sample_match = re.match(
-                r"^(.*?)_R1\.fastq\.gz", row["sequence_file_R1_fastq"]
+                r"^[^_]+", row["sequence_file_R1_fastq"]
             )
             if sample_match:
-                sample_name = sample_match.group(1)
+                sample_name = sample_match.group()
             else:
+                self.log_report.update_log_report(
+                    method_name,
+                    "warning",
+                    f'Regex failed to find extract sample name from: {row["sequence_file_R1_fastq"]}. Skipping...',
+                )
                 continue
-            for field, values in (
-                self.software_config["workflow_summary"].get("content").items()
+
+            # Append software versions
+            software_version_config = self.software_config["workflow_summary"].get("content").get("software_version")
+            for field, values in (software_version_config.items()
             ):
                 try:
                     row[field] = program_versions[values]
