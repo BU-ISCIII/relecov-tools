@@ -87,7 +87,7 @@ class LogSum:
             self.logs[current_key]["samples"][sample][log_type].append(entry)
         return
 
-    def create_error_summary(self, filename=None):
+    def create_error_summary(self, called_module, filename=None):
         """Dump the log summary dictionary into a file with json format. If any of
         the 'errors' key is not empty, the parent key value 'valid' is set to false.
 
@@ -101,9 +101,13 @@ class LogSum:
                 for sample in self.logs[key]["samples"].keys():
                     if self.logs[key]["samples"][sample]["errors"]:
                         self.logs[key]["samples"][sample]["valid"] = False
-        called_module = [
-            fr.function for fr in inspect.stack() if "__main__.py" in fr.filename
-        ][0]
+        if not called_module:
+            try:
+                called_module = [
+                    f.function for f in inspect.stack() if "__main__.py" in f.filename
+                ][0]
+            except IndexError:
+                called_module = ""
         if not filename:
             date = datetime.today().strftime("%Y%m%d%-H%M%S")
             filename = "_".join([date, called_module, "log_summary.json"])
