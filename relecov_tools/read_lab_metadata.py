@@ -354,7 +354,7 @@ class RelecovMetadata:
         )
         stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
-        self.logsum.create_error_summary()
+        self.logsum.create_error_summary(called_module="read-lab-metadata")
         file_path = os.path.join(self.output_folder, file_name)
         relecov_tools.utils.write_json_fo_file(completed_metadata, file_path)
         return True
