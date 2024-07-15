@@ -87,7 +87,7 @@ class LogSum:
             self.logs[current_key]["samples"][sample][log_type].append(entry)
         return
 
-    def create_error_summary(self, called_module, filename=None):
+    def create_error_summary(self, called_module=None, filename=None):
         """Dump the log summary dictionary into a file with json format. If any of
         the 'errors' key is not empty, the parent key value 'valid' is set to false.
 
