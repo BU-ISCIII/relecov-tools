@@ -2,6 +2,7 @@
 import logging
 import json
 import os
+import inspect
 from rich.console import Console
 from datetime import datetime
 from collections import OrderedDict
@@ -100,8 +101,12 @@ class LogSum:
                 for sample in self.logs[key]["samples"].keys():
                     if self.logs[key]["samples"][sample]["errors"]:
                         self.logs[key]["samples"][sample]["valid"] = False
+        called_module = [
+            fr.function for fr in inspect.stack() if "__main__.py" in fr.filename
+        ][0]
         if not filename:
-            filename = datetime.today().strftime("%Y%m%d%-H%M%S") + "_log_summary.json"
+            date = datetime.today().strftime("%Y%m%d%-H%M%S")
+            filename = "_".join([date, called_module, "log_summary.json"])
         summary_path = os.path.join(self.output_location, filename)
         with open(summary_path, "w", encoding="utf-8") as f:
             f.write(json.dumps(self.logs, indent=4, sort_keys=True, ensure_ascii=False))
