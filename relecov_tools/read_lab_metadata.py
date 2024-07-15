@@ -219,6 +219,7 @@ class RelecovMetadata:
                         )
                         self.logsum.add_warning(key=sample_id, entry=log_text)
                         continue
+                    # TODO: Include Not Provided as a configuration field
                     fields_to_add = {
                         x: "Not Provided [GENEPIO:0001668]"
                         for x in json_fields["adding_fields"]
@@ -307,7 +308,7 @@ class RelecovMetadata:
                             log_text = f"Invalid date format in sample {str(key)}"
                             self.logsum.add_error(sample_id, log_text)
                             stderr.print(f"[red]{log_text}")
-                            row[key] = None
+                            continue
                 elif "sample id" in key.lower():
                     if isinstance(row[key], float) or isinstance(row[key], int):
                         row[key] = str(int(row[key]))
@@ -321,8 +322,8 @@ class RelecovMetadata:
                         log_text = f"Error when mapping the label {str(e)}"
                         self.logsum.add_error(sample_id, log_text)
                         stderr.print(f"[red]{log_text}")
-
                         continue
+
             valid_metadata_rows.append(property_row)
         return valid_metadata_rows
 
