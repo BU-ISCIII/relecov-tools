@@ -1321,7 +1321,8 @@ class SftpHandle:
         target_folders = self.select_target_folders()
         if self.download_option == "delete_only":
             log.info("Initiating delete_only process")
-            for folder in target_folders.keys():
+            processed_folders = target_folders.keys()
+            for folder in processed_folders:
                 self.current_folder = folder
                 self.delete_remote_files(folder)
                 self.delete_remote_folder(folder)
