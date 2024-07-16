@@ -6,6 +6,7 @@ import os
 import sys
 import json
 import difflib
+import xlsxwriter
 
 import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
@@ -290,6 +291,73 @@ class SchemaBuilder:
             stderr.print(f"[red]An unexpected error occurred: {str(e)}")
         return False
 
+    def create_metadatalab_excel(self, json_data):
+        """
+        Generate the metadatalab templet file in xlsx format. It contains:
+            - Overview tab:
+            - Metadata LAB tab:
+            - Validation Tab:
+        """
+        # Create a new workbook and add the 'overview' worksheet
+        excel_file_path = os.path.join(
+            os.path.realpath(self.output_folder) + "/metadatalab_template.xlsx"
+        )
+        workbook = xlsxwriter.Workbook(excel_file_path)
+        # Define a bold format for headers
+        bold = workbook.add_format({"bold": True})
+
+        #
+        # Overview Tab
+        #
+        overview_sheet = workbook.add_worksheet("Overview")
+        overview_tab_headers = [
+            "",
+            "Label name",
+            "Description",
+            "Group",
+            "Mandatory (Y/N)",
+            "Example",
+            "METADATA_LAB COLUMN",
+        ]
+
+        # Write the headers to the worksheet
+        for col_num, header in enumerate(overview_tab_headers):
+            overview_sheet.write(0, col_num, header, bold)
+
+        # Set Starting column
+        column_index = ord("A")
+
+        row_num = 1
+        for property_id, details in json_data.items():
+            label_name = details.get("label_name", "")
+            description = details.get("description", "")
+            group = details.get("classification", "")
+            mandatory = details.get("required (Y/N)", "")
+            example = details.get("examples", [""])
+            metadata_column = chr(column_index)
+
+            # Fill the overview tab with processed data
+            # FIXME: Got few errors while filling table
+            try:
+                overview_sheet.write(row_num, 0, group)
+                overview_sheet.write(row_num, 1, label_name)
+                overview_sheet.write(row_num, 2, description)
+                overview_sheet.write(row_num, 3, group)
+                overview_sheet.write(row_num, 4, mandatory)
+                overview_sheet.write(row_num, 5, example)
+                overview_sheet.write(row_num, 6, metadata_column)
+            except TypeError as e:
+                stderr.print(
+                    f"[red] Error when filling excell in property '{property_id}': {e}"
+                )
+                pass
+            column_index += 1
+            row_num += 1
+
+        # Close the workbook
+        workbook.close()
+        print(f"Excel file saved to {excel_file_path}")
+
     def handle_build_schema(self):
         # Load xlsx database and convert into json format
         database_dic = self.read_database_definition()
@@ -318,14 +386,16 @@ class SchemaBuilder:
                 f"[green]No changes found against base schema ({self.base_schema_path}). Exiting..."
             )
             sys.exit(1)
-        
+
+        if schema_diff:
+            self.create_metadatalab_excel(database_dic)
+
         # Build EXCEL template
-            # TODO: Three tabs in file
-            #   - Overview
-            #   - METADATA_LAB
-            #   - DATA_VALIDATION
-            #   - Add versinon tag to filename
+        # TODO: Three tabs in file
+        #   - Overview
+        #   - METADATA_LAB
+        #   - DATA_VALIDATION
+        #   - Add versinon tag to filename
 
         # TODO: Bump json schema version when it gets updated?
         # TODO: Publish a log file that register modification in json schema?
-
