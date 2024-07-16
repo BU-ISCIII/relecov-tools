@@ -214,7 +214,7 @@ class SchemaValidation:
             valid_json_data (list(dict)): List of samples metadata as dictionaries
             out_folder (str): path to folder where file will be created
         """
-        file_name = "_".join(["validated", self.json_data_file])
+        file_name = "_".join(["validated", os.path.basename(self.json_data_file)])
         file_path = os.path.join(out_folder, file_name)
         log.info("Saving Json file with the validated samples as %s", file_name)
         relecov_tools.utils.write_json_fo_file(valid_json_data, file_path)
