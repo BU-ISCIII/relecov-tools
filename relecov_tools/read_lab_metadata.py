@@ -305,9 +305,9 @@ class RelecovMetadata:
                                 dtime.strptime(str(row[key]), "%Y-%m-%d").date()
                             )
                         except ValueError:
-                            log_text = f"Invalid date format in sample {str(key)}"
+                            log_text = f"Invalid date format in {key}: {row[key]}"
                             self.logsum.add_error(sample_id, log_text)
-                            stderr.print(f"[red]{log_text}")
+                            stderr.print(f"[red]{log_text} for sample {sample_id}")
                             continue
                 elif "sample id" in key.lower():
                     if isinstance(row[key], float) or isinstance(row[key], int):
