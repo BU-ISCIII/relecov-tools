@@ -9,6 +9,7 @@ import openpyxl
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
+from relecov_tools.log_summary import LogSum
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -50,11 +51,17 @@ class SchemaValidation:
         if not os.path.isfile(json_data_file):
             stderr.print("[red] Json file does not exists")
             sys.exit(1)
+        self.json_data_file = json_data_file
+        self.logsum = LogSum(output_location=self.out_folder, only_samples=True)
 
         stderr.print("[blue] Reading the json file")
         self.json_data = relecov_tools.utils.read_json_file(json_data_file)
-
         self.metadata = metadata
+        try:
+            self.sample_id_field = self.get_sample_id_field()
+        except ValueError as e:
+            self.sample_id_field = None
+            self.SAMPLE_FIELD_ERROR = str(e)
 
     def validate_schema(self):
         """Validate json schema against draft"""
@@ -63,6 +70,22 @@ class SchemaValidation:
         except jsonschema.ValidationError:
             stderr.print("[red] Json schema does not fulfill Draft 202012 Validation")
             sys.exit(1)
+
+    def get_sample_id_field(self):
+        """Find the name of the field used to track the samples in the given schema"""
+        # TODO: Include this field in configuration.json
+        sample_id_ontology = "GENEPIO:0000079"
+        ontology_match = [
+            x
+            for x, y in self.json_schema["properties"].items()
+            if y.get("ontology") == sample_id_ontology
+        ]
+        if ontology_match:
+            sample_id_field = ontology_match[0]
+        else:
+            error_text = f"No valid sample ID field ({sample_id_ontology}) in schema"
+            raise ValueError(error_text)
+        return sample_id_field
 
     def validate_instances(self):
         """Validate data instances against a validated json schema"""
@@ -74,11 +97,16 @@ class SchemaValidation:
         invalid_json = []
         errors = {}
         error_keys = {}
+        if self.sample_id_field is None:
+            log_text = f"Logs keys set to None. Reason: {self.SAMPLE_FIELD_ERROR}"
+            self.logsum.add_warning(self.sample_id_field, log_text)
         stderr.print("[blue] Start processing the json file")
         for item_row in self.json_data:
             # validate(instance=item_row, schema=json_schema)
+            sample_id_value = item_row.get(self.sample_id_field)
             if validator.is_valid(item_row):
                 validated_json_data.append(item_row)
+                self.logsum.feed_key(sample_id_value)
             else:
                 # Count error types
                 for error in validator.iter_errors(item_row):
@@ -90,6 +118,7 @@ class SchemaValidation:
                         errors[error.message] += 1
                     else:
                         errors[error.message] = 1
+                    self.logsum.add_error(key=sample_id_value, entry=error.message)
                 # append row with errors
                 invalid_json.append(item_row)
 
@@ -115,7 +144,7 @@ class SchemaValidation:
             )
             stderr.print("[red] --------------------")
 
-        return invalid_json
+        return validated_json_data, invalid_json
 
     def create_invalid_metadata(self, invalid_json, metadata, out_folder):
         """Create a new sub excel file having only the samples that were invalid.
@@ -124,70 +153,87 @@ class SchemaValidation:
         The rows that match the value collected from json file on tag
         collecting_lab_sample_id are removed from excel
         """
-        if len(invalid_json) == 0:
-            stderr.print(
-                "[green] Sucessful validation, no invalid file will be written!!"
+        if self.sample_id_field is None:
+            log_text = f"Invalid excel file won't be created: {self.SAMPLE_FIELD_ERROR}"
+            self.logsum.add_error(key="000_VALIDATION_PROCESS_ERROR", entry=log_text)
+            return
+        log.error("Some of the samples in json metadata were not validated")
+        stderr.print("[red] Some of the Samples are not validate")
+        if metadata is None:
+            metadata = relecov_tools.utils.prompt_path(
+                msg="Select the metadata file to select those not-validated samples."
             )
-        else:
-            log.error("Some of the samples in json metadata were not validated")
-            stderr.print("[red] Some of the Samples are not validate")
-            if metadata is None:
-                metadata = relecov_tools.utils.prompt_path(
-                    msg="Select the metadata file to select those not-validated samples."
-                )
-            if not os.path.isfile(metadata):
-                log.error("Metadata file %s does not exist", metadata)
-                stderr.print(
-                    "[red] Unable to create excel file for invalid samples. Metadata file ",
-                    metadata,
-                    " does not exist",
-                )
-                sys.exit(1)
+        if not os.path.isfile(metadata):
+            log.error("Metadata file %s does not exist", metadata)
+            stderr.print(
+                "[red] Unable to create excel file for invalid samples. Metadata file ",
+                metadata,
+                " does not exist",
+            )
+            sys.exit(1)
+        sample_list = []
+        stderr.print("Start preparation of invalid samples")
+        for row in invalid_json:
+            sample_list.append(str(row[self.sample_id_field]))
+        wb = openpyxl.load_workbook(metadata)
+        # TODO: Include this as a key in configuration.json
+        ws_sheet = wb["METADATA_LAB"]
+        row_to_del = []
+        for row in ws_sheet.iter_rows(min_row=5, max_row=ws_sheet.max_row):
+            # if not data on row 1 and 2 assume that no more data are in file
+            # then start deleting rows
+            if not row[2].value and not row[1].value:
+                break
+            if str(row[2].value) not in sample_list:
+                row_to_del.append(row[0].row)
+        stderr.print("Collected rows to create the excel file")
+        if len(row_to_del) > 0:
+            row_to_del.sort(reverse=True)
+            for idx in row_to_del:
+                try:
+                    ws_sheet.delete_rows(idx)
+                except TypeError as e:
+                    log.error(
+                        "Unable to delete row %s from metadata file because of",
+                        idx,
+                        e,
+                    )
+                    stderr.print(f"[red] Unable to delete row {idx} becuase of {e}")
+                    sys.exit(1)
+        os.makedirs(out_folder, exist_ok=True)
+        new_name = "invalid_" + os.path.basename(metadata)
+        m_file = os.path.join(out_folder, new_name)
+        stderr.print("Saving excel file with the invalid samples")
+        wb.save(m_file)
+        return
 
-            sample_list = []
+    def create_validated_json(self, valid_json_data, out_folder):
+        """Create a copy of the input json file, keeping only the validated samples
 
-            stderr.print("Start preparation of invalid samples")
-
-            for row in invalid_json:
-                sample_list.append(str(row["sequencing_sample_id"]))
-
-            wb = openpyxl.load_workbook(metadata)
-            ws_sheet = wb["METADATA_LAB"]
-            row_to_del = []
-
-            for row in ws_sheet.iter_rows(min_row=5, max_row=ws_sheet.max_row):
-                # if not data on row 1 and 2 assume that no more data are in file
-                # then start deleting rows
-                if not row[2].value and not row[1].value:
-                    break
-                if str(row[2].value) not in sample_list:
-                    row_to_del.append(row[0].row)
-
-            stderr.print("Collected rows to create the excel file")
-            if len(row_to_del) > 0:
-                row_to_del.sort(reverse=True)
-                for idx in row_to_del:
-                    try:
-                        ws_sheet.delete_rows(idx)
-                    except TypeError as e:
-                        log.error(
-                            "Unable to delete row %s from metadata file because of",
-                            idx,
-                            e,
-                        )
-                        stderr.print(f"[red] Unable to delete row {idx} becuase of {e}")
-                        sys.exit(1)
-
-            os.makedirs(out_folder, exist_ok=True)
-            new_name = "invalid_" + os.path.basename(metadata)
-            m_file = os.path.join(out_folder, new_name)
-            stderr.print("Saving excel file with the invalid samples")
-            wb.save(m_file)
+        Args:
+            valid_json_data (list(dict)): List of samples metadata as dictionaries
+            out_folder (str): path to folder where file will be created
+        """
+        file_name = "_".join(["validated", self.json_data_file])
+        file_path = os.path.join(out_folder, file_name)
+        log.info("Saving Json file with the validated samples as %s", file_name)
+        relecov_tools.utils.write_json_fo_file(valid_json_data, file_path)
         return
 
     def validate(self):
-        """Write invalid samples from metadata to excel"""
-
+        """Validate samples from metadata, create an excel with invalid samples,
+        and a json file with the validated ones
+        """
         self.validate_schema()
-        invalid_json = self.validate_instances()
-        self.create_invalid_metadata(invalid_json, self.metadata, self.out_folder)
+        valid_json_data, invalid_json = self.validate_instances()
+        if not invalid_json:
+            stderr.print("[green]Sucessful validation, no invalid file created!!")
+        else:
+            self.create_invalid_metadata(invalid_json, self.metadata, self.out_folder)
+        if valid_json_data:
+            self.create_validated_json(valid_json_data, self.out_folder)
+        else:
+            log_text = "All the samples were invalid. No valid file created"
+            self.logsum.add_error(key="000_VALIDATION_PROCESS_ERROR", entry=log_text)
+            stderr.print(f"[red]{log_text}")
+        self.logsum.create_error_summary(called_module="validate")
