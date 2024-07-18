@@ -58,7 +58,11 @@ class RelecovMetadata:
             )
         else:
             self.output_folder = output_folder
-
+        out_path = os.path.realpath(self.output_folder)
+        lab_code = out_path.split("/")[-2]
+        self.logsum = LogSum(
+            output_location=self.output_folder, unique_key=lab_code, path=out_path
+        )
         config_json = ConfigJson()
         relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
         relecov_sch_path = os.path.join(
@@ -79,7 +83,7 @@ class RelecovMetadata:
                     "[orange]Property " + prop + " does not have 'label' attribute"
                 )
                 continue
-        self.logsum = LogSum(output_location=self.output_folder, only_samples=True)
+
         self.json_req_files = config_json.get_topic_data(
             "lab_metadata", "lab_metadata_req_json"
         )
@@ -107,12 +111,12 @@ class RelecovMetadata:
         missing_samples = []
         for row in valid_metadata_rows:
             sample_id = str(row["sequencing_sample_id"]).strip()
-            self.logsum.feed_key(sample_id)
+            self.logsum.feed_key(sample=sample_id)
             if sample_id in samples_json.keys():
                 clean_metadata_rows.append(row)
             else:
                 log_text = "Sample missing in samples data Json file"
-                self.logsum.add_error(sample_id, log_text)
+                self.logsum.add_error(sample=sample_id, entry=log_text)
                 missing_samples.append(sample_id)
         return clean_metadata_rows, missing_samples
 
@@ -182,7 +186,7 @@ class RelecovMetadata:
                     else:
                         sample_id = m_data[idx]["sequencing_sample_id"]
                         log_text = f"No ontology found for {m_data[idx][key]} in {key}"
-                        self.logsum.add_warning(sample_id, log_text)
+                        self.logsum.add_warning(sample=sample_id, entry=log_text)
                         try:
                             ontology_errors[key] += 1
                         except KeyError:
@@ -211,13 +215,13 @@ class RelecovMetadata:
                             f"Label {map_field} was not provided in sample "
                             + f"{sample_id}, auto-completing with Not Provided"
                         )
-                        self.logsum.add_warning(key=sample_id, entry=log_text)
+                        self.logsum.add_warning(sample=sample_id, entry=log_text)
                     else:
                         log_text = (
                             f"Unknown map_field value {error} for json data: "
                             + f"{str(map_field)} in sample {sample_id}. Skipped"
                         )
-                        self.logsum.add_warning(key=sample_id, entry=log_text)
+                        self.logsum.add_warning(sample=sample_id, entry=log_text)
                         continue
                     # TODO: Include Not Provided as a configuration field
                     fields_to_add = {
@@ -290,7 +294,7 @@ class RelecovMetadata:
                     continue
                 if row[key] is None or "not provided" in str(row[key]).lower():
                     log_text = f"{key} not provided for sample {sample_id}"
-                    self.logsum.add_warning(sample_id, log_text)
+                    self.logsum.add_warning(sample=sample_id, entry=log_text)
                     continue
                 if "date" in key.lower():
                     # Check if date is a string. Format YYYY-MM-DD to YYYY/MM/DD
@@ -306,7 +310,7 @@ class RelecovMetadata:
                             )
                         except ValueError:
                             log_text = f"Invalid date format in {key}: {row[key]}"
-                            self.logsum.add_error(sample_id, log_text)
+                            self.logsum.add_error(sample=sample_id, entry=log_text)
                             stderr.print(f"[red]{log_text} for sample {sample_id}")
                             continue
                 elif "sample id" in key.lower():
@@ -320,7 +324,7 @@ class RelecovMetadata:
                         property_row[self.label_prop_dict[key]] = row[key]
                     except KeyError as e:
                         log_text = f"Error when mapping the label {str(e)}"
-                        self.logsum.add_error(sample_id, log_text)
+                        self.logsum.add_error(sample=sample_id, entry=log_text)
                         stderr.print(f"[red]{log_text}")
                         continue
 
