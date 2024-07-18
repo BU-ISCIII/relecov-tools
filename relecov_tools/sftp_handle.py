@@ -250,12 +250,11 @@ class SftpHandle:
                 log.error("Unable to fetch file %s ", e)
                 return False
 
-    def create_local_folder(self, folder, date):
+    def create_local_folder(self, folder):
         """Create folder to download files in local path using date
 
         Args:
             folder (str): name of remote folder to be downloaded
-            date (datetime.datetime): datetime in YYYYMMDD format
 
         Returns:
             local_folder_path(str): path to the new created folder
@@ -265,6 +264,7 @@ class SftpHandle:
         if platform_storage_folder == folder:
             local_folder_path = platform_storage_folder
         else:
+            folder = folder.strip("_tmp_processing")
             local_folder_path = os.path.join(platform_storage_folder, folder)
         os.makedirs(local_folder_path, exist_ok=True)
         log.info("created the folder to download files %s", local_folder_path)
@@ -681,7 +681,7 @@ class SftpHandle:
             files (list(str), optional): list of target filenames in remote repository
             skip_seqs (bool, optional): Skip sequencing files based on extension
         """
-        stderr.print(f"[blue]Deleting files in {remote_folder}...")
+        stderr.print(f"[blue]Deleting files in remote {remote_folder}...")
         if files is None:
             files_to_remove = self.get_file_list(remote_folder)
         else:
@@ -1167,7 +1167,7 @@ class SftpHandle:
             stderr.print("[blue]Processing folder " + folder)
             # Validate that the files are the ones described in metadata.
 
-            local_folder = self.create_local_folder(folder, date)
+            local_folder = self.create_local_folder(folder)
             try:
                 valid_filedict, meta_file = self.validate_remote_files(
                     folder, local_folder
@@ -1296,7 +1296,7 @@ class SftpHandle:
                 self.delete_remote_files(folder, files=files_to_download)
                 self.delete_remote_files(folder, skip_seqs=True)
                 self.delete_remote_folder(folder)
-                stderr.print(f"Delete process finished in {folder}")
+                stderr.print(f"Delete process finished in remote {folder}")
             stderr.print(f"[green]Finished processing {folder}")
         return
 
