@@ -1153,7 +1153,6 @@ class SftpHandle:
             log.error("You do not have permissions to create folder %s", e)
             sys.exit(1)
         folders_to_download = target_folders
-        date = datetime.today().strftime("%Y%m%d")
         for folder in folders_to_download.keys():
             self.current_folder = folder.split("/")[0]
             # Close previously open connection to avoid timeouts
