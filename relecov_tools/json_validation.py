@@ -52,7 +52,11 @@ class SchemaValidation:
             stderr.print("[red] Json file does not exists")
             sys.exit(1)
         self.json_data_file = json_data_file
-        self.logsum = LogSum(output_location=self.out_folder, only_samples=True)
+        out_path = os.path.realpath(self.out_folder)
+        lab_code = out_path.split("/")[-2]
+        self.logsum = LogSum(
+            output_location=self.out_folder, unique_key=lab_code, path=out_path
+        )
 
         stderr.print("[blue] Reading the json file")
         self.json_data = relecov_tools.utils.read_json_file(json_data_file)
@@ -99,14 +103,14 @@ class SchemaValidation:
         error_keys = {}
         if self.sample_id_field is None:
             log_text = f"Logs keys set to None. Reason: {self.SAMPLE_FIELD_ERROR}"
-            self.logsum.add_warning(self.sample_id_field, log_text)
+            self.logsum.add_warning(sample=self.sample_id_field, entry=log_text)
         stderr.print("[blue] Start processing the json file")
         for item_row in self.json_data:
             # validate(instance=item_row, schema=json_schema)
             sample_id_value = item_row.get(self.sample_id_field)
             if validator.is_valid(item_row):
                 validated_json_data.append(item_row)
-                self.logsum.feed_key(sample_id_value)
+                self.logsum.feed_key(sample=sample_id_value)
             else:
                 # Count error types
                 for error in validator.iter_errors(item_row):
@@ -118,7 +122,7 @@ class SchemaValidation:
                         errors[error.message] += 1
                     else:
                         errors[error.message] = 1
-                    self.logsum.add_error(key=sample_id_value, entry=error.message)
+                    self.logsum.add_error(sample=sample_id_value, entry=error.message)
                 # append row with errors
                 invalid_json.append(item_row)
 
@@ -155,7 +159,7 @@ class SchemaValidation:
         """
         if self.sample_id_field is None:
             log_text = f"Invalid excel file won't be created: {self.SAMPLE_FIELD_ERROR}"
-            self.logsum.add_error(key="000_VALIDATION_PROCESS_ERROR", entry=log_text)
+            self.logsum.add_error(entry=log_text)
             return
         log.error("Some of the samples in json metadata were not validated")
         stderr.print("[red] Some of the Samples are not validate")
@@ -229,11 +233,15 @@ class SchemaValidation:
         if not invalid_json:
             stderr.print("[green]Sucessful validation, no invalid file created!!")
         else:
+            log_text = "Summary: %s valid and %s invalid samples"
+            self.logsum.add_warning(
+                entry=log_text % (len(valid_json_data), len(invalid_json))
+            )
             self.create_invalid_metadata(invalid_json, self.metadata, self.out_folder)
         if valid_json_data:
             self.create_validated_json(valid_json_data, self.out_folder)
         else:
             log_text = "All the samples were invalid. No valid file created"
-            self.logsum.add_error(key="000_VALIDATION_PROCESS_ERROR", entry=log_text)
+            self.logsum.add_error(entry=log_text)
             stderr.print(f"[red]{log_text}")
         self.logsum.create_error_summary(called_module="validate")
