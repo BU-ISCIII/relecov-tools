@@ -122,7 +122,11 @@ class SchemaValidation:
                         errors[error.message] += 1
                     else:
                         errors[error.message] = 1
-                    self.logsum.add_error(sample=sample_id_value, entry=error.message)
+                    if error_keys[error.message] == error.message:
+                        error_text = error.message
+                    else:
+                        error_text = f"{error_keys[error.message]}:{error.message}"
+                    self.logsum.add_error(sample=sample_id_value, entry=error_text)
                 # append row with errors
                 invalid_json.append(item_row)
 
@@ -132,20 +136,11 @@ class SchemaValidation:
         stderr.print("[blue] --------------------")
         for error_type in errors.keys():
             num_of_errors = str(errors[error_type])
-            field_with_error = error_keys[error_type]
-            log.error(
-                "%s samples failed validation for %s:\n%s",
-                num_of_errors,
-                field_with_error,
-                error_type,
-            )
-            stderr.print(
-                "[red]"
-                + num_of_errors
-                + " samples failed validation for "
-                + f"{field_with_error}:\n"
-                + error_type
-            )
+            field_with_error = str(error_keys[error_type])
+            error_text = "{} samples failed validation for {}:\n{}"
+            error_text = error_text.format(num_of_errors, field_with_error, error_type)
+            self.logsum.add_warning(entry=error_text)
+            stderr.print(f"[red]{error_text}")
             stderr.print("[red] --------------------")
 
         return validated_json_data, invalid_json
