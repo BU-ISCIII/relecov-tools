@@ -20,6 +20,7 @@ import relecov_tools.read_bioinfo_metadata
 import relecov_tools.metadata_homogeneizer
 import relecov_tools.gisaid_upload
 import relecov_tools.upload_ena_protocol
+import relecov_tools.launch_pipeline
 
 log = logging.getLogger()
 
@@ -481,6 +482,38 @@ def metadata_homogeneizer(institution, directory, output):
     )
     new_parse.converting_metadata()
 
+# creating symbolic links
+@relecov_tools_cli.command(help_priority=13)
+@click.option(
+    "-i",
+    "--input",
+    type=click.Path(),
+    help="select input folder where are located the sample files",
+)
+@click.option(
+    "-v",
+    "--validate_file",
+    type=click.Path(),
+    help="select the json with the validate samples",
+)
+@click.option(
+    "-t",
+    "--template",
+    type=click.Path(),
+    help="select the template folder to be copied in the output folder",
+)
+@click.option(
+    "-c",
+    "--config",
+    type=click.Path(),
+    help="select the template config file",
+)
+@click.option("-o", "--output", type=click.Path(), help="select output folder")
+def launch_pipeline(input, validate_file, template, output, config):
+    """
+        Create the symbolic links for the samples which are validated.
+    """
+    
 
 if __name__ == "__main__":
     run_relecov_tools()
