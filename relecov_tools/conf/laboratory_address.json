@@ -1386,6 +1386,17 @@
         "submitting_institution_address": "Ctra. Colmenar Viejo, km.9, 100",
         "submitting_institution_email": ""
     },
+    "HU GREGORIO MARAÑÓN": {
+        "collecting_institution_address": "C. del Dr. Esquerdo, 46",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "HU GREGORIO MARAÑÓN",
+        "submitting_institution_address": "C. del Dr. Esquerdo, 46",
+        "submitting_institution_email": ""
+    },
     "Hospital Universitario Cruces": {
         "collecting_institution_address": "Plaza Cruces, s/n",
         "collecting_institution_email": "",
