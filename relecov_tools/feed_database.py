@@ -2,6 +2,7 @@
 import sys
 import os
 import re
+import glob
 import json
 import logging
 import rich.console
@@ -10,6 +11,7 @@ import time
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.rest_api import RestApi
+from relecov_tools.log_summary import LogSum
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -28,6 +30,7 @@ class FeedDatabase:
         json_file=None,
         type_of_info=None,
         database_server=None,
+        full_update=None,
     ):
         if user is None:
             user = relecov_tools.utils.prompt_text(
@@ -53,35 +56,30 @@ class FeedDatabase:
             "schema",
             self.config_json.get_topic_data("json_schemas", "relecov_schema"),
         )
-
         self.schema = relecov_tools.utils.read_json_file(schema)
-
-        if type_of_info is None:
-            type_of_info = relecov_tools.utils.prompt_selection(
-                "Select:",
-                ["sample", "bioinfodata", "variantdata"],
-            )
+        self.full_update = full_update
+        # TODO: Include types_of_data and database_servers as config fields
+        self.types_of_data = ["sample", "bioinfodata", "variantdata"]
+        self.db_servers_names = ["iskylims", "relecov"]
+        if not full_update:
+            if type_of_info is None:
+                type_of_info = relecov_tools.utils.prompt_selection(
+                    "Select type of data to upload:",
+                    self.types_of_data,
+                )
+            if database_server is None:
+                database_server = relecov_tools.utils.prompt_selection(
+                    "Select target database server:",
+                    self.db_servers_names,
+                )
+        self.server_name = database_server
         self.type_of_info = type_of_info
 
-        if database_server is None:
-            database_server = relecov_tools.utils.prompt_selection(
-                "Select:",
-                ["iskylims", "relecov"],
-            )
-        self.server_type = database_server
-        # Get database settings
-        try:
-            self.database_settings = self.config_json.get_topic_data(
-                "external_url", database_server
-            )
-        except KeyError:
-            log.error("Unable to get parameters for dataserver")
-            stderr.print(f"[red] Unable to fetch parameters data for {database_server}")
-            sys.exit(1)
-        self.database_server = self.database_settings["server"]
-        self.database_url = self.database_settings["url"]
-
-        self.database_rest_api = RestApi(self.database_server, self.database_url)
+        json_dir = os.path.dirname(os.path.realpath(self.json_file))
+        lab_code = json_dir.split("/")[-2]
+        self.logsum = LogSum(
+            output_location=json_dir, unique_key=lab_code, path=json_dir
+        )
 
     def get_schema_ontology_values(self):
         """Read the schema and extract the values of ontology with the label"""
@@ -136,20 +134,18 @@ class FeedDatabase:
         try:
             sample_fields_raw = self.database_rest_api.get_request(sample_url, "", "")
         except AttributeError:
-            log.error("Unable to connect to server %s", self.database_server)
-            stderr.print(f"[red] Unable to connect to server {self.database_server}")
-            sys.exit(1)
+            logtxt = f"Unable to connect to {self.db_server} server"
+            self.logsum.add_error(entry=logtxt)
+            stderr.print(f"[red]{logtxt}")
+            return
         if "ERROR" in sample_fields_raw:
-            log.error(
-                "Unable to get parameters. Received error code %s",
-                sample_fields_raw["ERROR"],
-            )
-            stderr.print(
-                f"[red] Unable to fetch data. Received error {sample_fields_raw['ERROR']}"
-            )
-            sys.exit(1)
+            logtxt1 = f"Unable to fetch data from {self.db_server}."
+            logtxt2 = f" Received error {sample_fields_raw['ERROR']}"
+            self.logsum.add_error(entry=str(logtxt1 + logtxt2))
+            stderr.print(f"[red]{logtxt1 + logtxt2}")
+            return
 
-        for key, values in sample_fields_raw["DATA"].items():
+        for _, values in sample_fields_raw["DATA"].items():
             if "ontology" in values:
                 try:
                     property = ontology_dict[values["ontology"]]
@@ -157,11 +153,14 @@ class FeedDatabase:
                     # the field name for the sample
                     sample_fields[property] = values["field_name"]
                 except KeyError as e:
-                    stderr.print(f"[red]Error in map ontology {e}")
+                    self.logsum.add_warning(entry=f"Error mapping ontology {e}")
+                    stderr.print(f"[red]Error mapping ontology {e}")
             else:
                 # for the ones that do not have ontology label in the sample field
                 # and have an empty value: sample_fields[key] = ""
-                log.info("not ontology for item  %s", values["field_name"])
+                logtxt = f"No ontology found for {values.get('field_name')}"
+                self.logsum.add_warning(entry=logtxt)
+                log.info(logtxt)
         # fetch label for sample Project
         s_project_url = self.database_settings["url_project_fields"]
         param = self.database_settings["param_sample_project"]
@@ -170,14 +169,10 @@ class FeedDatabase:
             s_project_url, param, p_name
         )
         if "ERROR" in s_project_fields_raw:
-            log.error(
-                "Unable to get parameters. Received error code %s",
-                s_project_fields_raw["ERROR"],
-            )
-            stderr.print(
-                f"[red] Unable to fetch data. Received error {s_project_fields_raw['ERROR']}"
-            )
-            sys.exit(1)
+            logtxt1 = f"Unable to fetch data from {self.db_server}."
+            logtxt2 = f" Received error {s_project_fields_raw['ERROR']}"
+            self.logsum.add_error(entry=str(logtxt1 + logtxt2))
+            return
         for field in s_project_fields_raw["DATA"]:
             s_project_fields.append(field["sampleProjectFieldName"])
         return [sample_fields, s_project_fields]
@@ -204,6 +199,7 @@ class FeedDatabase:
         for chunk in field_values:
             req_sample = ""
             request_count += 1
+            # TODO: Include these fields in config file
             if "sample_name" in chunk:
                 stderr.print(
                     f"[blue] sending request for sample {chunk['sample_name']}"
@@ -214,6 +210,7 @@ class FeedDatabase:
                     f"[blue] sending request for sample {chunk['sequencing_sample_id']}"
                 )
                 req_sample = chunk["sequencing_sample_id"]
+            self.logsum.feed_key(sample=req_sample)
             result = self.database_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
@@ -233,63 +230,61 @@ class FeedDatabase:
                         if "ERROR" not in result:
                             break
                     if i == 9 and "ERROR" in result:
-                        log.error("Unable to sent the request to remote server")
-                        stderr.print(
-                            "[red] Unable to sent the request to remote server"
-                        )
-                        sys.exit(1)
+                        logtxt = f"Unable to sent the request to {self.db_server}"
+                        self.logsum.add_error(entry=logtxt, sample=req_sample)
+                        stderr.print(f"[red]{logtxt}")
+                        continue
 
                 elif "is not defined" in result["ERROR_TEST"].lower():
-                    log.warning(
-                        "Request to %s for %s was not accepted",
-                        self.database_server,
-                        req_sample,
-                    )
-                    stderr.print(f"[yellow] Warning: {req_sample} is not defined")
+                    logtxt = f"{req_sample} is not defined in {self.db_server}"
+                    self.logsum.add_error(entry=logtxt, sample=req_sample)
+                    stderr.print(f"[yellow]Warning: {logtxt}")
                     continue
                 elif "already defined" in result["ERROR_TEST"].lower():
-                    log.warning(
-                        "Request to %s for %s was not accepted",
-                        self.database_server,
-                        req_sample,
-                    )
-                    stderr.print(
-                        f"[yellow] Warning request for {req_sample} already defined"
-                    )
+                    logtxt = f"Request to {self.db_server} already defined"
+                    self.logsum.add_warning(entry=logtxt, sample=req_sample)
+                    stderr.print(f"[yellow]{logtxt} for sample {req_sample}")
                     continue
                 else:
-                    log.error("Request to %s was not accepted", self.database_server)
-                    stderr.print(
-                        f"[red] Error {result['ERROR']} when sending request to {self.database_server}"
-                    )
-                    sys.exit(1)
+                    logtxt = f"Error {result['ERROR']} in request to {self.db_server}"
+                    self.logsum.add_error(entry=logtxt, sample=req_sample)
+                    stderr.print(f"[red]{logtxt}")
+                    continue
             log.info(
                 "stored data in %s iskylims for sample %s",
-                self.database_server,
+                self.db_server,
                 req_sample,
             )
             stderr.print(f"[green] Successful request for {req_sample}")
             suces_count += 1
         if request_count == suces_count:
             stderr.print(
-                f"[gren] All information was sent sucessfuly to {self.server_type}"
+                f"All {self.type_of_info} data sent sucessfuly to {self.db_server}"
             )
         else:
-            stderr.print(
-                "[yellow] Some of your requests were not successful stored in database"
+            logtxt = "%s of the %s requests were sent to %s"
+            self.logsum.add_warning(
+                entry=logtxt % (suces_count, request_count, self.server_name)
             )
-            stderr.print(f"[yellow] {suces_count} of the {request_count} were done ok")
+            stderr.print(
+                f"[yellow]{logtxt % (suces_count, request_count, self.server_name)}"
+            )
         return
 
-    def store_data(self):
+    def store_data(self, type_of_info, server_name):
         """Collect data from json file and split them to store data in iSkyLIMS
         and in Relecov Platform
         """
 
         map_fields = {}  #
-        if self.type_of_info == "sample":
-            if self.server_type == "iskylims":
-                stderr.print(f"[blue] Getting sample fields from {self.server_type}")
+        # TODO: Include all these hard-coded fields in config file
+        if type_of_info not in self.types_of_info:
+            self.logsum.add_error(entry=f"Invalid datatype {type_of_info} to upload")
+            stderr.print(f"[red]Invalid datatype {type_of_info} to upload")
+            return
+        if type_of_info == "sample":
+            if server_name == "iskylims":
+                stderr.print(f"[blue] Getting sample fields from {server_name}")
                 sample_fields, s_project_fields = self.get_iskylims_fields_sample()
                 stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_iskylims_sample_fields_values(
@@ -300,16 +295,69 @@ class FeedDatabase:
                 map_fields = self.map_relecov_sample_data()
             post_url = "store_samples"
 
-        elif self.type_of_info == "bioinfodata":
+        elif type_of_info == "bioinfodata":
             post_url = "bioinfodata"
             map_fields = self.json_data
 
-        elif self.type_of_info == "variantdata":
+        elif type_of_info == "variantdata":
             post_url = "variantdata"
             map_fields = self.json_data
-        else:
-            stderr.print("[red] Invalid type to upload to database")
-            sys.exit(1)
 
         self.update_database(map_fields, post_url)
-        stderr.print(f"[green] Upload process to {self.server_type} completed")
+        stderr.print(f"[green]Upload process to {self.server_name} completed")
+
+    def start_api(self, database_server):
+        """Open connection torwards database server API"""
+        # Get database settings
+        if database_server:
+            try:
+                self.database_settings = self.config_json.get_topic_data(
+                    "external_url", database_server
+                )
+            except KeyError:
+                logtxt = f"Unable to fetch parameters for {database_server}"
+                self.logsum.add_error(entry=logtxt)
+                stderr.print(f"[red]{logtxt}")
+                return
+            self.db_server = self.database_settings["server"]
+            self.db_url = self.database_settings["url"]
+            self.db_rest_api = RestApi(self.db_server, self.db_url)
+        else:
+            logtxt = f"No database server was selected for {self.type_of_info}. Skipped"
+            self.logsum.add_error(entry=logtxt)
+            stderr.print(f"[red]{logtxt}")
+            return
+        return
+
+    def update_db(self):
+        """Run the update database process with the provided input"""
+        if self.full_update is True:
+            self.server_name = "iskylims"
+            self.type_of_info = "sample"
+            self.start_api(self.server_name)
+            self.store_data(self.type_of_info, self.server_name)
+
+            self.server_name = "relecov"
+            self.start_api(self.server_name)
+            for datatype in self.types_of_data:
+                log_text = f"Sending {datatype} data to {self.server_name}"
+                log.info(log_text)
+                stderr.print(log_text)
+                self.type_of_info = datatype
+                # TODO: Handling for servers with different datatype needs
+                if datatype == "variantdata":
+                    json_dir = os.path.dirname(os.path.realpath(self.json_file))
+                    long_tables = glob.glob(os.path.join(json_dir, "*long_table*.json"))
+                    if not long_tables:
+                        json_file = relecov_tools.utils.prompt_path(
+                            msg="Select long_table json file for variant data"
+                        )
+                    else:
+                        json_file = long_tables[0]
+                    log.info("Selected %s file for variant data", str(json_file))
+                    self.json_data = relecov_tools.utils.read_json_file(json_file)
+                self.store_data(datatype, self.server_name)
+        else:
+            self.start_api(self.server_name)
+            self.store_data(self.type_of_info, self.server_name)
+        self.logsum.create_error_summary(called_module="update-db")

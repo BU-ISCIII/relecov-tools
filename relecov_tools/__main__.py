@@ -376,7 +376,7 @@ def launch(user):
     pass
 
 
-# update_db
+# update_db TODO: Include types of data and database servers in config file
 @relecov_tools_cli.command(help_priority=9)
 @click.option("-j", "--json", help="data in json format")
 @click.option(
@@ -384,6 +384,7 @@ def launch(user):
     "--type",
     type=click.Choice(["sample", "bioinfodata", "variantdata"]),
     multiple=False,
+    default=None,
     help="Select the type of information to upload to database",
 )
 @click.option(
@@ -396,16 +397,24 @@ def launch(user):
         ]
     ),
     multiple=False,
+    default=None,
     help="name of the server which information is defined in config file",
 )
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
-def update_db(user, password, json, type, databaseServer):
+@click.option(
+    "-f",
+    "--full_update",
+    is_flag=True,
+    default=False,
+    help="Sequentially run every update option",
+)
+def update_db(user, password, json, type, databaseServer, full_update):
     """feed database with json"""
     feed_database = relecov_tools.feed_database.FeedDatabase(
-        user, password, json, type, databaseServer
+        user, password, json, type, databaseServer, full_update
     )
-    feed_database.store_data()
+    feed_database.update_db()
 
 
 # read metadata bioinformatics
