@@ -587,6 +587,7 @@
                 "Research [GENEPIO:0100003]",
                 "Protocol Testing [GENEPIO:0100024]",
                 "Surveillance [GENEPIO:0100004]",
+                "Other [NCIT:C124261]",
                 "Not Applicable [GENEPIO:0001619]",
                 "Not Collected [GENEPIO:0001620]",
                 "Not Provided [GENEPIO:0001668]",
@@ -771,7 +772,7 @@
                 "Middle Nasal Turbinate Scraping",
                 "Nasopharynx Scraping",
                 "Oropharynx  Scraping",
-                "Nasopharynx Swab",
+                "Nasopharynx swab",
                 "Oropharynx Swab",
                 "Pharynx Swab",
                 "Lower respiratory tract Wash",
@@ -874,6 +875,7 @@
                 "Sputum Collection Tube [GENEPIO:0002115]",
                 "Suction Catheter [58253008]",
                 "Swab [GENEPIO:0100027]",
+                "Other [NCIT:C17649]",
                 "Not Applicable [GENEPIO:0001619]",
                 "Not Collected [GENEPIO:0001620]",
                 "Not Provided [GENEPIO:0001668]",
@@ -1479,6 +1481,17 @@
             "label": "If Enrichment panel/assay Is Other, Specify",
             "fill_mode": "batch"
         },
+        "if_enrichment_panel_assay_version_other": {
+            "examples": [
+                ""
+            ],
+            "ontology": "NCIT:C111093",
+            "type": "string",
+            "description": "",
+            "classification": "Sequencing",
+            "label": "If Enrichment panel/assay version Is Other, Specify",
+            "fill_mode": "batch"
+        },
         "amplicon_pcr_primer_scheme": {
             "examples": [
                 "https://github.com/joshquick/artic-ncov2019/blob/master/primer_schemes/nCoV-2019/V3/nCoV-2019.tsv"
@@ -1934,7 +1947,7 @@
             "examples": [
                 "2.4.1"
             ],
-            "ontology": "0",
+            "ontology": "NCIT:C111093",
             "type": "string",
             "description": "The method version used to remove host reads from the pathogen sequence.",
             "classification": "Bioinformatic Analysis fields",
@@ -1971,7 +1984,7 @@
             "type": "string",
             "description": "The name  of the bioinformatics protocol used.",
             "classification": "Bioinformatic Analysis fields",
-            "label": "If bioinformatic protocol Is Other, Specify",
+            "label": "If bioinformatics protocol Is Other, Specify",
             "fill_mode": "batch",
             "minLenght": "1"
         },
@@ -1983,7 +1996,7 @@
             "type": "string",
             "description": "The version number of the bioinformatics protocol used.",
             "classification": "Bioinformatic Analysis fields",
-            "label": "bioinformatics protocol version",
+            "label": "Bioinformatics protocol version",
             "fill_mode": "batch",
             "minLenght": "1"
         },
@@ -2011,25 +2024,25 @@
             "type": "string",
             "description": "Software used for preprocessing step.",
             "classification": "Bioinformatic Analysis fields",
-            "label": "Preprocessing",
+            "label": "Preprocessing software",
             "fill_mode": "batch"
         },
         "preprocessing_software_version": {
             "examples": [
                 "v5.3.1"
             ],
-            "ontology": "0",
+            "ontology": "NCIT:C111093",
             "type": "string",
             "description": "Version of the preprocessing software used.",
             "classification": "Bioinformatic Analysis fields",
-            "label": "Preprocessing Version",
+            "label": "Preprocessing software version",
             "fill_mode": "batch"
         },
         "if_preprocessing_other": {
             "examples": [
                 ""
             ],
-            "ontology": "0",
+            "ontology": "MS_1002386",
             "type": "string",
             "description": "Preprocessing software name other",
             "classification": "Bioinformatic Analysis fields",
@@ -2055,18 +2068,18 @@
             "type": "string",
             "description": "Software used for mapping step.",
             "classification": "Bioinformatic Analysis fields",
-            "label": "Mapping",
+            "label": "Mapping software",
             "fill_mode": "batch"
         },
         "mapping_software_version": {
             "examples": [
                 "v7.0.1"
             ],
-            "ontology": "0",
+            "ontology": "NCIT:C111093",
             "type": "string",
             "description": "Version of the mapper used.",
             "classification": "Bioinformatic Analysis fields",
-            "label": "Mapping Version",
+            "label": "Mapping software version",
             "fill_mode": "batch"
         },
         "if_mapping_other": {
@@ -2099,7 +2112,18 @@
             "type": "string",
             "description": "Software used for assembly of the pathogen genome.",
             "classification": "Bioinformatic Analysis fields",
-            "label": "Assembly",
+            "label": "Assembly software",
+            "fill_mode": "batch"
+        },
+        "assembly_version": {
+            "examples": [
+                "Spades"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Software used for assembly of the pathogen genome.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Assembly software version",
             "fill_mode": "batch"
         },
         "if_assembly_other": {
@@ -2121,7 +2145,18 @@
             "type": "string",
             "description": "Params used for genome assembly.",
             "classification": "Bioinformatic Analysis fields",
-            "label": "Assambly params",
+            "label": "Assembly params",
+            "fill_mode": "batch"
+        },
+        "vcf_filename": {
+            "examples": [
+                "Ivar"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Name of the vcf file.",
+            "classification": "Bioinformatic Variants",
+            "label": "VCF filename",
             "fill_mode": "batch"
         },
         "variant_calling_software_name": {
@@ -2132,18 +2167,18 @@
             "type": "string",
             "description": "Software used for variant calling.",
             "classification": "Bioinformatic Variants",
-            "label": "Variant Calling",
+            "label": "Variant calling software",
             "fill_mode": "batch"
         },
         "variant_calling_software_version": {
             "examples": [
                 "v4.1"
             ],
-            "ontology": "0",
+            "ontology": "NCIT:C111093",
             "type": "string",
             "description": "Variant calling software version",
             "classification": "Bioinformatic Variants",
-            "label": "Variant Calling Version",
+            "label": "Variant calling software version",
             "fill_mode": "batch"
         },
         "if_variant_calling_other": {
@@ -2165,7 +2200,7 @@
             "type": "string",
             "description": "Params used for variant calling",
             "classification": "Bioinformatic Variants",
-            "label": "Variant Calling params",
+            "label": "Variant calling params",
             "fill_mode": "batch"
         },
         "consensus_sequence_name": {
@@ -2231,7 +2266,7 @@
             "type": "string",
             "description": "The name of software used to generate the consensus sequence.",
             "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus sequence software name",
+            "label": "Consensus software",
             "fill_mode": "batch"
         },
         "if_consensus_other": {
@@ -2240,7 +2275,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "The version of the software used to generate the consensus sequence.",
+            "description": "",
             "classification": "Bioinformatic Analysis fields",
             "label": "If consensus Is Other, Specify",
             "fill_mode": "batch"
@@ -2249,11 +2284,11 @@
             "examples": [
                 "1.3"
             ],
-            "ontology": "GENEPIO:0001469",
+            "ontology": "NCIT:C111093",
             "type": "string",
             "description": "The version of the software used to generate the consensus sequence.",
             "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus sequence software version",
+            "label": "Consensus software version",
             "fill_mode": "batch"
         },
         "consensus_params": {
@@ -2264,7 +2299,7 @@
             "type": "string",
             "description": "Parameters used for consensus generation",
             "classification": "Bioinformatic Analysis fields",
-            "label": "Consensus Params",
+            "label": "Consensus params",
             "fill_mode": "batch"
         },
         "consensus_genome_length": {
@@ -2414,11 +2449,44 @@
             "examples": [
                 "B.1.1.7"
             ],
-            "ontology": "GENEPIO:0001500",
+            "ontology": "NCIT:C60792",
             "type": "string",
-            "description": "The name of the lineage or clade.",
+            "description": "The name of the lineage.",
             "classification": "Lineage fields",
-            "label": "Lineage/clade name",
+            "label": "Lineage designation",
+            "fill_mode": "batch"
+        },
+        "clade_name": {
+            "examples": [
+                "B.1.1.7"
+            ],
+            "ontology": "NCIT:C179767",
+            "type": "string",
+            "description": "The name of the clade.",
+            "classification": "Lineage fields",
+            "label": "Clade designation",
+            "fill_mode": "batch"
+        },
+        "clade_type_software_name": {
+            "examples": [
+                "Pangolin"
+            ],
+            "ontology": "GENEPIO:0001501",
+            "type": "string",
+            "description": "The name of the software used to determine the clade/type.",
+            "classification": "Lineage fields",
+            "label": "Clade/Type identification software",
+            "fill_mode": "batch"
+        },
+        "if_clade_type_other": {
+            "examples": [
+                "Pangolin"
+            ],
+            "ontology": "GENEPIO:0001501",
+            "type": "string",
+            "description": "The name of the software used to determine the clade/type.",
+            "classification": "Lineage fields",
+            "label": "If Clade/Type Is Other, Specify",
             "fill_mode": "batch"
         },
         "lineage_analysis_software_name": {
@@ -2429,7 +2497,7 @@
             "type": "string",
             "description": "The name of the software used to determine the lineage/clade.",
             "classification": "Lineage fields",
-            "label": "lineage/clade analysis software name",
+            "label": "Lineage identification software",
             "fill_mode": "batch"
         },
         "if_lineage_identification_other": {
@@ -2438,7 +2506,7 @@
             ],
             "ontology": "0",
             "type": "string",
-            "description": "The name of the software used to determine the lineage/clade.",
+            "description": "",
             "classification": "Lineage fields",
             "label": "If lineage identification Is Other, Specify",
             "fill_mode": "batch"
@@ -2458,18 +2526,18 @@
             "examples": [
                 "2.1.10"
             ],
-            "ontology": "GENEPIO:0001502",
+            "ontology": "NCIT:C111093",
             "type": "string",
             "description": "The version of the software used to determine the lineage/clade.",
             "classification": "Lineage fields",
-            "label": "Lineage/clade analysis software version",
+            "label": "Lineage software version",
             "fill_mode": "batch"
         },
         "lineage_analysis_scorpio_version": {
             "examples": [
                 "2.1.10"
             ],
-            "ontology": "GENEPIO:0001502",
+            "ontology": "NCIT:C111093",
             "type": "string",
             "description": "The version of the scorpio data used to determine the lineage/clade.",
             "classification": "Lineage fields",
@@ -2480,7 +2548,7 @@
             "examples": [
                 "2.1.10"
             ],
-            "ontology": "GENEPIO:0001502",
+            "ontology": "NCIT:C111093",
             "type": "string",
             "description": "The version of the constellations databases used to determine the lineage/clade.",
             "classification": "Lineage fields",
@@ -2561,6 +2629,7 @@
                 "orf10 [GENEPIO:0100181]",
                 "orf14 [GENEPIO:0100182]",
                 "SARS-COV-2 5' UTR [GENEPIO:0100183]",
+                "Other [NCIT:C124261]",
                 "Not Applicable [GENEPIO:0001619]",
                 "Not Collected [GENEPIO:0001620]",
                 "Not Provided [GENEPIO:0001668]",
@@ -2623,6 +2692,7 @@
                 "orf10 [GENEPIO:0100181]",
                 "orf14 [GENEPIO:0100182]",
                 "SARS-COV-2 5' UTR [GENEPIO:0100183]",
+                "Other [NCIT:C124261]",
                 "Not Applicable [GENEPIO:0001619]",
                 "Not Collected [GENEPIO:0001620]",
                 "Not Provided [GENEPIO:0001668]",

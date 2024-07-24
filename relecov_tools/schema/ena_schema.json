@@ -602,7 +602,7 @@
       "examples": [
         "e.g. #131"
       ],
-      "ontology": "GENEPIO:0000079",
+      "ontology": "GENEPIO:0001398",
       "type": "string",
       "description": "a unique identifier by which each subject can be referred to, de-identified.",
       "clasification": "Host information",
@@ -1172,7 +1172,7 @@
     },
     "sample_title": {
       "examples": [
-        ""
+        "s_20201007_026"
       ],
       "ontology": "GENEPIO:0000079",
       "type": "string",
@@ -1235,19 +1235,6 @@
       "label": "Study abstract",
       "table": [
         "study"
-      ]
-    },
-    "sample_name": {
-      "examples": [
-        "s_20201007_026"
-      ],
-      "ontology": "GENEPIO:0000079",
-      "type": "string",
-      "description": "",
-      "clasification": "Submission ENA",
-      "label": "Sample name",
-      "table": [
-        "sample"
       ]
     },
     "study_alias": {
