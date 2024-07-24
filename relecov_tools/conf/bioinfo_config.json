@@ -37,7 +37,7 @@
             }
         },
         "variants_long_table": {
-            "fn": "variants_long_table(?:_\\d{8})?\\.csv",
+            "fn": "variants_long_table.csv",
             "sample_col_idx": 1,
             "header_row_idx": 1,
             "required": true,
