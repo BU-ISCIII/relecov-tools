@@ -602,7 +602,7 @@
       "examples": [
         "e.g. #131"
       ],
-      "ontology": "GENEPIO:0001398",
+      "ontology": "GENEPIO:0000079",
       "type": "string",
       "description": "a unique identifier by which each subject can be referred to, de-identified.",
       "clasification": "Host information",
