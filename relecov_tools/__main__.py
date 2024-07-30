@@ -482,6 +482,7 @@ def metadata_homogeneizer(institution, directory, output):
     )
     new_parse.converting_metadata()
 
+
 # creating symbolic links
 @relecov_tools_cli.command(help_priority=13)
 @click.option(
@@ -489,12 +490,6 @@ def metadata_homogeneizer(institution, directory, output):
     "--input",
     type=click.Path(),
     help="select input folder where are located the sample files",
-)
-@click.option(
-    "-v",
-    "--validate_file",
-    type=click.Path(),
-    help="select the json with the validate samples",
 )
 @click.option(
     "-t",
@@ -511,9 +506,9 @@ def metadata_homogeneizer(institution, directory, output):
 @click.option("-o", "--output", type=click.Path(), help="select output folder")
 def launch_pipeline(input, validate_file, template, output, config):
     """
-        Create the symbolic links for the samples which are validated.
+    Create the symbolic links for the samples which are validated.
     """
-    
+
 
 if __name__ == "__main__":
     run_relecov_tools()
