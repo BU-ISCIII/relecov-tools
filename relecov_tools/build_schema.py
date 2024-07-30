@@ -149,19 +149,70 @@ class SchemaBuilder:
         )
         return draft_template
 
+    # TODO: in progress
+    def create_complex_schema_object(self, property_id):
+    # Read the tab specific to the complex field
+        complex_df = pd.read_excel(self.excel_file_path, sheet_name=property_id)
+        properties = {}
+        required = []
+        for _, complex_row in complex_df.iterrows():
+            field_name = complex_row['property_id']
+            field_type = complex_row['type']
+            field_schema = {"type": field_type}
+            # FIXME: enums not working
+            #if complex_row['enum'] and complex_row['enum'] != 'nan':
+            #    field_enum = complex_row['enum']
+            #    stderr.print(field_enum["enum"])
+#
+            #if field_enum:
+            #    field_schema["enum"] = field_enum.split(', ')
+#
+            properties[field_name] = field_schema
+            required.append(field_name)  # Assuming all fields are required
+
+        # Set schema for complex fields
+        dict_out =  {
+            "type": "object",
+            "properties": properties,
+            "required": required,
+            "additionalProperties": False
+        }
+        return False
+
+    def standar_jsonschema_object(self, data_dict, target_key):
+        """"Create standar json schema object"""
+        # For enum and examples, wrap the value in a list
+        json_dict = {}
+
+        if target_key in ["enum", "examples"]:
+            value = str(data_dict[target_key])
+            # if no value, json key wont be necessary, then avoid adding it
+            if len(value) > 0 and not value == "nan":
+                if target_key == "enum":
+                    json_dict[target_key] = value.split(", ")
+        elif target_key == "examples":
+            json_dict[target_key] = [value]
+        else:
+            json_dict[target_key] = data_dict[target_key]
+        return json_dict
+
+    def complex_json_schema_object(self):
+        """"Create complex/nested json schema object"""
+
     # TODO: add strategy to deal with json schema objects, defs and refs
+    # TODO: Reorder porperty's features returned.
     def build_new_schema(self, json_data, schema_draft):
         """
         Create a json schema file based on input data and draf skeleton..
         """
         try:
-            # List of properties to check in the features dictionary:
-            #       key[database_key]: value[schema_key]
+            # List of properties to check in the features dictionary (it maps values between database features and json schema features):
+            #       key[db_feature_key]: value[schema_feature_key]
             features_to_check = {
+                "type": "type",
                 "enum": "enum",
                 "examples": "examples",
                 "ontology_id": "ontology",
-                "type": "type",
                 "description": "description",
                 "classification": "classification",
                 "label_name": "label",
@@ -169,46 +220,39 @@ class SchemaBuilder:
                 "required (Y/N)": "required",
             }
             required_property_unique = []
+            complex_property = []
 
             # Read property_ids in the database.
-            # Perform checks and create (for each property) feature object like: 
-            #   {'example':'A', 'ontology': 'B'...}.
-            #  Finally this objet will be written to the draft schema.
-            for property_id, features_dic in json_data.items():
+            #   Perform checks and create (for each property) feature object like: 
+            #       {'example':'A', 'ontology': 'B'...}.
+            #   Finally this objet will be written to the draft schema.
+            for property_id, db_features_dic in json_data.items():
                 schema_property = {}
                 required_property = {}
-                schema_property_complex = []
                 
-                # Record property_ids that have complex objects.q
+                # Record property_ids that have complex objects.
+                #       TODO: This might be a bit harcoded. 
                 if json_data[property_id].get('complex_field (Y/N)') == 'Y':
-                    schema_property_complex.append(property_id)
-                # Iterate over all property's features to check.  
-                for database_key, schema_key in features_to_check.items():
-                    # Verifiy that database_key is present in the database (processed excel (aka json_data))
-                    if database_key not in features_dic:
-                        stderr.print(f"[INFO] Feature {database_key} is not present in database ({self.excel_file_path})")
-                    else:
-                        # For enum and examples, wrap the value in a list
-                        if schema_key in ["enum", "examples"]:
-                            value = str(features_dic[database_key])
-                            # if no value, json key wont be necessary, then avoid adding it
-                            if len(value) > 0 and not value == "nan":
-                                if schema_key == "enum":
-                                    schema_property[schema_key] = value.split(", ")
-                                elif schema_key == "examples":
-                                    schema_property[schema_key] = [value]
-                        # Recover 'required' properties from database definition.
-                        elif schema_key == "required":
-                            value = str(features_dic[database_key])
-                            if value != "nan":
-                                required_property[property_id] = value
+                    complex_property.append(property_id)
+                    continue
+                # Iterate over all property's features that follows standard format.  
+                else:
+                    for db_feature_key, schema_feature_key in features_to_check.items():
+                        # Verifiy that db_feature_key is present in the database (processed excel (aka 'json_data'))
+                        if db_feature_key not in db_features_dic:
+                            stderr.print(f"[INFO] Feature {db_feature_key} is not present in database ({self.excel_file_path})")
+                            continue
+                        # Record the required value for each property
+                        if 'required' in db_feature_key or "required" == schema_feature_key:
+                            is_required = str(db_features_dic[db_feature_key])
+                            if is_required != 'nan':
+                                required_property[property_id] = is_required
                         else:
-                            schema_property[schema_key] = features_dic[database_key]
-                
-                # Set default values if not provided
-                if "fill_mode" not in schema_property:
-                    schema_property["fill_mode"] = None
-
+                            std_json_feature = self.standar_jsonschema_object(db_features_dic, db_feature_key)
+                            if std_json_feature:
+                                schema_property[schema_feature_key] = std_json_feature[db_feature_key]
+                            else:
+                                continue
                 # Finally, send schema_property object to the new json schema draft.
                 schema_draft["properties"][property_id] = schema_property
 
@@ -217,7 +261,7 @@ class SchemaBuilder:
                     if values == "Y":
                         required_property_unique.append(key)
             schema_draft["required"] = required_property_unique
-
+            
             # Return new schema
             return schema_draft
 
