@@ -504,10 +504,14 @@ def metadata_homogeneizer(institution, directory, output):
     help="select the template config file",
 )
 @click.option("-o", "--output", type=click.Path(), help="select output folder")
-def launch_pipeline(input, validate_file, template, output, config):
+def launch_pipeline(input, template, output, config):
     """
     Create the symbolic links for the samples which are validated.
     """
+    new_launch = relecov_tools.launch_pipeline.LaunchPipeline(
+        input, template, output, config
+    )
+    new_launch.pipeline_exc()
 
 
 if __name__ == "__main__":

@@ -80,20 +80,32 @@ class LaunchPipeline:
             output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
+        # Create the output folder if not exists
+        try:
+            os.makedirs(output_folder, exist_ok=True)
+        except OSError or FileExistsError as e:
+            log.error("Unable to create output folder %s ", e)
+            stderr.print("[red] Unable to create output folder ", e)
+            sys.exit(1)
+        # Update the output folder with the current date and analysis name
         self.output_folder = os.path.join(
-            output_folder, current_date + "_" + self.analysis_name
+            output_folder, current_date + "_" + data["analysis_name"]
         )
         if os.path.exists(self.output_folder):
             msg = "Analysis folder already exists and it will be deleted. Do you want to continue? Y/N"
             confirmation = relecov_tools.utils.prompt_yn_question(msg)
-            if confirmation.lower() != "y":
+            if confirmation is False:
                 sys.exit(1)
+            shutil.rmtree(self.output_folder)
+        """
         try:
-            os.makedirs(self.output_folder)
-        except OSError as e:
+            os.makedirs(self.output_folder, exist_ok = True)
+        except OSError or FileExistsError as e:
             log.error("Unable to create output folder %s ", e)
-            stderr.print("[red] Unable to create output folder " + e)
+            import pdb; pdb.set_trace()
+            stderr.print("[red] Unable to create output folder ",  e)
             sys.exit(1)
+        """
         self.analysis_name = os.path.join(self.output_folder, data["analysis_name"])
         self.analysis_folder = os.path.join(self.analysis_name, data["analysis_folder"])
         self.copied_sample_folder = os.path.join(
@@ -131,7 +143,8 @@ class LaunchPipeline:
                         continue
                     if sub_f_date > last_folder_date:
                         last_folder_date = sub_f_date
-                        latest_folder_name = os.path.join(lab_sub_folder, f_name)
+                        # latest_folder_name = os.path.join(lab_sub_folder, f_name)
+                        latest_folder_name = lab_sub_folder
                         existing_upload_folders = True
                 if existing_upload_folders:
                     lab_latest_folders[lab_folder] = {
@@ -140,6 +153,8 @@ class LaunchPipeline:
                     }
                     if last_folder_date > latest_date:
                         latest_date = last_folder_date
+            log.info("Latest date to process is %s", latest_date)
+            stderr.print("[blue] Collecting samples from ", latest_date)
             return lab_latest_folders, latest_date
 
         upload_lab_folders, latest_date = get_latest_lab_folder(self)
@@ -149,26 +164,39 @@ class LaunchPipeline:
             if data_folder["date"] != latest_date:
                 continue
             # fetch the validate file and get sample id and r1 and r2 file path
+
             validate_files = [
-                f
+                os.path.join(data_folder["path"], f)
                 for f in os.listdir(data_folder["path"])
-                if f.startswith("validated_") and f.endswith(".json")
+                if f.startswith("validated_processed_metadata") and f.endswith(".json")
             ]
             if not validate_files:
                 continue
+            # import pdb; pdb.set_trace()
             for validate_file in validate_files:
+                print("carpeta ", validate_file)
+                # import pdb; pdb.set_trace()
+
                 validate_file_path = os.path.join(data_folder["path"], validate_file)
                 with open(validate_file_path) as fh:
                     data = json.load(fh)
                 for item in data:
                     sample = {}
+                    # import pdb; pdb.set_trace()
                     sample["sample_ids"] = item["sequencing_sample_id"]
-                    sample["r1_fastq_file_path"] = item["r1_fastq_file_path"]
+                    sample["r1_fastq_file_path"] = os.path.join(
+                        item["r1_fastq_file_path"], item["sequence_file_R1_fastq"]
+                    )
                     if "r2_fastq_file_path" in item:
-                        sample["r2_fastq_file_path"] = item["r2_fastq_file_path"]
+                        sample["r2_fastq_file_path"] = os.path.join(
+                            item["r2_fastq_file_path"], item["sequence_file_R2_fastq"]
+                        )
                     samples_data.append(sample)
-            log.info("Collecting samples for  %s", lab)
-            stderr.print("[blue] Collecting samples for " + lab)
+            # import pdb; pdb.set_trace()
+            lab_code = lab.split("/")[-1]
+            log.info("Collecting samples for  %s", lab_code)
+            stderr.print("[blue] Collecting samples for ", lab_code)
+        # import pdb; pdb.set_trace()
         return samples_data
 
     def pipeline_exc(self):

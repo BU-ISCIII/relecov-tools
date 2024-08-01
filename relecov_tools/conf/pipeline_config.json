@@ -2,5 +2,5 @@
     "analysis_name" : "RELECOV_icasas_C",
     "analysis_folder" : "ANALYSIS",
     "sample_stored_folder"  : "RAW",
-    "sample_link_folder"   : "00_reads",
+    "sample_link_folder"   : "00_reads"
 }
