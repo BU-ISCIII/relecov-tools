@@ -66,9 +66,9 @@ class LaunchPipeline:
             sys.exit(1)
         data = relecov_tools.utils.read_json_file(pipeline_conf_file)
         if (
-            not "analysis_name" in data
-            or not "sample_stored_folder" in data
-            or not "sample_link_folder" in data
+            "analysis_name" not in data
+            or "sample_stored_folder" not in data
+            or "sample_link_folder" not in data
         ):
             log.error("Invalid pipeline config file %s ", self.pipeline_conf_file)
             stderr.print(
