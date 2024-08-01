@@ -49,12 +49,12 @@ class LaunchPipeline:
             stderr.print("[red] Template folder " + self.template + " does not exist")
             sys.exit(1)
         if pipeline_conf_file is None:
-            self.pipeline_conf_file = os.path.join(
+            pipeline_conf_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "conf",
                 "pipeline_config.json",
             )
-        if not os.path.exists(self.pipeline_conf_file):
+        if not os.path.exists(pipeline_conf_file):
             log.error(
                 "Pipeline config file %s does not exist ", self.pipeline_conf_file
             )
@@ -64,7 +64,7 @@ class LaunchPipeline:
                 + " does not exist"
             )
             sys.exit(1)
-        data = relecov_tools.utils.read_json_file(self.pipeline_conf_file)
+        data = relecov_tools.utils.read_json_file(pipeline_conf_file)
         if (
             not "analysis_name" in data
             or not "sample_stored_folder" in data
@@ -88,6 +88,7 @@ class LaunchPipeline:
             stderr.print("[red] Unable to create output folder ", e)
             sys.exit(1)
         # Update the output folder with the current date and analysis name
+
         self.output_folder = os.path.join(
             output_folder, current_date + "_" + data["analysis_name"]
         )
@@ -97,25 +98,14 @@ class LaunchPipeline:
             if confirmation is False:
                 sys.exit(1)
             shutil.rmtree(self.output_folder)
-        """
-        try:
-            os.makedirs(self.output_folder, exist_ok = True)
-        except OSError or FileExistsError as e:
-            log.error("Unable to create output folder %s ", e)
-            import pdb; pdb.set_trace()
-            stderr.print("[red] Unable to create output folder ",  e)
-            sys.exit(1)
-        """
-        self.analysis_name = os.path.join(self.output_folder, data["analysis_name"])
-        self.analysis_folder = os.path.join(self.analysis_name, data["analysis_folder"])
+
+        self.analysis_folder = os.path.join(self.output_folder, data["analysis_folder"])
         self.copied_sample_folder = os.path.join(
-            self.analysis_name, data["sample_stored_folder"]
+            self.output_folder, data["sample_stored_folder"]
         )
         self.linked_sample_folder = os.path.join(
             self.analysis_folder, data["sample_link_folder"]
         )
-
-        self.sample_ids = []
 
     def join_valid_items(self):
         def get_latest_lab_folder(self):
@@ -172,18 +162,14 @@ class LaunchPipeline:
             ]
             if not validate_files:
                 continue
-            # import pdb; pdb.set_trace()
             for validate_file in validate_files:
-                print("carpeta ", validate_file)
-                # import pdb; pdb.set_trace()
 
                 validate_file_path = os.path.join(data_folder["path"], validate_file)
                 with open(validate_file_path) as fh:
                     data = json.load(fh)
                 for item in data:
                     sample = {}
-                    # import pdb; pdb.set_trace()
-                    sample["sample_ids"] = item["sequencing_sample_id"]
+                    sample["sequencing_sample_id"] = item["sequencing_sample_id"]
                     sample["r1_fastq_file_path"] = os.path.join(
                         item["r1_fastq_file_path"], item["sequence_file_R1_fastq"]
                     )
@@ -192,44 +178,80 @@ class LaunchPipeline:
                             item["r2_fastq_file_path"], item["sequence_file_R2_fastq"]
                         )
                     samples_data.append(sample)
-            # import pdb; pdb.set_trace()
             lab_code = lab.split("/")[-1]
             log.info("Collecting samples for  %s", lab_code)
             stderr.print("[blue] Collecting samples for ", lab_code)
-        # import pdb; pdb.set_trace()
         return samples_data
 
     def pipeline_exc(self):
         # copy template folder and subfolders in output folder
         shutil.copytree(self.template, self.output_folder)
+        # create the 00_reads folder
+        os.makedirs(self.linked_sample_folder, exist_ok=True)
         # collect json with all validated samples
         samples_data = self.join_valid_items()
 
         # iterate over the sample_data to copy the fastq files in the output folder
+        file_errors = []
+        copied_samples = 0
+        if len(samples_data) == 0:
+            stderr.print("[yellow] No samples were found. Deleting analysis folder")
+            shutil.rmtree(self.analysis_folder)
+            sys.exit(0)
         for item in samples_data:
-            sequencing_r1_sample_id = item["sequencing_sample_id"] + "_R1" + ".fastq.gz"
-            sequencing_r2_sample_id = item["sequencing_sample_id"] + "_R2" + ".fastq.gz"
+
+            # import pdb; pdb.set_trace()
+            # fetch the file extension
+            ext_found = re.match(r".*(fastq.*|bam)", item["r1_fastq_file_path"])
+            ext = ext_found.group(1)
+            sequencing_r1_sample_id = item["sequencing_sample_id"] + "_R1." + ext
             # join r1_fastq_file_path and sequencing_file_R1_fastq
-            r1_file_path = os.path.join(
+            """ r1_file_path = os.path.join(
                 item["r1_fastq_file_path"], item["sequencing_file_R1_fastq"]
-            )
-            # copy sequencing files into the output folder
-            raw_folder = os.path.join(self.output_folder, self.copied_sample_folder)
-            shutil.copy(r1_file_path, raw_folder)
-            # create simlink for the sample
-            sample_r1_link_path = os.path.join(
-                self.linked_sample_folder, sequencing_r1_sample_id
-            )
-            os.symlink(r1_file_path, sample_r1_link_path)
-            if r2_file_path:
-                sample_r2_link_path = os.path.join(
-                    self.linked_sample_folder, sequencing_r2_sample_id
+            ) """
+            # copy r1 sequencing file into the output folder
+            # import pdb; pdb.set_trace()
+            raw_folder = os.path.join(self.analysis_folder, self.copied_sample_folder)
+            try:
+                shutil.copy(item["r1_fastq_file_path"], raw_folder)
+                # create simlink for the r1
+                sample_r1_link_path = os.path.join(
+                    self.linked_sample_folder, sequencing_r1_sample_id
                 )
-                os.symlink(r2_file_path, sample_r2_link_path)
-            if "sequencing_file_R2_fastq" in item:
-                r2_file_path = os.path.join(
+                os.symlink(item["r1_fastq_file_path"], sample_r1_link_path)
+            except FileNotFoundError as e:
+                log.error("File not found %s", e)
+                # stderr.print("[red] File not found ", e)
+                file_errors.append(item["r1_fastq_file_path"])
+                continue
+            copied_samples += 1
+            # check if there is a r2 file
+            if item["r2_fastq_file_path"] in item:
+                sequencing_r2_sample_id = item["sequencing_sample_id"] + "_R2." + ext
+                """ r2_file_path = os.path.join(
                     item["r2_fastq_file_path"], item["sequencing_file_R2_fastq"]
-                )
-            else:
-                r2_file_path = None
-            # copy sequencing files into the output folder
+                ) """
+                try:
+                    shutil.copy(item["r2_fastq_file_path"], raw_folder)
+                    sample_r2_link_path = os.path.join(
+                        self.linked_sample_folder, sequencing_r2_sample_id
+                    )
+                    os.symlink(item["r2_fastq_file_path"], sample_r2_link_path)
+                except FileNotFoundError as e:
+                    log.error("File not found %s", e)
+                    # stderr.print("[red] File not found ", e)
+                    file_errors.append(item["r2_fastq_file_path"])
+                    continue
+        if len(file_errors) > 0:
+            stderr.print(
+                "[red] Files do not found. Unable to copy",
+                "[red] " + str(len(file_errors)),
+                "[red]sample files",
+            )
+            msg = "Do you want to delete analysis folder? Y/N"
+            confirmation = relecov_tools.utils.prompt_yn_question(msg)
+            if confirmation:
+                shutil.rmtree(self.output_folder)
+                sys.exit(1)
+        stderr.print("[green] Samples copied: ", copied_samples)
+        stderr.print("[blue] Pipeline launched successfully")
