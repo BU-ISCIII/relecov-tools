@@ -226,7 +226,7 @@ class LaunchPipeline:
                 continue
             copied_samples += 1
             # check if there is a r2 file
-            if item["r2_fastq_file_path"] in item:
+            if "r2_fastq_file_path" in item:
                 sequencing_r2_sample_id = item["sequencing_sample_id"] + "_R2." + ext
                 """ r2_file_path = os.path.join(
                     item["r2_fastq_file_path"], item["sequencing_file_R2_fastq"]
