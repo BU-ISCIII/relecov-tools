@@ -11,6 +11,7 @@ import xlsxwriter
 
 import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
+import relecov_tools.assets.schema_utils.metadatalab_template
 from relecov_tools.config_json import ConfigJson
 
 log = logging.getLogger(__name__)
@@ -116,7 +117,6 @@ class SchemaBuilder:
     def read_database_definition(self, sheet_id='main'):
         """Reads the database definition and converts it into json format."""
         # Read excel file
-        # FIXME: I think reading first tab by defining the tab name might be too harcoded.
         df = pd.read_excel(self.excel_file_path, sheet_name=sheet_id,  na_values=['nan', 'N/A', 'NA', ''])
         # Convert database to json format
         json_data = {}
@@ -208,7 +208,6 @@ class SchemaBuilder:
         #    return None
 
     # TODO: add strategy to deal with json schema objects, defs and refs
-    # TODO: Reorder porperty's features returned.
     def build_new_schema(self, json_data, schema_draft):
         """
         Create a json schema file based on input data and draf skeleton..
@@ -216,6 +215,7 @@ class SchemaBuilder:
         try:
             # List of properties to check in the features dictionary (it maps values between database features and json schema features):
             #       key[db_feature_key]: value[schema_feature_key]
+            # TODO: This should be a config variable available for all elements in this class
             features_to_check = {
                 "type": "type",
                 "enum": "enum",
@@ -278,7 +278,7 @@ class SchemaBuilder:
         except Exception as e:
             stderr.print(f"[red]Error building schema: {str(e)}")
             raise
-        # Once json schema is created, it requires validation
+        # TODO: Once json schema is created, it requires validation
 
     def verify_schema(self, schema):
         """Verify the schema_draft follows the JSON Schema specification [XXXX] meta-schema."""
@@ -351,26 +351,23 @@ class SchemaBuilder:
             stderr.print(f"[red]An unexpected error occurred: {str(e)}")
         return False
 
-    def create_metadatalab_excel(self, json_data):
+    # TODO: rename json_data to json_schema
+    def create_metadatalab_excel(self, json_schema):
         """
-        Generate the metadatalab templet file in xlsx format. It contains:
+        Generate the metadatalab template file in xlsx format. It contains:
             - Overview tab:
             - Metadata LAB tab:
             - Validation Tab:
         """
-        # Create a new workbook and add the 'overview' worksheet
-        excel_file_path = os.path.join(
+        # Create a new workbook
+        out_file = os.path.join(
             os.path.realpath(self.output_folder) + "/metadatalab_template.xlsx"
         )
-        workbook = xlsxwriter.Workbook(excel_file_path)
-        # Define a bold format for headers
-        bold = workbook.add_format({"bold": True})
-
+        
         #
-        # Overview Tab
+        # Overview sheet
         #
-        overview_sheet = workbook.add_worksheet("Overview")
-        overview_tab_headers = [
+        overview_header = [
             "",
             "Label name",
             "Description",
@@ -379,44 +376,10 @@ class SchemaBuilder:
             "Example",
             "METADATA_LAB COLUMN",
         ]
+        write_overview = relecov_tools.assets.schema_utils.metadatalab_template.overview_tab(json_schema, out_file, overview_header)
+        if write_overview:
+            stderr.print(f"[green]Excel file saved to {out_file}")
 
-        # Write the headers to the worksheet
-        for col_num, header in enumerate(overview_tab_headers):
-            overview_sheet.write(0, col_num, header, bold)
-
-        # Set Starting column
-        column_index = ord("A")
-
-        row_num = 1
-        for property_id, details in json_data.items():
-            label_name = details.get("label_name", "")
-            description = details.get("description", "")
-            group = details.get("classification", "")
-            mandatory = details.get("required (Y/N)", "")
-            example = details.get("examples", [""])
-            metadata_column = chr(column_index)
-
-            # Fill the overview tab with processed data
-            # FIXME: Got few errors while filling table
-            try:
-                overview_sheet.write(row_num, 0, group)
-                overview_sheet.write(row_num, 1, label_name)
-                overview_sheet.write(row_num, 2, description)
-                overview_sheet.write(row_num, 3, group)
-                overview_sheet.write(row_num, 4, mandatory)
-                overview_sheet.write(row_num, 5, example)
-                overview_sheet.write(row_num, 6, metadata_column)
-            except TypeError as e:
-                stderr.print(
-                    f"[red] Error when filling excell in property '{property_id}': {e}"
-                )
-                pass
-            column_index += 1
-            row_num += 1
-
-        # Close the workbook
-        workbook.close()
-        print(f"Excel file saved to {excel_file_path}")
 
     def handle_build_schema(self):
         # Load xlsx database and convert into json format
@@ -448,7 +411,7 @@ class SchemaBuilder:
             sys.exit(1)
 
         if schema_diff:
-            self.create_metadatalab_excel(database_dic)
+            self.create_metadatalab_excel(new_schema_json)
 
         # Build EXCEL template
         # TODO: Three tabs in file
