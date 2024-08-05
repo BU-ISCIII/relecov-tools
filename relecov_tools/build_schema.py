@@ -351,7 +351,6 @@ class SchemaBuilder:
             stderr.print(f"[red]An unexpected error occurred: {str(e)}")
         return False
 
-    # TODO: rename json_data to json_schema
     def create_metadatalab_excel(self, json_schema):
         """
         Generate the metadatalab template file in xlsx format. It contains:
@@ -359,27 +358,144 @@ class SchemaBuilder:
             - Metadata LAB tab:
             - Validation Tab:
         """
-        # Create a new workbook
-        out_file = os.path.join(
-            os.path.realpath(self.output_folder) + "/metadatalab_template.xlsx"
-        )
-        
-        #
-        # Overview sheet
-        #
-        overview_header = [
-            "",
-            "Label name",
-            "Description",
-            "Group",
-            "Mandatory (Y/N)",
-            "Example",
-            "METADATA_LAB COLUMN",
-        ]
-        write_overview = relecov_tools.assets.schema_utils.metadatalab_template.overview_tab(json_schema, out_file, overview_header)
-        if write_overview:
-            stderr.print(f"[green]Excel file saved to {out_file}")
+        try:
+            # Set up metadatalab configuration
+            out_file = os.path.join(
+                self.excel_file_path, 
+                os.path.join(self.output_folder, "metadatalab_template" + ".xlsx")
+            )
+            required_classification = [
+                "Database Identifiers",
+                "Sample collection and processing",
+                "Host information",
+                "Sequencing",
+                "Pathogen Diagnostic testing",
+                "Contributor Acknowledgement"
+            ]
+            required_properties = json_schema.get('required')
+            schema_properties = json_schema.get('properties')
 
+            # Read json schema properties and convert it into pandas df
+            try:
+                schema_properties_flatten = relecov_tools.assets.schema_utils.metadatalab_template.schema_to_flatten_json(
+                    schema_properties
+                )
+                df = relecov_tools.assets.schema_utils.metadatalab_template.schema_properties_to_df (schema_properties_flatten)
+                df = df[df['classification'].isin(required_classification)]
+                df['required'] = df['property_id'].apply(lambda x: 'Y' if x in required_properties else 'N')
+            except Exception as e:
+                stderr.print(f"Error processing schema properties: {e}")
+                return
+
+            # Overview sheet
+            try:
+                overview_header = [
+                    "",
+                    "Label name",
+                    "Description",
+                    "Group",
+                    "Mandatory (Y/N)",
+                    "Example",
+                    "METADATA_LAB COLUMN",
+                ]
+                df_overview = pd.DataFrame(columns=[col_name for col_name in overview_header])
+                df_overview[''] = df['classification']
+                df_overview['Label name'] = df['label']
+                df_overview['Description'] = df['description']
+                df_overview['Group'] = df['classification']
+                df_overview['Example'] = df['examples'].apply(lambda x: x[0] if isinstance(x, list) else x)
+            except Exception as e:
+                stderr.print(f"Error creating overview sheet: {e}")
+                return
+
+            # MetadataLab sheet
+            try:
+                metadatalab_header = [
+                    "",
+                    "EJEMPLOS",
+                    "DESCRIPCIÓN",
+                    "CAMPO"
+                ]
+                df_metadata = pd.DataFrame(columns=[col_name for col_name in metadatalab_header])
+                df_metadata[''] = df['label'].apply(lambda _: '')
+                df_metadata['EJEMPLOS'] = df['examples'].apply(lambda x: x[0] if isinstance(x, list) else x)
+                df_metadata['DESCRIPCIÓN'] = df['description']
+                df_metadata['CAMPO'] = df['label']
+                df_metadata = df_metadata.transpose()
+            except Exception as e:
+                stderr.print(f"[red]Error creating MetadataLab sheet: {e}")
+                return
+
+            # DataValidation sheet
+            try:
+                datavalidation_header = [
+                    "",
+                    "EJEMPLOS",
+                    "DESCRIPCIÓN",
+                    "CAMPO",
+                    ""
+                ]
+                df_hasenum = df[(pd.notnull(df.enum))]
+                df_validation = pd.DataFrame(columns=[col_name for col_name in datavalidation_header])
+                df_validation['tmp_property'] = df_hasenum['property_id']
+                df_validation[''] = df_hasenum['label'].apply(lambda _: '')
+                df_validation['EJEMPLOS'] = df_hasenum['examples'].apply(lambda x: x[0] if isinstance(x, list) else x)
+                df_validation['DESCRIPCIÓN'] = df_hasenum['description']
+                df_validation['CAMPO'] = df_hasenum['label']
+            except Exception as e:
+                stderr.print(f"[red]Error creating DataValidation sheet: {e}")
+                return
+
+            try:
+                # Since enums have different lengths we need further processing.
+                # Convert df into dict to perform data manipulation.
+                enum_dict = {property: [] for property in df_hasenum['property_id']}
+                enum_maxitems = 0
+                # Populate the dictionary with flattened lists
+                for key in enum_dict.keys():
+                    enum_values = df_hasenum[df_hasenum['property_id'] == key]['enum'].values
+                    if enum_values.size > 0:
+                        enum_list = enum_values[0]  # Extract the list
+                        enum_dict[key] = enum_list  # Assign the list to the dictionary
+                        if enum_maxitems < len(enum_list):
+                            enum_maxitems = len(enum_list)
+                    else:
+                        enum_dict[key] = []
+
+                # Reshape list dimensions based on enum length.
+                for key in enum_dict.keys():
+                    if len(enum_dict[key]) < enum_maxitems:
+                        num_nas = enum_maxitems - len(enum_dict[key])
+                        for _ in range(num_nas):
+                            enum_dict[key].append('NaN')
+
+                new_df = pd.DataFrame(enum_dict)
+                new_index = range(len(new_df.columns))
+                new_df.reindex(columns=new_index)
+
+                valid_index = df_validation['tmp_property'].values
+                valid_transposed = df_validation.transpose()
+                valid_transposed.columns = valid_index
+
+                frames = [valid_transposed, new_df]
+                df_validation = pd.concat(frames)
+            except Exception as e:
+                stderr.print(f"[red]Error processing enums and combining data: {e}")
+                return None
+
+            # WRITE EXCEL
+            try:
+                with pd.ExcelWriter(out_file) as writer:
+                    df_overview.to_excel(writer, sheet_name='OVERVIEW')
+                    df_metadata.to_excel(writer, sheet_name='METADATA_LAB')
+                    df_validation.to_excel(writer, sheet_name='DATA VALIDATION')
+                stderr.print(f"[green]Excel template successfuly created in: {out_file}")
+            except Exception as e:
+                stderr.print(f"[red]Error writing to Excel: {e}")
+                return None
+        except Exception as e:
+            stderr.print(f"[red]Error in create_metadatalab_excel: {e}")
+            return None
 
     def handle_build_schema(self):
         # Load xlsx database and convert into json format
@@ -414,11 +530,7 @@ class SchemaBuilder:
             self.create_metadatalab_excel(new_schema_json)
 
         # Build EXCEL template
-        # TODO: Three tabs in file
-        #   - Overview
-        #   - METADATA_LAB
-        #   - DATA_VALIDATION
         #   - Add versinon tag to filename
 
-        # TODO: Bump json schema version when it gets updated?
+        # TODO: metod to ask whether to bump version when json schema is generated?
         # TODO: Publish a log file that register modification in json schema?
