@@ -351,6 +351,8 @@ class SchemaBuilder:
             stderr.print(f"[red]An unexpected error occurred: {str(e)}")
         return False
 
+    #TODO: overview-tab - add mapping column to overview tab
+    #TODO: overview-tab - FIX first column values
     def create_metadatalab_excel(self, json_schema):
         """
         Generate the metadatalab template file in xlsx format. It contains:
@@ -403,6 +405,7 @@ class SchemaBuilder:
                 df_overview['Label name'] = df['label']
                 df_overview['Description'] = df['description']
                 df_overview['Group'] = df['classification']
+                df_overview['Mandatory (Y/N)'] = df['required']
                 df_overview['Example'] = df['examples'].apply(lambda x: x[0] if isinstance(x, list) else x)
             except Exception as e:
                 stderr.print(f"Error creating overview sheet: {e}")
@@ -411,13 +414,11 @@ class SchemaBuilder:
             # MetadataLab sheet
             try:
                 metadatalab_header = [
-                    "",
                     "EJEMPLOS",
                     "DESCRIPCIÓN",
                     "CAMPO"
                 ]
                 df_metadata = pd.DataFrame(columns=[col_name for col_name in metadatalab_header])
-                df_metadata[''] = df['label'].apply(lambda _: '')
                 df_metadata['EJEMPLOS'] = df['examples'].apply(lambda x: x[0] if isinstance(x, list) else x)
                 df_metadata['DESCRIPCIÓN'] = df['description']
                 df_metadata['CAMPO'] = df['label']
@@ -467,7 +468,7 @@ class SchemaBuilder:
                     if len(enum_dict[key]) < enum_maxitems:
                         num_nas = enum_maxitems - len(enum_dict[key])
                         for _ in range(num_nas):
-                            enum_dict[key].append('NaN')
+                            enum_dict[key].append('')
 
                 new_df = pd.DataFrame(enum_dict)
                 new_index = range(len(new_df.columns))
@@ -485,11 +486,14 @@ class SchemaBuilder:
 
             # WRITE EXCEL
             try:
-                with pd.ExcelWriter(out_file) as writer:
-                    df_overview.to_excel(writer, sheet_name='OVERVIEW')
-                    df_metadata.to_excel(writer, sheet_name='METADATA_LAB')
-                    df_validation.to_excel(writer, sheet_name='DATA VALIDATION')
+
+                writer = pd.ExcelWriter(out_file, engine="xlsxwriter")
+                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(df_overview, writer, 'OVERVIEW', out_file,  have_index=False, have_header=False)
+                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(df_metadata, writer, 'METADATA_LAB', out_file, have_index=True, have_header=False)
+                writer.close()
+                #TODO: add formater to last sheet
                 stderr.print(f"[green]Excel template successfuly created in: {out_file}")
+
             except Exception as e:
                 stderr.print(f"[red]Error writing to Excel: {e}")
                 return None
