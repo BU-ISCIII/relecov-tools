@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 import logging
 import rich.console
+import os
 import json
 import xlsxwriter
+import pandas as pd
 
 import relecov_tools.utils
 
@@ -15,61 +17,34 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
+def schema_to_flatten_json(json_data):
+    """This function flattens schema when nested items are found"""
+    flatten_json = {}
+    for property_id, features in json_data.items():
+        # TODO: might be another way to identify a nested dict property
+        if features.get('type') == 'array':
+            complex_properties= json_data[property_id]["items"].get('properties')
+            for complex_property_id, complex_feature in complex_properties.items():
+                flatten_json.update({complex_property_id : complex_feature})
+        else:
+            flatten_json.update({property_id : features} )
+    return flatten_json
 
-def overview_tab(json_schema, excel_file, header, start_col="A", start_row=1, tab_name="Overview"):
-    """"""
-    errors_record = {}
-    # Create workbook object
-    workbook = xlsxwriter.Workbook(excel_file)
-    sheet = workbook.add_worksheet(tab_name)
-    bold = workbook.add_format({"bold": True})
+def schema_properties_to_df(json_data):
+    # Initialize an empty list to store the rows of the DataFrame
+    rows = []
 
-    # Write the headers to the worksheet and setup dimentions
-    for col_num, col_name in enumerate(header):
-        sheet.write(0, col_num, col_name, bold)
-    col_index = ord(start_col)
-    row_index = start_row
+    # Iterate over each property in the JSON data
+    for property_id, property_features in json_data.items():
+        # Create a dictionary to hold the property features
+        row = {'property_id': property_id}
+        row.update(property_features)
+        
+        # Append the row to the list of rows
+        rows.append(row)
     
-    # Get schema property ID and its features
-    # TODO: try except 
-    required_list = json_schema.get('required')
-    properties_dict = json_schema.get('properties')
-
-    for property_id, features in properties_dict.items():
-        label_name = features.get("label", "")
-        description = features.get("description", "")
-        group = features.get("classification", "")
-        mandatory = "Y" if property_id in required_list else "N"
-        example = features.get("examples", [""])[0]
-        metadata_column = chr(col_index)
-        # Fill the overview tab with processed data
-        try:
-            sheet.write(row_index, 0, group)
-            sheet.write(row_index, 1, label_name)
-            sheet.write(row_index, 2, description)
-            sheet.write(row_index, 3, group)
-            sheet.write(row_index, 4, mandatory)
-            sheet.write(row_index, 5, example)
-            sheet.write(row_index, 6, metadata_column)
-        except TypeError as e:
-            stderr.print(
-                f"[red] Error when filling excell in property '{property_id}': {e}"
-            )
-            pass
-        col_index += 1
-        row_index += 1
-
-    if len(errors_record)>0:
-        stderr.print(f"[red]Errors encountered while generating the {tab_name} sheet. See errors {errors_record}")
-        return False
-    else:
-        # Close the workbook
-        workbook.close()
-        return True
-
-def metadatalab_tab():
-    """"""
-    return True
-def datavalidation_tab():
-    """"""
-    return True
+    # Create a DataFrame from the list of rows
+    df = pd.DataFrame(rows)
+    
+    # Return the DataFrame
+    return df
