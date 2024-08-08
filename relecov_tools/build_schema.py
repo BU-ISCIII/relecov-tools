@@ -5,10 +5,8 @@ import rich.console
 import pandas as pd
 import os
 import sys
-import re
 import json
 import difflib
-import xlsxwriter
 import inspect
 
 import relecov_tools.utils
@@ -64,7 +62,9 @@ class SchemaBuilder:
             if relecov_tools.utils.file_exists(base_schema_path):
                 self.base_schema_path = base_schema_path
             else:
-                stderr.print(f"[Error]Defined base schema file not found: {base_schema_path}. Exiting...")
+                stderr.print(
+                    f"[Error]Defined base schema file not found: {base_schema_path}. Exiting..."
+                )
                 sys.exit(1)
         else:
             try:
@@ -79,7 +79,9 @@ class SchemaBuilder:
                         relecov_schema,
                     )
                     if not relecov_tools.utils.file_exists(self.base_schema_path):
-                        stderr.print("[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning. Exiting...")
+                        stderr.print(
+                            "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning. Exiting..."
+                        )
                         sys.exit(1)
                     stderr.print(
                         "[green]RELECOV schema successfully found in the configuration."
@@ -123,11 +125,15 @@ class SchemaBuilder:
         else:
             return None
 
-    def read_database_definition(self, sheet_id='main'):
+    def read_database_definition(self, sheet_id="main"):
         """Reads the database definition and converts it into json format."""
         caller_method = inspect.stack()[1][3]
         # Read excel file
-        df = pd.read_excel(self.excel_file_path, sheet_name=sheet_id,  na_values=['nan', 'N/A', 'NA', ''])
+        df = pd.read_excel(
+            self.excel_file_path,
+            sheet_name=sheet_id,
+            na_values=["nan", "N/A", "NA", ""],
+        )
         # Convert database to json format
         json_data = {}
         for row in df.itertuples(index=False):
@@ -137,7 +143,9 @@ class SchemaBuilder:
 
         # Check json is not empty
         if len(json_data) == 0:
-            stderr.print(f"{caller_method}{sheet_id}) [red]No data found in xlsx database")
+            stderr.print(
+                f"{caller_method}{sheet_id}) [red]No data found in xlsx database"
+            )
             sys.exit(1)
 
         # Perform validation of database content
@@ -149,7 +157,9 @@ class SchemaBuilder:
             )
             sys.exit(1)
         else:
-            stderr.print(f"({caller_method}:{sheet_id}) [green]Validation of database content passed.")
+            stderr.print(
+                f"({caller_method}:{sheet_id}) [green]Validation of database content passed."
+            )
             return json_data
 
     def create_schema_draft_template(self):
@@ -163,13 +173,13 @@ class SchemaBuilder:
 
     # TODO: we have to discuss wether NaN (empty) values need to be handled
     def standard_jsonschema_object(self, data_dict, target_key):
-        """"Create standar json schema object"""
+        """ "Create standar json schema object"""
         # For enum and examples, wrap the value in a list
         json_dict = {}
-        
+
         # Function to handle NaN values
         def handle_nan(value):
-            if pd.isna(value) or value in ['nan', 'NaN', 'None', 'none']:
+            if pd.isna(value) or value in ["nan", "NaN", "None", "none"]:
                 return ""
             return str(value)
 
@@ -188,32 +198,34 @@ class SchemaBuilder:
         return json_dict
 
     def complex_jsonschema_object(self, property_id, features_dict):
-        """"Create complex/nested json schema object"""
-        json_dict = {"type": "object", "properties":{}}
-        
+        """ "Create complex/nested json schema object"""
+        json_dict = {"type": "object", "properties": {}}
+
         # Read tab-dedicated sheet in excell database
         try:
             complex_json_data = self.read_database_definition(sheet_id=property_id)
         except ValueError as e:
             stderr.print(f"[yellow]{e}")
             return None
-        
+
         # Add sub property items
-        # TODO: add try_excepts 
-        #try:
-        for sub_property_id, _  in complex_json_data.items():
+        # TODO: add try_excepts
+        # try:
+        for sub_property_id, _ in complex_json_data.items():
             json_dict["properties"][sub_property_id] = {}
             complex_json_feature = {}
             for db_feature_key, json_key in features_dict.items():
-                if json_key == 'required':
+                if json_key == "required":
                     continue
-                feature_schema = self.standard_jsonschema_object(complex_json_data[sub_property_id], db_feature_key)
+                feature_schema = self.standard_jsonschema_object(
+                    complex_json_data[sub_property_id], db_feature_key
+                )
                 if feature_schema:
                     complex_json_feature[json_key] = feature_schema[db_feature_key]
             json_dict["properties"][sub_property_id] = complex_json_feature
 
         return json_dict
-        #except:
+        # except:
         #    stderr.print(f"[red]Error while generating comples json object for {property_id}")
         #    return None
 
@@ -240,37 +252,50 @@ class SchemaBuilder:
             required_property_unique = []
 
             # Read property_ids in the database.
-            #   Perform checks and create (for each property) feature object like: 
+            #   Perform checks and create (for each property) feature object like:
             #       {'example':'A', 'ontology': 'B'...}.
             #   Finally this objet will be written to the draft schema.
             for property_id, db_features_dic in json_data.items():
                 schema_property = {}
                 required_property = {}
-                
+
                 # Parse property_ids that needs to be incorporated as complex fields in json_schema
-                if json_data[property_id].get('complex_field (Y/N)') == 'Y':
-                    complex_json_feature = self.complex_jsonschema_object(property_id, features_to_check)
+                if json_data[property_id].get("complex_field (Y/N)") == "Y":
+                    complex_json_feature = self.complex_jsonschema_object(
+                        property_id, features_to_check
+                    )
                     if complex_json_feature:
                         schema_property["type"] = "array"
                         schema_property["items"] = complex_json_feature
-                        schema_property["additionalProperties"]= "false"
-                        schema_property["required"] = [ key for key in complex_json_feature["properties"].keys()]
-                # For those that follows standard format, add them to json schema as well.  
+                        schema_property["additionalProperties"] = "false"
+                        schema_property["required"] = [
+                            key for key in complex_json_feature["properties"].keys()
+                        ]
+                # For those that follows standard format, add them to json schema as well.
                 else:
                     for db_feature_key, schema_feature_key in features_to_check.items():
                         # Verifiy that db_feature_key is present in the database (processed excel (aka 'json_data'))
                         if db_feature_key not in db_features_dic:
-                            stderr.print(f"[INFO] Feature {db_feature_key} is not present in database ({self.excel_file_path})")
+                            stderr.print(
+                                f"[INFO] Feature {db_feature_key} is not present in database ({self.excel_file_path})"
+                            )
                             continue
                         # Record the required value for each property
-                        if 'required' in db_feature_key or "required" == schema_feature_key:
+                        if (
+                            "required" in db_feature_key
+                            or "required" == schema_feature_key
+                        ):
                             is_required = str(db_features_dic[db_feature_key])
-                            if is_required != 'nan':
+                            if is_required != "nan":
                                 required_property[property_id] = is_required
                         else:
-                            std_json_feature = self.standard_jsonschema_object(db_features_dic, db_feature_key)
+                            std_json_feature = self.standard_jsonschema_object(
+                                db_features_dic, db_feature_key
+                            )
                             if std_json_feature:
-                                schema_property[schema_feature_key] = std_json_feature[db_feature_key]
+                                schema_property[schema_feature_key] = std_json_feature[
+                                    db_feature_key
+                                ]
                             else:
                                 continue
                 # Finally, send schema_property object to the new json schema draft.
@@ -281,14 +306,13 @@ class SchemaBuilder:
                     if values == "Y":
                         required_property_unique.append(key)
             schema_draft["required"] = required_property_unique
-            
+
             # Return new schema
             return schema_draft
 
         except Exception as e:
             stderr.print(f"[red]Error building schema: {str(e)}")
             raise
-        # TODO: Once json schema is created, it requires validation
 
     def verify_schema(self, schema):
         """Verify the schema_draft follows the JSON Schema specification [XXXX] meta-schema."""
@@ -361,8 +385,8 @@ class SchemaBuilder:
             stderr.print(f"[red]An unexpected error occurred: {str(e)}")
         return False
 
-    #TODO: overview-tab - add mapping column to overview tab
-    #TODO: overview-tab - FIX first column values
+    # TODO: overview-tab - add mapping column to overview tab
+    # TODO: overview-tab - FIX first column values
     def create_metadatalab_excel(self, json_schema):
         """
         Generate the metadatalab template file in xlsx format. It contains:
@@ -372,26 +396,32 @@ class SchemaBuilder:
         """
         try:
             # Set up metadatalab configuration
-            out_file = os.path.join(self.output_folder, "metadatalab_template" + ".xlsx")
+            out_file = os.path.join(
+                self.output_folder, "metadatalab_template" + ".xlsx"
+            )
             required_classification = [
                 "Database Identifiers",
                 "Sample collection and processing",
                 "Host information",
                 "Sequencing",
                 "Pathogen Diagnostic testing",
-                "Contributor Acknowledgement"
+                "Contributor Acknowledgement",
             ]
-            required_properties = json_schema.get('required')
-            schema_properties = json_schema.get('properties')
+            required_properties = json_schema.get("required")
+            schema_properties = json_schema.get("properties")
 
             # Read json schema properties and convert it into pandas df
             try:
                 schema_properties_flatten = relecov_tools.assets.schema_utils.metadatalab_template.schema_to_flatten_json(
                     schema_properties
                 )
-                df = relecov_tools.assets.schema_utils.metadatalab_template.schema_properties_to_df (schema_properties_flatten)
-                df = df[df['classification'].isin(required_classification)]
-                df['required'] = df['property_id'].apply(lambda x: 'Y' if x in required_properties else 'N')
+                df = relecov_tools.assets.schema_utils.metadatalab_template.schema_properties_to_df(
+                    schema_properties_flatten
+                )
+                df = df[df["classification"].isin(required_classification)]
+                df["required"] = df["property_id"].apply(
+                    lambda x: "Y" if x in required_properties else "N"
+                )
             except Exception as e:
                 stderr.print(f"Error processing schema properties: {e}")
                 return
@@ -406,27 +436,31 @@ class SchemaBuilder:
                     "Example",
                     "METADATA_LAB COLUMN",
                 ]
-                df_overview = pd.DataFrame(columns=[col_name for col_name in overview_header])
-                df_overview['Label name'] = df['label']
-                df_overview['Description'] = df['description']
-                df_overview['Group'] = df['classification']
-                df_overview['Mandatory (Y/N)'] = df['required']
-                df_overview['Example'] = df['examples'].apply(lambda x: x[0] if isinstance(x, list) else x)
+                df_overview = pd.DataFrame(
+                    columns=[col_name for col_name in overview_header]
+                )
+                df_overview["Label name"] = df["label"]
+                df_overview["Description"] = df["description"]
+                df_overview["Group"] = df["classification"]
+                df_overview["Mandatory (Y/N)"] = df["required"]
+                df_overview["Example"] = df["examples"].apply(
+                    lambda x: x[0] if isinstance(x, list) else x
+                )
             except Exception as e:
                 stderr.print(f"Error creating overview sheet: {e}")
                 return
 
             # MetadataLab sheet
             try:
-                metadatalab_header = [
-                    "EJEMPLOS",
-                    "DESCRIPCIÓN",
-                    "CAMPO"
-                ]
-                df_metadata = pd.DataFrame(columns=[col_name for col_name in metadatalab_header])
-                df_metadata['EJEMPLOS'] = df['examples'].apply(lambda x: x[0] if isinstance(x, list) else x)
-                df_metadata['DESCRIPCIÓN'] = df['description']
-                df_metadata['CAMPO'] = df['label']
+                metadatalab_header = ["EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
+                df_metadata = pd.DataFrame(
+                    columns=[col_name for col_name in metadatalab_header]
+                )
+                df_metadata["EJEMPLOS"] = df["examples"].apply(
+                    lambda x: x[0] if isinstance(x, list) else x
+                )
+                df_metadata["DESCRIPCIÓN"] = df["description"]
+                df_metadata["CAMPO"] = df["label"]
                 df_metadata = df_metadata.transpose()
             except Exception as e:
                 stderr.print(f"[red]Error creating MetadataLab sheet: {e}")
@@ -434,17 +468,17 @@ class SchemaBuilder:
 
             # DataValidation sheet
             try:
-                datavalidation_header = [
-                    "EJEMPLOS",
-                    "DESCRIPCIÓN",
-                    "CAMPO"
-                ]
+                datavalidation_header = ["EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
                 df_hasenum = df[(pd.notnull(df.enum))]
-                df_validation = pd.DataFrame(columns=[col_name for col_name in datavalidation_header])
-                df_validation['tmp_property'] = df_hasenum['property_id']
-                df_validation['EJEMPLOS'] = df_hasenum['examples'].apply(lambda x: x[0] if isinstance(x, list) else x)
-                df_validation['DESCRIPCIÓN'] = df_hasenum['description']
-                df_validation['CAMPO'] = df_hasenum['label']
+                df_validation = pd.DataFrame(
+                    columns=[col_name for col_name in datavalidation_header]
+                )
+                df_validation["tmp_property"] = df_hasenum["property_id"]
+                df_validation["EJEMPLOS"] = df_hasenum["examples"].apply(
+                    lambda x: x[0] if isinstance(x, list) else x
+                )
+                df_validation["DESCRIPCIÓN"] = df_hasenum["description"]
+                df_validation["CAMPO"] = df_hasenum["label"]
             except Exception as e:
                 stderr.print(f"[red]Error creating DataValidation sheet: {e}")
                 return
@@ -452,11 +486,13 @@ class SchemaBuilder:
             try:
                 # Since enums have different lengths we need further processing.
                 # Convert df into dict to perform data manipulation.
-                enum_dict = {property: [] for property in df_hasenum['property_id']}
+                enum_dict = {property: [] for property in df_hasenum["property_id"]}
                 enum_maxitems = 0
                 # Populate the dictionary with flattened lists
                 for key in enum_dict.keys():
-                    enum_values = df_hasenum[df_hasenum['property_id'] == key]['enum'].values
+                    enum_values = df_hasenum[df_hasenum["property_id"] == key][
+                        "enum"
+                    ].values
                     if enum_values.size > 0:
                         enum_list = enum_values[0]  # Extract the list
                         enum_dict[key] = enum_list  # Assign the list to the dictionary
@@ -470,19 +506,19 @@ class SchemaBuilder:
                     if len(enum_dict[key]) < enum_maxitems:
                         num_nas = enum_maxitems - len(enum_dict[key])
                         for _ in range(num_nas):
-                            enum_dict[key].append('')
+                            enum_dict[key].append("")
 
                 new_df = pd.DataFrame(enum_dict)
                 new_index = range(len(new_df.columns))
                 new_df.reindex(columns=new_index)
 
-                valid_index = df_validation['tmp_property'].values
+                valid_index = df_validation["tmp_property"].values
                 valid_transposed = df_validation.transpose()
                 valid_transposed.columns = valid_index
 
                 frames = [valid_transposed, new_df]
                 df_validation = pd.concat(frames)
-                df_validation = df_validation.drop(index=['tmp_property'])
+                df_validation = df_validation.drop(index=["tmp_property"])
             except Exception as e:
                 stderr.print(f"[red]Error processing enums and combining data: {e}")
                 return None
@@ -490,11 +526,34 @@ class SchemaBuilder:
             # WRITE EXCEL
             try:
                 writer = pd.ExcelWriter(out_file, engine="xlsxwriter")
-                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(df_overview, writer, 'OVERVIEW', out_file,  have_index=False, have_header=False)
-                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(df_metadata, writer, 'METADATA_LAB', out_file, have_index=True, have_header=False)
-                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(df_validation, writer, 'DATA_VALIDATION', out_file, have_index=True, have_header=False)
+                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(
+                    df_overview,
+                    writer,
+                    "OVERVIEW",
+                    out_file,
+                    have_index=False,
+                    have_header=False,
+                )
+                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(
+                    df_metadata,
+                    writer,
+                    "METADATA_LAB",
+                    out_file,
+                    have_index=True,
+                    have_header=False,
+                )
+                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(
+                    df_validation,
+                    writer,
+                    "DATA_VALIDATION",
+                    out_file,
+                    have_index=True,
+                    have_header=False,
+                )
                 writer.close()
-                stderr.print(f"[green]Metadata lab template successfuly created in: {out_file}")
+                stderr.print(
+                    f"[green]Metadata lab template successfuly created in: {out_file}"
+                )
             except Exception as e:
                 stderr.print(f"[red]Error writing to Excel: {e}")
                 return None
@@ -533,7 +592,9 @@ class SchemaBuilder:
             sys.exit(1)
 
         if schema_diff:
-            promp_answ = relecov_tools.utils.prompt_yn_question('Do you want to create a metadata lab file?:')
+            promp_answ = relecov_tools.utils.prompt_yn_question(
+                "Do you want to create a metadata lab file?:"
+            )
             if promp_answ:
                 self.create_metadatalab_excel(new_schema_json)
 
@@ -541,4 +602,3 @@ class SchemaBuilder:
         #   - Add versinon tag to filename
 
         # TODO: metod to ask whether to bump version when json schema is generated?
-        # TODO: Publish a log file that register modification in json schema?
