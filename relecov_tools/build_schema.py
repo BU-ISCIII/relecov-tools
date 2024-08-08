@@ -392,7 +392,6 @@ class SchemaBuilder:
             # Overview sheet
             try:
                 overview_header = [
-                    "",
                     "Label name",
                     "Description",
                     "Group",
@@ -401,7 +400,6 @@ class SchemaBuilder:
                     "METADATA_LAB COLUMN",
                 ]
                 df_overview = pd.DataFrame(columns=[col_name for col_name in overview_header])
-                df_overview[''] = df['classification']
                 df_overview['Label name'] = df['label']
                 df_overview['Description'] = df['description']
                 df_overview['Group'] = df['classification']
@@ -430,16 +428,13 @@ class SchemaBuilder:
             # DataValidation sheet
             try:
                 datavalidation_header = [
-                    "",
                     "EJEMPLOS",
                     "DESCRIPCIÓN",
-                    "CAMPO",
-                    ""
+                    "CAMPO"
                 ]
                 df_hasenum = df[(pd.notnull(df.enum))]
                 df_validation = pd.DataFrame(columns=[col_name for col_name in datavalidation_header])
                 df_validation['tmp_property'] = df_hasenum['property_id']
-                df_validation[''] = df_hasenum['label'].apply(lambda _: '')
                 df_validation['EJEMPLOS'] = df_hasenum['examples'].apply(lambda x: x[0] if isinstance(x, list) else x)
                 df_validation['DESCRIPCIÓN'] = df_hasenum['description']
                 df_validation['CAMPO'] = df_hasenum['label']
@@ -480,20 +475,19 @@ class SchemaBuilder:
 
                 frames = [valid_transposed, new_df]
                 df_validation = pd.concat(frames)
+                df_validation = df_validation.drop(index=['tmp_property'])
             except Exception as e:
                 stderr.print(f"[red]Error processing enums and combining data: {e}")
                 return None
 
             # WRITE EXCEL
             try:
-
                 writer = pd.ExcelWriter(out_file, engine="xlsxwriter")
                 relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(df_overview, writer, 'OVERVIEW', out_file,  have_index=False, have_header=False)
                 relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(df_metadata, writer, 'METADATA_LAB', out_file, have_index=True, have_header=False)
+                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(df_validation, writer, 'DATA_VALIDATION', out_file, have_index=True, have_header=False)
                 writer.close()
-                #TODO: add formater to last sheet
                 stderr.print(f"[green]Excel template successfuly created in: {out_file}")
-
             except Exception as e:
                 stderr.print(f"[red]Error writing to Excel: {e}")
                 return None
