@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# TODO: add utils to requirements
 import logging
 import rich.console
 import pandas as pd
@@ -8,6 +9,7 @@ import re
 import json
 import difflib
 import xlsxwriter
+import inspect
 
 import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
@@ -24,7 +26,6 @@ stderr = rich.console.Console(
 
 
 # TODO: user should be able to provide a custom schema as a file in order to replace the current one.
-# TODO: still need to work in logs 
 class SchemaBuilder:
     def __init__(
         self,
@@ -47,9 +48,9 @@ class SchemaBuilder:
         if not self.excel_file_path.endswith(".xlsx"):
             raise ValueError("The Excel file must have a .xlsx extension.")
 
-        # Validate output folder
-        relecov_tools.utils.prompt_create_outdir(os.getcwd(), out_dir)
-        self.output_folder = os.path.join(os.getcwd(), out_dir)
+        # Validate output folder creation
+        self.output_folder = relecov_tools.utils.prompt_create_outdir(None, out_dir)
+        stderr.print(self.output_folder)
 
         # Validate json schema draft version
         self.draft_version = (
@@ -59,7 +60,13 @@ class SchemaBuilder:
         )
 
         # Validate base schema
-        if not base_schema_path:
+        if base_schema_path is not None:
+            if relecov_tools.utils.file_exists(base_schema_path):
+                self.base_schema_path = base_schema_path
+            else:
+                stderr.print(f"[Error]Defined base schema file not found: {base_schema_path}. Exiting...")
+                sys.exit(1)
+        else:
             try:
                 config_json = ConfigJson()
                 relecov_schema = config_json.get_topic_data(
@@ -71,7 +78,9 @@ class SchemaBuilder:
                         "schema",
                         relecov_schema,
                     )
-                    os.path.isfile(self.base_schema_path)
+                    if not relecov_tools.utils.file_exists(self.base_schema_path):
+                        stderr.print("[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning. Exiting...")
+                        sys.exit(1)
                     stderr.print(
                         "[green]RELECOV schema successfully found in the configuration."
                     )
@@ -116,6 +125,7 @@ class SchemaBuilder:
 
     def read_database_definition(self, sheet_id='main'):
         """Reads the database definition and converts it into json format."""
+        caller_method = inspect.stack()[1][3]
         # Read excel file
         df = pd.read_excel(self.excel_file_path, sheet_name=sheet_id,  na_values=['nan', 'N/A', 'NA', ''])
         # Convert database to json format
@@ -127,7 +137,7 @@ class SchemaBuilder:
 
         # Check json is not empty
         if len(json_data) == 0:
-            stderr.print("[red]No data found in  xlsx database")
+            stderr.print(f"{caller_method}{sheet_id}) [red]No data found in xlsx database")
             sys.exit(1)
 
         # Perform validation of database content
@@ -135,11 +145,11 @@ class SchemaBuilder:
 
         if validation_out:
             stderr.print(
-                f"[red]Validation of database content falied. Missing mandatory features in: {validation_out}"
+                f"({caller_method}:{sheet_id}) [red]Validation of database content falied. Missing mandatory features in: {validation_out}"
             )
             sys.exit(1)
         else:
-            stderr.print("[green]Validation of database content passed.")
+            stderr.print(f"({caller_method}:{sheet_id}) [green]Validation of database content passed.")
             return json_data
 
     def create_schema_draft_template(self):
@@ -185,7 +195,7 @@ class SchemaBuilder:
         try:
             complex_json_data = self.read_database_definition(sheet_id=property_id)
         except ValueError as e:
-            stderr.print(f"[red]{e}")
+            stderr.print(f"[yellow]{e}")
             return None
         
         # Add sub property items
@@ -307,12 +317,12 @@ class SchemaBuilder:
 
         if not diff_lines:
             stderr.print(
-                "[orange]No differencess were found between already installed and new generated schema. Exiting. No changes made"
+                "[yellow]No differencess were found between already installed and new generated schema. Exiting. No changes made"
             )
             return None
         else:
             stderr.print(
-                "Differences found between the existing schema and the newly generated schema."
+                "[yellow]Differences found between the existing schema and the newly generated schema."
             )
             # Set user's choices
             choices = ["Print to sandard output (stdout)", "Save to file", "Both"]
@@ -362,10 +372,7 @@ class SchemaBuilder:
         """
         try:
             # Set up metadatalab configuration
-            out_file = os.path.join(
-                self.excel_file_path, 
-                os.path.join(self.output_folder, "metadatalab_template" + ".xlsx")
-            )
+            out_file = os.path.join(self.output_folder, "metadatalab_template" + ".xlsx")
             required_classification = [
                 "Database Identifiers",
                 "Sample collection and processing",
@@ -487,7 +494,7 @@ class SchemaBuilder:
                 relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(df_metadata, writer, 'METADATA_LAB', out_file, have_index=True, have_header=False)
                 relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(df_validation, writer, 'DATA_VALIDATION', out_file, have_index=True, have_header=False)
                 writer.close()
-                stderr.print(f"[green]Excel template successfuly created in: {out_file}")
+                stderr.print(f"[green]Metadata lab template successfuly created in: {out_file}")
             except Exception as e:
                 stderr.print(f"[red]Error writing to Excel: {e}")
                 return None
@@ -497,6 +504,7 @@ class SchemaBuilder:
 
     def handle_build_schema(self):
         # Load xlsx database and convert into json format
+        stderr.print("[white]Start reading xlsx database")
         database_dic = self.read_database_definition()
 
         # Verify current schema used by relecov-tools:
@@ -525,7 +533,9 @@ class SchemaBuilder:
             sys.exit(1)
 
         if schema_diff:
-            self.create_metadatalab_excel(new_schema_json)
+            promp_answ = relecov_tools.utils.prompt_yn_question('Do you want to create a metadata lab file?:')
+            if promp_answ:
+                self.create_metadatalab_excel(new_schema_json)
 
         # Build EXCEL template
         #   - Add versinon tag to filename

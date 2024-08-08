@@ -525,7 +525,7 @@ def launch_pipeline(input, template, output, config):
     "-s",
     "--schema_base",
     type=click.Path(),
-    help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module.",
+    help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module. (Default: installed schema in 'relecov-tools/relecov_tools/schema/relecov_schema.json')",
     required=False,
 )
 @click.option(

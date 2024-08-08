@@ -112,7 +112,6 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
             for col_num in range(0, len(df.columns)):
                 for row_num in range(0, len(df)):
                     if row_num < 3:
-                        stderr.print(f"{df.iloc[row_num, col_num]} for col {col_num} and row {row_num}")
                         try:
                             worksheet.write(row_num + 1, col_num + 1, df.iloc[row_num, col_num], header_formater)
                         except Exception as e:
