@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# TODO: add utils to requirements
 import logging
 import rich.console
 import pandas as pd
@@ -23,7 +22,6 @@ stderr = rich.console.Console(
 )
 
 
-# TODO: user should be able to provide a custom schema as a file in order to replace the current one.
 class SchemaBuilder:
     def __init__(
         self,
@@ -171,7 +169,6 @@ class SchemaBuilder:
         )
         return draft_template
 
-    # TODO: we have to discuss wether NaN (empty) values need to be handled
     def standard_jsonschema_object(self, data_dict, target_key):
         """ "Create standar json schema object"""
         # For enum and examples, wrap the value in a list
@@ -209,8 +206,6 @@ class SchemaBuilder:
             return None
 
         # Add sub property items
-        # TODO: add try_excepts
-        # try:
         for sub_property_id, _ in complex_json_data.items():
             json_dict["properties"][sub_property_id] = {}
             complex_json_feature = {}
@@ -225,11 +220,7 @@ class SchemaBuilder:
             json_dict["properties"][sub_property_id] = complex_json_feature
 
         return json_dict
-        # except:
-        #    stderr.print(f"[red]Error while generating comples json object for {property_id}")
-        #    return None
 
-    # TODO: add strategy to deal with json schema objects, defs and refs
     def build_new_schema(self, json_data, schema_draft):
         """
         Create a json schema file based on input data and draf skeleton..
@@ -237,7 +228,6 @@ class SchemaBuilder:
         try:
             # List of properties to check in the features dictionary (it maps values between database features and json schema features):
             #       key[db_feature_key]: value[schema_feature_key]
-            # TODO: This should be a config variable available for all elements in this class
             features_to_check = {
                 "type": "type",
                 "enum": "enum",
@@ -385,8 +375,8 @@ class SchemaBuilder:
             stderr.print(f"[red]An unexpected error occurred: {str(e)}")
         return False
 
-    # TODO: overview-tab - add mapping column to overview tab
-    # TODO: overview-tab - FIX first column values
+    # FIXME: overview-tab - FIX first column values
+    # FIXME: overview-tab - Still need to add the column that maps to tab metadatalab
     def create_metadatalab_excel(self, json_schema):
         """
         Generate the metadatalab template file in xlsx format. It contains:
@@ -597,8 +587,3 @@ class SchemaBuilder:
             )
             if promp_answ:
                 self.create_metadatalab_excel(new_schema_json)
-
-        # Build EXCEL template
-        #   - Add versinon tag to filename
-
-        # TODO: metod to ask whether to bump version when json schema is generated?
