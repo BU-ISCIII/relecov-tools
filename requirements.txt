@@ -10,6 +10,8 @@ pyyaml
 openpyxl>=3.1.2
 ena-upload-cli
 bio==1.4.0 
-xlsxwriter
+xlsxwriter==3.2.0
 bs4==0.0.2
 tabulate
+difflib==1.2.6
+pandas==2.2.2
