@@ -75,7 +75,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
         workbook = writer.book
         worksheet = writer.sheets[sheet]
         
-        # setup excel formaters
+        # setup excel format
         worksheet.set_column(0, len(df.columns), 30)
         header_formater = workbook.add_format({
                 'bold': True,
@@ -91,6 +91,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                 'fg_color': '#ADD8E6',
                 'border': 1
             })
+
         if sheet == 'OVERVIEW':
             # Write the column headers with the defined format.
             for col_num, value in enumerate(df.columns.values):
@@ -105,22 +106,23 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                     worksheet.write(row_num, 0, df.iloc[row_num - 1, 0], first_col_formater)
                 except Exception as e:
                     stderr.print(f"Error writing first column at row {row_num}: {e}")
-        
-        if sheet == 'METADATA_LAB':
+
+        if sheet == 'METADATA_LAB' or sheet == 'DATA_VALIDATION':
             # Write the column headers with the defined format.
-            for col_num, value in enumerate(df.columns.values):
+            for col_num in range(0, len(df.columns)):
                 for row_num in range(0, len(df)):
-                    try:
-                        worksheet.write(row_num + 1, col_num + 1, df.iloc[row_num-1, col_num], header_formater)
-                    except Exception as e:
-                        stderr.print(f"Error writing header at column {col_num + 1}: {e}")
+                    if row_num < 3:
+                        stderr.print(f"{df.iloc[row_num, col_num]} for col {col_num} and row {row_num}")
+                        try:
+                            worksheet.write(row_num + 1, col_num + 1, df.iloc[row_num, col_num], header_formater)
+                        except Exception as e:
+                            stderr.print(f"Error writing first column at row {row_num}: {e}")
 
             # Write the first column with the defined format.
-            for row_num in range(1, len(df)+1):
+            for index_num, index_val in enumerate(df.index):
                 try:
-                    worksheet.write(row_num, 0, df.index[row_num-1], first_col_formater)
+                    worksheet.write(index_num + 1, 0, index_val, first_col_formater)
                 except Exception as e:
                     stderr.print(f"Error writing first column at row {row_num}: {e}")
-        
     except Exception as e:
         stderr.print(f"Error in excel_formater: {e}")
