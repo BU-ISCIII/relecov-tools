@@ -46,12 +46,32 @@ def check_valid_version(draft_version):
 
 def create_draft(draft_version, required_items=None):
     """Creates a JSON Schema Draft template with required fields."""
-    # Check if required draft version is available
 
-    url_str = Draft202012Validator.META_SCHEMA["$id"]
+    def bump_version(version):
+        """Increment the patch version by 1."""
+        major, minor, patch = map(int, version.split("."))
+        return f"{major}.{minor}.{patch + 1}"
+
+    # Check if the user wants to bump the version
+    current_version = pkg_resources.get_distribution("relecov_tools").version
+    version_sel_choice = relecov_tools.utils.prompt_selection(
+        "Use default or custom/bumped version?",
+        ["Use default", "Bump version", "Custom"],
+    )
+    stderr.print(version_sel_choice)
+    if version_sel_choice == "Bump version":
+        pakage_version_str = bump_version(current_version)
+    if version_sel_choice == "Custom":
+        pakage_version_str = relecov_tools.utils.prompt_text(
+            "Write the desired version using semantic versioning:"
+        )
+    if version_sel_choice == "Use default":
+        pakage_version_str = current_version
+
+    # Get parameters to set create the schema
+    url_str = SCHEMA_VALIDATORS[draft_version].META_SCHEMA["$id"]
     id_str = "https://github.com/BU-ISCIII/relecov-tools/blob/develop/relecov_tools/schema/relecov_schema.json"
     description_str = "Json schema that specifies the structure, content, and validation rules for RELECOV metadata"
-    pakage_version_str = pkg_resources.get_distribution("relecov_tools").version
 
     # Construct the draft template
     draft_template = {
