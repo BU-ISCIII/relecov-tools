@@ -52,7 +52,7 @@ class LaunchPipeline:
             pipeline_conf_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "conf",
-                "pipeline_config.json",
+                "configuration.json",
             )
         if not os.path.exists(pipeline_conf_file):
             log.error(
@@ -64,7 +64,8 @@ class LaunchPipeline:
                 + " does not exist"
             )
             sys.exit(1)
-        data = relecov_tools.utils.read_json_file(pipeline_conf_file)
+        conf_settings = relecov_tools.utils.read_json_file(pipeline_conf_file)
+        data = conf_settings["pipeline_launch"]
         if (
             "analysis_name" not in data
             or "sample_stored_folder" not in data

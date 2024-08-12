@@ -439,5 +439,11 @@
                 "fastq_r2_md5"
             ]
         }
+    },
+    "launch_pipeline": {
+        "analysis_name": "RELECOV_icasas_C",
+        "analysis_folder": "ANALYSIS",
+        "sample_stored_folder": "RAW",
+        "sample_link_folder": "00-reads"
     }
 }
