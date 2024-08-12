@@ -134,7 +134,6 @@ class LaunchPipeline:
                         continue
                     if sub_f_date > last_folder_date:
                         last_folder_date = sub_f_date
-                        # latest_folder_name = os.path.join(lab_sub_folder, f_name)
                         latest_folder_name = lab_sub_folder
                         existing_upload_folders = True
                 if existing_upload_folders:
@@ -155,7 +154,6 @@ class LaunchPipeline:
             if data_folder["date"] != latest_date:
                 continue
             # fetch the validate file and get sample id and r1 and r2 file path
-
             validate_files = [
                 os.path.join(data_folder["path"], f)
                 for f in os.listdir(data_folder["path"])
@@ -164,7 +162,6 @@ class LaunchPipeline:
             if not validate_files:
                 continue
             for validate_file in validate_files:
-
                 validate_file_path = os.path.join(data_folder["path"], validate_file)
                 with open(validate_file_path) as fh:
                     data = json.load(fh)
@@ -200,18 +197,11 @@ class LaunchPipeline:
             shutil.rmtree(self.analysis_folder)
             sys.exit(0)
         for item in samples_data:
-
-            # import pdb; pdb.set_trace()
             # fetch the file extension
             ext_found = re.match(r".*(fastq.*|bam)", item["r1_fastq_file_path"])
             ext = ext_found.group(1)
             sequencing_r1_sample_id = item["sequencing_sample_id"] + "_R1." + ext
-            # join r1_fastq_file_path and sequencing_file_R1_fastq
-            """ r1_file_path = os.path.join(
-                item["r1_fastq_file_path"], item["sequencing_file_R1_fastq"]
-            ) """
             # copy r1 sequencing file into the output folder
-            # import pdb; pdb.set_trace()
             raw_folder = os.path.join(self.analysis_folder, self.copied_sample_folder)
             try:
                 shutil.copy(item["r1_fastq_file_path"], raw_folder)
@@ -222,16 +212,12 @@ class LaunchPipeline:
                 os.symlink(item["r1_fastq_file_path"], sample_r1_link_path)
             except FileNotFoundError as e:
                 log.error("File not found %s", e)
-                # stderr.print("[red] File not found ", e)
                 file_errors.append(item["r1_fastq_file_path"])
                 continue
             copied_samples += 1
             # check if there is a r2 file
             if "r2_fastq_file_path" in item:
                 sequencing_r2_sample_id = item["sequencing_sample_id"] + "_R2." + ext
-                """ r2_file_path = os.path.join(
-                    item["r2_fastq_file_path"], item["sequencing_file_R2_fastq"]
-                ) """
                 try:
                     shutil.copy(item["r2_fastq_file_path"], raw_folder)
                     sample_r2_link_path = os.path.join(
@@ -240,7 +226,6 @@ class LaunchPipeline:
                     os.symlink(item["r2_fastq_file_path"], sample_r2_link_path)
                 except FileNotFoundError as e:
                     log.error("File not found %s", e)
-                    # stderr.print("[red] File not found ", e)
                     file_errors.append(item["r2_fastq_file_path"])
                     continue
         if len(file_errors) > 0:
@@ -256,3 +241,4 @@ class LaunchPipeline:
                 sys.exit(1)
         stderr.print("[green] Samples copied: ", copied_samples)
         stderr.print("[blue] Pipeline launched successfully")
+        return
