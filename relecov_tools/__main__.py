@@ -20,7 +20,7 @@ import relecov_tools.read_bioinfo_metadata
 import relecov_tools.metadata_homogeneizer
 import relecov_tools.gisaid_upload
 import relecov_tools.upload_ena_protocol
-import relecov_tools.launch_pipeline
+import relecov_tools.pipeline_manager
 
 log = logging.getLogger()
 
