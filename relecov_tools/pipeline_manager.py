@@ -262,12 +262,12 @@ class ResultUpload:
             log.error("Input folder %s does not exist ", self.input_folder)
             stderr.print("[red] Input folder " + self.input_folder + " does not exist")
             sys.exit(1)
-        
+
         conf_file = os.path.join(
-                os.path.dirname(os.path.realpath(__file__)),
-                "conf",
-                "configuration.json",
-            )
+            os.path.dirname(os.path.realpath(__file__)),
+            "conf",
+            "configuration.json",
+        )
         if not os.path.exists(conf_file):
             log.error(
                 "Configuration file %s does not exist ", self.conf_file
@@ -286,3 +286,4 @@ class ResultUpload:
             stderr.print(
                 "[red] Invalid pipeline config file " + self.pipeline_conf_file
             )
+        stderr.print(f"[blue] Configuration file loaded  {data}")

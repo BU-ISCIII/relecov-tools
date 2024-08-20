@@ -4,7 +4,6 @@ import logging
 import json
 import sys
 import os
-import stat
 import yaml
 import warnings
 import rich.console
@@ -1207,8 +1206,6 @@ class DownloadManager:
 
     def execute_process(self):
         """Executes different processes depending on the download_option"""
-        import pdb
-
         if not self.relecov_sftp.open_connection():
             log.error("Unable to establish connection towards sftp server")
             stderr.print("[red]Unable to establish sftp connection")
