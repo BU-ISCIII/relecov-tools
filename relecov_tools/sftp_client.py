@@ -29,6 +29,7 @@ class SftpRelecov:
         "sftp_port": "port_number"
     }
     """
+
     def __init__(self, conf_file=None, username=None, password=None):
         if conf_file is None:
             config_json = ConfigJson()
@@ -167,7 +168,7 @@ class SftpRelecov:
             except FileNotFoundError as e:
                 log.error("Unable to fetch file %s ", e)
                 return False
- 
+
     def make_dir(self, folder_name):
         """Create a new directory in remote sftp
 
