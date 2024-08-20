@@ -5,6 +5,7 @@ import logging
 
 # from rich.prompt import Confirm
 import click
+import relecov_tools.download_manager
 import rich.console
 import rich.logging
 import rich.traceback
@@ -12,7 +13,7 @@ import rich.traceback
 import relecov_tools.utils
 import relecov_tools.assets.pipeline_utils.viralrecon
 import relecov_tools.read_lab_metadata
-import relecov_tools.sftp_handle
+import relecov_tools.download_manager
 import relecov_tools.json_validation
 import relecov_tools.map_schema
 import relecov_tools.feed_database
@@ -135,8 +136,6 @@ def relecov_tools_cli(verbose, log_file):
 @relecov_tools_cli.command(help_priority=2)
 @click.option("-u", "--user", help="User name for login to sftp server")
 @click.option("-p", "--password", help="password for the user to login")
-@click.option("-r_u", "--user_relecov", help="User name for updating data to relecov")
-@click.option("-p_r", "--password_relecov", help="password for relecov user")
 @click.option(
     "-f",
     "--conf_file",
@@ -170,24 +169,20 @@ def download(
     user,
     password,
     conf_file,
-    user_relecov,
-    password_relecov,
     download_option,
     output_location,
     target_folders,
 ):
     """Download files located in sftp server."""
-    sftp_connection = relecov_tools.sftp_handle.SftpHandle(
+    download_manager = relecov_tools.download_manager.DownloadManager(
         user,
         password,
         conf_file,
-        user_relecov,
-        password_relecov,
         download_option,
         output_location,
         target_folders,
     )
-    sftp_connection.execute_process()
+    download_manager.execute_process()
 
 
 # metadata
