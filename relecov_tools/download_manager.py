@@ -10,7 +10,7 @@ import warnings
 import rich.console
 import paramiko
 import relecov_tools.utils
-import relecov_tools.sftp
+import relecov_tools.sftp_client
 from datetime import datetime
 from itertools import islice
 from secrets import token_hex
@@ -131,127 +131,7 @@ class DownloadManager:
             "lab_metadata", "samples_json_fields"
         )
         # initialize the sftp client
-        self.my_sftp = relecov_tools.sftp.SftpRelecov(conf_file, sftp_user, sftp_passwd)
-        import pdb; pdb.set_trace()
-
-    """  def open_connection(self):
-        ""Establishing sftp connection""
-        log.info("Setting credentials for SFTP connection with remote server")
-        self.client = paramiko.SSHClient()
-        self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.client.connect(
-            hostname=self.sftp_server,
-            port=self.sftp_port,
-            username=self.sftp_user,
-            password=self.sftp_passwd,
-            allow_agent=False,
-            look_for_keys=False,
-        )
-        try:
-            log.info("Trying to establish SFTP connection")
-            self.client = self.client.open_sftp()
-            return True
-        except paramiko.SSHException as e:
-            log.error("Invalid Username/Password for %s:", e)
-            return False
-
-    def close_connection(self):
-        ""Closes SFTP connection""
-        log.info("Closing SFTP connection")
-        try:
-            self.client.close()
-        except NameError:
-            return False
-        return True """
-
-    def list_remote_folders(self, folder_name, recursive=False):
-        """Creates a directories list from the given client remote path
-
-        Args:
-            folder_name (str): folder name in remote path
-            recursive (bool, optional): finds all subdirectories too. Defaults to False.
-
-        Returns:
-            directory_list(list(str)): Names of all folders within remote folder
-        """
-        log.info("Listing directories in %s", folder_name)
-        directory_list = []
-        try:
-            content_list = self.client.listdir_attr(folder_name)
-            subfolders = any(stat.S_ISDIR(item.st_mode) for item in content_list)
-        except (FileNotFoundError, OSError) as e:
-            log.error("Invalid folder at remote sftp %s", e)
-            raise
-        if not subfolders:
-            return [folder_name]
-
-        def recursive_list(folder_name):
-            try:
-                attribute_list = self.client.listdir_attr(folder_name)
-            except (FileNotFoundError, OSError) as e:
-                log.error("Invalid folder at remote sftp %s", e)
-                raise
-            for attribute in attribute_list:
-                if stat.S_ISDIR(attribute.st_mode):
-                    abspath = os.path.join(folder_name, attribute.filename)
-                    directory_list.append(abspath)
-                    recursive_list(abspath)
-                else:
-                    continue
-            return directory_list
-
-        if recursive:
-            directory_list = recursive_list(folder_name)
-            if folder_name != ".":
-                directory_list.append(folder_name)
-            return directory_list
-        try:
-            directory_list = [
-                item.filename for item in content_list if stat.S_ISDIR(item.st_mode)
-            ]
-        except AttributeError:
-            return False
-        return directory_list
-
-    def get_file_list(self, folder_name):
-        """Return a tuple with file name and directory path from remote
-
-        Args:
-            folder_name (str): name of folder in remote repository
-
-        Returns:
-            file_list (list(str)): list of files in remote folder
-        """
-        log.info("Listing files in %s", folder_name)
-        file_list = []
-        content_list = self.client.listdir_attr(folder_name)
-        file_list = [
-            os.path.join(folder_name, content.filename)
-            for content in content_list
-            if stat.S_ISREG(content.st_mode)
-        ]
-        return file_list
-
-    def get_from_sftp(self, file, destination, exist_ok=False):
-        """Download a file from remote sftp
-
-        Args:
-            file (str): path of the file in remote sftp
-            destination (str): local path of the file after download
-            exist_ok (bool): Skip download if file exists in local destination
-
-        Returns:
-            bool: True if download was successful, False if it was not
-        """
-        if os.path.exists(destination) and exist_ok:
-            return True
-        else:
-            try:
-                self.client.get(file, destination)
-                return True
-            except FileNotFoundError as e:
-                log.error("Unable to fetch file %s ", e)
-                return False
+        self.relecov_sftp = relecov_tools.sftp_client.SftpRelecov(conf_file, sftp_user, sftp_passwd)
 
     def create_local_folder(self, folder):
         """Create folder to download files in local path using date
@@ -292,12 +172,12 @@ class DownloadManager:
         for file in file_list:
             file_to_fetch = os.path.join(folder, os.path.basename(file))
             output_file = os.path.join(local_folder, os.path.basename(file))
-            if self.get_from_sftp(file_to_fetch, output_file, exist_ok=True):
+            if self.relecov_sftp.get_from_sftp(file_to_fetch, output_file, exist_ok=True):
                 fetched_files.append(os.path.basename(file))
             else:
                 # Try to download again n times
                 for _ in range(3):
-                    if self.get_from_sftp(file_to_fetch, output_file):
+                    if self.relecov_sftp.get_from_sftp(file_to_fetch, output_file):
                         fetched_files.append(os.path.basename(file))
                         break
                 else:
@@ -314,7 +194,7 @@ class DownloadManager:
         Returns:
             md5_file(str): file basename if found. If not found returns False
         """
-        all_files = self.get_file_list(folder)
+        all_files = self.relecov_sftp.get_file_list(folder)
         md5_file = [file for file in all_files if pattern in file]
         if len(md5_file) == 1:
             return md5_file[0]
@@ -555,7 +435,7 @@ class DownloadManager:
         Returns:
             local_meta_file: Path to downloaded metadata file / merged metadata file.
         """
-        remote_files_list = self.get_file_list(remote_folder)
+        remote_files_list = self.relecov_sftp.get_file_list(remote_folder)
         meta_files = [fi for fi in remote_files_list if fi.endswith(".xlsx")]
 
         def download_remote_metafile(target_meta_file):
@@ -563,7 +443,7 @@ class DownloadManager:
                 local_folder, os.path.basename(target_meta_file)
             )
             try:
-                self.get_from_sftp(target_meta_file, local_meta_file)
+                self.relecov_sftp.get_from_sftp(target_meta_file, local_meta_file)
             except (IOError, PermissionError) as e:
                 raise type(e)(f"[red]Unable to fetch metadata file {e}")
             log.info(
@@ -634,7 +514,7 @@ class DownloadManager:
         out_folder = os.path.dirname(local_meta_file)
         allowed_extensions = self.allowed_file_ext
         remote_files_list = [
-            os.path.basename(file) for file in self.get_file_list(remote_folder)
+            os.path.basename(file) for file in self.relecov_sftp.get_file_list(remote_folder)
         ]
         filtered_files_list = sorted(
             [fi for fi in remote_files_list if fi.endswith(tuple(allowed_extensions))]
@@ -686,7 +566,7 @@ class DownloadManager:
         """
         stderr.print(f"[blue]Deleting files in remote {remote_folder}...")
         if files is None:
-            files_to_remove = self.get_file_list(remote_folder)
+            files_to_remove = self.relecov_sftp.get_file_list(remote_folder)
         else:
             files_to_remove = files
         if any(file.endswith(tuple(self.allowed_file_ext)) for file in files_to_remove):
@@ -696,7 +576,7 @@ class DownloadManager:
                 return
         for file in files_to_remove:
             try:
-                self.client.remove(os.path.join(remote_folder, os.path.basename(file)))
+                self.relecov_sftp.remove(os.path.join(remote_folder, os.path.basename(file)))
                 log.info("%s Deleted from remote server", file)
             except (IOError, PermissionError) as e:
                 self.include_warning(f"Could not delete remote file {file}: {e}")
@@ -715,7 +595,7 @@ class DownloadManager:
             if len(remote_folder.replace("./", "").split("/")) >= 2:
                 log.info("Trying to remove %s", remote_folder)
                 try:
-                    self.client.rmdir(remote_folder)
+                    self.relecov_sftp.rmdir(remote_folder)
                     log.info("Successfully removed %s", remote_folder)
                 except (OSError, PermissionError) as e:
                     log_text = f"Could not delete remote {remote_folder}. Error: {e}"
@@ -724,7 +604,7 @@ class DownloadManager:
             else:
                 log.info("%s is a top-level folder. Not removed", remote_folder)
 
-        remote_folder_files = self.get_file_list(remote_folder)
+        remote_folder_files = self.relecov_sftp.get_file_list(remote_folder)
         if remote_folder_files:
             log_text = f"Remote folder {remote_folder} not empty. Not removed"
             self.include_warning(log_text)
@@ -752,7 +632,7 @@ class DownloadManager:
                 file_dest = os.path.join(folder, os.path.basename(file))
                 try:
                     # Paramiko.SSHClient.sftp_open does not have a method to copy files
-                    self.client.rename(file, file_dest)
+                    self.relecov_sftp.rename_file(file, file_dest)
                     successful_files.append(file_dest)
                 except OSError:
                     if file in folders_with_metadata[folder]:
@@ -801,7 +681,7 @@ class DownloadManager:
             for md5sum in md5sumlist:
                 md5_name = "_".join([token_hex(nbytes=12), "md5_temp.md5"])
                 fetched_md5 = os.path.join(output_location, md5_name)
-                if self.get_from_sftp(file=md5sum, destination=fetched_md5):
+                if self.relecov_sftp.get_from_sftp(file=md5sum, destination=fetched_md5):
                     downloaded_md5files.append(fetched_md5)
             merged_md5 = md5_merger(downloaded_md5files, self.avoidable_characters)
             if merged_md5:
@@ -811,7 +691,7 @@ class DownloadManager:
                     write_md5 = csv_writer(md5out, delimiter="\t")
                     write_md5.writerows(merged_md5.items())
                 md5_dest = os.path.join(folder, os.path.basename(merged_md5_path))
-                self.client.put(localpath=merged_md5_path, remotepath=md5_dest)
+                self.relecov_sftp.upload_file(merged_md5_path, md5_dest)
                 # Remove local files once merged and uploaded
                 os.remove(merged_md5_path)
                 [os.remove(md5_file) for md5_file in downloaded_md5files]
@@ -917,7 +797,7 @@ class DownloadManager:
 
         def upload_merged_df(merged_excel_path, last_main_folder, merged_df):
             """Upload metadata dataframe merged from all subfolders back to sftp"""
-            self.client.mkdir(last_main_folder)
+            self.relecov_sftp.make_dir(last_main_folder)
             pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
             for sheet in merged_df.keys():
                 format_sheet = merged_df[sheet].astype(str)
@@ -925,7 +805,7 @@ class DownloadManager:
                 format_sheet.to_excel(pd_writer, sheet_name=sheet, index=False)
             pd_writer.close()
             dest = os.path.join(last_main_folder, os.path.basename(merged_excel_path))
-            self.client.put(merged_excel_path, dest)
+            self.relecov_sftp.upload_file(merged_excel_path, dest)
             os.remove(merged_excel_path)
             return
 
@@ -1033,7 +913,7 @@ class DownloadManager:
         Returns:
             folders_to_process (dict(str:list)): Dictionary with folders and their files
         """
-        root_directory_list = self.list_remote_folders(".", recursive=True)
+        root_directory_list = self.relecov_sftp.list_remote_folders(".", recursive=True)
         clean_root_list = [folder.replace("./", "") for folder in root_directory_list]
         if not root_directory_list:
             log.error("Error while listing folders in remote. Aborting")
@@ -1056,12 +936,12 @@ class DownloadManager:
         folders_to_process = {}
         for targeted_folder in target_folders:
             try:
-                full_folders = self.list_remote_folders(targeted_folder, recursive=True)
+                full_folders = self.relecov_sftp.list_remote_folders(targeted_folder, recursive=True)
             except (FileNotFoundError, OSError) as e:
                 log.error(f"Error during sftp listing. {targeted_folder} skipped:", e)
                 continue
             for folder in full_folders:
-                list_files = self.get_file_list(folder)
+                list_files = self.relecov_sftp.get_file_list(folder)
                 if list_files:
                     folders_to_process[folder] = list_files
                 else:
@@ -1070,7 +950,7 @@ class DownloadManager:
         if len(folders_to_process) == 0:
             log.info("Exiting process, folders were empty.")
             log.error("There are no files in the selected folders.")
-            self.close_connection()
+            self.relecov_sftp.close_connection()
             sys.exit(0)
         return folders_to_process
 
@@ -1160,11 +1040,11 @@ class DownloadManager:
             self.current_folder = folder.split("/")[0]
             # Close previously open connection to avoid timeouts
             try:
-                self.close_connection()
+                self.relecov_sftp.close_connection()
             except paramiko.ssh_exception.NoValidConnectionsError:
                 pass
             # Check if the connection has been closed due to time limit
-            self.open_connection()
+            self.relecov_sftp.open_connection()
             log.info("Processing folder %s", folder)
             stderr.print("[blue]Processing folder " + folder)
             # Validate that the files are the ones described in metadata.
@@ -1199,7 +1079,7 @@ class DownloadManager:
                 fetched_md5 = os.path.join(
                     local_folder, os.path.basename(remote_md5sum)
                 )
-                self.get_from_sftp(file=remote_md5sum, destination=fetched_md5)
+                self.relecov_sftp.get_from_sftp(file=remote_md5sum, destination=fetched_md5)
                 successful_files, corrupted = self.verify_md5_checksum(
                     local_folder, fetched_files, fetched_md5
                 )
@@ -1316,10 +1196,8 @@ class DownloadManager:
 
     def execute_process(self):
         """Executes different processes depending on the download_option"""
-        import pdb; pdb.set_trace()
-        # self.sftp_client.open_connection()
-        self.my_sftp.list_folders(".")
-        if not self.sftp_client.open_connection():
+        import pdb
+        if not self.relecov_sftp.open_connection():
             log.error("Unable to establish connection towards sftp server")
             stderr.print("[red]Unable to establish sftp connection")
             sys.exit(1)
@@ -1344,7 +1222,7 @@ class DownloadManager:
                     self.delete_remote_folder(folder)
                     stderr.print(f"Delete process finished in {folder}")
 
-        self.close_connection()
+        self.relecov_sftp.close_connection()
         stderr.print(f"Processed {len(processed_folders)} folders: {processed_folders}")
         if self.logsum.logs:
             log.info("Printing process summary to %s", self.platform_storage_folder)
