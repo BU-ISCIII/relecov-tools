@@ -10,6 +10,7 @@ import warnings
 import rich.console
 import paramiko
 import relecov_tools.utils
+import relecov_tools.sftp
 from datetime import datetime
 from itertools import islice
 from secrets import token_hex
@@ -19,6 +20,7 @@ from pandas import read_excel, ExcelWriter, concat
 from pandas.errors import ParserError, EmptyDataError
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.log_summary import LogSum
+
 
 # from relecov_tools.rest_api import RestApi
 
@@ -36,14 +38,12 @@ class MetadataError(Exception):
         super().__init__(message)
 
 
-class SftpHandle:
+class DownloadManager:
     def __init__(
         self,
         user=None,
         passwd=None,
         conf_file=None,
-        user_relecov=None,
-        password_relecov=None,
         download_option=None,
         output_location=None,
         target_folders=None,
@@ -53,8 +53,8 @@ class SftpHandle:
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
-        self.sftp_user = user
-        self.sftp_passwd = passwd
+        sftp_user = user
+        sftp_passwd = passwd
         self.target_folders = target_folders
         self.allowed_download_options = config_json.get_topic_data(
             "sftp_handle", "allowed_download_options"
@@ -66,8 +66,8 @@ class SftpHandle:
         else:
             self.download_option = download_option
         if conf_file is None:
-            self.sftp_server = config_json.get_topic_data("sftp_handle", "sftp_server")
-            self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
+            # self.sftp_server = config_json.get_topic_data("sftp_handle", "sftp_server")
+            # self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
             self.platform_storage_folder = config_json.get_topic_data(
                 "sftp_handle", "platform_storage_folder"
             )
@@ -87,8 +87,8 @@ class SftpHandle:
             with open(conf_file, "r") as fh:
                 config = yaml.load(fh, Loader=yaml.FullLoader)
             try:
-                self.sftp_server = config["sftp_server"]
-                self.sftp_port = config["sftp_port"]
+                # self.sftp_server = config["sftp_server"]
+                # self.sftp_port = config["sftp_port"]
                 self.target_folders = config["target_folders"]
                 try:
                     self.platform_storage_folder = config["platform_storage_folder"]
@@ -96,8 +96,8 @@ class SftpHandle:
                     self.platform_storage_folder = config_json.get_topic_data(
                         "sftp_handle", "platform_storage_folder"
                     )
-                self.sftp_user = config["sftp_user"]
-                self.sftp_passwd = config["sftp_passwd"]
+                sftp_user = config["sftp_user"]
+                sftp_passwd = config["sftp_passwd"]
             except KeyError as e:
                 log.error("Invalid configuration file %s", e)
                 stderr.print(f"[red] Invalid configuration file {e} !")
@@ -109,13 +109,13 @@ class SftpHandle:
                 log.error("Output location does not exist, aborting")
                 stderr.print("[red] Output location does not exist, aborting")
                 sys.exit(1)
-        if self.sftp_user is None:
-            self.sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
+        if sftp_user is None:
+            sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
             self.target_folders = self.target_folders.split(",")
         self.logsum = LogSum(output_location=self.platform_storage_folder)
-        if self.sftp_passwd is None:
-            self.sftp_passwd = relecov_tools.utils.prompt_password(
+        if sftp_passwd is None:
+            sftp_passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password"
             )
         self.metadata_lab_heading = config_json.get_topic_data(
@@ -130,9 +130,12 @@ class SftpHandle:
         self.samples_json_fields = config_json.get_topic_data(
             "lab_metadata", "samples_json_fields"
         )
+        # initialize the sftp client
+        self.my_sftp = relecov_tools.sftp.SftpRelecov(conf_file, sftp_user, sftp_passwd)
+        import pdb; pdb.set_trace()
 
-    def open_connection(self):
-        """Establishing sftp connection"""
+    """  def open_connection(self):
+        ""Establishing sftp connection""
         log.info("Setting credentials for SFTP connection with remote server")
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -153,13 +156,13 @@ class SftpHandle:
             return False
 
     def close_connection(self):
-        """Closes SFTP connection"""
+        ""Closes SFTP connection""
         log.info("Closing SFTP connection")
         try:
             self.client.close()
         except NameError:
             return False
-        return True
+        return True """
 
     def list_remote_folders(self, folder_name, recursive=False):
         """Creates a directories list from the given client remote path
@@ -1313,7 +1316,10 @@ class SftpHandle:
 
     def execute_process(self):
         """Executes different processes depending on the download_option"""
-        if not self.open_connection():
+        import pdb; pdb.set_trace()
+        # self.sftp_client.open_connection()
+        self.my_sftp.list_folders(".")
+        if not self.sftp_client.open_connection():
             log.error("Unable to establish connection towards sftp server")
             stderr.print("[red]Unable to establish sftp connection")
             sys.exit(1)
