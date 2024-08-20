@@ -269,9 +269,7 @@ class ResultUpload:
             "configuration.json",
         )
         if not os.path.exists(conf_file):
-            log.error(
-                "Configuration file %s does not exist ", self.conf_file
-            )
+            log.error("Configuration file %s does not exist ", self.conf_file)
             stderr.print(
                 "[red] Pipeline config file "
                 + self.pipeline_conf_file
