@@ -115,9 +115,7 @@ class DownloadManager:
             self.target_folders = self.target_folders.split(",")
         self.logsum = LogSum(output_location=self.platform_storage_folder)
         if sftp_passwd is None:
-            sftp_passwd = relecov_tools.utils.prompt_password(
-                msg="Enter your password"
-            )
+            sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
         self.metadata_lab_heading = config_json.get_topic_data(
             "lab_metadata", "metadata_lab_heading"
         )
@@ -131,7 +129,9 @@ class DownloadManager:
             "lab_metadata", "samples_json_fields"
         )
         # initialize the sftp client
-        self.relecov_sftp = relecov_tools.sftp_client.SftpRelecov(conf_file, sftp_user, sftp_passwd)
+        self.relecov_sftp = relecov_tools.sftp_client.SftpRelecov(
+            conf_file, sftp_user, sftp_passwd
+        )
 
     def create_local_folder(self, folder):
         """Create folder to download files in local path using date
@@ -172,7 +172,9 @@ class DownloadManager:
         for file in file_list:
             file_to_fetch = os.path.join(folder, os.path.basename(file))
             output_file = os.path.join(local_folder, os.path.basename(file))
-            if self.relecov_sftp.get_from_sftp(file_to_fetch, output_file, exist_ok=True):
+            if self.relecov_sftp.get_from_sftp(
+                file_to_fetch, output_file, exist_ok=True
+            ):
                 fetched_files.append(os.path.basename(file))
             else:
                 # Try to download again n times
@@ -514,7 +516,8 @@ class DownloadManager:
         out_folder = os.path.dirname(local_meta_file)
         allowed_extensions = self.allowed_file_ext
         remote_files_list = [
-            os.path.basename(file) for file in self.relecov_sftp.get_file_list(remote_folder)
+            os.path.basename(file)
+            for file in self.relecov_sftp.get_file_list(remote_folder)
         ]
         filtered_files_list = sorted(
             [fi for fi in remote_files_list if fi.endswith(tuple(allowed_extensions))]
@@ -576,7 +579,9 @@ class DownloadManager:
                 return
         for file in files_to_remove:
             try:
-                self.relecov_sftp.remove(os.path.join(remote_folder, os.path.basename(file)))
+                self.relecov_sftp.remove(
+                    os.path.join(remote_folder, os.path.basename(file))
+                )
                 log.info("%s Deleted from remote server", file)
             except (IOError, PermissionError) as e:
                 self.include_warning(f"Could not delete remote file {file}: {e}")
@@ -681,7 +686,9 @@ class DownloadManager:
             for md5sum in md5sumlist:
                 md5_name = "_".join([token_hex(nbytes=12), "md5_temp.md5"])
                 fetched_md5 = os.path.join(output_location, md5_name)
-                if self.relecov_sftp.get_from_sftp(file=md5sum, destination=fetched_md5):
+                if self.relecov_sftp.get_from_sftp(
+                    file=md5sum, destination=fetched_md5
+                ):
                     downloaded_md5files.append(fetched_md5)
             merged_md5 = md5_merger(downloaded_md5files, self.avoidable_characters)
             if merged_md5:
@@ -936,7 +943,9 @@ class DownloadManager:
         folders_to_process = {}
         for targeted_folder in target_folders:
             try:
-                full_folders = self.relecov_sftp.list_remote_folders(targeted_folder, recursive=True)
+                full_folders = self.relecov_sftp.list_remote_folders(
+                    targeted_folder, recursive=True
+                )
             except (FileNotFoundError, OSError) as e:
                 log.error(f"Error during sftp listing. {targeted_folder} skipped:", e)
                 continue
@@ -1079,7 +1088,9 @@ class DownloadManager:
                 fetched_md5 = os.path.join(
                     local_folder, os.path.basename(remote_md5sum)
                 )
-                self.relecov_sftp.get_from_sftp(file=remote_md5sum, destination=fetched_md5)
+                self.relecov_sftp.get_from_sftp(
+                    file=remote_md5sum, destination=fetched_md5
+                )
                 successful_files, corrupted = self.verify_md5_checksum(
                     local_folder, fetched_files, fetched_md5
                 )
@@ -1197,6 +1208,7 @@ class DownloadManager:
     def execute_process(self):
         """Executes different processes depending on the download_option"""
         import pdb
+
         if not self.relecov_sftp.open_connection():
             log.error("Unable to establish connection towards sftp server")
             stderr.print("[red]Unable to establish sftp connection")
