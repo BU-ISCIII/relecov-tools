@@ -71,11 +71,9 @@ def prepare_remote_test(**kwargs):
         download_manager.relecov_sftp.make_dir(os.path.join(remote_dir, base_folder))
         print(f"Uploading files from {base_folder}")
         for file in files:
-            remotepath = os.path.join(remote_dir, base_folder, file)
+            remote_path = os.path.join(remote_dir, base_folder, file)
             local_path = os.path.join(os.path.abspath(folder), file)
-            download_manager.relecov_sftp.upload_file(
-                localpath=local_path, remotepath=remotepath
-            )
+            download_manager.relecov_sftp.upload_file(local_path, remote_path)
 
     download_manager.relecov_sftp.close_connection()
 
