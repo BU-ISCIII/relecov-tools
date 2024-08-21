@@ -245,7 +245,7 @@ class DownloadManager:
         prefix_file_name = "_".join(local_folder.split("/")[-2:])
         prefix_file_name = prefix_file_name.replace("_tmp_processing", "")
         # TODO: Move these prefixes to configuration.json
-        new_metadata_file = "metadata_lab_" + prefix_file_name + ".xlsx"
+        new_metadata_file = "lab_metadata_" + prefix_file_name + ".xlsx"
         sample_data_file = "samples_data_" + prefix_file_name + ".json"
         sample_data_path = os.path.join(local_folder, sample_data_file)
         os.rename(metadata_file, os.path.join(local_folder, new_metadata_file))
