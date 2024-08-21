@@ -578,7 +578,7 @@ class DownloadManager:
                 return
         for file in files_to_remove:
             try:
-                self.relecov_sftp.remove(
+                self.relecov_sftp.remove_file(
                     os.path.join(remote_folder, os.path.basename(file))
                 )
                 log.info("%s Deleted from remote server", file)
@@ -599,7 +599,7 @@ class DownloadManager:
             if len(remote_folder.replace("./", "").split("/")) >= 2:
                 log.info("Trying to remove %s", remote_folder)
                 try:
-                    self.relecov_sftp.rmdir(remote_folder)
+                    self.relecov_sftp.remove_dir(remote_folder)
                     log.info("Successfully removed %s", remote_folder)
                 except (OSError, PermissionError) as e:
                     log_text = f"Could not delete remote {remote_folder}. Error: {e}"
