@@ -59,11 +59,12 @@ class RelecovMetadata:
         else:
             self.output_folder = output_folder
         out_path = os.path.realpath(self.output_folder)
-        lab_code = out_path.split("/")[-2]
+        self.lab_code = out_path.split("/")[-2]
         self.logsum = LogSum(
-            output_location=self.output_folder, unique_key=lab_code, path=out_path
+            output_location=self.output_folder, unique_key=self.lab_code, path=out_path
         )
         config_json = ConfigJson()
+        # TODO: remove hardcoded schema selection
         relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
         relecov_sch_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
@@ -128,6 +129,7 @@ class RelecovMetadata:
                 m_data[idx][key] = value
             m_data[idx]["schema_name"] = self.schema_name
             m_data[idx]["schema_version"] = self.schema_version
+            m_data[idx]["submitting_institution_id"] = self.lab_code
         return m_data
 
     def adding_copy_from_other_field(self, m_data):
@@ -353,9 +355,8 @@ class RelecovMetadata:
         if not completed_metadata:
             stderr.print("Metadata was completely empty. No output file generated")
             sys.exit(1)
-        file_name = (
-            "processed_metadata_lab_" + dtime.now().strftime("%Y_%m_%d") + ".json"
-        )
+        file_code = "lab_metadata_" + self.lab_code + "_"
+        file_name = file_code + dtime.now().strftime("%Y%m%d%H%M%S") + ".json"
         stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
         self.logsum.create_error_summary(called_module="read-lab-metadata")
