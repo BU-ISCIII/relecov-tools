@@ -299,12 +299,18 @@ class RelecovMetadata:
                     self.logsum.add_warning(sample=sample_id, entry=log_text)
                     continue
                 if "date" in key.lower():
-                    # Check if date is a string. Format YYYY-MM-DD to YYYY/MM/DD
-                    if re.match(r"^\d{4}[-/]\d{2}[-/]\d{2}$", str(row[key])):
-                        row[key] = row[key].replace("/", "-")
-                    if isinstance(row[key], int) or isinstance(row[key], float):
+                    # Check if date is a string. Format YYYY/MM/DD to YYYY-MM-DD
+                    if isinstance(row[key], dtime):
+                        row[key] = str(row[key].date())
+                        continue
+                    try:
+                        row[key] = str(int(float(row[key])))
                         log.info("Date given as an integer. Understood as a year")
-                        row[key] = str(int(row[key]))
+                        continue
+                    except ValueError:
+                        pass
+                    if re.match(r"^\d{4}[-/]\d{2}[-/]\d{2}$", str(row[key])):
+                        row[key] = row[key].replace("/", "-").replace(".", "-")
                     else:
                         try:
                             row[key] = str(
