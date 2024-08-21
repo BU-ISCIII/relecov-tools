@@ -204,6 +204,40 @@ class SftpRelecov:
             stderr.print("[red]File not found")
             return False
 
+    def remove_file(self, file_name):
+        """Remove a file from remote sftp
+
+        Args:
+            file_name (str): name of the file to be removed
+
+        Returns:
+            bool: True if file was removed, False if it was not
+        """
+        try:
+            self.sftp.remove(file_name)
+            return True
+        except FileNotFoundError:
+            log.error("File %s not found", file_name)
+            stderr.print("[red]File not found")
+            return False
+
+    def remove_dir(self, folder_name):
+        """Remove a directory from remote sftp
+
+        Args:
+            folder_name (str): name of the directory to be removed
+
+        Returns:
+            bool: True if directory was removed, False if it was not
+        """
+        try:
+            self.sftp.rmdir(folder_name)
+            return True
+        except FileNotFoundError:
+            log.error("Directory %s not found", folder_name)
+            stderr.print("[red]Directory not found")
+            return False
+
     def upload_file(self, local_path, remote_file):
         """Upload a file to remote sftp
 
