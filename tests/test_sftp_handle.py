@@ -2,7 +2,7 @@
 import os
 import sys
 import argparse
-from relecov_tools.sftp_handle import SftpHandle
+from relecov_tools.download_manager import DownloadManager
 
 
 def main():
@@ -29,32 +29,30 @@ def main():
 def prepare_remote_test(**kwargs):
     # First clean the repository.
     print("Initating sftp module")
-    sftp_connection = SftpHandle(
+    download_manager = DownloadManager(
         user=kwargs["user"],
         passwd=kwargs["password"],
         conf_file=None,
-        user_relecov=None,
-        password_relecov=None,
         download_option=kwargs["download_option"],
         output_location=kwargs["output_location"],
         target_folders=kwargs["target_folders"],
     )
     print("Openning connection to sftp")
-    sftp_connection.sftp_port = os.environ["TEST_PORT"]
-    if not sftp_connection.open_connection():
+    download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
+    if not download_manager.relecov_sftp.open_connection():
         print("Could not open connection to remote sftp")
         sys.exit(1)
-    remote_folders = sftp_connection.list_remote_folders(".", recursive=True)
+    remote_folders = download_manager.relecov_sftp.list_remote_folders(".", recursive=True)
     clean_folders = [folder.replace("./", "") for folder in remote_folders]
     print("Cleaning folders")
     for folder in clean_folders:
         if len(folder.split("/")) < 2:
             continue
-        filelist = sftp_connection.get_file_list(folder)
+        filelist = download_manager.relecov_sftp.get_file_list(folder)
         for file in filelist:
-            sftp_connection.client.remove(file)
+            download_manager.relecov_sftp.remove_file(file)
         print(f"Removing remote folder {folder}")
-        sftp_connection.client.rmdir(folder)
+        download_manager.relecov_sftp.remove_dir(folder)
 
     # Upload the test dataset to the sftp.
     data_loc = "tests/data/sftp_handle"
@@ -68,20 +66,20 @@ def prepare_remote_test(**kwargs):
         else:
             continue
         base_folder = folder.split("/")[-1]
-        sftp_connection.client.mkdir(os.path.join(remote_dir, base_folder))
+        download_manager.relecov_sftp.make_dir(os.path.join(remote_dir, base_folder))
         print(f"Uploading files from {base_folder}")
         for file in files:
             remotepath = os.path.join(remote_dir, base_folder, file)
             local_path = os.path.join(os.path.abspath(folder), file)
-            sftp_connection.client.put(localpath=local_path, remotepath=remotepath)
+            download_manager.client.put(localpath=local_path, remotepath=remotepath)
 
-    sftp_connection.close_connection()
+    download_manager.relecov_sftp.close_connection()
 
     # Test download_module
-    def test_download(sftp_connection):
-        sftp_connection.execute_process()
+    def test_download(download_manager):
+        download_manager.execute_process()
 
-    test_download(sftp_connection)
+    test_download(download_manager)
 
 
 if __name__ == "__main__":
