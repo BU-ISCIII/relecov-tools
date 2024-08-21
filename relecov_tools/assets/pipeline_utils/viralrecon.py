@@ -163,7 +163,7 @@ class LongTableParse:
 
     def save_to_file(self, j_list):
         """Transform the parsed data into a json file"""
-        date_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        date_now = datetime.now().strftime("%Y%m%d%H%M%S")
         file_name = "long_table_" + date_now + ".json"
         file_path = os.path.join(self.output_directory, file_name)
 
