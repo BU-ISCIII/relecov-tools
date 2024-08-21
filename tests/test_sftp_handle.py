@@ -42,7 +42,9 @@ def prepare_remote_test(**kwargs):
     if not download_manager.relecov_sftp.open_connection():
         print("Could not open connection to remote sftp")
         sys.exit(1)
-    remote_folders = download_manager.relecov_sftp.list_remote_folders(".", recursive=True)
+    remote_folders = download_manager.relecov_sftp.list_remote_folders(
+        ".", recursive=True
+    )
     clean_folders = [folder.replace("./", "") for folder in remote_folders]
     print("Cleaning folders")
     for folder in clean_folders:
@@ -71,7 +73,9 @@ def prepare_remote_test(**kwargs):
         for file in files:
             remotepath = os.path.join(remote_dir, base_folder, file)
             local_path = os.path.join(os.path.abspath(folder), file)
-            download_manager.client.put(localpath=local_path, remotepath=remotepath)
+            download_manager.relecov_sftp.upload_file(
+                localpath=local_path, remotepath=remotepath
+            )
 
     download_manager.relecov_sftp.close_connection()
 
