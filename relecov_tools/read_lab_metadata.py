@@ -312,7 +312,6 @@ class RelecovMetadata:
                             log.info("Date given as an integer. Understood as a year")
                         except (ValueError, TypeError):
                             log_text = f"Invalid date format in {key}: {row[key]}"
-                            import pdb; pdb.set_trace()
                             self.logsum.add_error(sample=sample_id, entry=log_text)
                             stderr.print(f"[red]{log_text} for sample {sample_id}")
                             continue
