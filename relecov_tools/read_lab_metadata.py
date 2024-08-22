@@ -300,16 +300,14 @@ class RelecovMetadata:
                     continue
                 if "date" in key.lower():
                     # Check if date is a string. Format YYYY/MM/DD to YYYY-MM-DD
-                    if isinstance(row[key], dtime):
-                        row[key] = str(row[key].date())
-                        continue
                     try:
                         row[key] = str(int(float(row[key])))
                         log.info("Date given as an integer. Understood as a year")
-                        continue
                     except ValueError:
                         pass
-                    if re.match(r"^\d{4}[-/]\d{2}[-/]\d{2}$", str(row[key])):
+                    if isinstance(row[key], dtime):
+                        row[key] = str(row[key].date())
+                    elif re.match(r"^\d{4}[-/]\d{2}[-/]\d{2}$", str(row[key])):
                         row[key] = row[key].replace("/", "-").replace(".", "-")
                     else:
                         try:
