@@ -300,22 +300,19 @@ class RelecovMetadata:
                     continue
                 if "date" in key.lower():
                     # Check if date is a string. Format YYYY/MM/DD to YYYY-MM-DD
-                    try:
-                        row[key] = str(int(float(row[key])))
-                        log.info("Date given as an integer. Understood as a year")
-                    except ValueError:
-                        pass
+                    pattern = r"^\d{4}[-/.]\d{2}[-/.]\d{2}"
                     if isinstance(row[key], dtime):
                         row[key] = str(row[key].date())
-                    elif re.match(r"^\d{4}[-/]\d{2}[-/]\d{2}$", str(row[key])):
+                    elif re.match(pattern, str(row[key])):
                         row[key] = row[key].replace("/", "-").replace(".", "-")
+                        row[key] = re.match(pattern, row[key]).group(0)
                     else:
                         try:
-                            row[key] = str(
-                                dtime.strptime(str(row[key]), "%Y-%m-%d").date()
-                            )
-                        except ValueError:
+                            row[key] = str(int(float(str(row[key]))))
+                            log.info("Date given as an integer. Understood as a year")
+                        except (ValueError, TypeError):
                             log_text = f"Invalid date format in {key}: {row[key]}"
+                            import pdb; pdb.set_trace()
                             self.logsum.add_error(sample=sample_id, entry=log_text)
                             stderr.print(f"[red]{log_text} for sample {sample_id}")
                             continue
