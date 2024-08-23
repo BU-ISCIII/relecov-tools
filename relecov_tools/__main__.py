@@ -503,7 +503,7 @@ def launch_pipeline(input, template, output, config):
     """
     Create the symbolic links for the samples which are validated.
     """
-    new_launch = relecov_tools.launch_pipeline.LaunchPipeline(
+    new_launch = relecov_tools.pipeline_manager.LaunchPipeline(
         input, template, output, config
     )
     new_launch.pipeline_exc()
