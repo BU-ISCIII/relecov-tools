@@ -55,23 +55,18 @@ class LaunchPipeline:
                 "configuration.json",
             )
         if not os.path.exists(pipeline_conf_file):
-            log.error(
-                "Pipeline config file %s does not exist ", self.pipeline_conf_file
-            )
+            log.error("Pipeline config file %s does not exist ", pipeline_conf_file)
             stderr.print(
-                "[red] Pipeline config file "
-                + self.pipeline_conf_file
-                + " does not exist"
+                "[red] Pipeline config file " + pipeline_conf_file + " does not exist"
             )
             sys.exit(1)
         conf_settings = relecov_tools.utils.read_json_file(pipeline_conf_file)
         try:
-            data = conf_settings["pipelines"]["relecov"]
+            data = conf_settings["launch_pipeline"]
+            # get_topic_data("launch_pipeline", "analysis_name")
         except KeyError:
-            log.error("Invalid pipeline config file %s ", self.pipeline_conf_file)
-            stderr.print(
-                "[red] Invalid pipeline config file " + self.pipeline_conf_file
-            )
+            log.error("Invalid pipeline config file %s ", pipeline_conf_file)
+            stderr.print("[red] Invalid pipeline config file " + pipeline_conf_file)
         if (
             "analysis_name" not in data
             or "sample_stored_folder" not in data
@@ -163,7 +158,7 @@ class LaunchPipeline:
             validate_files = [
                 os.path.join(data_folder["path"], f)
                 for f in os.listdir(data_folder["path"])
-                if f.startswith("validated_processed_metadata") and f.endswith(".json")
+                if f.startswith("validated_lab_metadata") and f.endswith(".json")
             ]
             if not validate_files:
                 continue
@@ -175,11 +170,11 @@ class LaunchPipeline:
                     sample = {}
                     sample["sequencing_sample_id"] = item["sequencing_sample_id"]
                     sample["r1_fastq_file_path"] = os.path.join(
-                        item["r1_fastq_file_path"], item["sequence_file_R1_fastq"]
+                        item["r1_fastq_filepath"], item["sequence_file_R1_fastq"]
                     )
                     if "r2_fastq_file_path" in item:
                         sample["r2_fastq_file_path"] = os.path.join(
-                            item["r2_fastq_file_path"], item["sequence_file_R2_fastq"]
+                            item["r1_fastq_filepath"], item["sequence_file_R2_fastq"]
                         )
                     samples_data.append(sample)
             lab_code = lab.split("/")[-1]
@@ -209,6 +204,7 @@ class LaunchPipeline:
             sequencing_r1_sample_id = item["sequencing_sample_id"] + "_R1." + ext
             # copy r1 sequencing file into the output folder
             raw_folder = os.path.join(self.analysis_folder, self.copied_sample_folder)
+
             try:
                 shutil.copy(item["r1_fastq_file_path"], raw_folder)
                 # create simlink for the r1
