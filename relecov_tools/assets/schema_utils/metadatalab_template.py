@@ -89,6 +89,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                 "valign": "top",
                 "fg_color": "#ADD8E6",
                 "border": 1,
+                "locked": True,
             }
         )
         first_col_formater = workbook.add_format(
@@ -98,6 +99,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                 "valign": "center",
                 "fg_color": "#ADD8E6",
                 "border": 1,
+                "locked": True,
             }
         )
 

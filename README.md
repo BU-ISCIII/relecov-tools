@@ -19,6 +19,7 @@ relecov-tools is a set of helper tools for the assembly of the different element
     * [upload-to-gisaid](#upload-to-gisaid)
     * [launch](#launch)
     * [update-db](#update-db)
+    * [build-schema](#build-schema)
 * [Aknowledgements](#aknowledgements)
 
 ## Installation
@@ -68,6 +69,7 @@ Commands:
     upload-to-gisaid        parsed data to create files to upload to gisaid
     update-db               feed database with metadata jsons
     launch                  launch viralrecon in hpc
+    build-schema            Generates and updates JSON Schema files from...
 ```
 #### download
 The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different available folders in the passed credentials. In addition, it checks if the files in the current folder match the files in the metadata file and also checks if there are md5sum for each file. Else, it creates one before storing in the final repository.
@@ -231,6 +233,49 @@ Usage: relecov-tools upload-to-gisaid [OPTIONS]
     -p, --password                     password for the user to login
     -t, --type                         Select the type of information to upload to database [sample,bioinfodata,variantdata]
     -d, --databaseServer               Name of the database server receiving the data [iskylims,relecov]
+
+### build-schema
+The `build-schema` module provides functionality to generate and manage JSON Schema files based on database definitions from Excel spreadsheets. It automates the creation of JSON Schemas, including validation, drafting, and comparison with existing schemas.
+
+```
+Usage: relecov-tools build-schema [OPTIONS]
+
+  Generates and updates JSON Schema files from Excel-based database
+  definitions.
+
+Options:
+  -i, --input_file PATH     Path to the Excel document containing the database
+                            definition. This file must have a .xlsx extension.
+                            [required]
+  -s, --schema_base PATH    Path to the base schema file. This file is used as
+                            a reference to compare it with the schema
+                            generated using this module. (Default: installed
+                            schema in 'relecov-
+                            tools/relecov_tools/schema/relecov_schema.json')
+  -v, --draft_version TEXT  Version of the JSON schema specification to be
+                            used. Example: '2020-12'. See: https://json-
+                            schema.org/specification-links
+  -d, --diff BOOLEAN        Prints a changelog/diff between the base and
+                            incoming versions of the schema.
+  -o, --out_dir PATH        Path to save output file/s
+  --help                    Show this message and exit.
+```
+
+#### Mandatory Fields
+Ensure that the fields below are properly defined as headers in your Excel sheet (dataase definition):
+
+```
+enum: List of possible values for enumeration.
+examples: Example values for the property.
+ontology_id: Identifier for ontology.
+type: Data type of the property (e.g., string, integer).
+description: Description of the property.
+classification: Classification or category of the property.
+label_name: Label or name for the property.
+fill_mode: Mode for filling in the property (e.g., required, optional).
+required (Y/N): Indicates if the property is required (Y) or optional (N).
+complex_field (Y/N): Indicates if the property is a complex (nested) field (Y) or a standard field (N).
+```
 
 #### launch
 SOON
