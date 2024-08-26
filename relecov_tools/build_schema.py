@@ -92,7 +92,16 @@ class SchemaBuilder:
                 sys.exit(1)
 
     def validate_database_definition(self, json_data):
-        """Validate the mandatory features of each property in json_data."""
+        """Validate the mandatory features of each property in json_data.
+        Validate the mandatory features of each property in json_data.
+
+        Args:
+        json_data (dict): The JSON data representing the database definition.
+
+        Returns:
+            dict or None: A dictionary with properties that are missing mandatory/invalid features,
+            or None if all mandatory features are present
+        """
         # Check mandatory key features to build a json schema
         notvalid_properties = {}
         mandatory_features = [
@@ -124,7 +133,14 @@ class SchemaBuilder:
             return None
 
     def read_database_definition(self, sheet_id="main"):
-        """Reads the database definition and converts it into json format."""
+        """Reads the database definition from an Excel sheet and converts it into JSON format.
+
+        Args:
+            sheet_id (str): The sheet name or ID in the Excel file to read from. Defaults to "main".
+
+        Returns:
+            json_data (dict): The JSON data representing the database definition.
+        """
         caller_method = inspect.stack()[1][3]
         # Read excel file
         df = pd.read_excel(
@@ -161,7 +177,13 @@ class SchemaBuilder:
             return json_data
 
     def create_schema_draft_template(self):
-        "Loads JsonSchema template based on draft name: Available drafts: [2020-12]"
+        """
+        Create a JSON Schema draft template based on the draft version.
+        Available drafts: [2020-12]
+
+        Returns:
+            draft_template(dict): The JSON Schema draft template.
+        """
         draft_template = (
             relecov_tools.assets.schema_utils.jsonschema_draft.create_draft(
                 self.draft_version, True
@@ -169,8 +191,17 @@ class SchemaBuilder:
         )
         return draft_template
 
-    def standard_jsonschema_object(self, data_dict, target_key):
-        """ "Create standar json schema object"""
+    def standard_jsonschema_object(seschemalf, data_dict, target_key):
+        """
+        Create a standard JSON Schema object for a given key in the data dictionary.
+
+        Args:
+            data_dict (dict): The data dictionary containing the properties.
+            target_key (str): The key for which to create the JSON Schema object.
+
+        Returns:
+            json_dict (dict): The JSON Schema object for the target key.
+        """
         # For enum and examples, wrap the value in a list
         json_dict = {}
 
@@ -195,7 +226,16 @@ class SchemaBuilder:
         return json_dict
 
     def complex_jsonschema_object(self, property_id, features_dict):
-        """ "Create complex/nested json schema object"""
+        """
+        Create a complex (nested) JSON Schema object for a given property ID.
+
+        Args:
+            property_id (str): The ID of the property for which to create the JSON Schema object.
+            features_dict (dict): A dictionary mapping database features to JSON Schema features.
+
+        Returns:
+            json_dict (dict): The complex JSON Schema object.
+        """
         json_dict = {"type": "object", "properties": {}}
 
         # Read tab-dedicated sheet in excell database
@@ -223,7 +263,14 @@ class SchemaBuilder:
 
     def build_new_schema(self, json_data, schema_draft):
         """
-        Create a json schema file based on input data and draf skeleton..
+        Build a new JSON Schema based on the provided JSON data and draft template.
+
+        Parameters:
+        json_data (dict): The JSON data representing the database definition.
+        schema_template (dict): The JSON Schema draft template.
+
+        Returns:
+            schema_draft (dict): The newly created JSON Schema.
         """
         try:
             # List of properties to check in the features dictionary (it maps values between database features and json schema features):
@@ -305,15 +352,29 @@ class SchemaBuilder:
             raise
 
     def verify_schema(self, schema):
-        """Verify the schema_draft follows the JSON Schema specification [XXXX] meta-schema."""
+        """
+        Verify that the given schema adheres to the JSON Schema specification for the specified draft version.
+
+        Args:
+            schema (dict): The JSON Schema to be verified.
+
+        Raises:
+            ValueError: If the schema does not conform to the JSON Schema specification.
+        """
         relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(
             schema, self.draft_version
         )
 
     def print_schema_diff(self, base_schema, new_schema):
         """
-        Print the differences between the base version of schema_input.json
-        and the updated version.
+        Print the differences between the base schema and the newly generated schema.
+
+        Args:
+            base_schema (dict): The base JSON Schema to compare against.
+            new_schema (dict): The newly generated JSON Schema to compare.
+
+        Returns:
+            bool: True if differences are found, False otherwise.
         """
         # Set diff input
         base_schema_lines = json.dumps(base_schema, indent=4).splitlines()
@@ -359,7 +420,13 @@ class SchemaBuilder:
     # FIXME: Add version tag to file name
     def save_new_schema(self, json_data):
         """
-        Saves the schema generated by SchemaBuilder class into output folder.
+        Save the generated JSON Schema to the output folder.
+
+        Args:
+            json_data (dict): The JSON Schema to be saved.
+
+        Returns:
+            bool: True if the schema was successfully saved, False otherwise.
         """
         try:
             path_to_save = self.output_folder + "/relecov_schema.json"
@@ -379,10 +446,13 @@ class SchemaBuilder:
     # FIXME: overview-tab - Still need to add the column that maps to tab metadatalab
     def create_metadatalab_excel(self, json_schema):
         """
-        Generate the metadatalab template file in xlsx format. It contains:
-            - Overview tab:
-            - Metadata LAB tab:
-            - Validation Tab:
+        Generate an Excel template file for Metadata LAB with three tabs: Overview, Metadata LAB, and Data Validation.
+
+        Args:
+            json_schema (dict): The JSON Schema from which the Excel template is generated. It should include properties and required fields.
+
+        Returns:
+            None: if any error occurs during the process.
         """
         try:
             # Set up metadatalab configuration
@@ -414,7 +484,7 @@ class SchemaBuilder:
                 )
             except Exception as e:
                 stderr.print(f"Error processing schema properties: {e}")
-                return
+                return None
 
             # Overview sheet
             try:
@@ -438,7 +508,7 @@ class SchemaBuilder:
                 )
             except Exception as e:
                 stderr.print(f"Error creating overview sheet: {e}")
-                return
+                return None
 
             # MetadataLab sheet
             try:
@@ -454,7 +524,7 @@ class SchemaBuilder:
                 df_metadata = df_metadata.transpose()
             except Exception as e:
                 stderr.print(f"[red]Error creating MetadataLab sheet: {e}")
-                return
+                return None
 
             # DataValidation sheet
             try:
@@ -471,7 +541,7 @@ class SchemaBuilder:
                 df_validation["CAMPO"] = df_hasenum["label"]
             except Exception as e:
                 stderr.print(f"[red]Error creating DataValidation sheet: {e}")
-                return
+                return None
 
             try:
                 # Since enums have different lengths we need further processing.
