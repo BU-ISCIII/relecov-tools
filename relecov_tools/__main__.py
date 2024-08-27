@@ -21,11 +21,8 @@ import relecov_tools.read_bioinfo_metadata
 import relecov_tools.metadata_homogeneizer
 import relecov_tools.gisaid_upload
 import relecov_tools.upload_ena_protocol
-<<<<<<< HEAD
 import relecov_tools.pipeline_manager
-=======
 import relecov_tools.build_schema
->>>>>>> baa2c36 (init skeleton for build_schema module)
 
 log = logging.getLogger()
 
