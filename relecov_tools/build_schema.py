@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import logging
+import relecov_tools.json_validation
 import rich.console
 import pandas as pd
 import os
@@ -28,7 +29,7 @@ class SchemaBuilder:
         excel_file_path=None,
         base_schema_path=None,
         draft_version=None,
-        show_diff=False,
+        show_diff=None,
         out_dir=None,
     ):
         """
@@ -36,8 +37,6 @@ class SchemaBuilder:
         It reads the database definition from an Excel file and allows customization of the schema generation process.
         """
         self.excel_file_path = excel_file_path
-        self.show_diff = show_diff
-
         # Validate input variables
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
             raise ValueError("A valid Excel file path must be provided.")
@@ -45,9 +44,17 @@ class SchemaBuilder:
             raise ValueError("The Excel file must have a .xlsx extension.")
 
         # Validate output folder creation
-        self.output_folder = relecov_tools.utils.prompt_create_outdir(None, out_dir)
-        stderr.print(self.output_folder)
+        if not out_dir or not os.path.isfile(out_dir):
+            self.output_folder = relecov_tools.utils.prompt_create_outdir(None, out_dir)
+        else:
+            self.output_folder = out_dir
 
+        # Validate show diff option
+        if not show_diff:
+            self.show_diff = None
+        else:
+            self.show_diff = True
+    
         # Validate json schema draft version
         self.draft_version = (
             relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(
@@ -304,7 +311,7 @@ class SchemaBuilder:
                     if complex_json_feature:
                         schema_property["type"] = "array"
                         schema_property["items"] = complex_json_feature
-                        schema_property["additionalProperties"] = "false"
+                        schema_property["additionalProperties"] = False
                         schema_property["required"] = [
                             key for key in complex_json_feature["properties"].keys()
                         ]
@@ -365,7 +372,7 @@ class SchemaBuilder:
             schema, self.draft_version
         )
 
-    def print_schema_diff(self, base_schema, new_schema):
+    def get_schema_diff(self, base_schema, new_schema):
         """
         Print the differences between the base schema and the newly generated schema.
 
@@ -399,23 +406,26 @@ class SchemaBuilder:
             stderr.print(
                 "[yellow]Differences found between the existing schema and the newly generated schema."
             )
-            # Set user's choices
-            choices = ["Print to sandard output (stdout)", "Save to file", "Both"]
-            diff_output_choice = relecov_tools.utils.prompt_selection(
-                "How would you like to print the diff between schemes?:", choices
+            return self.print_save_schema_diff(diff_lines)
+    
+    def print_save_schema_diff(self, diff_lines=None):
+        # Set user's choices
+        choices = ["Print to sandard output (stdout)", "Save to file", "Both"]
+        diff_output_choice = relecov_tools.utils.prompt_selection(
+            "How would you like to print the diff between schemes?:", choices
+        )
+        if diff_output_choice in ["Print to sandard output (stdout)", "Both"]:
+            for line in diff_lines:
+                print(line)
+            return True
+        if diff_output_choice in ["Save to file", "Both"]:
+            diff_filepath = os.path.join(
+                os.path.realpath(self.output_folder) + "/build_schema_diff.txt"
             )
-            if diff_output_choice in ["Print to sandard output (stdout)", "Both"]:
-                for line in diff_lines:
-                    print(line)
-                return True
-            if diff_output_choice in ["Save to file", "Both"]:
-                diff_filepath = os.path.join(
-                    os.path.realpath(self.output_folder) + "/build_schema_diff.txt"
-                )
-                with open(diff_filepath, "w") as diff_file:
-                    diff_file.write("\n".join(diff_lines))
-                stderr.print(f"[green]Schema diff file saved to {diff_filepath}")
-                return True
+            with open(diff_filepath, "w") as diff_file:
+                diff_file.write("\n".join(diff_lines))
+            stderr.print(f"[green]Schema diff file saved to {diff_filepath}")
+            return True
 
     # FIXME: Add version tag to file name
     def save_new_schema(self, json_data):
@@ -642,18 +652,22 @@ class SchemaBuilder:
         self.verify_schema(new_schema_json)
 
         # Compare base vs new schema and saves new JSON schema
-        schema_diff = self.print_schema_diff(base_schema_json, new_schema_json)
+        stderr.print(self.show_diff)
+        if self.show_diff:
+            schema_diff = self.get_schema_diff(base_schema_json, new_schema_json)
+        else:
+            schema_diff = None
+
         if schema_diff:
             self.save_new_schema(new_schema_json)
         else:
             stderr.print(
-                f"[green]No changes found against base schema ({self.base_schema_path}). Exiting..."
+                f"[green]No changes found against base schema ({self.base_schema_path})."
             )
-            sys.exit(1)
 
-        if schema_diff:
-            promp_answ = relecov_tools.utils.prompt_yn_question(
-                "Do you want to create a metadata lab file?:"
-            )
-            if promp_answ:
-                self.create_metadatalab_excel(new_schema_json)
+        # Create metadata lab template
+        promp_answ = relecov_tools.utils.prompt_yn_question(
+            "Do you want to create a metadata lab file?:"
+        )
+        if promp_answ:
+            self.create_metadatalab_excel(new_schema_json)

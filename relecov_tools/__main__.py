@@ -537,7 +537,7 @@ def launch_pipeline(input, template, output, config):
 @click.option(
     "-d",
     "--diff",
-    type=click.BOOL,
+    is_flag=True,
     help="Prints a changelog/diff between the base and incoming versions of the schema.",
 )
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file/s")

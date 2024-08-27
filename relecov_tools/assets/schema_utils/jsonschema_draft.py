@@ -4,6 +4,7 @@ import rich.console
 
 import relecov_tools.utils
 import pkg_resources
+import jsonschema
 from jsonschema import Draft202012Validator, exceptions
 
 log = logging.getLogger(__name__)
@@ -102,8 +103,8 @@ def check_schema_draft(schema_draft, draft_version):
     try:
         validator_class.check_schema(schema_draft)
         stderr.print("[green]New schema is valid based on JSON Specification rules.")
-    except exceptions.SchemaError as e:
-        stderr.print(f"[yellow]Schema validation error: {e.message}")
+    except jsonschema.ValidationError:
+        stderr.print(f"[red] Json schema does not fulfill ${draft_version} Validation")
         promp_answ = relecov_tools.utils.prompt_yn_question(
             "Errors found during schema validation, proceed?:"
         )
@@ -111,9 +112,6 @@ def check_schema_draft(schema_draft, draft_version):
             sys.exit(1)
     except Exception as e:
         stderr.print(f"[yellow]Error occurred during schema validation: {e}")
-        relecov_tools.utils.prompt_yn_question(
-            "Errors found during schema validation, proceed?:"
-        )
         promp_answ = relecov_tools.utils.prompt_yn_question(
             "Errors found during schema validation, proceed?:"
         )

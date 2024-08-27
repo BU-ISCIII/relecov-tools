@@ -415,27 +415,30 @@ def print_log_report(
     )
 
 
-# TODO: not used so far but can help to handle output folder creation.
 def prompt_create_outdir(
     path, folder_name=None, prompt_message="Define path to store the output:"
 ):
     """Ensure the directory exists or prompt the user to define and create it."""
     # Check path
     if not path:
-        path = prompt_path("Define path to store the output:")
+        path = prompt_path(prompt_message)
         stderr.print(f"Chosen directory: {path}")
 
     # Check folder_name
     if not folder_name:
         default_folder = prompt_yn_question(
-            "Do you want to use default directory ('results') to store the results? (yes/no):"
+            "Do you want to use the default directory ('results') to store the results? (yes/no):"
         )
         if not default_folder:
             folder_name = prompt_text("Write your output directory: ")
         else:
             folder_name = "results"
 
-    global_path = os.path.join(path, folder_name)
+    # Prevent duplicate folder names in the path
+    if os.path.basename(path) == folder_name:
+        global_path = path
+    else:
+        global_path = os.path.join(path, folder_name)
 
     if not os.path.exists(global_path):
         create_folder = prompt_yn_question(
@@ -449,8 +452,9 @@ def prompt_create_outdir(
             sys.exit(1)
     elif os.path.isdir(global_path):
         os.makedirs(global_path, exist_ok=True)
-        stderr.print(f"[green]Folder '{folder_name}' created at {path}")
+        stderr.print(f"[green]Defining '{folder_name}' as output folder")
     else:
         stderr.print("[red]The provided path is not a directory.")
         sys.exit(1)
+    
     return global_path
