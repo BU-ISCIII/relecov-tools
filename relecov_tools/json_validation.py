@@ -8,6 +8,7 @@ import os
 import openpyxl
 
 import relecov_tools.utils
+import relecov_tools.assets.schema_utils.jsonschema_draft
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.log_summary import LogSum
 
@@ -69,11 +70,7 @@ class SchemaValidation:
 
     def validate_schema(self):
         """Validate json schema against draft"""
-        try:
-            Draft202012Validator.check_schema(self.json_schema)
-        except jsonschema.ValidationError:
-            stderr.print("[red] Json schema does not fulfill Draft 202012 Validation")
-            sys.exit(1)
+        relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(self.json_schema, "2020-12")
 
     def get_sample_id_field(self):
         """Find the name of the field used to track the samples in the given schema"""
