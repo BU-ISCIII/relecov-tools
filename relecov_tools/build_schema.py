@@ -54,7 +54,7 @@ class SchemaBuilder:
             self.show_diff = None
         else:
             self.show_diff = True
-    
+
         # Validate json schema draft version
         self.draft_version = (
             relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(
@@ -407,7 +407,7 @@ class SchemaBuilder:
                 "[yellow]Differences found between the existing schema and the newly generated schema."
             )
             return self.print_save_schema_diff(diff_lines)
-    
+
     def print_save_schema_diff(self, diff_lines=None):
         # Set user's choices
         choices = ["Print to sandard output (stdout)", "Save to file", "Both"]

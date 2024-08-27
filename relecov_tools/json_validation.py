@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import logging
 import rich.console
-import jsonschema
 from jsonschema import Draft202012Validator
 import sys
 import os
@@ -70,7 +69,9 @@ class SchemaValidation:
 
     def validate_schema(self):
         """Validate json schema against draft"""
-        relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(self.json_schema, "2020-12")
+        relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(
+            self.json_schema, "2020-12"
+        )
 
     def get_sample_id_field(self):
         """Find the name of the field used to track the samples in the given schema"""
