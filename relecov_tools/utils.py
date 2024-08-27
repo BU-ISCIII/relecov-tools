@@ -456,5 +456,5 @@ def prompt_create_outdir(
     else:
         stderr.print("[red]The provided path is not a directory.")
         sys.exit(1)
-    
+
     return global_path
