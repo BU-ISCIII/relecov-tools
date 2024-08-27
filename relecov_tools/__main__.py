@@ -509,6 +509,7 @@ def launch_pipeline(input, template, output, config):
     )
     new_launch.pipeline_exc()
 
+
 # schema builder
 @relecov_tools_cli.command(help_priority=13)
 @click.option(

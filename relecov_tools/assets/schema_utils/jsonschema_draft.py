@@ -5,7 +5,7 @@ import rich.console
 import relecov_tools.utils
 import pkg_resources
 import jsonschema
-from jsonschema import Draft202012Validator, exceptions
+from jsonschema import Draft202012Validator
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
