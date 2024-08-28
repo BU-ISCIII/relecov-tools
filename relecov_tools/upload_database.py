@@ -22,16 +22,18 @@ stderr = rich.console.Console(
 )
 
 
-class FeedDatabase:
+class UpdateDatabase:
     def __init__(
         self,
         user=None,
         passwd=None,
         json_file=None,
         type_of_info=None,
-        database_server=None,
-        full_update=None,
+        platform=None,
+        server_url=None,
+        full_update=False,
     ):
+        # Get the user and password for the database
         if user is None:
             user = relecov_tools.utils.prompt_text(
                 msg="Enter username for upload data to server"
@@ -40,6 +42,7 @@ class FeedDatabase:
         if passwd is None:
             passwd = relecov_tools.utils.prompt_text(msg="Enter credential password")
         self.passwd = passwd
+        # get the default coonfiguration used the instance
         self.config_json = ConfigJson()
         if json_file is None:
             json_file = relecov_tools.utils.prompt_path(
@@ -57,23 +60,36 @@ class FeedDatabase:
             self.config_json.get_topic_data("json_schemas", "relecov_schema"),
         )
         self.schema = relecov_tools.utils.read_json_file(schema)
-        self.full_update = full_update
-        # TODO: Include types_of_data and database_servers as config fields
-        self.types_of_data = ["sample", "bioinfodata", "variantdata"]
-        self.db_servers_names = ["iskylims", "relecov"]
-        if not full_update:
+        if full_update is True:
+            self.full_update = True
+            self.server_url = None
+        else:
+            self.full_update = False
             if type_of_info is None:
                 type_of_info = relecov_tools.utils.prompt_selection(
-                    "Select type of data to upload:",
-                    self.types_of_data,
+                    "Select:",
+                    ["sample", "bioinfodata", "variantdata"],
                 )
-            if database_server is None:
-                database_server = relecov_tools.utils.prompt_selection(
-                    "Select target database server:",
-                    self.db_servers_names,
+            self.type_of_info = type_of_info
+            # collect data for plarform to upload data
+            if platform is None:
+                platform = relecov_tools.utils.prompt_selection(
+                    "Select:",
+                    ["iskylims", "relecov"],
                 )
-        self.server_name = database_server
-        self.type_of_info = type_of_info
+            self.platform = platform
+            if server_url is None:
+                self.server_url = server_url
+        # Get configuration settings for upload database
+        try:
+            self.platform_settings = self.config_json.get_topic_data(
+                "upload_database", "platform"
+            )
+        except KeyError as e:
+            logtxt = f"Unable to fetch parameters for {platform} {e}"
+            stderr.print(f"[red]{logtxt}")
+            log.error(logtxt)
+            sys.exit(1)
 
         json_dir = os.path.dirname(os.path.realpath(self.json_file))
         lab_code = json_dir.split("/")[-2]
@@ -111,12 +127,26 @@ class FeedDatabase:
                     # be included in iSkyLIMS request
                     log.info("not key %s in iSkyLIMS", key)
             # include the fixed value
-            fixed_value = self.config_json.get_configuration("iskylims_fixed_values")
+            fixed_value = self.config_json.get_topic_data(
+                "upload_database", "iskylims_fixed_values"
+            )
             for prop, val in fixed_value.items():
                 s_dict[prop] = val
-            # Adding tha specimen_source field to set sampleType
-            s_dict["sampleType"] = row["specimen_source"]
+            # Adding tha specimen_source field to set sample_type
+            try:
+                s_dict["sample_type"] = row["specimen_source"]
+            except KeyError as e:
+                logtxt = f"Unable to fetch specimen_source from json file {e}"
+                self.logsum.add_warning(entry=logtxt)
+                s_dict["sample_type"] = "Other"
             sample_list.append(s_dict)
+            # if sample_entry_date is not set then, add the current date
+            if "sample_entry_date" not in row:
+                logtxt = "sample_entry_date is not in the sample fields"
+                self.logsum.add_warning(entry=logtxt)
+                stderr.print(f"[yellow]{logtxt}")
+                s_dict["sample_entry_date"] = time.strftime("%Y-%m-%d")
+
         return sample_list
 
     def get_iskylims_fields_sample(self):
@@ -130,20 +160,15 @@ class FeedDatabase:
         s_project_fields = []
         # get the ontology values for mapping values in sample fields
         ontology_dict = self.get_schema_ontology_values()
-        sample_url = self.database_settings["url_sample_fields"]
-        try:
-            sample_fields_raw = self.database_rest_api.get_request(sample_url, "", "")
-        except AttributeError:
-            logtxt = f"Unable to connect to {self.db_server} server"
-            self.logsum.add_error(entry=logtxt)
-            stderr.print(f"[red]{logtxt}")
-            return
+        sample_url = self.platform_settings["iskylims"]["url_sample_fields"]
+        sample_fields_raw = self.platform_rest_api.get_request(sample_url, "", "")
+
         if "ERROR" in sample_fields_raw:
-            logtxt1 = f"Unable to fetch data from {self.db_server}."
+            logtxt1 = f"Unable to fetch data from {self.platform}."
             logtxt2 = f" Received error {sample_fields_raw['ERROR']}"
             self.logsum.add_error(entry=str(logtxt1 + logtxt2))
             stderr.print(f"[red]{logtxt1 + logtxt2}")
-            return
+            sys.exit(1)
 
         for _, values in sample_fields_raw["DATA"].items():
             if "ontology" in values:
@@ -162,19 +187,22 @@ class FeedDatabase:
                 self.logsum.add_warning(entry=logtxt)
                 log.info(logtxt)
         # fetch label for sample Project
-        s_project_url = self.database_settings["url_project_fields"]
-        param = self.database_settings["param_sample_project"]
-        p_name = self.database_settings["project_name"]
-        s_project_fields_raw = self.database_rest_api.get_request(
+        s_project_url = self.platform_settings["iskylims"]["url_project_fields"]
+        param = self.platform_settings["iskylims"]["param_sample_project"]
+        p_name = self.platform_settings["iskylims"]["project_name"]
+        s_project_fields_raw = self.platform_rest_api.get_request(
             s_project_url, param, p_name
         )
         if "ERROR" in s_project_fields_raw:
-            logtxt1 = f"Unable to fetch data from {self.db_server}."
+            logtxt1 = f"Unable to fetch data from {self.platform}."
             logtxt2 = f" Received error {s_project_fields_raw['ERROR']}"
             self.logsum.add_error(entry=str(logtxt1 + logtxt2))
             return
+        else:
+            log.info("Fetched sample project fields from iSkyLIMS")
+            stderr.print("[blue] Fetched sample project fields from iSkyLIMS")
         for field in s_project_fields_raw["DATA"]:
-            s_project_fields.append(field["sampleProjectFieldName"])
+            s_project_fields.append(field["sample_project_field_name"])
         return [sample_fields, s_project_fields]
 
     def map_relecov_sample_data(self):
@@ -194,12 +222,12 @@ class FeedDatabase:
 
     def update_database(self, field_values, post_url):
         """Send the request to update database"""
+        post_url = self.platform_settings[self.platform][post_url]
         suces_count = 0
         request_count = 0
         for chunk in field_values:
             req_sample = ""
             request_count += 1
-            # TODO: Include these fields in config file
             if "sample_name" in chunk:
                 stderr.print(
                     f"[blue] sending request for sample {chunk['sample_name']}"
@@ -211,10 +239,10 @@ class FeedDatabase:
                 )
                 req_sample = chunk["sequencing_sample_id"]
             self.logsum.feed_key(sample=req_sample)
-            result = self.database_rest_api.post_request(
+            result = self.platform_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
-                self.database_settings[post_url],
+                post_url,
             )
             if "ERROR" in result:
                 if result["ERROR"] == "Server not available":
@@ -222,44 +250,45 @@ class FeedDatabase:
                     for i in range(10):
                         # wait 5 sec before resending the request
                         time.sleep(5)
-                        result = self.database_rest_api.post_request(
+                        result = self.platform_rest_api.post_request(
                             json.dumps(chunk),
                             {"user": self.user, "pass": self.passwd},
-                            self.database_settings[post_url],
+                            self.platform_settings[post_url],
                         )
                         if "ERROR" not in result:
                             break
                     if i == 9 and "ERROR" in result:
-                        logtxt = f"Unable to sent the request to {self.db_server}"
+                        logtxt = f"Unable to sent the request to {self.platform}"
                         self.logsum.add_error(entry=logtxt, sample=req_sample)
                         stderr.print(f"[red]{logtxt}")
                         continue
 
                 elif "is not defined" in result["ERROR_TEST"].lower():
-                    logtxt = f"{req_sample} is not defined in {self.db_server}"
+                    error_txt = result["ERROR_TEST"]
+                    logtxt = f"Sample {req_sample}: {error_txt}"
                     self.logsum.add_error(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]Warning: {logtxt}")
                     continue
                 elif "already defined" in result["ERROR_TEST"].lower():
-                    logtxt = f"Request to {self.db_server} already defined"
+                    logtxt = f"Request to {self.platform} already defined"
                     self.logsum.add_warning(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]{logtxt} for sample {req_sample}")
                     continue
                 else:
-                    logtxt = f"Error {result['ERROR']} in request to {self.db_server}"
+                    logtxt = f"Error {result['ERROR']} in request to {self.platform}"
                     self.logsum.add_error(entry=logtxt, sample=req_sample)
                     stderr.print(f"[red]{logtxt}")
                     continue
             log.info(
                 "stored data in %s iskylims for sample %s",
-                self.db_server,
+                self.platform,
                 req_sample,
             )
             stderr.print(f"[green] Successful request for {req_sample}")
             suces_count += 1
         if request_count == suces_count:
             stderr.print(
-                f"All {self.type_of_info} data sent sucessfuly to {self.db_server}"
+                f"All {self.type_of_info} data sent sucessfuly to {self.platform}"
             )
         else:
             logtxt = "%s of the %s requests were sent to %s"
@@ -275,16 +304,16 @@ class FeedDatabase:
         """Collect data from json file and split them to store data in iSkyLIMS
         and in Relecov Platform
         """
+        map_fields = {}
 
-        map_fields = {}  #
-        # TODO: Include all these hard-coded fields in config file
-        if type_of_info not in self.types_of_info:
+        """ if type_of_info not in self.types_of_info:
             self.logsum.add_error(entry=f"Invalid datatype {type_of_info} to upload")
             stderr.print(f"[red]Invalid datatype {type_of_info} to upload")
-            return
+            return """
         if type_of_info == "sample":
             if server_name == "iskylims":
                 stderr.print(f"[blue] Getting sample fields from {server_name}")
+
                 sample_fields, s_project_fields = self.get_iskylims_fields_sample()
                 stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_iskylims_sample_fields_values(
@@ -304,29 +333,25 @@ class FeedDatabase:
             map_fields = self.json_data
 
         self.update_database(map_fields, post_url)
-        stderr.print(f"[green]Upload process to {self.server_name} completed")
+        stderr.print(f"[green]Upload process to {self.platform} completed")
 
-    def start_api(self, database_server):
+    def start_api(self, platform):
         """Open connection torwards database server API"""
         # Get database settings
-        if database_server:
-            try:
-                self.database_settings = self.config_json.get_topic_data(
-                    "external_url", database_server
-                )
-            except KeyError:
-                logtxt = f"Unable to fetch parameters for {database_server}"
-                self.logsum.add_error(entry=logtxt)
-                stderr.print(f"[red]{logtxt}")
-                return
-            self.db_server = self.database_settings["server"]
-            self.db_url = self.database_settings["url"]
-            self.db_rest_api = RestApi(self.db_server, self.db_url)
-        else:
-            logtxt = f"No database server was selected for {self.type_of_info}. Skipped"
-            self.logsum.add_error(entry=logtxt)
+        try:
+            p_settings = self.platform_settings[platform]
+        except KeyError as e:
+            logtxt = f"Unable to fetch parameters for {platform} {e}"
             stderr.print(f"[red]{logtxt}")
-            return
+            log.error(logtxt)
+            sys.exit(1)
+        if self.server_url is None:
+            server_url = p_settings["server_url"]
+        else:
+            server_url = self.server_url
+        self.platform = platform
+        self.api_url = p_settings["api_url"]
+        self.platform_rest_api = RestApi(server_url, self.api_url)
         return
 
     def update_db(self):
@@ -358,6 +383,6 @@ class FeedDatabase:
                     self.json_data = relecov_tools.utils.read_json_file(json_file)
                 self.store_data(datatype, self.server_name)
         else:
-            self.start_api(self.server_name)
-            self.store_data(self.type_of_info, self.server_name)
+            self.start_api(self.platform)
+            self.store_data(self.type_of_info, self.platform)
         self.logsum.create_error_summary(called_module="update-db")
