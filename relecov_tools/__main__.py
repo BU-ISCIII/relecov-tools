@@ -16,7 +16,7 @@ import relecov_tools.read_lab_metadata
 import relecov_tools.download_manager
 import relecov_tools.json_validation
 import relecov_tools.map_schema
-import relecov_tools.feed_database
+import relecov_tools.upload_database
 import relecov_tools.read_bioinfo_metadata
 import relecov_tools.metadata_homogeneizer
 import relecov_tools.gisaid_upload
@@ -60,7 +60,7 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "0.0.5"
+    __version__ = "0.0.6"
     stderr.print(
         "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
@@ -373,7 +373,6 @@ def launch(user):
     pass
 
 
-# update_db TODO: Include types of data and database servers in config file
 @relecov_tools_cli.command(help_priority=9)
 @click.option("-j", "--json", help="data in json format")
 @click.option(
@@ -385,8 +384,8 @@ def launch(user):
     help="Select the type of information to upload to database",
 )
 @click.option(
-    "-d",
-    "databaseServer",
+    "-plat",
+    "--platform",
     type=click.Choice(
         [
             "iskylims",
@@ -395,10 +394,11 @@ def launch(user):
     ),
     multiple=False,
     default=None,
-    help="name of the server which information is defined in config file",
+    help="name of the platform where data is uploaded",
 )
 @click.option("-u", "--user", help="user name for login")
 @click.option("-p", "--password", help="password for the user to login")
+@click.option("-s", "--server_url", help="url of the platform server")
 @click.option(
     "-f",
     "--full_update",
@@ -406,12 +406,12 @@ def launch(user):
     default=False,
     help="Sequentially run every update option",
 )
-def update_db(user, password, json, type, databaseServer, full_update):
-    """feed database with json"""
-    feed_database = relecov_tools.feed_database.FeedDatabase(
-        user, password, json, type, databaseServer, full_update
+def update_db(user, password, json, type, platform, server_url, full_update):
+    """upload the information included in json file to the database"""
+    update_database_obj = relecov_tools.upload_database.UpdateDatabase(
+        user, password, json, type, platform, server_url, full_update
     )
-    feed_database.update_db()
+    update_database_obj.update_db()
 
 
 # read metadata bioinformatics

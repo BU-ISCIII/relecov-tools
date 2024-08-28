@@ -270,54 +270,56 @@
     "GISAID_configuration": {
         "submitter": "GISAID_ID"
     },
-    "external_url": {
-        "iskylims": {
-            "server": "http://relecov-iskylims.isciiides.es",
-            "url": "/wetlab/api/",
-            "store_samples": "createSampleData",
-            "url_project_fields": "sampleProjectFields",
-            "url_sample_fields": "sampleFields",
-            "param_sample_project": "project",
-            "project_name": "relecov",
-            "token": ""
-        },
-        "relecov": {
-            "server": "http://relecov-platform.isciiides.es",
-            "url": "/api/",
+    "upload_database": {
+        "platform":{
+            "iskylims": {
+                "server_url": "http://relecov-iskylims.isciiides.es",
+                "api_url": "/wetlab/api/",
+                "store_samples": "create-sample",
+                "url_project_fields": "projects-fields",
+                "url_sample_fields": "sample-fields",
+                "param_sample_project": "project",
+                "project_name": "relecov",
+                "token": ""
+            },
+            "relecov": {
+            "server_url": "http://relecov-platform.isciiides.es",
+            "api_url": "/api/",
             "store_samples": "createSampleData",
             "bioinfodata": "createBioinfoData",
             "variantdata": "createVariantData",
             "sftp_info": "sftpInfo",
             "token": ""
-        }
+            }
+        },
+        "iskylims_fixed_values": {
+            "patient_core": "",
+            "sample_project": "Relecov",
+            "only_recorded": "Yes",
+            "sample_location": "Not defined"
+        },
+        "relecov_sample_metadata": [
+            "authors",
+            "collecting_institution",
+            "collecting_lab_sample_id",
+            "ena_broker_name",
+            "ena_sample_accession",
+            "gisaid_accession_id",
+            "gisaid_virus_name",
+            "microbiology_lab_sample_id",
+            "r1_fastq_filepath",
+            "r2_fastq_filepath",
+            "schema_name",
+            "schema_version",
+            "sequencing_date",
+            "sequence_file_R1_md5",
+            "sequence_file_R2_md5",
+            "sequence_file_R1_fastq",
+            "sequence_file_R2_fastq",
+            "sequencing_sample_id",
+            "submitting_lab_sample_id"
+        ]
     },
-    "iskylims_fixed_values": {
-        "patientCore": "",
-        "sampleProject": "Relecov",
-        "onlyRecorded": "Yes",
-        "sampleLocation": "Not defined"
-    },
-    "relecov_sample_metadata": [
-        "authors",
-        "collecting_institution",
-        "collecting_lab_sample_id",
-        "ena_broker_name",
-        "ena_sample_accession",
-        "gisaid_accession_id",
-        "gisaid_virus_name",
-        "microbiology_lab_sample_id",
-        "r1_fastq_filepath",
-        "r2_fastq_filepath",
-        "schema_name",
-        "schema_version",
-        "sequencing_date",
-        "sequence_file_R1_md5",
-        "sequence_file_R2_md5",
-        "sequence_file_R1_fastq",
-        "sequence_file_R2_fastq",
-        "sequencing_sample_id",
-        "submitting_lab_sample_id"
-    ],
     "ENA_fields": {
         "ENA_configuration": {
             "study_alias": "RELECOV",
