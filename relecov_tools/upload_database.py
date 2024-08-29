@@ -91,7 +91,6 @@ class UpdateDatabase:
             sys.exit(1)
 
         json_dir = os.path.dirname(os.path.realpath(self.json_file))
-        lab_code = json_dir.split("/")[-2]
 
     def get_schema_ontology_values(self):
         """Read the schema and extract the values of ontology with the label"""
