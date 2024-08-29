@@ -11,6 +11,7 @@ import time
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.rest_api import RestApi
+from relecov_tools.log_summary import LogSum
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -89,6 +90,12 @@ class UpdateDatabase:
             stderr.print(f"[red]{logtxt}")
             log.error(logtxt)
             sys.exit(1)
+        # create the instance for logging the summary information
+        json_dir = os.path.dirname(os.path.realpath(self.json_file))
+        lab_code = json_dir.split("/")[-2]
+        self.logsum = LogSum(
+            output_location=json_dir, unique_key=lab_code, path=json_dir
+        )
 
     def get_schema_ontology_values(self):
         """Read the schema and extract the values of ontology with the label"""
@@ -118,7 +125,7 @@ class UpdateDatabase:
                 if key not in s_project_fields and key not in s_fields:
                     # just for debugging, write the fields that will not
                     # be included in iSkyLIMS request
-                    log.info("not key %s in iSkyLIMS", key)
+                    log.debug("not key %s in iSkyLIMS", key)
             # include the fixed value
             fixed_value = self.config_json.get_topic_data(
                 "upload_database", "iskylims_fixed_values"
@@ -130,13 +137,13 @@ class UpdateDatabase:
                 s_dict["sample_type"] = row["specimen_source"]
             except KeyError as e:
                 logtxt = f"Unable to fetch specimen_source from json file {e}"
-                log.warning(logtxt)
+                self.logsum.add_warning(entry=logtxt)
                 s_dict["sample_type"] = "Other"
             sample_list.append(s_dict)
             # if sample_entry_date is not set then, add the current date
             if "sample_entry_date" not in row:
                 logtxt = "sample_entry_date is not in the sample fields"
-                log.warning(logtxt)
+                self.logsum.add_warning(entry=logtxt)
                 stderr.print(f"[yellow]{logtxt}")
                 s_dict["sample_entry_date"] = time.strftime("%Y-%m-%d")
 
@@ -159,7 +166,7 @@ class UpdateDatabase:
         if "ERROR" in sample_fields_raw:
             logtxt1 = f"Unable to fetch data from {self.platform}."
             logtxt2 = f" Received error {sample_fields_raw['ERROR']}"
-            log.error(str(logtxt1 + logtxt2))
+            self.logsum.add_error(entry=str(logtxt1 + logtxt2))
             stderr.print(f"[red]{logtxt1 + logtxt2}")
             sys.exit(1)
 
@@ -188,7 +195,7 @@ class UpdateDatabase:
         if "ERROR" in s_project_fields_raw:
             logtxt1 = f"Unable to fetch data from {self.platform}."
             logtxt2 = f" Received error {s_project_fields_raw['ERROR']}"
-            log.error(str(logtxt1 + logtxt2))
+            self.logsum.add_error(entry=str(logtxt1 + logtxt2))
             return
         else:
             log.info("Fetched sample project fields from iSkyLIMS")
@@ -200,9 +207,6 @@ class UpdateDatabase:
     def map_relecov_sample_data(self):
         """Select the values from self.json_data"""
         field_values = []
-        import pdb
-
-        pdb.set_trace()
         r_fields = self.config_json.get_topic_data(
             "upload_database", "relecov_sample_metadata"
         )
@@ -255,24 +259,24 @@ class UpdateDatabase:
                             break
                     if i == 9 and "ERROR" in result:
                         logtxt = f"Unable to sent the request to {self.platform}"
-                        log.error(logtxt)
+                        self.logsum.add_error(entry=logtxt)
                         stderr.print(f"[red]{logtxt}")
                         continue
 
                 elif "is not defined" in result["ERROR_TEST"].lower():
                     error_txt = result["ERROR_TEST"]
                     logtxt = f"Sample {req_sample}: {error_txt}"
-                    log.error(logtxt)
+                    self.logsum.add_error(entry=logtxt)
                     stderr.print(f"[yellow]Warning: {logtxt}")
                     continue
                 elif "already defined" in result["ERROR_TEST"].lower():
                     logtxt = f"Request to {self.platform} already defined"
-                    log.warning(logtxt)
+                    self.logsum.add_warning(entry=logtxt)
                     stderr.print(f"[yellow]{logtxt} for sample {req_sample}")
                     continue
                 else:
                     logtxt = f"Error {result['ERROR']} in request to {self.platform}"
-                    log.error(logtxt)
+                    self.logsum.add_error(entry=logtxt)
                     stderr.print(f"[red]{logtxt}")
                     continue
             log.info(
@@ -287,11 +291,9 @@ class UpdateDatabase:
                 f"All {self.type_of_info} data sent sucessfuly to {self.platform}"
             )
         else:
-            log.warning(
-                "%s of the %s requests were sent to %s",
-                suces_count,
-                request_count,
-                self.platform,
+            logtxt = "%s of the %s requests were sent to %s"
+            self.logsum.add_warning(
+                entry=logtxt % (suces_count, request_count, self.platform)
             )
             stderr.print(
                 f"[yellow]logtxt % {suces_count}  {request_count} {self.platform})"
@@ -338,7 +340,7 @@ class UpdateDatabase:
         except KeyError as e:
             logtxt = f"Unable to fetch parameters for {platform} {e}"
             stderr.print(f"[red]{logtxt}")
-            log.error(logtxt)
+            self.logsum.add_error(entry=logtxt)
             sys.exit(1)
         if self.server_url is None:
             server_url = p_settings["server_url"]
@@ -380,4 +382,5 @@ class UpdateDatabase:
         else:
             self.start_api(self.platform)
             self.store_data(self.type_of_info, self.platform)
+        self.logsum.create_error_summary(called_module="update-db")
         return
