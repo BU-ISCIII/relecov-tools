@@ -11,7 +11,6 @@ import time
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.rest_api import RestApi
-from relecov_tools.log_summary import LogSum
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -93,9 +92,6 @@ class UpdateDatabase:
 
         json_dir = os.path.dirname(os.path.realpath(self.json_file))
         lab_code = json_dir.split("/")[-2]
-        self.logsum = LogSum(
-            output_location=json_dir, unique_key=lab_code, path=json_dir
-        )
 
     def get_schema_ontology_values(self):
         """Read the schema and extract the values of ontology with the label"""
@@ -137,13 +133,13 @@ class UpdateDatabase:
                 s_dict["sample_type"] = row["specimen_source"]
             except KeyError as e:
                 logtxt = f"Unable to fetch specimen_source from json file {e}"
-                self.logsum.add_warning(entry=logtxt)
+                log.warning(logtxt)
                 s_dict["sample_type"] = "Other"
             sample_list.append(s_dict)
             # if sample_entry_date is not set then, add the current date
             if "sample_entry_date" not in row:
                 logtxt = "sample_entry_date is not in the sample fields"
-                self.logsum.add_warning(entry=logtxt)
+                log.warning(logtxt)
                 stderr.print(f"[yellow]{logtxt}")
                 s_dict["sample_entry_date"] = time.strftime("%Y-%m-%d")
 
@@ -166,7 +162,7 @@ class UpdateDatabase:
         if "ERROR" in sample_fields_raw:
             logtxt1 = f"Unable to fetch data from {self.platform}."
             logtxt2 = f" Received error {sample_fields_raw['ERROR']}"
-            self.logsum.add_error(entry=str(logtxt1 + logtxt2))
+            log.error(str(logtxt1 + logtxt2))
             stderr.print(f"[red]{logtxt1 + logtxt2}")
             sys.exit(1)
 
@@ -178,13 +174,12 @@ class UpdateDatabase:
                     # the field name for the sample
                     sample_fields[property] = values["field_name"]
                 except KeyError as e:
-                    self.logsum.add_warning(entry=f"Error mapping ontology {e}")
-                    stderr.print(f"[red]Error mapping ontology {e}")
+                    log.info(f"Error mapping ontology {e}")
+                    # stderr.print(f"[red]Error mapping ontology {e}")
             else:
                 # for the ones that do not have ontology label in the sample field
                 # and have an empty value: sample_fields[key] = ""
                 logtxt = f"No ontology found for {values.get('field_name')}"
-                self.logsum.add_warning(entry=logtxt)
                 log.info(logtxt)
         # fetch label for sample Project
         s_project_url = self.platform_settings["iskylims"]["url_project_fields"]
@@ -196,7 +191,7 @@ class UpdateDatabase:
         if "ERROR" in s_project_fields_raw:
             logtxt1 = f"Unable to fetch data from {self.platform}."
             logtxt2 = f" Received error {s_project_fields_raw['ERROR']}"
-            self.logsum.add_error(entry=str(logtxt1 + logtxt2))
+            log.error(str(logtxt1 + logtxt2))
             return
         else:
             log.info("Fetched sample project fields from iSkyLIMS")
@@ -208,7 +203,12 @@ class UpdateDatabase:
     def map_relecov_sample_data(self):
         """Select the values from self.json_data"""
         field_values = []
-        r_fields = self.config_json.get_configuration("relecov_sample_metadata")
+        import pdb
+
+        pdb.set_trace()
+        r_fields = self.config_json.get_topic_data(
+            "upload_database", "relecov_sample_metadata"
+        )
 
         for row in self.json_data:
             s_dict = {}
@@ -238,7 +238,6 @@ class UpdateDatabase:
                     f"[blue] sending request for sample {chunk['sequencing_sample_id']}"
                 )
                 req_sample = chunk["sequencing_sample_id"]
-            self.logsum.feed_key(sample=req_sample)
             result = self.platform_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
@@ -259,24 +258,24 @@ class UpdateDatabase:
                             break
                     if i == 9 and "ERROR" in result:
                         logtxt = f"Unable to sent the request to {self.platform}"
-                        self.logsum.add_error(entry=logtxt, sample=req_sample)
+                        log.error(logtxt)
                         stderr.print(f"[red]{logtxt}")
                         continue
 
                 elif "is not defined" in result["ERROR_TEST"].lower():
                     error_txt = result["ERROR_TEST"]
                     logtxt = f"Sample {req_sample}: {error_txt}"
-                    self.logsum.add_error(entry=logtxt, sample=req_sample)
+                    log.error(logtxt)
                     stderr.print(f"[yellow]Warning: {logtxt}")
                     continue
                 elif "already defined" in result["ERROR_TEST"].lower():
                     logtxt = f"Request to {self.platform} already defined"
-                    self.logsum.add_warning(entry=logtxt, sample=req_sample)
+                    log.warning(logtxt)
                     stderr.print(f"[yellow]{logtxt} for sample {req_sample}")
                     continue
                 else:
                     logtxt = f"Error {result['ERROR']} in request to {self.platform}"
-                    self.logsum.add_error(entry=logtxt, sample=req_sample)
+                    log.error(logtxt)
                     stderr.print(f"[red]{logtxt}")
                     continue
             log.info(
@@ -291,12 +290,14 @@ class UpdateDatabase:
                 f"All {self.type_of_info} data sent sucessfuly to {self.platform}"
             )
         else:
-            logtxt = "%s of the %s requests were sent to %s"
-            self.logsum.add_warning(
-                entry=logtxt % (suces_count, request_count, self.server_name)
+            log.warning(
+                "%s of the %s requests were sent to %s",
+                suces_count,
+                request_count,
+                self.platform,
             )
             stderr.print(
-                f"[yellow]{logtxt % (suces_count, request_count, self.server_name)}"
+                f"[yellow]logtxt % {suces_count}  {request_count} {self.platform})"
             )
         return
 
@@ -306,15 +307,12 @@ class UpdateDatabase:
         """
         map_fields = {}
 
-        """ if type_of_info not in self.types_of_info:
-            self.logsum.add_error(entry=f"Invalid datatype {type_of_info} to upload")
-            stderr.print(f"[red]Invalid datatype {type_of_info} to upload")
-            return """
         if type_of_info == "sample":
             if server_name == "iskylims":
+                log.info("Getting sample fields from %s", server_name)
                 stderr.print(f"[blue] Getting sample fields from {server_name}")
-
                 sample_fields, s_project_fields = self.get_iskylims_fields_sample()
+                log.info("Selecting sample fields")
                 stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_iskylims_sample_fields_values(
                     sample_fields, s_project_fields
@@ -385,4 +383,4 @@ class UpdateDatabase:
         else:
             self.start_api(self.platform)
             self.store_data(self.type_of_info, self.platform)
-        self.logsum.create_error_summary(called_module="update-db")
+        return
