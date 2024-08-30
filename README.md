@@ -8,19 +8,28 @@ relecov-tools is a set of helper tools for the assembly of the different element
 
 ## Table of contents
 
-* [Installation](#installation)
-* [Usage](#usage)
-    * [download](#download)
-    * [read-lab-metadata](#read-lab-metadata)
-    * [read-bioinfo-metadata](#read-bioinfo-metadata)
-    * [validate](#validate)
-    * [map](#map)
-    * [upload-to-ena](#upload-to-ena)
-    * [upload-to-gisaid](#upload-to-gisaid)
-    * [launch](#launch)
-    * [update-db](#update-db)
-    * [build-schema](#build-schema)
-* [Aknowledgements](#aknowledgements)
+- [relecov-tools](#relecov-tools)
+  - [Table of contents](#table-of-contents)
+  - [Installation](#installation)
+    - [Bioconda](#bioconda)
+    - [Pip](#pip)
+    - [Development version](#development-version)
+  - [Usage](#usage)
+    - [Command-line](#command-line)
+      - [download](#download)
+      - [read-lab-metadata](#read-lab-metadata)
+      - [read-bioinfo-metadata](#read-bioinfo-metadata)
+      - [validate](#validate)
+      - [map](#map)
+      - [upload-to-ena](#upload-to-ena)
+      - [upload-to-gisaid](#upload-to-gisaid)
+      - [update-db](#update-db)
+    - [build-schema](#build-schema)
+      - [Mandatory Fields](#mandatory-fields)
+      - [launch-pipeline](#launch-pipeline)
+      - [custom logs](#custom-logs)
+    - [Python package mode](#python-package-mode)
+  - [Acknowledgements](#acknowledgements)
 
 ## Installation
 
@@ -28,7 +37,10 @@ relecov-tools is a set of helper tools for the assembly of the different element
 Soon
 
 ### Pip
-Soon
+relecov-tools is available in Pypi and can be installed via pip:
+```
+pip install relecov-tools
+```
 
 ### Development version
 If you want to install the latest code in the repository:
@@ -50,7 +62,7 @@ $ relecov-tools --help
 \    \  /   |__ / |__  |    |___ |    |   |  \    /
 /    /  \   |  \  |    |    |    |    |   |   \  /
 /    |--|   |   \ |___ |___ |___ |___ |___|    \/
-RELECOV-tools version 0.0.1
+RELECOV-tools version 1.0.0
 Usage: relecov-tools [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -68,8 +80,8 @@ Commands:
     upload-to-ena           parsed data to create xml files to upload to ena
     upload-to-gisaid        parsed data to create files to upload to gisaid
     update-db               feed database with metadata jsons
-    launch                  launch viralrecon in hpc
     build-schema            Generates and updates JSON Schema files from...
+    launch-pipeline         Create the symbolic links for the samples which...
 ```
 #### download
 The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different available folders in the passed credentials. In addition, it checks if the files in the current folder match the files in the metadata file and also checks if there are md5sum for each file. Else, it creates one before storing in the final repository.
@@ -158,7 +170,7 @@ Usage: relecov-tools validate [OPTIONS]
 
   Options:
     -j, --json_file TEXT    Json file to validate
-    -s, --json_schema TEXT  Json schema
+    -s, --json_schema TEXT  Json schema (default: relecov-schema)
     -m, --metadata PATH     Origin file containing metadata
     -o, --out_folder TEXT   Path to save validate json file
     --help                  Show this message and exit.
@@ -262,7 +274,7 @@ Options:
 ```
 
 #### Mandatory Fields
-Ensure that the fields below are properly defined as headers in your Excel sheet (dataase definition):
+Ensure that the fields below are properly defined as headers in your Excel sheet (database definition):
 
 ```
 enum: List of possible values for enumeration.
@@ -277,8 +289,24 @@ required (Y/N): Indicates if the property is required (Y) or optional (N).
 complex_field (Y/N): Indicates if the property is a complex (nested) field (Y) or a standard field (N).
 ```
 
-#### launch
-SOON
+#### launch-pipeline
+Create the folder structure to execute the given pipeline for the latest sample batches after executing download, read-lab-metadata and validate modules. This module will create symbolic links for each sample and generate the necessary files for pipeline execution using the information from validated_BATCH-NAME_DATE.json.
+```
+Usage: relecov-tools launch-pipeline [OPTIONS]
+
+  Create the symbolic links for the samples which are validated to prepare for
+  bioinformatics pipeline execution.
+
+Options:
+  -i, --input PATH          Path to the input folder where sample files are located
+  -t, --template PATH       Path to the pipeline template folder to be copied in the                       output folder
+  -c, --config PATH         Path to the the template config file
+  -o, --out_dir PATH        Path to output folder
+  --help                    Show this message and exit.
+```
+
+#### custom logs
+After executing each of these modules, you may find a custom log report in json format named "DATE_EXECUTED-MODULE_log_summary.json. These custom log summaries can be useful to detect errors in metadata in order to fix them and/or notify the users.
 
 ### Python package mode
 relecov-tools is designed in a way that you can use import the different modules and use them in your own scripts, for example:
