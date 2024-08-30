@@ -3,7 +3,7 @@
     "id": "https://github.com/BU-ISCIII/relecov-tools/blob/develop/relecov_tools/schema/relecov_schema.json",
     "title": "RELECOV schema",
     "description":"Json schema that specifies the structure, content, and validation rules for RELECOV metadata",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "required": [
         "collecting_lab_sample_id",
         "sequencing_sample_id",
@@ -17,6 +17,8 @@
         "host_scientific_name",
         "sequencing_instrument_model",
         "sequencing_instrument_platform",
+        "library_source",
+        "library_layout",
         "enrichment_panel",
         "enrichment_panel_version"
     ],
@@ -560,7 +562,7 @@
                 "Exome Sequencing [OBI:0002118]",
                 "Pooled Clone Sequencing [OBI:2100402]",
                 "Transcriptome Sequencing [NCIT:C124261]",
-                "Other [NCIT:C124261]"
+                "Other [NCIT:C17649]"
             ],
             "ontology": "GENEPIO:0000156",
             "type": "string",
@@ -995,6 +997,7 @@
                 "Not Collected [GENEPIO:0001620]",
                 "Not Provided [GENEPIO:0001668]",
                 "Missing [GENEPIO:0001618]",
+                "Other [NCIT:C17649]",
                 "Restricted Access [GENEPIO:0001810]"
             ],
             "ontology": "GENEPIO:0001223",
