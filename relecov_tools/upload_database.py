@@ -239,6 +239,7 @@ class UpdateDatabase:
                     f"[blue] sending request for sample {chunk['sequencing_sample_id']}"
                 )
                 req_sample = chunk["sequencing_sample_id"]
+            self.logsum.feed_key(sample=req_sample)
             result = self.platform_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
@@ -259,24 +260,24 @@ class UpdateDatabase:
                             break
                     if i == 9 and "ERROR" in result:
                         logtxt = f"Unable to sent the request to {self.platform}"
-                        self.logsum.add_error(entry=logtxt)
+                        self.logsum.add_error(entry=logtxt, sample=req_sample)
                         stderr.print(f"[red]{logtxt}")
                         continue
 
                 elif "is not defined" in result["ERROR_TEST"].lower():
                     error_txt = result["ERROR_TEST"]
                     logtxt = f"Sample {req_sample}: {error_txt}"
-                    self.logsum.add_error(entry=logtxt)
+                    self.logsum.add_error(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]Warning: {logtxt}")
                     continue
                 elif "already defined" in result["ERROR_TEST"].lower():
                     logtxt = f"Request to {self.platform} already defined"
-                    self.logsum.add_warning(entry=logtxt)
+                    self.logsum.add_warning(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]{logtxt} for sample {req_sample}")
                     continue
                 else:
                     logtxt = f"Error {result['ERROR']} in request to {self.platform}"
-                    self.logsum.add_error(entry=logtxt)
+                    self.logsum.add_error(entry=logtxt, sample=req_sample)
                     stderr.print(f"[red]{logtxt}")
                     continue
             log.info(
@@ -293,7 +294,8 @@ class UpdateDatabase:
         else:
             logtxt = "%s of the %s requests were sent to %s"
             self.logsum.add_warning(
-                entry=logtxt % (suces_count, request_count, self.platform)
+                entry=logtxt % (suces_count, request_count, self.platform),
+                sample=req_sample,
             )
             stderr.print(
                 f"[yellow]logtxt % {suces_count}  {request_count} {self.platform})"
