@@ -1440,6 +1440,16 @@
         "submitting_institution": "Hospital Universitario Cruces",
         "submitting_institution_address": "Plaza Cruces, s/n",
         "submitting_institution_email": ""
+    },
+    "Hospital Virgen Macarena": {
+        "collecting_institution_address": "Av. Dr. Fedriani, 3",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Sevilla",
+        "geo_loc_city": "Sevilla",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
+        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
     }
-
 }
