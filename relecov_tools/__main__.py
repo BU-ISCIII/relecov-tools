@@ -60,7 +60,7 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "0.0.6"
+    __version__ = "1.0.0"
     stderr.print(
         "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
@@ -365,14 +365,6 @@ def upload_to_gisaid(
     upload_gisaid.gisaid_upload()
 
 
-# launch
-@relecov_tools_cli.command(help_priority=8)
-@click.option("-u", "--user", help="user name for connecting to the server")
-def launch(user):
-    """launch viralrecon in hpc"""
-    pass
-
-
 @relecov_tools_cli.command(help_priority=9)
 @click.option("-j", "--json", help="data in json format")
 @click.option(
@@ -440,23 +432,6 @@ def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
 
 
 # read metadata bioinformatics
-@relecov_tools_cli.command(help_priority=11)
-@click.option(
-    "-l",
-    "--longtable_file",
-    type=click.Path(),
-    help="file containing variant long table ",
-)
-@click.option("-o", "--output", type=click.Path(), help="Path to save json output")
-def long_table_parse(longtable_file, output):
-    new_json_parse = relecov_tools.assets.pipeline_utils.viralrecon.LongTableParse(
-        longtable_file, output
-    )
-    """Create Json file from long table"""
-    new_json_parse.parsing_csv()
-
-
-# read metadata bioinformatics
 @relecov_tools_cli.command(help_priority=12)
 @click.option(
     "-i",
@@ -491,7 +466,7 @@ def metadata_homogeneizer(institution, directory, output):
     "-t",
     "--template",
     type=click.Path(),
-    help="select the template folder to be copied in the output folder",
+    help="select the pipeline template folder to be copied in the output folder",
 )
 @click.option(
     "-c",
@@ -502,7 +477,8 @@ def metadata_homogeneizer(institution, directory, output):
 @click.option("-o", "--output", type=click.Path(), help="select output folder")
 def launch_pipeline(input, template, output, config):
     """
-    Create the symbolic links for the samples which are validated.
+    Create the symbolic links for the samples which are validated to prepare for
+    bioinformatics pipeline execution.
     """
     new_launch = relecov_tools.pipeline_manager.LaunchPipeline(
         input, template, output, config
