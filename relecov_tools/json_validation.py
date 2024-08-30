@@ -52,10 +52,10 @@ class SchemaValidation:
             stderr.print("[red] Json file does not exists")
             sys.exit(1)
         self.json_data_file = json_data_file
-        out_path = os.path.realpath(self.out_folder)
-        lab_code = out_path.split("/")[-2]
+        out_path = os.path.dirname(os.path.realpath(self.json_data_file))
+        self.lab_code = out_path.split("/")[-2]
         self.logsum = LogSum(
-            output_location=self.out_folder, unique_key=lab_code, path=out_path
+            output_location=self.out_folder, unique_key=self.lab_code, path=out_path
         )
 
         stderr.print("[blue] Reading the json file")
