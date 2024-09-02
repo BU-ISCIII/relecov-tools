@@ -178,13 +178,13 @@ class UpdateDatabase:
                     # the field name for the sample
                     sample_fields[property] = values["field_name"]
                 except KeyError as e:
-                    log.info(f"Error mapping ontology {e}")
+                    self.logsum.add_warning(entry=f"Error mapping ontology {e}")
                     # stderr.print(f"[red]Error mapping ontology {e}")
             else:
                 # for the ones that do not have ontology label in the sample field
                 # and have an empty value: sample_fields[key] = ""
                 logtxt = f"No ontology found for {values.get('field_name')}"
-                log.info(logtxt)
+                self.logsum.add_warning(entry=(logtxt))
         # fetch label for sample Project
         s_project_url = self.platform_settings["iskylims"]["url_project_fields"]
         param = self.platform_settings["iskylims"]["param_sample_project"]
