@@ -1,0 +1,6 @@
+include LICENSE
+include README.md
+graft relecov_tools/assets
+graft relecov_tools/schema
+graft relecov_tools/conf
+include requirements.txt

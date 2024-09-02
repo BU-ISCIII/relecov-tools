@@ -1,0 +1,7 @@
+This module will map the metadata_lab.json to the selected DB (ENA or GISAID) 
+This module input is: 
+-j processed_metadata_lab.json 
+-d ENA or GISAID
+-o output folder where json file will be generated 
+
+The output of this module is processed_metadata_lab_ENA_mapped.json  

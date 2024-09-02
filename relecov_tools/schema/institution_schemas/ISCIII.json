@@ -1,0 +1,149 @@
+{
+    "python_file": "ISCIII.py",
+    "required_files": {
+        "metadata_file": {
+            "file_name": "new_lab_metadata.xlsx",
+            "mapped_fields": {
+                "Public Health sample id (SIVIES)": "Código SiViEs",
+                "Sample ID given by originating laboratory": "Ref Hospital",
+                "Sample ID given by the submitting laboratory": "ID CNM",
+                "Sample ID given in the microbiology lab": "ID VI-VRP",
+                "Sample ID given if multiple rna-extraction or passages": "ID VI-VRP",
+                "Sample ID given for sequencing": "ID VI-VRP",
+                "GISAID id": "ID GISAID",
+                "Originating Laboratory": "Hospital",
+                "Sample Collection Date": "Fecha de toma",
+                "Sample Received Date": "Fecha recepción",
+                "Host Age": "Edad (años)",
+                "Host Gender": "Sexo",
+                "Diagnostic Pcr Ct Value 1": "PCR genE",
+                "Specimen source": "Muestra",
+                "Purpose of Sequencing": "Contexto",
+                "Nucleic acid extraction protocol": "Extracción"
+            },
+            "function": "None"
+        },
+        "sample_file": {
+            "file_name": "sample_data.json",
+            "mapped_fields": {
+                "Sequence file R1 fastq": "sequence_file_R1_fastq",
+                "Sequence file R2 fastq": "sequence_file_R2_fastq"
+            },
+            "function": "None",
+            "mapped_key": "Sample ID given for sequencing"
+        },
+        "run_id_file": {
+            "file_name": "samples_run_services_length.tsv",
+            "mapped_fields": {
+                "Runid": "run_name"
+            },
+            "function": "None",
+            "mapped_key": "Sample ID given for sequencing"
+        },
+        "org_lab_file": {
+            "file_name": "laboratory_mapping_list.tsv",
+            "mapped_fields": {
+                "Originating Laboratory": "mapped_org_lab"
+            },
+            "mapped_key": "",
+            "function": "replace_originating_lab"
+        },
+        "sequencer_file": {
+            "file_name": "samples_run_services_length.tsv",
+            "mapped_fields": {
+                "Sequencing Instrument Model": "run_name"
+            },
+            "mapped_key": "",
+            "function": "added_seq_inst_model"
+        },
+        "host_gender_file": {
+            "file_name": "",
+            "mapped_fields": {
+                "Host Gender": ""
+            },
+            "mapped_key": "",
+            "function": "translate_gender_to_english"
+        },
+        "specimen_source_file": {
+            "file_name": "",
+            "mapped_fields": {
+                "Specimen source": ""
+            },
+            "mapped_key": "",
+            "function": "translate_specimen_source"
+        },
+        "authors_file": {
+            "file_name": "gisaid_authors.tsv",
+            "mapped_fields": {
+                "Authors": "authors"
+            },
+            "mapped_key": "GISAID id",
+            "function": "None"
+        },
+        "run_date": {
+            "file_name": "runName_runDate.tsv",
+            "mapped_fields": {
+                "Sequencing Date": "run_date"
+            },
+            "mapped_key": "Runid",
+            "function": "None"
+        },
+        "read_length": {
+            "file_name": "samples_run_services_length.tsv",
+            "mapped_fields": {
+                "Read Length" : "read1_cycles"
+            },
+            "mapped_key": "Sample ID given for sequencing",
+            "function": "None"
+        },
+        "samples_in_run": {
+            "file_name": "run_and_num_of_samples.csv",
+            "mapped_fields": {
+                "Number Of Samples In Run": "num_samples"
+            },
+            "mapped_key": "Runid",
+            "function": "None"
+        },
+        "artic_version": {
+            "file_name": "samples_artic_version.tsv",
+            "mapped_fields": {
+                "Enrichment panel/assay version": "artic_version"
+            },
+            "mapped_key": "Sample ID given for sequencing",
+            "function": "None"
+        },
+        "purpose_of_sequencing": {
+            "file_name": "",
+            "mapped_fields" : {"Purpose of Sequencing" : "" },
+            "mapped_key" : "",
+            "function": "translate_purpose_seq_to_english"
+        },
+        "nucleic_acid_extraction_protocol": {
+            "file_name": "",
+            "mapped_fields" : {"Nucleic acid extraction protocol" : "" },
+            "mapped_key" : "",
+            "function": "translate_nucleic_acid_extract_prot"
+        },
+        "library_layout": {
+            "file_name": "samples_run_services_length.tsv",
+            "mapped_fields" : {"Library Layout" : "read2_cycles" },
+            "mapped_key" : "sample_name",
+            "function": "findout_library_layout"
+        }
+    },
+    "fixed_fields": {
+        "Submitting Institution": "Instituto de Salud Carlos III",
+        "Biological Sample Storage Condition": "-80 C",
+        "Purpose of sampling": "Surveillance",
+        "Specimen source": "Nasopharyngeal exudate",
+        "Host": "Human",
+        "Library Preparation Kit": "Illumina DNA Prep",
+        "Enrichment Protocol": "Amplicon",
+        "Enrichment panel/assay": "ARTIC",
+        "Source material": "viral rna",
+        "Capture method": "PCR",
+        "Sequencing technique": "Amplicon",
+        "Gene Name 1": "E gene",
+        "Diagnostic Pcr Ct Value 1": ""
+    }
+}

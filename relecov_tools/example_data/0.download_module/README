@@ -1,0 +1,6 @@
+To use this module it is needed:
+-u sftp user associated to ISCIII
+-p sftp password associated to ISCIII sftp user
+The sftp server must contain fastq.gz files and the associated excel containting those sample metadata
+The ouput is: 
+sample_data.json containing the md5 info and fastq names for each sample

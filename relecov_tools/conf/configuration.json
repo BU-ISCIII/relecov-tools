@@ -1,0 +1,451 @@
+{
+    "lab_metadata": {
+        "fixed_fields": {
+            "host_disease": "COVID-19",
+            "tax_id": "2697049",
+            "organism": "Severe acute respiratory syndrome coronavirus 2",
+            "study_type": "Whole Genome Sequencing",
+            "collector_name": "Not Provided"
+        },
+        "metadata_lab_heading": [
+            "Public Health sample id (SIVIES)",
+            "Sample ID given by originating laboratory",
+            "Sample ID given by the submitting laboratory",
+            "Sample ID given in the microbiology lab",
+            "Sample ID given if multiple rna-extraction or passages",
+            "Sample ID given for sequencing",
+            "ENA Sample ID",
+            "GISAID Virus Name",
+            "GISAID id",
+            "Originating Laboratory",
+            "Submitting Institution",
+            "Sequencing Institution",
+            "Sample Collection Date",
+            "Sample Received Date",
+            "Purpose of sampling",
+            "Biological Sample Storage Condition",
+            "Specimen source",
+            "Environmental Material",
+            "Environmental System",
+            "Collection Device",
+            "Host",
+            "Host Age",
+            "Host Gender",
+            "Sequencing Date",
+            "Nucleic acid extraction protocol",
+            "Commercial All-in-one library kit",
+            "Library Preparation Kit",
+            "Enrichment Protocol",
+            "If Enrichment Protocol Is Other, Specify",
+            "Enrichment panel/assay",
+            "If Enrichment panel/assay Is Other, Specify",
+            "Enrichment panel/assay version",
+            "Number Of Samples In Run",
+            "Runid",
+            "Sequencing Instrument Model",
+            "Flowcell Kit",
+            "Source material",
+            "Capture method",
+            "Sequencing technique",
+            "Library Layout",
+            "Gene Name 1",
+            "Diagnostic Pcr Ct Value 1",
+            "Gene Name 2",
+            "Diagnostic Pcr Ct Value-2",
+            "Authors",
+            "Sequence file R1 fastq",
+            "Sequence file R2 fastq"
+        ],
+        "bioinfo_heading": [
+            "Consensus sequence filename",
+            "VCF filename",
+            "Variant designation table filename",
+            "Bioinformatics protocol",
+            "If bioinformatics protocol Is Other, Specify",
+            "Bioinformatics protocol version",
+            "Commercial/Open-source/both",
+            "Preprocessing software",
+            "Preprocessing software version",
+            "If preprocessing Is Other, Specify",
+            "Preprocessing params",
+            "Mapping software",
+            "Mapping software version",
+            "If mapping Is Other, Specify",
+            "Mapping params",
+            "Assembly software",
+            "Assembly software version",
+            "If assembly Is Other, Specify",
+            "Assembly params",
+            "Variant calling software",
+            "Variant calling software version",
+            "If variant calling Is Other, Specify",
+            "Variant calling params",
+            "Consensus software",
+            "Consensus software version",
+            "If consensus Is Other, Specify",
+            "Consensus params",
+            "Clade/Type identification software",
+            "Clade/Type software version",
+            "If Clade/Type Is Other, Specify",
+            "Lineage identification software",
+            "Lineage software version",
+            "If lineage identification Is Other, Specify",
+            "Quality control metrics (sample discard criteria)"
+        ],
+        "lab_metadata_req_json": {
+            "laboratory_data": {
+                "file": "laboratory_address.json",
+                "map_field": "collecting_institution",
+                "adding_fields": [
+                  "collecting_institution_address",
+                  "collecting_institution_email",
+                  "geo_loc_state",
+                  "geo_loc_region",
+                  "geo_loc_city",
+                  "geo_loc_country"
+                ]
+            },
+            "geo_location_data": {
+                "file": "geo_loc_cities.json",
+                "map_field": "geo_loc_city",
+                "adding_fields": [
+                  "geo_loc_latitude",
+                  "geo_loc_longitude"
+                ]
+            },
+            "submitting_data": {
+                "file": "laboratory_address.json",
+                "map_field": "collecting_institution",
+                "adding_fields": [
+                    "submitting_institution",
+                    "submitting_institution_address",
+                    "submitting_institution_email"
+                ]
+            },
+            "specimen_source_splitting": {
+                "file": "anatomical_material_collection_method.json",
+                "map_field": "specimen_source",
+                "adding_fields": [
+                    "anatomical_material",
+                    "anatomical_part",
+                    "body_product",
+                    "collection_method"
+                ]
+            }
+         },
+        "required_post_processing": {
+            "host_common_name": {
+                "Human": "host_scientific_name::Homo sapiens"
+            },
+            "sequencing_instrument_model": {
+                "Illumina": "sequencing_instrument_platform::Illumina",
+                "PacBio": "sequencing_instrument_platform::PacBio",
+                "Ion Torrent": "sequencing_instrument_platform::Ion Torrent",
+                "Oxford Nanopore": "sequencing_instrument_platform::Oxford Nanopore"
+            }
+        },
+        "required_copy_from_other_field": {
+            "isolate_sample_id": "sequencing_sample_id"
+        },
+        "samples_json_fields": [
+            "fastq_r1_md5",
+            "fastq_r2_md5",
+            "sequence_file_R1_fastq",
+            "sequence_file_R2_fastq",
+            "r1_fastq_filepath",
+            "r2_fastq_filepath"
+        ]
+    },
+    "long_table_heading": [
+        "SAMPLE",
+        "CHROM",
+        "POS",
+        "REF",
+        "ALT",
+        "FILTER",
+        "DP",
+        "REF_DP",
+        "ALT_DP",
+        "AF",
+        "GENE",
+        "EFFECT",
+        "HGVS_C",
+        "HGVS_P",
+        "HGVS_P_1LETTER",
+        "CALLER",
+        "LINEAGE"
+    ],
+    "long_table_parse_aux": {
+        "Chromosome": "CHROM",
+        "Variant": {
+            "pos": "POS", 
+            "alt": "ALT", 
+            "ref": "REF"
+        },
+        "Filter": "FILTER",
+        "VariantInSample": {
+            "dp": "DP",
+            "ref_dp": "REF_DP",
+            "alt_dp": "ALT_DP",
+            "af": "AF"
+        },
+        "Effect": "EFFECT",
+        "VariantAnnotation": {
+            "hgvs_c": "HGVS_C",
+            "hgvs_p": "HGVS_P",
+            "hgvs_p_1_letter": "HGVS_P_1LETTER"
+        }
+    },
+    "gisaid_csv_headers": [
+        "submitter",
+        "covv_virus_name",
+        "covv_type",
+        "covv_passage",
+        "covv_collection_date",
+        "covv_location",
+        "covv_add_location",
+        "covv_host",
+        "covv_add_host_info",
+        "covv_sampling_strategy",
+        "covv_gender",
+        "covv_patient_age",
+        "covv_patient_status",
+        "covv_specimen",
+        "covv_outbreak",
+        "covv_last_vaccinated",
+        "covv_treatment",
+        "covv_seq_technology",
+        "covv_assembly_method",
+        "covv_coverage",
+        "covv_orig_lab",
+        "covv_orig_lab_addr",
+        "covv_provider_sample_id",
+        "covv_subm_lab",
+        "covv_subm_lab_addr",
+        "covv_subm_sample_id",
+        "covv_authors"
+    ],
+    "json_schemas": {
+        "relecov_schema": "relecov_schema.json",
+        "ena_schema": "ena_schema.json",
+        "gisaid_schema": "gisaid_schema.json"
+    },
+    "institution_mapping_file": {
+        "ISCIII": "ISCIII.json",
+        "HUGTiP": "HUGTiP.json"
+    },
+    "sftp_handle": {
+        "sftp_connection": {
+            "sftp_server": "sftprelecov.isciii.es",
+            "sftp_port": "22"
+        },
+        "metadata_processing": {
+            "header_flag": "CAMPO",
+            "excel_sheet": "METADATA_LAB"
+        },
+        "abort_if_md5_mismatch": "False",
+        "platform_storage_folder": "/tmp/relecov",
+        "allowed_file_extensions": [
+            ".fastq.gz",
+            ".fastq",
+            ".fq",
+            ".fq.gz",
+            ".fasta",
+            ".fasta.gz",
+            ".fa",
+            ".fa.gz",
+            "bam"
+        ],
+        "allowed_download_options": [
+            "download_only",
+            "download_clean",
+            "delete_only"
+        ],
+        "skip_when_found": [
+            "#",
+            "Hash",
+            "Path"
+        ]
+    },
+    "GISAID_configuration": {
+        "submitter": "GISAID_ID"
+    },
+    "upload_database": {
+        "platform":{
+            "iskylims": {
+                "server_url": "http://relecov-iskylims.isciiides.es",
+                "api_url": "/wetlab/api/",
+                "store_samples": "create-sample",
+                "url_project_fields": "projects-fields",
+                "url_sample_fields": "sample-fields",
+                "param_sample_project": "project",
+                "project_name": "relecov",
+                "token": ""
+            },
+            "relecov": {
+            "server_url": "http://relecov-platform.isciiides.es",
+            "api_url": "/api/",
+            "store_samples": "createSampleData",
+            "bioinfodata": "createBioinfoData",
+            "variantdata": "createVariantData",
+            "sftp_info": "sftpInfo",
+            "token": ""
+            }
+        },
+        "iskylims_fixed_values": {
+            "patient_core": "",
+            "sample_project": "Relecov",
+            "only_recorded": "Yes",
+            "sample_location": "Not defined"
+        },
+        "relecov_sample_metadata": [
+            "authors",
+            "collecting_institution",
+            "collecting_lab_sample_id",
+            "ena_broker_name",
+            "ena_sample_accession",
+            "gisaid_accession_id",
+            "gisaid_virus_name",
+            "microbiology_lab_sample_id",
+            "r1_fastq_filepath",
+            "r2_fastq_filepath",
+            "schema_name",
+            "schema_version",
+            "sequencing_date",
+            "sequence_file_R1_md5",
+            "sequence_file_R2_md5",
+            "sequence_file_R1_fastq",
+            "sequence_file_R2_fastq",
+            "sequencing_sample_id",
+            "submitting_lab_sample_id"
+        ]
+    },
+    "ENA_fields": {
+        "ENA_configuration": {
+            "study_alias": "RELECOV",
+            "design_description": "Design Description",
+            "experiment_title": "Project for ENA submission RELECOV",
+            "study_title": "RELECOV Spanish Network for genomics surveillance",
+            "study_type": "Whole Genome Sequencing",
+            "study_id": "ERP137164",
+            "ena_broker_name": "Instituto de Salud Carlos III"
+        },
+        "checklist": "ERC000033",
+        "templates_path": "",
+        "tool": {
+            "tool_name": "ena-upload-cli",
+            "tool_version": "0.5.3"
+        },
+        "df_study_fields": [
+            "study_alias",
+            "study_title",
+            "study_type",
+            "study_abstract"
+        ],
+        "df_sample_fields": [
+            "sample_alias",
+            "sample_title",
+            "collection date",
+            "geographic location (country and/or sea)",
+            "sample_description",
+            "host common name",
+            "host scientific name",
+            "host sex",
+            "scientific_name",
+            "collector name",
+            "collecting institution",
+            "address",
+            "isolate",
+            "host subject id",
+            "host health state",
+            "authors",
+            "taxon_id"
+        ],
+        "df_run_fields": [
+            "run_alias",
+            "experiment_alias",
+            "file_name",
+            "file_format",
+            "file_checksum",
+            "collecting institution"
+        ],
+        "df_experiment_fields": [
+            "experiment_alias",
+            "experiment_title",
+            "sample_alias",
+            "study_alias",
+            "design_description",
+            "library_name",
+            "library_strategy",
+            "library_source",
+            "library_selection",
+            "library_layout",
+            "library_construction_protocol",
+            "insert_size",
+            "platform",
+            "instrument_model",
+            "collecting institution"
+        ],
+        "ena_fixed_fields": {
+          "broker_name": "Instituto de Salud Carlos III",
+          "file_format": "FASTQ",
+          "study_alias": "RELECOV",
+          "study_title": "RELECOV Spanish Network for genomics surveillance",
+          "study_abstract": "RELECOV is a Spanish Network for genomics surveillance",
+          "insert_size": "0"
+        },
+        "accession_fields": [
+            "ena_study_accession",
+            "ena_sample_accession",
+            "ena_experiment_accession",
+            "ena_run_accession"
+        ],
+        "additional_formating": {
+            "sample_description": [
+                "host_common_name",
+                "anatomical_part",
+                "collection_method"
+            ],
+            "design_description": [
+                "library_layout",
+                "library_preparation_kit",
+                "library_selection",
+                "library_strategy"
+            ],
+            "r1_fastq_filepath": [
+                "r1_fastq_filepath",
+                "sequence_file_R1_fastq"
+            ],
+            "r2_fastq_filepath": [
+                "r2_fastq_filepath",
+                "sequence_file_R2_fastq"
+            ],
+            "experiment_alias": [
+                "isolate_sample_id",
+                "sample_collection_date"
+            ],
+            "run_alias": [
+                "isolate_sample_id",
+                "sample_collection_date"
+            ],
+            "experiment_title": [
+                "sequencing_instrument_model",
+                "isolate_sample_id"
+            ],
+            "file_name": [
+                "sequence_file_R1_fastq",
+                "sequence_file_R2_fastq"
+            ],
+            "file_checksum": [
+                "fastq_r1_md5",
+                "fastq_r2_md5"
+            ]
+        }
+    },
+    "launch_pipeline": {
+        "analysis_name": "RELECOV_icasas_C",
+        "analysis_folder": "ANALYSIS",
+        "sample_stored_folder": "RAW",
+        "sample_link_folder": "00-reads"
+    }
+}

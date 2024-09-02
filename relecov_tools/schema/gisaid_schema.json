@@ -1,0 +1,270 @@
+{
+    "schema": "GISAID#",
+    "required": [
+        "covv_type",
+        "covv_virus_name",
+        "submitter",
+        "covv_orig_lab",
+        "covv_orig_lab_addr",
+        "covv_collection_date",
+        "covv_location",
+        "covv_host",
+        "covv_patient_age",
+        "covv_gender",
+        "covv_seq_technology",
+        "covv_subm_lab",
+        "covv_subm_lab_addr",
+        "covv_authors"
+    ],
+    "type": "object",
+    "properties": {
+        "covv_type": {
+            "examples": ["betacoronavirus"],
+            "ontology": "NCIT:C25284",
+            "type": "string",
+            "description": "default must remain 'betacoronavirus'",
+            "clasification": "Database Identifiers"
+        },
+        "sample_name": {
+            "examples": ["prov_rona_99"],
+            "ontology": "0",
+            "type": "string",
+            "description": "The user-defined name for the sample.",
+            "clasification": "Database Identifiers",
+            "label": "Collecting Sample id"
+        },
+        "covv_virus_name": {
+            "examples": ["hCoV-19/Canada/prov_rona_99/2020"],
+            "ontology": "GENEPIO:0100282",
+            "type": "string",
+            "description": "The user-defined GISAID virus name assigned to the sequence.",
+            "clasification": "Database Identifiers",
+            "label": "GISAID Virus Name"
+        },
+        "submitter": {
+            "examples": [""],
+            "ontology": "NCIT:C54269",
+            "type": "string",
+            "description": "",
+            "clasification": "enter your GISAID-Username",
+            "label": "GISAID Id"
+        },
+        "covv_orig_lab": {
+            "examples": ["Public Health Agency of Canada"],
+            "ontology": "GENEPIO:0001153",
+            "type": "string",
+            "description": "The name of the agency that collected the original sample.",
+            "label": "Originating Laboratory"
+        },
+        "covv_orig_lab_addr": {
+            "examples": ["655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"],
+            "ontology": "GENEPIO:0001158",
+            "type": "string",
+            "description": "The mailing address of the agency submitting the sample.",
+            "clasification": "Sample collection and processing",
+            "label": "Originating Laboratory Address"
+        },
+        "covv_subm_lab_addr": {
+            "examples": ["123 Sunnybrooke St, Toronto, Ontario, M4P 1L6, Canada"],
+            "ontology": "GENEPIO:0001167",
+            "type": "string",
+            "description": "The mailing address of the agency submitting the sequence.",
+            "clasification": "Sample collection and processing",
+            "label": "Submitting Institution Address"
+        },
+        "covv_collection_date": {
+            "examples": ["3/19/2020"],
+            "ontology": "GENEPIO:0001174",
+            "type": "string",
+            "description": "The date on which the sample was collected.",
+            "format": "date",
+            "classification": "Sample collection and processing",
+            "label": "Sample Collection Date"
+        },
+        "covv_location": {
+            "examples": ["e.g. Europe / Germany / Bavaria / Munich"],
+            "ontology": "GENEPIO:0001181",
+            "type": "string",
+            "description": "The country of origin of the sample.",
+            "clasification": "Sample collection and processing",
+            "label": "Geo Loc Autonomic Country"
+        },
+        "covv_host": {
+            "examples": [
+                "e.g. Human, Environment, Canine, Manis javanica, Rhinolophus affinis, etc"
+            ],
+            "ontology": "GENEPIO:0001387",
+            "type": "string",
+            "description": "The taxonomic, or scientific name of the host.",
+            "clasification": "Host information",
+            "label": "Host Scientific Name"
+        },
+        "covv_patient_age": {
+            "ontology": "GENEPIO:0001392",
+            "anyOf": [{"type": "integer"}, {"pattern": "\\d+-\\d+", "type": "string"}],
+            "description": "Age of host at the time of sampling.",
+            "examples": [79],
+            "label": "Host Age"
+        },
+        "covv_specimen": {
+            "enum": [
+                "Blood [UBERON:0000178]",
+                "Fluid [UBERON:0006314]",
+                "Fluid (Cerebrospinal (CSF)) [UBERON:0001359]",
+                "Fluid (Pericardial) [UBERON:0002409]",
+                "Fluid (Pleural) [UBERON:0001087]",
+                "Fluid (Vaginal) [UBERON:0036243]",
+                "Fluid (Amniotic) [UBERON:0000173]",
+                "Saliva [UBERON:0001836]",
+                "Tissue [UBERON:0000479]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "ontology": "GENEPIO:0001211",
+            "type": "string",
+            "description": "A substance obtained from an anatomical part of an organism e.g. tissue, blood.",
+            "examples": ["Blood [UBERON:0000178]"],
+            "classification": "Sample collection and processing",
+            "label": "Organism Substance"
+        },
+        "covv_assembly_method": {
+            "examples": ["Ivar"],
+            "ontology": "GENEPIO:0001463",
+            "type": "string",
+            "description": "The name of software used to generate the consensus sequence.",
+            "clasification": "Bioinformatics and QC metrics",
+            "label": "Consensus sequence software name"
+        },
+        "covv_gender": {
+            "enum": [
+                "Female [NCIT:C46110]",
+                "Male [NCIT:C46109]",
+                "Non-binary Gender [GSSO:000132]",
+                "Transgender (assigned male at birth) [GSSO:004004]",
+                "Transgender (assigned female at birth) [GSSO:004005]",
+                "Undeclared [NCIT:C110959]",
+                "Not Applicable [GENEPIO:0001619]",
+                "Not Collected [GENEPIO:0001620]",
+                "Not Provided [GENEPIO:0001668]",
+                "Missing [GENEPIO:0001618]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "examples": ["Male [NCIT:C46109]"],
+            "ontology": "GENEPIO:0001395",
+            "type": "string",
+            "description": "The gender of the host at the time of sample collection.",
+            "clasification": "Host information"
+        },
+        "covv_seq_technology": {
+            "examples": [
+                "e.g. Illumina Miseq, Sanger, Nanopore MinION, Ion Torrent, etc."
+            ],
+            "ontology": "GENEPIO:0001452",
+            "type": "string",
+            "description": "The model of the sequencing instrument used.",
+            "classification": "Sequencing",
+            "label": "Sequencing Instrument Model"
+        },
+        "covv_authors": {
+            "examples": [""],
+            "ontology": "GENEPIO:0001517",
+            "type": "string",
+            "description": "",
+            "clasification": "Contributor Acknowledgement",
+            "label": "Authors"
+        },
+        "covv_coverage": {
+            "examples": ["400x"],
+            "ontology": "GENEPIO:0001474",
+            "type": "string",
+            "description": "The average number of reads representing a given nucleotide in the reconstructed sequence.",
+            "clasification": "Bioinformatics and QC metrics",
+            "label": "Depth of coverage value "
+        },
+        "covv_fasta_filename": {
+            "examples": [""],
+            "ontology": "GENEPIO:0001460",
+            "type": "string",
+            "description": "Filename that contains the sequence without path",
+            "clasification": "Bioinformatics and QC metrics"
+        },
+        "covv_add_host_info": {
+            "examples": ["e.g. Patient infected while traveling in …."],
+            "ontology": "GENEPIO_0001268",
+            "type": "string",
+            "description": "If the information is unknown or can not be shared, leave blank.",
+            "clasification": "Host information",
+            "label": "Additional Host Information"
+        },
+        "covv_last_vaccinated": {
+            "examples": ["e.g. 04/09/2021"],
+            "ontology": "0",
+            "type": "string",
+            "description": "The date the host received their last dose of vaccine.",
+            "format": "date",
+            "clasification": "Host information"
+        },
+        "covv_outbreak": {
+            "examples": ["Date, Location e.g. type of gathering, Family cluster, etc."],
+            "ontology": "GENEPIO:0001417",
+            "type": "string",
+            "description": "If the information is unknown or can not be shared, leave blank.",
+            "clasification": "Host information",
+            "label": "Outbreak Exposure Event Location"
+        },
+        "covv_sampling_strategy": {
+            "examples": [
+                "e.g. Sentinel surveillance (ILI), Sentinel surveillance (ARI), Sentinel surveillance (SARI), Non-sentinel-surveillance (hospital), Non-sentinel-surveillance (GP network), Longitudinal sampling on same patient(s), S gene dropout"
+            ],
+            "ontology": "GENEPIO:0001445",
+            "type": "string",
+            "description": "The reason that the sample was sequenced.",
+            "classification": "Sequencing",
+            "label": "Purpose of Sequencing"
+        },
+        "submitting_lab_sequence_id": {
+            "examples": [""],
+            "ontology": "0",
+            "type": "string",
+            "description": "Sample ID given by the submitting laboratory",
+            "clasification": "Database Identifiers"
+        },
+        "covv_subm_lab": {
+            "examples": ["Centers for Disease Control and Prevention"],
+            "ontology": "GENEPIO:0001159",
+            "type": "string",
+            "description": "The name of the agency that generated the sequence.",
+            "label": "Submitting Institution"
+        },
+        "covv_subm_sample_id": {
+            "examples": "",
+            "ontology": "GENEPIO:0001148",
+            "type": "string",
+            "description": "Sample ID given by the submitting laboratory",
+            "classification": "Database Identifiers",
+            "label": "Sample ID given by submitting laboratory",
+            "fill_mode": "sample"
+        },
+        "covv_provider_sample_id": {
+            "examples": ["prov_rona_99"],
+            "ontology": "GENEPIO:0001123",
+            "type": "string",
+            "description": "The user-defined name for the sample.",
+            "classification": "Database Identifiers",
+            "label": "Sample ID given by originating laboratory",
+            "fill_mode": "sample"
+        },
+        "covv_patient_status": {
+            "examples": ["Hospitalized", "Released", "Live", "Deceased"],
+            "ontology": "GENEPIO:0001388",
+            "type": "string",
+            "description": " Status of the host",
+            "classification": "Host information",
+            "label": "Host health state",
+            "fill_mode": "sample"
+        }
+    }
+}

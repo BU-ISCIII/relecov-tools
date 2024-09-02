@@ -1,0 +1,1352 @@
+{
+  "schema": "ENA",
+  "version": "2.0.0",
+  "required": [
+    "sample_title",
+    "collecting institution",
+    "geographic location (country and/or sea)",
+    "isolate",
+    "collector name",
+    "host scientific name",
+    "host common name",
+    "instrument_model",
+    "host subject id",
+    "host health state",
+    "host sex",
+    "host scientific name",
+    "scientific_name",
+    "sample_description",
+    "library_source",
+    "library_selection",
+    "library_strategy",
+    "library_layout",
+    "sample_alias",
+    "study_alias",
+    "experiment_alias",
+    "run_alias",
+    "experiment_title",
+    "study_title",
+    "study_type",
+    "platform",
+    "file_format",
+    "file_name"
+  ],
+  "type": "object",
+  "properties": {
+    "virus identifier": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001123",
+      "type": "string",
+      "description": "Unique laboratory identifier assigned to the virus by the investigator. Strain name is not sufficient since it might not be unique due to various passsages of the same virus. Format: up to 50 alphanumeric characters",
+      "clasification": "Database Identifiers",
+      "label": "Sample ID given by originating laboratory",
+      "table": [
+        "sample",
+        "experiments"
+      ]
+    },
+    "collecting institution": {
+      "examples": [
+        "Public Health Agency of Canada"
+      ],
+      "ontology": "GENEPIO:0001153",
+      "type": "string",
+      "description": "Name of the institution to which the person collecting the specimen belongs. Format: Institute Name, Institute Address",
+      "label": "Originating Laboratory",
+      "table": "sample"
+    },
+    "collector name": {
+      "examples": [
+        "John Smith, unknown"
+      ],
+      "ontology": "GENEPIO:0001797",
+      "type": "string",
+      "description": "Name of the person who collected the specimen",
+      "clasification": "Sample collection and processing",
+      "label": "Sample collector name",
+      "table": "sample"
+    },
+    "collection date": {
+      "examples": [
+        "3/19/2020"
+      ],
+      "ontology": "GENEPIO:0001174",
+      "type": "string",
+      "description": "The date on which the sample was collected.",
+      "format": "date",
+      "classification": "Sample collection and processing",
+      "label": "Sample Collection Date",
+      "table": "sample"
+    },
+    "receipt date": {
+      "examples": [
+        "3/21/2020"
+      ],
+      "ontology": "NCIT:C93644",
+      "type": "string",
+      "description": "The date on which the sample was received.",
+      "format": "date",
+      "clasification": "Sample collection and processing",
+      "label": "Sample Received Date"
+    },
+    "design_description": {
+      "examples": [
+        "design_description_1"
+      ],
+      "ontology": "NCIT:C147139",
+      "type": "string",
+      "description": "",
+      "clasification": "",
+      "label": "Design description",
+      "table": [
+        "experiments"
+      ]
+    },
+    "geographic location (country and/or sea)": {
+      "enum": [
+        "Afghanistan [GAZ:00006882]",
+        "Albania [GAZ:00002953]",
+        "Algeria [GAZ:00000563]",
+        "American Samoa [GAZ:00003957]",
+        "Andorra [GAZ:00002948]",
+        "Angola [GAZ:00001095]",
+        "Anguilla [GAZ:00009159]",
+        "Antarctica [GAZ:00000462]",
+        "Antigua and Barbuda [GAZ:00006883]",
+        "Argentina [GAZ:00002928]",
+        "Armenia [GAZ:00004094]",
+        "Aruba [GAZ:00004025]",
+        "Ashmore and Cartier Islands [GAZ:00005901]",
+        "Australia [GAZ:00000463]",
+        "Austria [GAZ:00002942]",
+        "Azerbaijan [GAZ:00004941]",
+        "Bahamas [GAZ:00002733]",
+        "Bahrain [GAZ:00005281]",
+        "Baker Island [GAZ:00007117]",
+        "Bangladesh [GAZ:00003750]",
+        "Barbados [GAZ:00001251]",
+        "Bassas da India [GAZ:00005810]",
+        "Belarus [GAZ:00006886]",
+        "Belgium [GAZ:00002938]",
+        "Belize [GAZ:00002934]",
+        "Benin [GAZ:00000904]",
+        "Bermuda [GAZ:00001264]",
+        "Bhutan [GAZ:00003920]",
+        "Bolivia [GAZ:00002511]",
+        "Borneo [GAZ:00025355]",
+        "Bosnia and Herzegovina [GAZ:00006887]",
+        "Botswana [GAZ:00001097]",
+        "Bouvet Island [GAZ:00001453]",
+        "Brazil [GAZ:00002828]",
+        "British Virgin Islands [GAZ:00003961]",
+        "Brunei [GAZ:00003901]",
+        "Bulgaria [GAZ:00002950]",
+        "Burkina Faso [GAZ:00000905]",
+        "Burundi [GAZ:00001090]",
+        "Cambodia [GAZ:00006888]",
+        "Cameroon [GAZ:00001093]",
+        "Canada [GAZ:00002560]",
+        "Cape Verde [GAZ:00001227]",
+        "Cayman Islands [GAZ:00003986]",
+        "Central African Republic [GAZ:00001089]",
+        "Chad [GAZ:00000586]",
+        "Chile [GAZ:00002825]",
+        "China [GAZ:00002845]",
+        "Christmas Island [GAZ:00005915]",
+        "Clipperton Island [GAZ:00005838]",
+        "Cocos Islands [GAZ:00009721]",
+        "Colombia [GAZ:00002929]",
+        "Comoros [GAZ:00005820]",
+        "Cook Islands [GAZ:00053798]",
+        "Coral Sea Islands [GAZ:00005917]",
+        "Costa Rica [GAZ:00002901]",
+        "Cote d'Ivoire [GAZ:00000906]",
+        "Croatia [GAZ:00002719]",
+        "Cuba [GAZ:00003762]",
+        "Curacao [GAZ:00012582]",
+        "Cyprus [GAZ:00004006]",
+        "Czech Republic [GAZ:00002954]",
+        "Democratic Republic of the Congo [GAZ:00001086]",
+        "Denmark [GAZ:00005852]",
+        "Djibouti [GAZ:00000582]",
+        "Dominica [GAZ:00006890]",
+        "Dominican Republic [GAZ:00003952]",
+        "Ecuador [GAZ:00002912]",
+        "Egypt [GAZ:00003934]",
+        "El Salvador [GAZ:00002935]",
+        "Equatorial Guinea [GAZ:00001091]",
+        "Eritrea [GAZ:00000581]",
+        "Estonia [GAZ:00002959]",
+        "Eswatini [GAZ:00001099]",
+        "Ethiopia [GAZ:00000567]",
+        "Europa Island [GAZ:00005811]",
+        "Falkland Islands (Islas Malvinas) [GAZ:00001412]",
+        "Faroe Islands [GAZ:00059206]",
+        "Fiji [GAZ:00006891]",
+        "Finland [GAZ:00002937]",
+        "France [GAZ:00003940]",
+        "French Guiana [GAZ:00002516]",
+        "French Polynesia [GAZ:00002918]",
+        "French Southern and Antarctic Lands [GAZ:00003753]",
+        "Gabon [GAZ:00001092]",
+        "Gambia [GAZ:00000907]",
+        "Gaza Strip [GAZ:00009571]",
+        "Georgia [GAZ:00004942]",
+        "Germany [GAZ:00002646]",
+        "Ghana [GAZ:00000908]",
+        "Gibraltar [GAZ:00003987]",
+        "Glorioso Islands [GAZ:00005808]",
+        "Greece [GAZ:00002945]",
+        "Greenland [GAZ:00001507]",
+        "Grenada [GAZ:02000573]",
+        "Guadeloupe [GAZ:00067142]",
+        "Guam [GAZ:00003706]",
+        "Guatemala [GAZ:00002936]",
+        "Guernsey [GAZ:00001550]",
+        "Guinea [GAZ:00000909]",
+        "Guinea-Bissau [GAZ:00000910]",
+        "Guyana [GAZ:00002522]",
+        "Haiti [GAZ:00003953]",
+        "Heard Island and McDonald Islands [GAZ:00009718]",
+        "Honduras [GAZ:00002894]",
+        "Hong Kong [GAZ:00003203]",
+        "Howland Island [GAZ:00007120]",
+        "Hungary [GAZ:00002952]",
+        "Iceland [GAZ:00000843]",
+        "India [GAZ:00002839]",
+        "Indonesia [GAZ:00003727]",
+        "Iran [GAZ:00004474]",
+        "Iraq [GAZ:00004483]",
+        "Ireland [GAZ:00002943]",
+        "Isle of Man [GAZ:00052477]",
+        "Israel [GAZ:00002476]",
+        "Italy [GAZ:00002650]",
+        "Jamaica [GAZ:00003781]",
+        "Jan Mayen [GAZ:00005853]",
+        "Japan [GAZ:00002747]",
+        "Jarvis Island [GAZ:00007118]",
+        "Jersey [GAZ:00001551]",
+        "Johnston Atoll [GAZ:00007114]",
+        "Jordan [GAZ:00002473]",
+        "Juan de Nova Island [GAZ:00005809]",
+        "Kazakhstan [GAZ:00004999]",
+        "Kenya [GAZ:00001101]",
+        "Kerguelen Archipelago [GAZ:00005682]",
+        "Kingman Reef [GAZ:00007116]",
+        "Kiribati [GAZ:00006894]",
+        "Kosovo [GAZ:00011337]",
+        "Kuwait [GAZ:00005285]",
+        "Kyrgyzstan [GAZ:00006893]",
+        "Laos [GAZ:00006889]",
+        "Latvia [GAZ:00002958]",
+        "Lebanon [GAZ:00002478]",
+        "Lesotho [GAZ:00001098]",
+        "Liberia [GAZ:00000911]",
+        "Libya [GAZ:00000566]",
+        "Liechtenstein [GAZ:00003858]",
+        "Line Islands [GAZ:00007144]",
+        "Lithuania [GAZ:00002960]",
+        "Luxembourg [GAZ:00002947]",
+        "Macau [GAZ:00003202]",
+        "Madagascar [GAZ:00001108]",
+        "Malawi [GAZ:00001105]",
+        "Malaysia [GAZ:00003902]",
+        "Maldives [GAZ:00006924]",
+        "Mali [GAZ:00000584]",
+        "Malta [GAZ:00004017]",
+        "Marshall Islands [GAZ:00007161]",
+        "Martinique [GAZ:00067143]",
+        "Mauritania [GAZ:00000583]",
+        "Mauritius [GAZ:00003745]",
+        "Mayotte [GAZ:00003943]",
+        "Mexico [GAZ:00002852]",
+        "Micronesia [GAZ:00005862]",
+        "Midway Islands [GAZ:00007112]",
+        "Moldova [GAZ:00003897]",
+        "Monaco [GAZ:00003857]",
+        "Mongolia [GAZ:00008744]",
+        "Montenegro [GAZ:00006898]",
+        "Montserrat [GAZ:00003988]",
+        "Morocco [GAZ:00000565]",
+        "Mozambique [GAZ:00001100]",
+        "Myanmar [GAZ:00006899]",
+        "Namibia [GAZ:00001096]",
+        "Nauru [GAZ:00006900]",
+        "Navassa Island [GAZ:00007119]",
+        "Nepal [GAZ:00004399]",
+        "Netherlands [GAZ:00002946]",
+        "New Caledonia [GAZ:00005206]",
+        "New Zealand [GAZ:00000469]",
+        "Nicaragua [GAZ:00002978]",
+        "Niger [GAZ:00000585]",
+        "Nigeria [GAZ:00000912]",
+        "Niue [GAZ:00006902]",
+        "Norfolk Island [GAZ:00005908]",
+        "North Korea [GAZ:00002801]",
+        "North Macedonia [GAZ:00006895]",
+        "North Sea [GAZ:00002284]",
+        "Northern Mariana Islands [GAZ:00003958]",
+        "Norway [GAZ:00002699]",
+        "Oman [GAZ:00005283]",
+        "Pakistan [GAZ:00005246]",
+        "Palau [GAZ:00006905]",
+        "Panama [GAZ:00002892]",
+        "Papua New Guinea [GAZ:00003922]",
+        "Paracel Islands [GAZ:00010832]",
+        "Paraguay [GAZ:00002933]",
+        "Peru [GAZ:00002932]",
+        "Philippines [GAZ:00004525]",
+        "Pitcairn Islands [GAZ:00005867]",
+        "Poland [GAZ:00002939]",
+        "Portugal [GAZ:00004126]",
+        "Puerto Rico [GAZ:00006935]",
+        "Qatar [GAZ:00005286]",
+        "Republic of the Congo [GAZ:00001088]",
+        "Reunion [GAZ:00003945]",
+        "Romania [GAZ:00002951]",
+        "Ross Sea [GAZ:00023304]",
+        "Russia [GAZ:00002721]",
+        "Rwanda [GAZ:00001087]",
+        "Saint Helena [GAZ:00000849]",
+        "Saint Kitts and Nevis [GAZ:00006906]",
+        "Saint Lucia [GAZ:00006909]",
+        "Saint Pierre and Miquelon [GAZ:00003942]",
+        "Saint Martin [GAZ:00005841]",
+        "Saint Vincent and the Grenadines [GAZ:02000565]",
+        "Samoa [GAZ:00006910]",
+        "San Marino [GAZ:00003102]",
+        "Sao Tome and Principe [GAZ:00006927]",
+        "Saudi Arabia [GAZ:00005279]",
+        "Senegal [GAZ:00000913]",
+        "Serbia [GAZ:00002957]",
+        "Seychelles [GAZ:00006922]",
+        "Sierra Leone [GAZ:00000914]",
+        "Singapore [GAZ:00003923]",
+        "Sint Maarten [GAZ:00012579]",
+        "Slovakia [GAZ:00002956]",
+        "Slovenia [GAZ:00002955]",
+        "Solomon Islands [GAZ:00005275]",
+        "Somalia [GAZ:00001104]",
+        "South Africa [GAZ:00001094]",
+        "South Georgia and the South Sandwich Islands [GAZ:00003990]",
+        "South Korea [GAZ:00002802]",
+        "South Sudan [GAZ:00233439]",
+        "Spain [GAZ:00003936]",
+        "Spratly Islands [GAZ:00010831]",
+        "Sri Lanka [GAZ:00003924]",
+        "State of Palestine [GAZ:00002475]",
+        "Sudan [GAZ:00000560]",
+        "Suriname [GAZ:00002525]",
+        "Svalbard [GAZ:00005396]",
+        "Swaziland [GAZ:00001099]",
+        "Sweden [GAZ:00002729]",
+        "Switzerland [GAZ:00002941]",
+        "Syria [GAZ:00002474]",
+        "Taiwan [GAZ:00005341]",
+        "Tajikistan [GAZ:00006912]",
+        "Tanzania [GAZ:00001103]",
+        "Thailand [GAZ:00003744]",
+        "Timor-Leste [GAZ:00006913]",
+        "Togo [GAZ:00000915]",
+        "Tokelau [GAZ:00260188]",
+        "Tonga [GAZ:00006916]",
+        "Trinidad and Tobago [GAZ:00003767]",
+        "Tromelin Island [GAZ:00005812]",
+        "Tunisia [GAZ:00000562]",
+        "Turkey [GAZ:00000558]",
+        "Turkmenistan [GAZ:00005018]",
+        "Turks and Caicos Islands [GAZ:00003955]",
+        "Tuvalu [GAZ:00009715]",
+        "USA [GAZ:00002459]",
+        "Uganda [GAZ:00001102]",
+        "Ukraine [GAZ:00002724]",
+        "United Arab Emirates [GAZ:00005282]",
+        "United Kingdom [GAZ:00002637]",
+        "Uruguay [GAZ:00002930]",
+        "Uzbekistan [GAZ:00004979]",
+        "Vanuatu [GAZ:00006918]",
+        "Venezuela [GAZ:00002931]",
+        "Viet Nam [GAZ:00003756]",
+        "Virgin Islands [GAZ:00003959]",
+        "Wake Island [GAZ:00007111]",
+        "Wallis and Futuna [GAZ:00007191]",
+        "West Bank [GAZ:00009572]",
+        "Western Sahara [GAZ:00000564]",
+        "Yemen [GAZ:00005284]",
+        "Zambia [GAZ:00001107]",
+        "Zimbabwe [GAZ:00001106]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
+      "ontology": "GENEPIO:0001181",
+      "type": "string",
+      "description": "The country of origin of the sample.",
+      "examples": [
+        "South Africa [GAZ:00001094]"
+      ],
+      "clasification": "Sample collection and processing",
+      "label": "Geo Loc Autonomic Country",
+      "table": "sample"
+    },
+    "geographic location (region and locality)": {
+      "ontology": "NCIT:C87189",
+      "type": "string",
+      "description": "The county/region of origin of the sample.",
+      "examples": [
+        "Derbyshire"
+      ],
+      "clasification": "Sample collection and processing",
+      "label": "Geo Loc Province"
+    },
+    "geographic location (latitude)": {
+      "ontology": "OBI:0001620",
+      "type": "string",
+      "description": "The latitude coordinates of the geographical location of sample collection.",
+      "examples": [
+        "38.98 N"
+      ],
+      "clasification": "Sample collection and processing",
+      "label": "Geo Loc Latitude"
+    },
+    "geographic location (longitude)": {
+      "ontology": "OBI:0001621",
+      "type": "string",
+      "description": "The longitude coordinates of the geographical location of sample collection.",
+      "examples": [
+        "77.11 W"
+      ],
+      "clasification": "Sample collection and processing",
+      "label": "Geo Loc Longitude"
+    },
+    "isolate": {
+      "ontology": "GENEPIO:0001644",
+      "type": "string",
+      "description": "Identifier of the specific isolate.",
+      "examples": [
+        "SARS-CoV-2/human/USA/CA-CDPH-001/2020"
+      ],
+      "genepio_label": "isolate identifier",
+      "clasification": "Sample collection and processing",
+      "label": "Sample ID given by originating laboratory",
+      "table": "sample"
+    },
+    "sample capture status": {
+      "examples": [
+        "Diagnostic testing"
+      ],
+      "enum": [
+        "Cluster/Outbreak Investigation [GENEPIO:0100001]",
+        "Diagnostic Testing [GENEPIO:0100002]",
+        "Research [GENEPIO:0100003]",
+        "Protocol Testing [GENEPIO:0100024]",
+        "Surveillance [GENEPIO:0100004]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
+      "ontology": "GENEPIO:0001198",
+      "type": "string",
+      "description": "The reason that the sample was collected.",
+      "clasification": "Sample collection and processing"
+    },
+    "isolation source host-associated": {
+      "enum": [
+        "Blood [UBERON:0000178]",
+        "Fluid [UBERON:0006314]",
+        "Fluid (Cerebrospinal (CSF)) [UBERON:0001359]",
+        "Fluid (Pericardial) [UBERON:0002409]",
+        "Fluid (Pleural) [UBERON:0001087]",
+        "Fluid (Vaginal) [UBERON:0036243]",
+        "Fluid (Amniotic) [UBERON:0000173]",
+        "Saliva [UBERON:0001836]",
+        "Tissue [UBERON:0000479]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
+      "ontology": "GENEPIO:0001211",
+      "type": "string",
+      "description": "A substance obtained from an anatomical part of an organism e.g. tissue, blood.",
+      "examples": [
+        "Blood [UBERON:0000178]"
+      ],
+      "classification": "Sample collection and processing",
+      "label": "Specimen source"
+    },
+    "isolation source non-host-associated": {
+      "enum": [
+        "Air vent [ENVO:03501208]",
+        "Banknote [ENVO:00003896]",
+        "Bed rail [ENVO:03501209]",
+        "Building Floor [ENVO:01000486]",
+        "Cloth [ENVO:02000058]",
+        "Control Panel [ENVO:03501210]",
+        "Door [ENVO:03501220]",
+        "Door Handle [ENVO:03501211]",
+        "Face Mask [OBI:0002787]",
+        "Face Shield [OBI:0002791]",
+        "Food [FOODON:00002403]",
+        "Food Packaging [FOODON:03490100]",
+        "Glass [ENVO:01000481]",
+        "Handrail [ENVO:03501212]",
+        "Hospital Gown [OBI:0002796]",
+        "Light Switch [ENVO:03501213]",
+        "Locker [ENVO:03501214]",
+        "N95 Mask [OBI:0002790]",
+        "Nurse Call Button [ENVO:03501215]",
+        "Paper [ENVO:03501256]",
+        "Particulate Matter [ENVO:01000060]",
+        "Plastic [ENVO:01000404]",
+        "PPE Gown [GENEPIO:0100025]",
+        "Sewage [ENVO:00002018]",
+        "Sink [ENVO:01000990]",
+        "Soil [ENVO:00001998]",
+        "Stainless Steel [ENVO:03501216]",
+        "Tissue Paper [ENVO:03501217]",
+        "Toilet Bowl [ENVO:03501218]",
+        "Water [ENVO:00002006]",
+        "Wastewater [ENVO:00002001]",
+        "Window [ENVO:03501219]",
+        "Wood [ENVO:00002040]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
+      "ontology": "GENEPIO:0001223",
+      "type": "string",
+      "description": "A substance obtained from the natural or man-made environment e.g. soil, water, sewage, door handle, bed handrail, face mask.",
+      "examples": [
+        "Face Mask [OBI:0002787]"
+      ],
+      "clasification": "Sample collection and processing",
+      "label": "Environmental Material"
+    },
+    "host common name": {
+      "enum": [
+        "Human [NCBITaxon:9606]",
+        "Bat [NCBITaxon:9397]",
+        "Cat [NCBITaxon:9685]",
+        "Chicken [NCBITaxon:9031]",
+        "Civet [NCBITaxon:9673]",
+        "Cow [NCBITaxon:9913]",
+        "Dog [NCBITaxon:9615]",
+        "Lion [NCBITaxon:9689]",
+        "Mink [NCBITaxon:452646]",
+        "Pangolin [NCBITaxon:9973]",
+        "Pig [NCBITaxon:9825]",
+        "Pigeon [NCBITaxon:8930]",
+        "Tiger [NCBITaxon:9694]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
+      "ontology": "GENEPIO:0001386",
+      "type": "string",
+      "description": "The commonly used name of the host.",
+      "examples": [
+        "Human [NCBITaxon:9606]"
+      ],
+      "classification": "Host information",
+      "label": "Host Common Name",
+      "table": "sample"
+    },
+    "host scientific name": {
+      "enum": [
+        "Bos taurus [NCBITaxon:9913]",
+        "Canis lupus familiaris [NCBITaxon:9615]",
+        "Chiroptera [NCBITaxon:9397]",
+        "Columbidae [NCBITaxon:8930]",
+        "Felis catus [NCBITaxon:9685]",
+        "Gallus gallus [NCBITaxon:9031]",
+        "Homo sapiens [NCBITaxon:9606]",
+        "Manis [NCBITaxon:9973]",
+        "Manis javanica [NCBITaxon:9974]",
+        "Neovison vison [NCBITaxon:452646]",
+        "Panthera leo [NCBITaxon:9689]",
+        "Panthera tigris [NCBITaxon:9694]",
+        "Rhinolophidae [NCBITaxon:58055]",
+        "Rhinolophus affinis [NCBITaxon:59477]",
+        "Sus scrofa domesticus [NCBITaxon:9825]",
+        "Viverridae [NCBITaxon:9673]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
+      "ontology": "GENEPIO:0001387",
+      "type": "string",
+      "description": "The taxonomic, or scientific name of the host.",
+      "examples": [
+        "Homo sapiens [NCBITaxon:9606]"
+      ],
+      "clasification": "Host information",
+      "label": "Host Scientific Name",
+      "table": [
+        "runs"
+      ]
+    },
+    "host subject id": {
+      "examples": [
+        "e.g. #131"
+      ],
+      "ontology": "GENEPIO:0000079",
+      "type": "string",
+      "description": "a unique identifier by which each subject can be referred to, de-identified.",
+      "clasification": "Host information",
+      "label": "Host Subject Id",
+      "table": [
+        "sample"
+      ]
+    },
+    "taxon_id": {
+      "examples": [
+        "2697049"
+      ],
+      "ontology": "NCIT:C164641",
+      "type": "string",
+      "description": "The NCBITaxon identifier for the organism being sequenced.",
+      "classification": "Sample collection and processing",
+      "label": "Tax ID",
+      "fill_mode": "batch",
+      "minLenght": "1"
+    },
+    "definition for seropositive sample": {
+      "examples": [
+        ""
+      ],
+      "ontology": "NCIT:C159692",
+      "type": "string",
+      "description": " The cut off value used by an investigatior in determining that a sample was seropositive.",
+      "clasification": "Sample collection and processing",
+      "label": "Definition for seropositive sample",
+      "table": [
+        "sample"
+      ]
+    },
+    "serotype (required for a seropositive sample)": {
+      "examples": [
+        "h1n1"
+      ],
+      "ontology": "NCIT:C88894",
+      "type": "string",
+      "description": " erological variety of a species characterised by its antigenic properties. For influenza, ha subtype should be the letter h followed by a number between 1-16 unless novel subtype is identified and the na subtype should be the letter n followed by a number between 1-9 unless novel subtype is identified. If only one of the subtypes have been tested then use the format h5nx or hxn1.",
+      "clasification": "Sample collection and processing",
+      "label": "Serotype (required for a seropositive sample)",
+      "table": [
+        "sample"
+      ]
+    },
+    "host habitat": {
+      "examples": [
+        ""
+      ],
+      "ontology": "ENVO:00002036",
+      "type": "string",
+      "description": "Natural habitat of the avian or mammalian host.",
+      "clasification": "Sample collection and processing",
+      "label": "Host habitat",
+      "table": [
+        "sample"
+      ]
+    },
+    "host description": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0000009",
+      "type": "string",
+      "description": "Other descriptive information relating to the host.",
+      "clasification": "Host information",
+      "label": "Host description",
+      "table": [
+        "sample"
+      ]
+    },
+    "gravidity": {
+      "examples": [
+        ""
+      ],
+      "ontology": "OBI:0002456",
+      "type": "string",
+      "description": "Whether or not the subject is gravid. If so, report date due or date post-conception and specify which of these two dates is being reported.",
+      "clasification": "Host information",
+      "label": "Gravidity",
+      "table": [
+        "sample"
+      ]
+    },
+    "strain": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001123",
+      "type": "string",
+      "description": "Name of the strain from which the sample was obtained..",
+      "clasification": "Sample collection and processing",
+      "label": "Strain",
+      "table": [
+        "sample"
+      ]
+    },
+    "host_age": {
+      "ontology": "GENEPIO:0001392",
+      "type": "string",
+      "description": "Age of host at the time of sampling.",
+      "examples": [
+        "79"
+      ],
+      "classification": "Host information",
+      "label": "Host Age",
+      "fill_mode": "sample"
+    },
+    "host disease outcome": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001390",
+      "type": "string",
+      "description": "Disease outcome in the host.",
+      "clasification": "Host information",
+      "label": "Host disease outcome",
+      "table": [
+        "sample"
+      ]
+    },
+    "host health state": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001388",
+      "type": "string",
+      "description": " Status of the host",
+      "clasification": "Host information",
+      "label": "Host health state",
+      "table": [
+        "sample"
+      ]
+    },
+    "type exposure": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001417",
+      "type": "string",
+      "description": " Date, Location e.g. type of gathering, Family cluster, etc.",
+      "clasification": "Host information",
+      "label": "Outbreak Exposure Event Location",
+      "table": [
+        "sample"
+      ]
+    },
+    "personal protective equipment": {
+      "examples": [
+        ""
+      ],
+      "ontology": "NCIT:C173748",
+      "type": "string",
+      "description": "Use of personal protective equipment, such as gloves, gowns, during any type of exposure. Example: mask",
+      "clasification": "Host information",
+      "label": "Personal protective equipment",
+      "table": [
+        "sample"
+      ]
+    },
+    "host sex": {
+      "enum": [
+        "Female [NCIT:C46110]",
+        "Male [NCIT:C46109]",
+        "Non-binary Gender [GSSO:000132]",
+        "Transgender (assigned male at birth) [GSSO:004004]",
+        "Transgender (assigned female at birth) [GSSO:004005]",
+        "Undeclared [NCIT:C110959]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
+      "ontology": "GENEPIO:0001395",
+      "type": "string",
+      "description": "The gender of the host at the time of sample collection.",
+      "examples": [
+        "Male [NCIT:C46109]"
+      ],
+      "label": "Host Gender",
+      "table": [
+        "sample"
+      ]
+    },
+    "subject exposure duration": {
+      "examples": [
+        "e.g. Patient infected while traveling in …."
+      ],
+      "ontology": "NCIT:C83280",
+      "type": "string",
+      "description": "If the information is unknown or can not be shared, leave blank.",
+      "clasification": "Host information",
+      "label": "Additional Host Information"
+    },
+    "instrument_model": {
+      "enum": [
+        "Illumina sequencing instrument [GENEPIO:0100105]",
+        "Illumina Genome Analyzer [GENEPIO:0100106]",
+        "Illumina Genome Analyzer II [GENEPIO:0100107]",
+        "Illumina Genome Analyzer IIx [GENEPIO:0100108]",
+        "Illumina HiScanSQ [GENEPIO:0100109]",
+        "Illumina HiSeq [GENEPIO:0100110]",
+        "Illumina HiSeq X [GENEPIO:0100111]",
+        "Illumina HiSeq X Five [GENEPIO:0100112]",
+        "Illumina HiSeq X Ten [GENEPIO:0100113]",
+        "Illumina HiSeq 1000 [GENEPIO:0100114]",
+        "Illumina HiSeq 1500 [GENEPIO:0100115]",
+        "Illumina HiSeq 2000 [GENEPIO:0100116]",
+        "Illumina HiSeq 2500 [GENEPIO:0100117]",
+        "Illumina HiSeq 3000 [GENEPIO:0100118]",
+        "Illumina HiSeq 4000 [GENEPIO:0100119]",
+        "Illumina iSeq [GENEPIO:0100120]",
+        "Illumina iSeq 100 [GENEPIO:0100121]",
+        "Illumina NovaSeq [GENEPIO:0100122]",
+        "Illumina NovaSeq 6000 [GENEPIO:0100123]",
+        "Illumina MiniSeq [GENEPIO:0100124]",
+        "Illumina MiSeq [GENEPIO:0100125]",
+        "Illumina NextSeq [GENEPIO:0100126]",
+        "Illumina NextSeq 500 [GENEPIO:0100127]",
+        "Illumina NextSeq 550 [GENEPIO:0100128]",
+        "Illumina NextSeq 2000 [GENEPIO:0100129]",
+        "Pacific Biosciences sequencing instrument [GENEPIO:0100130]",
+        "PacBio RS [GENEPIO:0100131]",
+        "PacBio RS II [GENEPIO:0100132]",
+        "PacBio Sequel [GENEPIO:0100133]",
+        "PacBio Sequel II [GENEPIO:0100134]",
+        "Ion Torrent sequencing instrument [GENEPIO:0100135]",
+        "Ion Torrent PGM [GENEPIO:0100136]",
+        "Ion Torrent Proton [GENEPIO:0100137]",
+        "Ion Torrent S5 XL [GENEPIO:0100138]",
+        "Ion Torrent S5 [GENEPIO:0100139]",
+        "Oxford Nanopore sequencing instrument [GENEPIO:0100140]",
+        "Oxford Nanopore GridION [GENEPIO:0100141]",
+        "Oxford Nanopore MinION [GENEPIO:0100142]",
+        "Oxford Nanopore PromethION [GENEPIO:0100143]",
+        "BGI Genomics sequencing instrument [GENEPIO:0100144]",
+        "BGI SEQ-500 [GENEPIO:0100145]",
+        "MGI sequencing instrument [GENEPIO:0100146]",
+        "MGI DNBSEQ-T7 [GENEPIO:0100147]",
+        "MGI DNBSEQ-G400 [GENEPIO:0100148]",
+        "MGI DNBSEQ-G400RS FAST [GENEPIO:0100149]",
+        "MGI DNBSEQ-G50 [GENEPIO:0100150]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
+      "ontology": "GENEPIO:0001452",
+      "type": "string",
+      "description": "The model of the sequencing instrument used.",
+      "examples": [
+        "Oxford Nanopore MinION [GENEPIO:0100142]"
+      ],
+      "classification": "Sequencing",
+      "label": "Sequencing Instrument Model",
+      "table": [
+        "experiments"
+      ]
+    },
+    "platform": {
+      "enum": [
+        "Oxford Nanopore [OBI:0002750]",
+        "Illumina [OBI:0000759]",
+        "Ion Torrent [GENEPIO:0002683]",
+        "PacBio [GENEPIO:0001927]",
+        "BGI",
+        "MGI",
+        "Other"
+      ],
+      "examples": [
+        "Illumina"
+      ],
+      "ontology": "GENEPIO_0000071",
+      "type": "string",
+      "description": "",
+      "classification": "Sequencing",
+      "label": "Sequencing Instrument Platform",
+      "fill_mode": "batch",
+      "minLenght": "1"
+    },
+    "sequence_file_R1_fastq": {
+      "examples": [
+        "ABC123_S1_L001_R1_001.fastq.gz"
+      ],
+      "ontology": "GENEPIO:0001476",
+      "type": "string",
+      "description": "The user-specified filename of the r1 FASTQ file.",
+      "clasification": "Bioinformatics and QC metrics",
+      "label": "Sequence file R1 fastq"
+    },
+    "sequence_file_R2_fastq": {
+      "examples": [
+        "ABC123_S1_L001_R2_001.fastq.gz"
+      ],
+      "ontology": "GENEPIO:0001477",
+      "type": "string",
+      "description": "The user-specified filename of the r2 FASTQ file.",
+      "clasification": "Bioinformatics and QC metrics",
+      "label": "Sequence file R2 fastq"
+    },
+    "r1_fastq_filepath": {
+      "examples": [
+        "/User/Documents/RespLab/Data/"
+      ],
+      "ontology": "GENEPIO:0001478",
+      "type": "string",
+      "description": "The filepath of the r1 FASTQ file.",
+      "clasification": "Bioinformatics and QC metrics",
+      "label": "Filepath R1 fastq"
+    },
+    "r2_fastq_filepath": {
+      "examples": [
+        "/User/Documents/RespLab/Data/"
+      ],
+      "ontology": "GENEPIO:0001479",
+      "type": "string",
+      "description": "The filepath of the r2 FASTQ file.",
+      "clasification": "Bioinformatics and QC metrics",
+      "label": "Filepath R2 fastq"
+    },
+    "sequence_file_R2_md5": {
+      "examples": [
+        "3e69af1f875fab020aed82f5edbc1f03"
+      ],
+      "ontology": "MS_1000569",
+      "type": "string",
+      "description": "",
+      "clasification": "Bioinformatics and QC metrics",
+      "label": "file checksum",
+      "table": [
+        "runs"
+      ]
+    },
+    "scientific_name": {
+      "enum": [
+        "Coronaviridae [NCBITaxon:11118]",
+        "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]",
+        "Not Applicable [GENEPIO:0001619]",
+        "Not Collected [GENEPIO:0001620]",
+        "Not Provided [GENEPIO:0001668]",
+        "Missing [GENEPIO:0001618]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
+      "examples": [
+        ""
+      ],
+      "ontology": "NCIT:C43459",
+      "type": "string",
+      "description": "The taxonomic name of the organism.",
+      "clasification": "Sample collection and processing",
+      "classification": "Sample collection and processing",
+      "label": "Organism",
+      "table": "sample"
+    },
+    "hospitalisation": {
+      "examples": [],
+      "ontology": "NCIT:C25179",
+      "type": "string",
+      "description": " Was the subject confined to a hospital as a result of virus infection or problems occurring secondary to virus infection?",
+      "clasification": "Sample collection and processing",
+      "label": "Hospitalisation",
+      "table": "sample"
+    },
+    "illness symptoms": {
+      "examples": [
+        "cough, diarrhea, fever, headache, malaise, myalgia"
+      ],
+      "ontology": "GENEPIO:0001523",
+      "type": "string",
+      "description": "The symptoms that have been reported in relation to the illness.  If multiple exposures are applicable, please state them separated by semicolon.",
+      "clasification": "Sample collection and processing",
+      "label": "Illness symptoms",
+      "table": "sample"
+    },
+    "sample_alias": {
+      "examples": [
+        ""
+      ],
+      "ontology": "GENEPIO:0001148",
+      "type": "string",
+      "description": "Unique Identifier for the sample",
+      "clasification": "Sample collection and processing",
+      "label": "Sample ID given by submitting laboratory",
+      "table": "sample"
+    },
+    "sample_description": {
+      "examples": [
+        "Sample from Belgian Covid-19 patient. Sample was obtained at the Hospital AZ Rivierenland, in Antwerp, Belgium."
+      ],
+      "ontology": "sep:00196",
+      "type": "string",
+      "description": "Free text description of the sample.",
+      "clasification": "Sample collection and processing",
+      "label": "Sample Description",
+      "table": "sample"
+    },
+    "sample storage conditions": {
+      "examples": [
+        "24 degrees celsius"
+      ],
+      "ontology": "NCIT:C115535",
+      "type": "string",
+      "description": "The name and version of a particular protocol used for sampling.",
+      "clasification": "Sample collection and processing",
+      "label": "Biological Sample Storage Condition"
+    },
+    "library_source": {
+      "enum": [
+        "genomic",
+        "genomic single cell",
+        "transcriptomic",
+        "transcriptomic single cell",
+        "metagenomic",
+        "metatranscriptomic",
+        "synthetic",
+        "viral rna",
+        "other"
+      ],
+      "examples": [
+        "METAGENOMIC"
+      ],
+      "ontology": "GENEPIO_0001965",
+      "type": "string",
+      "description": "Molecule type used to make the library.",
+      "clasification": "Sequencing",
+      "label": "Source material",
+      "table": [
+        "experiments"
+      ]
+    },
+    "library_selection": {
+      "enum": [
+        "RANDOM [NCIT:C60702]",
+        "PCR [GENEPIO:0001955]",
+        "RANDOM PCR [GENEPIO:0001957]",
+        "RT-PCR [GENEPIO:0001959]",
+        "HMPR [GENEPIO:0001949]",
+        "MF [GENEPIO:0001952]",
+        "repeat fractionation",
+        "size fractionation [GENEPIO:0001963]",
+        "MSLL [GENEPIO:0001954]",
+        "cDNA [GENEPIO:0001962]",
+        "ChIP [GENEPIO:0001947]",
+        "MNase [GENEPIO:0001953]",
+        "DNase [GENEPIO:0001948]",
+        "Hybrid Selection [GENEPIO:0001950]",
+        "Reduced Representation [GENEPIO:0001960]",
+        "Restriction Digest [GENEPIO:0001961]",
+        "5-methylcytidine antibody [GENEPIO:0001941]",
+        "MBD2 protein methyl-CpG binding domain [GENEPIO:0001951]",
+        "CAGE [GENEPIO:0001942]",
+        "RACE [GENEPIO:0001956]",
+        "MDA",
+        "padlock probes capture method",
+        "Oligo-dT",
+        "Inverse rRNA selection",
+        "ChIP-Seq [GENEPIO:0001947]",
+        "Other"
+      ],
+      "examples": [
+        "RANDOM PCR"
+      ],
+      "ontology": "GENEPIO_0001940",
+      "type": "string",
+      "description": "Library capture method.",
+      "classification": "Sequencing",
+      "label": "Capture method",
+      "fill_mode": "batch"
+    },
+    "library_construction_protocol": {
+      "examples": [
+        "library_construction_protocol_1"
+      ],
+      "ontology": "GENEPIO:0001450",
+      "type": "string",
+      "description": "",
+      "clasification": "Sequencing",
+      "label": "Library Construction protocol",
+      "table": [
+        "experiments"
+      ]
+    },
+    "library_strategy": {
+      "enum": [
+        "Bisultife-Seq strategy [GENEPIO:0001975]",
+        "CTS strategy [GENEPIO:0001978]",
+        "ChIP-Seq strategy [GENEPIO:0001979]",
+        "DNase-Hypersensitivity strategy [GENEPIO:0001980]",
+        "EST strategy [GENEPIO:0001981]",
+        "FL-cDNA strategy [GENEPIO:0001983]",
+        "MB-Seq strategy [GENEPIO:0001984]",
+        "MNase-Seq strategy [GENEPIO:0001985]",
+        "MRE-Seq strategy [GENEPIO:0001986]",
+        "MeDIP-Seq strategy [GENEPIO:0001987]",
+        "RNA-Seq strategy [GENEPIO:0001990]",
+        "WCS strategy [GENEPIO:0001991]",
+        "WGS strategy [GENEPIO:0001992]",
+        "WXS strategy [GENEPIO:0001993]",
+        "Amplicon [GENEPIO:0001974]",
+        "Clone end strategy [GENEPIO:0001976]",
+        "Clone strategy [GENEPIO:0001977]",
+        "Finishing strategy [GENEPIO:0001982]",
+        "Other library strategy [GENEPIO:0001988]",
+        "Pool clone strategy [GENEPIO:0001989]"
+      ],
+      "examples": [
+        "WGS"
+      ],
+      "ontology": "GENEPIO_0001973",
+      "type": "string",
+      "description": "Overall sequencing strategy or approach.",
+      "classification": "Sequencing",
+      "label": "Sequencing technique",
+      "fill_mode": "batch"
+    },
+    "library_layout": {
+      "examples": [
+        "CTS strategy"
+      ],
+      "ontology": "NCIT:C175894",
+      "type": "string",
+      "description": "Single or paired.",
+      "clasification": "Sequencing",
+      "label": "Library Layout",
+      "table": [
+        "experiments"
+      ]
+    },
+    "library_name": {
+      "examples": [
+        "e.g PAIRED"
+      ],
+      "ontology": "GENEPIO:0001450",
+      "type": "string",
+      "description": "The submitter's name for this library.",
+      "clasification": "Sequencing",
+      "label": "Library Name",
+      "table": [
+        "experiments"
+      ]
+    },
+    "insert_size": {
+      "examples": [
+        "350"
+      ],
+      "ontology": "GENEPIO_0000076",
+      "type": "string",
+      "description": "",
+      "clasification": "Sequencing",
+      "label": "Insert size"
+    },
+    "experiment_title": {
+      "examples": [
+        "experiment_title_1"
+      ],
+      "ontology": "ORNASEQ_0000004",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Experiment title",
+      "table": [
+        "experiments"
+      ]
+    },
+    "sample_title": {
+      "examples": [
+        "s_20201007_026"
+      ],
+      "ontology": "GENEPIO:0000079",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Sample title",
+      "table": [
+        "sample"
+      ]
+    },
+    "study_title": {
+      "examples": [
+        "e.g SARS-CoV-2 genomes from late April in Stockholm"
+      ],
+      "ontology": "OPMI_0000380",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Study title",
+      "table": [
+        "study"
+      ]
+    },
+    "study_type": {
+      "examples": [
+        ""
+      ],
+      "enum": [
+        "Whole Genome Sequencing [NCIT:C101294]",
+        "Metagenomics [NCIT:C153191]",
+        "Transcriptome Analysis [GENEPIO:0001111]",
+        "Resequencing [NCIT:C41254]",
+        "Epigenetics [OMIT:0027036] ",
+        "Synthetic Genomics [NCIT:C84343]",
+        "Forensic or Paleo-genomics [topic:3943]",
+        "Gene Regulation Study [topic:0204]",
+        "Cancer Genomics [NCIT:C18247]",
+        "Population Genomics [topic:3796]",
+        "RNASeq [OBI:0001177]",
+        "Exome Sequencing [OBI:0002118]",
+        "Pooled Clone Sequencing [OBI:2100402]",
+        "Transcriptome Sequencing [NCIT:C124261]",
+        "Other [NCIT:C124261]"
+      ],
+      "ontology": "GENEPIO:0000156",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Study type",
+      "table": "study"
+    },
+    "study_abstract": {
+      "examples": [
+        "Whole-genome sequences of SARS-CoV-2 from oro-pharyngeal swabs obtained from Belgian Covid-19 patients."
+      ],
+      "ontology": "OPMI:0000380",
+      "type": "string",
+      "description": " Briefly describes the goals, purpose, and scope of the Study.  This need not be listed if it can be inherited from a referenced publication.",
+      "clasification": "Submission ENA",
+      "label": "Study abstract",
+      "table": [
+        "study"
+      ]
+    },
+    "study_alias": {
+      "examples": [
+        "e.g Sweden"
+      ],
+      "ontology": "SIO_001066",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Study alias",
+      "table": [
+        "study",
+        "experiments"
+      ]
+    },
+    "experiment_alias": {
+      "examples": [
+        "experiment_alias_7a"
+      ],
+      "ontology": "NCIT_C42790",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Experiment alias",
+      "table": [
+        "experiments"
+      ]
+    },
+    "file_format": {
+      "examples": [
+        "BAM,CRAM,FASTQ"
+      ],
+      "enum": [
+        "BAM [format:2572]",
+        "CRAM [format:3462]",
+        "FASTQ [format:1930]"
+      ],
+      "ontology": "NMR:1001459",
+      "type": "string",
+      "description": "The run data file model.",
+      "clasification": "Submission ENA",
+      "label": "File format",
+      "table": [
+        "experiments"
+      ]
+    },
+    "run_alias": {
+      "examples": [
+        "e.g ena-EXPERIMENT-KAROLINSKA INSITUTET-29-07-2020-14:50:07:151-1"
+      ],
+      "ontology": "NCIT_C47911",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Run Alias",
+      "table": [
+        "runs"
+      ]
+    },
+    "sequence_file_R1_md5": {
+      "examples": [
+        ""
+      ],
+      "ontology": "MS_1000568",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Fastq md5 r1"
+    },
+    "broker_name": {
+      "examples": [
+        "P17157_1007"
+      ],
+      "ontology": "BU_ISCIII:045",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Broker Name"
+    },
+    "center_name": {
+      "examples": [
+        "P17157_1007"
+      ],
+      "ontology": "GENEPIO:0001153",
+      "type": "string",
+      "description": "",
+      "clasification": "Submission ENA",
+      "label": "Originating Laboratory"
+    },
+    "authors": {
+      "examples": [
+          ""
+      ],
+      "ontology": "GENEPIO:0001517",
+      "type": "string",
+      "description": "",
+      "classification": "Public databases",
+      "label": "Authors",
+      "fill_mode": "batch"
+    },
+    "address": {
+      "examples": [
+          "655 Lab St, Vancouver, British Columbia, V5N 2A2, Canada"
+      ],
+      "ontology": "GENEPIO:0001158",
+      "type": "string",
+      "description": "The mailing address of the agency submitting the sample.",
+      "classification": "Sample collection and processing",
+      "label": "Originating Laboratory Address",
+      "fill_mode": "batch"
+    }
+  }
+}

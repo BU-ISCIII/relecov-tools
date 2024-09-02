@@ -1,0 +1,9 @@
+<PROJECT_SET>
+   <PROJECT alias="workshop_project">
+      <TITLE>Example project for ENA submission workshop</TITLE>
+      <DESCRIPTION>This study was created as part of an ENA submissions workshop</DESCRIPTION>
+      <SUBMISSION_PROJECT>
+         <SEQUENCING_PROJECT/>
+      </SUBMISSION_PROJECT>
+   </PROJECT>
+</PROJECT_SET>

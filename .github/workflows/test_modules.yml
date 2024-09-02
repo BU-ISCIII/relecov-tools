@@ -1,0 +1,79 @@
+name: test_modules
+
+on:
+  push:
+    branches: "**"
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    branches: "**"
+
+jobs:
+  test_map:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 2
+      matrix:
+        map_args: ["-d 'ENA' -f relecov_tools/schema/ena_schema.json", "-d 'GISAID' -f relecov_tools/schema/gisaid_schema.json"]
+    steps:
+    - name: Set up Python 3.9.16
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.9.16'
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
+    - name: Install package and dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install .
+    - name: Run each module tests
+      run: |
+        relecov-tools map -j tests/data/map_validate/processed_metadata_lab_test.json -p relecov_tools/schema/relecov_schema.json ${{ matrix.map_args }} -o .
+      env:
+        OUTPUT_LOCATION: ${{ github.workspace }}/tests/
+    - name: Upload output file
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-output
+        path: output.txt
+
+  test_all_modules:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 3
+      matrix:
+        modules: ["read-lab-metadata", "read-bioinfo-metadata", "validate"]
+    steps:
+
+    - name: Set up Python 3.9.16
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.9.16'
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
+
+    - name: Install package and dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install .
+
+    - name: Run each module tests
+      run: |
+        if [ "${{ matrix.modules }}" == "read-lab-metadata" ]; then
+          relecov-tools read-lab-metadata -m tests/data/read_lab_metadata/metadata_lab_test.xlsx -s tests/data/read_lab_metadata/samples_data_test.json -o $OUTPUT_LOCATION
+        elif [ "${{ matrix.modules }}" == "validate" ]; then
+          relecov-tools validate -j tests/data/map_validate/processed_metadata_lab_test.json -s relecov_tools/schema/relecov_schema.json -m tests/data/map_validate/metadata_lab_test.xlsx -o $OUTPUT_LOCATION
+        fi
+      env:
+        OUTPUT_LOCATION: ${{ github.workspace }}/tests/
+    - name: Upload output file
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-output
+        path: output.txt
