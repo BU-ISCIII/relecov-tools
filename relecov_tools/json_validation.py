@@ -217,6 +217,46 @@ class SchemaValidation:
         relecov_tools.utils.write_json_fo_file(valid_json_data, file_path)
         return
 
+    def create_logs_excel(self, logs):
+        batch_date = os.path.dirname(os.path.realpath(self.metadata)).split("/")[-1]
+        excel_filename = self.lab_code + "_" + batch_date + "_report.xlsx"
+        if not logs.get("samples"):
+            try:
+                samples_logs = logs.get(list(logs.keys())[0]).get("samples")
+            except (KeyError, AttributeError) as e:
+                stderr.print(f"[red]Could not convert log summary to excel: {e}")
+                return
+        else:
+            samples_logs = logs.get("samples")
+        def translate_fields(samples_logs):
+            #TODO Translate logs to spanish using a local translator model
+            return
+        workbook = openpyxl.Workbook()
+        main_worksheet = workbook.active
+        main_worksheet.title = "Samples Report"
+        main_headers = ["Sample ID given for sequencing", "Valid", "Errors"]
+        main_worksheet.append(main_headers)
+        warnings_sheet = workbook.create_sheet("Other warnings")
+        warnings_headers = ["Sample ID given for sequencing", "Valid", "Warnings"]
+        warnings_sheet.append(warnings_headers)
+        for sample, logs in samples_logs.items():
+            error_row = [
+                sample,
+                str(logs["valid"]),
+                ", ".join(logs["errors"]),
+            ]
+            main_worksheet.append(error_row)
+            warning_row = [
+                sample,
+                str(logs["valid"]),
+                ", ".join(logs["warnings"]),
+            ]
+            warnings_sheet.append(warning_row)
+        excel_outpath = os.path.join(self.out_folder, excel_filename)
+        workbook.save(excel_outpath)
+        stderr.print(f"[green]Successfully created logs excel in {excel_outpath}")
+        return
+
     def validate(self):
         """Validate samples from metadata, create an excel with invalid samples,
         and a json file with the validated ones
@@ -238,3 +278,4 @@ class SchemaValidation:
             self.logsum.add_error(entry=log_text)
             stderr.print(f"[red]{log_text}")
         self.logsum.create_error_summary(called_module="validate")
+        self.create_logs_excel(self.logsum.logs)
