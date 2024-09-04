@@ -228,9 +228,11 @@ class SchemaValidation:
                 return
         else:
             samples_logs = logs.get("samples")
+
         def translate_fields(samples_logs):
-            #TODO Translate logs to spanish using a local translator model
+            # TODO Translate logs to spanish using a local translator model
             return
+
         workbook = openpyxl.Workbook()
         main_worksheet = workbook.active
         main_worksheet.title = "Samples Report"
