@@ -200,29 +200,32 @@ def handle_pangolin_data(files_list):
     Returns:
         pango_data_processed: A dictionary containing pangolin data handled.
     """
+
     # Handling pangolin data
     def pango_version_from_sbatch(sbatch_files, analysis_folder):
         pango_data_v = None
         for _ in sbatch_files:
-            latest_date= max(
+            latest_date = max(
                 [relecov_tools.utils.get_file_date(x) for x in sbatch_files]
             )
             latest_sbatch = [
-                x for x in sbatch_files if relecov_tools.utils.get_file_date(x) == latest_date
+                x
+                for x in sbatch_files
+                if relecov_tools.utils.get_file_date(x) == latest_date
             ][0]
             with open(latest_sbatch, "r") as f:
                 content = f.readlines()
             nxf_index = [n for n, line in enumerate(content) if "nextflow run" in line]
-            for line in content[nxf_index[0]:-1]:
+            for line in content[nxf_index[0] : -1]:
                 if "-c" in line and ".config" in line:
-                    conf_path = line.split("-c")[1].replace("\\","").strip()
+                    conf_path = line.split("-c")[1].replace("\\", "").strip()
                     break
             else:
                 method_log_report.update_log_report(
-                method_name,
-                "warning",
-                "Missing files to extract pango-data version"
-            )
+                    method_name,
+                    "warning",
+                    "Missing files to extract pango-data version",
+                )
                 pango_data_v = None
                 break
             if not os.path.isabs(conf_path):
@@ -236,7 +239,9 @@ def handle_pangolin_data(files_list):
                 for block in conf.split("}"):
                     if "PANGOLIN" in block:
                         pango_folder = [
-                            x.split("--datadir")[1] for x in block.split("'") if "--datadir" in x
+                            x.split("--datadir")[1]
+                            for x in block.split("'")
+                            if "--datadir" in x
                         ][0].strip()
                         break
                 # if pango_data version is outdated just set as not provided
@@ -258,23 +263,20 @@ def handle_pangolin_data(files_list):
         analysis_folder = "".join(
             re.split(r"(\/\d{8}_ANALYSIS0.*_HUMAN)", single_file)[0:2]
         )
-         #         /data/bi/references/pangolin/20240626/pangolin_data-1.28.dist-info/METADATA version: 1.28"""
         pango_data_v = None
         if "lablog_viralrecon.log" in os.listdir(os.path.join(analysis_folder, "..")):
             with open(os.path.join(analysis_folder, "../lablog_viralrecon.log")) as f:
                 content = f.readlines()
             for line in content:
                 if "pangolin-data" in line:
-                    version_pattern = r'v\d+\.\d+(\.\d+)?'
+                    version_pattern = r"v\d+\.\d+(\.\d+)?"
                     match = re.search(version_pattern, line, re.IGNORECASE)
                     if match:
                         pango_data_v = match.group()
                     else:
                         pango_data_v = None
         if not pango_data_v:
-            sbatch_files = [
-                x for x in os.listdir(analysis_folder) if "sbatch" in x
-            ]
+            sbatch_files = [x for x in os.listdir(analysis_folder) if "sbatch" in x]
             sbatch_files = [os.path.join(analysis_folder, x) for x in sbatch_files]
             pango_data_v = pango_version_from_sbatch(sbatch_files, analysis_folder)
         if not pango_data_v:
