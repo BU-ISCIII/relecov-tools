@@ -278,6 +278,7 @@ class LaunchPipeline:
                 shutil.rmtree(self.output_folder)
                 sys.exit(1)
         stderr.print("[green] Samples copied: ", copied_samples)
+        log.info("[blue] Pipeline launched successfully")
         stderr.print("[blue] Pipeline launched successfully")
         return
 
