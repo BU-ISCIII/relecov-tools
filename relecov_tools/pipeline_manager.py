@@ -151,6 +151,9 @@ class LaunchPipeline:
         upload_lab_folders, latest_date = get_latest_lab_folder(self)
         samples_data = []
         for lab, data_folder in upload_lab_folders.items():
+            lab_code = lab.split("/")[-1]
+            log.info("Collecting samples for  %s", lab_code)
+            stderr.print("[blue] Collecting samples for ", lab_code)
             # check if laboratory folder is the latest date to process
             if data_folder["date"] != latest_date:
                 continue
@@ -169,17 +172,15 @@ class LaunchPipeline:
                 for item in data:
                     sample = {}
                     sample["sequencing_sample_id"] = item["sequencing_sample_id"]
-                    sample["r1_fastq_file_path"] = os.path.join(
+                    sample["r1_fastq_filepath"] = os.path.join(
                         item["r1_fastq_filepath"], item["sequence_file_R1_fastq"]
                     )
-                    if "r2_fastq_file_path" in item:
-                        sample["r2_fastq_file_path"] = os.path.join(
-                            item["r1_fastq_filepath"], item["sequence_file_R2_fastq"]
+                    if "r2_fastq_filepath" in item:
+                        sample["r2_fastq_filepath"] = os.path.join(
+                            item["r2_fastq_filepath"], item["sequence_file_R2_fastq"]
                         )
                     samples_data.append(sample)
-            lab_code = lab.split("/")[-1]
-            log.info("Collecting samples for  %s", lab_code)
-            stderr.print("[blue] Collecting samples for ", lab_code)
+
         return samples_data
 
     def pipeline_exc(self):
@@ -197,38 +198,48 @@ class LaunchPipeline:
             stderr.print("[yellow] No samples were found. Deleting analysis folder")
             shutil.rmtree(self.analysis_folder)
             sys.exit(0)
-        for item in samples_data:
+        log.info("Samples to copy %s", len(samples_data))
+        for sample in samples_data:
             # fetch the file extension
-            ext_found = re.match(r".*(fastq.*|bam)", item["r1_fastq_file_path"])
+            ext_found = re.match(r".*(fastq.*|bam)", sample["r1_fastq_filepath"])
             ext = ext_found.group(1)
-            sequencing_r1_sample_id = item["sequencing_sample_id"] + "_R1." + ext
+            sequencing_r1_sample_id = sample["sequencing_sample_id"] + "_R1." + ext
             # copy r1 sequencing file into the output folder
-            raw_folder = os.path.join(self.analysis_folder, self.copied_sample_folder)
-
+            sample_raw_r1 = os.path.join(self.analysis_folder, self.copied_sample_folder, sequencing_r1_sample_id)
+            log.info("Copying sample %s", sample)
+            stderr.print("[blue] Copying sample: ", sample["sequencing_sample_id"])
             try:
-                shutil.copy(item["r1_fastq_file_path"], raw_folder)
+                shutil.copy(sample["r1_fastq_filepath"], sample_raw_r1)
                 # create simlink for the r1
-                sample_r1_link_path = os.path.join(
+                r1_link_path = os.path.join(
                     self.linked_sample_folder, sequencing_r1_sample_id
                 )
-                os.symlink(item["r1_fastq_file_path"], sample_r1_link_path)
+                r1_link_path_ori = os.path.join(
+                    "../../RAW", sequencing_r1_sample_id
+                )
+                os.symlink(r1_link_path_ori, r1_link_path)
             except FileNotFoundError as e:
                 log.error("File not found %s", e)
-                file_errors.append(item["r1_fastq_file_path"])
+                file_errors.append(sample["r1_fastq_filepath"])
                 continue
             copied_samples += 1
             # check if there is a r2 file
-            if "r2_fastq_file_path" in item:
-                sequencing_r2_sample_id = item["sequencing_sample_id"] + "_R2." + ext
+            if "r2_fastq_filepath" in sample:
+                sequencing_r2_sample_id = sample["sequencing_sample_id"] + "_R2." + ext
+                sample_raw_r2 = os.path.join(self.analysis_folder, self.copied_sample_folder, sequencing_r1_sample_id)
+
                 try:
-                    shutil.copy(item["r2_fastq_file_path"], raw_folder)
-                    sample_r2_link_path = os.path.join(
+                    shutil.copy(sample["r2_fastq_filepath"], sample_raw_r2)
+                    r2_link_path = os.path.join(
                         self.linked_sample_folder, sequencing_r2_sample_id
                     )
-                    os.symlink(item["r2_fastq_file_path"], sample_r2_link_path)
+                    r2_link_path_ori = os.path.join(
+                        "../../RAW", sequencing_r2_sample_id
+                    )
+                    os.symlink(r2_link_path_ori, r2_link_path)
                 except FileNotFoundError as e:
                     log.error("File not found %s", e)
-                    file_errors.append(item["r2_fastq_file_path"])
+                    file_errors.append(sample["r2_fastq_filepath"])
                     continue
         if len(file_errors) > 0:
             stderr.print(
