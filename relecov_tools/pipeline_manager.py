@@ -211,6 +211,11 @@ class LaunchPipeline:
             stderr.print(f"[red] There are duplicated samples in your batch: {duplicates}. Please handle manually")
             sys.exit()
 
+        # print samples_id file
+        with open(os.path.join(self.analysis_folder, "samples_id.txt"), 'w') as f:
+            for sample_id in sample_ids:
+                f.write(f"{sample_id}\n")
+
         # iterate over the sample_data to copy the fastq files in the output folder
         file_errors = []
         copied_samples = 0
