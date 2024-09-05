@@ -1,14 +1,15 @@
-import json
-import re
-import os
-import sys
-import shutil
 import datetime
+import json
 import logging
+import os
+import re
+import shutil
+import sys
+from collections import Counter
+
 import rich.console
 
 import relecov_tools.utils
-
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -194,6 +195,21 @@ class LaunchPipeline:
         os.makedirs(self.linked_sample_folder, exist_ok=True)
         # collect json with all validated samples
         samples_data = self.join_valid_items()
+
+        # Check for possible duplicates
+        # Extract the sequencing_sample_id from the list of dictionaries
+        sample_ids = [item['sequencing_sample_id'] for item in samples_data]
+
+        # Use Counter to count the occurrences of each sequencing_sample_id
+        id_counts = Counter(sample_ids)
+
+        # Find the sequencing_sample_id values that are duplicated (count > 1)
+        duplicates = [sample_id for sample_id, count in id_counts.items() if count > 1]
+
+        if duplicates:
+            log.error(f"There are duplicated samples in your batch: {duplicates}")
+            stderr.print(f"[red] There are duplicated samples in your batch: {duplicates}. Please handle manually")
+            sys.exit()
 
         # iterate over the sample_data to copy the fastq files in the output folder
         file_errors = []
