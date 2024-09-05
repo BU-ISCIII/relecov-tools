@@ -183,7 +183,9 @@ class LaunchPipeline:
                             item["r2_fastq_filepath"], item["sequence_file_R2_fastq"]
                         )
                     samples_data.append(sample)
-            with open(os.path.join(self.input_folder, "validate_batch.json"), 'w') as fo:
+            with open(
+                os.path.join(self.input_folder, "validate_batch.json"), "w"
+            ) as fo:
                 json.dump(join_validate, fo, indent=4)
 
         return samples_data
@@ -198,7 +200,7 @@ class LaunchPipeline:
 
         # Check for possible duplicates
         # Extract the sequencing_sample_id from the list of dictionaries
-        sample_ids = [item['sequencing_sample_id'] for item in samples_data]
+        sample_ids = [item["sequencing_sample_id"] for item in samples_data]
 
         # Use Counter to count the occurrences of each sequencing_sample_id
         id_counts = Counter(sample_ids)
@@ -208,11 +210,13 @@ class LaunchPipeline:
 
         if duplicates:
             log.error(f"There are duplicated samples in your batch: {duplicates}")
-            stderr.print(f"[red] There are duplicated samples in your batch: {duplicates}. Please handle manually")
+            stderr.print(
+                f"[red] There are duplicated samples in your batch: {duplicates}. Please handle manually"
+            )
             sys.exit()
 
         # print samples_id file
-        with open(os.path.join(self.analysis_folder, "samples_id.txt"), 'w') as f:
+        with open(os.path.join(self.analysis_folder, "samples_id.txt"), "w") as f:
             for sample_id in sample_ids:
                 f.write(f"{sample_id}\n")
 
@@ -230,7 +234,9 @@ class LaunchPipeline:
             ext = ext_found.group(1)
             sequencing_r1_sample_id = sample["sequencing_sample_id"] + "_R1." + ext
             # copy r1 sequencing file into the output folder
-            sample_raw_r1 = os.path.join(self.analysis_folder, self.copied_sample_folder, sequencing_r1_sample_id)
+            sample_raw_r1 = os.path.join(
+                self.analysis_folder, self.copied_sample_folder, sequencing_r1_sample_id
+            )
             log.info("Copying sample %s", sample)
             stderr.print("[blue] Copying sample: ", sample["sequencing_sample_id"])
             try:
@@ -239,9 +245,7 @@ class LaunchPipeline:
                 r1_link_path = os.path.join(
                     self.linked_sample_folder, sequencing_r1_sample_id
                 )
-                r1_link_path_ori = os.path.join(
-                    "../../RAW", sequencing_r1_sample_id
-                )
+                r1_link_path_ori = os.path.join("../../RAW", sequencing_r1_sample_id)
                 os.symlink(r1_link_path_ori, r1_link_path)
             except FileNotFoundError as e:
                 log.error("File not found %s", e)
@@ -251,7 +255,11 @@ class LaunchPipeline:
             # check if there is a r2 file
             if "r2_fastq_filepath" in sample:
                 sequencing_r2_sample_id = sample["sequencing_sample_id"] + "_R2." + ext
-                sample_raw_r2 = os.path.join(self.analysis_folder, self.copied_sample_folder, sequencing_r1_sample_id)
+                sample_raw_r2 = os.path.join(
+                    self.analysis_folder,
+                    self.copied_sample_folder,
+                    sequencing_r1_sample_id,
+                )
 
                 try:
                     shutil.copy(sample["r2_fastq_filepath"], sample_raw_r2)
