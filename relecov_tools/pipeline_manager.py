@@ -113,7 +113,31 @@ class LaunchPipeline:
         self.doc_folder = data["doc_folder"]
 
     def join_valid_items(self):
+        """Join validated metadata for the latest batches downloaded
+
+        Args:
+
+        Returns:
+            sample_data: list(dict)
+                [
+                  {
+                    "sequencing_sample_id":XXXX,
+                    "r1_fastq_filepath": XXXX,
+                    "r2_fastq_filepath":XXXX
+                  }
+                ]
+        """
+
         def get_latest_lab_folder(self):
+            """Get latest folder with the newest date
+
+            Args:
+
+            Returns:
+                lab_latest_folders: list of paths with the latest folders
+                latest_date: latest date in the folders
+
+            """
             lab_folders = [f.path for f in os.scandir(self.input_folder) if f.is_dir()]
             lab_latest_folders = {}
             latest_date = datetime.datetime.strptime("20220101", "%Y%m%d").date()
@@ -199,6 +223,17 @@ class LaunchPipeline:
         return samples_data
 
     def pipeline_exc(self):
+        """Prepare folder for analysis in HPC
+            Copies template selected as input
+            Copies RAW data with sequencing id as fastq file names
+            Creates samples_id.txt
+
+            Args:
+
+            Returns:
+
+        """
+
         # copy template folder and subfolders in output folder
         shutil.copytree(self.template, self.output_folder)
         # create the 00_reads folder
