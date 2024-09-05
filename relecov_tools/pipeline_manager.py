@@ -194,7 +194,7 @@ class LaunchPipeline:
                 ),
                 "w",
             ) as fo:
-                json.dump(join_validate, fo, indent=4)
+                json.dump(join_validate, fo, indent=4, ensure_ascii=False)
 
         return samples_data
 
