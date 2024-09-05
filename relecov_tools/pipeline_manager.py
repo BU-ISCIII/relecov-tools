@@ -224,13 +224,13 @@ class LaunchPipeline:
 
     def pipeline_exc(self):
         """Prepare folder for analysis in HPC
-            Copies template selected as input
-            Copies RAW data with sequencing id as fastq file names
-            Creates samples_id.txt
+        Copies template selected as input
+        Copies RAW data with sequencing id as fastq file names
+        Creates samples_id.txt
 
-            Args:
+        Args:
 
-            Returns:
+        Returns:
 
         """
 
