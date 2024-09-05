@@ -72,6 +72,7 @@ class LaunchPipeline:
             "analysis_name" not in data
             or "sample_stored_folder" not in data
             or "sample_link_folder" not in data
+            or "doc_folder" not in data
         ):
             log.error("Invalid pipeline config file %s ", self.pipeline_conf_file)
             stderr.print(
@@ -109,6 +110,7 @@ class LaunchPipeline:
         self.linked_sample_folder = os.path.join(
             self.analysis_folder, data["sample_link_folder"]
         )
+        self.doc_folder = data["doc_folder"]
 
     def join_valid_items(self):
         def get_latest_lab_folder(self):
@@ -183,8 +185,14 @@ class LaunchPipeline:
                             item["r2_fastq_filepath"], item["sequence_file_R2_fastq"]
                         )
                     samples_data.append(sample)
+            date_and_time = datetime.datetime.today().strftime("%Y%m%d%-H%M%S")
             with open(
-                os.path.join(self.input_folder, "validate_batch.json"), "w"
+                os.path.join(
+                    self.output_folder,
+                    self.doc_folder,
+                    f"{date_and_time}_validate_batch.json",
+                ),
+                "w",
             ) as fo:
                 json.dump(join_validate, fo, indent=4)
 
