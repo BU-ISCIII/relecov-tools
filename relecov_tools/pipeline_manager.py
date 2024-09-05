@@ -150,6 +150,7 @@ class LaunchPipeline:
 
         upload_lab_folders, latest_date = get_latest_lab_folder(self)
         samples_data = []
+        join_validate = list()
         for lab, data_folder in upload_lab_folders.items():
             lab_code = lab.split("/")[-1]
             log.info("Collecting samples for  %s", lab_code)
@@ -169,6 +170,7 @@ class LaunchPipeline:
                 validate_file_path = os.path.join(data_folder["path"], validate_file)
                 with open(validate_file_path) as fh:
                     data = json.load(fh)
+                join_validate.extend(data)
                 for item in data:
                     sample = {}
                     sample["sequencing_sample_id"] = item["sequencing_sample_id"]
@@ -180,6 +182,8 @@ class LaunchPipeline:
                             item["r2_fastq_filepath"], item["sequence_file_R2_fastq"]
                         )
                     samples_data.append(sample)
+            with open(os.path.join(self.input_folder, "validate_batch.json"), 'w') as fo:
+                json.dump(join_validate, fo, indent=4)
 
         return samples_data
 
