@@ -5,13 +5,13 @@ import os
 import inspect
 import sys
 import copy
+
+import openpyxl
 from rich.console import Console
 from datetime import datetime
 from collections import OrderedDict
 from relecov_tools.utils import rich_force_colors
 
-
-# from relecov_tools.rest_api import RestApi
 
 log = logging.getLogger(__name__)
 stderr = Console(
@@ -30,8 +30,8 @@ class LogSum:
         unique_key: str = None,
         path: str = None,
     ):
-        if not os.path.exists(output_location):
-            raise FileNotFoundError("Output location does not exist")
+        if not os.path.exists(str(output_location)):
+            raise FileNotFoundError(f"Output folder {output_location} does not exist")
         else:
             self.output_location = output_location
         if only_samples and unique_key:
@@ -116,20 +116,98 @@ class LogSum:
             self.logs[current_key]["samples"][sample][log_type].append(entry)
         return
 
-    def create_error_summary(self, called_module=None, filename=None):
+    def prepare_final_logs(self, logs):
+        """Sets valid field to false if any errors were found for each key/sample
+
+        Args:
+            logs (dict): Custom dictionary of logs.
+
+        Returns:
+            logs: logs with updated valid field values
+        """
+        for key in logs.keys():
+            if logs[key]["errors"]:
+                logs[key]["valid"] = False
+            if not self.only_samples:
+                for sample in logs[key]["samples"].keys():
+                    if logs[key]["samples"][sample]["errors"]:
+                        logs[key]["samples"][sample]["valid"] = False
+        return logs
+
+    def create_logs_excel(self, logs, called_module=None):
+        """Create an excel file with logs information
+
+        Args:
+            logs (dict, optional): Custom dictionary of logs. Useful to create outputs
+            called_module (str, optional): Name of the module running this code.
+        """
+
+        def translate_fields(samples_logs):
+            # TODO Translate logs to spanish using a local translator model like deepl
+            return
+
+        batch_date = os.path.dirname(os.path.realpath(self.metadata)).split("/")[-1]
+        if called_module:
+            excel_filename = "_".join(
+                [self.lab_code, batch_date, called_module, "report.xlsx"]
+            )
+        else:
+            excel_filename = self.lab_code + "_" + batch_date + "_report.xlsx"
+        if not logs.get("samples"):
+            try:
+                samples_logs = logs.get(list(logs.keys())[0]).get("samples")
+            except (KeyError, AttributeError) as e:
+                stderr.print(f"[red]Could not convert log summary to excel: {e}")
+                return
+        else:
+            samples_logs = logs.get("samples")
+
+        workbook = openpyxl.Workbook()
+        main_worksheet = workbook.active
+        main_worksheet.title = "Samples Report"
+        main_headers = ["Sample ID given for sequencing", "Valid", "Errors"]
+        main_worksheet.append(main_headers)
+        warnings_sheet = workbook.create_sheet("Other warnings")
+        warnings_headers = ["Sample ID given for sequencing", "Valid", "Warnings"]
+        warnings_sheet.append(warnings_headers)
+        for sample, logs in samples_logs.items():
+            error_row = [
+                sample,
+                str(logs["valid"]),
+                ", ".join(logs["errors"]),
+            ]
+            main_worksheet.append(error_row)
+            warning_row = [
+                sample,
+                str(logs["valid"]),
+                ", ".join(logs["warnings"]),
+            ]
+            warnings_sheet.append(warning_row)
+        excel_outpath = os.path.join(self.out_folder, excel_filename)
+        workbook.save(excel_outpath)
+        stderr.print(f"[green]Successfully created logs excel in {excel_outpath}")
+        return
+
+    def create_error_summary(
+        self, called_module=None, filename=None, logs=None, to_excel=False
+    ):
         """Dump the log summary dictionary into a file with json format. If any of
         the 'errors' key is not empty, the parent key value 'valid' is set to false.
 
         Args:
+            called_module (str, optional): Name of the module running this code.
             filename (str, optional): Name of the output file. Defaults to None.
+            logs (dict, optional): Custom dictionary of logs. Useful to create outputs
+            with selective information within all logs. Key names must remain the same.
+            to_excel (bool, optional): Wether to output logs in excel format or not
         """
-        for key in self.logs.keys():
-            if self.logs[key]["errors"]:
-                self.logs[key]["valid"] = False
-            if not self.only_samples:
-                for sample in self.logs[key]["samples"].keys():
-                    if self.logs[key]["samples"][sample]["errors"]:
-                        self.logs[key]["samples"][sample]["valid"] = False
+        if logs is None:
+            logs = self.logs
+        else:
+            if not isinstance(logs, dict):
+                stderr.print("[red]Logs input must be a dict. No output file.")
+                return
+        final_logs = self.prepare_final_logs(logs)
         if not called_module:
             try:
                 called_module = [
@@ -143,7 +221,9 @@ class LogSum:
         summary_path = os.path.join(self.output_location, filename)
         with open(summary_path, "w", encoding="utf-8") as f:
             f.write(
-                json.dumps(self.logs, indent=4, sort_keys=False, ensure_ascii=False)
+                json.dumps(final_logs, indent=4, sort_keys=False, ensure_ascii=False)
             )
         stderr.print(f"Process log summary saved in {summary_path}")
+        if to_excel is True:
+            self.create_logs_excel(final_logs, called_module)
         return
