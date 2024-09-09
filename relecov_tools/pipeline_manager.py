@@ -301,7 +301,7 @@ class LaunchPipeline:
                 sample_raw_r2 = os.path.join(
                     self.analysis_folder,
                     self.copied_sample_folder,
-                    sequencing_r1_sample_id,
+                    sequencing_r2_sample_id,
                 )
 
                 try:
