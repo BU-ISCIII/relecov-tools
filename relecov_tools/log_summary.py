@@ -3,7 +3,6 @@ import logging
 import json
 import os
 import inspect
-import sys
 import copy
 
 import openpyxl
@@ -127,8 +126,7 @@ class LogSum:
         return logs
 
     def merge_logs(self, key_name, logs_list):
-        """Merge a multiple set of logs without losing information
-        """
+        """Merge a multiple set of logs without losing information"""
         if not logs_list:
             return
         merged_logs = copy.deepcopy(logs_list[0])
@@ -162,6 +160,7 @@ class LogSum:
         def translate_fields(samples_logs):
             # TODO Translate logs to spanish using a local translator model like deepl
             return
+
         date = datetime.today().strftime("%Y%m%d%-H%M%S")
         lab_code = list(logs.keys())[0]
         if self.unique_key:
@@ -188,17 +187,9 @@ class LogSum:
         warnings_headers = ["Sample ID given for sequencing", "Valid", "Warnings"]
         warnings_sheet.append(warnings_headers)
         for sample, logs in samples_logs.items():
-            error_row = [
-                sample,
-                str(logs["valid"]),
-                *"; ".join(logs["errors"])
-            ]
+            error_row = [sample, str(logs["valid"]), *"; ".join(logs["errors"])]
             main_worksheet.append(error_row)
-            warning_row = [
-                sample,
-                str(logs["valid"]),
-                *"; ".join(logs["warnings"])
-            ]
+            warning_row = [sample, str(logs["valid"]), *"; ".join(logs["warnings"])]
             warnings_sheet.append(warning_row)
         excel_outpath = os.path.join(self.output_location, excel_filename)
         workbook.save(excel_outpath)
