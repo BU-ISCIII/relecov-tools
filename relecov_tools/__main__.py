@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import logging
-
-# import re
+import os
+import json
 
 # from rich.prompt import Confirm
 import click
 import relecov_tools.download_manager
+import relecov_tools.log_summary
 import rich.console
 import rich.logging
 import rich.traceback
@@ -60,7 +61,7 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "1.0.0"
+    __version__ = "1.1.0dev"
     stderr.print(
         "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
@@ -487,7 +488,7 @@ def launch_pipeline(input, template, output, config):
 
 
 # schema builder
-@relecov_tools_cli.command(help_priority=13)
+@relecov_tools_cli.command(help_priority=14)
 @click.option(
     "-i",
     "--input_file",
@@ -521,6 +522,49 @@ def build_schema(input_file, schema_base, draft_version, diff, out_dir):
         input_file, schema_base, draft_version, diff, out_dir
     )
     schema_update.handle_build_schema()
+
+@relecov_tools_cli.command(help_priority=15)
+@click.option(
+    "-l",
+    "--lab_code",
+    type=click.Path(),
+    help="Name for target laboratory in log-summary.json files",
+    required=True,
+)
+@click.option(
+    "-o",
+    "--output_folder",
+    type=click.Path(),
+    help="Path to output folder where xlsx file is saved",
+    required=False,
+)
+@click.option(
+    "-f",
+    "--files",
+    help="Paths to log_summary.json files to merge into xlsx file, called once per file",
+    required=True,
+    multiple=True
+)
+def logs_to_excel(lab_code, output_folder, files):
+    """Creates a merged xlsx report from all the log summary jsons given as input"""
+    all_logs = []
+    full_paths = [os.path.realpath(f) for f in files]
+    for file in full_paths:
+        if not os.path.exists(file):
+            stderr.print(f"[red]File {file} does not exist")
+            continue
+        try:
+            with open(file, "r") as f:
+                all_logs.append(json.load(f)[lab_code])
+        except Exception as e:
+            stderr.print(f"[red]Could extract data from {file}: {e}")
+    if not all_logs:
+        stderr.print("All provided files were empty.")
+        exit(1)
+    logsum = relecov_tools.log_summary.LogSum(output_location=output_folder)
+    merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
+    final_logs = logsum.prepare_final_logs(logs=merged_logs)
+    logsum.create_logs_excel(logs=final_logs)
 
 
 if __name__ == "__main__":
