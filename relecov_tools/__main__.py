@@ -523,6 +523,7 @@ def build_schema(input_file, schema_base, draft_version, diff, out_dir):
     )
     schema_update.handle_build_schema()
 
+
 @relecov_tools_cli.command(help_priority=15)
 @click.option(
     "-l",
@@ -566,6 +567,28 @@ def logs_to_excel(lab_code, output_folder, files):
     final_logs = logsum.prepare_final_logs(logs=merged_logs)
     logsum.create_logs_excel(logs=final_logs)
 
+
+@relecov_tools_cli.command(help_priority=16)
+@click.option(
+    "-c",
+    "--config_file",
+    type=click.Path(),
+    help="Path to config file in yaml format",
+    required=True,
+)
+@click.option(
+    "-o",
+    "--output_folder",
+    type=click.Path(),
+    help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module. (Default: installed schema in 'relecov-tools/relecov_tools/schema/relecov_schema.json')",
+    required=False,
+)
+def wrapper(config_file, output_folder):
+    """Executes the modules in config file sequentially"""
+    process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(
+        config_file=config_file, output_folder=output_folder
+    )
+    process_wrapper.run_wrapper()
 
 if __name__ == "__main__":
     run_relecov_tools()
