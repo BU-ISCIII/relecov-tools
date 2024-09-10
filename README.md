@@ -24,9 +24,10 @@ relecov-tools is a set of helper tools for the assembly of the different element
       - [upload-to-ena](#upload-to-ena)
       - [upload-to-gisaid](#upload-to-gisaid)
       - [update-db](#update-db)
+      - [launch-pipeline](#launch-pipeline)
+      - [logs-to-excel](#logs-to-excel)
     - [build-schema](#build-schema)
       - [Mandatory Fields](#mandatory-fields)
-      - [launch-pipeline](#launch-pipeline)
       - [custom logs](#custom-logs)
     - [Python package mode](#python-package-mode)
   - [Acknowledgements](#acknowledgements)
@@ -62,7 +63,7 @@ $ relecov-tools --help
 \    \  /   |__ / |__  |    |___ |    |   |  \    /
 /    /  \   |  \  |    |    |    |    |   |   \  /
 /    |--|   |   \ |___ |___ |___ |___ |___|    \/
-RELECOV-tools version 1.0.0
+RELECOV-tools version 1.1.0
 Usage: relecov-tools [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -160,7 +161,7 @@ Usage: relecov-tools read-bioinfo-metadata [OPTIONS]
 - Note: Software-specific configurations are available in [bioinfo_config.json](./relecov_tools/conf/bioinfo_config.json).
 
 #### validate
-`validate` commands validate the data in json format outputted by `read-metadata` command against a json schema, in this case the relecov [schema specification](./relecov_tools/schema/relecov_schema.json).
+`validate` commands validate the data in json format outputted by `read-metadata` command against a json schema, in this case the relecov [schema specification](./relecov_tools/schema/relecov_schema.json). It also creates a summary of the errors and warnings found in excel format as a report to the users.
 
 ```
 $ relecov-tools validate --help
@@ -246,6 +247,35 @@ Usage: relecov-tools upload-to-gisaid [OPTIONS]
     -t, --type                         Select the type of information to upload to database [sample,bioinfodata,variantdata]
     -d, --databaseServer               Name of the database server receiving the data [iskylims,relecov]
 
+#### launch-pipeline
+Create the folder structure to execute the given pipeline for the latest sample batches after executing download, read-lab-metadata and validate modules. This module will create symbolic links for each sample and generate the necessary files for pipeline execution using the information from validated_BATCH-NAME_DATE.json.
+```
+Usage: relecov-tools launch-pipeline [OPTIONS]
+
+  Create the symbolic links for the samples which are validated to prepare for
+  bioinformatics pipeline execution.
+
+Options:
+  -i, --input PATH          Path to the input folder where sample files are located
+  -t, --template PATH       Path to the pipeline template folder to be copied in the                       output folder
+  -c, --config PATH         Path to the the template config file
+  -o, --out_dir PATH        Path to output folder
+  --help                    Show this message and exit.
+```
+
+#### logs-to-excel
+Creates an xlsx file with all the entries found for a specified laboratory in a given set of log_summary.json files (from log-summary module). The laboratory name must match the name of one of the keys in the provided logs to work.
+```
+Usage: relecov-tools logs-to-excel [OPTIONS]
+
+  Creates a merged xlsx report from all the log summary jsons given as input
+
+Options:
+    -l, --lab_name                         Name for target laboratory in log-summary.json files
+    -o, --output_folder                    Path to output folder where xlsx file is saved
+    -f, --files                            Paths to log_summary.json files to merge into xlsx file, called once per file
+```
+
 ### build-schema
 The `build-schema` module provides functionality to generate and manage JSON Schema files based on database definitions from Excel spreadsheets. It automates the creation of JSON Schemas, including validation, drafting, and comparison with existing schemas.
 
@@ -287,22 +317,6 @@ label_name: Label or name for the property.
 fill_mode: Mode for filling in the property (e.g., required, optional).
 required (Y/N): Indicates if the property is required (Y) or optional (N).
 complex_field (Y/N): Indicates if the property is a complex (nested) field (Y) or a standard field (N).
-```
-
-#### launch-pipeline
-Create the folder structure to execute the given pipeline for the latest sample batches after executing download, read-lab-metadata and validate modules. This module will create symbolic links for each sample and generate the necessary files for pipeline execution using the information from validated_BATCH-NAME_DATE.json.
-```
-Usage: relecov-tools launch-pipeline [OPTIONS]
-
-  Create the symbolic links for the samples which are validated to prepare for
-  bioinformatics pipeline execution.
-
-Options:
-  -i, --input PATH          Path to the input folder where sample files are located
-  -t, --template PATH       Path to the pipeline template folder to be copied in the                       output folder
-  -c, --config PATH         Path to the the template config file
-  -o, --out_dir PATH        Path to output folder
-  --help                    Show this message and exit.
 ```
 
 #### custom logs
