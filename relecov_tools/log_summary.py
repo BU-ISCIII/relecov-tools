@@ -26,7 +26,6 @@ class LogSum:
     def __init__(
         self,
         output_location: str = None,
-        only_samples: bool = False,
         unique_key: str = None,
         path: str = None,
     ):
@@ -34,14 +33,6 @@ class LogSum:
             raise FileNotFoundError(f"Output folder {output_location} does not exist")
         else:
             self.output_location = output_location
-        if only_samples and unique_key:
-            stderr.print("[red]LogSum only_samples and unique_key are incompatible")
-            sys.exit(1)
-        # if only_samples is given, no "samples" key will be added to logs
-        if only_samples:
-            self.only_samples = True
-        else:
-            self.only_samples = False
         # if unique_key is given, all entries will be saved inside that key by default
         if unique_key:
             self.unique_key = unique_key
@@ -55,29 +46,35 @@ class LogSum:
         self.logs = {}
         return
 
-    def feed_key(self, key=None, sample=None):
+    def feed_key(self, key=None, sample=None, path=None):
         """Run update_summary() with no entry nor log_type. Add a new empty key"""
         if self.unique_key:
             key = self.unique_key
-        self.update_summary(log_type=None, key=key, entry=None, sample=sample)
+        self.update_summary(
+            log_type=None, key=key, entry=None, sample=sample, path=path
+        )
 
-    def add_error(self, entry, key=None, sample=None):
+    def add_error(self, entry, key=None, sample=None, path=None):
         """Run update_summary() with log_type as errors"""
         if self.unique_key:
             key = self.unique_key
         log.error(entry)
-        self.update_summary(log_type="errors", key=key, entry=entry, sample=sample)
+        self.update_summary(
+            log_type="errors", key=key, entry=entry, sample=sample, path=path
+        )
         return
 
-    def add_warning(self, entry, key=None, sample=None):
+    def add_warning(self, entry, key=None, sample=None, path=None):
         """Run update_summary() with log_type as warnings"""
         if self.unique_key:
             key = self.unique_key
         log.warning(entry)
-        self.update_summary(log_type="warnings", key=key, entry=entry, sample=sample)
+        self.update_summary(
+            log_type="warnings", key=key, entry=entry, sample=sample, path=path
+        )
         return
 
-    def update_summary(self, log_type, key, entry, sample=None):
+    def update_summary(self, log_type, key, entry, sample=None, path=None):
         """Create a dictionary with a defined structure for each new key. Add the
         entry to the dictionary if it already exists. Add it to samples if its a sample
 
@@ -91,19 +88,14 @@ class LogSum:
         feed_dict = OrderedDict({"valid": True, "errors": [], "warnings": []})
         # Removing strange characters
         current_key = str(key).replace("./", "")
-        if self.only_samples and sample is not None:
-            log.warning(
-                "No samples record can be added if only_samples is set to True. "
-                + f"Record will be added to {current_key}"
-            )
-            sample = None
         entry, sample = (str(entry), str(sample))
         if current_key not in self.logs.keys():
             self.logs[current_key] = copy.deepcopy(feed_dict)
-            if self.path and "path" not in self.logs[current_key]:
-                self.logs[current_key].update({"path": self.path})
-            if not self.only_samples:
-                self.logs[current_key]["samples"] = OrderedDict()
+            self.logs[current_key]["samples"] = OrderedDict()
+        if self.path:
+            self.logs[current_key].update({"path": str(self.path)})
+        if path is not None:
+            self.logs[current_key].update({"path": str(path)})
         if log_type is None:
             if sample != "None" and sample not in self.logs[current_key]["samples"]:
                 self.logs[current_key]["samples"][sample] = copy.deepcopy(feed_dict)
@@ -128,13 +120,38 @@ class LogSum:
         for key in logs.keys():
             if logs[key]["errors"]:
                 logs[key]["valid"] = False
-            if not self.only_samples:
+            if logs[key].get("samples") is not None:
                 for sample in logs[key]["samples"].keys():
                     if logs[key]["samples"][sample]["errors"]:
                         logs[key]["samples"][sample]["valid"] = False
         return logs
 
-    def create_logs_excel(self, logs, called_module=None):
+    def merge_logs(self, key_name, logs_list):
+        """Merge a multiple set of logs without losing information
+        """
+        if not logs_list:
+            return
+        merged_logs = copy.deepcopy(logs_list[0])
+        if not merged_logs["samples"]:
+            merged_logs["samples"] = {}
+        for logs in logs_list:
+            merged_logs["errors"].extend(logs["errors"])
+            merged_logs["warnings"].extend(logs["warnings"])
+            if "samples" in logs.keys():
+                for sample, vals in logs["samples"].items():
+                    if sample not in merged_logs["samples"].keys():
+                        merged_logs["samples"][sample] = vals
+                    else:
+                        merged_logs["samples"][sample]["errors"].extend(
+                            logs["samples"][sample]["errors"]
+                        )
+                        merged_logs["samples"][sample]["warnings"].extend(
+                            logs["samples"][sample]["warnings"]
+                        )
+        final_logs = {key_name: merged_logs}
+        return final_logs
+
+    def create_logs_excel(self, logs, called_module=""):
         """Create an excel file with logs information
 
         Args:
@@ -145,17 +162,17 @@ class LogSum:
         def translate_fields(samples_logs):
             # TODO Translate logs to spanish using a local translator model like deepl
             return
-
-        batch_date = os.path.dirname(os.path.realpath(self.metadata)).split("/")[-1]
-        if called_module:
+        date = datetime.today().strftime("%Y%m%d%-H%M%S")
+        lab_code = list(logs.keys())[0]
+        if self.unique_key:
             excel_filename = "_".join(
-                [self.lab_code, batch_date, called_module, "report.xlsx"]
-            )
+                [self.unique_key, called_module, date, "report.xlsx"]
+            ).replace("__", "")
         else:
-            excel_filename = self.lab_code + "_" + batch_date + "_report.xlsx"
+            excel_filename = "_".join([lab_code, date, "report.xlsx"])
         if not logs.get("samples"):
             try:
-                samples_logs = logs.get(list(logs.keys())[0]).get("samples")
+                samples_logs = logs[lab_code].get("samples")
             except (KeyError, AttributeError) as e:
                 stderr.print(f"[red]Could not convert log summary to excel: {e}")
                 return
@@ -174,16 +191,16 @@ class LogSum:
             error_row = [
                 sample,
                 str(logs["valid"]),
-                ", ".join(logs["errors"]),
+                *"; ".join(logs["errors"])
             ]
             main_worksheet.append(error_row)
             warning_row = [
                 sample,
                 str(logs["valid"]),
-                ", ".join(logs["warnings"]),
+                *"; ".join(logs["warnings"])
             ]
             warnings_sheet.append(warning_row)
-        excel_outpath = os.path.join(self.out_folder, excel_filename)
+        excel_outpath = os.path.join(self.output_location, excel_filename)
         workbook.save(excel_outpath)
         stderr.print(f"[green]Successfully created logs excel in {excel_outpath}")
         return
