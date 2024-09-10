@@ -544,7 +544,7 @@ def build_schema(input_file, schema_base, draft_version, diff, out_dir):
     "--files",
     help="Paths to log_summary.json files to merge into xlsx file, called once per file",
     required=True,
-    multiple=True
+    multiple=True,
 )
 def logs_to_excel(lab_code, output_folder, files):
     """Creates a merged xlsx report from all the log summary jsons given as input"""
@@ -589,6 +589,7 @@ def wrapper(config_file, output_folder):
         config_file=config_file, output_folder=output_folder
     )
     process_wrapper.run_wrapper()
+
 
 if __name__ == "__main__":
     run_relecov_tools()
