@@ -334,7 +334,7 @@ def get_file_date(file_path):
         # Convert the modification time to a datetime object
         file_date = datetime.fromtimestamp(mtime)
         # Format date
-        formatted_date = file_date.strftime("%Y/%m/%d")
+        formatted_date = file_date.strftime("%Y%m%d")
         return formatted_date
     except FileNotFoundError:
         # Handle file not found error
