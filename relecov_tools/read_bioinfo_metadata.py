@@ -71,7 +71,7 @@ class BioinfoReportLog:
 
 
 # TODO: Add method to validate bioinfo_config.json file requirements.
-class BioinfoMetadata():
+class BioinfoMetadata:
     def __init__(
         self,
         readlabmeta_json_file=None,
@@ -117,7 +117,6 @@ class BioinfoMetadata():
         else:
             self.input_folder = input_folder
 
-
         # Parse bioinfo configuration
         self.bioinfo_json_file = os.path.join(
             os.path.dirname(__file__), "conf", "bioinfo_config.json"
@@ -140,7 +139,6 @@ class BioinfoMetadata():
             sys.exit(
                 self.log_report.print_log_report(self.__init__.__name__, ["error"])
             )
-
 
     def get_available_software(self, json):
         """Get list of available software in configuration
@@ -286,7 +284,7 @@ class BioinfoMetadata():
                 continue
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data_mapped
-    
+
     def handling_tables(self, file_list, conf_tab_name):
         """Reads a tabular file in different formats and returns a dictionary containing
         the corresponding data for each sample.
@@ -306,7 +304,9 @@ class BioinfoMetadata():
         extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
         if file_ext in extdict.keys():
             data = relecov_tools.utils.read_csv_file_return_dict(
-                file_name=file_list[0], sep=extdict.get(file_ext), key_position=sample_idx_colpos
+                file_name=file_list[0],
+                sep=extdict.get(file_ext),
+                key_position=sample_idx_colpos,
             )
             return data
         elif conf_tab_name.endswith(".gz"):
@@ -321,8 +321,8 @@ class BioinfoMetadata():
         return data
 
     def handling_files(self, file_list, output_folder):
-        """Handles different file formats to extract data regardless of their structure. 
-        The goal is to extract the data contained in files specified in ${file_list}, 
+        """Handles different file formats to extract data regardless of their structure.
+        The goal is to extract the data contained in files specified in ${file_list},
         using either 'standard' handlers defined in this class or pipeline-specific file handlers.
         (inspired from ./metadata_homogenizer.py)
 
@@ -340,8 +340,8 @@ class BioinfoMetadata():
                 },
                 ...
             }
-            Note: ensure that 'field1','field2','field3' corresponds with the values 
-            especified in the 'content' section of each software configuration scope 
+            Note: ensure that 'field1','field2','field3' corresponds with the values
+            especified in the 'content' section of each software configuration scope
             (see: conf/bioinfo_config.json).
 
         Args:
@@ -618,10 +618,10 @@ class BioinfoMetadata():
                 row[path_key] = file_path
                 if self.software_config[key].get("extract"):
                     self.extract_file(
-                        file=file_path, 
+                        file=file_path,
                         dest_folder=row.get("r1_fastq_filepath"),
                         sample_name=sample_name,
-                        path_key=path_key
+                        path_key=path_key,
                     )
         self.log_report.print_log_report(method_name, ["warning"])
         if sample_name_error == 0:
@@ -675,7 +675,7 @@ class BioinfoMetadata():
 
         Args:
             file (str): Path the file that is going to be copied
-            dest_folder (str): Folder with files from batch of samples 
+            dest_folder (str): Folder with files from batch of samples
             sample_name (str, optional): Name of the sample in metadata. Defaults to None.
             path_key (str, optional): Metadata field for the file. Defaults to None.
 
@@ -691,20 +691,18 @@ class BioinfoMetadata():
             self.log_report.update_log_report(
                 self.extract_file.__name__,
                 "warning",
-                 f'File for {path_key} not provided in sample {sample_name}',
+                f"File for {path_key} not provided in sample {sample_name}",
             )
             return False
         try:
             shutil.copy(file, out_filepath)
         except (IOError, PermissionError) as e:
             self.log_report.update_log_report(
-                self.extract_file.__name__,
-                "warning",
-                f"Could not extract {file}: {e}"
+                self.extract_file.__name__, "warning", f"Could not extract {file}: {e}"
             )
             return False
         return True
-    
+
     def split_data_by_batch(self, j_data):
         """Split metadata from json for each batch of samples found according to folder location of the samples.
 
@@ -713,7 +711,7 @@ class BioinfoMetadata():
             j_data (list(dict)): List of dictionaries, one per sample, including metadata for that sample
 
         Returns:
-            data_by_batch (dict(list(dict))): Dictionary containing parts of j_data corresponding to each 
+            data_by_batch (dict(list(dict))): Dictionary containing parts of j_data corresponding to each
             different folder with samples (batch) included in the original json metadata used as input
         """
         unique_batchs = set([x.get("r1_fastq_filepath") for x in j_data])
@@ -732,6 +730,7 @@ class BioinfoMetadata():
             batch_data (list(dict)): Metadata corresponding to a single folder with samples (folder)
             output_dir (str): Output location for the generated tabular file
         """
+
         def extract_batch_rows_to_file(file):
             """Create a new table file only with rows matching samples in batch_data"""
             file_extension = os.path.splitext(file)[1]
@@ -746,6 +745,7 @@ class BioinfoMetadata():
             )
             file_df.to_csv(output_path, index=False, sep=extdict.get(file_extension))
             return
+
         method_name = self.split_tables_by_batch.__name__
         namekey = "sequencing_sample_id"
         batch_samples = [row.get(namekey) for row in batch_data]
@@ -766,7 +766,7 @@ class BioinfoMetadata():
                     self.log_report.update_log_report(
                         method_name,
                         log_type,
-                        f"Could not create batch table for {file}: {e}"
+                        f"Could not create batch table for {file}: {e}",
                     )
         self.log_report.print_log_report(method_name, ["valid", "warning", "error"])
         return

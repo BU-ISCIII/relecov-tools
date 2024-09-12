@@ -342,8 +342,10 @@ def parse_long_table(files_list, output_folder=None):
                 method_name, "error", f"{files_list_processed} given file is not a file"
             )
             sys.exit(method_log_report.print_log_report(method_name, ["error"]))
-        
-        long_table = LongTableParse(file_path=files_list_processed, output_directory=output_folder)
+
+        long_table = LongTableParse(
+            file_path=files_list_processed, output_directory=output_folder
+        )
         # Parsing long table data and saving it
         long_table_data = long_table.parsing_csv()
         # Saving long table data into a file
