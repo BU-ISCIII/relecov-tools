@@ -173,17 +173,14 @@ class LongTableParse:
         # Parsing longtable file
         parsed_data = self.parse_file()
         j_list = self.convert_to_json(parsed_data)
-        # Saving long table data into a file
-        self.save_to_file(j_list)
-        stderr.print("[green]\tProcess completed")
-        return
+        return j_list
 
 
 # END of Class
 
 
 # START util functions
-def handle_pangolin_data(files_list):
+def handle_pangolin_data(files_list, output_folder=None):
     """File handler to parse pangolin data (csv) into JSON structured format.
 
     Args:
@@ -323,7 +320,7 @@ def handle_pangolin_data(files_list):
     return pango_data_processed
 
 
-def parse_long_table(files_list):
+def parse_long_table(files_list, output_folder=None):
     """File handler to retrieve data from long table files and convert it into a JSON structured format.
     This function utilizes the LongTableParse class to parse the long table data.
     Since this utility handles and maps data using a custom way, it returns None to be avoid being  transferred to method read_bioinfo_metadata.BioinfoMetadata.mapping_over_table().
@@ -345,9 +342,13 @@ def parse_long_table(files_list):
                 method_name, "error", f"{files_list_processed} given file is not a file"
             )
             sys.exit(method_log_report.print_log_report(method_name, ["error"]))
-        long_table = LongTableParse(files_list_processed)
+        
+        long_table = LongTableParse(file_path=files_list_processed, output_directory=output_folder)
         # Parsing long table data and saving it
-        long_table.parsing_csv()
+        long_table_data = long_table.parsing_csv()
+        # Saving long table data into a file
+        long_table.save_to_file(long_table_data)
+        stderr.print("[green]\tProcess completed")
     elif len(files_list) > 1:
         method_log_report.update_log_report(
             method_name,
@@ -358,7 +359,7 @@ def parse_long_table(files_list):
     return None
 
 
-def handle_consensus_fasta(files_list):
+def handle_consensus_fasta(files_list, output_folder=None):
     """File handler to parse consensus data (fasta) into JSON structured format.
 
     Args:
