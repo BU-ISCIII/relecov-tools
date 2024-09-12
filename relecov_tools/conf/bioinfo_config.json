@@ -2,10 +2,11 @@
     "viralrecon": {
         "mapping_stats": {
             "fn": "mapping_illumina(?:_\\d{8})?\\.tab",
-            "sample_col_idx": 5,
+            "sample_col_idx": 2,
             "header_row_idx": 1,
             "required": true,
             "function": null,
+            "split_by_batch": true,
             "content": {
                 "analysis_date": "analysis_date",
                 "depth_of_coverage_value": "medianDPcoveragevirus",
@@ -26,6 +27,7 @@
             "header_row_idx": 1,
             "required": false,
             "function": "handle_pangolin_data",
+            "extract": true,
             "content": {
                 "variant_name": "scorpio_call",
                 "lineage_name": "lineage",
@@ -42,6 +44,7 @@
             "sample_col_idx": 1,
             "header_row_idx": 1,
             "required": true,
+            "split_by_batch": true,
             "function": "parse_long_table",
             "content": {
                 "sample" : "SAMPLE",
@@ -67,6 +70,7 @@
             "fn": ".consensus.fa",
             "required": false,
             "function": "handle_consensus_fasta",
+            "extract": true,
             "content": {
                 "consensus_sequence_name" : "sequence_name",
                 "consensus_genome_length" : "genome_length",
@@ -85,6 +89,13 @@
             "content": {
                 "ns_per_100_kbp": "# Ns per 100kb consensus"
             }
+        },
+        "other_files": {
+            "fn": "^(?!.*tbi$).*.filtered.vcf.gz",
+            "required": false,
+            "function": null,
+            "extract": true,
+            "content": {}
         },
         "workflow_summary": {
             "fn": "multiqc_report.html",
