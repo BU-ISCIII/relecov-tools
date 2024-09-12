@@ -14,7 +14,6 @@ import yaml
 import gzip
 import re
 import shutil
-import csv
 from itertools import islice
 from Bio import SeqIO
 from rich.console import Console
@@ -264,6 +263,22 @@ def compress_file(file):
         return True
     except FileNotFoundError:
         return False
+
+
+def check_gzip_integrity(file_path):
+    """Check if a compressed file is not corrupted"""
+    chunksize = 100000000  # 10 Mbytes
+    with gzip.open(file_path, "rb") as f:
+        try:
+            while f.read(chunksize) != b"":
+                pass
+        except gzip.BadGzipFile:
+            # Not a gzip file
+            return False
+        # EOFError: Compressed file is truncated
+        except EOFError:
+            return False
+    return True
 
 
 def rich_force_colors():
