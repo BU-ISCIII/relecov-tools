@@ -14,6 +14,7 @@ import yaml
 import gzip
 import re
 import shutil
+import csv
 from itertools import islice
 from Bio import SeqIO
 from rich.console import Console
@@ -92,16 +93,22 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
     return ws_data, heading_row
 
 
-def read_csv_file_return_dict(file_name, sep, key_position=None):
+def read_csv_file_return_dict(file_name, sep=None, key_position=None):
     """Read csv or tsv file, according to separator, and return a dictionary
     where the main key is the first column, if key position is None otherwise
-    the index value of the key position is used as key
+    the index value of the key position is used as key. If sep is None then
+    try to assert a separator automaticallly depending on file extension.
     """
     try:
         with open(file_name, "r") as fh:
             lines = fh.readlines()
     except FileNotFoundError:
         raise
+    if sep is None:
+        file_extension = os.path.splitext(file_name)[1]
+        extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
+        # Use space as a default separator, None would also be valid
+        sep = extdict.get(file_extension, " ")
     heading = lines[0].strip().split(sep)
     if len(heading) == 1:
         return {"ERROR": "not valid format"}
@@ -410,7 +417,7 @@ def print_log_report(
         tabulate(
             table_data,
             headers=["Log type", "Category", "Message"],
-            tablefmt="fancy_grid",
+            tablefmt="presto",
         )
     )
 
