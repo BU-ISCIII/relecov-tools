@@ -310,6 +310,11 @@ class BioinfoMetadata:
             )
             return data
         elif conf_tab_name.endswith(".gz"):
+            self.log_report.update_log_report(
+                method_name,
+                "warning",
+                f".gz files are not supported yet for data extraction: {conf_tab_name}",
+            )
             data = {}
         else:
             self.log_report.update_log_report(
