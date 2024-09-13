@@ -21,7 +21,7 @@ Code contributions to the hotfix:
 
 - Included a way to extract pango-designation version in read-bioinfo-metadata [#299](https://github.com/BU-ISCIII/relecov-tools/pull/299)
 - Now log_summary.py also creates an excel file with the process logs [#300](https://github.com/BU-ISCIII/relecov-tools/pull/300)
-- Read-bioinfo-metadata splits files and data by batch of samples [#301]()
+- Read-bioinfo-metadata splits files and data by batch of samples [#306](https://github.com/BU-ISCIII/relecov-tools/pull/306)
 
 #### Fixes
 
