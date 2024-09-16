@@ -34,7 +34,7 @@ jobs:
       env:
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
     - name: Upload output file
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: test-output
         path: output.txt
@@ -73,7 +73,7 @@ jobs:
       env:
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
     - name: Upload output file
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: test-output
         path: output.txt

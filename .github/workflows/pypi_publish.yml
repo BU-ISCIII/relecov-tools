@@ -1,8 +1,9 @@
 name: Publish package python distribution to Pypi
 
 on:
-  push:
-    branches: "main"
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
     build:
@@ -23,14 +24,13 @@ jobs:
       - name: Build a binary wheel and a source tarball
         run: python3 -m build
       - name: Store the distribution packages
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
 
     publish-to-pypi:
       name: Publish dist to PyPI
-      if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
       needs:
       - build
       runs-on: ubuntu-latest
@@ -41,7 +41,7 @@ jobs:
         id-token: write
       steps:
       - name: Download all the dists
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
@@ -58,7 +58,7 @@ jobs:
           id-token: write
         steps:
         - name: Download all the dists
-          uses: actions/download-artifact@v3
+          uses: actions/download-artifact@v4
           with:
             name: python-package-distributions
             path: dist/
