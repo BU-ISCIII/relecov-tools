@@ -14,6 +14,9 @@ Code contributions to the hotfix:
 
 #### Added enhancements
 
+- Now also check for gzip file integrity after download. Moved cleaning process to end of workflow [#313](https://github.com/BU-ISCIII/relecov-tools/pull/313)
+- Introduced a decorator in sftp_client.py to reconnect when conection is lost [#313](https://github.com/BU-ISCIII/relecov-tools/pull/313)
+
 #### Fixes
 
 #### Changed
