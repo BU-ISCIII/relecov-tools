@@ -77,9 +77,10 @@ class SftpRelecov:
                 else:
                     log.error("Could not reconnect to remote client")
                 return func(self, *args, **kwargs)
-            return retrier
-        return decorator
 
+            return retrier
+
+        return decorator
 
     def open_connection(self):
         """Establishing sftp connection"""
