@@ -5,6 +5,7 @@ import json
 import sys
 import os
 import yaml
+import time
 import warnings
 import rich.console
 import paramiko
@@ -1070,7 +1071,7 @@ class DownloadManager:
             # Close previously open connection to avoid timeouts
             try:
                 self.relecov_sftp.close_connection()
-            except paramiko.ssh_exception.NoValidConnectionsError:
+            except paramiko.SSHException:
                 pass
             # Check if the connection has been closed due to time limit
             self.relecov_sftp.open_connection()
@@ -1161,10 +1162,13 @@ class DownloadManager:
             clean_fetchlist = [
                 fi for fi in fetched_files if fi.endswith(tuple(self.allowed_file_ext))
             ]
-
             clean_fetchlist = [fi for fi in clean_fetchlist if fi not in corrupted]
             # Checking for uncompressed files
-            files_to_compress = [fi for fi in clean_fetchlist if not fi.endswith(".gz")]
+            files_to_compress = [
+                fi
+                for fi in clean_fetchlist
+                if not fi.endswith(".gz") and not fi.endswith(".bam")
+            ]
             if files_to_compress:
                 comp_files = str(len(files_to_compress))
                 log.info("Found %s uncompressed files, compressing...", comp_files)
@@ -1196,21 +1200,21 @@ class DownloadManager:
                     relecov_tools.utils.calculate_md5(path) for path in clean_pathlist
                 ]
                 files_md5_dict = dict(zip(clean_fetchlist, md5_hashes))
-
+            for file in files_md5_dict.keys():
+                full_f_path = os.path.join(local_folder, file)
+                if not relecov_tools.utils.check_gzip_integrity(full_f_path):
+                    corrupted.append(file)
+                    files_md5_dict.pop(file, None)
             processed_filedict = self.process_filedict(
                 valid_filedict, clean_fetchlist, corrupted=corrupted, md5miss=not_md5sum
             )
             self.create_files_with_metadata_info(
                 local_folder, processed_filedict, files_md5_dict, meta_file
             )
-            # If download_option is "download_clean", remove
-            # sftp folder content after download is finished
-            if option == "clean":
-                self.delete_remote_files(folder, files=files_to_download)
-                self.delete_remote_files(folder, skip_seqs=True)
-                self.delete_remote_folder(folder)
-                stderr.print(f"Delete process finished in remote {folder}")
+            if self.logsum.logs.get(self.current_folder):
+                self.logsum.logs[self.current_folder].update({"path": local_folder})
             stderr.print(f"[green]Finished processing {folder}")
+            self.finished_folders[folder] = clean_fetchlist
         return
 
     def include_new_key(self, sample=None):
