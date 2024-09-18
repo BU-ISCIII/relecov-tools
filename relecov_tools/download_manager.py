@@ -131,6 +131,7 @@ class DownloadManager:
         self.relecov_sftp = relecov_tools.sftp_client.SftpRelecov(
             conf_file, sftp_user, sftp_passwd
         )
+        self.finished_folders = {}
 
     def create_local_folder(self, folder):
         """Create folder to download files in local path using date
@@ -267,7 +268,8 @@ class DownloadManager:
             data = {k: v for k, v in data.items() if k not in samples_to_delete}
         with open(sample_data_path, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
-        log.info("Successfully created json file with samples %s", sample_data_path)
+        # Feed accessible dict with necessary information for wrapper to work
+        log.info("Successfully created samples json file %s", sample_data_path)
         return
 
     def remove_duplicated_values(self, sample_file_dict):
@@ -574,7 +576,7 @@ class DownloadManager:
         if any(file.endswith(tuple(self.allowed_file_ext)) for file in files_to_remove):
             if skip_seqs is True:
                 log_text = f"Folder {remote_folder} has sequencing files. Not removed."
-                self.include_warning(log_text)
+                log.warning(log_text)
                 return
         for file in files_to_remove:
             try:
@@ -583,11 +585,30 @@ class DownloadManager:
                 )
                 log.info("%s Deleted from remote server", file)
             except (IOError, PermissionError) as e:
-                self.include_warning(f"Could not delete remote file {file}: {e}")
+                log.error(f"Could not delete remote file {file}: {e}")
                 stderr.print(f"Could not delete remote file {file}. Error: {e}")
         return
 
-    def delete_remote_folder(self, remote_folder):
+    def rename_remote_folder(self, remote_folder):
+        if "tmp_processing" in remote_folder:
+            new_name = remote_folder.replace("tmp_processing", "invalid_samples")
+            try:
+                self.relecov_sftp.rename_file(remote_folder, new_name)
+                if self.finished_folders.get(remote_folder):
+                    self.finished_folders[new_name] = self.finished_folders.pop(
+                        remote_folder
+                    )
+                log.info("Successfully renamed %s to %s" % (remote_folder, new_name))
+            except (OSError, PermissionError) as e:
+                log_text = f"Could not rename remote {remote_folder}. Error: {e}"
+                log.error(log_text)
+        else:
+            log.warning(
+                "No `tmp_processing` pattern in %s, not renamed" % remote_folder
+            )
+        return
+
+    def clean_remote_folder(self, remote_folder):
         """Delete a folder from remote sftp, check if it is empty or not first.
 
         Args:
@@ -603,15 +624,16 @@ class DownloadManager:
                     log.info("Successfully removed %s", remote_folder)
                 except (OSError, PermissionError) as e:
                     log_text = f"Could not delete remote {remote_folder}. Error: {e}"
-                    self.include_warning(log_text)
+                    log.error(log_text)
                     stderr.print(log_text)
             else:
                 log.info("%s is a top-level folder. Not removed", remote_folder)
 
         remote_folder_files = self.relecov_sftp.get_file_list(remote_folder)
         if remote_folder_files:
+            self.rename_remote_folder(remote_folder)
             log_text = f"Remote folder {remote_folder} not empty. Not removed"
-            self.include_warning(log_text)
+            log.warning(log_text)
         else:
             remove_client_dir(remote_folder)
         return
@@ -715,7 +737,7 @@ class DownloadManager:
             if not md5sumlist:
                 error_text = "No md5sum could be found in remote folder %s"
                 stderr.print(f"[yellow]{error_text % folder}")
-                self.include_warning(error_text)
+                self.include_warning(error_text % folder)
                 continue
             folders_with_metadata[folder] = [fi for fi in files if fi not in md5sumlist]
             try:
@@ -1006,7 +1028,7 @@ class DownloadManager:
             processed(dict{str:str}): Updated valid_filedict
         """
         processed_dict = {}
-        error_text = "md5 mismatch for %s"
+        error_text = "corrupted or md5 mismatch for %s"
         warning_text = "File %s not found in md5sum. Creating hash"
         for sample, vals in valid_filedict.items():
             processed_dict[sample] = {}
@@ -1028,13 +1050,12 @@ class DownloadManager:
                 del processed_dict[sample]
         return processed_dict
 
-    def download(self, target_folders, option="download"):
+    def download(self, target_folders):
         """Manages all the different functions to download files, verify their
         integrity and create initial json with filepaths and md5 hashes
 
         Args:
             target_folders (dict): dictionary
-            option (str, optional): Download option. Defaults to "download".
         """
         log.info("Initiating download process")
         main_folder = self.platform_storage_folder
@@ -1217,19 +1238,11 @@ class DownloadManager:
             for folder in processed_folders:
                 self.current_folder = folder
                 self.delete_remote_files(folder)
-                self.delete_remote_folder(folder)
+                self.clean_remote_folder(folder)
                 stderr.print(f"Delete process finished in {folder}")
         else:
             target_folders, processed_folders = self.merge_subfolders(target_folders)
-            if self.download_option == "download_only":
-                self.download(target_folders, option="download")
-            if self.download_option == "download_clean":
-                self.download(target_folders, option="clean")
-                for folder in processed_folders:
-                    self.current_folder = folder
-                    self.delete_remote_files(folder, skip_seqs=True)
-                    self.delete_remote_folder(folder)
-                    stderr.print(f"Delete process finished in {folder}")
+            self.download(target_folders)
 
         self.relecov_sftp.close_connection()
         stderr.print(f"Processed {len(processed_folders)} folders: {processed_folders}")
@@ -1238,5 +1251,14 @@ class DownloadManager:
             self.logsum.create_error_summary(called_module="download")
         else:
             log.info("Process log summary was empty. Not generated.")
+        # If download_option is "download_clean", remove
+        # sftp folder content after download is finished
+        if self.download_option == "download_clean":
+            folders_to_clean = copy.deepcopy(self.finished_folders)
+            for folder, downloaded_files in folders_to_clean.items():
+                self.delete_remote_files(folder, files=downloaded_files)
+                self.delete_remote_files(folder, skip_seqs=True)
+                self.clean_remote_folder(folder)
+                stderr.print(f"Delete process finished in remote {folder}")
         stderr.print("Finished execution")
         return
