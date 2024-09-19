@@ -73,7 +73,7 @@
             "Variant designation table filename" : "Lineage analysis file",
             "Library preparation kit" : "Library Preparation Kit",
             "Library layout" : "Library Layout",
-            "Variant Clade Genotype" : "clade_name",
+            "Read lenght" : "Read length",
             "SARS-CoV-2 Lineage designation" : "Lineage designation",
             "fastq filename R1" : "Sequence file R1 fastq",
             "fastq filename R2" : "Sequence file R2 fastq"
