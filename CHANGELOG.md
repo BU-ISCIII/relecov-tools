@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 Code contributions to the hotfix:
+- [Juan Ledesma](https://github.com/juanledesma78)
 
 ### Modules
 
@@ -78,4 +79,3 @@ Code contributions to the inital release:
 - [Erika Kvalem](https://github.com/ErikaKvalem)
 - [Alberto Lema](https://github.com/Alema91)
 - [Daniel Valle](https://github.com/Daniel-VM)
-- [Juan Ledesma](https://github.com/juanledesma78)
