@@ -400,7 +400,7 @@ class RelecovMetadata:
                 else:
                     if isinstance(row[key], float) or isinstance(row[key], int):
                         row[key] = str(row[key])
-                if not "date" in key.lower() and isinstance(row[key], dtime):
+                if "date" not in key.lower() and isinstance(row[key], dtime):
                     logtxt = f"Non-date field {key} provided as date. Parsed as int"
                     self.logsum.add_warning(sample=sample_id, entry=logtxt)
                     row[key] = str(relecov_tools.utils.excel_date_to_num(row[key]))
