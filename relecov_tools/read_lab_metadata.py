@@ -38,7 +38,7 @@ class RelecovMetadata:
 
         if sample_list_file is None:
             stderr.print("[Yellow]No samples_data.json file provided")
-            self.sample_list_file = sample_list_file
+        self.sample_list_file = sample_list_file
 
         if sample_list_file is not None and not os.path.exists(sample_list_file):
             log.error("Sample information file %s does not exist ", sample_list_file)
