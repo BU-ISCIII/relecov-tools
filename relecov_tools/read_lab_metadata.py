@@ -41,12 +41,8 @@ class RelecovMetadata:
             self.sample_list_file = sample_list_file
 
         if sample_list_file is not None and not os.path.exists(sample_list_file):
-            log.error(
-                "Sample information file %s does not exist ", sample_list_file
-            )
-            stderr.print(
-                "[red] Samples file " + sample_list_file + " does not exist"
-            )
+            log.error("Sample information file %s does not exist ", sample_list_file)
+            stderr.print("[red] Samples file " + sample_list_file + " does not exist")
             sys.exit(1)
 
         if output_folder is None:
@@ -104,16 +100,20 @@ class RelecovMetadata:
             j_data (dict(dict)): Dictionary where each key is the sample ID and the values are
             its file names, locations and md5
         """
+
         def safely_calculate_md5(file):
             """Check file md5, but return Not Provided if file does not exist"""
             try:
                 return relecov_tools.utils.calculate_md5(file)
             except IOError:
                 return "Not Provided [GENEPIO:0001668]"
+
         dir_path = os.path.dirname(os.path.realpath(self.metadata_file))
         md5_checksum_files = [f for f in os.listdir(dir_path) if "md5" in f]
         if md5_checksum_files:
-            skip_list = self.configuration.get_topic_data("sftp_handle", "skip_when_found")
+            skip_list = self.configuration.get_topic_data(
+                "sftp_handle", "skip_when_found"
+            )
             md5_dict = relecov_tools.utils.read_md5_checksum(
                 file_name=md5_checksum_files[0], avoid_chars=skip_list
             )
@@ -128,7 +128,7 @@ class RelecovMetadata:
             if not r1_file:
                 self.logsum.add_error(
                     sample=sample.get("sequencing_sample_id"),
-                    entry=no_fastq_error % sample.get("sequencing_sample_id")
+                    entry=no_fastq_error % sample.get("sequencing_sample_id"),
                 )
                 j_data[str(sample.get("sequencing_sample_id"))] = files_dict
                 continue
@@ -147,8 +147,8 @@ class RelecovMetadata:
                     files_dict["fastq_r2_md5"] = r2_md5
                 else:
                     files_dict["fastq_r2_md5"] = safely_calculate_md5(
-                    os.path.join(dir_path, r2_file)
-                )
+                        os.path.join(dir_path, r2_file)
+                    )
             j_data[str(sample.get("sequencing_sample_id"))] = files_dict
         return j_data
 
@@ -404,7 +404,7 @@ class RelecovMetadata:
                     logtxt = f"Non-date field {key} provided as date. Parsed as int"
                     self.logsum.add_warning(sample=sample_id, entry=logtxt)
                     row[key] = str(relecov_tools.utils.excel_date_to_num(row[key]))
-                if self.alternative_heading: 
+                if self.alternative_heading:
                     alt_key = alt_header_dict.get(key)
                 if row[key] is not None or "not provided" not in str(row[key]).lower():
                     try:
