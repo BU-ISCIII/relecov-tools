@@ -3,7 +3,7 @@
     "id": "https://github.com/BU-ISCIII/relecov-tools/blob/develop/relecov_tools/schema/relecov_schema.json",
     "title": "RELECOV schema",
     "description":"Json schema that specifies the structure, content, and validation rules for RELECOV metadata",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "required": [
         "collecting_lab_sample_id",
         "sequencing_sample_id",
