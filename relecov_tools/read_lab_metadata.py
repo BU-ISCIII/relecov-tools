@@ -37,18 +37,15 @@ class RelecovMetadata:
             sys.exit(1)
 
         if sample_list_file is None:
-            self.sample_list_file = relecov_tools.utils.prompt_path(
-                msg="Select the file which contains the sample information"
-            )
-        else:
+            stderr.print("[Yellow]No samples_data.json file provided")
             self.sample_list_file = sample_list_file
 
-        if not os.path.exists(self.sample_list_file):
+        if sample_list_file is not None and not os.path.exists(sample_list_file):
             log.error(
-                "Sample information file %s does not exist ", self.sample_list_file
+                "Sample information file %s does not exist ", sample_list_file
             )
             stderr.print(
-                "[red] Sample information " + self.sample_list_file + " does not exist"
+                "[red] Samples file " + sample_list_file + " does not exist"
             )
             sys.exit(1)
 
@@ -97,6 +94,64 @@ class RelecovMetadata:
             "lab_metadata", "samples_json_fields"
         )
 
+    def get_samples_files_data(self, clean_metadata_rows):
+        """Include the fields that would be included in samples_data.json
+
+        Args:
+            clean_metadata_rows (list(dict)): Cleaned list of rows from metadata_lab.xlsx file
+
+        Returns:
+            j_data (dict(dict)): Dictionary where each key is the sample ID and the values are
+            its file names, locations and md5
+        """
+        def safely_calculate_md5(file):
+            """Check file md5, but return Not Provided if file does not exist"""
+            try:
+                return relecov_tools.utils.calculate_md5(file)
+            except IOError:
+                return "Not Provided [GENEPIO:0001668]"
+        dir_path = os.path.dirname(os.path.realpath(self.metadata_file))
+        md5_checksum_files = [f for f in os.listdir(dir_path) if "md5" in f]
+        if md5_checksum_files:
+            skip_list = self.configuration.get_topic_data("sftp_handle", "skip_when_found")
+            md5_dict = relecov_tools.utils.read_md5_checksum(
+                file_name=md5_checksum_files[0], avoid_chars=skip_list
+            )
+        else:
+            md5_dict = {}
+        j_data = {}
+        no_fastq_error = "No R1 fastq was given for sample %s"
+        for sample in clean_metadata_rows:
+            files_dict = {}
+            r1_file = sample.get("sequence_file_R1_fastq")
+            r2_file = sample.get("sequence_file_R2_fastq")
+            if not r1_file:
+                self.logsum.add_error(
+                    sample=sample.get("sequencing_sample_id"),
+                    entry=no_fastq_error % sample.get("sequencing_sample_id")
+                )
+                j_data[str(sample.get("sequencing_sample_id"))] = files_dict
+                continue
+            r1_md5 = md5_dict.get(r1_file)
+            r2_md5 = md5_dict.get(r2_file)
+            files_dict["r1_fastq_filepath"] = dir_path
+            if r1_md5:
+                files_dict["fastq_r1_md5"] = r1_md5
+            else:
+                files_dict["fastq_r1_md5"] = safely_calculate_md5(
+                    os.path.join(dir_path, r1_file)
+                )
+            if r2_file:
+                files_dict["r2_fastq_filepath"] = dir_path
+                if r2_md5:
+                    files_dict["fastq_r2_md5"] = r2_md5
+                else:
+                    files_dict["fastq_r2_md5"] = safely_calculate_md5(
+                    os.path.join(dir_path, r2_file)
+                )
+            j_data[str(sample.get("sequencing_sample_id"))] = files_dict
+        return j_data
+
     def match_to_json(self, valid_metadata_rows):
         """Keep only the rows from samples present in the input file samples.json
 
@@ -104,12 +159,17 @@ class RelecovMetadata:
             valid_metadata_rows (list(dict)): List of rows from metadata_lab.xlsx file
 
         Returns:
-            clean_metadata_rows(list(dict)): _description_
-            missing_samples(list(str)):
+            clean_metadata_rows(list(dict)): List of rows matching the samples in samples_data.json
+            missing_samples(list(str)): List of samples not found in samples_data.json
         """
-        samples_json = relecov_tools.utils.read_json_file(self.sample_list_file)
-        clean_metadata_rows = []
         missing_samples = []
+        if not self.sample_list_file:
+            logtxt = "samples_data.json not provided, all samples will be included"
+            self.logsum.add_warning(entry=logtxt)
+            return valid_metadata_rows, missing_samples
+        else:
+            samples_json = relecov_tools.utils.read_json_file(self.sample_list_file)
+        clean_metadata_rows = []
         for row in valid_metadata_rows:
             sample_id = str(row["sequencing_sample_id"]).strip()
             self.logsum.feed_key(sample=sample_id)
@@ -251,7 +311,10 @@ class RelecovMetadata:
         # TODO: Change sequencing_sample_id for some unique ID used in RELECOV database
         s_json["map_field"] = "sequencing_sample_id"
         s_json["adding_fields"] = self.samples_json_fields
-        s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
+        if self.sample_list_file:
+            s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
+        else:
+            s_json["j_data"] = self.get_samples_files_data(metadata)
         metadata = self.process_from_json(metadata, s_json)
         stderr.print("[green]Processed sample data file.")
         return metadata
