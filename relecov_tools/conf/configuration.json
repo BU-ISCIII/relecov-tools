@@ -226,8 +226,12 @@
             "sftp_port": "22"
         },
         "metadata_processing": {
+            "sample_id_col": "Sample ID given for sequencing",
             "header_flag": "CAMPO",
-            "excel_sheet": "METADATA_LAB"
+            "excel_sheet": "METADATA_LAB",
+            "alternative_sheet": "5.Viral Characterisation and Se",
+            "alternative_flag": "LAB ID",
+            "alternative_sample_id_col": "Sample ID"
         },
         "abort_if_md5_mismatch": "False",
         "platform_storage_folder": "/tmp/relecov",
