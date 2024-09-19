@@ -338,8 +338,24 @@ class RelecovMetadata:
         """
         meta_sheet = self.metadata_processing.get("excel_sheet")
         header_flag = self.metadata_processing.get("header_flag")
-        ws_metadata_lab, heading_row_number = relecov_tools.utils.read_excel_file(
-            self.metadata_file, meta_sheet, header_flag, leave_empty=False
+        sample_id_col = self.metadata_processing.get("sample_id_col")
+        self.alternative_heading = False
+        try:
+            ws_metadata_lab, heading_row_number = relecov_tools.utils.read_excel_file(
+                self.metadata_file, meta_sheet, header_flag, leave_empty=False
+            )
+        except KeyError:
+            self.alternative_heading = True
+            alt_sheet = self.metadata_processing.get("alternative_sheet")
+            header_flag = self.metadata_processing.get("alternative_flag")
+            sample_id_col = self.metadata_processing.get("alternative_sample_id_col")
+            logtxt = f"No excel sheet named {meta_sheet}. Using {alt_sheet}"
+            stderr.print(f"[yellow]{logtxt}")
+            ws_metadata_lab, heading_row_number = relecov_tools.utils.read_excel_file(
+                self.metadata_file, alt_sheet, header_flag, leave_empty=False
+            )
+        alt_header_dict = self.configuration.get_topic_data(
+            "lab_metadata", "alt_heading_equivalences"
         )
         valid_metadata_rows = []
         row_number = heading_row_number
@@ -347,7 +363,7 @@ class RelecovMetadata:
             row_number += 1
             property_row = {}
             try:
-                sample_id = str(row["Sample ID given for sequencing"]).strip()
+                sample_id = str(row[sample_id_col]).strip()
             except KeyError:
                 log_text = f"Sample ID given for sequencing empty in row {row_number}"
                 log.error(log_text)
@@ -384,16 +400,28 @@ class RelecovMetadata:
                 else:
                     if isinstance(row[key], float) or isinstance(row[key], int):
                         row[key] = str(row[key])
+                if not "date" in key.lower() and isinstance(row[key], dtime):
+                    logtxt = f"Non-date field {key} provided as date. Parsed as int"
+                    self.logsum.add_warning(sample=sample_id, entry=logtxt)
+                    row[key] = str(relecov_tools.utils.excel_date_to_num(row[key]))
+                if self.alternative_heading: 
+                    alt_key = alt_header_dict.get(key)
                 if row[key] is not None or "not provided" not in str(row[key]).lower():
                     try:
                         property_row[self.label_prop_dict[key]] = row[key]
                     except KeyError as e:
+                        if self.alternative_heading:
+                            try:
+                                property_row[self.label_prop_dict[alt_key]] = row[key]
+                                continue
+                            except KeyError:
+                                pass
                         log_text = f"Error when mapping the label {str(e)}"
                         self.logsum.add_error(sample=sample_id, entry=log_text)
                         stderr.print(f"[red]{log_text}")
                         continue
-
             valid_metadata_rows.append(property_row)
+
         return valid_metadata_rows
 
     def create_metadata_json(self):
