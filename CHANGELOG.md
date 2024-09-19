@@ -56,6 +56,7 @@ Code contributions to the hotfix:
 #### Changed
 
 - Changed pypi_publish action to publish on every release, no need to push tags [#308](https://github.com/BU-ISCIII/relecov-tools/pull/308)
+- Included a new hospital (Hospital Universitario Araba) to laboratory_address.json [#315](https://github.com/BU-ISCIII/relecov-tools/pull/315) 
 
 #### Removed
 
@@ -77,3 +78,4 @@ Code contributions to the inital release:
 - [Erika Kvalem](https://github.com/ErikaKvalem)
 - [Alberto Lema](https://github.com/Alema91)
 - [Daniel Valle](https://github.com/Daniel-VM)
+- [Juan Ledesma](https://github.com/juanledesma78)
