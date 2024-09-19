@@ -91,6 +91,12 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
 
     return ws_data, heading_row
 
+def excel_date_to_num(date):
+    """Transform a date object formatted by excel to a numeric value"""
+    try:
+        return date.toordinal() - datetime(1899,12,30).toordinal()
+    except AttributeError:
+        return None
 
 def read_csv_file_return_dict(file_name, sep=None, key_position=None):
     """Read csv or tsv file, according to separator, and return a dictionary
