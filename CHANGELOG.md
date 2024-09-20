@@ -4,12 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - 2024-09-19 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/1.2.0
+## [1.2.0] - 2024-09-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/1.2.0
 
 ### Credits
 
-Code contributions to the hotfix:
+Code contributions to the release:
+
 - [Juan Ledesma](https://github.com/juanledesma78)
+- [Pablo Mata](https://github.com/Shettland)
 
 ### Modules
 
@@ -20,6 +22,7 @@ Code contributions to the hotfix:
 - Add Hospital Universitari Doctor Josep Trueta to laboratory_address.json [#316] (https://github.com/BU-ISCIII/relecov-tools/pull/316)
 - samples_data json file is no longer mandatory as input in read-lab-metadata [#314](https://github.com/BU-ISCIII/relecov-tools/pull/314)
 - Included handling of alternative column names to support two distinct headers using the same schema in read-lab-metadata [#314](https://github.com/BU-ISCIII/relecov-tools/pull/314)
+- Included a new hospital (Hospital Universitario Araba) to laboratory_address.json [#315](https://github.com/BU-ISCIII/relecov-tools/pull/315) 
 
 #### Fixes
 
@@ -63,7 +66,6 @@ Code contributions to the release:
 #### Changed
 
 - Changed pypi_publish action to publish on every release, no need to push tags [#308](https://github.com/BU-ISCIII/relecov-tools/pull/308)
-- Included a new hospital (Hospital Universitario Araba) to laboratory_address.json [#315](https://github.com/BU-ISCIII/relecov-tools/pull/315) 
 
 #### Removed
 
