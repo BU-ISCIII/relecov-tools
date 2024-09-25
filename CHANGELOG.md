@@ -12,6 +12,7 @@ Code contributions to the release:
 
 - [Juan Ledesma](https://github.com/juanledesma78)
 - [Pablo Mata](https://github.com/Shettland)
+- [Sergio Olmos](https://github.com/OPSergio)
 
 ### Modules
 
