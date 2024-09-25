@@ -561,6 +561,17 @@
         "submitting_institution_address": " Passeig de la Vall d'Hebron, 119-129",
         "submitting_institution_email": ""
     },
+    "Hospital Universitari Doctor Josep Trueta": {
+        "collecting_institution_address": "Avinguda de França, S/N,",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Girona",
+        "geo_loc_city": "Girona",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Vall d'Hebron",
+        "submitting_institution_address": " Passeig de la Vall d'Hebron, 119-129",
+        "submitting_institution_email": ""
+    },
     "Hospital Universitari Germans Trias i Pujol (HUGTiP)": {
         "collecting_institution_address": " Crta del Canyet s/n",
         "collecting_institution_email": "",
