@@ -62,7 +62,7 @@ class SftpRelecov:
     def reconnect_if_fail(n_times, sleep_time):
         def decorator(func):
             def retrier(self, *args, **kwargs):
-                more_sleep_time = sleep_time
+                more_sleep_time = 0
                 retries = 0
                 while retries < n_times:
                     try:
