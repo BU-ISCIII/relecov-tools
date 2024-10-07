@@ -21,8 +21,19 @@ jobs:
         uses: actions/checkout@master
       - name: Install flake8
         run: pip install flake8
+      - name: Check for Python file changes
+        id: file_check
+        uses: tj-actions/changed-files@v44
+        with:
+          sha: ${{ github.event.pull_request.head.sha }}
+          files: |
+             **.py
       - name: Run flake8
+        if: steps.file_check.outputs.any_changed == 'true'
         run: flake8 --ignore E501,W503,E203,W605
+      - name: No Python files changed
+        if: steps.file_check.outputs.any_changed != 'true'
+        run: echo "No Python files have been changed."
 
   black_lint:
     runs-on: ubuntu-latest
@@ -31,5 +42,15 @@ jobs:
           uses: actions/checkout@v2
         - name: Install black in jupyter
           run: pip install black[jupyter]
+        - name: Check for Python file changes
+          id: file_check
+          uses: tj-actions/changed-files@v44
+          with:
+            sha: ${{ github.event.pull_request.head.sha }}
+            files: '**.py'
         - name: Check code lints with Black
+          if: steps.file_check.outputs.any_changed == 'true'
           uses: psf/black@stable
+        - name: No Python files changed
+          if: steps.file_check.outputs.any_changed != 'true'
+          run: echo "No Python files have been changed."
