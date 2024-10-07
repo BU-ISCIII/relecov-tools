@@ -1212,8 +1212,19 @@ class DownloadManager:
             )
             if self.logsum.logs.get(self.current_folder):
                 self.logsum.logs[self.current_folder].update({"path": local_folder})
+                try:
+                    folder_basename = os.path.basename(local_folder.rstrip("/"))
+                    log_name = folder_basename + "_download_log_summary.json"
+                    self.logsum.create_error_summary(
+                        filepath=os.path.join(local_folder, log_name),
+                        logs={
+                            self.current_folder: self.logsum.logs[self.current_folder]
+                        },
+                    )
+                except Exception as e:
+                    log.error("Could not create logsum for %s: %s" % (folder, str(e)))
             stderr.print(f"[green]Finished processing {folder}")
-            self.finished_folders[folder] = clean_fetchlist
+            self.finished_folders[folder] = list(files_md5_dict.keys())
         return
 
     def include_new_key(self, sample=None):
