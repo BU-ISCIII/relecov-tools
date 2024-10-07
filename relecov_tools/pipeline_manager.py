@@ -5,11 +5,12 @@ import os
 import re
 import shutil
 import sys
+import copy
 from collections import Counter
 
 import rich.console
-
 import relecov_tools.utils
+from relecov_tools.log_summary import LogSum
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -209,18 +210,8 @@ class LaunchPipeline:
                             item["r2_fastq_filepath"], item["sequence_file_R2_fastq"]
                         )
                     samples_data.append(sample)
-            date_and_time = datetime.datetime.today().strftime("%Y%m%d%-H%M%S")
-            with open(
-                os.path.join(
-                    self.output_folder,
-                    self.doc_folder,
-                    f"{date_and_time}_validate_batch.json",
-                ),
-                "w",
-            ) as fo:
-                json.dump(join_validate, fo, indent=4, ensure_ascii=False)
 
-        return samples_data
+        return samples_data, join_validate
 
     def pipeline_exc(self):
         """Prepare folder for analysis in HPC
@@ -239,7 +230,7 @@ class LaunchPipeline:
         # create the 00_reads folder
         os.makedirs(self.linked_sample_folder, exist_ok=True)
         # collect json with all validated samples
-        samples_data = self.join_valid_items()
+        samples_data, join_validate = self.join_valid_items()
 
         # Check for possible duplicates
         # Extract the sequencing_sample_id from the list of dictionaries
@@ -258,13 +249,9 @@ class LaunchPipeline:
             )
             sys.exit()
 
-        # print samples_id file
-        with open(os.path.join(self.analysis_folder, "samples_id.txt"), "w") as f:
-            for sample_id in sample_ids:
-                f.write(f"{sample_id}\n")
-
         # iterate over the sample_data to copy the fastq files in the output folder
         file_errors = []
+        samp_errors = []
         copied_samples = 0
         if len(samples_data) == 0:
             stderr.print("[yellow] No samples were found. Deleting analysis folder")
@@ -293,6 +280,9 @@ class LaunchPipeline:
             except FileNotFoundError as e:
                 log.error("File not found %s", e)
                 file_errors.append(sample["r1_fastq_filepath"])
+                if "r2_fastq_filepath" in sample:
+                    file_errors.append(sample["r2_fastq_filepath"])
+                samp_errors.append(sample["sequencing_sample_id"])
                 continue
             copied_samples += 1
             # check if there is a r2 file
@@ -316,21 +306,39 @@ class LaunchPipeline:
                 except FileNotFoundError as e:
                     log.error("File not found %s", e)
                     file_errors.append(sample["r2_fastq_filepath"])
+                    samp_errors.append(sample["sequencing_sample_id"])
                     continue
-        if len(file_errors) > 0:
+        if len(samp_errors) > 0:
             stderr.print(
-                "[red] Files do not found. Unable to copy",
-                "[red] " + str(len(file_errors)),
-                "[red]sample files",
+                "[red]Some files were not found. Unable to copy files from",
+                "[red]" + str(len(samp_errors)) + " samples",
             )
             msg = "Do you want to delete analysis folder? Y/N"
             confirmation = relecov_tools.utils.prompt_yn_question(msg)
             if confirmation:
                 shutil.rmtree(self.output_folder)
                 sys.exit(1)
+
+        final_valid_samples = [
+            x for x in join_validate if x.get("sequencing_sample_id") not in samp_errors
+        ]
+        sample_ids = [i for i in sample_ids if i not in samp_errors]
+        # print samples_id file
+        stderr.print(f"[blue]Generating sample_id.txt file in {self.analysis_folder}")
+        with open(os.path.join(self.analysis_folder, "samples_id.txt"), "w") as f:
+            for sample_id in sample_ids:
+                f.write(f"{sample_id}\n")
+
+        date_and_time = datetime.datetime.today().strftime("%Y%m%d%-H%M%S")
+        json_filename = os.path.join(
+            self.output_folder,
+            self.doc_folder,
+            f"{date_and_time}_validate_batch.json",
+        )
+        relecov_tools.utils.write_json_fo_file(final_valid_samples, json_filename)
         stderr.print("[green] Samples copied: ", copied_samples)
-        log.info("[blue] Pipeline launched successfully")
-        stderr.print("[blue] Pipeline launched successfully")
+        log.info("[blue]Successfully created pipeline folder. Ready to launch ")
+        stderr.print("[blue]Successfully created pipeline folder. Ready to launch")
         return
 
 
