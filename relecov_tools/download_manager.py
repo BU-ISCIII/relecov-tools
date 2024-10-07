@@ -389,23 +389,22 @@ class DownloadManager:
                 except ValueError as e:
                     stderr.print("[red]Unable to convert to string. ", e)
                     continue
-                if s_name not in sample_file_dict:
-                    sample_file_dict[s_name] = {}
-                else:
+                if s_name in sample_file_dict:
                     log_text = f"Found duplicated sample name: {s_name}. Skipped."
                     stderr.print(log_text)
                     self.include_warning(log_text, sample=s_name)
                     continue
-                if row[index_layout] == "paired" and row[index_fastq_r2] is None:
+                if row[index_layout] == "Paired" and row[index_fastq_r2] is None:
                     error_text = "Sample %s is paired-end, but no R2 given"
                     self.include_error(error_text % str(row[index_sampleID]), s_name)
                     row_complete = False
-                if row[index_layout] == "single" and row[index_fastq_r2] is not None:
+                if row[index_layout] == "Single" and row[index_fastq_r2] is not None:
                     error_text = "Sample %s is single-end, but R1&R2 given"
                     self.include_error(error_text % str(row[index_sampleID]), s_name)
                     row_complete = False
                 if row_complete:
                     if row[index_fastq_r1] is not None:
+                        sample_file_dict[s_name] = {}
                         # TODO: move these keys to configuration.json
                         sample_file_dict[s_name]["sequence_file_R1_fastq"] = row[
                             index_fastq_r1
@@ -418,7 +417,6 @@ class DownloadManager:
                         log_text = "Fastq_R1 not defined in Metadata for sample %s"
                         stderr.print(f"[red]{str(log_text % s_name)}")
                         self.include_error(entry=str(log_text % s_name), sample=s_name)
-                        del sample_file_dict[s_name]
             else:
                 self.include_warning(entry=f"Row {counter} skipped. No sample ID given")
         # Remove duplicated files
