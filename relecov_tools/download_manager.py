@@ -1160,14 +1160,14 @@ class DownloadManager:
                 stderr.print(f"[red]{error_text}")
                 self.include_warning(error_text)
 
-            clean_fetchlist = [
+            seqs_fetchlist = [
                 fi for fi in fetched_files if fi.endswith(tuple(self.allowed_file_ext))
             ]
-            clean_fetchlist = [fi for fi in clean_fetchlist if fi not in corrupted]
+            seqs_fetchlist = [fi for fi in seqs_fetchlist if fi not in corrupted]
             # Checking for uncompressed files
             files_to_compress = [
                 fi
-                for fi in clean_fetchlist
+                for fi in seqs_fetchlist
                 if not fi.endswith(".gz") and not fi.endswith(".bam")
             ]
             if files_to_compress:
@@ -1175,8 +1175,10 @@ class DownloadManager:
                 log.info("Found %s uncompressed files, compressing...", comp_files)
                 stderr.print(f"Found {comp_files} uncompressed files, compressing...")
                 clean_fetchlist = self.compress_and_update(
-                    clean_fetchlist, files_to_compress, local_folder
+                    seqs_fetchlist, files_to_compress, local_folder
                 )
+            else:
+                clean_fetchlist = seqs_fetchlist
             clean_pathlist = [os.path.join(local_folder, fi) for fi in clean_fetchlist]
             not_md5sum = []
             if remote_md5sum:
@@ -1205,7 +1207,9 @@ class DownloadManager:
                 full_f_path = os.path.join(local_folder, file)
                 if not relecov_tools.utils.check_gzip_integrity(full_f_path):
                     corrupted.append(file)
-                    files_md5_dict.pop(file, None)
+            files_md5_dict = {
+                x: y for x, y in files_md5_dict.items() if x not in corrupted
+            }
             processed_filedict = self.process_filedict(
                 valid_filedict, clean_fetchlist, corrupted=corrupted, md5miss=not_md5sum
             )
