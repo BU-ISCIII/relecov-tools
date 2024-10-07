@@ -571,12 +571,10 @@ class DownloadManager:
             files_to_remove = self.relecov_sftp.get_file_list(remote_folder)
         else:
             files_to_remove = files
-        if any(file.endswith(tuple(self.allowed_file_ext)) for file in files_to_remove):
-            if skip_seqs is True:
-                log_text = f"Folder {remote_folder} has sequencing files. Not removed."
-                log.warning(log_text)
-                return
         for file in files_to_remove:
+            if skip_seqs is True:
+                if file.endswith(tuple(self.allowed_file_ext)):
+                    continue
             try:
                 self.relecov_sftp.remove_file(
                     os.path.join(remote_folder, os.path.basename(file))
@@ -590,6 +588,9 @@ class DownloadManager:
     def rename_remote_folder(self, remote_folder):
         if "tmp_processing" in remote_folder:
             new_name = remote_folder.replace("tmp_processing", "invalid_samples")
+            if new_name == remote_folder:
+                log.warning("Remote folder %s was already renamed", remote_folder)
+                return
             try:
                 self.relecov_sftp.rename_file(remote_folder, new_name)
                 if self.finished_folders.get(remote_folder):
@@ -1266,6 +1267,9 @@ class DownloadManager:
         # If download_option is "download_clean", remove
         # sftp folder content after download is finished
         if self.download_option == "download_clean":
+            for folder in processed_folders:
+                self.delete_remote_files(folder, skip_seqs=True)
+                self.clean_remote_folder(folder)
             folders_to_clean = copy.deepcopy(self.finished_folders)
             for folder, downloaded_files in folders_to_clean.items():
                 self.delete_remote_files(folder, files=downloaded_files)
