@@ -5,12 +5,10 @@ import os
 import re
 import shutil
 import sys
-import copy
 from collections import Counter
 
 import rich.console
 import relecov_tools.utils
-from relecov_tools.log_summary import LogSum
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
