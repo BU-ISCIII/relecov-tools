@@ -863,6 +863,9 @@ class DownloadManager:
         log.info("Setting %s remote folders...", str(len(target_folders.keys())))
         stderr.print(f"[blue]Setting {len(target_folders.keys())} remote folders...")
         for folder in sorted(target_folders.keys()):
+            if "invalid_samples" in folder:
+                log.warning("Skipped invalid_samples folder %s", folder)
+                continue
             self.current_folder = folder
             # Include the folder in the final process log summary
             self.include_new_key()
