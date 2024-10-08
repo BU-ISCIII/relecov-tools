@@ -19,6 +19,9 @@ from Bio import SeqIO
 from rich.console import Console
 from datetime import datetime
 from tabulate import tabulate
+import openpyxl.utils
+import openpyxl.styles
+
 
 log = logging.getLogger(__name__)
 
@@ -488,3 +491,26 @@ def prompt_create_outdir(
         sys.exit(1)
 
     return global_path
+
+def adjust_sheet_size(sheet, wrap_text=True, col_width=30):
+    """Adjust column width and row heights depending on the max number of
+    characters in each one.
+
+    Args:
+        sheet (openpyxl.worksheet): active openpyxl worksheet object
+        wrap_text (bool): Wether to use excel wrap_text function for each cell. Defaults to True
+        col_width (int): Minimum columns width value. Also used to define maximum
+        number of characters in each cell when wrap_text is True. Defaults to 30.
+    """
+    dims = {}
+    for _, row in enumerate(sheet.iter_rows(min_row=2, max_row=sheet.max_row), start=2):
+        for cell in row:
+            if wrap_text:
+                cell.alignment = openpyxl.styles.Alignment(wrapText=True)
+            if cell.value is not None:
+                max_length = max((dims.get(cell.column, 0), len(str(cell.value))))
+                dims[cell.column] = max_length / col_width
+    for col_num, value in dims.items():
+        if value < col_width:
+            value = col_width
+        sheet.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = value
