@@ -24,6 +24,7 @@ import relecov_tools.gisaid_upload
 import relecov_tools.upload_ena_protocol
 import relecov_tools.pipeline_manager
 import relecov_tools.build_schema
+import relecov_tools.dataprocess_wrapper
 
 log = logging.getLogger()
 
@@ -565,7 +566,8 @@ def logs_to_excel(lab_code, output_folder, files):
     logsum = relecov_tools.log_summary.LogSum(output_location=output_folder)
     merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
     final_logs = logsum.prepare_final_logs(logs=merged_logs)
-    logsum.create_logs_excel(logs=final_logs)
+    excel_outpath = os.path.join(output_folder, lab_code + "_logs_report.xlsx")
+    logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
 
 
 @relecov_tools_cli.command(help_priority=16)
