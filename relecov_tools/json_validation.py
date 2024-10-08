@@ -94,6 +94,7 @@ class SchemaValidation:
 
         # create validator
         validator = Draft202012Validator(self.json_schema)
+        schema_props = self.json_schema["properties"]
 
         validated_json_data = []
         invalid_json = []
@@ -112,18 +113,24 @@ class SchemaValidation:
             else:
                 # Count error types
                 for error in validator.iter_errors(item_row):
+                    if error.validator == "required":
+                        error_field = [
+                            f for f in error.validator_value if f in error.message
+                        ][0]
+                    else:
+                        error_field = error.absolute_path[0]
                     try:
-                        error_keys[error.message] = error.absolute_path[0]
-                    except Exception:
-                        error_keys[error.message] = error.message
+                        err_field_label = schema_props[error_field]["label"]
+                    except KeyError:
+                        log.error("Could not extract label for %s" % error_field)
+                        err_field_label = error_field
+                    error.message.replace(error_field, err_field_label)
+                    error_text = f"Error in column {err_field_label}: {error.message}"
+                    error_keys[error.message] = error_field
                     if error.message in errors:
                         errors[error.message] += 1
                     else:
                         errors[error.message] = 1
-                    if error_keys[error.message] == error.message:
-                        error_text = error.message
-                    else:
-                        error_text = f"{error_keys[error.message]}:{error.message}"
                     self.logsum.add_error(sample=sample_id_value, entry=error_text)
                 # append row with errors
                 invalid_json.append(item_row)
