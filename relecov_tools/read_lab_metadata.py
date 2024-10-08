@@ -176,8 +176,8 @@ class RelecovMetadata:
             if sample_id in samples_json.keys():
                 clean_metadata_rows.append(row)
             else:
-                log_text = "Sample missing in samples data Json file"
-                self.logsum.add_error(sample=sample_id, entry=log_text)
+                log_text = "Sample in metadata but missing in downloaded samples file"
+                self.logsum.add_warning(sample=sample_id, entry=log_text)
                 missing_samples.append(sample_id)
         return clean_metadata_rows, missing_samples
 
@@ -264,6 +264,7 @@ class RelecovMetadata:
     def process_from_json(self, m_data, json_fields):
         """Find the labels that are missing in the file to match the given schema."""
         map_field = json_fields["map_field"]
+        col_name = self.relecov_sch_json["properties"].get(map_field).get("label")
         json_data = json_fields["j_data"]
         for idx in range(len(m_data)):
             sample_id = str(m_data[idx].get("sequencing_sample_id"))
@@ -274,14 +275,14 @@ class RelecovMetadata:
                     clean_error = re.sub("[\[].*?[\]]", "", str(error.args[0]))
                     if str(clean_error).lower().strip() == "not provided":
                         log_text = (
-                            f"Label {map_field} was not provided in sample "
+                            f"Label {col_name} was not provided in sample "
                             + f"{sample_id}, auto-completing with Not Provided"
                         )
                         self.logsum.add_warning(sample=sample_id, entry=log_text)
                     else:
                         log_text = (
-                            f"Unknown map_field value {error} for json data: "
-                            + f"{str(map_field)} in sample {sample_id}. Skipped"
+                            f"Unknown field value {error} for json data: "
+                            + f"{str(col_name)} in sample {sample_id}. Skipped"
                         )
                         self.logsum.add_warning(sample=sample_id, entry=log_text)
                         continue
@@ -383,7 +384,7 @@ class RelecovMetadata:
                     if isinstance(row[key], dtime):
                         row[key] = str(row[key].date())
                     elif re.match(pattern, str(row[key])):
-                        row[key] = row[key].replace("/", "-").replace(".", "-")
+                        row[key] = str(row[key]).replace("/", "-").replace(".", "-")
                         row[key] = re.match(pattern, row[key]).group(0)
                     else:
                         try:
@@ -408,11 +409,13 @@ class RelecovMetadata:
                     alt_key = alt_header_dict.get(key)
                 if row[key] is not None or "not provided" not in str(row[key]).lower():
                     try:
-                        property_row[self.label_prop_dict[key]] = row[key]
+                        property_row[self.label_prop_dict[key]] = str(row[key]).strip()
                     except KeyError as e:
                         if self.alternative_heading:
                             try:
-                                property_row[self.label_prop_dict[alt_key]] = row[key]
+                                property_row[self.label_prop_dict[alt_key]] = str(
+                                    row[key]
+                                ).strip()
                                 continue
                             except KeyError:
                                 pass
