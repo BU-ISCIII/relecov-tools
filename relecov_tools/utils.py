@@ -492,6 +492,7 @@ def prompt_create_outdir(
 
     return global_path
 
+
 def adjust_sheet_size(sheet, wrap_text=True, col_width=30):
     """Adjust column width and row heights depending on the max number of
     characters in each one.
