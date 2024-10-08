@@ -97,21 +97,27 @@ class ProcessWrapper:
         return valid_json_data, invalid_json, validate_logs
 
     def process_folder(self, finished_folders, key, folder_logs):
-        """_summary_
+        """Executes read-lab-metadata and validation process for the given downloaded folder.
+        Merges all the log summaries generated with the ones from download process, creates
+        an excel file with custom format and uploads it back to its remote sftp folder.
+        Also uploads the files that failed validation back to the remote sftp folder.
+        Finally. It cleans all the remote remaining files if the process was successful.
 
         Args:
-            finished_folders (_type_): _description_
-            key (_type_): _description_
-            folder_logs (_type_): _description_
+            finished_folders (dict(str:list)): Dictionary which includes the names
+            of the remote folders processed during download and the successfull files for each
+            key (str): Name of the folder to process in remote sftp, same name as the one
+            included in the log_summary from download process.
+            folder_logs (dict): Download log_summary corresponding to the processed folder
 
         Raises:
-            ValueError: _description_
-            KeyError: _description_
-            ValueError: _description_
-            ValueError: _description_
+            ValueError: If folder_logs dont include a path to the local folder
+            ValueError: If folder is not found in remote sftp or more than 1
+            ValueError: If no samples/files are found for the folder after download
+            ValueError: If no metadata json file is found after read-lab-metadata
 
         Returns:
-            _type_: _description_
+            merged_logs (dict): Dictionary which includes the logs from all processes
         """
 
         def upload_files_from_json(invalid_json, remote_dir):
@@ -147,11 +153,11 @@ class ProcessWrapper:
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
         if not valid_dirs or len(valid_dirs) >= 2:
             logtxt = f"Could not find {key} folder in remote sftp. Skipped"
-            raise KeyError(logtxt)
+            raise ValueError(logtxt)
         # As all folders are merged into one during download, there should only be 1 folder
         remote_dir = valid_dirs[0]
         if not local_folder:
-            raise ValueError()
+            raise ValueError(f"Couldnt find local path for {key} in log after download")
         files = [os.path.join(local_folder, file) for file in os.listdir(local_folder)]
         try:
             metadata_file = [x for x in files if re.search("lab_metadata.*.xlsx", x)][0]
@@ -227,10 +233,14 @@ class ProcessWrapper:
                 )
         else:
             log.error("Could not find xlsx report for %s in %s" % (key, local_folder))
-        return merged_logs, valid_json_data
+        return merged_logs
 
     def run_wrapper(self):
-        """Execute each given process in config file sequentially"""
+        """Execute each given process in config file sequentially, starting with download.
+        Once the download has finished, each downloaded folder is processed using read-lab-metadata
+        and validation modules. The logs from each module are merged into a single log-summary.
+        These merged logs are then used to create an excel report of all the processes
+        """
         finished_folders, download_logs = self.exec_download(self.download_params)
         if not finished_folders:
             stderr.print("[red]No valid folders found to process")
@@ -243,10 +253,8 @@ class ProcessWrapper:
             if not folder_logs.get("valid"):
                 continue
             try:
-                merged_logs, valid_json_data = self.process_folder(
-                    finished_folders, key, folder_logs
-                )
-            except FileNotFoundError as e:
+                merged_logs = self.process_folder(finished_folders, key, folder_logs)
+            except (FileNotFoundError, ValueError) as e:
                 log.error(f"Could not process folder {key}: {e}")
                 folder_logs["errors"].append(f"Could not process folder {key}: {e}")
                 log_filepath = os.path.join(
