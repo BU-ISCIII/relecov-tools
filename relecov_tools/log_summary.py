@@ -29,10 +29,12 @@ class LogSum:
         unique_key: str = None,
         path: str = None,
     ):
-        if not os.path.exists(str(output_location)):
-            raise FileNotFoundError(f"Output folder {output_location} does not exist")
-        else:
-            self.output_location = output_location
+        if not os.path.isdir(str(output_location)):
+            try:
+                os.makedirs(output_location, exist_ok=True)
+            except IOError:
+                raise IOError(f"Logs output folder {output_location} does not exist")
+        self.output_location = output_location
         # if unique_key is given, all entries will be saved inside that key by default
         if unique_key:
             self.unique_key = unique_key
