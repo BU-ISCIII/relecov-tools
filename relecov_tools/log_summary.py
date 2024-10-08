@@ -120,7 +120,7 @@ class LogSum:
             logs: logs with updated valid field values
         """
         for key in logs.keys():
-            if logs[key]["errors"]:
+            if logs[key].get("errors"):
                 logs[key]["valid"] = False
             if logs[key].get("samples") is not None:
                 for sample in logs[key]["samples"].keys():
@@ -129,16 +129,23 @@ class LogSum:
         return logs
 
     def merge_logs(self, key_name, logs_list):
-        """Merge a multiple set of logs without losing information"""
-        if not logs_list:
-            return
-        merged_logs = copy.deepcopy(logs_list[0])
-        if not merged_logs["samples"]:
-            merged_logs["samples"] = {}
-        for logs in logs_list:
-            merged_logs["errors"].extend(logs["errors"])
-            merged_logs["warnings"].extend(logs["warnings"])
-            if "samples" in logs.keys():
+        """Merge a multiple set of logs without losing information
+
+        Args:
+            key_name (str): Name of the final key holding the logs
+            logs_list (list(dict)): List of logs for different processes,
+            logs should only include the actual records,
+
+        Returns:
+            final_logs (dict): Merged list of logs into a single record
+        """
+
+        def add_new_logs(merged_logs, logs):
+            if "errors" not in logs.keys():
+                logs = logs.get(list(logs.keys())[0])
+            merged_logs["errors"].extend(logs.get("errors"))
+            merged_logs["warnings"].extend(logs.get("warnings"))
+            if logs.get("samples"):
                 for sample, vals in logs["samples"].items():
                     if sample not in merged_logs["samples"].keys():
                         merged_logs["samples"][sample] = vals
@@ -149,34 +156,53 @@ class LogSum:
                         merged_logs["samples"][sample]["warnings"].extend(
                             logs["samples"][sample]["warnings"]
                         )
+            return merged_logs
+
+        if not logs_list:
+            return
+        merged_logs = OrderedDict({"valid": True, "errors": [], "warnings": []})
+        merged_logs["samples"] = {}
+        for idx, logs in enumerate(logs_list):
+            if not logs:
+                continue
+            try:
+                merged_logs = add_new_logs(merged_logs, logs)
+            except (TypeError, KeyError) as e:
+                err = f"Could not add logs {idx} in list: {e}"
+                merged_logs["errors"].extend(err)
+                log.error(err)
         final_logs = {key_name: merged_logs}
         return final_logs
 
-    def create_logs_excel(self, logs, called_module=""):
+    def create_logs_excel(self, logs, excel_outpath):
         """Create an excel file with logs information
 
         Args:
             logs (dict, optional): Custom dictionary of logs. Useful to create outputs
-            called_module (str, optional): Name of the module running this code.
+            excel_outpath (str): Path to output excel file
         """
 
         def translate_fields(samples_logs):
             # TODO Translate logs to spanish using a local translator model like deepl
             return
 
-        date = datetime.today().strftime("%Y%m%d%-H%M%S")
+        date = datetime.today().strftime("%Y%m%d%H%M%S")
         lab_code = list(logs.keys())[0]
-        if self.unique_key:
-            excel_filename = "_".join(
-                [self.unique_key, called_module, date, "report.xlsx"]
-            ).replace("__", "")
-        else:
-            excel_filename = "_".join([lab_code, date, "report.xlsx"])
+        if not os.path.exists(os.path.dirname(excel_outpath)):
+            excel_outpath = os.path.join(
+                self.output_location, lab_code + "_" + date + "_report.xlsx"
+            )
+            log.warning(
+                "Given report outpath does not exist, changed to %s" % (excel_outpath)
+            )
+        file_ext = os.path.splitext(excel_outpath)[-1]
+        excel_outpath = excel_outpath.replace(file_ext, ".xlsx")
         if not logs.get("samples"):
             try:
-                samples_logs = logs[lab_code].get("samples")
+                samples_logs = logs[lab_code]["samples"]
             except (KeyError, AttributeError) as e:
                 stderr.print(f"[red]Could not convert log summary to excel: {e}")
+                log.error("Could not convert log summary to excel: %s" % str(e))
                 return
         else:
             samples_logs = logs.get("samples")
