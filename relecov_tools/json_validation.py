@@ -258,3 +258,4 @@ class SchemaValidation:
             self.logsum.add_error(entry=log_text)
             stderr.print(f"[red]{log_text}")
         self.logsum.create_error_summary(called_module="validate")
+        return valid_json_data, invalid_json
