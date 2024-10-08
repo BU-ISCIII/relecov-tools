@@ -186,13 +186,22 @@ class SchemaValidation:
         wb = openpyxl.load_workbook(metadata)
         # TODO: Include this as a key in configuration.json
         ws_sheet = wb["METADATA_LAB"]
+        tag = "Sample ID given for sequencing"
+        seq_id_col = [idx for idx, cell in enumerate(ws_sheet[1]) if tag in cell.value]
+        if seq_id_col:
+            id_col = seq_id_col[0]
         row_to_del = []
-        for row in ws_sheet.iter_rows(min_row=5, max_row=ws_sheet.max_row):
-            # if not data on row 1 and 2 assume that no more data are in file
-            # then start deleting rows
-            if not row[2].value and not row[1].value:
+        row_iterator = ws_sheet.iter_rows(min_row=1, max_row=ws_sheet.max_row)
+        consec_empty_rows = 0
+        for row in row_iterator:
+            # if no data in 10 consecutive rows, break loop
+            if not any(row[x].value for x in range(10)):
+                row_to_del.append(row[0].row)
+                consec_empty_rows += 1
+            if consec_empty_rows > 10:
                 break
-            if str(row[2].value) not in sample_list:
+            consec_empty_rows = 0
+            if str(row[id_col].value) not in sample_list:
                 row_to_del.append(row[0].row)
         stderr.print("Collected rows to create the excel file")
         if len(row_to_del) > 0:
