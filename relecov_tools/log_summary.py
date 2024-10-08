@@ -10,6 +10,7 @@ from rich.console import Console
 from datetime import datetime
 from collections import OrderedDict
 from relecov_tools.utils import rich_force_colors
+import relecov_tools.utils
 
 
 log = logging.getLogger(__name__)
@@ -191,13 +192,14 @@ class LogSum:
             main_worksheet.append(error_row)
             warning_row = [sample, str(logs["valid"]), "; ".join(logs["warnings"])]
             warnings_sheet.append(warning_row)
-        excel_outpath = os.path.join(self.output_location, excel_filename)
+        relecov_tools.utils.adjust_sheet_size(main_worksheet)
+        relecov_tools.utils.adjust_sheet_size(warnings_sheet)
         workbook.save(excel_outpath)
         stderr.print(f"[green]Successfully created logs excel in {excel_outpath}")
         return
 
     def create_error_summary(
-        self, called_module=None, filename=None, logs=None, to_excel=False
+        self, called_module=None, filepath=None, logs=None, to_excel=False
     ):
         """Dump the log summary dictionary into a file with json format. If any of
         the 'errors' key is not empty, the parent key value 'valid' is set to false.
@@ -223,15 +225,27 @@ class LogSum:
                 ][0]
             except IndexError:
                 called_module = ""
-        if not filename:
+        if not filepath:
             date = datetime.today().strftime("%Y%m%d%-H%M%S")
             filename = "_".join([date, called_module, "log_summary.json"])
-        summary_path = os.path.join(self.output_location, filename)
-        with open(summary_path, "w", encoding="utf-8") as f:
-            f.write(
-                json.dumps(final_logs, indent=4, sort_keys=False, ensure_ascii=False)
-            )
-        stderr.print(f"Process log summary saved in {summary_path}")
-        if to_excel is True:
-            self.create_logs_excel(final_logs, called_module)
+            os.makedirs(self.output_location, exist_ok=True)
+            filepath = os.path.join(self.output_location, filename)
+        else:
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, "w", encoding="utf-8") as f:
+            try:
+                f.write(
+                    json.dumps(
+                        final_logs, indent=4, sort_keys=False, ensure_ascii=False
+                    )
+                )
+                stderr.print(f"Process log summary saved in {filepath}")
+                if to_excel is True:
+                    self.create_logs_excel(
+                        final_logs, filepath.replace("log_summary", "report")
+                    )
+            except Exception as e:
+                stderr.print(f"[red]Error parsing logs to json format: {e}")
+                log.error("Error parsing logs to json format: %s", str(e))
+                f.write(str(final_logs))
         return
