@@ -60,6 +60,10 @@ class SchemaValidation:
 
         stderr.print("[blue] Reading the json file")
         self.json_data = relecov_tools.utils.read_json_file(json_data_file)
+        if isinstance(self.json_data, dict):
+            stderr.print(f"[red]Invalid json file content in {json_data_file}.")
+            stderr.print("Should be a list of dicts. Create it with read-lab-metadata")
+            sys.exit(1)
         self.metadata = metadata
         try:
             self.sample_id_field = self.get_sample_id_field()
