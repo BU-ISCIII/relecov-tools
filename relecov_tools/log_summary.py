@@ -182,10 +182,11 @@ class LogSum:
             logs (dict, optional): Custom dictionary of logs. Useful to create outputs
             excel_outpath (str): Path to output excel file
         """
+
         def reg_remover(string, pattern):
             """Remove annotation between brackets in logs message"""
             string = string.replace("['", "'").replace("']", "'")
-            string = re.sub(pattern, '', string)
+            string = re.sub(pattern, "", string)
             return string.strip()
 
         def translate_fields(samples_logs):
@@ -221,7 +222,7 @@ class LogSum:
         warnings_sheet = workbook.create_sheet("Other warnings")
         warnings_headers = ["Sample ID given for sequencing", "Valid", "Warnings"]
         warnings_sheet.append(warnings_headers)
-        regex = r"\[.*?\]" # Regex to remove annotation between brackets
+        regex = r"\[.*?\]"  # Regex to remove annotation between brackets
         for sample, logs in samples_logs.items():
             clean_errors = [reg_remover(x, regex) for x in logs["errors"]]
             error_row = [sample, str(logs["valid"]), "\n ".join(clean_errors)]
