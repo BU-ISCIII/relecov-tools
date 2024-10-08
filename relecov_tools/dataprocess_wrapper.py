@@ -5,7 +5,6 @@ import yaml
 import os
 import sys
 from datetime import datetime
-import json
 import inspect
 import rich.console
 from relecov_tools.download_manager import DownloadManager
@@ -143,7 +142,6 @@ class ProcessWrapper:
             return uploaded_files
 
         local_folder = folder_logs.get("path")
-        match_date = re.search(r"\/\d{4}\d{2}\d{2}\d{6}", local_folder)
         sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(key)
         sftp_dirs_paths = [os.path.join(key, d) for d in sftp_dirs]
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
@@ -159,7 +157,7 @@ class ProcessWrapper:
             metadata_file = [x for x in files if re.search("lab_metadata.*.xlsx", x)][0]
             samples_file = [x for x in files if re.search("samples_data.*.json", x)][0]
         except IndexError:
-            raise ValueError(f"No metadata/samples files found after download")
+            raise ValueError("No metadata/samples files found after download")
         self.readmeta_params.update(
             {
                 "metadata_file": metadata_file,
@@ -172,7 +170,7 @@ class ProcessWrapper:
             x for x in os.listdir(local_folder) if re.search("lab_metadata.*.json", x)
         ]
         if not metadata_json:
-            raise ValueError(f"No metadata json found after read-lab-metadata")
+            raise ValueError("No metadata json found after read-lab-metadata")
         self.validate_params.update(
             {
                 "json_data_file": os.path.join(local_folder, metadata_json[0]),
@@ -228,7 +226,7 @@ class ProcessWrapper:
                     "Could not upload %s report to remote %s" % (key, local_folder)
                 )
         else:
-            log.error("Could not find xlsx report for %s in %s" % (key, logs_dir))
+            log.error("Could not find xlsx report for %s in %s" % (key, local_folder))
         return merged_logs, valid_json_data
 
     def run_wrapper(self):
@@ -251,7 +249,9 @@ class ProcessWrapper:
             except FileNotFoundError as e:
                 log.error(f"Could not process folder {key}: {e}")
                 folder_logs["errors"].append(f"Could not process folder {key}: {e}")
-                log_filepath = os.path.join(folder, str(key) + "_metadata_summary.json")
+                log_filepath = os.path.join(
+                    folder, date + "_" + str(key) + "_wrapper_summary.json"
+                )
                 self.wrapper_logsum.create_error_summary(
                     called_module="metadata",
                     filepath=log_filepath,
