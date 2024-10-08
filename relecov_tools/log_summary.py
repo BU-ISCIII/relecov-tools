@@ -4,6 +4,7 @@ import json
 import os
 import inspect
 import copy
+import re
 
 import openpyxl
 from rich.console import Console
@@ -181,6 +182,11 @@ class LogSum:
             logs (dict, optional): Custom dictionary of logs. Useful to create outputs
             excel_outpath (str): Path to output excel file
         """
+        def reg_remover(string, pattern):
+            """Remove annotation between brackets in logs message"""
+            string = string.replace("['", "'").replace("']", "'")
+            string = re.sub(pattern, '', string)
+            return string.strip()
 
         def translate_fields(samples_logs):
             # TODO Translate logs to spanish using a local translator model like deepl
@@ -215,10 +221,13 @@ class LogSum:
         warnings_sheet = workbook.create_sheet("Other warnings")
         warnings_headers = ["Sample ID given for sequencing", "Valid", "Warnings"]
         warnings_sheet.append(warnings_headers)
+        regex = r"\[.*?\]" # Regex to remove annotation between brackets
         for sample, logs in samples_logs.items():
-            error_row = [sample, str(logs["valid"]), "; ".join(logs["errors"])]
+            clean_errors = [reg_remover(x, regex) for x in logs["errors"]]
+            error_row = [sample, str(logs["valid"]), "\n ".join(clean_errors)]
             main_worksheet.append(error_row)
-            warning_row = [sample, str(logs["valid"]), "; ".join(logs["warnings"])]
+            clean_warngs = [reg_remover(x, regex) for x in logs["warnings"]]
+            warning_row = [sample, str(logs["valid"]), "\n ".join(clean_warngs)]
             warnings_sheet.append(warning_row)
         relecov_tools.utils.adjust_sheet_size(main_worksheet)
         relecov_tools.utils.adjust_sheet_size(warnings_sheet)
