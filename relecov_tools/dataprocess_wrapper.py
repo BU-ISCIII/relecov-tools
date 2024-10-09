@@ -183,18 +183,27 @@ class ProcessWrapper:
         merged_logs = self.wrapper_logsum.merge_logs(
             key_name=key, logs_list=[{key: folder_logs}, read_meta_logs, validate_logs]
         )
+        stderr.print(f"[green]Merged logs from all processes in {local_folder}")
         sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(key)
         sftp_dirs_paths = [os.path.join(key, d) for d in sftp_dirs]
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
+        # As all folders are merged into one during download, there should only be 1 folder
         if not valid_dirs or len(valid_dirs) >= 2:
-            # As all folders are merged into one during download, there should only be 1 folder
+            # If all samples were valid during download and download_clean is used, the original folder might have been deleted
             log.warning("Couldnt find %s folder in remote sftp. Creating new one", key)
             remote_dir = os.path.join(key, self.date + "_invalid_samples")
             self.download_manager.relecov_sftp.make_dir(remote_dir)
         else:
             remote_dir = valid_dirs[0]
+            stderr.print(f"[blue]Cleaning successfully validated files from {remote_dir}")
+            log.info("Cleaning successfully validated files from remote dir")
+            file_fields = ("sequence_file_R1_fastq", "sequence_file_R2_fastq")
+            valid_sampfiles = [f.get(key) for key in file_fields for f in valid_json_data]
+            valid_files = [f for f in finished_folders[remote_dir] if f in valid_sampfiles]
+            self.download_manager.delete_remote_files(remote_dir, files=valid_files)
+            self.download_manager.delete_remote_files(remote_dir, skip_seqs=True)
+            self.download_manager.clean_remote_folder(remote_dir)
         if invalid_json:
-            stderr.print(f"[green]Merged logs from all processes in {local_folder}")
             logtxt = f"Found {len(invalid_json)} invalid samples in {key}"
             self.wrapper_logsum.add_warning(key=key, entry=logtxt)
             assets = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
@@ -202,20 +211,16 @@ class ProcessWrapper:
                 x for x in os.listdir(assets) if re.search("metadata_templat.*.xlsx", x)
             ][0]
             sftp_path = os.path.join(remote_dir, os.path.basename(metadata_template))
+            log.info("Uploading invalid files and template to %s", remote_dir)
             stderr.print(f"[blue]Uploading invalid files and template to {remote_dir}")
             self.download_manager.relecov_sftp.upload_file(
                 os.path.join(assets, metadata_template), sftp_path
             )
             # Upload all the files that failed validation process back to sftp
             upload_files_from_json(invalid_json, remote_dir)
-        stderr.print(f"[blue]Cleaning successfully validated files from {remote_dir}")
-        log.info("Cleaning successfully validated files from remote dir")
-        file_fields = ("sequence_file_R1_fastq", "sequence_file_R2_fastq")
-        valid_sampfiles = [f.get(key) for key in file_fields for f in valid_json_data]
-        valid_files = [f for f in finished_folders[remote_dir] if f in valid_sampfiles]
-        self.download_manager.delete_remote_files(remote_dir, files=valid_files)
-        self.download_manager.delete_remote_files(remote_dir, skip_seqs=True)
-        self.download_manager.clean_remote_folder(remote_dir)
+        else:
+            log.info("No invalid samples in %s", key)
+            stderr.print(f"[green]No invalid samples were found for {key} !!!")
         log_filepath = os.path.join(local_folder, str(key) + "_metadata_report.json")
         self.wrapper_logsum.create_error_summary(
             called_module="metadata",
