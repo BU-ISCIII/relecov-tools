@@ -19,7 +19,7 @@ stderr = rich.console.Console(
 )
 
 
-class LaunchPipeline:
+class PipelineManager:
     def __init__(
         self,
         input_folder=None,
