@@ -62,7 +62,7 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "1.1.0"
+    __version__ = "1.2.0"
     stderr.print(
         "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
