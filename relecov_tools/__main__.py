@@ -575,14 +575,14 @@ def logs_to_excel(lab_code, output_folder, files):
     "-c",
     "--config_file",
     type=click.Path(),
-    help="Path to config file in yaml format",
+    help="Path to config file in yaml format [required]",
     required=True,
 )
 @click.option(
     "-o",
     "--output_folder",
     type=click.Path(),
-    help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module. (Default: installed schema in 'relecov-tools/relecov_tools/schema/relecov_schema.json')",
+    help="Path to folder where global results are saved [required]",
     required=False,
 )
 def wrapper(config_file, output_folder):
