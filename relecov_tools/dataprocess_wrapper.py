@@ -195,11 +195,17 @@ class ProcessWrapper:
             self.download_manager.relecov_sftp.make_dir(remote_dir)
         else:
             remote_dir = valid_dirs[0]
-            stderr.print(f"[blue]Cleaning successfully validated files from {remote_dir}")
+            stderr.print(
+                f"[blue]Cleaning successfully validated files from {remote_dir}"
+            )
             log.info("Cleaning successfully validated files from remote dir")
             file_fields = ("sequence_file_R1_fastq", "sequence_file_R2_fastq")
-            valid_sampfiles = [f.get(key) for key in file_fields for f in valid_json_data]
-            valid_files = [f for f in finished_folders[remote_dir] if f in valid_sampfiles]
+            valid_sampfiles = [
+                f.get(key) for key in file_fields for f in valid_json_data
+            ]
+            valid_files = [
+                f for f in finished_folders[remote_dir] if f in valid_sampfiles
+            ]
             self.download_manager.delete_remote_files(remote_dir, files=valid_files)
             self.download_manager.delete_remote_files(remote_dir, skip_seqs=True)
             self.download_manager.clean_remote_folder(remote_dir)
