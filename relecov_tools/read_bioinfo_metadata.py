@@ -300,7 +300,6 @@ class BioinfoMetadata:
         file_ext = os.path.splitext(conf_tab_name)[1]
         # Parsing key position
         sample_idx_colpos = self.get_sample_idx_colpos(self.current_config_key)
-        # TODO: What if you need to process one table for each sample?
         extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
         if file_ext in extdict.keys():
             data = relecov_tools.utils.read_csv_file_return_dict(
@@ -738,6 +737,7 @@ class BioinfoMetadata:
 
         def extract_batch_rows_to_file(file):
             """Create a new table file only with rows matching samples in batch_data"""
+            extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
             file_extension = os.path.splitext(file)[1]
             file_df = pd.read_csv(
                 file, sep=extdict.get(file_extension), header=header_pos
@@ -754,7 +754,6 @@ class BioinfoMetadata:
         method_name = self.split_tables_by_batch.__name__
         namekey = "sequencing_sample_id"
         batch_samples = [row.get(namekey) for row in batch_data]
-        extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
         for key, files in files_found_dict.items():
             if not self.software_config[key].get("split_by_batch"):
                 continue
@@ -793,6 +792,7 @@ class BioinfoMetadata:
         data_by_batch = self.split_data_by_batch(self.j_data)
         # Add bioinfo metadata to j_data
         for batch_dir, batch_dict in data_by_batch.items():
+            self.log_report.logsum.feed_key(batch_dir)
             stderr.print(f"[blue]Processing data from {batch_dir}")
             batch_data = batch_dict["j_data"]
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
@@ -815,6 +815,10 @@ class BioinfoMetadata:
             batch_filename = tag + lab_code + "_" + batch_date + ".json"
             batch_filepath = os.path.join(batch_dir, batch_filename)
             relecov_tools.utils.write_json_fo_file(batch_data, batch_filepath)
+            for sample in batch_data:
+                self.log_report.logsum.feed_key(
+                    key=batch_dir, sample=sample.get("sequencing_sample_id")
+                )
             log.info("Created output json file: %s" % batch_filepath)
             stderr.print(f"[green]Created batch json file: {batch_filepath}")
         stderr.print("[blue]Writting output json file")

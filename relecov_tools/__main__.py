@@ -62,7 +62,7 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "1.1.0"
+    __version__ = "1.2.0"
     stderr.print(
         "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
@@ -477,12 +477,12 @@ def metadata_homogeneizer(institution, directory, output):
     help="select the template config file",
 )
 @click.option("-o", "--output", type=click.Path(), help="select output folder")
-def launch_pipeline(input, template, output, config):
+def pipeline_manager(input, template, output, config):
     """
     Create the symbolic links for the samples which are validated to prepare for
     bioinformatics pipeline execution.
     """
-    new_launch = relecov_tools.pipeline_manager.LaunchPipeline(
+    new_launch = relecov_tools.pipeline_manager.PipelineManager(
         input, template, output, config
     )
     new_launch.pipeline_exc()
@@ -575,14 +575,14 @@ def logs_to_excel(lab_code, output_folder, files):
     "-c",
     "--config_file",
     type=click.Path(),
-    help="Path to config file in yaml format",
+    help="Path to config file in yaml format [required]",
     required=True,
 )
 @click.option(
     "-o",
     "--output_folder",
     type=click.Path(),
-    help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module. (Default: installed schema in 'relecov-tools/relecov_tools/schema/relecov_schema.json')",
+    help="Path to folder where global results are saved [required]",
     required=False,
 )
 def wrapper(config_file, output_folder):

@@ -77,7 +77,7 @@ class RelecovMetadata:
                     "[orange]Property " + prop + " does not have 'label' attribute"
                 )
                 continue
-
+        self.date = dtime.now().strftime("%Y%m%d%H%M%S")
         self.json_req_files = config_json.get_topic_data(
             "lab_metadata", "lab_metadata_req_json"
         )
@@ -119,6 +119,8 @@ class RelecovMetadata:
             )
         else:
             md5_dict = {}
+            log.warning("No md5sum file found.")
+            log.warning("Generating new md5 hashes. This might take a while...")
         j_data = {}
         no_fastq_error = "No R1 fastq was given for sample %s"
         for sample in clean_metadata_rows:
@@ -134,6 +136,7 @@ class RelecovMetadata:
                 continue
             r1_md5 = md5_dict.get(r1_file)
             r2_md5 = md5_dict.get(r2_file)
+            files_dict["sequence_file_R1_fastq"] = r1_file
             files_dict["r1_fastq_filepath"] = dir_path
             if r1_md5:
                 files_dict["fastq_r1_md5"] = r1_md5
@@ -142,6 +145,7 @@ class RelecovMetadata:
                     os.path.join(dir_path, r1_file)
                 )
             if r2_file:
+                files_dict["sequence_file_R2_fastq"] = r2_file
                 files_dict["r2_fastq_filepath"] = dir_path
                 if r2_md5:
                     files_dict["fastq_r2_md5"] = r2_md5
@@ -150,6 +154,12 @@ class RelecovMetadata:
                         os.path.join(dir_path, r2_file)
                     )
             j_data[str(sample.get("sequencing_sample_id"))] = files_dict
+        try:
+            filename = "_".join(["samples_data", self.lab_code, self.date + ".json"])
+            file_path = os.path.join(self.output_folder, filename)
+            relecov_tools.utils.write_json_fo_file(j_data, file_path)
+        except Exception:
+            log.error("Could not output samples_data.json file to output folder")
         return j_data
 
     def match_to_json(self, valid_metadata_rows):
@@ -450,7 +460,7 @@ class RelecovMetadata:
             stderr.print("Metadata was completely empty. No output file generated")
             sys.exit(1)
         file_code = "lab_metadata_" + self.lab_code + "_"
-        file_name = file_code + dtime.now().strftime("%Y%m%d%H%M%S") + ".json"
+        file_name = file_code + self.date + ".json"
         stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
         self.logsum.create_error_summary(called_module="read-lab-metadata")

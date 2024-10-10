@@ -259,24 +259,24 @@ class UpdateDatabase:
                         if "ERROR" not in result:
                             break
                     if i == 9 and "ERROR" in result:
-                        logtxt = f"Unable to sent the request to {self.platform}"
+                        logtxt = f"Unable to sent the request to {post_url}"
                         self.logsum.add_error(entry=logtxt, sample=req_sample)
                         stderr.print(f"[red]{logtxt}")
                         continue
 
                 elif "is not defined" in result["ERROR_TEST"].lower():
                     error_txt = result["ERROR_TEST"]
-                    logtxt = f"Sample {req_sample}: {error_txt}"
+                    logtxt = f"Sample {req_sample} failed in {post_url}: {error_txt}"
                     self.logsum.add_error(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]Warning: {logtxt}")
                     continue
                 elif "already defined" in result["ERROR_TEST"].lower():
-                    logtxt = f"Request to {self.platform} already defined"
+                    logtxt = f"Request to {post_url} already defined"
                     self.logsum.add_warning(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]{logtxt} for sample {req_sample}")
                     continue
                 else:
-                    logtxt = f"Error {result['ERROR']} in request to {self.platform}"
+                    logtxt = f"Error {result['ERROR']} in request to {post_url}"
                     self.logsum.add_error(entry=logtxt, sample=req_sample)
                     stderr.print(f"[red]{logtxt}")
                     continue
@@ -298,7 +298,7 @@ class UpdateDatabase:
                 sample=req_sample,
             )
             stderr.print(
-                f"[yellow]logtxt % {suces_count}  {request_count} {self.platform})"
+                f"[yellow]{logtxt % (suces_count, request_count, self.platform)}"
             )
         return
 
@@ -363,7 +363,7 @@ class UpdateDatabase:
 
             self.server_name = "relecov"
             self.start_api(self.server_name)
-            for datatype in self.types_of_data:
+            for datatype in ["sample", "bioinfodata", "variantdata"]:
                 log_text = f"Sending {datatype} data to {self.server_name}"
                 log.info(log_text)
                 stderr.print(log_text)

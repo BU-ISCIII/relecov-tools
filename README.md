@@ -24,7 +24,8 @@ relecov-tools is a set of helper tools for the assembly of the different element
       - [upload-to-ena](#upload-to-ena)
       - [upload-to-gisaid](#upload-to-gisaid)
       - [update-db](#update-db)
-      - [launch-pipeline](#launch-pipeline)
+      - [pipeline-manager](#pipeline-manager)
+      - [wrapper](#wrapper)
       - [logs-to-excel](#logs-to-excel)
     - [build-schema](#build-schema)
       - [Mandatory Fields](#mandatory-fields)
@@ -63,7 +64,7 @@ $ relecov-tools --help
 \    \  /   |__ / |__  |    |___ |    |   |  \    /
 /    /  \   |  \  |    |    |    |    |   |   \  /
 /    |--|   |   \ |___ |___ |___ |___ |___|    \/
-RELECOV-tools version 1.1.0
+RELECOV-tools version 1.2.0
 Usage: relecov-tools [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -73,16 +74,19 @@ Options:
 --help                     Show this message and exit.
 
 Commands:
-    download                Download files located in sftp server.
-    read-lab-metadata       Create the json compliant to the relecov schema from...
-    read-bioinfo-metadata   Create the json compliant to the relecov schema with Bioinfo Metadata.
-    validate                Validate json file against schema.
-    map                     Convert data between phage plus schema to ENA,...
-    upload-to-ena           parsed data to create xml files to upload to ena
-    upload-to-gisaid        parsed data to create files to upload to gisaid
-    update-db               feed database with metadata jsons
-    build-schema            Generates and updates JSON Schema files from...
-    launch-pipeline         Create the symbolic links for the samples which...
+  download               Download files located in sftp server.
+  read-lab-metadata      Create the json compliant to the relecov schema...
+  validate               Validate json file against schema.
+  map                    Convert data between phage plus schema to ENA,...
+  upload-to-ena          parse data to create xml files to upload to ena
+  upload-to-gisaid       parsed data to create files to upload to gisaid
+  update-db              upload the information included in json file to...
+  read-bioinfo-metadata  Create the json compliant from the Bioinfo...
+  metadata-homogeneizer  Parse institution metadata lab to the one used...
+  pipeline-manager       Create the symbolic links for the samples which...
+  wrapper                Execute download, read-lab-metadata and validate...
+  build-schema           Generates and updates JSON Schema files from...
+  logs-to-excel          Creates a merged xlsx report from all the log...
 ```
 #### download
 The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different available folders in the passed credentials. In addition, it checks if the files in the current folder match the files in the metadata file and also checks if there are md5sum for each file. Else, it creates one before storing in the final repository.
@@ -247,10 +251,10 @@ Usage: relecov-tools upload-to-gisaid [OPTIONS]
     -t, --type                         Select the type of information to upload to database [sample,bioinfodata,variantdata]
     -d, --databaseServer               Name of the database server receiving the data [iskylims,relecov]
 
-#### launch-pipeline
+#### pipeline-manager
 Create the folder structure to execute the given pipeline for the latest sample batches after executing download, read-lab-metadata and validate modules. This module will create symbolic links for each sample and generate the necessary files for pipeline execution using the information from validated_BATCH-NAME_DATE.json.
 ```
-Usage: relecov-tools launch-pipeline [OPTIONS]
+Usage: relecov-tools pipeline-manager [OPTIONS]
 
   Create the symbolic links for the samples which are validated to prepare for
   bioinformatics pipeline execution.
@@ -260,6 +264,19 @@ Options:
   -t, --template PATH       Path to the pipeline template folder to be copied in the                       output folder
   -c, --config PATH         Path to the the template config file
   -o, --out_dir PATH        Path to output folder
+  --help                    Show this message and exit.
+```
+
+#### wrapper
+Execute download, read-lab-metadata and validate sequentially using a config file to fill the arguments for each one. It also creates a global report with all the logs for the three processes in a user-friendly .xlsx format. The config file should include the name of each module that is executed, along with the necessary parameters in YAML format.
+```
+Usage: relecov-tools wrapper [OPTIONS]
+
+  Executes the modules in config file sequentially
+
+Options:
+  -c, --config_file PATH    Path to config file in yaml format  [required]
+  -o, --output_folder PATH  Path to folder where global results are saved [required]
   --help                    Show this message and exit.
 ```
 
