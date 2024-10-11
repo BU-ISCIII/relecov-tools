@@ -561,6 +561,17 @@
         "submitting_institution_address": " Passeig de la Vall d'Hebron, 119-129",
         "submitting_institution_email": ""
     },
+    "Hospital Universitari Doctor Josep Trueta": {
+        "collecting_institution_address": "Avinguda de França, S/N,",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Girona",
+        "geo_loc_city": "Girona",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Vall d'Hebron",
+        "submitting_institution_address": " Passeig de la Vall d'Hebron, 119-129",
+        "submitting_institution_email": ""
+    },
     "Hospital Universitari Germans Trias i Pujol (HUGTiP)": {
         "collecting_institution_address": " Crta del Canyet s/n",
         "collecting_institution_email": "",
@@ -977,6 +988,17 @@
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Txagorritxu",
         "submitting_institution_address": " Jose Atxotegi Kalea, s/n",
+        "submitting_institution_email": ""
+    },
+    "Hospital Universitario Araba": {
+        "collecting_institution_address": "Calle Jose Atxotegi, 01009",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Pais Vasco",
+        "geo_loc_region": "Alava",
+        "geo_loc_city": "Gasteiz",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Donostia",
+        "submitting_institution_address": "Begiristain Doktorea Pasealekua, s/n",
         "submitting_institution_email": ""
     },
     "Hospital Universitari Arnau de Vilanova": {
@@ -1402,7 +1424,7 @@
         "collecting_institution_email": "",
         "geo_loc_state": "Pais Vasco",
         "geo_loc_region": "Vizcaya",
-        "geo_loc_city": "Baracaldo",
+        "geo_loc_city": "Barakaldo",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Cruces",
         "submitting_institution_address": "Plaza Cruces, s/n",

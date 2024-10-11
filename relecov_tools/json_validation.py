@@ -60,6 +60,10 @@ class SchemaValidation:
 
         stderr.print("[blue] Reading the json file")
         self.json_data = relecov_tools.utils.read_json_file(json_data_file)
+        if isinstance(self.json_data, dict):
+            stderr.print(f"[red]Invalid json file content in {json_data_file}.")
+            stderr.print("Should be a list of dicts. Create it with read-lab-metadata")
+            sys.exit(1)
         self.metadata = metadata
         try:
             self.sample_id_field = self.get_sample_id_field()
@@ -94,6 +98,7 @@ class SchemaValidation:
 
         # create validator
         validator = Draft202012Validator(self.json_schema)
+        schema_props = self.json_schema["properties"]
 
         validated_json_data = []
         invalid_json = []
@@ -112,18 +117,24 @@ class SchemaValidation:
             else:
                 # Count error types
                 for error in validator.iter_errors(item_row):
+                    if error.validator == "required":
+                        error_field = [
+                            f for f in error.validator_value if f in error.message
+                        ][0]
+                    else:
+                        error_field = error.absolute_path[0]
                     try:
-                        error_keys[error.message] = error.absolute_path[0]
-                    except Exception:
-                        error_keys[error.message] = error.message
+                        err_field_label = schema_props[error_field]["label"]
+                    except KeyError:
+                        log.error("Could not extract label for %s" % error_field)
+                        err_field_label = error_field
+                    error.message.replace(error_field, err_field_label)
+                    error_text = f"Error in column {err_field_label}: {error.message}"
+                    error_keys[error.message] = error_field
                     if error.message in errors:
                         errors[error.message] += 1
                     else:
                         errors[error.message] = 1
-                    if error_keys[error.message] == error.message:
-                        error_text = error.message
-                    else:
-                        error_text = f"{error_keys[error.message]}:{error.message}"
                     self.logsum.add_error(sample=sample_id_value, entry=error_text)
                 # append row with errors
                 invalid_json.append(item_row)
@@ -175,13 +186,22 @@ class SchemaValidation:
         wb = openpyxl.load_workbook(metadata)
         # TODO: Include this as a key in configuration.json
         ws_sheet = wb["METADATA_LAB"]
+        tag = "Sample ID given for sequencing"
+        seq_id_col = [idx for idx, cell in enumerate(ws_sheet[1]) if tag in cell.value]
+        if seq_id_col:
+            id_col = seq_id_col[0]
         row_to_del = []
-        for row in ws_sheet.iter_rows(min_row=5, max_row=ws_sheet.max_row):
-            # if not data on row 1 and 2 assume that no more data are in file
-            # then start deleting rows
-            if not row[2].value and not row[1].value:
+        row_iterator = ws_sheet.iter_rows(min_row=1, max_row=ws_sheet.max_row)
+        consec_empty_rows = 0
+        for row in row_iterator:
+            # if no data in 10 consecutive rows, break loop
+            if not any(row[x].value for x in range(10)):
+                row_to_del.append(row[0].row)
+                consec_empty_rows += 1
+            if consec_empty_rows > 10:
                 break
-            if str(row[2].value) not in sample_list:
+            consec_empty_rows = 0
+            if str(row[id_col].value) not in sample_list:
                 row_to_del.append(row[0].row)
         stderr.print("Collected rows to create the excel file")
         if len(row_to_del) > 0:
@@ -238,3 +258,4 @@ class SchemaValidation:
             self.logsum.add_error(entry=log_text)
             stderr.print(f"[red]{log_text}")
         self.logsum.create_error_summary(called_module="validate")
+        return valid_json_data, invalid_json

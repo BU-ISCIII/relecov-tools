@@ -4,6 +4,7 @@ import paramiko
 import rich.console
 import stat
 import sys
+import time
 from relecov_tools.config_json import ConfigJson
 import relecov_tools.utils
 
@@ -58,6 +59,29 @@ class SftpRelecov:
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+    def reconnect_if_fail(n_times, sleep_time):
+        def decorator(func):
+            def retrier(self, *args, **kwargs):
+                more_sleep_time = 0
+                retries = 0
+                while retries < n_times:
+                    try:
+                        return func(self, *args, **kwargs)
+                    except Exception:
+                        retries += 1
+                        log.info("Connection lost. Trying to reconnect...")
+                        time.sleep(more_sleep_time)
+                        # Try extending sleep time before reconnecting in each step
+                        more_sleep_time = more_sleep_time + sleep_time
+                        self.open_connection()
+                else:
+                    log.error("Could not reconnect to remote client")
+                return func(self, *args, **kwargs)
+
+            return retrier
+
+        return decorator
+
     def open_connection(self):
         """Establishing sftp connection"""
         log.info("Setting credentials for SFTP connection with remote server")
@@ -78,6 +102,7 @@ class SftpRelecov:
             return False
         return True
 
+    @reconnect_if_fail(n_times=3, sleep_time=30)
     def list_remote_folders(self, folder_name, recursive=False):
         """Creates a directories list from the given client remote path
 
@@ -90,7 +115,6 @@ class SftpRelecov:
         """
         log.info("Listing directories in %s", folder_name)
         directory_list = []
-        self.open_connection()
         try:
             content_list = self.sftp.listdir_attr(folder_name)
             subfolders = any(stat.S_ISDIR(item.st_mode) for item in content_list)
@@ -129,6 +153,7 @@ class SftpRelecov:
         self.close_connection()
         return directory_list
 
+    @reconnect_if_fail(n_times=3, sleep_time=30)
     def get_file_list(self, folder_name):
         """Return a tuple with file name and directory path from remote
 
@@ -148,6 +173,7 @@ class SftpRelecov:
         ]
         return file_list
 
+    @reconnect_if_fail(n_times=3, sleep_time=30)
     def get_from_sftp(self, file, destination, exist_ok=False):
         """Download a file from remote sftp
 
@@ -169,6 +195,7 @@ class SftpRelecov:
                 log.error("Unable to fetch file %s ", e)
                 return False
 
+    @reconnect_if_fail(n_times=3, sleep_time=30)
     def make_dir(self, folder_name):
         """Create a new directory in remote sftp
 
@@ -186,6 +213,7 @@ class SftpRelecov:
             stderr.print("[red]Directory already exists")
             return False
 
+    @reconnect_if_fail(n_times=3, sleep_time=30)
     def rename_file(self, old_name, new_name):
         """Rename a file in remote sftp
 
@@ -199,11 +227,13 @@ class SftpRelecov:
         try:
             self.sftp.rename(old_name, new_name)
             return True
-        except FileNotFoundError:
-            log.error("File %s not found", old_name)
-            stderr.print("[red]File not found")
+        except FileNotFoundError as e:
+            error_txt = f"Could not rename {old_name} to {new_name}: {e}"
+            log.error(error_txt)
+            stderr.print(f"[red]{error_txt}")
             return False
 
+    @reconnect_if_fail(n_times=3, sleep_time=30)
     def remove_file(self, file_name):
         """Remove a file from remote sftp
 
@@ -221,6 +251,7 @@ class SftpRelecov:
             stderr.print("[red]File not found")
             return False
 
+    @reconnect_if_fail(n_times=3, sleep_time=30)
     def remove_dir(self, folder_name):
         """Remove a directory from remote sftp
 
@@ -238,6 +269,7 @@ class SftpRelecov:
             stderr.print("[red]Directory not found")
             return False
 
+    @reconnect_if_fail(n_times=3, sleep_time=30)
     def upload_file(self, local_path, remote_file):
         """Upload a file to remote sftp
 
@@ -256,11 +288,13 @@ class SftpRelecov:
             stderr.print("[red]File not found")
             return False
 
+    @reconnect_if_fail(n_times=3, sleep_time=30)
     def close_connection(self):
         log.info("Closing SFTP connection")
         try:
             self.sftp.close()
         except NameError:
+            log.warning("Could not close sftp connection")
             return False
         log.info("SFTP connection closed")
         return True

@@ -3,7 +3,7 @@
     "id": "https://github.com/BU-ISCIII/relecov-tools/blob/develop/relecov_tools/schema/relecov_schema.json",
     "title": "RELECOV schema",
     "description":"Json schema that specifies the structure, content, and validation rules for RELECOV metadata",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "required": [
         "collecting_lab_sample_id",
         "sequencing_sample_id",
@@ -1794,7 +1794,18 @@
             "type": "string",
             "description": "number of base pairs per read",
             "classification": "Sequencing",
-            "label": "Read Length",
+            "label": "Read length",
+            "fill_mode": "batch"
+        },
+        "number_of_reads" : {
+            "examples": [
+                "75"
+            ],
+            "ontology": "GENEPIO:0000087",
+            "type": "string",
+            "description": "number of reads passing base call filters",
+            "classification": "Sequencing",
+            "label": "Read count",
             "fill_mode": "batch"
         },
         "sequence_file_R1_fastq": {
@@ -2346,7 +2357,7 @@
             "type": "string",
             "description": "Percentage of read that pass quality control threshold ",
             "classification": "Bioinformatics and QC metrics fields",
-            "label": "%qc filtered",
+            "label": "%QC filtered",
             "fill_mode": "batch"
         },
         "per_reads_host": {
@@ -2357,7 +2368,7 @@
             "type": "string",
             "description": "Percentage of reads mapped to host",
             "classification": "Bioinformatics and QC metrics fields",
-            "label": "%reads host",
+            "label": "%Reads host",
             "fill_mode": "batch"
         },
         "per_reads_virus": {
@@ -2368,7 +2379,7 @@
             "type": "string",
             "description": "Percentage of reads mapped to virus",
             "classification": "Bioinformatics and QC metrics fields",
-            "label": "%reads virus",
+            "label": "%Reads virus",
             "fill_mode": "batch"
         },
         "per_unmapped": {
@@ -2379,7 +2390,7 @@
             "type": "string",
             "description": "Percentage of reads unmapped to virus or to host",
             "classification": "Bioinformatics and QC metrics fields",
-            "label": "%unmapped",
+            "label": "%Unmapped",
             "fill_mode": "batch"
         },
         "depth_of_coverage_value": {
@@ -2390,7 +2401,7 @@
             "type": "string",
             "description": "The average number of reads representing a given nucleotide in the reconstructed sequence.",
             "classification": "Bioinformatics and QC metrics fields",
-            "label": "Depth of coverage value ",
+            "label": "Depth of coverage Mean value",
             "fill_mode": "batch"
         },
         "per_genome_greater_10x": {
@@ -2401,7 +2412,7 @@
             "type": "string",
             "description": "Percentage of genome with coverage greater than 10x",
             "classification": "Bioinformatics and QC metrics fields",
-            "label": "% genome greater 10x",
+            "label": "% Genome > 10x",
             "fill_mode": "batch"
         },
         "per_Ns": {
@@ -2434,7 +2445,7 @@
             "type": "string",
             "description": "The number of variants found in consensus sequence",
             "classification": "Bioinformatic Variants",
-            "label": "Number of variants (AF greater 75%)",
+            "label": "Number of variants (AF > 75%)",
             "fill_mode": "batch"
         },
         "number_of_variants_with_effect": {
@@ -2467,7 +2478,7 @@
             "type": "string",
             "description": "The name of the clade.",
             "classification": "Lineage fields",
-            "label": "Clade designation",
+            "label": "Variant Clade Genotype",
             "fill_mode": "batch"
         },
         "clade_type_software_name": {
@@ -2491,6 +2502,16 @@
             "classification": "Lineage fields",
             "label": "If Clade/Type Is Other, Specify",
             "fill_mode": "batch"
+        },
+        "clade_type_software_version": {
+            "examples": [
+                "Pangolin"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the software used to determine the clade/type.",
+            "classification": "Lineage fields",
+            "label": "Clade/Type software version"
         },
         "lineage_analysis_software_name": {
             "examples": [
@@ -2544,7 +2565,7 @@
             "type": "string",
             "description": "The version of the scorpio data used to determine the lineage/clade.",
             "classification": "Lineage fields",
-            "label": "Lineage/clade analysis software version",
+            "label": "Scorpio version",
             "fill_mode": "batch"
         },
         "lineage_analysis_constellation_version": {
@@ -2555,7 +2576,7 @@
             "type": "string",
             "description": "The version of the constellations databases used to determine the lineage/clade.",
             "classification": "Lineage fields",
-            "label": "Lineage/clade analysis software version",
+            "label": "Constellations version",
             "fill_mode": "batch"
         },
         "lineage_analysis_date": {
@@ -2568,6 +2589,14 @@
             "description": "Date when the lineage analysis was performed",
             "classification": "Lineage fields",
             "label": "lineage/clade analysis date",
+            "fill_mode": "batch"
+        },
+        "lineage_analysis_file": {
+            "ontology": "0",
+            "type": "string",
+            "description": "File containing results from lineage/clade analysis",
+            "classification": "Lineage fields",
+            "label": "Lineage analysis file",
             "fill_mode": "batch"
         },
         "variant_name": {

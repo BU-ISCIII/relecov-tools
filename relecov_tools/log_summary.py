@@ -4,12 +4,14 @@ import json
 import os
 import inspect
 import copy
+import re
 
 import openpyxl
 from rich.console import Console
 from datetime import datetime
 from collections import OrderedDict
 from relecov_tools.utils import rich_force_colors
+import relecov_tools.utils
 
 
 log = logging.getLogger(__name__)
@@ -28,10 +30,12 @@ class LogSum:
         unique_key: str = None,
         path: str = None,
     ):
-        if not os.path.exists(str(output_location)):
-            raise FileNotFoundError(f"Output folder {output_location} does not exist")
-        else:
-            self.output_location = output_location
+        if not os.path.isdir(str(output_location)):
+            try:
+                os.makedirs(output_location, exist_ok=True)
+            except IOError:
+                raise IOError(f"Logs output folder {output_location} does not exist")
+        self.output_location = output_location
         # if unique_key is given, all entries will be saved inside that key by default
         if unique_key:
             self.unique_key = unique_key
@@ -117,7 +121,7 @@ class LogSum:
             logs: logs with updated valid field values
         """
         for key in logs.keys():
-            if logs[key]["errors"]:
+            if logs[key].get("errors"):
                 logs[key]["valid"] = False
             if logs[key].get("samples") is not None:
                 for sample in logs[key]["samples"].keys():
@@ -126,16 +130,23 @@ class LogSum:
         return logs
 
     def merge_logs(self, key_name, logs_list):
-        """Merge a multiple set of logs without losing information"""
-        if not logs_list:
-            return
-        merged_logs = copy.deepcopy(logs_list[0])
-        if not merged_logs["samples"]:
-            merged_logs["samples"] = {}
-        for logs in logs_list:
-            merged_logs["errors"].extend(logs["errors"])
-            merged_logs["warnings"].extend(logs["warnings"])
-            if "samples" in logs.keys():
+        """Merge a multiple set of logs without losing information
+
+        Args:
+            key_name (str): Name of the final key holding the logs
+            logs_list (list(dict)): List of logs for different processes,
+            logs should only include the actual records,
+
+        Returns:
+            final_logs (dict): Merged list of logs into a single record
+        """
+
+        def add_new_logs(merged_logs, logs):
+            if "errors" not in logs.keys():
+                logs = logs.get(list(logs.keys())[0])
+            merged_logs["errors"].extend(logs.get("errors"))
+            merged_logs["warnings"].extend(logs.get("warnings"))
+            if logs.get("samples"):
                 for sample, vals in logs["samples"].items():
                     if sample not in merged_logs["samples"].keys():
                         merged_logs["samples"][sample] = vals
@@ -146,34 +157,59 @@ class LogSum:
                         merged_logs["samples"][sample]["warnings"].extend(
                             logs["samples"][sample]["warnings"]
                         )
+            return merged_logs
+
+        if not logs_list:
+            return
+        merged_logs = OrderedDict({"valid": True, "errors": [], "warnings": []})
+        merged_logs["samples"] = {}
+        for idx, logs in enumerate(logs_list):
+            if not logs:
+                continue
+            try:
+                merged_logs = add_new_logs(merged_logs, logs)
+            except (TypeError, KeyError) as e:
+                err = f"Could not add logs {idx} in list: {e}"
+                merged_logs["errors"].extend(err)
+                log.error(err)
         final_logs = {key_name: merged_logs}
         return final_logs
 
-    def create_logs_excel(self, logs, called_module=""):
+    def create_logs_excel(self, logs, excel_outpath):
         """Create an excel file with logs information
 
         Args:
             logs (dict, optional): Custom dictionary of logs. Useful to create outputs
-            called_module (str, optional): Name of the module running this code.
+            excel_outpath (str): Path to output excel file
         """
+
+        def reg_remover(string, pattern):
+            """Remove annotation between brackets in logs message"""
+            string = string.replace("['", "'").replace("']", "'")
+            string = re.sub(pattern, "", string)
+            return string.strip()
 
         def translate_fields(samples_logs):
             # TODO Translate logs to spanish using a local translator model like deepl
             return
 
-        date = datetime.today().strftime("%Y%m%d%-H%M%S")
+        date = datetime.today().strftime("%Y%m%d%H%M%S")
         lab_code = list(logs.keys())[0]
-        if self.unique_key:
-            excel_filename = "_".join(
-                [self.unique_key, called_module, date, "report.xlsx"]
-            ).replace("__", "")
-        else:
-            excel_filename = "_".join([lab_code, date, "report.xlsx"])
+        if not os.path.exists(os.path.dirname(excel_outpath)):
+            excel_outpath = os.path.join(
+                self.output_location, lab_code + "_" + date + "_report.xlsx"
+            )
+            log.warning(
+                "Given report outpath does not exist, changed to %s" % (excel_outpath)
+            )
+        file_ext = os.path.splitext(excel_outpath)[-1]
+        excel_outpath = excel_outpath.replace(file_ext, ".xlsx")
         if not logs.get("samples"):
             try:
-                samples_logs = logs[lab_code].get("samples")
+                samples_logs = logs[lab_code]["samples"]
             except (KeyError, AttributeError) as e:
                 stderr.print(f"[red]Could not convert log summary to excel: {e}")
+                log.error("Could not convert log summary to excel: %s" % str(e))
                 return
         else:
             samples_logs = logs.get("samples")
@@ -186,18 +222,22 @@ class LogSum:
         warnings_sheet = workbook.create_sheet("Other warnings")
         warnings_headers = ["Sample ID given for sequencing", "Valid", "Warnings"]
         warnings_sheet.append(warnings_headers)
+        regex = r"\[.*?\]"  # Regex to remove annotation between brackets
         for sample, logs in samples_logs.items():
-            error_row = [sample, str(logs["valid"]), "; ".join(logs["errors"])]
+            clean_errors = [reg_remover(x, regex) for x in logs["errors"]]
+            error_row = [sample, str(logs["valid"]), "\n ".join(clean_errors)]
             main_worksheet.append(error_row)
-            warning_row = [sample, str(logs["valid"]), "; ".join(logs["warnings"])]
+            clean_warngs = [reg_remover(x, regex) for x in logs["warnings"]]
+            warning_row = [sample, str(logs["valid"]), "\n ".join(clean_warngs)]
             warnings_sheet.append(warning_row)
-        excel_outpath = os.path.join(self.output_location, excel_filename)
+        relecov_tools.utils.adjust_sheet_size(main_worksheet)
+        relecov_tools.utils.adjust_sheet_size(warnings_sheet)
         workbook.save(excel_outpath)
         stderr.print(f"[green]Successfully created logs excel in {excel_outpath}")
         return
 
     def create_error_summary(
-        self, called_module=None, filename=None, logs=None, to_excel=False
+        self, called_module=None, filepath=None, logs=None, to_excel=False
     ):
         """Dump the log summary dictionary into a file with json format. If any of
         the 'errors' key is not empty, the parent key value 'valid' is set to false.
@@ -223,15 +263,27 @@ class LogSum:
                 ][0]
             except IndexError:
                 called_module = ""
-        if not filename:
+        if not filepath:
             date = datetime.today().strftime("%Y%m%d%-H%M%S")
             filename = "_".join([date, called_module, "log_summary.json"])
-        summary_path = os.path.join(self.output_location, filename)
-        with open(summary_path, "w", encoding="utf-8") as f:
-            f.write(
-                json.dumps(final_logs, indent=4, sort_keys=False, ensure_ascii=False)
-            )
-        stderr.print(f"Process log summary saved in {summary_path}")
-        if to_excel is True:
-            self.create_logs_excel(final_logs, called_module)
+            os.makedirs(self.output_location, exist_ok=True)
+            filepath = os.path.join(self.output_location, filename)
+        else:
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, "w", encoding="utf-8") as f:
+            try:
+                f.write(
+                    json.dumps(
+                        final_logs, indent=4, sort_keys=False, ensure_ascii=False
+                    )
+                )
+                stderr.print(f"Process log summary saved in {filepath}")
+                if to_excel is True:
+                    self.create_logs_excel(
+                        final_logs, filepath.replace("log_summary", "report")
+                    )
+            except Exception as e:
+                stderr.print(f"[red]Error parsing logs to json format: {e}")
+                log.error("Error parsing logs to json format: %s", str(e))
+                f.write(str(final_logs))
         return
