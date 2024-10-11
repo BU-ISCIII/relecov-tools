@@ -446,8 +446,8 @@ class RelecovMetadata:
         clean_metadata_rows, missing_samples = self.match_to_json(valid_metadata_rows)
         if missing_samples:
             num_miss = len(missing_samples)
-            logtxt = "%s samples from metadata were not found: %s" % (num_miss, missing_samples)
-            self.logsum.add_warning(entry=logtxt)
+            logtx = "%s samples not found in metadata: %s" % (num_miss, missing_samples)
+            self.logsum.add_warning(entry=logtx)
             stderr.print(f"[yellow]{num_miss} samples missing:\n{missing_samples}")
         # Continue by adding extra information
         stderr.print("[blue]Including additional information")
