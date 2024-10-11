@@ -418,7 +418,8 @@ class DownloadManager:
                         stderr.print(f"[red]{str(log_text % s_name)}")
                         self.include_error(entry=str(log_text % s_name), sample=s_name)
             else:
-                self.include_warning(entry=f"Row {counter} skipped. No sample ID given")
+                txt = f"Row {counter} in metadata skipped.No sequencing sample ID given"
+                self.include_warning(entry=txt)
         # Remove duplicated files
         clean_sample_dict = self.remove_duplicated_values(sample_file_dict)
         return clean_sample_dict
