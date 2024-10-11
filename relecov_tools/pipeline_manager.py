@@ -99,19 +99,14 @@ class PipelineManager:
         self.doc_folder = config_data["doc_folder"]
 
     def join_valid_items(self):
-        """Join validated metadata for the latest batches downloaded
+        """Join validated metadata for the latest batches downloaded into a single one
 
         Args:
 
         Returns:
-            sample_data: list(dict)
-                [
-                  {
-                    "sequencing_sample_id":XXXX,
-                    "r1_fastq_filepath": XXXX,
-                    "r2_fastq_filepath":XXXX
-                  }
-                ]
+            join_validate (list(dict)): List of dictionaries containing all the samples
+            found in each validated_lab_metadata.json form the scanned folders
+            latest_date (str): Latest batch date found in the scanned folder
         """
 
         def get_latest_lab_folder(self):
@@ -188,6 +183,18 @@ class PipelineManager:
         return join_validate, latest_date
 
     def copy_process(self, samples_data, output_folder):
+        """Copies all the necessary samples files in the given samples_data list
+        to the output folder. Also creates symbolic links into the link folder
+        given in config_file.
+
+        Args:
+            samples_data (list(dict)): samples_data from self.create_samples_data()
+            output_folder (str): Destination folder to copy files
+
+        Returns:
+            samp_errors (dict): Dictionary where keys are sequencing_sample_id and values
+            the files that received an error while trying to copy.
+        """
         samp_errors = {}
         links_folder = os.path.join(
             output_folder, self.analysis_folder, self.linked_sample_folder
@@ -241,18 +248,26 @@ class PipelineManager:
                         samp_errors[sample_id] = []
                     samp_errors[sample_id].append(sample["r2_fastq_filepath"])
                     continue
-        if len(samp_errors) > 0:
-            stderr.print(
-                "[red]Some files were not found. Unable to copy files from",
-                "[red]" + str(len(samp_errors)) + " samples",
-            )
-            msg = f"Do you want to delete analysis folder {output_folder}? Y/N"
-            confirmation = relecov_tools.utils.prompt_yn_question(msg)
-            if confirmation:
-                shutil.rmtree(output_folder)
         return samp_errors
 
     def create_samples_data(self, json_data):
+        """Creates a copy of the json_data but only with relevant keys to copy files.
+        Here 'r1_fastq_filepath' is created joining the original 'r1_fastq_filepath'
+        and 'sequence_file_R1_fastq' fields. The same goes for 'r2_fastq_filepath'
+
+        Args:
+            json_data (list(dict)): Samples metadata in a list of dictionaries
+
+        Returns:
+            sample_data: list(dict)
+                [
+                  {
+                    "sequencing_sample_id":XXXX,
+                    "r1_fastq_filepath": XXXX,
+                    "r2_fastq_filepath":XXXX
+                  }
+                ]
+        """
         samples_data = []
         for item in json_data:
             sample = {}
@@ -358,6 +373,16 @@ class PipelineManager:
                 continue
 
             samp_errors = self.copy_process(samples_data, group_outfolder)
+            if len(samp_errors) > 0:
+                stderr.print(
+                    f"[red]Unable to copy files from {len(samp_errors)} samples in group {group_tag}"
+                )
+                msg = f"Do you want to delete analysis folder {group_outfolder}? Y/N"
+                confirmation = relecov_tools.utils.prompt_yn_question(msg)
+                if confirmation:
+                    shutil.rmtree(group_outfolder)
+                    log.info(f"Folder {group_outfolder} removed")
+                    continue
             global_samp_errors[group_tag] = samp_errors
             samples_copied = len(list_of_samples) - len(samp_errors)
             stderr.print(
