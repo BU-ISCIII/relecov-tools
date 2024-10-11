@@ -5,7 +5,6 @@ import os
 import re
 import shutil
 import sys
-import re
 from collections import Counter
 
 import rich.console
@@ -313,7 +312,7 @@ class PipelineManager:
         # collect json with all validated samples
         join_validate, latest_date = self.join_valid_items()
         if len(join_validate) == 0:
-            stderr.print(f"[yellow]No samples were found. Aborting")
+            stderr.print("[yellow]No samples were found. Aborting")
             sys.exit(0)
         keys_to_split = ["host_gender", "enrichment_panel_version"]
         stderr.print(f"[blue]Splitting samples based on {keys_to_split}...")
