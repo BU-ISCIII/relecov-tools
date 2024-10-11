@@ -37,7 +37,7 @@ class RelecovMetadata:
             sys.exit(1)
 
         if sample_list_file is None:
-            stderr.print("[Yellow]No samples_data.json file provided")
+            stderr.print("[yellow]No samples_data.json file provided")
         self.sample_list_file = sample_list_file
 
         if sample_list_file is not None and not os.path.exists(sample_list_file):
@@ -376,8 +376,11 @@ class RelecovMetadata:
             try:
                 sample_id = str(row[sample_id_col]).strip()
             except KeyError:
-                log_text = f"Sample ID given for sequencing empty in row {row_number}"
-                log.error(log_text)
+                self.logsum.add_error(entry=f"No {sample_id_col} found in excel file")
+                continue
+            if not row[sample_id_col] or "Not Provided" in sample_id:
+                log_text = f"{sample_id_col} not provided in row {row_number}. Skipped"
+                self.logsum.add_warning(entry=log_text)
                 stderr.print(f"[red]{log_text}")
                 continue
             for key in row.keys():
@@ -443,9 +446,8 @@ class RelecovMetadata:
         clean_metadata_rows, missing_samples = self.match_to_json(valid_metadata_rows)
         if missing_samples:
             num_miss = len(missing_samples)
-            log.warning(
-                "%s samples from metadata were not found: %s", num_miss, missing_samples
-            )
+            logtxt = "%s samples from metadata were not found: %s" % (num_miss, missing_samples)
+            self.logsum.add_warning(entry=logtxt)
             stderr.print(f"[yellow]{num_miss} samples missing:\n{missing_samples}")
         # Continue by adding extra information
         stderr.print("[blue]Including additional information")
