@@ -432,8 +432,9 @@
             ]
         }
     },
-    "launch_pipeline": {
-        "analysis_name": "RELECOV_icasas_C",
+    "pipeline_manager": {
+        "analysis_group": "RLV",
+        "analysis_user": "icasas_C",
         "doc_folder": "DOC",
         "analysis_folder": "ANALYSIS",
         "sample_stored_folder": "RAW",
