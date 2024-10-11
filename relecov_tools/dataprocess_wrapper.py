@@ -260,8 +260,9 @@ class ProcessWrapper:
         if not finished_folders:
             stderr.print("[red]No valid folders found to process")
             sys.exit(1)
+        stderr.print(f"[blue]Processing {len(finished_folders)} downloaded folders...")
+        counter = 0
         for key, folder_logs in download_logs.items():
-            log.info(f"Processing folder {key}")
             folder = folder_logs.get("path")
             if not folder:
                 log.error(f"Skipped folder {key}. Logs do not include path field")
@@ -269,7 +270,10 @@ class ProcessWrapper:
             if not folder_logs.get("valid"):
                 log.error(f"Folder {key} is set as invalid in logs. Skipped.")
                 continue
-            stderr.print(f"Processing folder {key} with local path: {folder}")
+            counter += 1
+            logtxt = "Processing folder %s/%s: %s with local path %s"
+            log.info(logtxt % (counter, str(len(finished_folders)), key, folder))
+            stderr.print(logtxt % (counter, str(len(finished_folders)), key, folder))
             try:
                 merged_logs = self.process_folder(finished_folders, key, folder_logs)
             except (FileNotFoundError, ValueError) as e:
