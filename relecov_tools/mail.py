@@ -1,67 +1,71 @@
-"""
-=============================================================
-HEADER
-=============================================================
-INSTITUTION: BU-ISCIII
-AUTHOR: Guillermo J. Gorines Cordero
-MAIL: guillermo.gorines@urjc.es
-VERSION: 0
-CREATED: 7-3-2022
-REVISED: 7-3-2022
-REVISED BY: guillermo.gorines@urjc.es
-DESCRIPTION:
-
-    Includes the Email, and its associated methods.
-
-REQUIREMENTS:
-    -Python
-
-TO DO:
-
-
-================================================================
-END_OF_HEADER
-================================================================
-"""
-
-# Imports
+import json
+import logging
+import os
 import smtplib
-
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 
+log = logging.getLogger(__name__)
 
-class Email:
-    def __init__(self, receiver, sender, password, subject):
-        self.receiver = receiver
-        self.sender = sender
-        self.password = password
-        self.subject = subject
-        self.text = ""
-        self.html = False
+class EmailSender:
+    def __init__(self, validate_file, lab_info_file):
+        self.validate_file = validate_file
+        self.lab_info_file = lab_info_file
 
-    def write_message(self, text):
-        self.message = text
-        return
+    def get_invalid_count(self):
+        invalid_count = 0
 
-    def generate_HTML(self):
-        pass
-        return
+        try:
+            with open(self.validate_file, "r") as f:
+                validate_data = json.load(f)
 
-    def send_message(self):
-        msg = MIMEMultipart("alternative")
-        msg["To"] = self.receiver
-        msg["From"] = self.sender
-        msg["Subject"] = self.subject
+                for entry_key, entry_value in validate_data.items():
+                    if "samples" in entry_value:
+                        samples = entry_value["samples"]
+                        for sample_key, sample_value in samples.items():
+                            if "valid" in sample_value and not sample_value["valid"]:
+                                invalid_count += 1
+            return invalid_count
+        except Exception as e:
+            log.error("Error reading validate file: %s", e)
+            return None
 
-        text_part = MIMEText(self.text, "plain")
-        msg.attach(text_part)
+    def send_email(self, receiver_email, subject, body, attachments):
+        sender_email = "solmos.buisciii@gmail.com" 
+        sender_password = "nmqm oorh egkf yvbo" 
 
-        if self.html:
-            html_part = MIMEText(self.html, "html")
-            msg.attach(html_part)
+        try:
+            msg = MIMEMultipart()
+            msg["From"] = sender_email
+            msg["To"] = receiver_email
+            msg["Subject"] = subject
 
-        # open server, send email, close email
-        server = smtplib.SMTP("localhost")
-        server.sendmail(self.sender, self.receiver, msg.as_string())
-        server.quit()
+            msg.attach(MIMEText(body, "plain"))
+            
+            for attachment in attachments: 
+                try:
+                    with open(attachment, "rb") as attachment_file:
+                        part= MIMEBase("application", "octet-stream")
+                        part.set_payload(attachment_file.read())
+                        encoders.encode_base64(part)
+                        part.add_header("Content-Disposition",
+                                        f"attachment; filename={os.path.basename(attachment)}"
+                        )
+                        msg.attach(part)
+                except Exception as e:
+                    log.error(f"Error when attaching the file {attachment}: {e}")
+                    print(f"Error when attaching the file {attachment}: {e}")
+
+            server = smtplib.SMTP("smtp.gmail.com", 587)
+            server.starttls()
+            server.login(sender_email, sender_password)
+
+            server.sendmail(sender_email, receiver_email, msg.as_string())
+            server.quit()
+
+            print("Mail sent successfully.")
+        except Exception as e:
+            log.error(f"Error sending mail: {e}")
+            print(f"Error sending mail: {e}")
