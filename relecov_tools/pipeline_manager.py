@@ -163,7 +163,7 @@ class PipelineManager:
             log.info("Collecting samples for  %s", lab_code)
             stderr.print("[blue] Collecting samples for ", lab_code)
             # check if laboratory folder is the latest date to process
-            if data_folder["date"] != datetime.date(2024, 9, 30):  # latest_date:
+            if data_folder["date"] != latest_date:
                 continue
             # fetch the validate file and get sample id and r1 and r2 file path
             validate_files = [
@@ -326,10 +326,11 @@ class PipelineManager:
         """
         # collect json with all validated samples
         join_validate, latest_date = self.join_valid_items()
+        latest_date = str(latest_date).replace("-", "")
         if len(join_validate) == 0:
             stderr.print("[yellow]No samples were found. Aborting")
             sys.exit(0)
-        keys_to_split = ["host_gender", "enrichment_panel_version"]
+        keys_to_split = ["enrichment_panel", "enrichment_panel_version"]
         stderr.print(f"[blue]Splitting samples based on {keys_to_split}...")
         json_split_by_panel = self.split_data_by_key(join_validate, keys_to_split)
         stderr.print(f"[blue]Data splitted into {len(json_split_by_panel)} groups")
@@ -337,6 +338,8 @@ class PipelineManager:
         global_samp_errors = {}
         for idx, list_of_samples in enumerate(json_split_by_panel, start=1):
             group_tag = f"{latest_date}_PANEL{idx:02d}"
+            log.info("Processing group %s", group_tag)
+            stderr.print(f"[blue]Processing group {group_tag}...")
             group_outfolder = os.path.join(
                 self.output_folder, self.out_folder_namevar % group_tag
             )
@@ -346,6 +349,7 @@ class PipelineManager:
                 if confirmation is False:
                     continue
                 shutil.rmtree(group_outfolder)
+                log.info(f"Folder {group_outfolder} removed")
             samples_data = self.create_samples_data(list_of_samples)
             # Create a folder for the group of samples and copy the files there
             log.info("Creating folder for group %s", group_tag)
@@ -390,7 +394,7 @@ class PipelineManager:
             )
             final_valid_samples = [
                 x
-                for x in join_validate
+                for x in list_of_samples
                 if x.get("sequencing_sample_id") not in samp_errors
             ]
             sample_ids = [i for i in sample_ids if i not in samp_errors]
@@ -412,11 +416,11 @@ class PipelineManager:
             stderr.print(
                 f"[blue]Successfully created folder for {group_tag}. Ready to launch"
             )
-            for group, samples in global_samp_errors.items():
-                if not samples:
-                    continue
-                log.error("Group %s received error for samples: %s" % (group, samples))
-        else:
+        for group, samples in global_samp_errors.items():
+            if not samples:
+                continue
+            log.error("Group %s received error for samples: %s" % (group, samples))
+        if not any(v for v in global_samp_errors.values()):
             stderr.print("[green]All samples were copied successfully!!")
         log.info("Finished execution")
         stderr.print("Finished execution")
