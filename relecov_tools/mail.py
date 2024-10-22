@@ -11,18 +11,19 @@ from jinja2 import Environment, FileSystemLoader
 
 log = logging.getLogger(__name__)
 
+
 class EmailSender:
     def __init__(self, validate_file, config):
         self.validate_file = validate_file
         self.config = config
-    
+
     @staticmethod
     def load_config_json(config_path):
         """
         Load the JSON configuration file.
         """
         try:
-            with open(config_path, 'r') as json_file:
+            with open(config_path, "r") as json_file:
                 config = json.load(json_file)
                 return config
         except FileNotFoundError:
@@ -54,7 +55,7 @@ class EmailSender:
         try:
             with open(self.validate_file, "r") as f:
                 validate_data = json.load(f)
-                
+
                 for entry_key, entry_value in validate_data.items():
                     if "samples" in entry_value:
                         samples = entry_value["samples"]
@@ -65,16 +66,20 @@ class EmailSender:
         except Exception as e:
             print(f"Error reading the validation file: {e}")
             return None
-    
-    def get_institution_info(self, institution_code, institutions_file='institutions.json'):
+
+    def get_institution_info(
+        self, institution_code, institutions_file="institutions.json"
+    ):
         """
         Load the institution's information from the JSON file.
         """
-        institutions_file = self.config["mail_sender"].get("institutions_guide_path", "institutions_guide.json")
+        institutions_file = self.config["mail_sender"].get(
+            "institutions_guide_path", "institutions_guide.json"
+        )
         try:
-            with open(institutions_file, 'r') as file:
+            with open(institutions_file, "r") as file:
                 institutions_data = json.load(file)
-            
+
             if institution_code in institutions_data:
                 return institutions_data[institution_code]
             else:
@@ -95,17 +100,21 @@ class EmailSender:
             institution_info = self.get_institution_info(submitting_institution_code)
 
             if not institution_info:
-                print("Error: The information could not be obtained from the institution.")
+                print(
+                    "Error: The information could not be obtained from the institution."
+                )
                 return None, None
 
-            institution_name = institution_info['institution_name']
-            email_receiver = institution_info['email_receiver']
+            institution_name = institution_info["institution_name"]
+            email_receiver = institution_info["email_receiver"]
 
             # Obtener la ruta de la plantilla desde la configuración
             template_path = self.config["mail_sender"]["delivery_template_path_file"]
 
             if not os.path.exists(template_path):
-                print(f"Error: The template file could not be found in path {template_path}.")
+                print(
+                    f"Error: The template file could not be found in path {template_path}."
+                )
                 return None, None
 
             env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
@@ -114,32 +123,32 @@ class EmailSender:
             email_template = template.render(
                 submitting_institution=institution_name,
                 invalid_count=invalid_count,
-                additional_info=additional_info
+                additional_info=additional_info,
             )
 
             return email_template, email_receiver
         except Exception as e:
             print(f"Error rendering email template: {e}")
             return None, None
-        
+
     def send_email(self, receiver_email, subject, body, attachments):
         """
         Send an email using the YAML credentials and JSON configuration.
         """
         yaml_cred_path = self.config["mail_sender"]["yaml_cred_path"]
         credentials = self.load_credentials(yaml_cred_path)
-        
+
         if not credentials:
             print("No credentials found.")
             return
 
         sender_email = self.config["mail_sender"]["email_host_user"]
         email_password = credentials.get("email_password")
-        
+
         if not email_password:
             print("The e-mail password could not be found.")
             return
-        
+
         try:
             msg = MIMEMultipart()
             msg["From"] = sender_email
@@ -154,12 +163,16 @@ class EmailSender:
                     part.set_payload(attachment_file.read())
                     encoders.encode_base64(part)
                     part.add_header(
-                        "Content-Disposition", f"attachment; filename={os.path.basename(attachment)}"
+                        "Content-Disposition",
+                        f"attachment; filename={os.path.basename(attachment)}",
                     )
                     msg.attach(part)
 
             # Configurar el servidor SMTP
-            server = smtplib.SMTP(self.config["mail_sender"]["email_host"], self.config["mail_sender"]["email_port"])
+            server = smtplib.SMTP(
+                self.config["mail_sender"]["email_host"],
+                self.config["mail_sender"]["email_port"],
+            )
             server.starttls()
             server.login(sender_email, email_password)
             server.sendmail(sender_email, receiver_email, msg.as_string())
