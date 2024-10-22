@@ -242,41 +242,49 @@ def validate(json_file, json_schema, metadata, out_folder):
     )
     validation.validate()
 
+import click
+import relecov_tools.mail
+
+
 #send-email
 @relecov_tools_cli.command(help_priority=4)
-@click.option('-v','--validate-file', type=click.Path(exists=True), help="Path to the validation file (validate.json)")
-@click.option('-i', '--lab-info-file', type=click.Path(exists=True), help="Path to the lab information file (lab_metadata.json)")
-@click.option('-r', '--receiver-email', prompt="Email of the addressee", help="Recipient's e-mail address")
-@click.option('-a', '--attachments', multiple=True, type= click.Path(exists=True), help="Path to file")
-def send_mail(validate_file, lab_info_file, receiver_email, attachments):
-    """Send a sample validation report by mail."""
-    email_sender = relecov_tools.mail.EmailSender(validate_file, lab_info_file)
-    
-    invalid_count = email_sender.get_invalid_count()
-    
-    with open(lab_info_file, "r") as lab_info_file:
-        lab_info_data = json.load(lab_info_file)
-        
-    submitting_institution = lab_info_data[0]["submitting_institution"]
-    
-    # Template 
-    email_template = f"""
-    Asunto: Informe de Validación de Muestras - {submitting_institution}
-
-    Estimado/a responsable de la subida de datos de secuenciación del {submitting_institution},
-
-    Le informamos que tras el proceso de validación de los datos enviados, el número de muestras que ha sido imposible validar es de {invalid_count}.
-    Las muestras no han superado el proceso de validación debido a errores o faltas de información en los datos proporcionados. Le solicitamos que revise los detalles de cada muestra para subsanar los problemas.
-    Adjunto a este correo encontrará un documento en formato Excel con información detallada sobre los errores o la información faltante para cada muestra. Le pedimos que proceda a realizar las correcciones necesarias y a reenviar los datos.
-
-    En caso de cualquier duda o aclaración, no dude en ponerse en contacto con el equipo técnico.
-
-    Atentamente,
-
-    Equipo Relecov
+@click.option('-v', '--validate-file', type=click.Path(exists=True), help="Path to the validation file (validate.json)")
+@click.option('-r', '--receiver-email', required=False, help="Recipient's e-mail address (optional). If not provided, it will be extracted from the institutions guide.")
+@click.option('-a', '--attachments', multiple=True, type=click.Path(exists=True), help="Path to file")
+@click.option('-p', '--email-psswd', help="Password for bioinformatica@isciii.es", required=False, default=None)
+def send_mail(validate_file, receiver_email, attachments, email_psswd):
     """
-    subject = f"Informe de Validación de Muestras - {submitting_institution}"
-    email_sender.send_email(receiver_email, subject, email_template, attachments)
+    Send a sample validation report by mail.
+    """
+    config = relecov_tools.mail.EmailSender.load_config_json('./relecov_tools/conf/configuration.json')
+    
+    if not config:
+        print("Error: The configuration could not be loaded.")
+        return
+
+    email_sender = relecov_tools.mail.EmailSender(validate_file, config)
+
+    add_info = click.confirm('Would you like to add additional information in the mail?', default=False)
+    additional_info = ""
+    if add_info:
+        additional_info = click.prompt('Enter additional information')
+
+    email_body, email_receiver_from_json = email_sender.render_email_template(additional_info)
+
+    if email_body is None:
+        print("Error: Could not generate mail.")
+        return
+
+    final_receiver_email = receiver_email if receiver_email else email_receiver_from_json
+
+    if not final_receiver_email:
+        print("Error: Could not obtain the recipient's email address.")
+        return
+
+    subject = f"Informe de Validación de Muestras - {email_receiver_from_json}"
+
+    email_sender.send_email(final_receiver_email, subject, email_body, attachments)
+
 
 # mapping to ENA schema
 @relecov_tools_cli.command(help_priority=5)
