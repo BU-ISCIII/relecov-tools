@@ -445,5 +445,14 @@
             "enrichment_panel",
             "enrichment_panel_version"
         ]
+    },
+    "mail_sender":{
+        "delivery_template_path_file": "./relecov_tools/templates/jinja_template_mail_sender.j2",
+        "email_host": "mx2.isciii.es",
+        "email_port": "587",
+        "email_host_user": "bioinformatica@isciii.es", 
+        "email_use_tls": "True",
+        "yaml_cred_path": "~/buisciii_config.yml",
+        "institutions_guide_path": "../test_mail_module/institutions_guide.json"
     }
 }
