@@ -185,7 +185,7 @@ class LogSum:
 
         def reg_remover(string, pattern):
             """Remove annotation between brackets in logs message"""
-            string = string.replace("['", "'").replace("']", "'").replace('"', '')
+            string = string.replace("['", "'").replace("']", "'").replace('"', "")
             string = re.sub(pattern, "", string)
             return string.strip()
 
@@ -203,20 +203,21 @@ class LogSum:
                 samples_logs = logs.get("samples")
             if not samples_logs:
                 logs["Warnings"].append("No samples found to report")
-            
+
             workbook = openpyxl.Workbook()
             # TODO: Include these fields in configuration.json
+            sample_id_field = "Sample ID given for sequencing"
             sheet_names_and_headers = {
                 "Global Report": ["Valid", "Errors", "Warnings"],
-                "Samples Report": ["Sample ID given for sequencing", "Valid", "Errors"],
-                "Other warnings": ["Sample ID given for sequencing", "Valid", "Warnings"]
+                "Samples Report": [sample_id_field, "Valid", "Errors"],
+                "Other warnings": [sample_id_field, "Valid", "Warnings"],
             }
             for name, header in sheet_names_and_headers.items():
                 new_sheet = workbook.create_sheet(name)
                 new_sheet.append(header)
-            regex = r"[\[\]]" # Regex to remove lists brackets
+            regex = r"[\[\]]"  # Regex to remove lists brackets
             workbook["Global Report"].append(
-                [reg_remover(str(x), regex) for k,x in logs.items() if k != "samples"]
+                [reg_remover(str(x), regex) for k, x in logs.items() if k != "samples"]
             )
             regex = r"\[.*?\]"  # Regex to remove ontology annotations between brackets
             for sample, slog in samples_logs.items():
@@ -228,7 +229,7 @@ class LogSum:
                 workbook["Other warnings"].append(warning_row)
             for name in sheet_names_and_headers.keys():
                 relecov_tools.utils.adjust_sheet_size(workbook[name])
-            del workbook['Sheet']
+            del workbook["Sheet"]
             workbook.save(excel_outpath)
             stderr.print(f"[green]Successfully created logs excel in {excel_outpath}")
             return
@@ -236,7 +237,7 @@ class LogSum:
         def translate_fields(samples_logs):
             # TODO Translate logs to spanish using a local translator model like deepl
             return
-        
+
         date = datetime.today().strftime("%Y%m%d%H%M%S")
         lab_code = list(logs.keys())[0]
         if not os.path.exists(os.path.dirname(excel_outpath)):
