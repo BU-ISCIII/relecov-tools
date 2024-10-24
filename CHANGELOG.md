@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [1.X.0] - 202X-XX-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/
+
+### Credits
+
+Code contributions to the release:
+
+- [Pablo Mata](https://github.com/Shettland)
+
+### Modules
+
+#### Added enhancements
+
+- Now logs-to-excel can handle logs with multiple keys and includes folder logs [#329](https://github.com/BU-ISCIII/relecov-tools/pull/329)
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [1.2.0] - 2024-10-11 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/1.2.0
 
 ### Credits
