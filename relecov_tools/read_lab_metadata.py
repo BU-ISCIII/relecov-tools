@@ -21,7 +21,13 @@ stderr = rich.console.Console(
 
 
 class RelecovMetadata:
-    def __init__(self, metadata_file=None, sample_list_file=None, output_folder=None):
+    def __init__(
+        self,
+        metadata_file=None,
+        sample_list_file=None,
+        output_folder=None,
+        files_folder=None,
+    ):
         if metadata_file is None:
             self.metadata_file = relecov_tools.utils.prompt_path(
                 msg="Select the excel file which contains metadata"
@@ -38,7 +44,12 @@ class RelecovMetadata:
 
         if sample_list_file is None:
             stderr.print("[yellow]No samples_data.json file provided")
+            if not os.path.isdir(str(files_folder)):
+                stderr.print("[red]No samples file nor valid files folder provided")
+                sys.exit(1)
+
         self.sample_list_file = sample_list_file
+        self.files_folder = files_folder
 
         if sample_list_file is not None and not os.path.exists(sample_list_file):
             log.error("Sample information file %s does not exist ", sample_list_file)
@@ -103,13 +114,17 @@ class RelecovMetadata:
 
         def safely_calculate_md5(file):
             """Check file md5, but return Not Provided if file does not exist"""
+            log.info("Generating md5 hash for %s...", str(file))
             try:
                 return relecov_tools.utils.calculate_md5(file)
             except IOError:
                 return "Not Provided [GENEPIO:0001668]"
 
-        dir_path = os.path.dirname(os.path.realpath(self.metadata_file))
-        md5_checksum_files = [f for f in os.listdir(dir_path) if "md5" in f]
+        # The files are and md5file are supposed to be located together
+        dir_path = self.files_folder
+        md5_checksum_files = [
+            os.path.join(dir_path, f) for f in os.listdir(dir_path) if "md5" in f
+        ]
         if md5_checksum_files:
             skip_list = self.configuration.get_topic_data(
                 "sftp_handle", "skip_when_found"
