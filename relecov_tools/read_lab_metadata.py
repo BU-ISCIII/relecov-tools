@@ -405,19 +405,19 @@ class RelecovMetadata:
             property_row = {}
             try:
                 sample_id = str(row[sample_id_col]).strip()
-                included_sample_ids.append(sample_id)
             except KeyError:
                 self.logsum.add_error(entry=f"No {sample_id_col} found in excel file")
+                continue
+            if sample_id in included_sample_ids:
+                log_text = f"Skipped duplicated sample {sample_id} in row {row_number}. Sequencing sample id must be unique"
+                self.logsum.add_warning(entry=log_text)
                 continue
             if not row[sample_id_col] or "Not Provided" in sample_id:
                 log_text = f"{sample_id_col} not provided in row {row_number}. Skipped"
                 self.logsum.add_warning(entry=log_text)
                 stderr.print(f"[red]{log_text}")
                 continue
-            if sample_id in included_sample_ids:
-                log_text = f"Skipped duplicated sample {sample_id} in row {row_number}. Sequencing sample id must be unique"
-                self.logsum.add_warning(entry=log_text)
-                continue
+            included_sample_ids.append(sample_id)
             for key in row.keys():
                 # skip the first column of the Metadata lab file
                 if header_flag in key:
@@ -495,7 +495,7 @@ class RelecovMetadata:
         completed_metadata = self.adding_ontology_to_enum(extended_metadata)
         if not completed_metadata:
             stderr.print("Metadata was completely empty. No output file generated")
-            sys.exit(1)
+            sys.exit(0)
         file_code = "lab_metadata_" + self.lab_code + "_"
         file_name = file_code + self.date + ".json"
         stderr.print("[blue]Writting output json file")
