@@ -390,7 +390,7 @@ class DownloadManager:
                     stderr.print("[red]Unable to convert to string. ", e)
                     continue
                 if s_name in sample_file_dict:
-                    log_text = f"Found more samples with the same Sample ID given for sequencing. Only the first one will remain."
+                    log_text = "Found more samples with the same Sample ID given for sequencing. Only the first one remains."
                     stderr.print(log_text)
                     self.include_warning(log_text, sample=s_name)
                     continue
