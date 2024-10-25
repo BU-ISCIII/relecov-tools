@@ -137,22 +137,28 @@ class RelecovMetadata:
             log.warning("No md5sum file found.")
             log.warning("Generating new md5 hashes. This might take a while...")
         j_data = {}
-        no_fastq_error = "No R1 fastq was given for sample %s"
+        no_fastq_error = "No R1 fastq file was given for sample %s in metadata"
         for sample in clean_metadata_rows:
+            sample_id = str(sample.get("sequencing_sample_id"))
             files_dict = {}
             r1_file = sample.get("sequence_file_R1_fastq")
             r2_file = sample.get("sequence_file_R2_fastq")
             if not r1_file:
                 self.logsum.add_error(
-                    sample=sample.get("sequencing_sample_id"),
-                    entry=no_fastq_error % sample.get("sequencing_sample_id"),
+                    sample=sample_id,
+                    entry=no_fastq_error % sample_id,
                 )
-                j_data[str(sample.get("sequencing_sample_id"))] = files_dict
+                j_data[sample_id] = files_dict
                 continue
             r1_md5 = md5_dict.get(r1_file)
             r2_md5 = md5_dict.get(r2_file)
             files_dict["sequence_file_R1_fastq"] = r1_file
             files_dict["r1_fastq_filepath"] = dir_path
+            if not os.path.exists(os.path.join(dir_path, r1_file)):
+                self.logsum.add_error(
+                    sample=sample_id, entry="Provided R1 file not found after download"
+                )
+                continue
             if r1_md5:
                 files_dict["fastq_r1_md5"] = r1_md5
             else:
@@ -162,13 +168,21 @@ class RelecovMetadata:
             if r2_file:
                 files_dict["sequence_file_R2_fastq"] = r2_file
                 files_dict["r2_fastq_filepath"] = dir_path
+                if not os.path.exists(os.path.join(dir_path, r2_file)):
+                    self.logsum.add_error(
+                        sample=sample_id,
+                        entry="Provided R2 file not found after download",
+                    )
+                    continue
                 if r2_md5:
                     files_dict["fastq_r2_md5"] = r2_md5
                 else:
                     files_dict["fastq_r2_md5"] = safely_calculate_md5(
-                        os.path.join(dir_path, r2_file)
+                        os.path.join(dir_path, r1_file)
                     )
-            j_data[str(sample.get("sequencing_sample_id"))] = files_dict
+            j_data[sample_id] = files_dict
+        if not any(val for val in j_data.values()):
+            raise FileNotFoundError(f"No files found for the samples in {dir_path}")
         try:
             filename = "_".join(["samples_data", self.lab_code, self.date + ".json"])
             file_path = os.path.join(self.output_folder, filename)
@@ -384,12 +398,14 @@ class RelecovMetadata:
             "lab_metadata", "alt_heading_equivalences"
         )
         valid_metadata_rows = []
+        included_sample_ids = []
         row_number = heading_row_number
         for row in ws_metadata_lab:
             row_number += 1
             property_row = {}
             try:
                 sample_id = str(row[sample_id_col]).strip()
+                included_sample_ids.append(sample_id)
             except KeyError:
                 self.logsum.add_error(entry=f"No {sample_id_col} found in excel file")
                 continue
@@ -397,6 +413,10 @@ class RelecovMetadata:
                 log_text = f"{sample_id_col} not provided in row {row_number}. Skipped"
                 self.logsum.add_warning(entry=log_text)
                 stderr.print(f"[red]{log_text}")
+                continue
+            if sample_id in included_sample_ids:
+                log_text = f"Skipped duplicated sample {sample_id} in row {row_number}. Sequencing sample id must be unique"
+                self.logsum.add_warning(entry=log_text)
                 continue
             for key in row.keys():
                 # skip the first column of the Metadata lab file
