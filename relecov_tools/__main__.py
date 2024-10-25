@@ -212,12 +212,12 @@ def download(
     type=click.Path(),
     help="Path to folder where samples files are located"
 )
-def read_lab_metadata(metadata_file, sample_list_file, metadata_out):
+def read_lab_metadata(metadata_file, sample_list_file, metadata_out, files_folder):
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
     new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(
-        metadata_file, sample_list_file, metadata_out
+        metadata_file, sample_list_file, metadata_out, files_folder
     )
     relecov_json = new_metadata.create_metadata_json()
     return relecov_json
