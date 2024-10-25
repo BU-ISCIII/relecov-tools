@@ -210,7 +210,7 @@ def download(
     "--files-folder",
     default=None,
     type=click.Path(),
-    help="Path to folder where samples files are located"
+    help="Path to folder where samples files are located",
 )
 def read_lab_metadata(metadata_file, sample_list_file, metadata_out, files_folder):
     """
