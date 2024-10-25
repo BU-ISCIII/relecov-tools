@@ -390,7 +390,7 @@ class DownloadManager:
                     stderr.print("[red]Unable to convert to string. ", e)
                     continue
                 if s_name in sample_file_dict:
-                    log_text = f"Found duplicated sample name: {s_name}. Skipped."
+                    log_text = f"Found more samples with the same Sample ID given for sequencing. Only the first one will remain."
                     stderr.print(log_text)
                     self.include_warning(log_text, sample=s_name)
                     continue
@@ -542,10 +542,10 @@ class DownloadManager:
             mismatch_rev = [fi for fi in set_list if fi not in filtered_files_list]
 
             if mismatch_files:
-                error_text1 = "Files in folder missing in metadata %s"
+                error_text1 = "Files in folder missing in metadata: %s"
                 self.include_warning(error_text1 % str(mismatch_files))
             if mismatch_rev:
-                error_text2 = "Files in metadata missing in folder %s"
+                error_text2 = "Files in metadata missing in folder: %s"
                 self.include_warning(error_text2 % str(mismatch_rev))
             # Try to check if the metadata filename lacks the proper extension
             log.info("Trying to match files without proper file extension")
