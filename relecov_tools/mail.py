@@ -8,6 +8,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from jinja2 import Environment, FileSystemLoader
+from relecov_tools.utils import read_json_file
 
 log = logging.getLogger(__name__)
 
@@ -16,22 +17,6 @@ class EmailSender:
     def __init__(self, validate_file, config):
         self.validate_file = validate_file
         self.config = config
-
-    @staticmethod
-    def load_config_json(config_path):
-        """
-        Load the JSON configuration file.
-        """
-        try:
-            with open(config_path, "r") as json_file:
-                config = json.load(json_file)
-                return config
-        except FileNotFoundError:
-            print(f"The configuration file {config_path} not found.")
-            return None
-        except json.JSONDecodeError:
-            print(f"Error decoding the configuration file {config_path}.")
-            return None
 
     @staticmethod
     def load_credentials(yaml_path):

@@ -279,9 +279,8 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     """
     Send a sample validation report by mail.
     """
-    config = relecov_tools.mail.EmailSender.load_config_json(
-        "./relecov_tools/conf/configuration.json"
-    )
+    config_path = "./relecov_tools/conf/configuration.json"
+    config = relecov_tools.utils.read_json_file(config_path)
 
     if not config:
         print("Error: The configuration could not be loaded.")
