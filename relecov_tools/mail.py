@@ -21,19 +21,19 @@ class EmailSender:
         self.validate_data = relecov_tools.utils.read_json_file(validate_file)
         self.template_path = self.config.get("delivery_template_path_file")
         self.yaml_cred_path = self.config.get("yaml_cred_path")
-        
+
         if not self.config:
             raise ValueError("Configuration not loaded correctly.")
-        
+
         if not self.validate_data:
             raise ValueError("Validation data is not available.")
-        
+
         if not os.path.exists(self.template_path):
-            raise FileNotFoundError(f"The template file could not be found in path {self.template_path}.")
-        
+            raise FileNotFoundError(
+                f"The template file could not be found in path {self.template_path}.")
+
     def get_invalid_count(self):
         invalid_count = 0
-
 
         for entry_key, entry_value in self.validate_data.items():
             if "samples" in entry_value:
@@ -108,7 +108,8 @@ class EmailSender:
                 part = MIMEBase("application", "octet-stream")
                 part.set_payload(attachment_file.read())
                 encoders.encode_base64(part)
-                part.add_header("Content-Disposition", f"attachment; filename={os.path.basename(attachment)}")
+                part.add_header("Content-Disposition",
+                                f"attachment; filename={os.path.basename(attachment)}")
                 msg.attach(part)
 
         try:

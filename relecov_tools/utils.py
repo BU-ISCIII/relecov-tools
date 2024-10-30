@@ -337,9 +337,9 @@ def rich_force_colors():
     Check if any environment variables are set to force Rich to use coloured output
     """
     if (
-        os.getenv("GITHUB_ACTIONS")
-        or os.getenv("FORCE_COLOR")
-        or os.getenv("PY_COLORS")
+        os.getenv("GITHUB_ACTIONS") or
+        os.getenv("FORCE_COLOR") or
+        os.getenv("PY_COLORS")
     ):
         return True
     return None
@@ -418,7 +418,9 @@ def select_most_recent_files_per_sample(paths_list):
     filename_groups = {}
     # Count occurrences of each filename and group files by sample names
     for file in paths_list:
-        # TODO: So far, it uses split method to identify this pattern: [sample1.pangolin.csv, sample1.pangolin_20240310.csv]. It should be improve to parse files based on a different character matching field.
+        # TODO: So far, it uses split method to identify this pattern:
+        # [sample1.pangolin.csv, sample1.pangolin_20240310.csv]. It should be
+        # improve to parse files based on a different character matching field.
         file_name = os.path.basename(file).split(".")[0]
         if file_name in filename_groups:
             filename_groups[file_name].append(file)

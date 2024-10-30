@@ -62,7 +62,7 @@ def run_relecov_tools():
         "[blue]   /   [grey39] |-[blue]-|   |   \ |___ |___ |___ |___ |___|    \/     ",
         highlight=False,
     )
-
+    
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
     __version__ = "1.2.0"
     stderr.print(
@@ -280,7 +280,8 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     config = config_loader.get_configuration("mail_sender")
 
     if not config:
-        raise ValueError("Error: The configuration for 'mail_sender' could not be loaded.")
+        raise ValueError(
+            "Error: The configuration for 'mail_sender' could not be loaded.")
 
     email_sender = relecov_tools.mail.EmailSender(validate_file, config)
 
@@ -308,7 +309,6 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     subject = f"Informe de Validación de Muestras - {email_receiver_from_json}"
 
     email_sender.send_email(final_receiver_email, subject, email_body, attachments)
-
 
 
 # mapping to ENA schema
@@ -573,32 +573,29 @@ def pipeline_manager(input, template, output, config, folder_names):
 
 # schema builder
 @relecov_tools_cli.command(help_priority=14)
-@click.option(
-    "-i",
-    "--input_file",
-    type=click.Path(),
-    help="Path to the Excel document containing the database definition. This file must have a .xlsx extension.",
-    required=True,
-)
-@click.option(
-    "-s",
-    "--schema_base",
-    type=click.Path(),
-    help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module. (Default: installed schema in 'relecov-tools/relecov_tools/schema/relecov_schema.json')",
-    required=False,
-)
+@click.option("-i",
+              "--input_file",
+              type=click.Path(),
+              help="Path to the Excel document containing the database definition. This file must have a .xlsx extension.",
+              required=True,
+              )
+@click.option("-s",
+              "--schema_base",
+              type=click.Path(),
+              help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module. (Default: installed schema in 'relecov-tools/relecov_tools/schema/relecov_schema.json')",
+              required=False,
+              )
 @click.option(
     "-v",
     "--draft_version",
     type=click.STRING,
     help="Version of the JSON schema specification to be used. Example: '2020-12'. See: https://json-schema.org/specification-links",
 )
-@click.option(
-    "-d",
-    "--diff",
-    is_flag=True,
-    help="Prints a changelog/diff between the base and incoming versions of the schema.",
-)
+@click.option("-d",
+              "--diff",
+              is_flag=True,
+              help="Prints a changelog/diff between the base and incoming versions of the schema.",
+              )
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file/s")
 def build_schema(input_file, schema_base, draft_version, diff, out_dir):
     """Generates and updates JSON Schema files from Excel-based database definitions."""
@@ -623,13 +620,12 @@ def build_schema(input_file, schema_base, draft_version, diff, out_dir):
     help="Path to output folder where xlsx file is saved",
     required=False,
 )
-@click.option(
-    "-f",
-    "--files",
-    help="Paths to log_summary.json files to merge into xlsx file, called once per file",
-    required=True,
-    multiple=True,
-)
+@click.option("-f",
+              "--files",
+              help="Paths to log_summary.json files to merge into xlsx file, called once per file",
+              required=True,
+              multiple=True,
+              )
 def logs_to_excel(lab_code, output_folder, files):
     """Creates a merged xlsx report from all the log summary jsons given as input"""
     all_logs = []
