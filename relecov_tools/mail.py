@@ -42,17 +42,12 @@ class EmailSender:
         institutions_file = self.config["mail_sender"].get(
             "institutions_guide_path", "institutions_guide.json"
         )
-        try:
-            with open(institutions_file, "r") as file:
-                institutions_data = json.load(file)
+        institutions_data = relecov_tools.utils.read_json_file(institutions_file)
 
-            if institution_code in institutions_data:
-                return institutions_data[institution_code]
-            else:
-                print(f"No information found for code {institution_code}")
-                return None
-        except FileNotFoundError:
-            print(f"The file {institutions_file} was not found.")
+        if institutions_data and institution_code in institutions_data:
+            return institutions_data[institution_code]
+        else:
+            print(f"No information found for code {institution_code}")
             return None
 
     def render_email_template(self, additional_info=""):
