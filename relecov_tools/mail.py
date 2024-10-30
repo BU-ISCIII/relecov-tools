@@ -19,6 +19,11 @@ class EmailSender:
         self.validate_file = validate_file
         self.config = config
         self.validate_data = relecov_tools.utils.read_json_file(validate_file)
+        self.template_path = self.config["mail_sender"].get("delivery_template_path_file")
+        self.yaml_cred_path = self.config["mail_sender"].get("yaml_cred_path")
+        
+        if not self.config:
+            raise ValueError("Configuration not loaded correctly.")
 
     def get_invalid_count(self):
         invalid_count = 0
@@ -66,13 +71,12 @@ class EmailSender:
         institution_name = institution_info["institution_name"]
         email_receiver = institution_info["email_receiver"]
 
-        template_path = self.config["mail_sender"]["delivery_template_path_file"]
-        if not os.path.exists(template_path):
-            print(f"Error: The template file could not be found in path {template_path}.")
+        if not os.path.exists(self.template_path):
+            print(f"Error: The template file could not be found in path {self.template_path}.")
             return None, None
 
-        env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
-        template = env.get_template(os.path.basename(template_path))
+        env = Environment(loader=FileSystemLoader(os.path.dirname(self.template_path)))
+        template = env.get_template(os.path.basename(self.template_path))
 
         email_template = template.render(
             submitting_institution=institution_name,
@@ -83,12 +87,7 @@ class EmailSender:
         return email_template, email_receiver
 
     def send_email(self, receiver_email, subject, body, attachments):
-        """
-        Send an email using the YAML credentials and JSON configuration.
-        """
-        yaml_cred_path = self.config["mail_sender"]["yaml_cred_path"]
-        credentials = relecov_tools.utils.read_yml_file(yaml_cred_path)
-
+        credentials = relecov_tools.utils.read_yml_file(self.yaml_cred_path)
         if not credentials:
             print("No credentials found.")
             return
@@ -100,35 +99,26 @@ class EmailSender:
             print("The e-mail password could not be found.")
             return
 
+        msg = MIMEMultipart()
+        msg["From"] = sender_email
+        msg["To"] = receiver_email
+        msg["Subject"] = subject
+        msg.attach(MIMEText(body, "plain"))
+
+        for attachment in attachments:
+            with open(attachment, "rb") as attachment_file:
+                part = MIMEBase("application", "octet-stream")
+                part.set_payload(attachment_file.read())
+                encoders.encode_base64(part)
+                part.add_header("Content-Disposition", f"attachment; filename={os.path.basename(attachment)}")
+                msg.attach(part)
+
         try:
-            msg = MIMEMultipart()
-            msg["From"] = sender_email
-            msg["To"] = receiver_email
-            msg["Subject"] = subject
-
-            msg.attach(MIMEText(body, "plain"))
-
-            for attachment in attachments:
-                with open(attachment, "rb") as attachment_file:
-                    part = MIMEBase("application", "octet-stream")
-                    part.set_payload(attachment_file.read())
-                    encoders.encode_base64(part)
-                    part.add_header(
-                        "Content-Disposition",
-                        f"attachment; filename={os.path.basename(attachment)}",
-                    )
-                    msg.attach(part)
-
-            # Configurar el servidor SMTP
-            server = smtplib.SMTP(
-                self.config["mail_sender"]["email_host"],
-                self.config["mail_sender"]["email_port"],
-            )
+            server = smtplib.SMTP(self.config["mail_sender"]["email_host"], self.config["mail_sender"]["email_port"])
             server.starttls()
             server.login(sender_email, email_password)
             server.sendmail(sender_email, receiver_email, msg.as_string())
             server.quit()
-
             print("Mail sent successfully.")
-        except Exception as e:
+        except smtplib.SMTPException as e:
             log.error(f"Error sending the mail: {e}")
