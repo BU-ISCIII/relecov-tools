@@ -244,10 +244,6 @@ def validate(json_file, json_schema, metadata, out_folder):
     validation.validate()
 
 
-import click
-import relecov_tools.mail
-
-
 # send-email
 @relecov_tools_cli.command(help_priority=4)
 @click.option(
@@ -300,20 +296,19 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     )
 
     if email_body is None:
-        print("Error: Could not generate mail.")
-        return
+        raise RuntimeError("Error: Could not generate mail.")
 
     final_receiver_email = (
         receiver_email if receiver_email else email_receiver_from_json
     )
 
     if not final_receiver_email:
-        print("Error: Could not obtain the recipient's email address.")
-        return
+        raise ValueError("Error: Could not obtain the recipient's email address.")
 
     subject = f"Informe de Validación de Muestras - {email_receiver_from_json}"
 
     email_sender.send_email(final_receiver_email, subject, email_body, attachments)
+
 
 
 # mapping to ENA schema

@@ -19,8 +19,8 @@ class EmailSender:
         self.validate_file = validate_file
         self.config = config
         self.validate_data = relecov_tools.utils.read_json_file(validate_file)
-        self.template_path = self.config["mail_sender"].get("delivery_template_path_file")
-        self.yaml_cred_path = self.config["mail_sender"].get("yaml_cred_path")
+        self.template_path = self.config.get("delivery_template_path_file")
+        self.yaml_cred_path = self.config.get("yaml_cred_path")
         
         if not self.config:
             raise ValueError("Configuration not loaded correctly.")
@@ -49,7 +49,7 @@ class EmailSender:
         """
         Load the institution's information from the JSON file.
         """
-        institutions_file = self.config["mail_sender"].get(
+        institutions_file = self.config.get(
             "institutions_guide_path", "institutions_guide.json"
         )
         institutions_data = relecov_tools.utils.read_json_file(institutions_file)
@@ -90,7 +90,7 @@ class EmailSender:
             print("No credentials found.")
             return
 
-        sender_email = self.config["mail_sender"]["email_host_user"]
+        sender_email = self.config["email_host_user"]
         email_password = credentials.get("email_password")
 
         if not email_password:
@@ -112,7 +112,7 @@ class EmailSender:
                 msg.attach(part)
 
         try:
-            server = smtplib.SMTP(self.config["mail_sender"]["email_host"], self.config["mail_sender"]["email_port"])
+            server = smtplib.SMTP(self.config["email_host"], self.config["email_port"])
             server.starttls()
             server.login(sender_email, email_password)
             server.sendmail(sender_email, receiver_email, msg.as_string())
