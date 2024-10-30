@@ -31,7 +31,7 @@ class EmailSender:
                             if "valid" in sample_value and not sample_value["valid"]:
                                 invalid_count += 1
             return invalid_count
-        except Exception as e:
+        except (json.JSONDecodeError, PermissionError) as e:
             print(f"Error reading the validation file: {e}")
             return None
 
