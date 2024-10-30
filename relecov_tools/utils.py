@@ -188,6 +188,7 @@ def read_fasta_return_SeqIO_instance(file_name):
 
 def read_yml_file(file_name):
     """Read yml file"""
+    file_name = os.path.expanduser(file_name)
     with open(file_name, "r") as fh:
         try:
             return yaml.safe_load(fh)
