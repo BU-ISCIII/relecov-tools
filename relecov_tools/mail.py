@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from jinja2 import Environment, FileSystemLoader
-from relecov_tools.utils import read_json_file
+import relecov_tools.utils
 
 log = logging.getLogger(__name__)
 
@@ -17,23 +17,6 @@ class EmailSender:
     def __init__(self, validate_file, config):
         self.validate_file = validate_file
         self.config = config
-
-    @staticmethod
-    def load_credentials(yaml_path):
-        """
-        Load the credentials from the YAML file.
-        """
-        try:
-            yaml_path = os.path.expanduser(yaml_path)
-            with open(yaml_path, "r") as yaml_file:
-                credentials = yaml.safe_load(yaml_file)
-                return credentials
-        except FileNotFoundError:
-            print(f"YAML file {yaml_path} not found.")
-            return None
-        except yaml.YAMLError as e:
-            print(f"Error reading YAML file: {e}")
-            return None
 
     def get_invalid_count(self):
         invalid_count = 0
@@ -121,7 +104,7 @@ class EmailSender:
         Send an email using the YAML credentials and JSON configuration.
         """
         yaml_cred_path = self.config["mail_sender"]["yaml_cred_path"]
-        credentials = self.load_credentials(yaml_cred_path)
+        credentials = relecov_tools.utils.read_yml_file(yaml_cred_path)
 
         if not credentials:
             print("No credentials found.")
