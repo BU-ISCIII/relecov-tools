@@ -5,6 +5,7 @@ import json
 
 # from rich.prompt import Confirm
 import click
+import relecov_tools.config_json
 import relecov_tools.download_manager
 import relecov_tools.log_summary
 import rich.console
@@ -279,12 +280,11 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     """
     Send a sample validation report by mail.
     """
-    config_path = "./relecov_tools/conf/configuration.json"
-    config = relecov_tools.utils.read_json_file(config_path)
+    config_loader = relecov_tools.config_json.ConfigJson()
+    config = config_loader.get_configuration("mail_sender")
 
     if not config:
-        print("Error: The configuration could not be loaded.")
-        return
+        raise ValueError("Error: The configuration for 'mail_sender' could not be loaded.")
 
     email_sender = relecov_tools.mail.EmailSender(validate_file, config)
 

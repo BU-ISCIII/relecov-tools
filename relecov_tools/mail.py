@@ -24,11 +24,16 @@ class EmailSender:
         
         if not self.config:
             raise ValueError("Configuration not loaded correctly.")
-
+        
+        if not self.validate_data:
+            raise ValueError("Validation data is not available.")
+        
+        if not os.path.exists(self.template_path):
+            raise FileNotFoundError(f"The template file could not be found in path {self.template_path}.")
+        
     def get_invalid_count(self):
         invalid_count = 0
-        if not self.validate_data:
-            return None
+
 
         for entry_key, entry_value in self.validate_data.items():
             if "samples" in entry_value:
@@ -56,9 +61,6 @@ class EmailSender:
             return None
 
     def render_email_template(self, additional_info=""):
-        if not self.validate_data:
-            print("Error: Validation data is not available.")
-            return None, None
 
         submitting_institution_code = list(self.validate_data.keys())[0]
         invalid_count = self.get_invalid_count()
@@ -70,10 +72,6 @@ class EmailSender:
 
         institution_name = institution_info["institution_name"]
         email_receiver = institution_info["email_receiver"]
-
-        if not os.path.exists(self.template_path):
-            print(f"Error: The template file could not be found in path {self.template_path}.")
-            return None, None
 
         env = Environment(loader=FileSystemLoader(os.path.dirname(self.template_path)))
         template = env.get_template(os.path.basename(self.template_path))
