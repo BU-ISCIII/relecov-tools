@@ -3,12 +3,13 @@ import json
 import logging
 import os
 import smtplib
+import relecov_tools.utils
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from jinja2 import Environment, FileSystemLoader
-import relecov_tools.utils
+
 
 log = logging.getLogger(__name__)
 
@@ -17,23 +18,20 @@ class EmailSender:
     def __init__(self, validate_file, config):
         self.validate_file = validate_file
         self.config = config
+        self.validate_data = relecov_tools.utils.read_json_file(validate_file)
 
     def get_invalid_count(self):
         invalid_count = 0
-        try:
-            with open(self.validate_file, "r") as f:
-                validate_data = json.load(f)
-
-                for entry_key, entry_value in validate_data.items():
-                    if "samples" in entry_value:
-                        samples = entry_value["samples"]
-                        for sample_key, sample_value in samples.items():
-                            if "valid" in sample_value and not sample_value["valid"]:
-                                invalid_count += 1
-            return invalid_count
-        except (json.JSONDecodeError, PermissionError) as e:
-            print(f"Error reading the validation file: {e}")
+        if not self.validate_data:
             return None
+
+        for entry_key, entry_value in self.validate_data.items():
+            if "samples" in entry_value:
+                samples = entry_value["samples"]
+                for sample_key, sample_value in samples.items():
+                    if "valid" in sample_value and not sample_value["valid"]:
+                        invalid_count += 1
+        return invalid_count
 
     def get_institution_info(
         self, institution_code, institutions_file="institutions.json"
@@ -58,46 +56,36 @@ class EmailSender:
             return None
 
     def render_email_template(self, additional_info=""):
-        try:
-            with open(self.validate_file, "r") as validate_file:
-                validate_data = json.load(validate_file)
-
-            submitting_institution_code = list(validate_data.keys())[0]
-            invalid_count = self.get_invalid_count()
-
-            institution_info = self.get_institution_info(submitting_institution_code)
-
-            if not institution_info:
-                print(
-                    "Error: The information could not be obtained from the institution."
-                )
-                return None, None
-
-            institution_name = institution_info["institution_name"]
-            email_receiver = institution_info["email_receiver"]
-
-            # Obtener la ruta de la plantilla desde la configuración
-            template_path = self.config["mail_sender"]["delivery_template_path_file"]
-
-            if not os.path.exists(template_path):
-                print(
-                    f"Error: The template file could not be found in path {template_path}."
-                )
-                return None, None
-
-            env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
-            template = env.get_template(os.path.basename(template_path))
-
-            email_template = template.render(
-                submitting_institution=institution_name,
-                invalid_count=invalid_count,
-                additional_info=additional_info,
-            )
-
-            return email_template, email_receiver
-        except Exception as e:
-            print(f"Error rendering email template: {e}")
+        if not self.validate_data:
+            print("Error: Validation data is not available.")
             return None, None
+
+        submitting_institution_code = list(self.validate_data.keys())[0]
+        invalid_count = self.get_invalid_count()
+
+        institution_info = self.get_institution_info(submitting_institution_code)
+        if not institution_info:
+            print("Error: The information could not be obtained from the institution.")
+            return None, None
+
+        institution_name = institution_info["institution_name"]
+        email_receiver = institution_info["email_receiver"]
+
+        template_path = self.config["mail_sender"]["delivery_template_path_file"]
+        if not os.path.exists(template_path):
+            print(f"Error: The template file could not be found in path {template_path}.")
+            return None, None
+
+        env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
+        template = env.get_template(os.path.basename(template_path))
+
+        email_template = template.render(
+            submitting_institution=institution_name,
+            invalid_count=invalid_count,
+            additional_info=additional_info,
+        )
+
+        return email_template, email_receiver
 
     def send_email(self, receiver_email, subject, body, attachments):
         """
