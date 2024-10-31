@@ -68,18 +68,26 @@ class PipelineManager:
         except KeyError:
             log.error("Invalid pipeline config file %s ", pipeline_conf_file)
             stderr.print("[red] Invalid pipeline config file " + pipeline_conf_file)
-        if (
-            "analysis_user" not in config_data
-            or "analysis_group" not in config_data
-            or "analysis_folder" not in config_data
-            or "sample_stored_folder" not in config_data
-            or "sample_link_folder" not in config_data
-            or "doc_folder" not in config_data
-        ):
-            log.error("Invalid pipeline config file %s ", pipeline_conf_file)
-            stderr.print("[red] Invalid pipeline config file " + pipeline_conf_file)
+        required_conf = [
+            "analysis_user",
+            "analysis_group",
+            "analysis_folder",
+            "sample_stored_folder",
+            "sample_link_folder",
+            "doc_folder",
+        ]
+        missing_conf = [k for k in required_conf if k not in config_data]
+        if missing_conf:
+            log.error("Invalid pipeline config file. Missing %s", missing_conf)
+            stderr.print(f"[red]Invalid pipeline config file. Missing {missing_conf}")
             sys.exit(1)
-        self.config_fata = config_data
+        if "group_by_fields" in config_data:
+            logtxt = "Data will be grouped by the following fields: %s"
+            log.info(logtxt % str(config_data["group_by_fields"]))
+            self.keys_to_split = config_data["group_by_fields"]
+        else:
+            log.warning("No group_by_fields found in config, Data won't be grouped")
+            self.keys_to_split = []
         if output_folder is None:
             output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
