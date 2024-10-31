@@ -304,7 +304,7 @@ class PipelineManager:
             split data.
 
         Returns:
-
+            list_of_jsons_by_key (list(list(dict))): List of JSONs. One for each group
         """
         if not keylist:
             return [json_data]
