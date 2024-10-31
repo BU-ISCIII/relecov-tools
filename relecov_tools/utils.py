@@ -121,7 +121,7 @@ def string_to_date(string):
         res_date = datetime.strptime(matchdate, datepattern)
         return res_date
 
-    seps = ["", " ", "/", "-"]
+    seps = ["", " ", "/", "-", "_"]
     digits_list = [x for x in range(4, 16, 2)]
     combinations = sorted(product(digits_list, seps), reverse=True)
     for digits, sep in combinations:
