@@ -249,6 +249,7 @@ def validate(json_file, json_schema, metadata, out_folder):
 @click.option(
     "-v",
     "--validate-file",
+    required = True,
     type=click.Path(exists=True),
     help="Path to the validation file (validate.json)",
 )
@@ -282,8 +283,14 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     if not config:
         raise ValueError(
             "Error: The configuration for 'mail_sender' could not be loaded.")
+    
+    validate_data = relecov_tools.utils.read_json_file(validate_file)
+    
+    if not validate_data:
+        raise ValueError(
+                    "Error: Validation data could not be loaded.")
 
-    email_sender = relecov_tools.mail.EmailSender(validate_file, config)
+    email_sender = relecov_tools.mail.EmailSender(config)
 
     add_info = click.confirm(
         "Would you like to add additional information in the mail?", default=False

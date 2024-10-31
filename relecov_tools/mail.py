@@ -1,5 +1,3 @@
-import yaml
-import json
 import logging
 import os
 import smtplib
@@ -15,18 +13,13 @@ log = logging.getLogger(__name__)
 
 
 class EmailSender:
-    def __init__(self, validate_file, config):
-        self.validate_file = validate_file
+    def __init__(self, config):
         self.config = config
-        self.validate_data = relecov_tools.utils.read_json_file(validate_file)
         self.template_path = self.config.get("delivery_template_path_file")
         self.yaml_cred_path = self.config.get("yaml_cred_path")
 
         if not self.config:
             raise ValueError("Configuration not loaded correctly.")
-
-        if not self.validate_data:
-            raise ValueError("Validation data is not available.")
 
         if not os.path.exists(self.template_path):
             raise FileNotFoundError(
@@ -60,7 +53,7 @@ class EmailSender:
             print(f"No information found for code {institution_code}")
             return None
 
-    def render_email_template(self, additional_info=""):
+    def render_email_template(self, additional_info="", validate_data=None):
 
         submitting_institution_code = list(self.validate_data.keys())[0]
         invalid_count = self.get_invalid_count()
