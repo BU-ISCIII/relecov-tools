@@ -5,7 +5,6 @@ import os
 import re
 import shutil
 import sys
-import datetime
 from collections import Counter
 
 import rich.console
@@ -174,7 +173,7 @@ class PipelineManager:
                     [f for f in lab_subfolders if os.path.basename(f) in folder_list]
                 )
             if not folders_to_process:
-                raise FileNotFoundError(f"No folders found with the given names")
+                raise FileNotFoundError("No folders found with the given names")
             last_folder = sorted(folder_list)[-1]
             try:
                 latest_date = relecov_tools.utils.string_to_date(last_folder)
@@ -184,7 +183,7 @@ class PipelineManager:
                     [relecov_tools.utils.get_file_date(f) for f in folders_to_process]
                 )
         else:
-            folders_to_process, latest_date = get_latest_lab_folders(initial_date)
+            folders_to_process, latest_date = self.get_latest_lab_folders(initial_date)
         join_validate = list()
         for folder in folders_to_process:
             lab_code = folder.split("/")[-2]
