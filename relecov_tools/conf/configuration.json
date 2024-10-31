@@ -438,6 +438,12 @@
         "doc_folder": "DOC",
         "analysis_folder": "ANALYSIS",
         "sample_stored_folder": "RAW",
-        "sample_link_folder": "00-reads"
+        "sample_link_folder": "00-reads",
+        "group_by_fields": [
+            "organism",
+            "sequencing_instrument_platform",
+            "enrichment_panel",
+            "enrichment_panel_version"
+        ]
     }
 }
