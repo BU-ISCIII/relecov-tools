@@ -108,88 +108,105 @@ class PipelineManager:
         self.linked_sample_folder = config_data["sample_link_folder"]
         self.doc_folder = config_data["doc_folder"]
 
-    def join_valid_items(self):
+    def get_latest_lab_folders(self, initial_date):
+        """Get latest folder with the newest date
+        Args:
+            initial_date(datetime.date()): Starting date to search for
+        Returns:
+            lab_latest_folders: list of paths with the latest folders
+            latest_date: latest date in the folders
+        """
+        lab_folders = [f.path for f in os.scandir(self.input_folder) if f.is_dir()]
+        lab_latest_folders = {}
+        latest_date = initial_date
+        for lab_folder in lab_folders:
+            existing_upload_folders = False
+            last_folder_date = initial_date
+            scan_folder = os.path.join(self.input_folder, lab_folder)
+            lab_sub_folders = [f.path for f in os.scandir(scan_folder) if f.is_dir()]
+            for lab_sub_folder in lab_sub_folders:
+                f_name = os.path.basename(lab_sub_folder)
+                sub_f_date = relecov_tools.utils.string_to_date(f_name)
+                if not sub_f_date:
+                    continue
+                if sub_f_date.date() > last_folder_date:
+                    last_folder_date = sub_f_date.date()
+                    latest_folder_name = lab_sub_folder
+                    existing_upload_folders = True
+            if existing_upload_folders:
+                lab_latest_folders[lab_folder] = {
+                    "path": latest_folder_name,
+                    "date": last_folder_date,
+                }
+                if last_folder_date > latest_date:
+                    latest_date = last_folder_date
+        # keep only folders with the latest date to process
+        lab_latest_folders = [
+            d["path"] for d in lab_latest_folders.values() if d["date"] == latest_date
+        ]
+        log.info("Latest date to process is %s", latest_date)
+        stderr.print("[blue] Collecting samples from date ", latest_date)
+        return lab_latest_folders, latest_date
+
+    def join_valid_items(self, input_folder, folder_list=[], initial_date="20220101"):
         """Join validated metadata for the latest batches downloaded into a single one
 
         Args:
+            input_folder (str): Folder to start the searching process.
+            initial_date (str): Only search for folders newer than this date.
+            folder_list (list(str)): Only retrieve folders with these basenames. Defaults to list()
 
         Returns:
             join_validate (list(dict)): List of dictionaries containing all the samples
             found in each validated_lab_metadata.json form the scanned folders
             latest_date (str): Latest batch date found in the scanned folder
         """
-
-        def get_latest_lab_folder(self):
-            """Get latest folder with the newest date
-
-            Args:
-
-            Returns:
-                lab_latest_folders: list of paths with the latest folders
-                latest_date: latest date in the folders
-
-            """
+        if folder_list:
+            folders_to_process = []
+            # TODO: Change this for os.walk but with multithreading because its too slow
             lab_folders = [f.path for f in os.scandir(self.input_folder) if f.is_dir()]
-            lab_latest_folders = {}
-            latest_date = datetime.datetime.strptime("20220101", "%Y%m%d").date()
             for lab_folder in lab_folders:
-                existing_upload_folders = False
-                last_folder_date = datetime.datetime.strptime(
-                    "20220101", "%Y%m%d"
-                ).date()
-                scan_folder = os.path.join(self.input_folder, lab_folder)
-                lab_sub_folders = [
-                    f.path for f in os.scandir(scan_folder) if f.is_dir()
+                full_path = os.path.join(input_folder, lab_folder)
+                lab_subfolders = [
+                    f.path for f in os.scandir(full_path) if f.path if f.is_dir()
                 ]
-                for lab_sub_folder in lab_sub_folders:
-                    f_name = os.path.basename(lab_sub_folder)
-                    f_date_match = re.match(r"(^\d{8}).*", f_name)
-                    if not f_date_match:
-                        continue
-                    f_date = f_date_match.group(1)
-                    try:
-                        sub_f_date = datetime.datetime.strptime(f_date, "%Y%m%d").date()
-                    except ValueError:
-                        continue
-                    if sub_f_date > last_folder_date:
-                        last_folder_date = sub_f_date
-                        latest_folder_name = lab_sub_folder
-                        existing_upload_folders = True
-                if existing_upload_folders:
-                    lab_latest_folders[lab_folder] = {
-                        "path": latest_folder_name,
-                        "date": last_folder_date,
-                    }
-                    if last_folder_date > latest_date:
-                        latest_date = last_folder_date
-            log.info("Latest date to process is %s", latest_date)
-            stderr.print("[blue] Collecting samples from ", latest_date)
-            return lab_latest_folders, latest_date
-
-        upload_lab_folders, latest_date = get_latest_lab_folder(self)
+                folders_to_process.extend(
+                    [f for f in lab_subfolders if os.path.basename(f) in folder_list]
+                )
+            if not folders_to_process:
+                raise FileNotFoundError(f"No folders found with the given names")
+            last_folder = sorted(folder_list)[-1]
+            try:
+                latest_date = relecov_tools.utils.string_to_date(last_folder)
+            except ValueError:
+                log.error("Failed to get date from folder names. Using last mod date")
+                latest_date = max(
+                    [relecov_tools.utils.get_file_date(f) for f in folders_to_process]
+                )
+        else:
+            folders_to_process, latest_date = get_latest_lab_folders(initial_date)
         join_validate = list()
-        for lab, data_folder in upload_lab_folders.items():
-            lab_code = lab.split("/")[-1]
-            log.info("Collecting samples for  %s", lab_code)
-            stderr.print("[blue] Collecting samples for ", lab_code)
-            # check if laboratory folder is the latest date to process
-            if data_folder["date"] != latest_date:
-                continue
+        for folder in folders_to_process:
+            lab_code = folder.split("/")[-2]
+            log.info("Collecting samples for %s", str(lab_code))
+            stderr.print(f"[blue] Collecting samples for {lab_code}")
             # fetch the validate file and get sample id and r1 and r2 file path
             validate_files = [
-                os.path.join(data_folder["path"], f)
-                for f in os.listdir(data_folder["path"])
+                os.path.join(folder, f)
+                for f in os.listdir(folder)
                 if f.startswith("validated_lab_metadata") and f.endswith(".json")
             ]
             if not validate_files:
+                log.error(f"No validated json file found for {folder}. Skipped")
                 continue
-            for validate_file in validate_files:
-                validate_file_path = os.path.join(data_folder["path"], validate_file)
-                with open(validate_file_path) as fh:
-                    data = json.load(fh)
-                join_validate.extend(data)
+            elif len(validate_files) > 1:
+                log.error("Found multiple validated files in %s. Skipped" % folder)
+                continue
+            with open(validate_files[0]) as fh:
+                data = json.load(fh)
+            join_validate.extend(data)
         log.info("Found a total of %s samples", str(len(join_validate)))
-        stderr.print(f"Found a total of {len(join_validate)} samples")
+        stderr.print(f"[blue]Found a total of {len(join_validate)} samples")
         return join_validate, latest_date
 
     def copy_process(self, samples_data, output_folder):
@@ -335,21 +352,31 @@ class PipelineManager:
 
         """
         # collect json with all validated samples
-        join_validate, latest_date = self.join_valid_items()
+        init_date = datetime.datetime.strptime("20220101", "%Y%m%d").date()
+        join_validate, latest_date = self.join_valid_items(
+            input_folder=self.input_folder,
+            initial_date=init_date,
+            folder_list=self.folder_list,
+        )
         latest_date = str(latest_date).replace("-", "")
         if len(join_validate) == 0:
             stderr.print("[yellow]No samples were found. Aborting")
             sys.exit(0)
-        keys_to_split = ["enrichment_panel", "enrichment_panel_version"]
-        stderr.print(f"[blue]Splitting samples based on {keys_to_split}...")
-        json_split_by_panel = self.split_data_by_key(join_validate, keys_to_split)
-        stderr.print(f"[blue]Data splitted into {len(json_split_by_panel)} groups")
+        if self.keys_to_split:
+            stderr.print(f"[blue]Splitting samples based on {self.keys_to_split}...")
+            splitted_json = self.split_data_by_key(join_validate, self.keys_to_split)
+            stderr.print(f"[blue]Data splitted into {len(splitted_json)} groups")
+        else:
+            splitted_json = [join_validate]
         # iterate over the sample_data to copy the fastq files in the output folder
         global_samp_errors = {}
-        for idx, list_of_samples in enumerate(json_split_by_panel, start=1):
-            group_tag = f"{latest_date}_PANEL{idx:02d}"
+        for idx, list_of_samples in enumerate(splitted_json, start=1):
+            group_tag = f"{latest_date}_GROUP{idx:02d}"
             log.info("Processing group %s", group_tag)
-            stderr.print(f"[blue]Processing group {group_tag}...")
+            fields = {
+                k: v for k, v in list_of_samples[0].items() if k in self.keys_to_split
+            }
+            stderr.print(f"[blue]Processing group {group_tag} with fields: {fields}...")
             group_outfolder = os.path.join(
                 self.output_folder, self.out_folder_namevar % group_tag
             )
