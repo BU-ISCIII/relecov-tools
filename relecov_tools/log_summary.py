@@ -308,3 +308,26 @@ class LogSum:
                 log.error("Error exporting logs to file: %s", str(e))
                 f.write(str(final_logs))
         return
+    
+    @staticmethod
+    def get_invalid_count(validation_logs):
+        """
+        Counts the number of invalid samples in the logs data by checking the `valid` field.
+        
+        Args:
+            validation_logs (dict): Dictionary containing the validation logs.
+    
+        Returns:
+            dict: Dictionary with entry_key as keys and counts of invalid samples as values.
+        """
+        invalid_counts = {}
+        for entry_key, entry_value in validation_logs.items():
+            if "samples" in entry_value:
+                samples = entry_value["samples"]
+                for sample_key, sample_value in samples.items():
+                    if "valid" in sample_value and not sample_value["valid"]:
+                        if invalid_counts.get(entry_key):
+                            invalid_counts[entry_key] += 1
+                        else:
+                            invalid_counts[entry_key] = 1
+        return invalid_counts

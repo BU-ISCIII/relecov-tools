@@ -25,17 +25,6 @@ class EmailSender:
             raise FileNotFoundError(
                 f"The template file could not be found in path {self.template_path}.")
 
-    def get_invalid_count(self):
-        invalid_count = 0
-
-        for entry_key, entry_value in self.validate_data.items():
-            if "samples" in entry_value:
-                samples = entry_value["samples"]
-                for sample_key, sample_value in samples.items():
-                    if "valid" in sample_value and not sample_value["valid"]:
-                        invalid_count += 1
-        return invalid_count
-
     def get_institution_info(
         self, institution_code, institutions_file="institutions.json"
     ):
@@ -53,11 +42,10 @@ class EmailSender:
             print(f"No information found for code {institution_code}")
             return None
 
-    def render_email_template(self, additional_info="", validate_data=None):
-
-        submitting_institution_code = list(self.validate_data.keys())[0]
-        invalid_count = self.get_invalid_count()
-
+    def render_email_template(self, additional_info="",
+                              invalid_count= None,
+                              submitting_institution_code=None):
+        
         institution_info = self.get_institution_info(submitting_institution_code)
         if not institution_info:
             print("Error: The information could not be obtained from the institution.")
@@ -75,7 +63,7 @@ class EmailSender:
             additional_info=additional_info,
         )
 
-        return email_template, email_receiver
+        return email_template, email_receiver, institution_name
 
     def send_email(self, receiver_email, subject, body, attachments):
         credentials = relecov_tools.utils.read_yml_file(self.yaml_cred_path)

@@ -289,6 +289,10 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     if not validate_data:
         raise ValueError(
                     "Error: Validation data could not be loaded.")
+    
+    submitting_institution_code = list(validate_data.keys())[0]
+    
+    invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
 
     email_sender = relecov_tools.mail.EmailSender(config)
 
@@ -299,8 +303,10 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     if add_info:
         additional_info = click.prompt("Enter additional information")
 
-    email_body, email_receiver_from_json = email_sender.render_email_template(
-        additional_info
+    email_body, email_receiver_from_json, institution_name = email_sender.render_email_template(
+        additional_info,
+        invalid_count=invalid_count,
+        submitting_institution_code = submitting_institution_code
     )
 
     if email_body is None:
@@ -313,7 +319,7 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     if not final_receiver_email:
         raise ValueError("Error: Could not obtain the recipient's email address.")
 
-    subject = f"Informe de Validación de Muestras - {email_receiver_from_json}"
+    subject = f"Informe de Validación de Muestras - {institution_name}"
 
     email_sender.send_email(final_receiver_email, subject, email_body, attachments)
 
