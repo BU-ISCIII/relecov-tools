@@ -369,15 +369,11 @@ class PipelineManager:
                 sample_id for sample_id, count in id_counts.items() if count > 1
             ]
             if duplicates:
-                log.error(
-                    "There are duplicated samples in group %s: %s"
-                    % ({group_tag}, {duplicates})
-                )
+                log.error("Duplicate samples in group %s: %s" % (group_tag, duplicates))
                 stderr.print(
                     f"[red] There are duplicated samples in group {group_tag}: {duplicates}. Please handle manually"
                 )
                 continue
-
             samp_errors = self.copy_process(samples_data, group_outfolder)
             if len(samp_errors) > 0:
                 stderr.print(
@@ -391,9 +387,9 @@ class PipelineManager:
                     continue
             global_samp_errors[group_tag] = samp_errors
             samples_copied = len(list_of_samples) - len(samp_errors)
-            stderr.print(
-                f"[green]Group {group_tag}: {samples_copied} samples copied out of {len(list_of_samples)}"
-            )
+            copied_samps_log = f"Group {group_tag}: {samples_copied} samples copied out of {len(list_of_samples)}"
+            log.info(copied_samps_log)
+            stderr.print(copied_samps_log)
             final_valid_samples = [
                 x
                 for x in list_of_samples
@@ -401,28 +397,31 @@ class PipelineManager:
             ]
             sample_ids = [i for i in sample_ids if i not in samp_errors]
             group_analysis_folder = os.path.join(group_outfolder, self.analysis_folder)
+            group_doc_folder = os.path.join(group_outfolder, self.doc_folder)
             # print samples_id file
             stderr.print(
-                f"[blue]Generating sample_id.txt file in {group_analysis_folder}"
+                f"[blue]Generating sample_id.txt file in {group_analysis_folder}..."
             )
             with open(os.path.join(group_analysis_folder, "samples_id.txt"), "w") as f:
                 for sample_id in sample_ids:
                     f.write(f"{sample_id}\n")
+            group_info = os.path.join(group_doc_folder, "group_fields.json")
+            relecov_tools.utils.write_json_fo_file(fields, group_info)
+            log.info(f"Group fields info saved in {group_info}")
+
             json_filename = os.path.join(
-                group_outfolder,
-                self.doc_folder,
-                f"{group_tag}_validate_batch.json",
+                group_doc_folder, f"{group_tag}_validate_batch.json"
             )
             relecov_tools.utils.write_json_fo_file(final_valid_samples, json_filename)
-            log.info("[blue]Successfully created pipeline folder. Ready to launch")
-            stderr.print(
-                f"[blue]Successfully created folder for {group_tag}. Ready to launch"
-            )
+            log.info("Successfully created pipeline folder. Ready to launch")
+            stderr.print(f"[blue]Folder {group_outfolder} finished. Ready to launch")
+        error_ocurred = False
         for group, samples in global_samp_errors.items():
             if not samples:
                 continue
             log.error("Group %s received error for samples: %s" % (group, samples))
-        if not any(v for v in global_samp_errors.values()):
+            error_ocurred = True
+        if not error_ocurred:
             stderr.print("[green]All samples were copied successfully!!")
         log.info("Finished execution")
         stderr.print("Finished execution")
