@@ -26,6 +26,7 @@ class PipelineManager:
         template=None,
         output_folder=None,
         pipeline_conf_file=None,
+        folder_list=None,
     ):
         self.current_date = datetime.date.today().strftime("%Y%m%d")
         if input_folder is None:
@@ -89,8 +90,8 @@ class PipelineManager:
             log.error("Unable to create output folder %s ", e)
             stderr.print("[red] Unable to create output folder ", e)
             sys.exit(1)
+        self.folder_list = folder_list
         # Update the output folder with the current date and analysis name
-
         self.output_folder = output_folder
         self.out_folder_namevar = f"{self.current_date}_{config_data['analysis_group']}_%s_{config_data['analysis_user']}"
         self.analysis_folder = config_data["analysis_folder"]

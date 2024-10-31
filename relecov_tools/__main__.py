@@ -484,13 +484,20 @@ def metadata_homogeneizer(institution, directory, output):
     help="select the template config file",
 )
 @click.option("-o", "--output", type=click.Path(), help="select output folder")
-def pipeline_manager(input, template, output, config):
+@click.option(
+    "-l",
+    "--folder_names",
+    multiple=True,
+    default=None,
+    help="Folders to process. Target folders names should match the given dates",
+)
+def pipeline_manager(input, template, output, config, folder_names):
     """
     Create the symbolic links for the samples which are validated to prepare for
     bioinformatics pipeline execution.
     """
     new_launch = relecov_tools.pipeline_manager.PipelineManager(
-        input, template, output, config
+        input, template, output, config, folder_names
     )
     new_launch.pipeline_exc()
 
