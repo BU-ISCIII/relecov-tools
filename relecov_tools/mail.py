@@ -23,7 +23,8 @@ class EmailSender:
 
         if not os.path.exists(self.template_path):
             raise FileNotFoundError(
-                f"The template file could not be found in path {self.template_path}.")
+                f"The template file could not be found in path {self.template_path}."
+            )
 
     def get_institution_info(
         self, institution_code, institutions_file="institutions.json"
@@ -42,10 +43,10 @@ class EmailSender:
             print(f"No information found for code {institution_code}")
             return None
 
-    def render_email_template(self, additional_info="",
-                              invalid_count= None,
-                              submitting_institution_code=None):
-        
+    def render_email_template(
+        self, additional_info="", invalid_count=None, submitting_institution_code=None
+    ):
+
         institution_info = self.get_institution_info(submitting_institution_code)
         if not institution_info:
             print("Error: The information could not be obtained from the institution.")
@@ -89,8 +90,10 @@ class EmailSender:
                 part = MIMEBase("application", "octet-stream")
                 part.set_payload(attachment_file.read())
                 encoders.encode_base64(part)
-                part.add_header("Content-Disposition",
-                                f"attachment; filename={os.path.basename(attachment)}")
+                part.add_header(
+                    "Content-Disposition",
+                    f"attachment; filename={os.path.basename(attachment)}",
+                )
                 msg.attach(part)
 
         try:

@@ -62,7 +62,7 @@ def run_relecov_tools():
         "[blue]   /   [grey39] |-[blue]-|   |   \ |___ |___ |___ |___ |___|    \/     ",
         highlight=False,
     )
-    
+
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
     __version__ = "1.2.0"
     stderr.print(
@@ -249,7 +249,7 @@ def validate(json_file, json_schema, metadata, out_folder):
 @click.option(
     "-v",
     "--validate-file",
-    required = True,
+    required=True,
     type=click.Path(exists=True),
     help="Path to the validation file (validate.json)",
 )
@@ -282,16 +282,16 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
 
     if not config:
         raise ValueError(
-            "Error: The configuration for 'mail_sender' could not be loaded.")
-    
+            "Error: The configuration for 'mail_sender' could not be loaded."
+        )
+
     validate_data = relecov_tools.utils.read_json_file(validate_file)
-    
+
     if not validate_data:
-        raise ValueError(
-                    "Error: Validation data could not be loaded.")
-    
+        raise ValueError("Error: Validation data could not be loaded.")
+
     submitting_institution_code = list(validate_data.keys())[0]
-    
+
     invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
 
     email_sender = relecov_tools.mail.EmailSender(config)
@@ -303,10 +303,12 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     if add_info:
         additional_info = click.prompt("Enter additional information")
 
-    email_body, email_receiver_from_json, institution_name = email_sender.render_email_template(
-        additional_info,
-        invalid_count=invalid_count,
-        submitting_institution_code = submitting_institution_code
+    email_body, email_receiver_from_json, institution_name = (
+        email_sender.render_email_template(
+            additional_info,
+            invalid_count=invalid_count,
+            submitting_institution_code=submitting_institution_code,
+        )
     )
 
     if email_body is None:
@@ -586,29 +588,32 @@ def pipeline_manager(input, template, output, config, folder_names):
 
 # schema builder
 @relecov_tools_cli.command(help_priority=14)
-@click.option("-i",
-              "--input_file",
-              type=click.Path(),
-              help="Path to the Excel document containing the database definition. This file must have a .xlsx extension.",
-              required=True,
-              )
-@click.option("-s",
-              "--schema_base",
-              type=click.Path(),
-              help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module. (Default: installed schema in 'relecov-tools/relecov_tools/schema/relecov_schema.json')",
-              required=False,
-              )
+@click.option(
+    "-i",
+    "--input_file",
+    type=click.Path(),
+    help="Path to the Excel document containing the database definition. This file must have a .xlsx extension.",
+    required=True,
+)
+@click.option(
+    "-s",
+    "--schema_base",
+    type=click.Path(),
+    help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module. (Default: installed schema in 'relecov-tools/relecov_tools/schema/relecov_schema.json')",
+    required=False,
+)
 @click.option(
     "-v",
     "--draft_version",
     type=click.STRING,
     help="Version of the JSON schema specification to be used. Example: '2020-12'. See: https://json-schema.org/specification-links",
 )
-@click.option("-d",
-              "--diff",
-              is_flag=True,
-              help="Prints a changelog/diff between the base and incoming versions of the schema.",
-              )
+@click.option(
+    "-d",
+    "--diff",
+    is_flag=True,
+    help="Prints a changelog/diff between the base and incoming versions of the schema.",
+)
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file/s")
 def build_schema(input_file, schema_base, draft_version, diff, out_dir):
     """Generates and updates JSON Schema files from Excel-based database definitions."""
@@ -633,12 +638,13 @@ def build_schema(input_file, schema_base, draft_version, diff, out_dir):
     help="Path to output folder where xlsx file is saved",
     required=False,
 )
-@click.option("-f",
-              "--files",
-              help="Paths to log_summary.json files to merge into xlsx file, called once per file",
-              required=True,
-              multiple=True,
-              )
+@click.option(
+    "-f",
+    "--files",
+    help="Paths to log_summary.json files to merge into xlsx file, called once per file",
+    required=True,
+    multiple=True,
+)
 def logs_to_excel(lab_code, output_folder, files):
     """Creates a merged xlsx report from all the log summary jsons given as input"""
     all_logs = []
