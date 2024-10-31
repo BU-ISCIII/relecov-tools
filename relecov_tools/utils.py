@@ -14,7 +14,7 @@ import yaml
 import gzip
 import re
 import shutil
-from itertools import islice
+from itertools import islice, product
 from Bio import SeqIO
 from rich.console import Console
 from datetime import datetime
@@ -95,36 +95,43 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
     return ws_data, heading_row
 
 
-def string_to_date(string, digits=8, sep=""):
-    """Convert date (Y-M-D...) from string to date format, extracting N number of digits
+def string_to_date(string):
+    """Convert date (Y-M-D...) from string to date. Tries iteratively with variable
+    number of digits and multiple separators, starting from seconds up to year.
     args:
         string (str): Date in string format to be parsed: e.g. 2020-08-07-12-00-00
-        sep (str): Separator for date. Defaults to ''
-        intnum (int): Number of digits in string to consider as date. Defaults to 8
-        e.g. If you use 8 in '2024-08-07-15-00-50' and sep='-' you will get up to day,
-        but you should use 14 if you want also hour, minutes and seconds.
     returns:
         res_date (datetime.datetime): String converted to date format
     """
-    if not isinstance(digits, int):
-        raise ValueError("digits arg to split date must be an even integer")
-    elif digits % 2 != 0:
-        raise ValueError("digits arg to split date must be an even integer")
-    regex = r"^\d{4}"  # The string should start from year
-    for _ in range(0, digits - 4, 2):
-        new_reg = sep + "\d{2}"  # Each date param occupies 2 digits (4 for year)
-        regex = regex + new_reg
-    match = re.match(regex, string)
-    if not match:
-        match = re.match(regex, string.replace(":", "-"))
+
+    def rec_date_extraction(string, digits, sep):
+        regex = r"^\d{4}"  # The string should start from year
+        for _ in range(0, digits - 4, 2):
+            new_reg = sep + "\d{2}"  # Each date param occupies 2 digits (4 for year)
+            regex = regex + new_reg
+        match = re.match(regex, string)
         if not match:
-            raise ValueError(f"Could not match date to given string: {string}")
-    matchdate = match.group(0)
-    # Getting the equivalent format from given digits
-    full_date = "%Y%m%d%H%M%S"[0 : digits - 2]
-    datepattern = f"{sep}%".join(full_date.split("%")).strip(sep)
-    res_date = datetime.strptime(matchdate, datepattern).date()
-    return res_date
+            match = re.match(regex, string.replace(":", sep))
+            if not match:
+                raise ValueError(f"Could not match date to given string: {string}")
+        matchdate = match.group(0)
+        # Getting the equivalent format from given digits
+        full_date = "%Y%m%d%H%M%S"[0 : digits - 2]
+        datepattern = f"{sep}%".join(full_date.split("%")).strip(sep)
+        res_date = datetime.strptime(matchdate, datepattern)
+        return res_date
+
+    seps = ["", " ", "/", "-"]
+    digits_list = [x for x in range(4, 16, 2)]
+    combinations = sorted(product(digits_list, seps), reverse=True)
+    for digits, sep in combinations:
+        try:
+            res_date = rec_date_extraction(string, digits, sep)
+        except ValueError:
+            continue
+        return res_date
+    else:
+        return None
 
 
 def excel_date_to_num(date):
