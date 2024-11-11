@@ -50,12 +50,16 @@ class EmailSender:
         institution_info = self.get_institution_info(submitting_institution_code)
         if not institution_info:
             raise ValueError("Error: Institution information could not be obtained.")
-        
+
         institution_name = institution_info["institution_name"]
-        
+
         template_vars_dict = {
             "submitting_institution": institution_name,
-            "invalid_count": invalid_count.get(submitting_institution_code, 0) if invalid_count else 0,
+            "invalid_count": (
+                invalid_count.get(submitting_institution_code, 0)
+                if invalid_count
+                else 0
+            ),
             "additional_info": additional_info,
         }
 

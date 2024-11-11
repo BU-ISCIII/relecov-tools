@@ -302,11 +302,11 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     additional_info = ""
     if add_info:
         additional_info = click.prompt("Enter additional information")
-    
+
     institution_info = email_sender.get_institution_info(submitting_institution_code)
     if not institution_info:
         raise ValueError("Error: Could not obtain institution information.")
-    
+
     institution_name = institution_info["institution_name"]
     email_receiver_from_json = institution_info["email_receiver"]
 
