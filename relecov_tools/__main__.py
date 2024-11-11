@@ -302,13 +302,18 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     additional_info = ""
     if add_info:
         additional_info = click.prompt("Enter additional information")
+    
+    institution_info = email_sender.get_institution_info(submitting_institution_code)
+    if not institution_info:
+        raise ValueError("Error: Could not obtain institution information.")
+    
+    institution_name = institution_info["institution_name"]
+    email_receiver_from_json = institution_info["email_receiver"]
 
-    email_body, email_receiver_from_json, institution_name = (
-        email_sender.render_email_template(
-            additional_info,
-            invalid_count=invalid_count,
-            submitting_institution_code=submitting_institution_code,
-        )
+    email_body = email_sender.render_email_template(
+        additional_info,
+        invalid_count=invalid_count,
+        submitting_institution_code=submitting_institution_code,
     )
 
     if email_body is None:

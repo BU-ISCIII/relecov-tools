@@ -49,22 +49,21 @@ class EmailSender:
 
         institution_info = self.get_institution_info(submitting_institution_code)
         if not institution_info:
-            print("Error: The information could not be obtained from the institution.")
-            return None, None
-
+            raise ValueError("Error: Institution information could not be obtained.")
+        
         institution_name = institution_info["institution_name"]
-        email_receiver = institution_info["email_receiver"]
+        
+        template_vars_dict = {
+            "submitting_institution": institution_name,
+            "invalid_count": invalid_count.get(submitting_institution_code, 0) if invalid_count else 0,
+            "additional_info": additional_info,
+        }
 
         env = Environment(loader=FileSystemLoader(os.path.dirname(self.template_path)))
         template = env.get_template(os.path.basename(self.template_path))
+        email_template = template.render(**template_vars_dict)
 
-        email_template = template.render(
-            submitting_institution=institution_name,
-            invalid_count=invalid_count,
-            additional_info=additional_info,
-        )
-
-        return email_template, email_receiver, institution_name
+        return email_template
 
     def send_email(self, receiver_email, subject, body, attachments):
         credentials = relecov_tools.utils.read_yml_file(self.yaml_cred_path)
