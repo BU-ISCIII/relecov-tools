@@ -188,6 +188,7 @@ def read_fasta_return_SeqIO_instance(file_name):
 
 def read_yml_file(file_name):
     """Read yml file"""
+    file_name = os.path.expanduser(file_name)
     with open(file_name, "r") as fh:
         try:
             return yaml.safe_load(fh)
@@ -417,7 +418,9 @@ def select_most_recent_files_per_sample(paths_list):
     filename_groups = {}
     # Count occurrences of each filename and group files by sample names
     for file in paths_list:
-        # TODO: So far, it uses split method to identify this pattern: [sample1.pangolin.csv, sample1.pangolin_20240310.csv]. It should be improve to parse files based on a different character matching field.
+        # TODO: So far, it uses split method to identify this pattern:
+        # [sample1.pangolin.csv, sample1.pangolin_20240310.csv]. It should be
+        # improve to parse files based on a different character matching field.
         file_name = os.path.basename(file).split(".")[0]
         if file_name in filename_groups:
             filename_groups[file_name].append(file)

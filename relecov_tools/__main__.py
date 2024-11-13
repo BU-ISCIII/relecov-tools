@@ -5,6 +5,7 @@ import json
 
 # from rich.prompt import Confirm
 import click
+import relecov_tools.config_json
 import relecov_tools.download_manager
 import relecov_tools.log_summary
 import rich.console
@@ -16,6 +17,7 @@ import relecov_tools.assets.pipeline_utils.viralrecon
 import relecov_tools.read_lab_metadata
 import relecov_tools.download_manager
 import relecov_tools.json_validation
+import relecov_tools.mail
 import relecov_tools.map_schema
 import relecov_tools.upload_database
 import relecov_tools.read_bioinfo_metadata
@@ -240,6 +242,93 @@ def validate(json_file, json_schema, metadata, out_folder):
         json_file, json_schema, metadata, out_folder
     )
     validation.validate()
+
+
+# send-email
+@relecov_tools_cli.command(help_priority=4)
+@click.option(
+    "-v",
+    "--validate-file",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to the validation file (validate.json)",
+)
+@click.option(
+    "-r",
+    "--receiver-email",
+    required=False,
+    help="Recipient's e-mail address (optional). If not provided, it will be extracted from the institutions guide.",
+)
+@click.option(
+    "-a",
+    "--attachments",
+    multiple=True,
+    type=click.Path(exists=True),
+    help="Path to file",
+)
+@click.option(
+    "-p",
+    "--email-psswd",
+    help="Password for bioinformatica@isciii.es",
+    required=False,
+    default=None,
+)
+def send_mail(validate_file, receiver_email, attachments, email_psswd):
+    """
+    Send a sample validation report by mail.
+    """
+    config_loader = relecov_tools.config_json.ConfigJson()
+    config = config_loader.get_configuration("mail_sender")
+
+    if not config:
+        raise ValueError(
+            "Error: The configuration for 'mail_sender' could not be loaded."
+        )
+
+    validate_data = relecov_tools.utils.read_json_file(validate_file)
+
+    if not validate_data:
+        raise ValueError("Error: Validation data could not be loaded.")
+
+    submitting_institution_code = list(validate_data.keys())[0]
+
+    invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
+
+    email_sender = relecov_tools.mail.EmailSender(config)
+
+    add_info = click.confirm(
+        "Would you like to add additional information in the mail?", default=False
+    )
+    additional_info = ""
+    if add_info:
+        additional_info = click.prompt("Enter additional information")
+
+    institution_info = email_sender.get_institution_info(submitting_institution_code)
+    if not institution_info:
+        raise ValueError("Error: Could not obtain institution information.")
+
+    institution_name = institution_info["institution_name"]
+    email_receiver_from_json = institution_info["email_receiver"]
+
+    email_body = email_sender.render_email_template(
+        additional_info,
+        invalid_count=invalid_count,
+        submitting_institution_code=submitting_institution_code,
+    )
+
+    if email_body is None:
+        raise RuntimeError("Error: Could not generate mail.")
+
+    final_receiver_email = (
+        receiver_email if receiver_email else email_receiver_from_json
+    )
+
+    if not final_receiver_email:
+        raise ValueError("Error: Could not obtain the recipient's email address.")
+
+    subject = f"Informe de Validación de Muestras - {institution_name}"
+
+    email_sender.send_email(final_receiver_email, subject, email_body, attachments)
 
 
 # mapping to ENA schema
