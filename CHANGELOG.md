@@ -71,7 +71,8 @@ Code contributions to the release:
 - Handling for missing sample ids in read-lab-metadata [#324](https://github.com/BU-ISCIII/relecov-tools/pull/324)
 - Better logging for download, read-lab-metadata and wrapper [#324](https://github.com/BU-ISCIII/relecov-tools/pull/324)
 - Add SQK-RBK114-96 to library_preparation_kit schema [#333](https://github.com/BU-ISCIII/relecov-tools/pull/333)
-
+- Corrected the Submitting_institution for Hospital de Valdepeñas, Centro de Salud Altagracia and Hospital General de Santa Bárbara.[#334](https://github.com/BU-ISCIII/relecov-tools/pull/334)
+- Added Hospital General de Tomelloso. [#334](https://github.com/BU-ISCIII/relecov-tools/pull/334)
 #### Fixes
 
 - Fixed wrong city name in relecov_tools/conf/laboratory_address.json [#320](https://github.com/BU-ISCIII/relecov-tools/pull/320)
