@@ -381,8 +381,8 @@
         "geo_loc_region": "Ciudad Real",
         "geo_loc_city": "Alcazar de San Juan",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital General La Mancha Centro",
-        "submitting_institution_address": "Av. Constitución, 3",
+        "submitting_institution": "Hospital General Universitario de Ciudad Real",
+        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
         "submitting_institution_email": ""
     },
     "Hospital Virgen de Altagracia": {
@@ -392,8 +392,8 @@
         "geo_loc_region": "Ciudad Real",
         "geo_loc_city": "Manzanares",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Virgen de Altagracia",
-        "submitting_institution_address": "Avda. D. Emiliano García Roldan, s/n",
+        "submitting_institution": "Hospital General Universitario de Ciudad Real",
+        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
         "submitting_institution_email": ""
     },
     "Hospital General de Valdepeñas": {
@@ -403,8 +403,8 @@
         "geo_loc_region": "Ciudad Real",
         "geo_loc_city": "Valdepeñas",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital General de Valdepeñas",
-        "submitting_institution_address": "Av. de los Estudiantes, s/n, Valdepeñas",
+        "submitting_institution": "Hospital General Universitario de Ciudad Real",
+        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
         "submitting_institution_email": ""
     },
     "Hospital Público Santa Barbara": {
@@ -414,8 +414,19 @@
         "geo_loc_region": "Ciudad Real",
         "geo_loc_city": "Puertollano",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Público Santa Barbara",
-        "submitting_institution_address": "C. Malagón s/n",
+        "submitting_institution": "Hospital General Universitario de Ciudad Real",
+        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
+        "submitting_institution_email": ""
+    },
+    "Hospital General de Tomelloso": {
+        "collecting_institution_address": "Cam. Vereda Socuéllamos, s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Ciudad Real",
+        "geo_loc_city": "Tomelloso",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital General Universitario de Ciudad Real",
+        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
         "submitting_institution_email": ""
     },
     "Hospital Virgen de la Luz": {
