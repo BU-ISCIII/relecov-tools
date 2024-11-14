@@ -31,6 +31,8 @@ Code contributions to the release:
 
 #### Fixes
 
+- Fixed python linting workflow was still waiting for .py files[#335](https://github.com/BU-ISCIII/relecov-tools/pull/335)
+
 #### Changed
 
 - Pipeline-manager fields_to_split is now in configuration.json to group samples by those fields [#331](https://github.com/BU-ISCIII/relecov-tools/pull/331)
