@@ -1,5 +1,5 @@
 {
-    "Instituto de Salud Carlos III ": {
+    "Instituto de Salud Carlos III": {
         "collecting_institution_address": "Crta. Pozuelo Majadahonda S/N",
         "collecting_institution_email": "info@isciii.es",
         "geo_loc_state": "Comunidad de Madrid",
@@ -374,7 +374,7 @@
         "submitting_institution_address": "Ctra. Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es"
     },
-    "Hospital General Mateu Orfila": {
+    "Hospital Mateu Orfila": {
         "collecting_institution_address": "Ronda de Malbúger, 1",
         "collecting_institution_email": "antonio.oliver@ssib.es",
         "geo_loc_state": "Islas Baleares",

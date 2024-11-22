@@ -50,7 +50,7 @@
         },
         "collecting_institution": {
             "enum": [
-                "Instituto de Salud Carlos III ",
+                "Instituto de Salud Carlos III",
                 "Hospital de Antequera",
                 "Hospital La Inmaculada - Huércal Overa",
                 "Hospital de la Serranía",
@@ -193,7 +193,7 @@
                 "Hospital de Manacor",
                 "Hospital Can Misses",
                 "Hospital Comarcal d'Inca",
-                "Hospital General Mateu Orfila"
+                "Hospital Mateu Orfila"
             ],
             "ontology": "GENEPIO:0001153",
             "type": "string",
