@@ -225,7 +225,51 @@
         "collecting_institution_email": "josea.lepe.sspa@juntadeandalucia.es",
         "geo_loc_state": "Andalucia",
         "geo_loc_region": "Sevilla",
+        "geo_loc_city": "Osuna",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
+        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
+    },
+    "Hospital La Merced": {
+        "collecting_institution_address": "Av. la Constitución, 2",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Sevilla",
         "geo_loc_city": "Sevilla",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
+        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
+    },
+    "Hospital Universitario de Puerto Real": {
+        "collecting_institution_address": "Calle Romería, 7",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Cadiz",
+        "geo_loc_city": "Puerto Real",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
+        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
+    },
+    "Hospital Infanta Margarita": {
+        "collecting_institution_address": "Av. Góngora, 9B",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Cordoba",
+        "geo_loc_city": "Cabra",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
+        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
+    },
+    "Hospital Universitario de Jerez de la Frontera": {
+        "collecting_institution_address": "Ctra. Trebujena, s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Cadiz",
+        "geo_loc_city": "Jerez de la Frontera",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
         "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
@@ -284,6 +328,61 @@
         "geo_loc_country": "Spain",
         "submitting_institution": "Servicio de Microbiologia HU Son Espases",
         "submitting_institution_address": " Ctra. Valldemossa 79",
+        "submitting_institution_email": "antonio.oliver@ssib.es"
+    },
+    "Hospital Universitario Son Llatzer": {
+        "collecting_institution_address": "Ctra. de Manacor, km 4",
+        "collecting_institution_email": "antonio.oliver@ssib.es",
+        "geo_loc_state": "Islas Baleares",
+        "geo_loc_region": "Palma de Mallorca",
+        "geo_loc_city": "Palma de Mallorca",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Servicio de Microbiologia HU Son Espases",
+        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_email": "antonio.oliver@ssib.es"
+    },
+    "Hospital de Manacor": {
+        "collecting_institution_address": "Ctra. Manacor-Alcudia, s/n",
+        "collecting_institution_email": "antonio.oliver@ssib.es",
+        "geo_loc_state": "Islas Baleares",
+        "geo_loc_region": "Palma de Mallorca",
+        "geo_loc_city": "Manacor",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Servicio de Microbiologia HU Son Espases",
+        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_email": "antonio.oliver@ssib.es"
+    },
+    "Hospital Can Misses": {
+        "collecting_institution_address": "Carrer de Corona, s/n",
+        "collecting_institution_email": "antonio.oliver@ssib.es",
+        "geo_loc_state": "Islas Baleares",
+        "geo_loc_region": "Ibiza",
+        "geo_loc_city": "Ibiza",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Servicio de Microbiologia HU Son Espases",
+        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_email": "antonio.oliver@ssib.es"
+    },
+    "Hospital Comarcal d'Inca": {
+        "collecting_institution_address": "Ctra. Vella de Llubí, s/n",
+        "collecting_institution_email": "antonio.oliver@ssib.es",
+        "geo_loc_state": "Islas Baleares",
+        "geo_loc_region": "Palma de Mallorca",
+        "geo_loc_city": "Inca",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Servicio de Microbiologia HU Son Espases",
+        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_email": "antonio.oliver@ssib.es"
+    },
+    "Hospital General Mateu Orfila": {
+        "collecting_institution_address": "Ronda de Malbúger, 1",
+        "collecting_institution_email": "antonio.oliver@ssib.es",
+        "geo_loc_state": "Islas Baleares",
+        "geo_loc_region": "Menorca",
+        "geo_loc_city": "Mahón",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Servicio de Microbiologia HU Son Espases",
+        "submitting_institution_address": "Ctra. Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es"
     },
     "Hospital Universitario Ntra. Sra de Candelaria (HUNSC)": {
