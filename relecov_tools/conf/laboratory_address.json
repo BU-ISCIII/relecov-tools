@@ -31,7 +31,6 @@
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
         "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
-      
     },
     "Hospital de la Serranía":{
         "collecting_institution_address": "Calle San Pedro, Km 2",
@@ -320,14 +319,14 @@
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "Servicio de Microbiologia HU Son Espases": {
-        "collecting_institution_address": " Ctra. Valldemossa 79",
+        "collecting_institution_address": "Ctra. Valldemossa 79",
         "collecting_institution_email": "antonio.oliver@ssib.es",
         "geo_loc_state": "Islas Baleares",
         "geo_loc_region": "Palma de Mallorca",
         "geo_loc_city": "Palma de Mallorca",
         "geo_loc_country": "Spain",
         "submitting_institution": "Servicio de Microbiologia HU Son Espases",
-        "submitting_institution_address": " Ctra. Valldemossa 79",
+        "submitting_institution_address": "Ctra. Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es"
     },
     "Hospital Universitario Son Llatzer": {
@@ -585,14 +584,14 @@
     },
     "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)": {
         "collecting_institution_address": "Paseo de Belen 19",
-        "collecting_institution_email": "",
+        "collecting_institution_email": "jmeirosbouza@gmail.com",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Valladolid",
         "geo_loc_city": "Valladolid",
         "geo_loc_country": "Spain",
         "submitting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)",
         "submitting_institution_address": "Paseo de Belen 19",
-        "submitting_institution_email": ""
+        "submitting_institution_email": "jmeirosbouza@gmail.com"
     },
     "Hospital Los Montalvos (Complejo Asistencial Universitario de Salamanca)": {
         "collecting_institution_address": "P.º de San Vicente, 58",
@@ -617,14 +616,14 @@
         "submitting_institution_email": ""
     },
     "Hospital Nuestra Señora de Sonsoles": {
-        "collecting_institution_address": " Av. Juan Carlos I, s/n",
+        "collecting_institution_address": "Av. Juan Carlos I, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Avila",
         "geo_loc_city": "Avila",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Nuestra Señora de Sonsoles",
-        "submitting_institution_address": " Av. Juan Carlos I, s/n",
+        "submitting_institution_address": "Av. Juan Carlos I, s/n",
         "submitting_institution_email": ""
     },
     "Hospital Universitario de Burgos Complejo Asistencial Univer. de Burgos": {
@@ -639,14 +638,14 @@
         "submitting_institution_email": ""
     },
     "Hospital Universitari Vall d'Hebron": {
-        "collecting_institution_address": " Passeig de la Vall d'Hebron, 119-129",
+        "collecting_institution_address": "Passeig de la Vall d'Hebron, 119-129",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Vall d'Hebron",
-        "submitting_institution_address": " Passeig de la Vall d'Hebron, 119-129",
+        "submitting_institution_address": "Passeig de la Vall d'Hebron, 119-129",
         "submitting_institution_email": ""
     },
     "Hospital Universitari de Girona Dr. JosepTrueta": {
@@ -661,14 +660,14 @@
         "submitting_institution_email": ""
     },
     "Hospital Universitari Germans Trias i Pujol (HUGTiP)": {
-        "collecting_institution_address": " Crta del Canyet s/n",
+        "collecting_institution_address": "Crta del Canyet s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Badalona",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": " Crta del Canyet s/n",
+        "submitting_institution_address": "Crta del Canyet s/n",
         "submitting_institution_email": ""
     },
     "Hospital Clínic de Barcelona (HCB)": {
@@ -947,14 +946,14 @@
         "submitting_institution_email": ""
     },
     "Complexo Hospitalario Universitario de Lugo": {
-        "collecting_institution_address": " Rúa Dr. Ulises Romero, 1",
+        "collecting_institution_address": "Rúa Dr. Ulises Romero, 1",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
         "geo_loc_region": "Lugp",
         "geo_loc_city": "Lugo",
         "geo_loc_country": "Spain",
         "submitting_institution": "Complexo Hospitalario Universitario de Lugo",
-        "submitting_institution_address": " Rúa Dr. Ulises Romero, 1",
+        "submitting_institution_address": "Rúa Dr. Ulises Romero, 1",
         "submitting_institution_email": ""
     },
     "Complexo Hospitalario Universitario A Coruña": {
@@ -1321,14 +1320,14 @@
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "CAP La Salut EAP Badalona": {
-        "collecting_institution_address": " Passatge dels Encants, s/n",
+        "collecting_institution_address": "Passatge dels Encants, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Badalona",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": " Crta del Canyet s/n",
+        "submitting_institution_address": "Crta del Canyet s/n",
         "submitting_institution_email": ""
     },
     "CAP Mataró-6 (Gatassa)": {
@@ -1339,7 +1338,7 @@
         "geo_loc_city": "Mataró",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": " Crta del Canyet s/n",
+        "submitting_institution_address": "Crta del Canyet s/n",
         "submitting_institution_email": ""
     },
     "CAP Can Mariner Santa Coloma-1": {
@@ -1350,7 +1349,7 @@
         "geo_loc_city": "Santa Coloma de Gramenet",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": " Crta del Canyet s/n",
+        "submitting_institution_address": "Crta del Canyet s/n",
         "submitting_institution_email": ""
     },
     "CAP Montmeló (Montornès)": {
@@ -1361,7 +1360,7 @@
         "geo_loc_city": "Montornès del Vallès",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": " Crta del Canyet s/n",
+        "submitting_institution_address": "Crta del Canyet s/n",
         "submitting_institution_email": ""
     },
     "Hospital García Orcoyen": {
@@ -1405,7 +1404,7 @@
         "geo_loc_city": "Viladecavalls",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": " Crta del Canyet s/n",
+        "submitting_institution_address": "Crta del Canyet s/n",
         "submitting_institution_email": ""
     },
     "Fundació Althaia-Manresa": {
@@ -1416,7 +1415,7 @@
         "geo_loc_city": "Manresa",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": " Crta del Canyet s/n",
+        "submitting_institution_address": "Crta del Canyet s/n",
         "submitting_institution_email": ""
     },
     "H U RAMÓN Y CAJAL": {
