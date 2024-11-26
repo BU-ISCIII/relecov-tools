@@ -317,19 +317,24 @@ def compress_file(file):
 
 
 def check_gzip_integrity(file_path):
-    """Check if a compressed file is not corrupted"""
+    """Check if a compressed file can be decompressed"""
     chunksize = 100000000  # 10 Mbytes
     with gzip.open(file_path, "rb") as f:
         try:
             while f.read(chunksize) != b"":
                 pass
-        except gzip.BadGzipFile:
+        except Exception:
             # Not a gzip file
             return False
         # EOFError: Compressed file is truncated
         except EOFError:
             return False
     return True
+
+
+def lower_keys(data):
+    """Transform all keys to lowercase strings in a dictionary"""
+    return {str(key).lower(): v for key, v in data.items()}
 
 
 def rich_force_colors():
