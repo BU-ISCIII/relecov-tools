@@ -1583,5 +1583,104 @@
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
         "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
+    },
+    "Complejo Hospitalario de Toledo": {
+        "collecting_institution_address": "Av. del Río Guadiana",
+        "collecting_institution_email": "eheredero@sescam.jccm.es",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Toledo",
+        "geo_loc_city": "Toledo",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Complejo Hospitalario de Toledo",
+        "submitting_institution_address": "Av. del Río Guadiana",
+        "submitting_institution_email": "eheredero@sescam.jccm.es"
+    },
+    "Hospital Clinico Universitario de Valladolid": {
+        "collecting_institution_address": "Av. Ramón y Cajal, 3",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla y León",
+        "geo_loc_region": "Valladolid",
+        "geo_loc_city": "Valladolid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)",
+        "submitting_institution_address": "Paseo de Belen 19",
+        "submitting_institution_email": "jmeirosbouza@gmail.com"
+    },
+    "Hospital Universitario Rio Hortega": {
+        "collecting_institution_address": "C. Dulzaina, 2",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Castilla y León",
+        "geo_loc_region": "Valladolid",
+        "geo_loc_city": "Valladolid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)",
+        "submitting_institution_address": "Paseo de Belen 19",
+        "submitting_institution_email": "jmeirosbouza@gmail.com"
+    },
+    "Complexo Hospitalario Universitario de Vigo": {
+        "collecting_institution_address": "Estrada de Clara Campoamor, 341",
+        "collecting_institution_email": "Benito.Jose.Regueiro.Garcia@sergas.es",
+        "geo_loc_state": "Galicia",
+        "geo_loc_region": "Pontevedra",
+        "geo_loc_city": "Vigo",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Complexo Hospitalario Universitario de Vigo",
+        "submitting_institution_address": "Estrada de Clara Campoamor, 341",
+        "submitting_institution_email": "Benito.Jose.Regueiro.Garcia@sergas.es"
+    },
+    "Plataforma de Genómica y Bioinformática": {
+        "collecting_institution_address": "Calle Piqueras, 98",
+        "collecting_institution_email": "mthernando@riojasalud.es",
+        "geo_loc_state": "La Rioja",
+        "geo_loc_region": "La Rioja",
+        "geo_loc_city": "Logroño",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Plataforma de Genómica y Bioinformática",
+        "submitting_institution_address": "Calle Piqueras, 98",
+        "submitting_institution_email": "mthernando@riojasalud.es"
+    },
+    "Hospital Universitario 12 de Octubre": {
+        "collecting_institution_address": "Av. de Cordoba, s/n",
+        "collecting_institution_email": "mfolgueira@salud.madrid.org",
+        "geo_loc_state": "Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario 12 de Octubre",
+        "submitting_institution_address": "Av. de Cordoba, s/n",
+        "submitting_institution_email": "mfolgueira@salud.madrid.org"
+    },
+    "Hospital Universitario La Paz": {
+        "collecting_institution_address": "P.º de la Castellana, 261",
+        "collecting_institution_email": "fernandoj.lazaro@salud.madrid.org",
+        "geo_loc_state": "Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario La Paz",
+        "submitting_institution_address": "P.º de la Castellana, 261",
+        "submitting_institution_email": "fernandoj.lazaro@salud.madrid.org"
+    },
+    "Hospital Universitario Basurto": {
+        "collecting_institution_address": "Montevideo Etorb., 18",
+        "collecting_institution_email": "MIKELJOSEBA.URRUTICOECHEAGUTIERREZ@osakidetza.eus",
+        "geo_loc_state": "Pais Vasco",
+        "geo_loc_region": "Vizcaya",
+        "geo_loc_city": "Bilbao",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Basurto",
+        "submitting_institution_address": "Montevideo Etorb., 18",
+        "submitting_institution_email": "MIKELJOSEBA.URRUTICOECHEAGUTIERREZ@osakidetza.eus"
+    },
+    "Hospital Valle de los Pedroches": {
+        "collecting_institution_address": "Av. el Silo",
+        "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
+        "geo_loc_state": "Andalucia",
+        "geo_loc_region": "Cordoba",
+        "geo_loc_city": "Cordoba",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
+        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
     }
 }
