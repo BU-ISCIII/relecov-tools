@@ -59,10 +59,6 @@
         "geo_loc_latitude": "42.2314",
         "geo_loc_longitude": "-8.7124"
     },
-    "Gijon": {
-        "geo_loc_latitude": "43.5333",
-        "geo_loc_longitude": "-5.7000"
-    },
     "Vitoria": {
         "geo_loc_latitude": "42.8500",
         "geo_loc_longitude": "-2.6833"
@@ -294,10 +290,6 @@
     "Marbella": {
         "geo_loc_latitude": "36.51543",
         "geo_loc_longitude": "-4.88583"
-    },
-    "Almeria": {
-        "geo_loc_latitude": "36.72016",
-        "geo_loc_longitude": "-4.42034"
     },
     "El Ejido": {
         "geo_loc_latitude": "36.772153",
