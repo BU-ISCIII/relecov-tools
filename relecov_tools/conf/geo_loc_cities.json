@@ -71,10 +71,6 @@
         "geo_loc_latitude": "37.1781",
         "geo_loc_longitude": "-3.6008"
     },
-    "Asturias": {
-        "geo_loc_latitude": "43.3600",
-        "geo_loc_longitude": "-5.8450"
-    },
     "Santa Cruz de Tenerife": {
         "geo_loc_latitude": "28.4667",
         "geo_loc_longitude": "-16.2500"
@@ -214,10 +210,6 @@
     "Soria": {
         "geo_loc_latitude": "41.7667",
         "geo_loc_longitude": "-2.4667"
-    },
-    "Pontevedra": {
-        "geo_loc_latitude": "42.4333",
-        "geo_loc_longitude": "-8.6333"
     },
     "Alcazar de San Juan": {
         "geo_loc_latitude": "39.4056",
