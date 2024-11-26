@@ -123,10 +123,6 @@
         "geo_loc_latitude": "37.2500",
         "geo_loc_longitude": "-6.9500"
     },
-    "Ciudad de Melilla": {
-        "geo_loc_latitude": "35.2937",
-        "geo_loc_longitude": "-2.9383"
-    },
     "Tarragona": {
         "geo_loc_latitude": "41.1187",
         "geo_loc_longitude": "1.2453"
@@ -282,10 +278,6 @@
    "Elche": {
         "geo_loc_latitude": "38.2669",
         "geo_loc_longitude": "-0.6983"
-    },
-    "Gasteiz": {
-        "geo_loc_latitude": "42.85",
-        "geo_loc_longitude": "-2.6667"
     },
     "Marbella": {
         "geo_loc_latitude": "36.51543",
