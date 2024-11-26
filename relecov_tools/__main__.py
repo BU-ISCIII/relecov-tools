@@ -187,7 +187,10 @@ def download(
         output_location,
         target_folders,
     )
-    download_manager.execute_process()
+    try:
+        download_manager.execute_process()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 # metadata
@@ -221,8 +224,10 @@ def read_lab_metadata(metadata_file, sample_list_file, metadata_out, files_folde
     new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(
         metadata_file, sample_list_file, metadata_out, files_folder
     )
-    relecov_json = new_metadata.create_metadata_json()
-    return relecov_json
+    try:
+        new_metadata.create_metadata_json()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 # validation
@@ -241,7 +246,10 @@ def validate(json_file, json_schema, metadata, out_folder):
     validation = relecov_tools.json_validation.SchemaValidation(
         json_file, json_schema, metadata, out_folder
     )
-    validation.validate()
+    try:
+        validation.validate()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 # send-email
@@ -348,7 +356,10 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
     new_schema = relecov_tools.map_schema.MappingSchema(
         origin_schema, json_data, destination_schema, schema_file, output
     )
-    new_schema.map_to_data_to_new_schema()
+    try:
+        new_schema.map_to_data_to_new_schema()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 # upload to ENA
@@ -393,7 +404,10 @@ def upload_to_ena(
         upload_fastq=upload_fastq,
         output_path=output_path,
     )
-    upload_ena.upload()
+    try:
+        upload_ena.upload()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 # upload to GISAID
@@ -460,7 +474,10 @@ def upload_to_gisaid(
         single,
         gzip,
     )
-    upload_gisaid.gisaid_upload()
+    try:
+        upload_gisaid.gisaid_upload()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 @relecov_tools_cli.command(help_priority=9)
@@ -501,7 +518,10 @@ def update_db(user, password, json, type, platform, server_url, full_update):
     update_database_obj = relecov_tools.upload_database.UpdateDatabase(
         user, password, json, type, platform, server_url, full_update
     )
-    update_database_obj.update_db()
+    try:
+        update_database_obj.update_db()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 # read metadata bioinformatics
@@ -525,8 +545,10 @@ def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
         out_dir,
         software_name,
     )
-
-    new_bioinfo_metadata.create_bioinfo_file()
+    try:
+        new_bioinfo_metadata.create_bioinfo_file()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 # read metadata bioinformatics
@@ -549,7 +571,10 @@ def metadata_homogeneizer(institution, directory, output):
     new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
         institution, directory, output
     )
-    new_parse.converting_metadata()
+    try:
+        new_parse.converting_metadata()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 # creating symbolic links
@@ -588,7 +613,10 @@ def pipeline_manager(input, template, output, config, folder_names):
     new_launch = relecov_tools.pipeline_manager.PipelineManager(
         input, template, output, config, folder_names
     )
-    new_launch.pipeline_exc()
+    try:
+        new_launch.pipeline_exc()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 # schema builder
@@ -625,7 +653,10 @@ def build_schema(input_file, schema_base, draft_version, diff, out_dir):
     schema_update = relecov_tools.build_schema.SchemaBuilder(
         input_file, schema_base, draft_version, diff, out_dir
     )
-    schema_update.handle_build_schema()
+    try:
+        schema_update.handle_build_schema()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 @relecov_tools_cli.command(help_priority=15)
@@ -667,10 +698,13 @@ def logs_to_excel(lab_code, output_folder, files):
         stderr.print("All provided files were empty.")
         exit(1)
     logsum = relecov_tools.log_summary.LogSum(output_location=output_folder)
-    merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
-    final_logs = logsum.prepare_final_logs(logs=merged_logs)
-    excel_outpath = os.path.join(output_folder, lab_code + "_logs_report.xlsx")
-    logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
+    try:
+        merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
+        final_logs = logsum.prepare_final_logs(logs=merged_logs)
+        excel_outpath = os.path.join(output_folder, lab_code + "_logs_report.xlsx")
+        logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 @relecov_tools_cli.command(help_priority=16)
@@ -693,7 +727,10 @@ def wrapper(config_file, output_folder):
     process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(
         config_file=config_file, output_folder=output_folder
     )
-    process_wrapper.run_wrapper()
+    try:
+        process_wrapper.run_wrapper()
+    except Exception as e:
+        log.error(f"EXCEPTION FOUND: {e}")
 
 
 if __name__ == "__main__":
