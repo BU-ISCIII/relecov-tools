@@ -185,6 +185,7 @@ class LogSum:
 
         def reg_remover(string, pattern):
             """Remove annotation between brackets in logs message"""
+            string = str(string)
             string = string.replace("['", "'").replace("']", "'").replace('"', "")
             string = re.sub(pattern, "", string)
             return string.strip()
@@ -217,7 +218,9 @@ class LogSum:
                 new_sheet.append(header)
             regex = r"[\[\]]"  # Regex to remove lists brackets
             workbook["Global Report"].append(
-                [reg_remover(str(x), regex) for k, x in logs.items() if k != "samples"]
+                "\n ".join(
+                    [reg_remover(x, regex) for k, x in logs.items() if k != "samples"]
+                )
             )
             regex = r"\[.*?\]"  # Regex to remove ontology annotations between brackets
             for sample, slog in samples_logs.items():
