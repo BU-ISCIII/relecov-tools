@@ -121,7 +121,7 @@
         "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
     },
-    "Hospital Reina Sofia":{
+    "Hospital Universitario Reina Sofia":{
         "collecting_institution_address": "Av. Menendez Pidal, s/n",
         "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "geo_loc_state": "Andalucia",
@@ -396,14 +396,14 @@
         "submitting_institution_address": "Carretera del Rosario 145",
         "submitting_institution_email": "jalcflo@gobiernodecanarias.org"
     },
-    "Instituto Tecnológico y de Energías Renovables": {
+    "Instituto Tecnológico y de Energías Renovables, S.A. (ITER, S.A.)": {
         "collecting_institution_address": "Polígono Industrial de Granadilla, s/n",
         "collecting_institution_email": "jlorenzo@iter.es",
         "geo_loc_state": "Islas Canarias",
         "geo_loc_region": "Santa Cruz de Tenerife",
         "geo_loc_city": "Santa Cruz de Tenerife",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Instituto Tecnológico y de Energías Renovables",
+        "submitting_institution": "Instituto Tecnológico y de Energías Renovables, S.A. (ITER, S.A.)",
         "submitting_institution_address": "Polígono Industrial de Granadilla, s/n",
         "submitting_institution_email": "jlorenzo@iter.es"
     },
@@ -418,14 +418,14 @@
         "submitting_institution_address": "Carretera Ofra s/n, La Laguna",
         "submitting_institution_email": ""
     },
-    "Hospital Universitario de Gran Canaria": {
+    "Hospital Universitario de Gran Canaria Dr. Negrín": {
         "collecting_institution_address": "C. Pl. Barranco de la Ballena s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Islas Canarias",
         "geo_loc_region": "Las Palmas",
         "geo_loc_city": "Las Palmas",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario de Gran Canaria",
+        "submitting_institution": "Hospital Universitario de Gran Canaria Dr. Negrín",
         "submitting_institution_address": "C. Pl. Barranco de la Ballena s/n",
         "submitting_institution_email": ""
     },
@@ -506,7 +506,7 @@
         "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
         "submitting_institution_email": ""
     },
-    "Hospital Público Santa Barbara": {
+    "Hospital Santa Bárbara": {
         "collecting_institution_address": "C. Malagón s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla-La Mancha",
@@ -550,25 +550,14 @@
         "submitting_institution_address": "C. Donante de Sangre, S/N",
         "submitting_institution_email": ""
     },
-    "Hospital Virgen de la Salud": {
-        "collecting_institution_address": "Calle Barber 30",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Castilla-La Mancha",
-        "geo_loc_region": "Toledo",
-        "geo_loc_city": "Toledo",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Virgen de la Salud",
-        "submitting_institution_address": "Calle Barber 30",
-        "submitting_institution_email": ""
-    },
-    "Hospital General Nuestra Sra. del Prado": {
+    "Hospital General Nuestra Señora del Prado": {
         "collecting_institution_address": "CTRA. MADRID, Av. Extremadura, KM 114",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla-La Mancha",
         "geo_loc_region": "Toledo",
         "geo_loc_city": "Talavera de la Reina",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital General Nuestra Sra. del Prado",
+        "submitting_institution": "Hospital General Nuestra Señora del Prado",
         "submitting_institution_address": "CTRA. MADRID, Av. Extremadura, KM 114",
         "submitting_institution_email": ""
     },
@@ -605,36 +594,25 @@
         "submitting_institution_address": "Paseo de Belen 19",
         "submitting_institution_email": ""
     },
-    "Complejo Asistencial Universitario de Salamanca": {
+    "Hospital Los Montalvos (Complejo Asistencial Universitario de Salamanca)": {
         "collecting_institution_address": "P.º de San Vicente, 58",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Salamanca",
         "geo_loc_city": "Salamanca",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Complejo Asistencial Universitario de Salamanca",
+        "submitting_institution": "Hospital Los Montalvos (Complejo Asistencial Universitario de Salamanca)",
         "submitting_institution_address": "P.º de San Vicente, 58",
         "submitting_institution_email": ""
     },
-    "Gerencia de Salud de Area de Soria": {
-        "collecting_institution_address": "P.º el Espolón",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Castilla y León",
-        "geo_loc_region": "Soria",
-        "geo_loc_city": "Soria",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Gerencia de Salud de Area de Soria",
-        "submitting_institution_address": "P.º el Espolón",
-        "submitting_institution_email": ""
-    },
-    "Hospital General Río Carrión": {
+    "Hospital Rio Carrion Complejo Asistencial Universitario de Palencia": {
         "collecting_institution_address": "Av. Donantes de Sangre, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Palencia",
         "geo_loc_city": "Palencia",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital General Río Carrión",
+        "submitting_institution": "Hospital Rio Carrion Complejo Asistencial Universitario de Palencia",
         "submitting_institution_address": "Av. Donantes de Sangre, s/n",
         "submitting_institution_email": ""
     },
@@ -649,14 +627,14 @@
         "submitting_institution_address": " Av. Juan Carlos I, s/n",
         "submitting_institution_email": ""
     },
-    "Hospital Universitario de Burgos": {
+    "Hospital Universitario de Burgos Complejo Asistencial Univer. de Burgos": {
         "collecting_institution_address": "Av. Islas Baleares, 3",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Burgos",
         "geo_loc_city": "Burgos",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario de Burgos",
+        "submitting_institution": "Hospital Universitario de Burgos Complejo Asistencial Univer. de Burgos",
         "submitting_institution_address": "Av. Islas Baleares, 3",
         "submitting_institution_email": ""
     },
@@ -671,7 +649,7 @@
         "submitting_institution_address": " Passeig de la Vall d'Hebron, 119-129",
         "submitting_institution_email": ""
     },
-    "Hospital Universitari Doctor Josep Trueta": {
+    "Hospital Universitari de Girona Dr. JosepTrueta": {
         "collecting_institution_address": "Avinguda de França, S/N,",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -679,7 +657,7 @@
         "geo_loc_city": "Girona",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Vall d'Hebron",
-        "submitting_institution_address": " Passeig de la Vall d'Hebron, 119-129",
+        "submitting_institution_address": "Passeig de la Vall d'Hebron, 119-129",
         "submitting_institution_email": ""
     },
     "Hospital Universitari Germans Trias i Pujol (HUGTiP)": {
@@ -748,26 +726,15 @@
         "submitting_institution_address": "Passeig del Taulat, 116",
         "submitting_institution_email": ""
     },
-    "Laboratorio Echevarne Sant Cugat del Vallès": {
+    "Laboratorio Echevarne, SA Sant Cugat del Vallès": {
         "collecting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Sant Cugat del Valles",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Laboratorio Echevarne Sant Cugat del Vallès",
+        "submitting_institution": "Laboratorio Echevarne, SA Sant Cugat del Vallès",
         "submitting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
-        "submitting_institution_email": ""
-    },
-    "Unitat de Genòmica i Medicina Personalitzada - Hospital Dr. Josep Trueta": {
-        "collecting_institution_address": "Avinguda de França, S/N,",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Cataluña",
-        "geo_loc_region": "Girona",
-        "geo_loc_city": "Girona",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Unitat de Genòmica i Medicina Personalitzada - Hospital Dr. Josep Trueta",
-        "submitting_institution_address": "Avinguda de França, S/N,",
         "submitting_institution_email": ""
     },
     "Hospital Universitario San Jorge": {
@@ -803,37 +770,26 @@
         "submitting_institution_address": "Remonta, 2",
         "submitting_institution_email": ""
     },
-    "Hospital de Mostoles": {
+    "Hospital Universitario de Mostoles": {
         "collecting_institution_address": "C. Dr. Luis Montes, S/N",
         "collecting_institution_email": "",
         "geo_loc_state": "Comunidad de Madrid",
         "geo_loc_region": "Madrid",
-        "geo_loc_city": "Mostoles",
+        "geo_loc_city": "Móstoles",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital de Mostoles",
+        "submitting_institution": "Hospital Universitario de Mostoles",
         "submitting_institution_address": "C. Dr. Luis Montes, S/N",
         "submitting_institution_email": ""
     },
-    "Hospital Clínico San Carlos": {
+    "Hospital Universitario Clinico San Carlos": {
         "collecting_institution_address": "Calle del Prof Martín Lagos",
         "collecting_institution_email": "",
         "geo_loc_state": "Comunidad de Madrid",
         "geo_loc_region": "Madrid",
         "geo_loc_city": "Madrid",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Clínico San Carlos",
+        "submitting_institution": "Hospital Universitario Clinico San Carlos",
         "submitting_institution_address": "Calle del Prof Martín Lagos",
-        "submitting_institution_email": ""
-    },
-    "Centro Militar de Veterinaria de la Defensa": {
-        "collecting_institution_address": "C. Darío Gazapo 3",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Comunidad de Madrid",
-        "geo_loc_region": "Madrid",
-        "geo_loc_city": "Madrid",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Centro Militar de Veterinaria de la Defensa",
-        "submitting_institution_address": "C. Darío Gazapo 3",
         "submitting_institution_email": ""
     },
     "Hospital Universitario Severo Ochoa": {
@@ -858,47 +814,14 @@
         "submitting_institution_address": "Carr. Madrid - Toledo, Km 12,500, Getafe",
         "submitting_institution_email": ""
     },
-    "Presidencia de Gobierno": {
-        "collecting_institution_address": "",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Comunidad de Madrid",
-        "geo_loc_region": "Madrid",
-        "geo_loc_city": "Madrid",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Presidencia de Gobierno",
-        "submitting_institution_address": "",
-        "submitting_institution_email": ""
-    },
-    "Ministerio de Sanidad, Servicios Sociales e Igualdad": {
-        "collecting_institution_address": "P.º del Prado, 18",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Comunidad de Madrid",
-        "geo_loc_region": "Madrid",
-        "geo_loc_city": "Madrid",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Ministerio de Sanidad, Servicios Sociales e Igualdad",
-        "submitting_institution_address": "P.º del Prado, 18",
-        "submitting_institution_email": ""
-    },
-    "HU Virgen de la Arrixaca": {
-        "collecting_institution_address": "Ctra. Madrid-Cartagena, s/n",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Murcia",
-        "geo_loc_region": "Murcia",
-        "geo_loc_city": "Murcia",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "HU Virgen de la Arrixaca",
-        "submitting_institution_address": "Ctra. Madrid-Cartagena, s/n",
-        "submitting_institution_email": ""
-    },
-    "Hospital Universitario Reina Sofía": {
+    "Hospital General Universitario Reina Sofia": {
         "collecting_institution_address": "Av. Intendente Jorge Palacios, 1",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Murcia",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario Reina Sofía",
+        "submitting_institution": "Hospital General Universitario Reina Sofia",
         "submitting_institution_address": "Av. Intendente Jorge Palacios, 1",
         "submitting_institution_email": ""
     },
@@ -924,14 +847,14 @@
         "submitting_institution_address": "Paraje Torre Octavio, 54, Pozo Aledo",
         "submitting_institution_email": ""
     },
-    "Hospital General Universitario Morales Meseguer": {
+    "Hospital G. Universitario J.M. Morales Meseguer": {
         "collecting_institution_address": "Av. Marqués de Los Vélez, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Murcia",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital General Universitario Morales Meseguer",
+        "submitting_institution": "Hospital G. Universitario J.M. Morales Meseguer",
         "submitting_institution_address": "Av. Marqués de Los Vélez, s/n",
         "submitting_institution_email": ""
     },
@@ -946,14 +869,14 @@
         "submitting_institution_address": "Ctra. Madrid-Cartagena, s/n, El Palmar",
         "submitting_institution_email": ""
     },
-    "Hospital Rafael Méndez de Lorca": {
+    "Hospital Rafael Mendez": {
         "collecting_institution_address": "Ctra. N-340, Lorca",
         "collecting_institution_email": "",
         "geo_loc_state": "Murcia",
         "geo_loc_region": "Murcia",
         "geo_loc_city": "Lorca",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Rafael Méndez de Lorca",
+        "submitting_institution": "Hospital Rafael Mendez",
         "submitting_institution_address": "Ctra. N-340, Lorca",
         "submitting_institution_email": ""
     },
@@ -1023,36 +946,36 @@
         "submitting_institution_address": "Av. das Camelias, 109, Vigo",
         "submitting_institution_email": ""
     },
-    "Hospital Universitario Lucus Augusti": {
+    "Complexo Hospitalario Universitario de Lugo": {
         "collecting_institution_address": " Rúa Dr. Ulises Romero, 1",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
         "geo_loc_region": "Lugp",
         "geo_loc_city": "Lugo",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario Lucus Augusti",
+        "submitting_institution": "Complexo Hospitalario Universitario de Lugo",
         "submitting_institution_address": " Rúa Dr. Ulises Romero, 1",
         "submitting_institution_email": ""
     },
-    "Hospital Universitario de A Coruña": {
+    "Complexo Hospitalario Universitario A Coruña": {
         "collecting_institution_address": "As Xubias, 84",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
         "geo_loc_region": "A Coruña",
         "geo_loc_city": "A Coruña",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario de A Coruña",
+        "submitting_institution": "Complexo Hospitalario Universitario A Coruña",
         "submitting_institution_address": "As Xubias, 84",
         "submitting_institution_email": ""
     },
-    "Hospital Clínico Universitario de Santiago": {
+    "Complexo Hospitalario Universitario Santiago": {
         "collecting_institution_address": "Rúa da Choupana, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
         "geo_loc_region": "A Coruña",
         "geo_loc_city": "Santiago de Compostela",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Clínico Universitario de Santiago",
+        "submitting_institution": "Complexo Hospitalario Universitario Santiago",
         "submitting_institution_address": "Rúa da Choupana, s/n",
         "submitting_institution_email": ""
     },
@@ -1074,7 +997,7 @@
         "geo_loc_region": "Alicante",
         "geo_loc_city": "Elche",
         "geo_loc_country": "Spain",
-        "submitting_institution": "FISABIO-Epidemiología Molecular",
+        "submitting_institution": "Fundació Fisabio",
         "submitting_institution_address": "Av. Roma, s/n",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
@@ -1089,17 +1012,6 @@
         "submitting_institution_address": "C. Piqueras, 98",
         "submitting_institution_email": ""
     },
-    "Hospital Universitario Txagorritxu": {
-        "collecting_institution_address": " Jose Atxotegi Kalea, s/n",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Pais Vasco",
-        "geo_loc_region": "Alava",
-        "geo_loc_city": "Gasteiz",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario Txagorritxu",
-        "submitting_institution_address": " Jose Atxotegi Kalea, s/n",
-        "submitting_institution_email": ""
-    },
     "Hospital Universitario Araba": {
         "collecting_institution_address": "Calle Jose Atxotegi, 01009",
         "collecting_institution_email": "",
@@ -1111,14 +1023,14 @@
         "submitting_institution_address": "Begiristain Doktorea Pasealekua, s/n",
         "submitting_institution_email": ""
     },
-    "Hospital Universitari Arnau de Vilanova": {
+    "Hospital Universitari Arnau de Vilanova de Lleida": {
         "collecting_institution_address": "Av. Alcalde Rovira Roure, 80",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Lleida",
         "geo_loc_city": "Lleida",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Arnau de Vilanova",
+        "submitting_institution": "Hospital Universitari Arnau de Vilanova de Lleida",
         "submitting_institution_address": "Av. Alcalde Rovira Roure, 80",
         "submitting_institution_email": ""
     },
@@ -1129,7 +1041,7 @@
         "geo_loc_region": "Valencia",
         "geo_loc_city": "Valencia",
         "geo_loc_country": "Spain",
-        "submitting_institution": "FISABIO-Epidemiología Molecular",
+        "submitting_institution": "Fundació Fisabio",
         "submitting_institution_address": "Av. Roma, s/n",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
@@ -1140,7 +1052,7 @@
         "geo_loc_region": "Valencia",
         "geo_loc_city": "Valencia",
         "geo_loc_country": "Spain",
-        "submitting_institution": "FISABIO-Epidemiología Molecular",
+        "submitting_institution": "Fundació Fisabio",
         "submitting_institution_address": "Av. Roma, s/n",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
@@ -1151,7 +1063,7 @@
         "geo_loc_region": "Valencia",
         "geo_loc_city": "Valencia",
         "geo_loc_country": "Spain",
-        "submitting_institution": "FISABIO-Epidemiología Molecular",
+        "submitting_institution": "Fundació Fisabio",
         "submitting_institution_address": "Av. Roma, s/n",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
@@ -1221,7 +1133,7 @@
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": ""
     },
-    "Hospital Comarcal de la Selva": {
+    "Hospital Comarcal de Blanes": {
         "collecting_institution_address": "Carrer Acces Cala Sant Francesc, 5",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -1364,14 +1276,14 @@
         "submitting_institution_address": "Av. Roma, s/n",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
-    "FISABIO-Epidemiología Molecular": {
+    "Fundació Fisabio": {
         "collecting_institution_address": "Av. de Catalunya, 21",
         "collecting_institution_email": "",
         "geo_loc_state": "Comunitat Valenciana",
         "geo_loc_region": "Valencia",
         "geo_loc_city": "Valencia",
         "geo_loc_country": "Spain",
-        "submitting_institution": "FISABIO-Epidemiología Molecular",
+        "submitting_institution": "Fundació Fisabio",
         "submitting_institution_address": "Av. de Catalunya, 21",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
@@ -1382,7 +1294,7 @@
         "geo_loc_region": "Valencia",
         "geo_loc_city": "Alicante",
         "geo_loc_country": "Spain",
-        "submitting_institution": "FISABIO-Epidemiología Molecular",
+        "submitting_institution": "Fundació Fisabio",
         "submitting_institution_address": "Av. Roma, s/n",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
@@ -1393,7 +1305,7 @@
         "geo_loc_region": "Valencia",
         "geo_loc_city": "Valencia",
         "geo_loc_country": "Spain",
-        "submitting_institution": "FISABIO-Epidemiología Molecular",
+        "submitting_institution": "Fundació Fisabio",
         "submitting_institution_address": "Av. Roma, s/n",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
@@ -1404,7 +1316,7 @@
         "geo_loc_region": "Valencia",
         "geo_loc_city": "Castellón de la Plana",
         "geo_loc_country": "Spain",
-        "submitting_institution": "FISABIO-Epidemiología Molecular",
+        "submitting_institution": "Fundació Fisabio",
         "submitting_institution_address": "Av. Roma, s/n",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
@@ -1463,7 +1375,7 @@
         "submitting_institution_address": "C. de Irunlarrea, 3, Pamplona",
         "submitting_institution_email": ""
     },
-    "Hospital Reina Sofía_Tudela": {
+    "Hospital Reina Sofia": {
         "collecting_institution_address": "Carretera de Tarazona, Km. 4",
         "collecting_institution_email": "",
         "geo_loc_state": "Navarra",
