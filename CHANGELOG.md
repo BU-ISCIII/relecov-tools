@@ -30,6 +30,7 @@ Code contributions to the release:
 
 - [Pablo Mata](https://github.com/Shettland)
 - [Sergio Olmos](https://github.com/OPSergio)
+- [Sarai Varona](https://github.com/svarona)
 
 ### Modules
 
@@ -46,6 +47,7 @@ Code contributions to the release:
 - Configurations for the mail module added to configuration.json [#328](https://github.com/BU-ISCIII/relecov-tools/pull/328)
 - Added static method get_invalid_count in log_summary.py [#328](https://github.com/BU-ISCIII/relecov-tools/pull/328)
 - Included a try-except for every module to catch unexpected errors in __main__.py [#339](https://github.com/BU-ISCIII/relecov-tools/pull/339)
+- Added, removed and renamed collecting institutions and their cities [#340](https://github.com/BU-ISCIII/relecov-tools/pull/340)
 
 #### Fixes
 
