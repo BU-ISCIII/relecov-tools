@@ -394,6 +394,37 @@
     "Urdúliz":{
         "geo_loc_latitude": "43.375278",
         "geo_loc_longitude": "-2.960000"
+    },
+    "Manacor":{
+        "geo_loc_latitude": "39.569716",
+        "geo_loc_longitude": "3.209629"
+    },
+    "Osuna":{
+        "geo_loc_latitude": "37.237347",
+        "geo_loc_longitude": "-5.103482"
+    },
+    "Jerez de la Frontera":{
+        "geo_loc_latitude": "36.685195",
+        "geo_loc_longitude": "-6.125217"
+    },
+    "Ibiza":{
+        "geo_loc_latitude": "38.906921",
+        "geo_loc_longitude": "1.419519"
+    },
+    "Cabra":{
+        "geo_loc_latitude": "37.473418",
+        "geo_loc_longitude": "-4.442200"
+    },
+    "Inca":{
+        "geo_loc_latitude": "39.716349",
+        "geo_loc_longitude": "2.915213"
+    },
+    "Mahón":{
+        "geo_loc_latitude": "39.887261",
+        "geo_loc_longitude": "4.259530"
+    },
+    "Puerto Real":{
+        "geo_loc_latitude": "36.531682",
+        "geo_loc_longitude": "-6.183047"
     }
-
 }
