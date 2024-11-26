@@ -190,8 +190,8 @@ def download(
     try:
         download_manager.execute_process()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 # metadata
 @relecov_tools_cli.command(help_priority=3)
@@ -227,8 +227,8 @@ def read_lab_metadata(metadata_file, sample_list_file, metadata_out, files_folde
     try:
         new_metadata.create_metadata_json()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 # validation
 @relecov_tools_cli.command(help_priority=4)
@@ -249,8 +249,8 @@ def validate(json_file, json_schema, metadata, out_folder):
     try:
         validation.validate()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 # send-email
 @relecov_tools_cli.command(help_priority=4)
@@ -335,8 +335,11 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
         raise ValueError("Error: Could not obtain the recipient's email address.")
 
     subject = f"Informe de Validación de Muestras - {institution_name}"
-
-    email_sender.send_email(final_receiver_email, subject, email_body, attachments)
+    try:
+        email_sender.send_email(final_receiver_email, subject, email_body, attachments)
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 # mapping to ENA schema
@@ -359,8 +362,8 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
     try:
         new_schema.map_to_data_to_new_schema()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 # upload to ENA
 @relecov_tools_cli.command(help_priority=6)
@@ -407,8 +410,8 @@ def upload_to_ena(
     try:
         upload_ena.upload()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 # upload to GISAID
 @relecov_tools_cli.command(help_priority=7)
@@ -477,8 +480,8 @@ def upload_to_gisaid(
     try:
         upload_gisaid.gisaid_upload()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 @relecov_tools_cli.command(help_priority=9)
 @click.option("-j", "--json", help="data in json format")
@@ -521,8 +524,8 @@ def update_db(user, password, json, type, platform, server_url, full_update):
     try:
         update_database_obj.update_db()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 # read metadata bioinformatics
 @relecov_tools_cli.command(help_priority=10)
@@ -548,8 +551,8 @@ def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
     try:
         new_bioinfo_metadata.create_bioinfo_file()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 # read metadata bioinformatics
 @relecov_tools_cli.command(help_priority=12)
@@ -574,8 +577,8 @@ def metadata_homogeneizer(institution, directory, output):
     try:
         new_parse.converting_metadata()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 # creating symbolic links
 @relecov_tools_cli.command(help_priority=13)
@@ -616,8 +619,8 @@ def pipeline_manager(input, template, output, config, folder_names):
     try:
         new_launch.pipeline_exc()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 # schema builder
 @relecov_tools_cli.command(help_priority=14)
@@ -656,8 +659,8 @@ def build_schema(input_file, schema_base, draft_version, diff, out_dir):
     try:
         schema_update.handle_build_schema()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 @relecov_tools_cli.command(help_priority=15)
 @click.option(
@@ -704,8 +707,8 @@ def logs_to_excel(lab_code, output_folder, files):
         excel_outpath = os.path.join(output_folder, lab_code + "_logs_report.xlsx")
         logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 @relecov_tools_cli.command(help_priority=16)
 @click.option(
@@ -730,8 +733,8 @@ def wrapper(config_file, output_folder):
     try:
         process_wrapper.run_wrapper()
     except Exception as e:
-        log.error(f"EXCEPTION FOUND: {e}")
-
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 if __name__ == "__main__":
     run_relecov_tools()
