@@ -176,12 +176,12 @@ class PipelineManager:
                 raise FileNotFoundError("No folders found with the given names")
             last_folder = sorted(folder_list)[-1]
             try:
-                latest_date = relecov_tools.utils.string_to_date(last_folder)
+                latest_date = relecov_tools.utils.string_to_date(last_folder).date()
             except ValueError:
                 log.error("Failed to get date from folder names. Using last mod date")
                 latest_date = max(
                     [relecov_tools.utils.get_file_date(f) for f in folders_to_process]
-                )
+                ).date()
         else:
             folders_to_process, latest_date = self.get_latest_lab_folders(initial_date)
         join_validate = list()
