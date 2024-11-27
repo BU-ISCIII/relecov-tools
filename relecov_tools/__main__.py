@@ -611,11 +611,11 @@ def metadata_homogeneizer(institution, directory, output):
 )
 @click.option("-o", "--output", type=click.Path(), help="select output folder")
 @click.option(
-    "-l",
+    "-f",
     "--folder_names",
     multiple=True,
     default=None,
-    help="Folders to process. Target folders names should match the given dates",
+    help="Folder basenames to process. Target folders names should match the given dates. E.g. ... -f folder1 -f folder2 -f folder3",
 )
 def pipeline_manager(input, template, output, config, folder_names):
     """
