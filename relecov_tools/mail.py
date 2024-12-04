@@ -70,6 +70,14 @@ class EmailSender:
         return email_template
 
     def send_email(self, receiver_email, subject, body, attachments):
+        
+        if not isinstance(receiver_email, list):
+            raise ValueError(f"receiver_emails debe ser una lista, pero se recibió: {type(receiver_email)}")
+
+        if not all(isinstance(email, str) for email in receiver_email):
+            raise ValueError("Todos los elementos en receiver_emails deben ser cadenas.")
+
+        
         credentials = relecov_tools.utils.read_yml_file(self.yaml_cred_path)
         if not credentials:
             print("No credentials found.")
@@ -81,10 +89,14 @@ class EmailSender:
         if not email_password:
             print("The e-mail password could not be found.")
             return
-
+        
+        log.info(f"Email receivers: {receiver_email}")
+        print(f"Email receivers: {receiver_email}") 
+        default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart()
         msg["From"] = sender_email
-        msg["To"] = receiver_email
+        msg["To"] = ", ".join(receiver_email)
+        msg["CC"] = default_cc
         msg["Subject"] = subject
         msg.attach(MIMEText(body, "plain"))
 
@@ -98,13 +110,14 @@ class EmailSender:
                     f"attachment; filename={os.path.basename(attachment)}",
                 )
                 msg.attach(part)
-
+        all_recipients = receiver_email + [default_cc]
         try:
             server = smtplib.SMTP(self.config["email_host"], self.config["email_port"])
             server.starttls()
             server.login(sender_email, email_password)
-            server.sendmail(sender_email, receiver_email, msg.as_string())
+            server.sendmail(sender_email, all_recipients, msg.as_string())
             server.quit()
-            print("Mail sent successfully.")
+            log.info(f"Mail sent successfully.")
+            print(f"Mail sent successfully.")
         except smtplib.SMTPException as e:
-            log.error(f"Error sending the mail: {e}")
+            log.error(f"Error sending the mail to {receiver_email}: {e}")

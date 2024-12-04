@@ -330,13 +330,19 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     if email_body is None:
         raise RuntimeError("Error: Could not generate mail.")
 
-    final_receiver_email = (
-        receiver_email if receiver_email else email_receiver_from_json
-    )
+    final_receiver_email = None
+    if not receiver_email:
+        final_receiver_email = [email.strip() for email in email_receiver_from_json.split(";")]
+    else:
+        final_receiver_email = (
+            [email.strip() for email in receiver_email.split(";")]
+            if isinstance(receiver_email, str)
+            else receiver_email
+        )
 
     if not final_receiver_email:
         raise ValueError("Error: Could not obtain the recipient's email address.")
-
+    
     subject = f"Informe de Validación de Muestras - {institution_name}"
     try:
         email_sender.send_email(final_receiver_email, subject, email_body, attachments)
