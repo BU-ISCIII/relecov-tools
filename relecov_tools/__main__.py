@@ -290,7 +290,6 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     """
     config_loader = relecov_tools.config_json.ConfigJson()
     config = config_loader.get_configuration("mail_sender")
-
     if not config:
         raise ValueError(
             "Error: The configuration for 'mail_sender' could not be loaded."

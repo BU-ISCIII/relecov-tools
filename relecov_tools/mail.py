@@ -121,7 +121,7 @@ class EmailSender:
             server.login(sender_email, email_password)
             server.sendmail(sender_email, all_recipients, msg.as_string())
             server.quit()
-            log.info(f"Mail sent successfully.")
-            print(f"Mail sent successfully.")
+            log.info("Mail sent successfully.")
+            print("Mail sent successfully.")
         except smtplib.SMTPException as e:
             log.error(f"Error sending the mail to {receiver_email}: {e}")
