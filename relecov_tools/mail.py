@@ -44,7 +44,11 @@ class EmailSender:
             return None
 
     def render_email_template(
-        self, additional_info="", invalid_count=None, submitting_institution_code=None, template_name=None
+        self,
+        additional_info="",
+        invalid_count=None,
+        submitting_institution_code=None,
+        template_name=None,
     ):
 
         institution_info = self.get_institution_info(submitting_institution_code)
@@ -63,7 +67,7 @@ class EmailSender:
             "additional_info": additional_info,
         }
 
-        templates_base_dir = os.path.dirname(self.template_path) 
+        templates_base_dir = os.path.dirname(self.template_path)
         env = Environment(loader=FileSystemLoader(templates_base_dir))
         template = env.get_template(template_name)
         email_template = template.render(**template_vars_dict)
@@ -71,14 +75,15 @@ class EmailSender:
         return email_template
 
     def send_email(self, receiver_email, subject, body, attachments):
-        
+
         if not isinstance(receiver_email, list):
-            raise ValueError(f"receiver_emails should be a list, but it received: {type(receiver_email)}")
+            raise ValueError(
+                f"receiver_emails should be a list, but it received: {type(receiver_email)}"
+            )
 
         if not all(isinstance(email, str) for email in receiver_email):
             raise ValueError("All elements in receiver_emails must be strings.")
 
-        
         credentials = relecov_tools.utils.read_yml_file(self.yaml_cred_path)
         if not credentials:
             print("No credentials found.")
@@ -90,7 +95,7 @@ class EmailSender:
         if not email_password:
             print("The e-mail password could not be found.")
             return
-        
+
         default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart()
         msg["From"] = sender_email

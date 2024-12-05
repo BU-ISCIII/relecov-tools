@@ -306,12 +306,12 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
 
     email_sender = relecov_tools.mail.EmailSender(config)
-    
+
     template_choice = click.prompt(
         "Select the type of template:\n1. Validation with errors\n2. Validation successful",
         type=int,
         default=1,
-        show_choices=False
+        show_choices=False,
     )
     if template_choice not in [1, 2]:
         raise ValueError("Error: invalid option.")
@@ -340,7 +340,7 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
         additional_info,
         invalid_count=invalid_count,
         submitting_institution_code=submitting_institution_code,
-        template_name=template_name
+        template_name=template_name,
     )
 
     if email_body is None:
@@ -348,7 +348,9 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
 
     final_receiver_email = None
     if not receiver_email:
-        final_receiver_email = [email.strip() for email in email_receiver_from_json.split(";")]
+        final_receiver_email = [
+            email.strip() for email in email_receiver_from_json.split(";")
+        ]
     else:
         final_receiver_email = (
             [email.strip() for email in receiver_email.split(";")]
@@ -358,7 +360,7 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
 
     if not final_receiver_email:
         raise ValueError("Error: Could not obtain the recipient's email address.")
-    
+
     subject = f"Informe de Validación de Muestras - {institution_name}"
     try:
         email_sender.send_email(final_receiver_email, subject, email_body, attachments)
