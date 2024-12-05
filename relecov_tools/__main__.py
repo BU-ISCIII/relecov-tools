@@ -306,6 +306,21 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
 
     email_sender = relecov_tools.mail.EmailSender(config)
+    
+    template_choice = click.prompt(
+        "Select the type of template:\n1. Validation with errors\n2. Validation successful",
+        type=int,
+        default=1,
+        show_choices=False
+    )
+    if template_choice not in [1, 2]:
+        raise ValueError("Error: invalid option.")
+
+    # Determinar el template a usar
+    if template_choice == 1:
+        template_name = "jinja_template_with_errors.j2"
+    else:
+        template_name = "jinja_template_success.j2"
 
     add_info = click.confirm(
         "Would you like to add additional information in the mail?", default=False
@@ -325,6 +340,7 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
         additional_info,
         invalid_count=invalid_count,
         submitting_institution_code=submitting_institution_code,
+        template_name=template_name
     )
 
     if email_body is None:

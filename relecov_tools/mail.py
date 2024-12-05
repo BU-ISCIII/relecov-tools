@@ -44,7 +44,7 @@ class EmailSender:
             return None
 
     def render_email_template(
-        self, additional_info="", invalid_count=None, submitting_institution_code=None
+        self, additional_info="", invalid_count=None, submitting_institution_code=None, template_name=None
     ):
 
         institution_info = self.get_institution_info(submitting_institution_code)
@@ -63,8 +63,9 @@ class EmailSender:
             "additional_info": additional_info,
         }
 
-        env = Environment(loader=FileSystemLoader(os.path.dirname(self.template_path)))
-        template = env.get_template(os.path.basename(self.template_path))
+        templates_base_dir = os.path.dirname(self.template_path) 
+        env = Environment(loader=FileSystemLoader(templates_base_dir))
+        template = env.get_template(template_name)
         email_template = template.render(**template_vars_dict)
 
         return email_template
@@ -72,10 +73,10 @@ class EmailSender:
     def send_email(self, receiver_email, subject, body, attachments):
         
         if not isinstance(receiver_email, list):
-            raise ValueError(f"receiver_emails debe ser una lista, pero se recibió: {type(receiver_email)}")
+            raise ValueError(f"receiver_emails should be a list, but it received: {type(receiver_email)}")
 
         if not all(isinstance(email, str) for email in receiver_email):
-            raise ValueError("Todos los elementos en receiver_emails deben ser cadenas.")
+            raise ValueError("All elements in receiver_emails must be strings.")
 
         
         credentials = relecov_tools.utils.read_yml_file(self.yaml_cred_path)
@@ -90,8 +91,6 @@ class EmailSender:
             print("The e-mail password could not be found.")
             return
         
-        log.info(f"Email receivers: {receiver_email}")
-        print(f"Email receivers: {receiver_email}") 
         default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart()
         msg["From"] = sender_email
