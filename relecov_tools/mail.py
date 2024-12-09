@@ -44,7 +44,11 @@ class EmailSender:
             return None
 
     def render_email_template(
-        self, additional_info="", invalid_count=None, submitting_institution_code=None
+        self,
+        additional_info="",
+        invalid_count=None,
+        submitting_institution_code=None,
+        template_name=None,
     ):
 
         institution_info = self.get_institution_info(submitting_institution_code)
@@ -63,13 +67,23 @@ class EmailSender:
             "additional_info": additional_info,
         }
 
-        env = Environment(loader=FileSystemLoader(os.path.dirname(self.template_path)))
-        template = env.get_template(os.path.basename(self.template_path))
+        templates_base_dir = os.path.dirname(self.template_path)
+        env = Environment(loader=FileSystemLoader(templates_base_dir))
+        template = env.get_template(template_name)
         email_template = template.render(**template_vars_dict)
 
         return email_template
 
     def send_email(self, receiver_email, subject, body, attachments):
+
+        if not isinstance(receiver_email, list):
+            raise ValueError(
+                f"receiver_emails should be a list, but it received: {type(receiver_email)}"
+            )
+
+        if not all(isinstance(email, str) for email in receiver_email):
+            raise ValueError("All elements in receiver_emails must be strings.")
+
         credentials = relecov_tools.utils.read_yml_file(self.yaml_cred_path)
         if not credentials:
             print("No credentials found.")
@@ -82,9 +96,11 @@ class EmailSender:
             print("The e-mail password could not be found.")
             return
 
+        default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart()
         msg["From"] = sender_email
-        msg["To"] = receiver_email
+        msg["To"] = ", ".join(receiver_email)
+        msg["CC"] = default_cc
         msg["Subject"] = subject
         msg.attach(MIMEText(body, "plain"))
 
@@ -98,13 +114,14 @@ class EmailSender:
                     f"attachment; filename={os.path.basename(attachment)}",
                 )
                 msg.attach(part)
-
+        all_recipients = receiver_email + [default_cc]
         try:
             server = smtplib.SMTP(self.config["email_host"], self.config["email_port"])
             server.starttls()
             server.login(sender_email, email_password)
-            server.sendmail(sender_email, receiver_email, msg.as_string())
+            server.sendmail(sender_email, all_recipients, msg.as_string())
             server.quit()
+            log.info("Mail sent successfully.")
             print("Mail sent successfully.")
         except smtplib.SMTPException as e:
-            log.error(f"Error sending the mail: {e}")
+            log.error(f"Error sending the mail to {receiver_email}: {e}")

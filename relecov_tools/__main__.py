@@ -290,7 +290,6 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     """
     config_loader = relecov_tools.config_json.ConfigJson()
     config = config_loader.get_configuration("mail_sender")
-
     if not config:
         raise ValueError(
             "Error: The configuration for 'mail_sender' could not be loaded."
@@ -306,6 +305,21 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
     invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
 
     email_sender = relecov_tools.mail.EmailSender(config)
+
+    template_choice = click.prompt(
+        "Select the type of template:\n1. Validation with errors\n2. Validation successful",
+        type=int,
+        default=1,
+        show_choices=False,
+    )
+    if template_choice not in [1, 2]:
+        raise ValueError("Error: invalid option.")
+
+    # Determinar el template a usar
+    if template_choice == 1:
+        template_name = "jinja_template_with_errors.j2"
+    else:
+        template_name = "jinja_template_success.j2"
 
     add_info = click.confirm(
         "Would you like to add additional information in the mail?", default=False
@@ -325,14 +339,23 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
         additional_info,
         invalid_count=invalid_count,
         submitting_institution_code=submitting_institution_code,
+        template_name=template_name,
     )
 
     if email_body is None:
         raise RuntimeError("Error: Could not generate mail.")
 
-    final_receiver_email = (
-        receiver_email if receiver_email else email_receiver_from_json
-    )
+    final_receiver_email = None
+    if not receiver_email:
+        final_receiver_email = [
+            email.strip() for email in email_receiver_from_json.split(";")
+        ]
+    else:
+        final_receiver_email = (
+            [email.strip() for email in receiver_email.split(";")]
+            if isinstance(receiver_email, str)
+            else receiver_email
+        )
 
     if not final_receiver_email:
         raise ValueError("Error: Could not obtain the recipient's email address.")
