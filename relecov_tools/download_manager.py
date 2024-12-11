@@ -1174,20 +1174,22 @@ class DownloadManager:
                     corrupted.append(file)
 
             for sample_id, files in list(valid_filedict.items()):
-                if any(files.get(key) in corrupted for key in ["sequence_file_R1_fastq", "sequence_file_R2_fastq"]):
+                if any(
+                    files.get(key) in corrupted
+                    for key in ["sequence_file_R1_fastq", "sequence_file_R2_fastq"]
+                ):
                     for file_name in files.values():
                         path = os.path.join(local_folder, file_name)
                         try:
                             os.remove(path)
-                            log.info("File %s was removed because it was corrupted", file_name)
+                            log.info(
+                                "File %s was removed because it was corrupted",
+                                file_name,
+                            )
                         except (FileNotFoundError, PermissionError, OSError) as e:
-                            error_text = (
-                                "Could not remove corrupted file %s: %s"
-                            )
+                            error_text = "Could not remove corrupted file %s: %s"
                             log.error(error_text % (path, e))
-                            stderr.print(
-                                f"[red]{error_text % (path, e)}"
-                            )
+                            stderr.print(f"[red]{error_text % (path, e)}")
 
             not_md5sum = []
             if remote_md5sum:
