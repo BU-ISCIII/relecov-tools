@@ -1127,23 +1127,9 @@ class DownloadManager:
                     if saved_files:
                         successful_files.extend(saved_files)
                     if corrupted:
-                        corr_fold = os.path.join(local_folder, "corrupted")
-                        os.mkdir(corr_fold)
-                        error_text = "Found corrupted files: %s. Moved to: %s"
-                        stderr.print(f"[red]{error_text % (str(corrupted), corr_fold)}")
-                        self.include_warning(error_text % (str(corrupted), corr_fold))
-                        for corr_file in corrupted:
-                            path = os.path.join(local_folder, corr_file)
-                            try:
-                                os.rename(path, os.path.join(corr_fold, corr_file))
-                            except (FileNotFoundError, PermissionError, OSError) as e:
-                                error_text = (
-                                    "Could not move corrupted file %s to %s: %s"
-                                )
-                                log.error(error_text % (path, corr_fold, e))
-                                stderr.print(
-                                    f"[red]{error_text % (path, corr_fold, e)}"
-                                )
+                        error_text = "Found corrupted files: %s. Removed"
+                        stderr.print(f"[red]{error_text % (str(corrupted))}")
+                        self.include_warning(error_text % (str(corrupted)))
                         if self.abort_if_md5_mismatch:
                             error_text = "Stop processing %s due to corrupted files."
                             stderr.print(f"[red]{error_text % folder}")
@@ -1186,6 +1172,22 @@ class DownloadManager:
                 full_f_path = os.path.join(local_folder, file)
                 if not relecov_tools.utils.check_gzip_integrity(full_f_path):
                     corrupted.append(file)
+
+            for sample_id, files in list(valid_filedict.items()):
+                if any(files.get(key) in corrupted for key in ["sequence_file_R1_fastq", "sequence_file_R2_fastq"]):
+                    for file_name in files.values():
+                        path = os.path.join(local_folder, file_name)
+                        try:
+                            os.remove(path)
+                            log.info("File %s was removed because it was corrupted", file_name)
+                        except (FileNotFoundError, PermissionError, OSError) as e:
+                            error_text = (
+                                "Could not remove corrupted file %s: %s"
+                            )
+                            log.error(error_text % (path, e))
+                            stderr.print(
+                                f"[red]{error_text % (path, e)}"
+                            )
 
             not_md5sum = []
             if remote_md5sum:
