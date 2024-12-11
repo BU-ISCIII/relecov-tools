@@ -1181,6 +1181,12 @@ class DownloadManager:
             else:
                 clean_fetchlist = seqs_fetchlist
             clean_pathlist = [os.path.join(local_folder, fi) for fi in clean_fetchlist]
+
+            for file in clean_fetchlist:
+                full_f_path = os.path.join(local_folder, file)
+                if not relecov_tools.utils.check_gzip_integrity(full_f_path):
+                    corrupted.append(file)
+
             not_md5sum = []
             if remote_md5sum:
                 # Get hashes from provided md5sum, create them for those not provided
@@ -1204,10 +1210,6 @@ class DownloadManager:
                     relecov_tools.utils.calculate_md5(path) for path in clean_pathlist
                 ]
                 files_md5_dict = dict(zip(clean_fetchlist, md5_hashes))
-            for file in files_md5_dict.keys():
-                full_f_path = os.path.join(local_folder, file)
-                if not relecov_tools.utils.check_gzip_integrity(full_f_path):
-                    corrupted.append(file)
             files_md5_dict = {
                 x: y for x, y in files_md5_dict.items() if x not in corrupted
             }
