@@ -1193,10 +1193,10 @@ class DownloadManager:
                 files_md5_dict = {}
                 for path in clean_pathlist:
                     f_name = os.path.basename(path)
-                    if f_name in successful_files:
-                        files_md5_dict[f_name] = hash_dict[f_name]
-                    elif f_name in corrupted:
+                    if f_name in corrupted:
                         clean_fetchlist.remove(f_name)
+                    elif f_name in successful_files:
+                        files_md5_dict[f_name] = hash_dict[f_name]
                     else:
                         if not str(f_name).rstrip(".gz") in files_to_compress:
                             error_text = "File %s not found in md5sum. Creating hash"
