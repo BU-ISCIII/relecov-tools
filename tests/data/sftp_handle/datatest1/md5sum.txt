@@ -10,3 +10,5 @@ BADBAD35deedza0182d5aacae53fe025  SAMPLE3_R1.fastq.gz
 bd22843bd5e36a54f9c1ae1f0e7bdbac  SAMPLE6_R1.fastq.gz
 eebd6cc938d962ca54b2cc4f3650e039  SAMPLE6_R2.fastq.gz
 e04c2abf071e931c2d8f2bab52d3f12b  Singlesamp.fastq.gz
+929afcb4017667621570efb854b918cb  SAMPLE7_R1.fastq.gz
+fc4e0e44b48b58b2aaf74d81626647bc  SAMPLE7_R2.fastq.gz
