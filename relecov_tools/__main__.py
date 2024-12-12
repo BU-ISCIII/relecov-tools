@@ -35,6 +35,8 @@ stderr = rich.console.Console(
     stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
 )
 
+__version__ = "1.3.0"
+
 
 def run_relecov_tools():
     # Set up the rich traceback
@@ -64,7 +66,6 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "1.3.0"
     stderr.print(
         "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
@@ -135,6 +136,7 @@ def relecov_tools_cli(verbose, log_file):
             )
         )
         log.addHandler(log_fh)
+        log.info(f"RELECOV-tools version {__version__}")
 
 
 # sftp
