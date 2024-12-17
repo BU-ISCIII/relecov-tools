@@ -30,9 +30,8 @@ class SchemaValidation:
         excel_sheet=None,
     ):
         """Validate json file against the schema"""
-
+        config_json = ConfigJson()
         if json_schema_file is None:
-            config_json = ConfigJson()
             schema_name = config_json.get_topic_data("json_schemas", "relecov_schema")
             json_schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
