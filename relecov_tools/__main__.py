@@ -245,10 +245,17 @@ def read_lab_metadata(metadata_file, sample_list_file, metadata_out, files_folde
     help="Origin file containing metadata",
 )
 @click.option("-o", "--out_folder", help="Path to save validate json file")
-def validate(json_file, json_schema, metadata, out_folder):
+@click.option(
+    "-e",
+    "--excel_sheet",
+    required=False,
+    default=None,
+    help="Optional: Name of the sheet in excel file to validate.",
+)
+def validate(json_file, json_schema, metadata, out_folder, excel_sheet):
     """Validate json file against schema."""
     validation = relecov_tools.json_validation.SchemaValidation(
-        json_file, json_schema, metadata, out_folder
+        json_file, json_schema, metadata, out_folder, excel_sheet
     )
     try:
         validation.validate()
