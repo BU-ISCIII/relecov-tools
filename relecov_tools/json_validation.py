@@ -75,8 +75,13 @@ class SchemaValidation:
         except ValueError as e:
             self.sample_id_field = None
             self.SAMPLE_FIELD_ERROR = str(e)
+        conf_subdata = config_json.get_topic_data("sftp_handle", "metadata_processing")
         if excel_sheet is None:
-            self.excel_sheet = "METADATA_LAB"
+            try:
+                self.excel_sheet = conf_subdata["excel_sheet"]
+            except KeyError:
+                log.error("Default metadata sheet name should be in config file")
+                raise
         else:
             self.excel_sheet = excel_sheet
 
@@ -193,11 +198,11 @@ class SchemaValidation:
         for row in invalid_json:
             sample_list.append(str(row[self.sample_id_field]))
         wb = openpyxl.load_workbook(metadata)
-        # TODO: Include this as a key in configuration.json
         try:
             ws_sheet = wb[self.excel_sheet]
         except KeyError:
-            log.error("No sheet with name %s could be found in excel file", str(self.excel_sheet))
+            logtxt = f"No sheet named {self.excel_sheet} could be found in {metadata}"
+            log.error(logtxt)
             raise
         tag = "Sample ID given for sequencing"
         seq_id_col = [idx for idx, cell in enumerate(ws_sheet[1]) if tag in cell.value]
