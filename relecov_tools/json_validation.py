@@ -22,7 +22,12 @@ stderr = rich.console.Console(
 
 class SchemaValidation:
     def __init__(
-        self, json_data_file=None, json_schema_file=None, metadata=None, out_folder=None
+        self,
+        json_data_file=None,
+        json_schema_file=None,
+        metadata=None,
+        out_folder=None,
+        excel_sheet=None,
     ):
         """Validate json file against the schema"""
 
@@ -70,6 +75,10 @@ class SchemaValidation:
         except ValueError as e:
             self.sample_id_field = None
             self.SAMPLE_FIELD_ERROR = str(e)
+        if excel_sheet is None:
+            self.excel_sheet = "METADATA_LAB"
+        else:
+            self.excel_sheet = excel_sheet
 
     def validate_schema(self):
         """Validate json schema against draft"""
@@ -185,7 +194,11 @@ class SchemaValidation:
             sample_list.append(str(row[self.sample_id_field]))
         wb = openpyxl.load_workbook(metadata)
         # TODO: Include this as a key in configuration.json
-        ws_sheet = wb["METADATA_LAB"]
+        try:
+            ws_sheet = wb[self.excel_sheet]
+        except KeyError:
+            log.error("No sheet with name %s could be found in excel file", str(self.excel_sheet))
+            raise
         tag = "Sample ID given for sequencing"
         seq_id_col = [idx for idx, cell in enumerate(ws_sheet[1]) if tag in cell.value]
         if seq_id_col:
