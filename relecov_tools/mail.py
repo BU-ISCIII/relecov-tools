@@ -49,6 +49,7 @@ class EmailSender:
         invalid_count=None,
         submitting_institution_code=None,
         template_name=None,
+        batch=None,
     ):
 
         institution_info = self.get_institution_info(submitting_institution_code)
@@ -65,6 +66,7 @@ class EmailSender:
                 else 0
             ),
             "additional_info": additional_info,
+            "batch": batch,
         }
 
         templates_base_dir = os.path.dirname(self.template_path)

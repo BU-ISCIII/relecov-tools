@@ -313,6 +313,7 @@ def send_mail(validate_file, receiver_email, attachments, template_path, email_p
         )
 
     validate_data = relecov_tools.utils.read_json_file(validate_file)
+    batch = os.path.basename(os.path.dirname(os.path.abspath(validate_file)))
 
     if not validate_data:
         raise ValueError("Error: Validation data could not be loaded.")
@@ -357,6 +358,7 @@ def send_mail(validate_file, receiver_email, attachments, template_path, email_p
         invalid_count=invalid_count,
         submitting_institution_code=submitting_institution_code,
         template_name=template_name,
+        batch=batch,
     )
 
     if email_body is None:
@@ -377,7 +379,7 @@ def send_mail(validate_file, receiver_email, attachments, template_path, email_p
     if not final_receiver_email:
         raise ValueError("Error: Could not obtain the recipient's email address.")
 
-    subject = f"Informe de Validación de Muestras - {institution_name}"
+    subject = f"RELECOV - Informe de Validación de Muestras {batch} - {institution_name}"
     try:
         email_sender.send_email(final_receiver_email, subject, email_body, attachments, email_psswd)
     except Exception as e:
