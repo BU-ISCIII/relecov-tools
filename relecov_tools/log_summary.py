@@ -218,9 +218,7 @@ class LogSum:
                 new_sheet.append(header)
             regex = r"[\[\]]"  # Regex to remove lists brackets
             workbook["Global Report"].append(
-                "\n ".join(
                     [reg_remover(x, regex) for k, x in logs.items() if k != "samples"]
-                )
             )
             regex = r"\[.*?\]"  # Regex to remove ontology annotations between brackets
             for sample, slog in samples_logs.items():
