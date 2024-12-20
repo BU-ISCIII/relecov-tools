@@ -13,9 +13,9 @@ log = logging.getLogger(__name__)
 
 
 class EmailSender:
-    def __init__(self, config):
+    def __init__(self, config, template_path):
         self.config = config
-        self.template_path = self.config.get("delivery_template_path_file")
+        self.template_path = template_path
         self.yaml_cred_path = self.config.get("yaml_cred_path")
 
         if not self.config:

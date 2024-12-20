@@ -287,13 +287,21 @@ def validate(json_file, json_schema, metadata, out_folder, excel_sheet):
     help="Path to file",
 )
 @click.option(
+    "-t",
+    "--template_path",
+    type=click.Path(exists=True),
+    required=True,
+    default=None,
+    help="Path to relecov-tools templates folder",
+)
+@click.option(
     "-p",
     "--email-psswd",
     help="Password for bioinformatica@isciii.es",
     required=False,
     default=None,
 )
-def send_mail(validate_file, receiver_email, attachments, email_psswd):
+def send_mail(validate_file, receiver_email, attachments, template_path, email_psswd):
     """
     Send a sample validation report by mail.
     """
@@ -313,7 +321,7 @@ def send_mail(validate_file, receiver_email, attachments, email_psswd):
 
     invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
 
-    email_sender = relecov_tools.mail.EmailSender(config)
+    email_sender = relecov_tools.mail.EmailSender(config, template_path)
 
     template_choice = click.prompt(
         "Select the type of template:\n1. Validation with errors\n2. Validation successful",
