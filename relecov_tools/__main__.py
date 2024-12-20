@@ -379,9 +379,13 @@ def send_mail(validate_file, receiver_email, attachments, template_path, email_p
     if not final_receiver_email:
         raise ValueError("Error: Could not obtain the recipient's email address.")
 
-    subject = f"RELECOV - Informe de Validación de Muestras {batch} - {institution_name}"
+    subject = (
+        f"RELECOV - Informe de Validación de Muestras {batch} - {institution_name}"
+    )
     try:
-        email_sender.send_email(final_receiver_email, subject, email_body, attachments, email_psswd)
+        email_sender.send_email(
+            final_receiver_email, subject, email_body, attachments, email_psswd
+        )
     except Exception as e:
         log.exception(f"EXCEPTION FOUND: {e}")
         raise

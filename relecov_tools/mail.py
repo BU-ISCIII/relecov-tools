@@ -93,7 +93,9 @@ class EmailSender:
 
         sender_email = self.config["email_host_user"]
 
-        email_password = email_psswd if email_psswd else credentials.get("email_password")
+        email_password = (
+            email_psswd if email_psswd else credentials.get("email_password")
+        )
 
         if not email_password:
             print("The e-mail password could not be found.")
