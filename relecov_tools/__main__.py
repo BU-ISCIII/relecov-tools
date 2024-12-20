@@ -271,7 +271,7 @@ def validate(json_file, json_schema, metadata, out_folder, excel_sheet):
     "--validate-file",
     required=True,
     type=click.Path(exists=True),
-    help="Path to the validation file (validate.json)",
+    help="Path to the validation summary json file (validate_log_summary.json)",
 )
 @click.option(
     "-r",
