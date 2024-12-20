@@ -54,6 +54,7 @@ Code contributions to the release:
 - Modified the module logic to dynamically select and render email templates based on user input. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
 - Enhanced email formatting and added a default CC to bioinformatica@isciii.es. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
 - Validate module now takes an optional argument to select the name of the sheet to check in excel file [#357](https://github.com/BU-ISCIII/relecov-tools/pull/357)
+- Fixed email module [#361](https://github.com/BU-ISCIII/relecov-tools/pull/361)
 
 #### Fixes
 
