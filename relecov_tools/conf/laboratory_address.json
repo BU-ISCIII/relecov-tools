@@ -178,7 +178,7 @@
         "submitting_institution_address": "",
         "submitting_institution_email": ""
     },
-    "Centro De Atención A La Salud Mental \"La Milagrosa\"": {
+    "Centro De Atención A La Salud Mental La Milagrosa": {
         "collecting_institution_address": "Travesía De La Igualdad, S/N",
         "collecting_institution_email": "Desconocido",
         "collecting_institution_finalidad": "Psiquiátrico",
@@ -682,7 +682,7 @@
         "submitting_institution_address": "",
         "submitting_institution_email": ""
     },
-    "Hospital \"Fundación San Juan De Dios De Extremadura\"": {
+    "Hospital Fundación San Juan De Dios De Extremadura": {
         "collecting_institution_address": "Paseo De La Piedad, 5",
         "collecting_institution_email": "almendralejosjd.es",
         "collecting_institution_finalidad": "Geriatría Y/O Larga Estancia",
@@ -2117,7 +2117,7 @@
         "submitting_institution_email": ""
     },
     "Hospital  Universitari De Vic": {
-        "collecting_institution_address": "Cr Francesc Pla \"El Vigata\", 1",
+        "collecting_institution_address": "Cr Francesc Pla El Vigata, 1",
         "collecting_institution_email": "gerencia@hgv.es",
         "collecting_institution_finalidad": "General",
         "geo_loc_state": "Cataluña",
@@ -2441,7 +2441,7 @@
         "submitting_institution_email": ""
     },
     "Comunitat Terapèutica Arenys De Munt": {
-        "collecting_institution_address": "Ct Barri Orient  \"Can Zariquiey\", 26",
+        "collecting_institution_address": "Ct Barri Orient, 26",
         "collecting_institution_email": "ctam@ctm-salutmental.com",
         "collecting_institution_finalidad": "Psiquiátrico",
         "geo_loc_state": "Cataluña",
@@ -3481,7 +3481,7 @@
         "submitting_institution_email": ""
     },
     "Hospital Quirón Campo De Gibraltar": {
-        "collecting_institution_address": "Parque Empresarial \"Las Marismas De Palmones\", Edificio Arttysur",
+        "collecting_institution_address": "Parque Empresarial Las Marismas De Palmones, Edificio Arttysur",
         "collecting_institution_email": "Desconocido",
         "collecting_institution_finalidad": "General",
         "geo_loc_state": "Andalucía",
@@ -7104,7 +7104,7 @@
         "submitting_institution_email": ""
     },
     "Clínica Rincón": {
-        "collecting_institution_address": "C/ Antonio Ferrandis \"Chanquete\", 1 - Edificio Riosol",
+        "collecting_institution_address": "C/ Antonio Ferrandis Chanquete, 1 - Edificio Riosol",
         "collecting_institution_email": "Desconocido",
         "collecting_institution_finalidad": "General",
         "geo_loc_state": "Andalucía",
@@ -7904,7 +7904,7 @@
         "submitting_institution_address": "",
         "submitting_institution_email": ""
     },
-    "Hospital  Universitario \"San Agustín\"": {
+    "Hospital  Universitario San Agustín": {
         "collecting_institution_address": "Camino De Heros, 6",
         "collecting_institution_email": "gerencia.gae3@sespa.es",
         "collecting_institution_finalidad": "General",
