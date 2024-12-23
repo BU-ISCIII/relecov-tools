@@ -22,7 +22,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.3.0] - 2024-11-26 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.3.0
+## [1.3.0] - 2024-12-23 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.3.0
 
 ### Credits
 
