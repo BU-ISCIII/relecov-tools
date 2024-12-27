@@ -185,9 +185,55 @@ class LogSum:
 
         def reg_remover(string, pattern):
             """Remove annotation between brackets in logs message"""
-            string = string.replace("['", "'").replace("']", "'")
+            string = str(string)
+            string = string.replace("['", "'").replace("']", "'").replace('"', "")
             string = re.sub(pattern, "", string)
             return string.strip()
+
+        def feed_logs_to_excel(key, logs, excel_outpath):
+            """Feed the data from logs into an excel file, creating different
+            sheets depending on the provided list from configuration file"""
+            if not logs.get("samples"):
+                try:
+                    samples_logs = logs[lab_code]["samples"]
+                except (KeyError, AttributeError) as e:
+                    stderr.print(f"[red]Could not convert log summary to excel: {e}")
+                    log.error("Could not convert log summary to excel: %s" % str(e))
+                    return
+            else:
+                samples_logs = logs.get("samples")
+            if not samples_logs:
+                logs["Warnings"].append("No samples found to report")
+
+            workbook = openpyxl.Workbook()
+            # TODO: Include these fields in configuration.json
+            sample_id_field = "Sample ID given for sequencing"
+            sheet_names_and_headers = {
+                "Global Report": ["Valid", "Errors", "Warnings"],
+                "Samples Report": [sample_id_field, "Valid", "Errors"],
+                "Other warnings": [sample_id_field, "Valid", "Warnings"],
+            }
+            for name, header in sheet_names_and_headers.items():
+                new_sheet = workbook.create_sheet(name)
+                new_sheet.append(header)
+            regex = r"[\[\]]"  # Regex to remove lists brackets
+            workbook["Global Report"].append(
+                [reg_remover(x, regex) for k, x in logs.items() if k != "samples"]
+            )
+            regex = r"\[.*?\]"  # Regex to remove ontology annotations between brackets
+            for sample, slog in samples_logs.items():
+                clean_errors = [reg_remover(x, regex) for x in slog["errors"]]
+                error_row = [sample, str(slog["valid"]), "\n ".join(clean_errors)]
+                workbook["Samples Report"].append(error_row)
+                clean_warngs = [reg_remover(x, regex) for x in slog["warnings"]]
+                warning_row = [sample, str(slog["valid"]), "\n ".join(clean_warngs)]
+                workbook["Other warnings"].append(warning_row)
+            for name in sheet_names_and_headers.keys():
+                relecov_tools.utils.adjust_sheet_size(workbook[name])
+            del workbook["Sheet"]
+            workbook.save(excel_outpath)
+            stderr.print(f"[green]Successfully created logs excel in {excel_outpath}")
+            return
 
         def translate_fields(samples_logs):
             # TODO Translate logs to spanish using a local translator model like deepl
@@ -204,36 +250,12 @@ class LogSum:
             )
         file_ext = os.path.splitext(excel_outpath)[-1]
         excel_outpath = excel_outpath.replace(file_ext, ".xlsx")
-        if not logs.get("samples"):
-            try:
-                samples_logs = logs[lab_code]["samples"]
-            except (KeyError, AttributeError) as e:
-                stderr.print(f"[red]Could not convert log summary to excel: {e}")
-                log.error("Could not convert log summary to excel: %s" % str(e))
-                return
-        else:
-            samples_logs = logs.get("samples")
-
-        workbook = openpyxl.Workbook()
-        main_worksheet = workbook.active
-        main_worksheet.title = "Samples Report"
-        main_headers = ["Sample ID given for sequencing", "Valid", "Errors"]
-        main_worksheet.append(main_headers)
-        warnings_sheet = workbook.create_sheet("Other warnings")
-        warnings_headers = ["Sample ID given for sequencing", "Valid", "Warnings"]
-        warnings_sheet.append(warnings_headers)
-        regex = r"\[.*?\]"  # Regex to remove annotation between brackets
-        for sample, logs in samples_logs.items():
-            clean_errors = [reg_remover(x, regex) for x in logs["errors"]]
-            error_row = [sample, str(logs["valid"]), "\n ".join(clean_errors)]
-            main_worksheet.append(error_row)
-            clean_warngs = [reg_remover(x, regex) for x in logs["warnings"]]
-            warning_row = [sample, str(logs["valid"]), "\n ".join(clean_warngs)]
-            warnings_sheet.append(warning_row)
-        relecov_tools.utils.adjust_sheet_size(main_worksheet)
-        relecov_tools.utils.adjust_sheet_size(warnings_sheet)
-        workbook.save(excel_outpath)
-        stderr.print(f"[green]Successfully created logs excel in {excel_outpath}")
+        for key, logs in logs.items():
+            if lab_code in excel_outpath:
+                lab_excelpath = excel_outpath.replace(lab_code, key)
+            else:
+                lab_excelpath = excel_outpath.replace(".xlsx", "_" + key + ".xlsx")
+            feed_logs_to_excel(key, logs, lab_excelpath)
         return
 
     def create_error_summary(
@@ -283,7 +305,30 @@ class LogSum:
                         final_logs, filepath.replace("log_summary", "report")
                     )
             except Exception as e:
-                stderr.print(f"[red]Error parsing logs to json format: {e}")
-                log.error("Error parsing logs to json format: %s", str(e))
+                stderr.print(f"[red]Error exporting logs to file: {e}")
+                log.error("Error exporting logs to file: %s", str(e))
                 f.write(str(final_logs))
         return
+
+    @staticmethod
+    def get_invalid_count(validation_logs):
+        """
+        Counts the number of invalid samples in the logs data by checking the `valid` field.
+
+        Args:
+            validation_logs (dict): Dictionary containing the validation logs.
+
+        Returns:
+            dict: Dictionary with entry_key as keys and counts of invalid samples as values.
+        """
+        invalid_counts = {}
+        for entry_key, entry_value in validation_logs.items():
+            if "samples" in entry_value:
+                samples = entry_value["samples"]
+                for sample_key, sample_value in samples.items():
+                    if "valid" in sample_value and not sample_value["valid"]:
+                        if invalid_counts.get(entry_key):
+                            invalid_counts[entry_key] += 1
+                        else:
+                            invalid_counts[entry_key] = 1
+        return invalid_counts

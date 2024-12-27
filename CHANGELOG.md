@@ -4,7 +4,75 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - 2024-10-11 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/1.2.0
+## [1.X.0] - 202X-XX-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/
+
+### Credits
+
+Code contributions to the release:
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [1.3.0] - 2024-12-23 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.3.0
+
+### Credits
+
+Code contributions to the release:
+
+- [Pablo Mata](https://github.com/Shettland)
+- [Sergio Olmos](https://github.com/OPSergio)
+- [Sarai Varona](https://github.com/svarona)
+
+### Modules
+
+- Included files-folder option for read-lab-metadata when no samples_data.json is provided [#330](https://github.com/BU-ISCIII/relecov-tools/pull/330)
+- Included folder_names multiple arg for pipeline_manager to specify names of folders to process [#331](https://github.com/BU-ISCIII/relecov-tools/pull/331)
+- Include send-mail. Automated email notification module to generate and send validation reports. [#328](https://github.com/BU-ISCIII/relecov-tools/pull/328)
+
+#### Added enhancements
+
+- Now logs-to-excel can handle logs with multiple keys and includes folder logs [#329](https://github.com/BU-ISCIII/relecov-tools/pull/329)
+- Improved logging messages for duplicated sample IDs in read-lab and download modules [#330](https://github.com/BU-ISCIII/relecov-tools/pull/330)
+- Included a new method string_to_date() in utils to search for a date pattern within a string [#331](https://github.com/BU-ISCIII/relecov-tools/pull/331)
+- Integrated jinja2 for template rendering in the mail module. [#328](https://github.com/BU-ISCIII/relecov-tools/pull/328)
+- Configurations for the mail module added to configuration.json [#328](https://github.com/BU-ISCIII/relecov-tools/pull/328)
+- Added static method get_invalid_count in log_summary.py [#328](https://github.com/BU-ISCIII/relecov-tools/pull/328)
+- Included a try-except for every module to catch unexpected errors in __main__.py [#339](https://github.com/BU-ISCIII/relecov-tools/pull/339)
+- Added, removed and renamed collecting institutions and their cities [#340](https://github.com/BU-ISCIII/relecov-tools/pull/340)
+- Updated contact directory to integrate additional institution data. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
+- Added support for multiple recipients in the email_receiver field. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
+- Introduced a new Jinja template for successful and error validation reports. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
+- Modified the module logic to dynamically select and render email templates based on user input. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
+- Enhanced email formatting and added a default CC to bioinformatica@isciii.es. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
+- Validate module now takes an optional argument to select the name of the sheet to check in excel file [#357](https://github.com/BU-ISCIII/relecov-tools/pull/357)
+- Fixed email module [#361](https://github.com/BU-ISCIII/relecov-tools/pull/361)
+
+#### Fixes
+
+- Fixed python linting workflow was still waiting for .py files[#335](https://github.com/BU-ISCIII/relecov-tools/pull/335)
+- Now files-folder arg works with relative paths in read-lab-metadata [#339](https://github.com/BU-ISCIII/relecov-tools/pull/339)
+- Now check-gzip-integrity() catches any exception in utils.py as it only needs to return True when file can be decompressed [#339](https://github.com/BU-ISCIII/relecov-tools/pull/339)
+- Now validate modules does not crash when no METADATA_LAB sheet is found. [#357](https://github.com/BU-ISCIII/relecov-tools/pull/357)
+
+#### Changed
+
+- Pipeline-manager fields_to_split is now in configuration.json to group samples by those fields [#331](https://github.com/BU-ISCIII/relecov-tools/pull/331)
+- Homogeneized style of report global report sheet in logs-excel [#339](https://github.com/BU-ISCIII/relecov-tools/pull/339)
+
+#### Removed
+
+### Requirements
+
+## [1.2.0] - 2024-10-11 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.2.0
 
 ### Credits
 
@@ -35,7 +103,9 @@ Code contributions to the release:
 - When no samples_data.json is given, read-lab-metadata now creates a new one [#324](https://github.com/BU-ISCIII/relecov-tools/pull/324)
 - Handling for missing sample ids in read-lab-metadata [#324](https://github.com/BU-ISCIII/relecov-tools/pull/324)
 - Better logging for download, read-lab-metadata and wrapper [#324](https://github.com/BU-ISCIII/relecov-tools/pull/324)
-
+- Add SQK-RBK114-96 to library_preparation_kit schema [#333](https://github.com/BU-ISCIII/relecov-tools/pull/333)
+- Corrected the Submitting_institution for Hospital de Valdepeñas, Centro de Salud Altagracia and Hospital General de Santa Bárbara.[#334](https://github.com/BU-ISCIII/relecov-tools/pull/334)
+- Added Hospital General de Tomelloso. [#334](https://github.com/BU-ISCIII/relecov-tools/pull/334)
 #### Fixes
 
 - Fixed wrong city name in relecov_tools/conf/laboratory_address.json [#320](https://github.com/BU-ISCIII/relecov-tools/pull/320)
@@ -64,7 +134,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.1.0] - 2024-09-13 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/1.1.0
+## [1.1.0] - 2024-09-13 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.1.0
 
 ### Credits
 

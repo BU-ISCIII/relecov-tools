@@ -14,7 +14,7 @@ import yaml
 import gzip
 import re
 import shutil
-from itertools import islice
+from itertools import islice, product
 from Bio import SeqIO
 from rich.console import Console
 from datetime import datetime
@@ -95,6 +95,45 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
     return ws_data, heading_row
 
 
+def string_to_date(string):
+    """Convert date (Y-M-D...) from string to date. Tries iteratively with variable
+    number of digits and multiple separators, starting from seconds up to year.
+    args:
+        string (str): Date in string format to be parsed: e.g. 2020-08-07-12-00-00
+    returns:
+        res_date (datetime.datetime): String converted to date format
+    """
+
+    def rec_date_extraction(string, digits, sep):
+        regex = r"^\d{4}"  # The string should start from year
+        for _ in range(0, digits - 4, 2):
+            new_reg = sep + "\d{2}"  # Each date param occupies 2 digits (4 for year)
+            regex = regex + new_reg
+        match = re.match(regex, string)
+        if not match:
+            match = re.match(regex, string.replace(":", sep))
+            if not match:
+                raise ValueError(f"Could not match date to given string: {string}")
+        matchdate = match.group(0)
+        # Getting the equivalent format from given digits
+        full_date = "%Y%m%d%H%M%S"[0 : digits - 2]
+        datepattern = f"{sep}%".join(full_date.split("%")).strip(sep)
+        res_date = datetime.strptime(matchdate, datepattern)
+        return res_date
+
+    seps = ["", " ", "/", "-", "_"]
+    digits_list = [x for x in range(4, 16, 2)]
+    combinations = sorted(product(digits_list, seps), reverse=True)
+    for digits, sep in combinations:
+        try:
+            res_date = rec_date_extraction(string, digits, sep)
+        except ValueError:
+            continue
+        return res_date
+    else:
+        return None
+
+
 def excel_date_to_num(date):
     """Transform a date object formatted by excel to a numeric value"""
     try:
@@ -149,6 +188,7 @@ def read_fasta_return_SeqIO_instance(file_name):
 
 def read_yml_file(file_name):
     """Read yml file"""
+    file_name = os.path.expanduser(file_name)
     with open(file_name, "r") as fh:
         try:
             return yaml.safe_load(fh)
@@ -277,19 +317,24 @@ def compress_file(file):
 
 
 def check_gzip_integrity(file_path):
-    """Check if a compressed file is not corrupted"""
+    """Check if a compressed file can be decompressed"""
     chunksize = 100000000  # 10 Mbytes
     with gzip.open(file_path, "rb") as f:
         try:
             while f.read(chunksize) != b"":
                 pass
-        except gzip.BadGzipFile:
+        except Exception:
             # Not a gzip file
             return False
         # EOFError: Compressed file is truncated
         except EOFError:
             return False
     return True
+
+
+def lower_keys(data):
+    """Transform all keys to lowercase strings in a dictionary"""
+    return {str(key).lower(): v for key, v in data.items()}
 
 
 def rich_force_colors():
@@ -378,7 +423,9 @@ def select_most_recent_files_per_sample(paths_list):
     filename_groups = {}
     # Count occurrences of each filename and group files by sample names
     for file in paths_list:
-        # TODO: So far, it uses split method to identify this pattern: [sample1.pangolin.csv, sample1.pangolin_20240310.csv]. It should be improve to parse files based on a different character matching field.
+        # TODO: So far, it uses split method to identify this pattern:
+        # [sample1.pangolin.csv, sample1.pangolin_20240310.csv]. It should be
+        # improve to parse files based on a different character matching field.
         file_name = os.path.basename(file).split(".")[0]
         if file_name in filename_groups:
             filename_groups[file_name].append(file)

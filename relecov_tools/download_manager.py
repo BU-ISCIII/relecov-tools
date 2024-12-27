@@ -390,7 +390,7 @@ class DownloadManager:
                     stderr.print("[red]Unable to convert to string. ", e)
                     continue
                 if s_name in sample_file_dict:
-                    log_text = f"Found duplicated sample name: {s_name}. Skipped."
+                    log_text = "Found more samples with the same Sample ID given for sequencing. Only the first one remains."
                     stderr.print(log_text)
                     self.include_warning(log_text, sample=s_name)
                     continue
@@ -542,10 +542,10 @@ class DownloadManager:
             mismatch_rev = [fi for fi in set_list if fi not in filtered_files_list]
 
             if mismatch_files:
-                error_text1 = "Files in folder missing in metadata %s"
+                error_text1 = "Files in folder missing in metadata: %s"
                 self.include_warning(error_text1 % str(mismatch_files))
             if mismatch_rev:
-                error_text2 = "Files in metadata missing in folder %s"
+                error_text2 = "Files in metadata missing in folder: %s"
                 self.include_warning(error_text2 % str(mismatch_rev))
             # Try to check if the metadata filename lacks the proper extension
             log.info("Trying to match files without proper file extension")
@@ -1127,23 +1127,9 @@ class DownloadManager:
                     if saved_files:
                         successful_files.extend(saved_files)
                     if corrupted:
-                        corr_fold = os.path.join(local_folder, "corrupted")
-                        os.mkdir(corr_fold)
-                        error_text = "Found corrupted files: %s. Moved to: %s"
-                        stderr.print(f"[red]{error_text % (str(corrupted), corr_fold)}")
-                        self.include_warning(error_text % (str(corrupted), corr_fold))
-                        for corr_file in corrupted:
-                            path = os.path.join(local_folder, corr_file)
-                            try:
-                                os.rename(path, os.path.join(corr_fold, corr_file))
-                            except (FileNotFoundError, PermissionError, OSError) as e:
-                                error_text = (
-                                    "Could not move corrupted file %s to %s: %s"
-                                )
-                                log.error(error_text % (path, corr_fold, e))
-                                stderr.print(
-                                    f"[red]{error_text % (path, corr_fold, e)}"
-                                )
+                        error_text = "Found corrupted files: %s. Removed"
+                        stderr.print(f"[red]{error_text % (str(corrupted))}")
+                        self.include_warning(error_text % (str(corrupted)))
                         if self.abort_if_md5_mismatch:
                             error_text = "Stop processing %s due to corrupted files."
                             stderr.print(f"[red]{error_text % folder}")
@@ -1181,16 +1167,40 @@ class DownloadManager:
             else:
                 clean_fetchlist = seqs_fetchlist
             clean_pathlist = [os.path.join(local_folder, fi) for fi in clean_fetchlist]
+
+            for file in clean_fetchlist:
+                full_f_path = os.path.join(local_folder, file)
+                if not relecov_tools.utils.check_gzip_integrity(full_f_path):
+                    corrupted.append(file)
+
+            for sample_id, files in list(valid_filedict.items()):
+                if any(
+                    files.get(key) in corrupted
+                    for key in ["sequence_file_R1_fastq", "sequence_file_R2_fastq"]
+                ):
+                    for file_name in files.values():
+                        path = os.path.join(local_folder, file_name)
+                        try:
+                            os.remove(path)
+                            log.info(
+                                "File %s was removed because it was corrupted",
+                                file_name,
+                            )
+                        except (FileNotFoundError, PermissionError, OSError) as e:
+                            error_text = "Could not remove corrupted file %s: %s"
+                            log.error(error_text % (path, e))
+                            stderr.print(f"[red]{error_text % (path, e)}")
+
             not_md5sum = []
             if remote_md5sum:
                 # Get hashes from provided md5sum, create them for those not provided
                 files_md5_dict = {}
                 for path in clean_pathlist:
                     f_name = os.path.basename(path)
-                    if f_name in successful_files:
-                        files_md5_dict[f_name] = hash_dict[f_name]
-                    elif f_name in corrupted:
+                    if f_name in corrupted:
                         clean_fetchlist.remove(f_name)
+                    elif f_name in successful_files:
+                        files_md5_dict[f_name] = hash_dict[f_name]
                     else:
                         if not str(f_name).rstrip(".gz") in files_to_compress:
                             error_text = "File %s not found in md5sum. Creating hash"
@@ -1204,10 +1214,6 @@ class DownloadManager:
                     relecov_tools.utils.calculate_md5(path) for path in clean_pathlist
                 ]
                 files_md5_dict = dict(zip(clean_fetchlist, md5_hashes))
-            for file in files_md5_dict.keys():
-                full_f_path = os.path.join(local_folder, file)
-                if not relecov_tools.utils.check_gzip_integrity(full_f_path):
-                    corrupted.append(file)
             files_md5_dict = {
                 x: y for x, y in files_md5_dict.items() if x not in corrupted
             }

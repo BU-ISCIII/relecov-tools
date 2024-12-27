@@ -21,7 +21,13 @@ stderr = rich.console.Console(
 
 
 class RelecovMetadata:
-    def __init__(self, metadata_file=None, sample_list_file=None, output_folder=None):
+    def __init__(
+        self,
+        metadata_file=None,
+        sample_list_file=None,
+        output_folder=None,
+        files_folder=None,
+    ):
         if metadata_file is None:
             self.metadata_file = relecov_tools.utils.prompt_path(
                 msg="Select the excel file which contains metadata"
@@ -38,6 +44,11 @@ class RelecovMetadata:
 
         if sample_list_file is None:
             stderr.print("[yellow]No samples_data.json file provided")
+            if not os.path.isdir(str(files_folder)):
+                stderr.print("[red]No samples file nor valid files folder provided")
+                sys.exit(1)
+            self.files_folder = os.path.abspath(files_folder)
+
         self.sample_list_file = sample_list_file
 
         if sample_list_file is not None and not os.path.exists(sample_list_file):
@@ -103,13 +114,17 @@ class RelecovMetadata:
 
         def safely_calculate_md5(file):
             """Check file md5, but return Not Provided if file does not exist"""
+            log.info("Generating md5 hash for %s...", str(file))
             try:
                 return relecov_tools.utils.calculate_md5(file)
             except IOError:
                 return "Not Provided [GENEPIO:0001668]"
 
-        dir_path = os.path.dirname(os.path.realpath(self.metadata_file))
-        md5_checksum_files = [f for f in os.listdir(dir_path) if "md5" in f]
+        # The files are and md5file are supposed to be located together
+        dir_path = self.files_folder
+        md5_checksum_files = [
+            os.path.join(dir_path, f) for f in os.listdir(dir_path) if "md5" in f
+        ]
         if md5_checksum_files:
             skip_list = self.configuration.get_topic_data(
                 "sftp_handle", "skip_when_found"
@@ -122,22 +137,28 @@ class RelecovMetadata:
             log.warning("No md5sum file found.")
             log.warning("Generating new md5 hashes. This might take a while...")
         j_data = {}
-        no_fastq_error = "No R1 fastq was given for sample %s"
+        no_fastq_error = "No R1 fastq file was given for sample %s in metadata"
         for sample in clean_metadata_rows:
+            sample_id = str(sample.get("sequencing_sample_id"))
             files_dict = {}
             r1_file = sample.get("sequence_file_R1_fastq")
             r2_file = sample.get("sequence_file_R2_fastq")
             if not r1_file:
                 self.logsum.add_error(
-                    sample=sample.get("sequencing_sample_id"),
-                    entry=no_fastq_error % sample.get("sequencing_sample_id"),
+                    sample=sample_id,
+                    entry=no_fastq_error % sample_id,
                 )
-                j_data[str(sample.get("sequencing_sample_id"))] = files_dict
+                j_data[sample_id] = files_dict
                 continue
             r1_md5 = md5_dict.get(r1_file)
             r2_md5 = md5_dict.get(r2_file)
             files_dict["sequence_file_R1_fastq"] = r1_file
             files_dict["r1_fastq_filepath"] = dir_path
+            if not os.path.exists(os.path.join(dir_path, r1_file)):
+                self.logsum.add_error(
+                    sample=sample_id, entry="Provided R1 file not found after download"
+                )
+                continue
             if r1_md5:
                 files_dict["fastq_r1_md5"] = r1_md5
             else:
@@ -147,13 +168,21 @@ class RelecovMetadata:
             if r2_file:
                 files_dict["sequence_file_R2_fastq"] = r2_file
                 files_dict["r2_fastq_filepath"] = dir_path
+                if not os.path.exists(os.path.join(dir_path, r2_file)):
+                    self.logsum.add_error(
+                        sample=sample_id,
+                        entry="Provided R2 file not found after download",
+                    )
+                    continue
                 if r2_md5:
                     files_dict["fastq_r2_md5"] = r2_md5
                 else:
                     files_dict["fastq_r2_md5"] = safely_calculate_md5(
-                        os.path.join(dir_path, r2_file)
+                        os.path.join(dir_path, r1_file)
                     )
-            j_data[str(sample.get("sequencing_sample_id"))] = files_dict
+            j_data[sample_id] = files_dict
+        if not any(val for val in j_data.values()):
+            raise FileNotFoundError(f"No files found for the samples in {dir_path}")
         try:
             filename = "_".join(["samples_data", self.lab_code, self.date + ".json"])
             file_path = os.path.join(self.output_folder, filename)
@@ -369,6 +398,7 @@ class RelecovMetadata:
             "lab_metadata", "alt_heading_equivalences"
         )
         valid_metadata_rows = []
+        included_sample_ids = []
         row_number = heading_row_number
         for row in ws_metadata_lab:
             row_number += 1
@@ -378,11 +408,16 @@ class RelecovMetadata:
             except KeyError:
                 self.logsum.add_error(entry=f"No {sample_id_col} found in excel file")
                 continue
+            if sample_id in included_sample_ids:
+                log_text = f"Skipped duplicated sample {sample_id} in row {row_number}. Sequencing sample id must be unique"
+                self.logsum.add_warning(entry=log_text)
+                continue
             if not row[sample_id_col] or "Not Provided" in sample_id:
                 log_text = f"{sample_id_col} not provided in row {row_number}. Skipped"
                 self.logsum.add_warning(entry=log_text)
                 stderr.print(f"[red]{log_text}")
                 continue
+            included_sample_ids.append(sample_id)
             for key in row.keys():
                 # skip the first column of the Metadata lab file
                 if header_flag in key:
@@ -460,7 +495,7 @@ class RelecovMetadata:
         completed_metadata = self.adding_ontology_to_enum(extended_metadata)
         if not completed_metadata:
             stderr.print("Metadata was completely empty. No output file generated")
-            sys.exit(1)
+            sys.exit(0)
         file_code = "lab_metadata_" + self.lab_code + "_"
         file_name = file_code + self.date + ".json"
         stderr.print("[blue]Writting output json file")

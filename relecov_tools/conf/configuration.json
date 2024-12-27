@@ -438,6 +438,21 @@
         "doc_folder": "DOC",
         "analysis_folder": "ANALYSIS",
         "sample_stored_folder": "RAW",
-        "sample_link_folder": "00-reads"
+        "sample_link_folder": "00-reads",
+        "group_by_fields": [
+            "organism",
+            "sequencing_instrument_platform",
+            "enrichment_panel",
+            "enrichment_panel_version"
+        ]
+    },
+    "mail_sender":{
+        "delivery_template_path_file": "./relecov_tools/templates/",
+        "email_host": "mx2.isciii.es",
+        "email_port": "587",
+        "email_host_user": "bioinformatica@isciii.es", 
+        "email_use_tls": "True",
+        "yaml_cred_path": "~/buisciii_config.yml",
+        "institutions_guide_path": "/data/bioinfoshare/UCCT_Relecov/statics/institutions_guide.json"
     }
 }

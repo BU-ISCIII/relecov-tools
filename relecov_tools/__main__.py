@@ -5,6 +5,7 @@ import json
 
 # from rich.prompt import Confirm
 import click
+import relecov_tools.config_json
 import relecov_tools.download_manager
 import relecov_tools.log_summary
 import rich.console
@@ -16,6 +17,7 @@ import relecov_tools.assets.pipeline_utils.viralrecon
 import relecov_tools.read_lab_metadata
 import relecov_tools.download_manager
 import relecov_tools.json_validation
+import relecov_tools.mail
 import relecov_tools.map_schema
 import relecov_tools.upload_database
 import relecov_tools.read_bioinfo_metadata
@@ -32,6 +34,8 @@ log = logging.getLogger()
 stderr = rich.console.Console(
     stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
 )
+
+__version__ = "1.3.0"
 
 
 def run_relecov_tools():
@@ -62,7 +66,6 @@ def run_relecov_tools():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "1.2.0"
     stderr.print(
         "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
@@ -133,6 +136,7 @@ def relecov_tools_cli(verbose, log_file):
             )
         )
         log.addHandler(log_fh)
+        log.info(f"RELECOV-tools version {__version__}")
 
 
 # sftp
@@ -185,7 +189,11 @@ def download(
         output_location,
         target_folders,
     )
-    download_manager.execute_process()
+    try:
+        download_manager.execute_process()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 # metadata
@@ -205,15 +213,25 @@ def download(
 @click.option(
     "-o", "--metadata-out", type=click.Path(), help="Path to save output metadata file"
 )
-def read_lab_metadata(metadata_file, sample_list_file, metadata_out):
+@click.option(
+    "-f",
+    "--files-folder",
+    default=None,
+    type=click.Path(),
+    help="Path to folder where samples files are located",
+)
+def read_lab_metadata(metadata_file, sample_list_file, metadata_out, files_folder):
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
     new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(
-        metadata_file, sample_list_file, metadata_out
+        metadata_file, sample_list_file, metadata_out, files_folder
     )
-    relecov_json = new_metadata.create_metadata_json()
-    return relecov_json
+    try:
+        new_metadata.create_metadata_json()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 # validation
@@ -227,12 +245,150 @@ def read_lab_metadata(metadata_file, sample_list_file, metadata_out):
     help="Origin file containing metadata",
 )
 @click.option("-o", "--out_folder", help="Path to save validate json file")
-def validate(json_file, json_schema, metadata, out_folder):
+@click.option(
+    "-e",
+    "--excel_sheet",
+    required=False,
+    default=None,
+    help="Optional: Name of the sheet in excel file to validate.",
+)
+def validate(json_file, json_schema, metadata, out_folder, excel_sheet):
     """Validate json file against schema."""
     validation = relecov_tools.json_validation.SchemaValidation(
-        json_file, json_schema, metadata, out_folder
+        json_file, json_schema, metadata, out_folder, excel_sheet
     )
-    validation.validate()
+    try:
+        validation.validate()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
+
+
+# send-email
+@relecov_tools_cli.command(help_priority=4)
+@click.option(
+    "-v",
+    "--validate-file",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to the validation summary json file (validate_log_summary.json)",
+)
+@click.option(
+    "-r",
+    "--receiver-email",
+    required=False,
+    help="Recipient's e-mail address (optional). If not provided, it will be extracted from the institutions guide.",
+)
+@click.option(
+    "-a",
+    "--attachments",
+    multiple=True,
+    type=click.Path(exists=True),
+    help="Path to file",
+)
+@click.option(
+    "-t",
+    "--template_path",
+    type=click.Path(exists=True),
+    required=True,
+    default=None,
+    help="Path to relecov-tools templates folder",
+)
+@click.option(
+    "-p",
+    "--email-psswd",
+    help="Password for bioinformatica@isciii.es",
+    required=False,
+    default=None,
+)
+def send_mail(validate_file, receiver_email, attachments, template_path, email_psswd):
+    """
+    Send a sample validation report by mail.
+    """
+    config_loader = relecov_tools.config_json.ConfigJson()
+    config = config_loader.get_configuration("mail_sender")
+    if not config:
+        raise ValueError(
+            "Error: The configuration for 'mail_sender' could not be loaded."
+        )
+
+    validate_data = relecov_tools.utils.read_json_file(validate_file)
+    batch = os.path.basename(os.path.dirname(os.path.abspath(validate_file)))
+
+    if not validate_data:
+        raise ValueError("Error: Validation data could not be loaded.")
+
+    submitting_institution_code = list(validate_data.keys())[0]
+
+    invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
+
+    email_sender = relecov_tools.mail.EmailSender(config, template_path)
+
+    template_choice = click.prompt(
+        "Select the type of template:\n1. Validation with errors\n2. Validation successful",
+        type=int,
+        default=1,
+        show_choices=False,
+    )
+    if template_choice not in [1, 2]:
+        raise ValueError("Error: invalid option.")
+
+    # Determinar el template a usar
+    if template_choice == 1:
+        template_name = "jinja_template_with_errors.j2"
+    else:
+        template_name = "jinja_template_success.j2"
+
+    add_info = click.confirm(
+        "Would you like to add additional information in the mail?", default=False
+    )
+    additional_info = ""
+    if add_info:
+        additional_info = click.prompt("Enter additional information")
+
+    institution_info = email_sender.get_institution_info(submitting_institution_code)
+    if not institution_info:
+        raise ValueError("Error: Could not obtain institution information.")
+
+    institution_name = institution_info["institution_name"]
+    email_receiver_from_json = institution_info["email_receiver"]
+
+    email_body = email_sender.render_email_template(
+        additional_info,
+        invalid_count=invalid_count,
+        submitting_institution_code=submitting_institution_code,
+        template_name=template_name,
+        batch=batch,
+    )
+
+    if email_body is None:
+        raise RuntimeError("Error: Could not generate mail.")
+
+    final_receiver_email = None
+    if not receiver_email:
+        final_receiver_email = [
+            email.strip() for email in email_receiver_from_json.split(";")
+        ]
+    else:
+        final_receiver_email = (
+            [email.strip() for email in receiver_email.split(";")]
+            if isinstance(receiver_email, str)
+            else receiver_email
+        )
+
+    if not final_receiver_email:
+        raise ValueError("Error: Could not obtain the recipient's email address.")
+
+    subject = (
+        f"RELECOV - Informe de Validación de Muestras {batch} - {institution_name}"
+    )
+    try:
+        email_sender.send_email(
+            final_receiver_email, subject, email_body, attachments, email_psswd
+        )
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 # mapping to ENA schema
@@ -252,7 +408,11 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
     new_schema = relecov_tools.map_schema.MappingSchema(
         origin_schema, json_data, destination_schema, schema_file, output
     )
-    new_schema.map_to_data_to_new_schema()
+    try:
+        new_schema.map_to_data_to_new_schema()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 # upload to ENA
@@ -297,7 +457,11 @@ def upload_to_ena(
         upload_fastq=upload_fastq,
         output_path=output_path,
     )
-    upload_ena.upload()
+    try:
+        upload_ena.upload()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 # upload to GISAID
@@ -364,7 +528,11 @@ def upload_to_gisaid(
         single,
         gzip,
     )
-    upload_gisaid.gisaid_upload()
+    try:
+        upload_gisaid.gisaid_upload()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 @relecov_tools_cli.command(help_priority=9)
@@ -405,7 +573,11 @@ def update_db(user, password, json, type, platform, server_url, full_update):
     update_database_obj = relecov_tools.upload_database.UpdateDatabase(
         user, password, json, type, platform, server_url, full_update
     )
-    update_database_obj.update_db()
+    try:
+        update_database_obj.update_db()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 # read metadata bioinformatics
@@ -429,8 +601,11 @@ def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
         out_dir,
         software_name,
     )
-
-    new_bioinfo_metadata.create_bioinfo_file()
+    try:
+        new_bioinfo_metadata.create_bioinfo_file()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 # read metadata bioinformatics
@@ -453,7 +628,11 @@ def metadata_homogeneizer(institution, directory, output):
     new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
         institution, directory, output
     )
-    new_parse.converting_metadata()
+    try:
+        new_parse.converting_metadata()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 # creating symbolic links
@@ -477,15 +656,26 @@ def metadata_homogeneizer(institution, directory, output):
     help="select the template config file",
 )
 @click.option("-o", "--output", type=click.Path(), help="select output folder")
-def pipeline_manager(input, template, output, config):
+@click.option(
+    "-f",
+    "--folder_names",
+    multiple=True,
+    default=None,
+    help="Folder basenames to process. Target folders names should match the given dates. E.g. ... -f folder1 -f folder2 -f folder3",
+)
+def pipeline_manager(input, template, output, config, folder_names):
     """
     Create the symbolic links for the samples which are validated to prepare for
     bioinformatics pipeline execution.
     """
     new_launch = relecov_tools.pipeline_manager.PipelineManager(
-        input, template, output, config
+        input, template, output, config, folder_names
     )
-    new_launch.pipeline_exc()
+    try:
+        new_launch.pipeline_exc()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 # schema builder
@@ -522,7 +712,11 @@ def build_schema(input_file, schema_base, draft_version, diff, out_dir):
     schema_update = relecov_tools.build_schema.SchemaBuilder(
         input_file, schema_base, draft_version, diff, out_dir
     )
-    schema_update.handle_build_schema()
+    try:
+        schema_update.handle_build_schema()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 @relecov_tools_cli.command(help_priority=15)
@@ -564,10 +758,14 @@ def logs_to_excel(lab_code, output_folder, files):
         stderr.print("All provided files were empty.")
         exit(1)
     logsum = relecov_tools.log_summary.LogSum(output_location=output_folder)
-    merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
-    final_logs = logsum.prepare_final_logs(logs=merged_logs)
-    excel_outpath = os.path.join(output_folder, lab_code + "_logs_report.xlsx")
-    logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
+    try:
+        merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
+        final_logs = logsum.prepare_final_logs(logs=merged_logs)
+        excel_outpath = os.path.join(output_folder, lab_code + "_logs_report.xlsx")
+        logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 @relecov_tools_cli.command(help_priority=16)
@@ -590,7 +788,11 @@ def wrapper(config_file, output_folder):
     process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(
         config_file=config_file, output_folder=output_folder
     )
-    process_wrapper.run_wrapper()
+    try:
+        process_wrapper.run_wrapper()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 
 if __name__ == "__main__":
