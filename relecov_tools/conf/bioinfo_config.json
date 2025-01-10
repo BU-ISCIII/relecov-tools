@@ -6,6 +6,7 @@
             "header_row_idx": 1,
             "required": true,
             "function": null,
+            "multiple_samples": true,
             "split_by_batch": true,
             "content": {
                 "analysis_date": "analysis_date",
@@ -44,6 +45,7 @@
             "sample_col_idx": 1,
             "header_row_idx": 1,
             "required": true,
+            "multiple_samples": true,
             "split_by_batch": true,
             "function": "parse_long_table",
             "content": {
@@ -84,6 +86,7 @@
             "fn": "summary_variants_metrics_mqc.csv",
             "sample_col_idx": 1,
             "header_row_idx": 1,
+            "multiple_samples": true,
             "required": true,
             "function": null,
             "content": {
@@ -100,6 +103,7 @@
         "workflow_summary": {
             "fn": "multiqc_report.html",
             "required": true,
+            "multiple_samples": true,
             "function": null,
             "content": {
                 "software_version": {
