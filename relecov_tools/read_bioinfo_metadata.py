@@ -601,6 +601,7 @@ class BioinfoMetadata:
         """
         method_name = f"{self.add_bioinfo_files_path.__name__}"
         sample_name_error = 0
+        multiple_sample_files = self.get_multiple_sample_files()
         for row in j_data:
             row["bioinfo_metadata_file"] = self.out_filename
             if not row.get("sequencing_sample_id"):
@@ -614,10 +615,13 @@ class BioinfoMetadata:
             for key, values in files_found_dict.items():
                 file_path = "Not Provided [GENEPIO:0001668]"
                 if values:  # Check if value is not empty
-                    for file in values:
-                        if sample_name in file:
-                            file_path = file
-                            break  # Exit loop if match found
+                    if key in multiple_sample_files:
+                        file_path = values[0]
+                    else:
+                        for file in values:
+                            if sample_name in file:
+                                file_path = file
+                                break  # Exit loop if match found
                 path_key = f"{self.software_name}_filepath_{key}"
                 row[path_key] = file_path
                 if self.software_config[key].get("extract"):
