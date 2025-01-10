@@ -4140,7 +4140,7 @@
         "submitting_institution_address": "",
         "submitting_institution_email": ""
     },
-    "Hospital Da Barbanza (*)": {
+    "Hospital Da Barbanza": {
         "collecting_institution_address": "Salmon, S/N",
         "collecting_institution_email": "Desconocido",
         "collecting_institution_finalidad": "General",
@@ -4152,7 +4152,7 @@
         "submitting_institution_address": "",
         "submitting_institution_email": ""
     },
-    "Hospital Virxe Da Xunqueira (*)": {
+    "Hospital Virxe Da Xunqueira": {
         "collecting_institution_address": "Alcalde Pepe Sanchez, 7",
         "collecting_institution_email": "Desconocido",
         "collecting_institution_finalidad": "General",
@@ -5711,7 +5711,7 @@
         "submitting_institution_address": "",
         "submitting_institution_email": ""
     },
-    "Hospital Publico Da Mariña (*)": {
+    "Hospital Publico Da Mariña": {
         "collecting_institution_address": "Medico Vior, S/N",
         "collecting_institution_email": "Desconocido",
         "collecting_institution_finalidad": "General",
@@ -5723,7 +5723,7 @@
         "submitting_institution_address": "",
         "submitting_institution_email": ""
     },
-    "Hospital De Monforte (*)": {
+    "Hospital De Monforte": {
         "collecting_institution_address": "Corredoira, S/N",
         "collecting_institution_email": "Desconocido",
         "collecting_institution_finalidad": "General",
@@ -7820,7 +7820,7 @@
         "submitting_institution_address": "",
         "submitting_institution_email": ""
     },
-    "Hospital De Valdeorras (*)": {
+    "Hospital De Valdeorras": {
         "collecting_institution_address": "Conde De Fenosa, 50",
         "collecting_institution_email": "Desconocido",
         "collecting_institution_finalidad": "General",
@@ -8718,7 +8718,7 @@
         "submitting_institution_address": "",
         "submitting_institution_email": ""
     },
-    "Hospital Do Salnes (*)": {
+    "Hospital Do Salnes": {
         "collecting_institution_address": "Hospital Do Salnes, 30",
         "collecting_institution_email": "Desconocido",
         "collecting_institution_finalidad": "General",
