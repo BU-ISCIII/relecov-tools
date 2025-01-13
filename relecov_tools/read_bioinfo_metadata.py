@@ -800,6 +800,19 @@ class BioinfoMetadata:
         self.validate_software_mandatory_files(files_found_dict)
         # Split files found based on each batch of samples
         data_by_batch = self.split_data_by_batch(self.j_data)
+        batch_dates = []
+        #Get batch date for all the samples
+        for batch_dir, batch_dict in data_by_batch.items():
+            if batch_dir.split("/")[-1] not in batch_dates:
+                batch_dates.append(batch_dir.split("/")[-1])
+
+        if len(batch_dates) == 1:
+            batch_dates = str(batch_dates[0])
+        else:
+            stderr.print(f"[orange]More than one batch date in the same json data. Using current date as batch date.")
+            log.info("]More than one batch date in the same json data. Using current date as batch date.")
+            batch_dates = datetime.now().strftime("%Y%m%d%H%M%S")
+
         # Add bioinfo metadata to j_data
         for batch_dir, batch_dict in data_by_batch.items():
             self.log_report.logsum.feed_key(batch_dir)
