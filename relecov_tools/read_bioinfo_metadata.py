@@ -856,6 +856,14 @@ class BioinfoMetadata:
                     sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return
     
+    def get_multiple_sample_files(self):
+        method_name = f"{self.add_bioinfo_files_path.__name__}:{self.get_multiple_sample_files.__name__}"
+        multiple_sample_files = []
+        for key in self.software_config.keys():
+            if self.software_config[key].get("multiple_samples"):
+                multiple_sample_files.append(key)
+        return multiple_sample_files
+
     def create_bioinfo_file(self):
         """Create the bioinfodata json with collecting information from lab
         metadata json, mapping_stats, and more information from the files
