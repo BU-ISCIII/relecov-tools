@@ -785,6 +785,49 @@ class BioinfoMetadata:
         self.log_report.print_log_report(method_name, ["valid", "warning", "error"])
         return
 
+    def save_splitted_files(self, files_dict, batch_date, output_folder=None):
+        """
+        Process and save files that where split by batch and that have a function to be processed
+
+        Args:
+            files_dict (dict): A dictionary containing file paths identified for each configuration item.
+            batch_date (str): Date or ID of the batch to be used in the output file name.
+            output_folder (str): Path to save output files generated during processing.
+
+        Returns:
+            None
+        """
+        method_name = f"{self.save_splitted_files.__name__}"
+        for key, config in self.software_config.items():
+            func_name = config.get("function")
+            # Skip configurations that do not match the conditions
+            if config.get("split_by_batch") is True and func_name:
+                try:
+                    file_path = files_dict[key]
+                    stderr.print(f"[blue]Processing splitted file: {file_path}")
+                except KeyError:
+                    self.log_report.update_log_report(
+                        method_name,
+                        "warning",
+                        f"No file path found for '{file_path}'",
+                    )
+                    continue
+                try:
+                    # Dynamically import the function from the specified module
+                    utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                    import_statement = f"import {utils_name}"
+                    exec(import_statement)
+                    # Get method name and execute it.
+                    data = eval(utils_name + "." + func_name + "(file_path, batch_date, output_folder)")
+                except Exception as e:
+                    self.log_report.update_log_report(
+                        self.save_splitted_files.__name__,
+                        "error",
+                        f"Error occurred while parsing '{func_name}': {e}.",
+                    )
+                    sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+        return
+    
     def create_bioinfo_file(self):
         """Create the bioinfodata json with collecting information from lab
         metadata json, mapping_stats, and more information from the files
@@ -849,6 +892,10 @@ class BioinfoMetadata:
         out_path = os.path.join(self.output_folder, year)
         os.makedirs(out_path, exist_ok=True)
 
+        stderr.print("[blue]Saving previously splitted files to output directory")
+
+        self.save_splitted_files(files_found_dict, batch_dates, out_path)
+        batch_filename = tag + batch_dates + ".json"
         stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
         file_path = os.path.join(self.output_folder, self.out_filename)
