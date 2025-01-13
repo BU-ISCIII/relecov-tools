@@ -153,10 +153,9 @@ class LongTableParse:
             j_list.append(j_dict)
         return j_list
 
-    def save_to_file(self, j_list):
+    def save_to_file(self, j_list, batch_date):
         """Transform the parsed data into a json file"""
-        date_now = datetime.now().strftime("%Y%m%d%H%M%S")
-        file_name = "long_table_" + date_now + ".json"
+        file_name = "long_table_" + batch_date + ".json"
         file_path = os.path.join(self.output_directory, file_name)
 
         try:
@@ -180,7 +179,7 @@ class LongTableParse:
 
 
 # START util functions
-def handle_pangolin_data(files_list, output_folder=None):
+def handle_pangolin_data(files_list, batch_date, output_folder=None):
     """File handler to parse pangolin data (csv) into JSON structured format.
 
     Args:
@@ -320,7 +319,7 @@ def handle_pangolin_data(files_list, output_folder=None):
     return pango_data_processed
 
 
-def parse_long_table(files_list, output_folder=None):
+def parse_long_table(files_list, batch_id, output_folder=None):
     """File handler to retrieve data from long table files and convert it into a JSON structured format.
     This function utilizes the LongTableParse class to parse the long table data.
     Since this utility handles and maps data using a custom way, it returns None to be avoid being  transferred to method read_bioinfo_metadata.BioinfoMetadata.mapping_over_table().
@@ -349,7 +348,7 @@ def parse_long_table(files_list, output_folder=None):
         # Parsing long table data and saving it
         long_table_data = long_table.parsing_csv()
         # Saving long table data into a file
-        long_table.save_to_file(long_table_data)
+        long_table.save_to_file(long_table_data, batch_id)
         stderr.print("[green]\tProcess completed")
     elif len(files_list) > 1:
         method_log_report.update_log_report(
@@ -361,7 +360,7 @@ def parse_long_table(files_list, output_folder=None):
     return None
 
 
-def handle_consensus_fasta(files_list, output_folder=None):
+def handle_consensus_fasta(files_list, batch_id, output_folder=None):
     """File handler to parse consensus data (fasta) into JSON structured format.
 
     Args:
