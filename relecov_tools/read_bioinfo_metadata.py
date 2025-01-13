@@ -831,6 +831,11 @@ class BioinfoMetadata:
                 )
             log.info("Created output json file: %s" % batch_filepath)
             stderr.print(f"[green]Created batch json file: {batch_filepath}")
+
+        year = str(datetime.now().year)
+        out_path = os.path.join(self.output_folder, year)
+        os.makedirs(out_path, exist_ok=True)
+
         stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
         file_path = os.path.join(self.output_folder, self.out_filename)
