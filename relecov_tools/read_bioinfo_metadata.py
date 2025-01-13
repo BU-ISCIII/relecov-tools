@@ -232,7 +232,7 @@ class BioinfoMetadata:
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return
 
-    def add_bioinfo_results_metadata(self, files_dict, j_data, output_folder=None):
+    def add_bioinfo_results_metadata(self, files_dict, j_data, batch_id, output_folder=None):
         """Adds metadata from bioinformatics results to j_data.
         It first calls file_handlers and then maps the handled
         data into j_data.
@@ -241,6 +241,7 @@ class BioinfoMetadata:
             files_dict (dict{str:str}): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (list item per sample).
             output_folder (str): Path to save output files generated during handling_files() process.
+            batch_id(str): ID of the batch which corresponds with the data download date.
 
         Returns:
             j_data_mapped: A list of dictionaries with bioinformatics metadata mapped into j_data.
@@ -263,7 +264,7 @@ class BioinfoMetadata:
                 )
                 continue
             # Handling files
-            data_to_map = self.handling_files(files_dict[key], output_folder)
+            data_to_map = self.handling_files(files_dict[key], output_folder, batch_id)
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
             if not mapping_fields:
@@ -324,7 +325,7 @@ class BioinfoMetadata:
             sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
 
-    def handling_files(self, file_list, output_folder):
+    def handling_files(self, file_list, output_folder, batch_id):
         """Handles different file formats to extract data regardless of their structure.
         The goal is to extract the data contained in files specified in ${file_list},
         using either 'standard' handlers defined in this class or pipeline-specific file handlers.
@@ -368,7 +369,7 @@ class BioinfoMetadata:
                 import_statement = f"import {utils_name}"
                 exec(import_statement)
                 # Get method name and execute it.
-                data = eval(utils_name + "." + func_name + "(file_list, output_folder)")
+                data = eval(utils_name + "." + func_name + "(file_list, batch_id, output_folder)")
             except Exception as e:
                 self.log_report.update_log_report(
                     self.add_bioinfo_results_metadata.__name__,
@@ -801,7 +802,7 @@ class BioinfoMetadata:
             batch_data = batch_dict["j_data"]
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
             batch_data = self.add_bioinfo_results_metadata(
-                files_found_dict, batch_data, batch_dir
+                files_found_dict, batch_data, batch_date, batch_dir
             )
             stderr.print("[blue]Adding software versions to read lab metadata...")
             batch_data = self.get_multiqc_software_versions(
