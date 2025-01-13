@@ -157,13 +157,36 @@ class LongTableParse:
         """Transform the parsed data into a json file"""
         file_name = "long_table_" + batch_date + ".json"
         file_path = os.path.join(self.output_directory, file_name)
+        if os.path.exists(file_path):
+            stderr.print(f"[blue]Long table {file_path} file already exists. Merging new data if possible.")
+            log.info("Long table %s file already exists. Merging new data if possible." % file_path)
+            original_table = relecov_tools.utils.read_json_file(file_path)
+            samples_indict = {item["sample_name"]: item for item in original_table}
+            for item in j_list:
+                sample_name = item["sample_name"]
+                if sample_name in samples_indict:
+                    if samples_indict[sample_name] != item:
+                        stderr.print(f"[red]Same sample has different data in both long tables.")
+                        log.error(
+                            "Sample %s has different data in %s and new long table. Can't merge." % (sample_name, file_path)
+                            )
+                        return None
+                else:
+                    original_table.append(item)
+            try:
+                with open(file_path, "w") as fh:
+                    fh.write(json.dumps(original_table, indent=4))
+                stderr.print("[green]\tParsed data successfully saved to file:", file_path)
+            except Exception as e:
+                stderr.print("[red]\tError saving parsed data to file:", str(e))
 
-        try:
-            with open(file_path, "w") as fh:
-                fh.write(json.dumps(j_list, indent=4))
-            stderr.print("[green]\tParsed data successfully saved to file:", file_path)
-        except Exception as e:
-            stderr.print("[red]\tError saving parsed data to file:", str(e))
+        else:
+            try:
+                with open(file_path, "w") as fh:
+                    fh.write(json.dumps(j_list, indent=4))
+                stderr.print("[green]\tParsed data successfully saved to file:", file_path)
+            except Exception as e:
+                stderr.print("[red]\tError saving parsed data to file:", str(e))
 
     def parsing_csv(self):
         """
