@@ -785,6 +785,34 @@ class BioinfoMetadata:
         self.log_report.print_log_report(method_name, ["valid", "warning", "error"])
         return
 
+    def merge_metadata(self, batch_filepath, batch_data):
+        """
+        Merge metadata json if sample does not exist in the metadata file
+
+        Args:
+            batch_filepath (str): Path to save the json file with the metadata.
+            batch_data (dict): A dictionary containing metadata of the samples.
+        Returns:
+            None
+        """        
+        merged_metadata = relecov_tools.utils.read_json_file(batch_filepath)
+        prev_metadata_dict = {item["sequencing_sample_id"]: item for item in merged_metadata}
+        for item in batch_data:
+            sample_id = item["sequencing_sample_id"]
+            if sample_id in prev_metadata_dict:
+                # When sample already in metadata, checking whether dictionary is the same
+                if prev_metadata_dict[sample_id] != item:
+                    stderr.print(f"[red] Sample {sample_id} has different data in {batch_filepath} and new metadata. Can't merge.")
+                    log.error(
+                        "Sample %s has different data in %s and new metadata. Can't merge." % (sample_id, batch_filepath)
+                    )
+                    sys.exit(1)
+            else:
+                merged_metadata.append(item)
+
+        relecov_tools.utils.write_json_fo_file(merged_metadata, batch_filepath)
+        return merged_metadata
+
     def save_splitted_files(self, files_dict, batch_date, output_folder=None):
         """
         Process and save files that where split by batch and that have a function to be processed
@@ -858,6 +886,8 @@ class BioinfoMetadata:
 
         # Add bioinfo metadata to j_data
         for batch_dir, batch_dict in data_by_batch.items():
+            lab_code = batch_dir.split("/")[-2]
+            batch_date = batch_dir.split("/")[-1]
             self.log_report.logsum.feed_key(batch_dir)
             stderr.print(f"[blue]Processing data from {batch_dir}")
             batch_data = batch_dict["j_data"]
@@ -875,12 +905,15 @@ class BioinfoMetadata:
             stderr.print("[blue]Adding files path to read lab metadata")
             batch_data = self.add_bioinfo_files_path(files_found_dict, batch_data)
             self.split_tables_by_batch(files_found_dict, batch_data, batch_dir)
-            lab_code = batch_dir.split("/")[-2]
-            batch_date = batch_dir.split("/")[-1]
             tag = "bioinfo_lab_metadata_"
             batch_filename = tag + lab_code + "_" + batch_date + ".json"
             batch_filepath = os.path.join(batch_dir, batch_filename)
-            relecov_tools.utils.write_json_fo_file(batch_data, batch_filepath)
+            if os.path.exists(batch_filepath):
+                stderr.print(f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible.")
+                log.info("Bioinfo metadata %s file already exists. Merging new data if possible." % batch_filepath)
+                batch_data = self.merge_metadata(batch_filepath, batch_data)
+            else:
+                relecov_tools.utils.write_json_fo_file(batch_data, batch_filepath)
             for sample in batch_data:
                 self.log_report.logsum.feed_key(
                     key=batch_dir, sample=sample.get("sequencing_sample_id")
