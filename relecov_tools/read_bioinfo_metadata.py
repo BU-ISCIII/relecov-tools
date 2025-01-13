@@ -892,14 +892,19 @@ class BioinfoMetadata:
         out_path = os.path.join(self.output_folder, year)
         os.makedirs(out_path, exist_ok=True)
 
+        tag = "bioinfo_lab_metadata_"
         stderr.print("[blue]Saving previously splitted files to output directory")
 
         self.save_splitted_files(files_found_dict, batch_dates, out_path)
         batch_filename = tag + batch_dates + ".json"
         stderr.print("[blue]Writting output json file")
-        os.makedirs(self.output_folder, exist_ok=True)
-        file_path = os.path.join(self.output_folder, self.out_filename)
-        relecov_tools.utils.write_json_fo_file(self.j_data, file_path)
+        file_path = os.path.join(out_path, batch_filename)
+        if os.path.exists(file_path):
+            stderr.print(f"[blue]Bioinfo metadata {file_path} file already exists. Merging new data if possible.")
+            log.info("Bioinfo metadata %s file already exists. Merging new data if possible." % file_path)
+            batch_data = self.merge_metadata(file_path, self.j_data)
+        else:
+            relecov_tools.utils.write_json_fo_file(self.j_data, file_path)
         stderr.print(f"[green]Sucessful creation of bioinfo analyis file: {file_path}")
         self.log_report.logsum.create_error_summary(
             called_module="read-bioinfo-metadata", logs=self.log_report.logsum.logs
