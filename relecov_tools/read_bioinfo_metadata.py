@@ -6,6 +6,7 @@ import rich.console
 import re
 import shutil
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 import pandas as pd
 import relecov_tools.utils
@@ -740,7 +741,7 @@ class BioinfoMetadata:
             output_dir (str): Output location for the generated tabular file
         """
 
-        def extract_batch_rows_to_file(file):
+        def extract_batch_rows_to_file(file, sufix):
             """Create a new table file only with rows matching samples in batch_data"""
             extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
             file_extension = os.path.splitext(file)[1]
@@ -750,14 +751,18 @@ class BioinfoMetadata:
             sample_col = file_df.columns[sample_colpos]
             file_df[sample_col] = file_df[sample_col].astype(str)
             file_df = file_df[file_df[sample_col].isin(batch_samples)]
+            
+            base, ext = os.path.splitext(os.path.basename(file))
+            new_filename = f"{base}_{sufix}{ext}"
             output_path = os.path.join(
-                output_dir, "analysis_results", os.path.basename(file)
+                output_dir, "analysis_results", new_filename
             )
             file_df.to_csv(output_path, index=False, sep=extdict.get(file_extension))
             return
 
         method_name = self.split_tables_by_batch.__name__
         namekey = "sequencing_sample_id"
+        sufix = datetime.now().strftime("%Y%m%d%H%M%S")
         batch_samples = [row.get(namekey) for row in batch_data]
         for key, files in files_found_dict.items():
             if not self.software_config[key].get("split_by_batch"):
@@ -766,7 +771,7 @@ class BioinfoMetadata:
             sample_colpos = self.get_sample_idx_colpos(key)
             for file in files:
                 try:
-                    extract_batch_rows_to_file(file)
+                    extract_batch_rows_to_file(file,sufix)
                 except Exception as e:
                     if self.software_config[key].get("required"):
                         log_type = "error"
