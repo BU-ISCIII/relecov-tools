@@ -47,7 +47,7 @@ keywords = [
     "next generation sequencing"
 ]
 license = {text = "GNU GENERAL PUBLIC LICENSE v.3"}
-dependencies = []
+dynamic = ["dependencies"]
 
 [project.urls]
 Homepage = "https://github.com/BU-ISCIII/relecov-tools"
