@@ -233,7 +233,9 @@ class BioinfoMetadata:
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return
 
-    def add_bioinfo_results_metadata(self, files_dict, j_data, batch_id, output_folder=None):
+    def add_bioinfo_results_metadata(
+        self, files_dict, j_data, batch_id, output_folder=None
+    ):
         """Adds metadata from bioinformatics results to j_data.
         It first calls file_handlers and then maps the handled
         data into j_data.
@@ -370,7 +372,12 @@ class BioinfoMetadata:
                 import_statement = f"import {utils_name}"
                 exec(import_statement)
                 # Get method name and execute it.
-                data = eval(utils_name + "." + func_name + "(file_list, batch_id, output_folder)")
+                data = eval(
+                    utils_name
+                    + "."
+                    + func_name
+                    + "(file_list, batch_id, output_folder)"
+                )
             except Exception as e:
                 self.log_report.update_log_report(
                     self.add_bioinfo_results_metadata.__name__,
@@ -751,12 +758,10 @@ class BioinfoMetadata:
             sample_col = file_df.columns[sample_colpos]
             file_df[sample_col] = file_df[sample_col].astype(str)
             file_df = file_df[file_df[sample_col].isin(batch_samples)]
-            
+
             base, ext = os.path.splitext(os.path.basename(file))
             new_filename = f"{base}_{sufix}{ext}"
-            output_path = os.path.join(
-                output_dir, "analysis_results", new_filename
-            )
+            output_path = os.path.join(output_dir, "analysis_results", new_filename)
             file_df.to_csv(output_path, index=False, sep=extdict.get(file_extension))
             return
 
@@ -771,7 +776,7 @@ class BioinfoMetadata:
             sample_colpos = self.get_sample_idx_colpos(key)
             for file in files:
                 try:
-                    extract_batch_rows_to_file(file,sufix)
+                    extract_batch_rows_to_file(file, sufix)
                 except Exception as e:
                     if self.software_config[key].get("required"):
                         log_type = "error"
@@ -794,17 +799,22 @@ class BioinfoMetadata:
             batch_data (dict): A dictionary containing metadata of the samples.
         Returns:
             None
-        """        
+        """
         merged_metadata = relecov_tools.utils.read_json_file(batch_filepath)
-        prev_metadata_dict = {item["sequencing_sample_id"]: item for item in merged_metadata}
+        prev_metadata_dict = {
+            item["sequencing_sample_id"]: item for item in merged_metadata
+        }
         for item in batch_data:
             sample_id = item["sequencing_sample_id"]
             if sample_id in prev_metadata_dict:
                 # When sample already in metadata, checking whether dictionary is the same
                 if prev_metadata_dict[sample_id] != item:
-                    stderr.print(f"[red] Sample {sample_id} has different data in {batch_filepath} and new metadata. Can't merge.")
+                    stderr.print(
+                        f"[red] Sample {sample_id} has different data in {batch_filepath} and new metadata. Can't merge."
+                    )
                     log.error(
-                        "Sample %s has different data in %s and new metadata. Can't merge." % (sample_id, batch_filepath)
+                        "Sample %s has different data in %s and new metadata. Can't merge."
+                        % (sample_id, batch_filepath)
                     )
                     sys.exit(1)
             else:
@@ -842,11 +852,18 @@ class BioinfoMetadata:
                     continue
                 try:
                     # Dynamically import the function from the specified module
-                    utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                    utils_name = (
+                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                    )
                     import_statement = f"import {utils_name}"
                     exec(import_statement)
                     # Get method name and execute it.
-                    data = eval(utils_name + "." + func_name + "(file_path, batch_date, output_folder)")
+                    data = eval(
+                        utils_name
+                        + "."
+                        + func_name
+                        + "(file_path, batch_date, output_folder)"
+                    )
                 except Exception as e:
                     self.log_report.update_log_report(
                         self.save_splitted_files.__name__,
@@ -855,7 +872,7 @@ class BioinfoMetadata:
                     )
                     sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return
-    
+
     def get_multiple_sample_files(self):
         method_name = f"{self.add_bioinfo_files_path.__name__}:{self.get_multiple_sample_files.__name__}"
         multiple_sample_files = []
@@ -880,7 +897,7 @@ class BioinfoMetadata:
         # Split files found based on each batch of samples
         data_by_batch = self.split_data_by_batch(self.j_data)
         batch_dates = []
-        #Get batch date for all the samples
+        # Get batch date for all the samples
         for batch_dir, batch_dict in data_by_batch.items():
             if batch_dir.split("/")[-1] not in batch_dates:
                 batch_dates.append(batch_dir.split("/")[-1])
@@ -888,8 +905,12 @@ class BioinfoMetadata:
         if len(batch_dates) == 1:
             batch_dates = str(batch_dates[0])
         else:
-            stderr.print(f"[orange]More than one batch date in the same json data. Using current date as batch date.")
-            log.info("]More than one batch date in the same json data. Using current date as batch date.")
+            stderr.print(
+                f"[orange]More than one batch date in the same json data. Using current date as batch date."
+            )
+            log.info(
+                "]More than one batch date in the same json data. Using current date as batch date."
+            )
             batch_dates = datetime.now().strftime("%Y%m%d%H%M%S")
 
         # Add bioinfo metadata to j_data
@@ -917,8 +938,13 @@ class BioinfoMetadata:
             batch_filename = tag + lab_code + "_" + batch_date + ".json"
             batch_filepath = os.path.join(batch_dir, batch_filename)
             if os.path.exists(batch_filepath):
-                stderr.print(f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible.")
-                log.info("Bioinfo metadata %s file already exists. Merging new data if possible." % batch_filepath)
+                stderr.print(
+                    f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
+                )
+                log.info(
+                    "Bioinfo metadata %s file already exists. Merging new data if possible."
+                    % batch_filepath
+                )
                 batch_data = self.merge_metadata(batch_filepath, batch_data)
             else:
                 relecov_tools.utils.write_json_fo_file(batch_data, batch_filepath)
@@ -941,8 +967,13 @@ class BioinfoMetadata:
         stderr.print("[blue]Writting output json file")
         file_path = os.path.join(out_path, batch_filename)
         if os.path.exists(file_path):
-            stderr.print(f"[blue]Bioinfo metadata {file_path} file already exists. Merging new data if possible.")
-            log.info("Bioinfo metadata %s file already exists. Merging new data if possible." % file_path)
+            stderr.print(
+                f"[blue]Bioinfo metadata {file_path} file already exists. Merging new data if possible."
+            )
+            log.info(
+                "Bioinfo metadata %s file already exists. Merging new data if possible."
+                % file_path
+            )
             batch_data = self.merge_metadata(file_path, self.j_data)
         else:
             relecov_tools.utils.write_json_fo_file(self.j_data, file_path)
