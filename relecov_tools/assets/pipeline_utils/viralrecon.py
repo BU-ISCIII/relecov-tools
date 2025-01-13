@@ -8,7 +8,6 @@ import rich
 import os.path
 
 from pathlib import Path
-from datetime import datetime
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
@@ -172,7 +171,7 @@ class LongTableParse:
                 if sample_name in samples_indict:
                     if samples_indict[sample_name] != item:
                         stderr.print(
-                            f"[red]Same sample has different data in both long tables."
+                            f"[red]Same sample {sample_name} has different data in both long tables."
                         )
                         log.error(
                             "Sample %s has different data in %s and new long table. Can't merge."

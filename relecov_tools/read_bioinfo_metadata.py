@@ -871,10 +871,9 @@ class BioinfoMetadata:
                         f"Error occurred while parsing '{func_name}': {e}.",
                     )
                     sys.exit(self.log_report.print_log_report(method_name, ["error"]))
-        return
+        return data
 
     def get_multiple_sample_files(self):
-        method_name = f"{self.add_bioinfo_files_path.__name__}:{self.get_multiple_sample_files.__name__}"
         multiple_sample_files = []
         for key in self.software_config.keys():
             if self.software_config[key].get("multiple_samples"):
@@ -906,10 +905,10 @@ class BioinfoMetadata:
             batch_dates = str(batch_dates[0])
         else:
             stderr.print(
-                f"[orange]More than one batch date in the same json data. Using current date as batch date."
+                "[orange]More than one batch date in the same json data. Using current date as batch date."
             )
             log.info(
-                "]More than one batch date in the same json data. Using current date as batch date."
+                "More than one batch date in the same json data. Using current date as batch date."
             )
             batch_dates = datetime.now().strftime("%Y%m%d%H%M%S")
 
