@@ -920,6 +920,7 @@ class BioinfoMetadata:
             stderr.print(f"[blue]Processing data from {batch_dir}")
             batch_data = batch_dict["j_data"]
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
+            self.split_tables_by_batch(files_found_dict, sufix, batch_data, batch_dir)
             batch_data = self.add_bioinfo_results_metadata(
                 files_found_dict, batch_data, batch_date, batch_dir
             )
@@ -932,7 +933,6 @@ class BioinfoMetadata:
             # Adding files path
             stderr.print("[blue]Adding files path to read lab metadata")
             batch_data = self.add_bioinfo_files_path(files_found_dict, batch_data)
-            self.split_tables_by_batch(files_found_dict, batch_data, batch_dir)
             tag = "bioinfo_lab_metadata_"
             batch_filename = tag + lab_code + "_" + batch_date + ".json"
             batch_filepath = os.path.join(batch_dir, batch_filename)
