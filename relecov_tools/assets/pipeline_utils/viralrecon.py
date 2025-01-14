@@ -134,7 +134,7 @@ class LongTableParse:
         j_list = []
         # Grab date from filename
         result_regex = re.search(
-            "variants_long_table(?:_\d{8})?\.csv", os.path.basename(self.file_path)
+            "variants_long_table(?:_\d{14})?\.csv", os.path.basename(self.file_path)
         )
         if result_regex is None:
             stderr.print(
