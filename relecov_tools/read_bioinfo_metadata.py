@@ -234,7 +234,7 @@ class BioinfoMetadata:
         return
 
     def add_bioinfo_results_metadata(
-        self, files_dict, j_data, batch_id, output_folder=None
+        self, files_dict, j_data, sufix, batch_id, output_folder=None
     ):
         """Adds metadata from bioinformatics results to j_data.
         It first calls file_handlers and then maps the handled
@@ -243,6 +243,7 @@ class BioinfoMetadata:
         Args:
             files_dict (dict{str:str}): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (list item per sample).
+            sufix (str): Sufix added to splitted tables file name.
             output_folder (str): Path to save output files generated during handling_files() process.
             batch_id(str): ID of the batch which corresponds with the data download date.
 
@@ -267,7 +268,7 @@ class BioinfoMetadata:
                 )
                 continue
             # Handling files
-            data_to_map = self.handling_files(files_dict[key], output_folder, batch_id)
+            data_to_map = self.handling_files(files_dict[key], sufix, output_folder, batch_id)
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
             if not mapping_fields:
@@ -328,7 +329,7 @@ class BioinfoMetadata:
             sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
 
-    def handling_files(self, file_list, output_folder, batch_id):
+    def handling_files(self, file_list, sufix, output_folder, batch_id):
         """Handles different file formats to extract data regardless of their structure.
         The goal is to extract the data contained in files specified in ${file_list},
         using either 'standard' handlers defined in this class or pipeline-specific file handlers.
@@ -739,11 +740,12 @@ class BioinfoMetadata:
             ]
         return data_by_batch
 
-    def split_tables_by_batch(self, files_found_dict, batch_data, output_dir):
+    def split_tables_by_batch(self, files_found_dict, sufix, batch_data, output_dir):
         """Filter table content to output a new table containing only the samples present in given metadata
 
         Args:
             files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
+            sufix (str): Sufix to be added to the new table file name.
             batch_data (list(dict)): Metadata corresponding to a single folder with samples (folder)
             output_dir (str): Output location for the generated tabular file
         """
@@ -767,7 +769,6 @@ class BioinfoMetadata:
 
         method_name = self.split_tables_by_batch.__name__
         namekey = "sequencing_sample_id"
-        sufix = datetime.now().strftime("%Y%m%d%H%M%S")
         batch_samples = [row.get(namekey) for row in batch_data]
         for key, files in files_found_dict.items():
             if not self.software_config[key].get("split_by_batch"):
@@ -896,6 +897,7 @@ class BioinfoMetadata:
         # Split files found based on each batch of samples
         data_by_batch = self.split_data_by_batch(self.j_data)
         batch_dates = []
+        sufix = datetime.now().strftime("%Y%m%d%H%M%S")
         # Get batch date for all the samples
         for batch_dir, batch_dict in data_by_batch.items():
             if batch_dir.split("/")[-1] not in batch_dates:
@@ -922,7 +924,7 @@ class BioinfoMetadata:
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
             self.split_tables_by_batch(files_found_dict, sufix, batch_data, batch_dir)
             batch_data = self.add_bioinfo_results_metadata(
-                files_found_dict, batch_data, batch_date, batch_dir
+                files_found_dict, batch_data, sufix, batch_date, batch_dir
             )
             stderr.print("[blue]Adding software versions to read lab metadata...")
             batch_data = self.get_multiqc_software_versions(
