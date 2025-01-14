@@ -22,6 +22,8 @@ Code contributions to the release:
 
 #### Fixes
 
+- Fixed read-bioinfo-metadata module [#367](https://github.com/BU-ISCIII/relecov-tools/pull/367)
+
 #### Changed
 
 #### Removed
