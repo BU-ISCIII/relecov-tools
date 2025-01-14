@@ -325,7 +325,7 @@ class EnaUpload:
                 break
             except ftplib.all_errors as e:
                 stderr.print(
-                    f"Connection attempt {connection_retries+1} failed: {e}. Retrying..."\
+                    f"Connection attempt {connection_retries+1} failed: {e}. Retrying..."
                 )
                 connection_retries += 1
                 time.sleep(retry_delay)
@@ -337,7 +337,7 @@ class EnaUpload:
             stderr.print(f"ERROR: Could not close FTP session properly: {e}")
 
     def upload_files_with_retries(
-            self, session, file_paths, max_retries=3, retry_delay=5
+        self, session, file_paths, max_retries=3, retry_delay=5
     ):
         for filename, path in file_paths.items():
             stderr.print(f"Uploading path: {path} with filename: {filename}")
@@ -358,7 +358,7 @@ class EnaUpload:
                     ftplib.error_temp,
                     ftplib.error_perm,
                     ftplib.socket.error,
-                    ftplib.error_proto
+                    ftplib.error_proto,
                 ) as e:
                     # Error handling related to FTP
                     retries += 1
@@ -382,7 +382,7 @@ class EnaUpload:
                                     "webin2.ebi.ac.uk",
                                     self.user,
                                     self.passwd,
-                                    timeout=60
+                                    timeout=60,
                                 )
                                 session.login(self.user, self.passwd)
                                 break
