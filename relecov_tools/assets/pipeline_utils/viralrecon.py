@@ -188,7 +188,7 @@ class LongTableParse:
                 )
             except Exception as e:
                 stderr.print("[red]\tError saving parsed data to file:", str(e))
-
+                log.error("Error saving parsed data to file: %s", e)
         else:
             try:
                 with open(file_path, "w") as fh:
@@ -198,6 +198,7 @@ class LongTableParse:
                 )
             except Exception as e:
                 stderr.print("[red]\tError saving parsed data to file:", str(e))
+                log.error("Error saving parsed data to file: %s", e)
 
     def parsing_csv(self):
         """
