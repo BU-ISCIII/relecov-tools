@@ -361,31 +361,64 @@ class BioinfoMetadata:
             data: A dictionary containing bioinfo metadata handled for each sample.
         """
         method_name = f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_files.__name__}"
+        splitted_path = os.path.join(output_folder, "analysis_results")
         file_name = self.software_config[self.current_config_key].get("fn")
         # Parsing files
-        func_name = self.software_config[self.current_config_key]["function"]
+        current_config = self.software_config[self.current_config_key]
+        func_name = current_config.get("function")
         if func_name is None:
             data = self.handling_tables(file_list=file_list, conf_tab_name=file_name)
         else:
-            try:
-                # Dynamically import the function from the specified module
-                utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
-                import_statement = f"import {utils_name}"
-                exec(import_statement)
-                # Get method name and execute it.
-                data = eval(
-                    utils_name
-                    + "."
-                    + func_name
-                    + "(file_list, batch_id, output_folder)"
-                )
-            except Exception as e:
-                self.log_report.update_log_report(
-                    self.add_bioinfo_results_metadata.__name__,
-                    "error",
-                    f"Error occurred while parsing '{func_name}': {e}.",
-                )
-                sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+            if current_config.get("split_by_batch") is True:
+                file_extension = current_config.get("fn").rsplit(".", 1)[1]
+                base_filename = current_config.get("fn").rsplit(".", 1)[0]
+                pattern = re.compile(f"{base_filename}_{sufix}.{re.escape(file_extension)}")
+                matching_files = [
+                    f for f in os.listdir(splitted_path) if pattern.match(f)
+                ]
+                full_paths = [os.path.join(splitted_path, f) for f in matching_files]
+                try:
+                    # Dynamically import the function from the specified module
+                    utils_name = (
+                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                    )
+                    import_statement = f"import {utils_name}"
+                    exec(import_statement)
+                    # Get method name and execute it.
+                    print("lanzar_variants_long_table")
+                    data = eval(
+                        utils_name
+                        + "."
+                        + func_name
+                        + "(full_paths, batch_id, output_folder)"
+                    )
+                except Exception as e:
+                    self.log_report.update_log_report(
+                        self.save_splitted_files.__name__,
+                        "error",
+                        f"Error occurred while parsing '{func_name}': {e}.",
+                    )
+                    sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+            else:
+                try:
+                    # Dynamically import the function from the specified module
+                    utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                    import_statement = f"import {utils_name}"
+                    exec(import_statement)
+                    # Get method name and execute it.
+                    data = eval(
+                        utils_name
+                        + "."
+                        + func_name
+                        + "(file_list, batch_id, output_folder)"
+                    )
+                except Exception as e:
+                    self.log_report.update_log_report(
+                        self.add_bioinfo_results_metadata.__name__,
+                        "error",
+                        f"Error occurred while parsing '{func_name}': {e}.",
+                    )
+                    sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
 
     def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
