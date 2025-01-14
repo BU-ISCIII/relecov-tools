@@ -165,38 +165,27 @@ def excel_date_to_num(date):
         return None
 
 
-def read_csv_file_return_dict(file_name, sep=None, key_position=None):
+def read_csv_file_return_dict(file_name, sep=None, key_position=0):
     """Read csv or tsv file, according to separator, and return a dictionary
     where the main key is the first column, if key position is None otherwise
     the index value of the key position is used as key. If sep is None then
     try to assert a separator automaticallly depending on file extension.
     """
-    try:
-        with open(file_name, "r") as fh:
-            lines = fh.readlines()
-    except FileNotFoundError:
-        raise
     if sep is None:
         file_extension = os.path.splitext(file_name)[1]
         extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
         # Use space as a default separator, None would also be valid
         sep = extdict.get(file_extension, " ")
-    heading = lines[0].strip().split(sep)
-    if len(heading) == 1:
-        return {"ERROR": "not valid format"}
+    try:
+        file_df = pd.read_csv(file_name, sep=sep)
+    except FileNotFoundError:
+        raise
     file_data = {}
-    for line in lines[1:]:
-        line_s = line.strip().split(sep)
-        if key_position is None:
-            file_data[line_s[0]] = {}
-            for idx in range(1, len(heading)):
-                file_data[line_s[0]][heading[idx]] = line_s[idx]
-        else:
-            file_data[line_s[key_position]] = {}
-            for idx in range(len(heading)):
-                if idx == key_position:
-                    continue
-                file_data[line_s[key_position]][heading[idx]] = line_s[idx]
+    for _, row in file_df.iterrows():
+        key = row.iloc[key_position]
+        # Create a dictionary excluding the key column
+        row_dict = row.drop(file_df.columns[key_position]).to_dict()
+        file_data[key] = row_dict
 
     return file_data
 
