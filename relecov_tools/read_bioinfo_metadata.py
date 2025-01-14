@@ -268,7 +268,9 @@ class BioinfoMetadata:
                 )
                 continue
             # Handling files
-            data_to_map = self.handling_files(files_dict[key], sufix, output_folder, batch_id)
+            data_to_map = self.handling_files(
+                files_dict[key], sufix, output_folder, batch_id
+            )
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
             if not mapping_fields:
@@ -372,7 +374,9 @@ class BioinfoMetadata:
             if current_config.get("split_by_batch") is True:
                 file_extension = current_config.get("fn").rsplit(".", 1)[1]
                 base_filename = current_config.get("fn").rsplit(".", 1)[0]
-                pattern = re.compile(f"{base_filename}_{sufix}.{re.escape(file_extension)}")
+                pattern = re.compile(
+                    f"{base_filename}_{sufix}.{re.escape(file_extension)}"
+                )
                 matching_files = [
                     f for f in os.listdir(splitted_path) if pattern.match(f)
                 ]
@@ -402,7 +406,9 @@ class BioinfoMetadata:
             else:
                 try:
                     # Dynamically import the function from the specified module
-                    utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                    utils_name = (
+                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                    )
                     import_statement = f"import {utils_name}"
                     exec(import_statement)
                     # Get method name and execute it.
