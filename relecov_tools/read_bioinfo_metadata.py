@@ -980,4 +980,10 @@ class BioinfoMetadata:
         self.log_report.logsum.create_error_summary(
             called_module="read-bioinfo-metadata", logs=self.log_report.logsum.logs
         )
+        for batch_dir, batch_dict in data_by_batch.items():
+            self.log_report.logsum.create_error_summary(
+                called_module="read-bioinfo-metadata",
+                filepath=batch_dir,
+                logs=self.log_report.logsum.logs
+            )
         return True
