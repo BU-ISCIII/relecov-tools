@@ -11,12 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Code contributions to the release:
 
 - [Sarai Varona](https://github.com/svarona)
+- [Alejandro Bernabeu](https://github.com/aberdur)
 
 ### Modules
 
 #### Added enhancements
 
 - Added a IonTorrent flow cell for validation [#363](https://github.com/BU-ISCIII/relecov-tools/pull/363)
+- Added solution to timeout in upload-to-ena module [#368](https://github.com/BU-ISCIII/relecov-tools/pull/368)
 
 #### Fixes
 
