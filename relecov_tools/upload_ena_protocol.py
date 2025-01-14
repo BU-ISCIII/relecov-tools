@@ -318,11 +318,15 @@ class EnaUpload:
         connection_retries = 0
         while connection_retries < 3:
             try:
-                session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd, timeout=60)
+                session = ftplib.FTP(
+                    "webin2.ebi.ac.uk", self.user, self.passwd, timeout=60
+                )
                 session.login(self.user, self.passwd)
                 break
             except ftplib.all_errors as e:
-                stderr.print(f"Connection attempt {connection_retries+1} failed: {e}. Retrying...")
+                stderr.print(
+                    f"Connection attempt {connection_retries+1} failed: {e}. Retrying..."\
+                )
                 connection_retries += 1
                 time.sleep(retry_delay)
         self.upload_files_with_retries(session, file_paths, max_retries, retry_delay)
@@ -332,7 +336,9 @@ class EnaUpload:
         except ftplib.all_errors as e:
             stderr.print(f"ERROR: Could not close FTP session properly: {e}")
 
-    def upload_files_with_retries(self, session, file_paths, max_retries=3, retry_delay=5):
+    def upload_files_with_retries(
+            self, session, file_paths, max_retries=3, retry_delay=5
+    ):
         for filename, path in file_paths.items():
             stderr.print(f"Uploading path: {path} with filename: {filename}")
             retries = 0
@@ -343,17 +349,25 @@ class EnaUpload:
                         response = session.storbinary(f"STOR {filename}", file)
 
                         # Verify if the upload was successful (using response code)
-                        if response.startswith('226'):
+                        if response.startswith("226"):
                             stderr.print(f"File {filename} uploaded successfully.")
                             break
                         else:
                             raise ftplib.error_perm(f"Unexpected response: {response}")
-                except (ftplib.error_temp, ftplib.error_perm, ftplib.socket.error, ftplib.error_proto) as e:
+                except (
+                    ftplib.error_temp,
+                    ftplib.error_perm,
+                    ftplib.socket.error,
+                    ftplib.error_proto
+                ) as e:
                     # Error handling related to FTP
                     retries += 1
                     stderr.print(f"FTP error: {e}. Retry {retries}/{max_retries}")
                     # Reopen connection if failed due to timeout or temporary error
-                    if isinstance(e, ftplib.error_temp) or "timed out" in str(e).lower():
+                    if (
+                        isinstance(e, ftplib.error_temp)
+                        or "timed out" in str(e).lower()
+                    ):
                         stderr.print("Reinitializing FTP connection...")
                         try:
                             session.quit()
@@ -364,11 +378,18 @@ class EnaUpload:
                         connection_retries = 0
                         while connection_retries < 3:
                             try:
-                                session = ftplib.FTP("webin2.ebi.ac.uk", self.user, self.passwd, timeout=60)
+                                session = ftplib.FTP(
+                                    "webin2.ebi.ac.uk",
+                                    self.user,
+                                    self.passwd,
+                                    timeout=60
+                                )
                                 session.login(self.user, self.passwd)
                                 break
-                            except (ftplib.all_errors) as e:
-                                stderr.print(f"Connection attempt {connection_retries+1} failed: {e}. Retrying...")
+                            except ftplib.all_errors as e:
+                                stderr.print(
+                                    f"Connection attempt {connection_retries+1} failed: {e}. Retrying..."
+                                )
                                 connection_retries += 1
                                 time.sleep(retry_delay)
                         if connection_retries == 3:
@@ -377,10 +398,14 @@ class EnaUpload:
                 except Exception as e:
                     # Handling of any other unexpected errors
                     retries += 1
-                    stderr.print(f"Unexpected error: {e}. Retry {retries}/{max_retries}")
+                    stderr.print(
+                        f"Unexpected error: {e}. Retry {retries}/{max_retries}"
+                    )
                     time.sleep(retry_delay)
             else:
-                stderr.print(f"Failed to upload {filename} after {max_retries} retries.")
+                stderr.print(
+                    f"Failed to upload {filename} after {max_retries} retries."
+                )
                 session.quit()
 
     def large_json_upload(self, json_data):
@@ -392,7 +417,7 @@ class EnaUpload:
         number_of_batchs = len(range(0, len(json_data), ena_api_limit))
         stderr.print(f"Splitting the json data in {number_of_batchs} batchs...")
         for index in range(0, len(json_data), ena_api_limit):
-            batch_index = json_data[index:index + ena_api_limit]
+            batch_index = json_data[index : index + ena_api_limit]
             stderr.print(f"[blue]Processing batch {batch_index}...")
             self.standard_upload(batch_index)
         return
