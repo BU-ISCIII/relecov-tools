@@ -66,6 +66,29 @@ def read_json_file(j_file):
     return data
 
 
+def write_to_excel_file(data, f_name, sheet_name, post_process=None):
+    book = openpyxl.Workbook()
+    sheet = book.active
+    for row in data:
+        sheet.append(row)
+    # adding one column with row number
+    if "insert_cols" in post_process:
+        sheet.insert_cols(post_process["insert_cols"])
+        sheet["A1"] = "CAMPO"
+        counter = 1
+        for i in range(len(data) - 1):
+            idx = "A" + str(counter + 1)
+            sheet[idx] = counter
+            counter += 1
+    # adding 3 empty rows
+    if "insert_rows" in post_process:
+        for x in range(post_process["insert_rows"]):
+            sheet.insert_rows(1)
+        sheet.title = sheet_name
+    book.save(f_name)
+    return
+
+
 def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
     """Read the input excel file and give the information in a list
     of dictionaries
@@ -77,7 +100,7 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
             idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
         ][0]
     except IndexError:
-        raise KeyError(f"Header flag '{header_flag}' could not be found in {f_name}")
+        raise IndexError(f"Header flag '{header_flag}' could not be found in {f_name}")
     heading = [str(i.value).strip() for i in ws_metadata_lab[heading_row] if i.value]
     ws_data = []
     for row in islice(ws_metadata_lab.values, heading_row, ws_metadata_lab.max_row):
