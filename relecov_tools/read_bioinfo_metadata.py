@@ -234,7 +234,7 @@ class BioinfoMetadata:
         return
 
     def add_bioinfo_results_metadata(
-        self, files_dict, j_data, sufix, batch_id, output_folder=None
+        self, files_dict, j_data, sufix, batch_date, output_folder=None
     ):
         """Adds metadata from bioinformatics results to j_data.
         It first calls file_handlers and then maps the handled
@@ -245,7 +245,7 @@ class BioinfoMetadata:
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (list item per sample).
             sufix (str): Sufix added to splitted tables file name.
             output_folder (str): Path to save output files generated during handling_files() process.
-            batch_id(str): ID of the batch which corresponds with the data download date.
+            batch_date(str): Number of the batch which corresponds with the data download date.
 
         Returns:
             j_data_mapped: A list of dictionaries with bioinformatics metadata mapped into j_data.
@@ -269,7 +269,7 @@ class BioinfoMetadata:
                 continue
             # Handling files
             data_to_map = self.handling_files(
-                files_dict[key], sufix, output_folder, batch_id
+                files_dict[key], sufix, output_folder, batch_date
             )
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
@@ -331,7 +331,7 @@ class BioinfoMetadata:
             sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
 
-    def handling_files(self, file_list, sufix, output_folder, batch_id):
+    def handling_files(self, file_list, sufix, output_folder, batch_date):
         """Handles different file formats to extract data regardless of their structure.
         The goal is to extract the data contained in files specified in ${file_list},
         using either 'standard' handlers defined in this class or pipeline-specific file handlers.
@@ -358,6 +358,7 @@ class BioinfoMetadata:
         Args:
             file_list (list): A list of file path/s to be processed.
             output_folder (str): Path to save output files from imported method if necessary
+            batch_date(str): Number of the batch which corresponds with the data download date.
 
         Returns:
             data: A dictionary containing bioinfo metadata handled for each sample.
@@ -394,7 +395,7 @@ class BioinfoMetadata:
                         utils_name
                         + "."
                         + func_name
-                        + "(full_paths, batch_id, output_folder)"
+                        + "(full_paths, batch_date, output_folder)"
                     )
                 except Exception as e:
                     self.log_report.update_log_report(
@@ -416,7 +417,7 @@ class BioinfoMetadata:
                         utils_name
                         + "."
                         + func_name
-                        + "(file_list, batch_id, output_folder)"
+                        + "(file_list, batch_date, output_folder)"
                     )
                 except Exception as e:
                     self.log_report.update_log_report(
