@@ -824,9 +824,9 @@ class BioinfoMetadata:
         relecov_tools.utils.write_json_fo_file(merged_metadata, batch_filepath)
         return merged_metadata
 
-    def save_splitted_files(self, files_dict, batch_date, output_folder=None):
+    def save_merged_files(self, files_dict, batch_date, output_folder=None):
         """
-        Process and save files that where split by batch and that have a function to be processed
+        Process and save files that where split by cod and that have a function to be processed
 
         Args:
             files_dict (dict): A dictionary containing file paths identified for each configuration item.
@@ -836,7 +836,7 @@ class BioinfoMetadata:
         Returns:
             None
         """
-        method_name = f"{self.save_splitted_files.__name__}"
+        method_name = f"{self.save_merged_files.__name__}"
         for key, config in self.software_config.items():
             func_name = config.get("function")
             # Skip configurations that do not match the conditions
@@ -867,7 +867,7 @@ class BioinfoMetadata:
                     )
                 except Exception as e:
                     self.log_report.update_log_report(
-                        self.save_splitted_files.__name__,
+                        self.save_merged_files.__name__,
                         "error",
                         f"Error occurred while parsing '{func_name}': {e}.",
                     )
@@ -963,7 +963,7 @@ class BioinfoMetadata:
         tag = "bioinfo_lab_metadata_"
         stderr.print("[blue]Saving previously splitted files to output directory")
 
-        self.save_splitted_files(files_found_dict, batch_dates, out_path)
+        self.save_merged_files(files_found_dict, batch_dates, out_path)
         batch_filename = tag + batch_dates + ".json"
         stderr.print("[blue]Writting output json file")
         file_path = os.path.join(out_path, batch_filename)
