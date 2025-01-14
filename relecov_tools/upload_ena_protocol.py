@@ -206,7 +206,6 @@ class EnaUpload:
             schemas_dataframe[source] = self.table_formatting(
                 schemas_dataframe_raw, source
             )
-            
         return schemas_dataframe
 
     def save_tables(self, schemas_dataframe, date):
