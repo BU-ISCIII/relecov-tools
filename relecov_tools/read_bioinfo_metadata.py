@@ -381,7 +381,9 @@ class BioinfoMetadata:
                 matching_files = [
                     f for f in os.listdir(splitted_path) if pattern.match(f)
                 ]
-                full_paths = [os.path.join(splitted_path, f) for f in matching_files]  # noqua: F841
+                full_paths = [
+                    os.path.join(splitted_path, f) for f in matching_files
+                ]  # noqa: F841
                 try:
                     # Dynamically import the function from the specified module
                     utils_name = (
