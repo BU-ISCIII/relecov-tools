@@ -392,7 +392,6 @@ class BioinfoMetadata:
                     import_statement = f"import {utils_name}"
                     exec(import_statement)
                     # Get method name and execute it.
-                    print("lanzar_variants_long_table")
                     data = eval(
                         utils_name
                         + "."
