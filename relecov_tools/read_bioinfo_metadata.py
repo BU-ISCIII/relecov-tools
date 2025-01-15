@@ -803,6 +803,7 @@ class BioinfoMetadata:
 
             base, ext = os.path.splitext(os.path.basename(file))
             new_filename = f"{base}_{sufix}{ext}"
+            os.makedirs(os.path.join(output_dir, "analysis_results"), exist_ok=True)
             output_path = os.path.join(output_dir, "analysis_results", new_filename)
             file_df.to_csv(output_path, index=False, sep=extdict.get(file_extension))
             return
