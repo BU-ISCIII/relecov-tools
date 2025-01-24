@@ -2317,10 +2317,7 @@
             "description": "The name of the DNA library preparation kit used to generate the library being sequenced.",
             "classification": "Sequencing",
             "label": "Library Preparation Kit",
-            "fill_mode": "batch",
-            "errors": [
-                "Error when mapping the label 'If Library Preparation Kit is other, specify'"
-            ]
+            "fill_mode": "batch"
         },
         "enrichment_protocol": {
             "enum": [
