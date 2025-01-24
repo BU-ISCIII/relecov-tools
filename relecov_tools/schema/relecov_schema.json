@@ -22,6 +22,11 @@
         "enrichment_panel",
         "enrichment_panel_version"
     ],
+    "errors": [
+        "Error when mapping the label 'If Library Preparation Kit is other, specify'",
+        "Error when mapping the label 'Quality control metrics (sample discard criteria)'",
+        "Error when mapping the label 'Consensus Criteria'"
+    ],
     "type": "object",
     "properties": {
         "public_health_sample_id_sivies": {
@@ -2312,7 +2317,10 @@
             "description": "The name of the DNA library preparation kit used to generate the library being sequenced.",
             "classification": "Sequencing",
             "label": "Library Preparation Kit",
-            "fill_mode": "batch"
+            "fill_mode": "batch",
+            "errors": [
+                "Error when mapping the label 'If Library Preparation Kit is other, specify'"
+            ]
         },
         "enrichment_protocol": {
             "enum": [
