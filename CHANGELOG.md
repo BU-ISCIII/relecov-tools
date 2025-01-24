@@ -12,6 +12,7 @@ Code contributions to the release:
 
 - [Sarai Varona](https://github.com/svarona)
 - [Alejandro Bernabeu](https://github.com/aberdur)
+- [Victor Lopez](https://github.com/victor5lm)
 
 ### Modules
 
@@ -20,6 +21,7 @@ Code contributions to the release:
 - Added a IonTorrent flow cell for validation [#363](https://github.com/BU-ISCIII/relecov-tools/pull/363)
 - Added solution to timeout in upload-to-ena module [#368](https://github.com/BU-ISCIII/relecov-tools/pull/368)
 - Added log functionality to build-schema module [#340](https://github.com/BU-ISCIII/relecov-tools/pull/340)
+- Updated the metadata_processing field in configuration.json and added an errors field in the json schema [#372](https://github.com/BU-ISCIII/relecov-tools/pull/372)
 
 #### Fixes
 
