@@ -722,7 +722,6 @@ class SchemaBuilder:
                 log.error(f"Error adding dropdowns: {e}")
                 stderr.print(f"[red]Error adding dropdowns: {e}")
                 return None
-            
         except Exception as e:
             log.error(f"Error in create_metadatalab_excel: {e}")
             stderr.print(f"[red]Error in create_metadatalab_excel: {e}")
