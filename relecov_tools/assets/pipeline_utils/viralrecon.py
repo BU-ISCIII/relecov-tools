@@ -440,3 +440,32 @@ def handle_consensus_fasta(files_list, batch_date, output_folder=None):
         )
         method_log_report.print_log_report(method_name, ["valid", "warning"])
     return consensus_data_processed
+
+
+def quality_control_evaluation(data):
+    """Evaluate the quality of the samples and add the field 'qc_test' to each 'data' entry."""
+    conditions = {
+        "per_sgene_ambiguous": lambda x: float(x) < 10,
+        "per_sgene_coverage": lambda x: float(x) > 98,
+        "per_ldmutations": lambda x: float(x) > 60,
+        "number_of_sgene_frameshifts": lambda x: int(x) == 0,
+        "number_of_unambiguous_bases": lambda x: int(x) > 24000,
+        "number_of_Ns": lambda x: int(x) < 5000,
+        "qc_filtered": lambda x: int(x) > 50000,
+        "per_reads_host": lambda x: float(x) < 20,
+    }
+    for sample in data:
+        try:
+            qc_status = "pass"
+            for param, condition in conditions.items():
+                value = sample.get(param)
+                if value is None or not condition(value):
+                    qc_status = "fail"
+                    break
+            sample["qc_test"] = qc_status
+        except ValueError as e:
+            sample["qc_test"] = "fail"
+            print(
+                f"Error processing sample {sample.get('sequencing_sample_id', 'unknown')}: {e}"
+            )
+    return data

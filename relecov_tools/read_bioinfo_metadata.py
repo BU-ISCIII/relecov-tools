@@ -1009,6 +1009,8 @@ class BioinfoMetadata:
         batch_filename = tag + batch_dates + ".json"
         stderr.print("[blue]Writting output json file")
         file_path = os.path.join(out_path, batch_filename)
+        qc_statement = f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation(self.j_data)"
+        exec(qc_statement)
         if os.path.exists(file_path):
             stderr.print(
                 f"[blue]Bioinfo metadata {file_path} file already exists. Merging new data if possible."

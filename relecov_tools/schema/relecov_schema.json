@@ -3353,6 +3353,39 @@
             "label": "%Ns",
             "fill_mode": "batch"
         },
+        "per_sgene_ambiguous": {
+            "examples": [
+              "e.g 0"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "clasification": "Bioinformatics and QC metrics fields",
+            "label": "S-Gene_Ambiguous_Percentage",
+            "fill_mode": "batch"
+        },
+        "per_sgene_coverage": {
+            "examples": [
+              "e.g 99"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "clasification": "Bioinformatics and QC metrics fields",
+            "label": "S-Gene_Coverage_Percentage",
+            "fill_mode": "batch"
+        },
+        "per_ldmutations": {
+            "examples": [
+              "e.g 87"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "clasification": "Bioinformatics and QC metrics fields",
+            "label": "% LDMutations",
+            "fill_mode": "batch"
+        },
         "ns_per_100_kbp": {
             "examples": [
                 "300"
@@ -3384,6 +3417,39 @@
             "description": "The number of missense variants",
             "classification": "Bioinformatic Variants",
             "label": "Number of variants with effect",
+            "fill_mode": "batch"
+        },
+        "number_of_sgene_frameshifts": {
+            "examples": [
+                "0"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The number of frameshift in sgene",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of frameshift in sgene",
+            "fill_mode": "batch"
+        },
+        "number_of_unambiguous_bases": {
+            "examples": [
+                "30000"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The number of unambiguous bases",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of unambiguous bases",
+            "fill_mode": "batch"
+        },
+        "number_of_Ns": {
+            "examples": [
+                "100"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The number of Ns",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of Ns",
             "fill_mode": "batch"
         },
         "lineage_name": {
