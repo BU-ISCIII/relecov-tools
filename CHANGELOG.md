@@ -23,6 +23,7 @@ Code contributions to the release:
 - Added log functionality to build-schema module [#340](https://github.com/BU-ISCIII/relecov-tools/pull/340)
 - Updated the metadata_processing field in configuration.json and added the other_preparation_kit, quality_control_metrics and consensus_criteria fields in the json schema [#372](https://github.com/BU-ISCIII/relecov-tools/pull/372)
 - Added quality control functionality to read-bioinfo-metadata [#373](https://github.com/BU-ISCIII/relecov-tools/pull/373)
+- Added dropdown functionality to build-schema enums [#374](https://github.com/BU-ISCIII/relecov-tools/pull/374)
 
 #### Fixes
 
