@@ -4,6 +4,7 @@ import relecov_tools.json_validation
 import rich.console
 import pandas as pd
 import os
+import openpyxl
 import sys
 import json
 import difflib
@@ -13,6 +14,7 @@ import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
 import relecov_tools.assets.schema_utils.metadatalab_template
 from relecov_tools.config_json import ConfigJson
+from openpyxl.worksheet.datavalidation import DataValidation
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -668,6 +670,59 @@ class SchemaBuilder:
                 log.error(f"Error writing to Excel: {e}")
                 stderr.print(f"[red]Error writing to Excel: {e}")
                 return None
+
+            try:
+                wb = openpyxl.load_workbook(out_file)
+                ws_metadata = wb["METADATA_LAB"]
+
+                ws_dropdowns = (
+                    wb.create_sheet("DROPDOWNS")
+                    if "DROPDOWNS" not in wb.sheetnames
+                    else wb["DROPDOWNS"]
+                )
+
+                for row in ws_dropdowns.iter_rows():
+                    for cell in row:
+                        cell.value = None
+
+                for col_idx, (property_id, enum_values) in enumerate(
+                    zip(df["property_id"], df["enum"]), start=1
+                ):
+                    if isinstance(enum_values, list) and len(enum_values) > 0:
+                        start_row = 1
+                        col_letter = openpyxl.utils.get_column_letter(col_idx)
+                        for row_offset, value in enumerate(
+                            enum_values, start=start_row
+                        ):
+                            ws_dropdowns[f"{col_letter}{row_offset}"] = value
+
+                        dropdown_range_address = f"DROPDOWNS!${col_letter}${start_row}:${col_letter}${start_row + len(enum_values) - 1}"
+
+                        col_letter_metadata = ws_metadata.cell(
+                            row=4, column=col_idx + 1
+                        ).column_letter
+                        dropdown_range_metadata = (
+                            f"{col_letter_metadata}5:{col_letter_metadata}1000"
+                        )
+                        dropdown = DataValidation(
+                            type="list",
+                            formula1=f"{dropdown_range_address}",
+                            allow_blank=True,
+                        )
+                        dropdown.error = "Invalid value"
+                        dropdown.errorTitle = "Invalid entry"
+                        dropdown.prompt = f"Select a value for {property_id}"
+                        dropdown.promptTitle = "Value selection"
+
+                        ws_metadata.add_data_validation(dropdown)
+                        dropdown.add(dropdown_range_metadata)
+                ws_dropdowns.sheet_state = "hidden"
+                wb.save(out_file)
+            except Exception as e:
+                log.error(f"Error adding dropdowns: {e}")
+                stderr.print(f"[red]Error adding dropdowns: {e}")
+                return None
+            
         except Exception as e:
             log.error(f"Error in create_metadatalab_excel: {e}")
             stderr.print(f"[red]Error in create_metadatalab_excel: {e}")
