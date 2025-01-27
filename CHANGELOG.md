@@ -20,6 +20,7 @@ Code contributions to the release:
 - Added a IonTorrent flow cell for validation [#363](https://github.com/BU-ISCIII/relecov-tools/pull/363)
 - Added solution to timeout in upload-to-ena module [#368](https://github.com/BU-ISCIII/relecov-tools/pull/368)
 - Added log functionality to build-schema module [#340](https://github.com/BU-ISCIII/relecov-tools/pull/340)
+- Added quality control functionality to read-bioinfo-metadata [#373](https://github.com/BU-ISCIII/relecov-tools/pull/373)
 
 #### Fixes
 
