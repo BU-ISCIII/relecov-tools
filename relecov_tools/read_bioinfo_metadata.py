@@ -6,6 +6,7 @@ import rich.console
 import re
 import shutil
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 import pandas as pd
 import relecov_tools.utils
@@ -232,7 +233,9 @@ class BioinfoMetadata:
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return
 
-    def add_bioinfo_results_metadata(self, files_dict, j_data, output_folder=None):
+    def add_bioinfo_results_metadata(
+        self, files_dict, j_data, sufix, batch_date, output_folder=None
+    ):
         """Adds metadata from bioinformatics results to j_data.
         It first calls file_handlers and then maps the handled
         data into j_data.
@@ -240,7 +243,9 @@ class BioinfoMetadata:
         Args:
             files_dict (dict{str:str}): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (list item per sample).
+            sufix (str): Sufix added to splitted tables file name.
             output_folder (str): Path to save output files generated during handling_files() process.
+            batch_date(str): Number of the batch which corresponds with the data download date.
 
         Returns:
             j_data_mapped: A list of dictionaries with bioinformatics metadata mapped into j_data.
@@ -263,7 +268,9 @@ class BioinfoMetadata:
                 )
                 continue
             # Handling files
-            data_to_map = self.handling_files(files_dict[key], output_folder)
+            data_to_map = self.handling_files(
+                files_dict[key], sufix, output_folder, batch_date
+            )
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
             if not mapping_fields:
@@ -324,7 +331,7 @@ class BioinfoMetadata:
             sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
 
-    def handling_files(self, file_list, output_folder):
+    def handling_files(self, file_list, sufix, output_folder, batch_date):
         """Handles different file formats to extract data regardless of their structure.
         The goal is to extract the data contained in files specified in ${file_list},
         using either 'standard' handlers defined in this class or pipeline-specific file handlers.
@@ -351,31 +358,75 @@ class BioinfoMetadata:
         Args:
             file_list (list): A list of file path/s to be processed.
             output_folder (str): Path to save output files from imported method if necessary
+            batch_date(str): Number of the batch which corresponds with the data download date.
 
         Returns:
             data: A dictionary containing bioinfo metadata handled for each sample.
         """
         method_name = f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_files.__name__}"
+        splitted_path = os.path.join(output_folder, "analysis_results")
         file_name = self.software_config[self.current_config_key].get("fn")
         # Parsing files
-        func_name = self.software_config[self.current_config_key]["function"]
+        current_config = self.software_config[self.current_config_key]
+        func_name = current_config.get("function")
         if func_name is None:
             data = self.handling_tables(file_list=file_list, conf_tab_name=file_name)
         else:
-            try:
-                # Dynamically import the function from the specified module
-                utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
-                import_statement = f"import {utils_name}"
-                exec(import_statement)
-                # Get method name and execute it.
-                data = eval(utils_name + "." + func_name + "(file_list, output_folder)")
-            except Exception as e:
-                self.log_report.update_log_report(
-                    self.add_bioinfo_results_metadata.__name__,
-                    "error",
-                    f"Error occurred while parsing '{func_name}': {e}.",
+            if current_config.get("split_by_batch") is True:
+                file_extension = current_config.get("fn").rsplit(".", 1)[1]
+                base_filename = current_config.get("fn").rsplit(".", 1)[0]
+                pattern = re.compile(
+                    f"{base_filename}_{sufix}.{re.escape(file_extension)}"
                 )
-                sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+                matching_files = [
+                    f for f in os.listdir(splitted_path) if pattern.match(f)
+                ]
+                full_paths = [  # noqa: F841
+                    os.path.join(splitted_path, f) for f in matching_files
+                ]
+                try:
+                    # Dynamically import the function from the specified module
+                    utils_name = (
+                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                    )
+                    import_statement = f"import {utils_name}"
+                    exec(import_statement)
+                    # Get method name and execute it.
+                    data = eval(
+                        utils_name
+                        + "."
+                        + func_name
+                        + "(full_paths, batch_date, output_folder)"
+                    )
+                except Exception as e:
+                    self.log_report.update_log_report(
+                        self.save_splitted_files.__name__,
+                        "error",
+                        f"Error occurred while parsing '{func_name}': {e}.",
+                    )
+                    sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+            else:
+                try:
+                    # Dynamically import the function from the specified module
+                    utils_name = (
+                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                    )
+                    import_statement = f"import {utils_name}"
+                    exec(import_statement)
+                    # Get method name and execute it.
+                    data = eval(
+                        utils_name
+                        + "."
+                        + func_name
+                        + "(file_list, batch_date, output_folder)"
+                    )
+                except Exception as e:
+                    self.log_report.update_log_report(
+                        self.add_bioinfo_results_metadata.__name__,
+                        "error",
+                        f"Error occurred while parsing '{func_name}': {e}.",
+                    )
+                    sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
 
     def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
@@ -601,6 +652,7 @@ class BioinfoMetadata:
         """
         method_name = f"{self.add_bioinfo_files_path.__name__}"
         sample_name_error = 0
+        multiple_sample_files = self.get_multiple_sample_files()
         for row in j_data:
             row["bioinfo_metadata_file"] = self.out_filename
             if not row.get("sequencing_sample_id"):
@@ -614,10 +666,13 @@ class BioinfoMetadata:
             for key, values in files_found_dict.items():
                 file_path = "Not Provided [GENEPIO:0001668]"
                 if values:  # Check if value is not empty
-                    for file in values:
-                        if sample_name in file:
-                            file_path = file
-                            break  # Exit loop if match found
+                    if key in multiple_sample_files:
+                        file_path = values[0]
+                    else:
+                        for file in values:
+                            if sample_name in file:
+                                file_path = file
+                                break  # Exit loop if match found
                 path_key = f"{self.software_name}_filepath_{key}"
                 row[path_key] = file_path
                 if self.software_config[key].get("extract"):
@@ -726,16 +781,17 @@ class BioinfoMetadata:
             ]
         return data_by_batch
 
-    def split_tables_by_batch(self, files_found_dict, batch_data, output_dir):
+    def split_tables_by_batch(self, files_found_dict, sufix, batch_data, output_dir):
         """Filter table content to output a new table containing only the samples present in given metadata
 
         Args:
             files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
+            sufix (str): Sufix to be added to the new table file name.
             batch_data (list(dict)): Metadata corresponding to a single folder with samples (folder)
             output_dir (str): Output location for the generated tabular file
         """
 
-        def extract_batch_rows_to_file(file):
+        def extract_batch_rows_to_file(file, sufix):
             """Create a new table file only with rows matching samples in batch_data"""
             extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
             file_extension = os.path.splitext(file)[1]
@@ -745,9 +801,11 @@ class BioinfoMetadata:
             sample_col = file_df.columns[sample_colpos]
             file_df[sample_col] = file_df[sample_col].astype(str)
             file_df = file_df[file_df[sample_col].isin(batch_samples)]
-            output_path = os.path.join(
-                output_dir, "analysis_results", os.path.basename(file)
-            )
+
+            base, ext = os.path.splitext(os.path.basename(file))
+            new_filename = f"{base}_{sufix}{ext}"
+            os.makedirs(os.path.join(output_dir, "analysis_results"), exist_ok=True)
+            output_path = os.path.join(output_dir, "analysis_results", new_filename)
             file_df.to_csv(output_path, index=False, sep=extdict.get(file_extension))
             return
 
@@ -761,7 +819,7 @@ class BioinfoMetadata:
             sample_colpos = self.get_sample_idx_colpos(key)
             for file in files:
                 try:
-                    extract_batch_rows_to_file(file)
+                    extract_batch_rows_to_file(file, sufix)
                 except Exception as e:
                     if self.software_config[key].get("required"):
                         log_type = "error"
@@ -774,6 +832,96 @@ class BioinfoMetadata:
                     )
         self.log_report.print_log_report(method_name, ["valid", "warning", "error"])
         return
+
+    def merge_metadata(self, batch_filepath, batch_data):
+        """
+        Merge metadata json if sample does not exist in the metadata file
+
+        Args:
+            batch_filepath (str): Path to save the json file with the metadata.
+            batch_data (dict): A dictionary containing metadata of the samples.
+        Returns:
+            None
+        """
+        merged_metadata = relecov_tools.utils.read_json_file(batch_filepath)
+        prev_metadata_dict = {
+            item["sequencing_sample_id"]: item for item in merged_metadata
+        }
+        for item in batch_data:
+            sample_id = item["sequencing_sample_id"]
+            if sample_id in prev_metadata_dict:
+                # When sample already in metadata, checking whether dictionary is the same
+                if prev_metadata_dict[sample_id] != item:
+                    stderr.print(
+                        f"[red] Sample {sample_id} has different data in {batch_filepath} and new metadata. Can't merge."
+                    )
+                    log.error(
+                        "Sample %s has different data in %s and new metadata. Can't merge."
+                        % (sample_id, batch_filepath)
+                    )
+                    sys.exit(1)
+            else:
+                merged_metadata.append(item)
+
+        relecov_tools.utils.write_json_fo_file(merged_metadata, batch_filepath)
+        return merged_metadata
+
+    def save_merged_files(self, files_dict, batch_date, output_folder=None):
+        """
+        Process and save files that where split by cod and that have a function to be processed
+
+        Args:
+            files_dict (dict): A dictionary containing file paths identified for each configuration item.
+            batch_date (str): Date or ID of the batch to be used in the output file name.
+            output_folder (str): Path to save output files generated during processing.
+
+        Returns:
+            None
+        """
+        method_name = f"{self.save_merged_files.__name__}"
+        for key, config in self.software_config.items():
+            func_name = config.get("function")
+            # Skip configurations that do not match the conditions
+            if config.get("split_by_batch") is True and func_name:
+                try:
+                    file_path = files_dict[key]
+                    stderr.print(f"[blue]Processing splitted file: {file_path}")
+                except KeyError:
+                    self.log_report.update_log_report(
+                        method_name,
+                        "warning",
+                        f"No file path found for '{file_path}'",
+                    )
+                    continue
+                try:
+                    # Dynamically import the function from the specified module
+                    utils_name = (
+                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                    )
+                    import_statement = f"import {utils_name}"
+                    exec(import_statement)
+                    # Get method name and execute it.
+                    data = eval(
+                        utils_name
+                        + "."
+                        + func_name
+                        + "(file_path, batch_date, output_folder)"
+                    )
+                except Exception as e:
+                    self.log_report.update_log_report(
+                        self.save_merged_files.__name__,
+                        "error",
+                        f"Error occurred while parsing '{func_name}': {e}.",
+                    )
+                    sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+        return data
+
+    def get_multiple_sample_files(self):
+        multiple_sample_files = []
+        for key in self.software_config.keys():
+            if self.software_config[key].get("multiple_samples"):
+                multiple_sample_files.append(key)
+        return multiple_sample_files
 
     def create_bioinfo_file(self):
         """Create the bioinfodata json with collecting information from lab
@@ -790,14 +938,35 @@ class BioinfoMetadata:
         self.validate_software_mandatory_files(files_found_dict)
         # Split files found based on each batch of samples
         data_by_batch = self.split_data_by_batch(self.j_data)
+        batch_dates = []
+        sufix = datetime.now().strftime("%Y%m%d%H%M%S")
+        # Get batch date for all the samples
+        for batch_dir, batch_dict in data_by_batch.items():
+            if batch_dir.split("/")[-1] not in batch_dates:
+                batch_dates.append(batch_dir.split("/")[-1])
+
+        if len(batch_dates) == 1:
+            batch_dates = str(batch_dates[0])
+        else:
+            stderr.print(
+                "[orange]More than one batch date in the same json data. Using current date as batch date."
+            )
+            log.info(
+                "More than one batch date in the same json data. Using current date as batch date."
+            )
+            batch_dates = datetime.now().strftime("%Y%m%d%H%M%S")
+
         # Add bioinfo metadata to j_data
         for batch_dir, batch_dict in data_by_batch.items():
+            lab_code = batch_dir.split("/")[-2]
+            batch_date = batch_dir.split("/")[-1]
             self.log_report.logsum.feed_key(batch_dir)
             stderr.print(f"[blue]Processing data from {batch_dir}")
             batch_data = batch_dict["j_data"]
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
+            self.split_tables_by_batch(files_found_dict, sufix, batch_data, batch_dir)
             batch_data = self.add_bioinfo_results_metadata(
-                files_found_dict, batch_data, batch_dir
+                files_found_dict, batch_data, sufix, batch_date, batch_dir
             )
             stderr.print("[blue]Adding software versions to read lab metadata...")
             batch_data = self.get_multiqc_software_versions(
@@ -808,23 +977,51 @@ class BioinfoMetadata:
             # Adding files path
             stderr.print("[blue]Adding files path to read lab metadata")
             batch_data = self.add_bioinfo_files_path(files_found_dict, batch_data)
-            self.split_tables_by_batch(files_found_dict, batch_data, batch_dir)
-            lab_code = batch_dir.split("/")[-2]
-            batch_date = batch_dir.split("/")[-1]
             tag = "bioinfo_lab_metadata_"
             batch_filename = tag + lab_code + "_" + batch_date + ".json"
             batch_filepath = os.path.join(batch_dir, batch_filename)
-            relecov_tools.utils.write_json_fo_file(batch_data, batch_filepath)
+            if os.path.exists(batch_filepath):
+                stderr.print(
+                    f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
+                )
+                log.info(
+                    "Bioinfo metadata %s file already exists. Merging new data if possible."
+                    % batch_filepath
+                )
+                batch_data = self.merge_metadata(batch_filepath, batch_data)
+            else:
+                relecov_tools.utils.write_json_fo_file(batch_data, batch_filepath)
             for sample in batch_data:
                 self.log_report.logsum.feed_key(
                     key=batch_dir, sample=sample.get("sequencing_sample_id")
                 )
             log.info("Created output json file: %s" % batch_filepath)
             stderr.print(f"[green]Created batch json file: {batch_filepath}")
+
+        year = str(datetime.now().year)
+        out_path = os.path.join(self.output_folder, year)
+        os.makedirs(out_path, exist_ok=True)
+
+        tag = "bioinfo_lab_metadata_"
+        stderr.print("[blue]Saving previously splitted files to output directory")
+
+        self.save_merged_files(files_found_dict, batch_dates, out_path)
+        batch_filename = tag + batch_dates + ".json"
         stderr.print("[blue]Writting output json file")
-        os.makedirs(self.output_folder, exist_ok=True)
-        file_path = os.path.join(self.output_folder, self.out_filename)
-        relecov_tools.utils.write_json_fo_file(self.j_data, file_path)
+        file_path = os.path.join(out_path, batch_filename)
+        qc_statement = f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation(self.j_data)"
+        exec(qc_statement)
+        if os.path.exists(file_path):
+            stderr.print(
+                f"[blue]Bioinfo metadata {file_path} file already exists. Merging new data if possible."
+            )
+            log.info(
+                "Bioinfo metadata %s file already exists. Merging new data if possible."
+                % file_path
+            )
+            batch_data = self.merge_metadata(file_path, self.j_data)
+        else:
+            relecov_tools.utils.write_json_fo_file(self.j_data, file_path)
         stderr.print(f"[green]Sucessful creation of bioinfo analyis file: {file_path}")
         self.log_report.logsum.create_error_summary(
             called_module="read-bioinfo-metadata", logs=self.log_report.logsum.logs

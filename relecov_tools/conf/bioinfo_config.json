@@ -6,6 +6,7 @@
             "header_row_idx": 1,
             "required": true,
             "function": null,
+            "multiple_samples": true,
             "split_by_batch": true,
             "content": {
                 "analysis_date": "analysis_date",
@@ -20,6 +21,23 @@
                 "qc_filtered": "totalreads",
                 "reference_genome_accession": "Virussequence",
                 "read_length": "read_length"
+            }
+        },
+        "quality_control": {
+            "fn": "quality_control_report(?:_\\d{8})?\\.tsv",
+            "sample_col_idx": 1,
+            "header_row_idx": 1,
+            "required": true,
+            "function": null,
+            "multiple_samples": true,
+            "split_by_batch": true,
+            "content": {
+                "per_sgene_ambiguous": "S-Gene_Ambiguous_Percentage",
+                "per_sgene_coverage": "S-Gene_Coverage_Percentage",
+                "per_ldmutations": "% LDMutations",
+                "number_of_sgene_frameshifts": "S-Gene_Frameshifts",
+                "number_of_unambiguous_bases": "Total_Unambiguous_Bases",
+                "number_of_Ns": "Total_Ns_count"
             }
         },
         "mapping_pangolin": {
@@ -44,6 +62,7 @@
             "sample_col_idx": 1,
             "header_row_idx": 1,
             "required": true,
+            "multiple_samples": true,
             "split_by_batch": true,
             "function": "parse_long_table",
             "content": {
@@ -84,6 +103,7 @@
             "fn": "summary_variants_metrics_mqc.csv",
             "sample_col_idx": 1,
             "header_row_idx": 1,
+            "multiple_samples": true,
             "required": true,
             "function": null,
             "content": {
@@ -100,6 +120,7 @@
         "workflow_summary": {
             "fn": "multiqc_report.html",
             "required": true,
+            "multiple_samples": true,
             "function": null,
             "content": {
                 "software_version": {

@@ -230,8 +230,8 @@
             "header_flag": "CAMPO",
             "excel_sheet": "METADATA_LAB",
             "alternative_sheet": "5.Viral Characterisation and Se",
-            "alternative_flag": "LAB ID",
-            "alternative_sample_id_col": "Sample ID"
+            "alternative_flag": "CAMPO",
+            "alternative_sample_id_col": "Sample ID given for sequencing"
         },
         "abort_if_md5_mismatch": "False",
         "platform_storage_folder": "/tmp/relecov",

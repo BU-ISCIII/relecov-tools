@@ -4,17 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.X.0] - 202X-XX-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/
+## [1.4.0] - 2025-01-27 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.4.0
 
 ### Credits
 
 Code contributions to the release:
 
+- [Sarai Varona](https://github.com/svarona)
+- [Alejandro Bernabeu](https://github.com/aberdur)
+- [Victor Lopez](https://github.com/victor5lm)
+
 ### Modules
 
 #### Added enhancements
 
+- Added a IonTorrent flow cell for validation [#363](https://github.com/BU-ISCIII/relecov-tools/pull/363)
+- Added solution to timeout in upload-to-ena module [#368](https://github.com/BU-ISCIII/relecov-tools/pull/368)
+- Added log functionality to build-schema module [#340](https://github.com/BU-ISCIII/relecov-tools/pull/340)
+- Updated the metadata_processing field in configuration.json and added the other_preparation_kit, quality_control_metrics and consensus_criteria fields in the json schema [#372](https://github.com/BU-ISCIII/relecov-tools/pull/372)
+- Added quality control functionality to read-bioinfo-metadata [#373](https://github.com/BU-ISCIII/relecov-tools/pull/373)
+- Added dropdown functionality to build-schema enums [#374](https://github.com/BU-ISCIII/relecov-tools/pull/374)
+
 #### Fixes
+
+- Fixed read-bioinfo-metadata module [#367](https://github.com/BU-ISCIII/relecov-tools/pull/367)
 
 #### Changed
 

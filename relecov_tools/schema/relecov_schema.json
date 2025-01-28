@@ -396,8 +396,8 @@
                  "Hospital Hm Esperanza",
                  "Hospital Hm Rosaleda",
                  "Sanatorio La Robleda",
-                 "Hospital Da Barbanza (*)",
-                 "Hospital Virxe Da Xunqueira (*)",
+                 "Hospital Da Barbanza",
+                 "Hospital Virxe Da Xunqueira",
                  "Hm Modelo (Grupo)",
                  "Hospital Hm Rosaleda - Hm La Esperanza",
                  "Hospital Virgen De La Luz",
@@ -527,8 +527,8 @@
                  "Hospital De Calde (Psiquiatrico)",
                  "Hospital Polusa",
                  "Sanatorio Nosa Señora Dos Ollos Grandes",
-                 "Hospital Publico Da Mariña (*)",
-                 "Hospital De Monforte (*)",
+                 "Hospital Publico Da Mariña",
+                 "Hospital De Monforte",
                  "Hospital Universitario Lucus Augusti",
                  "Hospital Universitario La Paz",
                  "Hospital Ramón Y Cajal",
@@ -703,7 +703,7 @@
                  "Hospital Santo Cristo De Piñor (Psiquiatrico)",
                  "Hospital Santa Maria Nai",
                  "Centro Medico El Carmen",
-                 "Hospital De Valdeorras (*)",
+                 "Hospital De Valdeorras",
                  "Hospital De Verin",
                  "Clinica Santa Teresa",
                  "Hospital Monte Naranco",
@@ -778,7 +778,7 @@
                  "Sanatorio Psiquiatrico San Jose",
                  "Clinica Residencia El Pinar",
                  "Complexo Hospitalario Universitario De Pontevedra",
-                 "Hospital Do Salnes (*)",
+                 "Hospital Do Salnes",
                  "Complexo Hospitalario Universitario De Vigo",
                  "Hospital Universitario Alvaro Cunqueiro",
                  "Plataforma de Genómica y Bioinformática",
@@ -2556,6 +2556,7 @@
                 "iSeq 100 i1 Reagent v2 (300-cycle)",
                 "iSeq 100 i1 Reagent v2 (300-cycle) 4 pack",
                 "iSeq 100 i1 Reagent v2 (300-cycle) 8 pack",
+                "Ion 540 Chip Kit",
                 "Not Provided [GENEPIO:0001668]",
                 "Other [NCIT:C17649]"
             ],
@@ -3352,6 +3353,39 @@
             "label": "%Ns",
             "fill_mode": "batch"
         },
+        "per_sgene_ambiguous": {
+            "examples": [
+              "e.g 0"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "clasification": "Bioinformatics and QC metrics fields",
+            "label": "S-Gene_Ambiguous_Percentage",
+            "fill_mode": "batch"
+        },
+        "per_sgene_coverage": {
+            "examples": [
+              "e.g 99"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "clasification": "Bioinformatics and QC metrics fields",
+            "label": "S-Gene_Coverage_Percentage",
+            "fill_mode": "batch"
+        },
+        "per_ldmutations": {
+            "examples": [
+              "e.g 87"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "",
+            "clasification": "Bioinformatics and QC metrics fields",
+            "label": "% LDMutations",
+            "fill_mode": "batch"
+        },
         "ns_per_100_kbp": {
             "examples": [
                 "300"
@@ -3383,6 +3417,39 @@
             "description": "The number of missense variants",
             "classification": "Bioinformatic Variants",
             "label": "Number of variants with effect",
+            "fill_mode": "batch"
+        },
+        "number_of_sgene_frameshifts": {
+            "examples": [
+                "0"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The number of frameshift in sgene",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of frameshift in sgene",
+            "fill_mode": "batch"
+        },
+        "number_of_unambiguous_bases": {
+            "examples": [
+                "30000"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The number of unambiguous bases",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of unambiguous bases",
+            "fill_mode": "batch"
+        },
+        "number_of_Ns": {
+            "examples": [
+                "100"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The number of Ns",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of Ns",
             "fill_mode": "batch"
         },
         "lineage_name": {
@@ -3727,7 +3794,7 @@
             "ontology": "NCIT:C25284",
             "type": "string",
             "description": "default must remain 'betacoronavirus'",
-            "clasification": "Database Identifiers",
+            "classification": "Database Identifiers",
             "label": "GISAID covv type",
             "fill_mode": "sample"
         },
@@ -3826,7 +3893,7 @@
             "ontology": "SIO_001066",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Study alias",
             "table": [
               "study",
@@ -3863,7 +3930,7 @@
             "ontology": "GENEPIO:0001388",
             "type": "string",
             "description": " Status of the host",
-            "clasification": "Host information",
+            "classification": "Host information",
             "label": "Host health state",
             "table": [
               "sample"
@@ -3876,7 +3943,7 @@
               "ontology": "sep:00196",
               "type": "string",
               "description": "Free text description of the sample.",
-              "clasification": "Sample collection and processing",
+              "classification": "Sample collection and processing",
               "label": "Sample Description",
               "table": "sample"
         },
@@ -3892,7 +3959,7 @@
             "ontology": "NMR:1001459",
             "type": "string",
             "description": "The run data file model.",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "File format",
             "table": [
               "experiments"
@@ -3905,7 +3972,7 @@
             "ontology": "GENEPIO:0001797",
             "type": "string",
             "description": "Name of the person who collected the specimen",
-            "clasification": "Sample collection and processing",
+            "classification": "Sample collection and processing",
             "label": "Sample collector name"
         },
        "experiment_alias": {
@@ -3915,7 +3982,7 @@
             "ontology": "NCIT_C42790",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Experiment alias"
         },
         "run_alias": {
@@ -3925,8 +3992,38 @@
             "ontology": "NCIT_C47911",
             "type": "string",
             "description": "",
-            "clasification": "Submission ENA",
+            "classification": "Submission ENA",
             "label": "Run Alias"
+        },
+        "other_preparation_kit": {
+            "examples": [
+              "Illumina DNA Prep"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Other Library Preparation Kits used",
+            "classification": "Sequencing",
+            "label": "If Library Preparation Kit is other, specify"
+        },
+        "quality_control_metrics": {
+            "examples": [
+              "percentage_reference_genome_in_consensus < 60"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "QC criteria to discard samples",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Quality control metrics (sample discard criteria)"
+        },
+        "consensus_criteria": {
+            "examples": [
+              "ALT_FREQ >= 0.75"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Consensus criteria",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Consensus Criteria"
         }
     }
 }

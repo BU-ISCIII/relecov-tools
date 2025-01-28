@@ -8,7 +8,6 @@ import rich
 import os.path
 
 from pathlib import Path
-from datetime import datetime
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
@@ -135,7 +134,7 @@ class LongTableParse:
         j_list = []
         # Grab date from filename
         result_regex = re.search(
-            "variants_long_table(?:_\d{8})?\.csv", os.path.basename(self.file_path)
+            "variants_long_table(?:_\d{14})?\.csv", os.path.basename(self.file_path)
         )
         if result_regex is None:
             stderr.print(
@@ -153,18 +152,53 @@ class LongTableParse:
             j_list.append(j_dict)
         return j_list
 
-    def save_to_file(self, j_list):
+    def save_to_file(self, j_list, batch_date):
         """Transform the parsed data into a json file"""
-        date_now = datetime.now().strftime("%Y%m%d%H%M%S")
-        file_name = "long_table_" + date_now + ".json"
+        file_name = "long_table_" + batch_date + ".json"
         file_path = os.path.join(self.output_directory, file_name)
-
-        try:
-            with open(file_path, "w") as fh:
-                fh.write(json.dumps(j_list, indent=4))
-            stderr.print("[green]\tParsed data successfully saved to file:", file_path)
-        except Exception as e:
-            stderr.print("[red]\tError saving parsed data to file:", str(e))
+        if os.path.exists(file_path):
+            stderr.print(
+                f"[blue]Long table {file_path} file already exists. Merging new data if possible."
+            )
+            log.info(
+                "Long table %s file already exists. Merging new data if possible."
+                % file_path
+            )
+            original_table = relecov_tools.utils.read_json_file(file_path)
+            samples_indict = {item["sample_name"]: item for item in original_table}
+            for item in j_list:
+                sample_name = item["sample_name"]
+                if sample_name in samples_indict:
+                    if samples_indict[sample_name] != item:
+                        stderr.print(
+                            f"[red]Same sample {sample_name} has different data in both long tables."
+                        )
+                        log.error(
+                            "Sample %s has different data in %s and new long table. Can't merge."
+                            % (sample_name, file_path)
+                        )
+                        return None
+                else:
+                    original_table.append(item)
+            try:
+                with open(file_path, "w") as fh:
+                    fh.write(json.dumps(original_table, indent=4))
+                stderr.print(
+                    "[green]\tParsed data successfully saved to file:", file_path
+                )
+            except Exception as e:
+                stderr.print("[red]\tError saving parsed data to file:", str(e))
+                log.error("Error saving parsed data to file: %s", e)
+        else:
+            try:
+                with open(file_path, "w") as fh:
+                    fh.write(json.dumps(j_list, indent=4))
+                stderr.print(
+                    "[green]\tParsed data successfully saved to file:", file_path
+                )
+            except Exception as e:
+                stderr.print("[red]\tError saving parsed data to file:", str(e))
+                log.error("Error saving parsed data to file: %s", e)
 
     def parsing_csv(self):
         """
@@ -180,7 +214,7 @@ class LongTableParse:
 
 
 # START util functions
-def handle_pangolin_data(files_list, output_folder=None):
+def handle_pangolin_data(files_list, batch_date, output_folder=None):
     """File handler to parse pangolin data (csv) into JSON structured format.
 
     Args:
@@ -320,7 +354,7 @@ def handle_pangolin_data(files_list, output_folder=None):
     return pango_data_processed
 
 
-def parse_long_table(files_list, output_folder=None):
+def parse_long_table(files_list, batch_date, output_folder=None):
     """File handler to retrieve data from long table files and convert it into a JSON structured format.
     This function utilizes the LongTableParse class to parse the long table data.
     Since this utility handles and maps data using a custom way, it returns None to be avoid being  transferred to method read_bioinfo_metadata.BioinfoMetadata.mapping_over_table().
@@ -349,7 +383,7 @@ def parse_long_table(files_list, output_folder=None):
         # Parsing long table data and saving it
         long_table_data = long_table.parsing_csv()
         # Saving long table data into a file
-        long_table.save_to_file(long_table_data)
+        long_table.save_to_file(long_table_data, batch_date)
         stderr.print("[green]\tProcess completed")
     elif len(files_list) > 1:
         method_log_report.update_log_report(
@@ -361,7 +395,7 @@ def parse_long_table(files_list, output_folder=None):
     return None
 
 
-def handle_consensus_fasta(files_list, output_folder=None):
+def handle_consensus_fasta(files_list, batch_date, output_folder=None):
     """File handler to parse consensus data (fasta) into JSON structured format.
 
     Args:
@@ -406,3 +440,32 @@ def handle_consensus_fasta(files_list, output_folder=None):
         )
         method_log_report.print_log_report(method_name, ["valid", "warning"])
     return consensus_data_processed
+
+
+def quality_control_evaluation(data):
+    """Evaluate the quality of the samples and add the field 'qc_test' to each 'data' entry."""
+    conditions = {
+        "per_sgene_ambiguous": lambda x: float(x) < 10,
+        "per_sgene_coverage": lambda x: float(x) > 98,
+        "per_ldmutations": lambda x: float(x) > 60,
+        "number_of_sgene_frameshifts": lambda x: int(x) == 0,
+        "number_of_unambiguous_bases": lambda x: int(x) > 24000,
+        "number_of_Ns": lambda x: int(x) < 5000,
+        "qc_filtered": lambda x: int(x) > 50000,
+        "per_reads_host": lambda x: float(x) < 20,
+    }
+    for sample in data:
+        try:
+            qc_status = "pass"
+            for param, condition in conditions.items():
+                value = sample.get(param)
+                if value is None or not condition(value):
+                    qc_status = "fail"
+                    break
+            sample["qc_test"] = qc_status
+        except ValueError as e:
+            sample["qc_test"] = "fail"
+            print(
+                f"Error processing sample {sample.get('sequencing_sample_id', 'unknown')}: {e}"
+            )
+    return data

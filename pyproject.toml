@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "relecov-tools"
+version = "1.4.0"
+description = "Tools for managing and proccessing relecov network data."
+readme = "README.md"
+requires-python = ">=3.7"
+authors = [
+    {name = "Sara Monzon", email = "smonzon@isciii.es"},
+    {name = "Luis Chapado", email = "lchapado@externos.isciii.es"},
+    {name = "Isabel Cuesta", email = "isabel.cuesta@isciii.es"},
+    {name = "Sarai Varona", email = "s.varona@isciii.es"},
+    {name = "Daniel Valle", email = "da.valle@externos.isciii.es"},
+    {name = "Pablo Mata", email = "pmata@externos.isciii.es"},
+    {name = "Victor Lopez", email = "vmlopez@isciii.es"},
+    {name = "Emi Arjona", email = "eiarjona@isciii.es"},
+    {name = "Jaime Ozaez", email = "jaime.ozaez@isciii.es"},
+    {name = "Juan Ledesma", email = "juan.ledesma@isciii.es"},
+    {name = "Sergio Olmos", email = "sergio.olmos@externos.isciii.es"},
+    {name = "Alejandro Bernabeu", email = "abernabeu@isciii.es"},
+    {name = "Alba Talavera", email = "alba.talavera@externos.isciii.es"}
+]
+maintainers = [
+    {name = "Sara Monzon", email = "smonzon@isciii.es"},
+    {name = "Luis Chapado", email = "lchapado@externos.isciii.es"},
+    {name = "Isabel Cuesta", email = "isabel.cuesta@isciii.es"},
+    {name = "Sarai Varona", email = "s.varona@isciii.es"},
+    {name = "Daniel Valle", email = "da.valle@externos.isciii.es"},
+    {name = "Pablo Mata", email = "pmata@externos.isciii.es"},
+    {name = "Victor Lopez", email = "vmlopez@isciii.es"},
+    {name = "Emi Arjona", email = "eiarjona@isciii.es"},
+    {name = "Jaime Ozaez", email = "jaime.ozaez@isciii.es"},
+    {name = "Juan Ledesma", email = "juan.ledesma@isciii.es"},
+    {name = "Sergio Olmos", email = "sergio.olmos@externos.isciii.es"},
+    {name = "Alejandro Bernabeu", email = "abernabeu@isciii.es"},
+    {name = "Alba Talavera", email = "alba.talavera@externos.isciii.es"}
+]
+keywords = [
+    "relecov",
+    "bioinformatics",
+    "pipeline",
+    "sequencing",
+    "NGS",
+    "next generation sequencing"
+]
+license = {text = "GNU GENERAL PUBLIC LICENSE v.3"}
+dynamic = ["dependencies"]
+
+[project.urls]
+Homepage = "https://github.com/BU-ISCIII/relecov-tools"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+exclude = ["docs"]
+
+[project.scripts]
+relecov-tools = "relecov_tools.__main__:run_relecov_tools"
