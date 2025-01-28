@@ -21,7 +21,7 @@ from datetime import datetime
 from tabulate import tabulate
 import openpyxl.utils
 import openpyxl.styles
-
+import pandas as pd
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +62,29 @@ def read_json_file(j_file):
     return data
 
 
+def write_to_excel_file(data, f_name, sheet_name, post_process=None):
+    book = openpyxl.Workbook()
+    sheet = book.active
+    for row in data:
+        sheet.append(row)
+    # adding one column with row number
+    if "insert_cols" in post_process:
+        sheet.insert_cols(post_process["insert_cols"])
+        sheet["A1"] = "CAMPO"
+        counter = 1
+        for i in range(len(data) - 1):
+            idx = "A" + str(counter + 1)
+            sheet[idx] = counter
+            counter += 1
+    # adding 3 empty rows
+    if "insert_rows" in post_process:
+        for x in range(post_process["insert_rows"]):
+            sheet.insert_rows(1)
+        sheet.title = sheet_name
+    book.save(f_name)
+    return
+
+
 def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
     """Read the input excel file and give the information in a list
     of dictionaries
@@ -73,7 +96,7 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
             idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
         ][0]
     except IndexError:
-        raise KeyError(f"Header flag '{header_flag}' could not be found in {f_name}")
+        raise IndexError(f"Header flag '{header_flag}' could not be found in {f_name}")
     heading = [str(i.value).strip() for i in ws_metadata_lab[heading_row] if i.value]
     ws_data = []
     for row in islice(ws_metadata_lab.values, heading_row, ws_metadata_lab.max_row):
@@ -142,38 +165,27 @@ def excel_date_to_num(date):
         return None
 
 
-def read_csv_file_return_dict(file_name, sep=None, key_position=None):
+def read_csv_file_return_dict(file_name, sep=None, key_position=0):
     """Read csv or tsv file, according to separator, and return a dictionary
     where the main key is the first column, if key position is None otherwise
     the index value of the key position is used as key. If sep is None then
     try to assert a separator automaticallly depending on file extension.
     """
-    try:
-        with open(file_name, "r") as fh:
-            lines = fh.readlines()
-    except FileNotFoundError:
-        raise
     if sep is None:
         file_extension = os.path.splitext(file_name)[1]
         extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
         # Use space as a default separator, None would also be valid
         sep = extdict.get(file_extension, " ")
-    heading = lines[0].strip().split(sep)
-    if len(heading) == 1:
-        return {"ERROR": "not valid format"}
+    try:
+        file_df = pd.read_csv(file_name, sep=sep)
+    except FileNotFoundError:
+        raise
     file_data = {}
-    for line in lines[1:]:
-        line_s = line.strip().split(sep)
-        if key_position is None:
-            file_data[line_s[0]] = {}
-            for idx in range(1, len(heading)):
-                file_data[line_s[0]][heading[idx]] = line_s[idx]
-        else:
-            file_data[line_s[key_position]] = {}
-            for idx in range(len(heading)):
-                if idx == key_position:
-                    continue
-                file_data[line_s[key_position]][heading[idx]] = line_s[idx]
+    for _, row in file_df.iterrows():
+        key = row.iloc[key_position]
+        # Create a dictionary excluding the key column
+        row_dict = row.drop(file_df.columns[key_position]).to_dict()
+        file_data[key] = row_dict
 
     return file_data
 

@@ -975,7 +975,15 @@
                  "Centro Sanitario Cinco Villas",
                  "Hospital Viamed Montecanal",
                  "Hospital Universitario De Ceuta",
-                 "Hospital Comarcal"
+                 "Hospital Comarcal",
+                 "Analiza, S.L. Hospital Moncloa",
+                 "Atimmunolab",
+                 "Ministerio Sanidad",
+                 "Centro Nacional De Microbiologia",
+                 "Presidencia Del Gobierno",
+                 "Xerencia De Xestión Integrada De Pontevedra",
+                 "Consejeria De Sanidad",
+                 "Instituto De Medicina Legal De Toledo"
             ],
             "ontology": "GENEPIO:0001153",
             "type": "string",
