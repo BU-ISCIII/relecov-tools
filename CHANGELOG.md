@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0dev] - 2025-0X-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/XXX
+
+### Credits
+
+Code contributions to the release:
+
+- [Pablo Mata](https://github.com/shettland)
+
+### Modules
+
+#### Added enhancements
+
+- Added a more robust datatype handling in utils.py read_csv_file_return_dict() method [#379](https://github.com/BU-ISCIII/relecov-tools/pull/379)
+
+#### Fixes
+
+#### Changed
+
+- Temporarily changed bioinfo_config 'quality_control' requirement to false [#379](https://github.com/BU-ISCIII/relecov-tools/pull/379)
+
+#### Removed
+
+### Requirements
+
 ## [1.4.0] - 2025-01-27 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.4.0
 
 ### Credits
