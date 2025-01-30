@@ -2,9 +2,11 @@
 import os
 import sys
 import logging
+import json
 import rich.console
 
 import relecov_tools.utils
+import pandas as pd
 from relecov_tools.config_json import ConfigJson
 
 log = logging.getLogger(__name__)
@@ -26,7 +28,9 @@ class MetadataHomogeneizer:
         self.heading = self.config_json.get_topic_data(
             "lab_metadata", "metadata_lab_heading"
         )
-
+        self.metadata_processing = self.config_json.get_topic_data(
+            "sftp_handle", "metadata_processing"
+        )
         # handle institution
         if institution is None:
             self.institution = relecov_tools.utils.prompt_selection(
@@ -164,9 +168,9 @@ class MetadataHomogeneizer:
             elif f_name.endswith(".csv"):
                 data = relecov_tools.utils.read_csv_file_return_dict(f_name, ",")
             elif f_name.endswith(".xlsx"):
-                header_flag = self.metadata_processing.get("header_flag")
-                data = relecov_tools.utils.read_excel_file(
-                    f_name, "Sheet", header_flag, leave_empty=True
+                excel_sheet = self.metadata_processing.get("excel_sheet")
+                data, _ = relecov_tools.utils.read_excel_file(
+                    f_name, excel_sheet, "ID CNM", leave_empty=True
                 )
             else:
                 log.error("Additional file extension %s is not supported ", f_name)
@@ -200,17 +204,21 @@ class MetadataHomogeneizer:
                         + str(s_value)
                     )
                     continue
+                
                     # sys.exit(1)
                 for m_field, f_field in file_data["mapped_fields"].items():
                     try:
                         meta_idx = self.heading.index(m_field)
                     except ValueError as e:
-                        log.error("Field %s does not exist in Metadata ", e)
+                        log.error("Field %s does not exist in Metadata heading, check config", e)
                         stderr.print(f"[red] Field {e} does not exist")
-                        sys.exit(1)
+                        break
                     row[meta_idx] = item_data[f_field]
 
+
         else:
+            if data == {'ERROR': 'not valid format'}:
+                raise ValueError(f"Unknown error during processing of {file_data["file_name"]}")
             func_name = file_data["function"]
             stderr.print("[yellow] Start processing function " + func_name)
             exec(
@@ -224,7 +232,6 @@ class MetadataHomogeneizer:
                 func_name
                 + "(data_to_add, data, file_data['mapped_fields'], self.heading)"
             )
-
         stderr.print("[green] Succesful processing of additional file ")
         return data_to_add
 
