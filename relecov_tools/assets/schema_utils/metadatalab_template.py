@@ -67,6 +67,7 @@ def schema_properties_to_df(json_data):
         stderr.print(f"[red]Error in schema_properties_to_df: {e}")
         return None
 
+
 def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=True):
     try:
 
@@ -164,7 +165,6 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                                 stderr.print(
                                     f"Error writing first row at column {col_num}: {e}"
                                 )
-            print(df.index)
             # Write the first column with the defined format.
             for index_num, index_val in enumerate(df.index):
                 try:
