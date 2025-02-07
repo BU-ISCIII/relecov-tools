@@ -18,7 +18,7 @@ from relecov_tools.config_json import ConfigJson
 from datetime import datetime
 from openpyxl.worksheet.datavalidation import DataValidation
 
-pd.set_option('future.no_silent_downcasting', True)
+pd.set_option("future.no_silent_downcasting", True)
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -359,8 +359,8 @@ class SchemaBuilder:
                             continue
                         # Record the required value for each property
                         if (
-                            "required" in db_feature_key or
-                            "required" == schema_feature_key
+                            "required" in db_feature_key
+                            or "required" == schema_feature_key
                         ):
                             is_required = str(db_features_dic[db_feature_key])
                             if is_required != "nan":
