@@ -4,6 +4,7 @@ import relecov_tools.json_validation
 import rich.console
 import pandas as pd
 import os
+import re
 import openpyxl
 import sys
 import json
@@ -14,6 +15,7 @@ import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
 import relecov_tools.assets.schema_utils.metadatalab_template
 from relecov_tools.config_json import ConfigJson
+from datetime import datetime
 from openpyxl.worksheet.datavalidation import DataValidation
 
 log = logging.getLogger(__name__)
@@ -33,6 +35,7 @@ class SchemaBuilder:
         draft_version=None,
         show_diff=None,
         out_dir=None,
+        version=None,
     ):
         """
         Initialize the SchemaBuilder class. This class generates a JSON Schema file based on the provided draft version.
@@ -52,6 +55,9 @@ class SchemaBuilder:
             self.output_folder = relecov_tools.utils.prompt_create_outdir(None, out_dir)
         else:
             self.output_folder = out_dir
+
+        # Get version option
+        self.version = version
 
         # Validate show diff option
         if not show_diff:
@@ -313,6 +319,7 @@ class SchemaBuilder:
                 "label_name": "label",
                 "fill_mode": "fill_mode",
                 "required (Y/N)": "required",
+                "submitting_lab_form": "header",
             }
             required_property_unique = []
 
@@ -424,10 +431,10 @@ class SchemaBuilder:
 
         if not diff_lines:
             log.info(
-                "No differencess were found between already installed and new generated schema. Exiting. No changes made"
+                "No differences were found between already installed and new generated schema. Exiting. No changes made"
             )
             stderr.print(
-                "[yellow]No differencess were found between already installed and new generated schema. Exiting. No changes made"
+                "[yellow]No differences were found between already installed and new generated schema. Exiting. No changes made"
             )
             return None
         else:
@@ -441,11 +448,11 @@ class SchemaBuilder:
 
     def print_save_schema_diff(self, diff_lines=None):
         # Set user's choices
-        choices = ["Print to sandard output (stdout)", "Save to file", "Both"]
+        choices = ["Print to standard output (stdout)", "Save to file", "Both"]
         diff_output_choice = relecov_tools.utils.prompt_selection(
             "How would you like to print the diff between schemes?:", choices
         )
-        if diff_output_choice in ["Print to sandard output (stdout)", "Both"]:
+        if diff_output_choice in ["Print to standard output (stdout)", "Both"]:
             for line in diff_lines:
                 print(line)
             return True
@@ -471,7 +478,10 @@ class SchemaBuilder:
             bool: True if the schema was successfully saved, False otherwise.
         """
         try:
-            path_to_save = self.output_folder + "/relecov_schema.json"
+            if not self.version:
+                raise ValueError("The next_version variable is not set.")
+
+            path_to_save = f"{self.output_folder}/relecov_schema_v{self.version}.json"
             with open(path_to_save, "w") as schema_file:
                 json.dump(json_data, schema_file, ensure_ascii=False, indent=4)
             log.info(f"New JSON schema saved to: {path_to_save}")
@@ -492,26 +502,90 @@ class SchemaBuilder:
     # FIXME: overview-tab - Still need to add the column that maps to tab metadatalab
     def create_metadatalab_excel(self, json_schema):
         """
-        Generate an Excel template file for Metadata LAB with three tabs: Overview, Metadata LAB, and Data Validation.
+        Generates an Excel template file for Metadata LAB with four sheets:
+        Overview, Metadata LAB, Data Validation, and Version History.
 
         Args:
-            json_schema (dict): The JSON Schema from which the Excel template is generated. It should include properties and required fields.
+            json_schema (dict): The JSON schema used to generate the template.
+                                It should include properties and required fields.
 
         Returns:
-            None: if any error occurs during the process.
+            None: If an error occurs during the process.
         """
         try:
-            # Set up metadatalab configuration
-            out_file = os.path.join(
-                self.output_folder, "metadatalab_template" + ".xlsx"
+            # Retrieve existing files in the output directory
+            output_files = os.listdir(self.output_folder)
+            notes_control_input = input(
+                "\033[93mEnter a note about changes made to the schema: \033[0m"
             )
+            # Identify existing template files
+            template_files = [
+                f for f in output_files if f.startswith("Relecov_metadata_template")
+            ]
+            if template_files:
+                # Extract the latest version number from existing files
+                latest_file = max(
+                    template_files,
+                    key=lambda x: (
+                        re.search(r"v(\d+\.\d+\.\d+)", x).group(1)
+                        if re.search(r"v(\d+\.\d+\.\d+)", x)
+                        else "0"
+                    ),
+                )
+                match = re.search(r"v(\d+\.\d+\.\d+)", latest_file)
+                if match:
+                    # Load the latest template file and attempt to read version history
+                    out_file = os.path.join(self.output_folder, latest_file)
+                    version_history = pd.DataFrame(
+                        columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
+                    )
+
+                    try:
+                        wb = openpyxl.load_workbook(out_file)
+                        if "VERSION" in wb.sheetnames:
+                            ws_version = wb["VERSION"]
+                            data = ws_version.values
+                            columns = next(data)
+                            version_history = pd.DataFrame(data, columns=columns)
+                    except Exception as e:
+                        log.warning(f"Error reading previous VERSION sheet: {e}")
+                    next_version = self.version
+                else:
+                    next_version = "1.0.0"
+                    out_file = os.path.join(
+                        self.output_folder,
+                        f"Relecov_metadata_template_v{next_version}.xlsx",
+                    )
+            else:
+                next_version = "1.0.0"
+                out_file = os.path.join(
+                    self.output_folder,
+                    f"Relecov_metadata_template_v{next_version}.xlsx",
+                )
+            # Store versioning information
+            version_info = {
+                "FILE_VERSION": f"Relecov_metadata_template_v{next_version}",
+                "CODE": next_version,
+                "NOTES CONTROL": notes_control_input,
+                "DATE": datetime.now().strftime("%Y-%m-%d"),
+            }
+            version_history = pd.concat(
+                [version_history, pd.DataFrame([version_info])], ignore_index=True
+            )
+            out_file = os.path.join(
+                self.output_folder, f"Relecov_metadata_template_v{next_version}.xlsx"
+            )
+
+            # Define required metadata classifications
             required_classification = [
                 "Database Identifiers",
                 "Sample collection and processing",
                 "Host information",
                 "Sequencing",
-                "Pathogen Diagnostic testing",
+                "Pathogen diagnostic testing",
                 "Contributor Acknowledgement",
+                "Public databases",
+                "Bioinformatics and QC metrics fields",
             ]
             required_properties = json_schema.get("required")
             schema_properties = json_schema.get("properties")
@@ -524,6 +598,7 @@ class SchemaBuilder:
                 df = relecov_tools.assets.schema_utils.metadatalab_template.schema_properties_to_df(
                     schema_properties_flatten
                 )
+                # Filter metadata fields based on required classifications
                 df = df[df["classification"].isin(required_classification)]
                 df["required"] = df["property_id"].apply(
                     lambda x: "Y" if x in required_properties else "N"
@@ -557,25 +632,34 @@ class SchemaBuilder:
                 log.error(f"Error creating overview sheet: {e}")
                 stderr.print(f"Error creating overview sheet: {e}")
                 return None
-
-            # MetadataLab sheet
+            # Ensure 'header' column exists before filtering
+            if "header" in df.columns:
+                df["header"] = df["header"].astype(str).str.strip()
+                df_filtered = df[df["header"].str.upper() == "Y"]
+            else:
+                log.warning(
+                    "No se encontró la columna 'header', usando df sin filtrar."
+                )
+                df_filtered = df
+            # Create Metadata LAB sheet
             try:
-                metadatalab_header = ["EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
+                metadatalab_header = ["REQUERIDO", "EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
                 df_metadata = pd.DataFrame(
                     columns=[col_name for col_name in metadatalab_header]
                 )
-                df_metadata["EJEMPLOS"] = df["examples"].apply(
+                df_metadata["REQUERIDO"] = df_filtered["required"]
+                df_metadata["EJEMPLOS"] = df_filtered["examples"].apply(
                     lambda x: x[0] if isinstance(x, list) else x
                 )
-                df_metadata["DESCRIPCIÓN"] = df["description"]
-                df_metadata["CAMPO"] = df["label"]
+                df_metadata["DESCRIPCIÓN"] = df_filtered["description"]
+                df_metadata["CAMPO"] = df_filtered["label"]
                 df_metadata = df_metadata.transpose()
             except Exception as e:
                 log.error(f"Error creating MetadataLab sheet: {e}")
                 stderr.print(f"[red]Error creating MetadataLab sheet: {e}")
                 return None
 
-            # DataValidation sheet
+            # Create Data Validation sheet
             try:
                 datavalidation_header = ["EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
                 df_hasenum = df[(pd.notnull(df.enum))]
@@ -594,8 +678,7 @@ class SchemaBuilder:
                 return None
 
             try:
-                # Since enums have different lengths we need further processing.
-                # Convert df into dict to perform data manipulation.
+
                 enum_dict = {property: [] for property in df_hasenum["property_id"]}
                 enum_maxitems = 0
                 # Populate the dictionary with flattened lists
@@ -634,6 +717,23 @@ class SchemaBuilder:
                 stderr.print(f"[red]Error processing enums and combining data: {e}")
                 return None
 
+            #  Replace NaN, Inf values with empty strings
+            df_overview = (
+                df_overview.replace([float("inf"), float("-inf")], "")
+                .fillna("")
+                .infer_objects()
+            )
+            df_metadata = (
+                df_metadata.replace([float("inf"), float("-inf")], "")
+                .fillna("")
+                .infer_objects()
+            )
+            df_validation = (
+                df_validation.replace([float("inf"), float("-inf")], "")
+                .fillna("")
+                .infer_objects()
+            )
+
             # WRITE EXCEL
             try:
                 writer = pd.ExcelWriter(out_file, engine="xlsxwriter")
@@ -661,6 +761,7 @@ class SchemaBuilder:
                     have_index=True,
                     have_header=False,
                 )
+                version_history.to_excel(writer, sheet_name="VERSION", index=False)
                 writer.close()
                 log.info(f"Metadata lab template successfuly created in: {out_file}")
                 stderr.print(
@@ -674,7 +775,8 @@ class SchemaBuilder:
             try:
                 wb = openpyxl.load_workbook(out_file)
                 ws_metadata = wb["METADATA_LAB"]
-
+                ws_metadata.freeze_panes = "D1"
+                ws_metadata.delete_rows(5)
                 ws_dropdowns = (
                     wb.create_sheet("DROPDOWNS")
                     if "DROPDOWNS" not in wb.sheetnames
@@ -716,7 +818,47 @@ class SchemaBuilder:
 
                         ws_metadata.add_data_validation(dropdown)
                         dropdown.add(dropdown_range_metadata)
+
+                if "OVERVIEW" in wb.sheetnames:
+                    ws_overview = wb["OVERVIEW"]
+                    ws_overview.protection.sheet = True
+                    ws_overview.protection.password = "password123"
+
+                if "DATA_VALIDATION" in wb.sheetnames:
+                    ws_data_validation = wb["DATA_VALIDATION"]
+                    ws_data_validation.protection.sheet = True
+                    ws_data_validation.protection.password = "password123"
+
+                if "VERSION" in wb.sheetnames:
+                    ws_data_validation = wb["VERSION"]
+                    ws_data_validation.protection.sheet = True
+                    ws_data_validation.protection.password = "password123"
+
+                    ws_version = wb["VERSION"]
+                    column_widths = []
+
+                    for col in ws_version.columns:
+                        max_length = 0
+                        column = col[0].column_letter
+                        for cell in col:
+                            try:
+                                if len(str(cell.value)) > max_length:
+                                    max_length = len(cell.value)
+                            except:
+                                pass
+                        adjusted_width = max_length + 2
+                        column_widths.append(adjusted_width)
+
+                    # Apply the calculated column width
+                    for i, width in enumerate(column_widths):
+                        ws_version.column_dimensions[
+                            openpyxl.utils.get_column_letter(i + 1)
+                        ].width = width
+
                 ws_dropdowns.sheet_state = "hidden"
+                ws_dropdowns.protection.sheet = True
+                ws_dropdowns.protection.password = "password123"
+
                 wb.save(out_file)
             except Exception as e:
                 log.error(f"Error adding dropdowns: {e}")

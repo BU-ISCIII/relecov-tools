@@ -67,7 +67,6 @@ def schema_properties_to_df(json_data):
         stderr.print(f"[red]Error in schema_properties_to_df: {e}")
         return None
 
-
 def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=True):
     try:
 
@@ -80,24 +79,41 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
         workbook = writer.book
         worksheet = writer.sheets[sheet]
 
-        # setup excel format
+        # Set up general column width
         worksheet.set_column(0, len(df.columns), 30)
+
+        # General header format
         header_formater = workbook.add_format(
             {
                 "bold": True,
                 "text_wrap": False,
                 "valign": "top",
-                "fg_color": "#ADD8E6",
+                "fg_color": "#B9DADE",  # Light blue
                 "border": 1,
                 "locked": True,
             }
         )
+
+        # Custom header format for METADATA_LAB (red text starting from column 2)
+        red_header_formater = workbook.add_format(
+            {
+                "bold": True,
+                "text_wrap": False,
+                "valign": "top",
+                "fg_color": "#B9DADE",  # Light blue background
+                "color": "#E05959",  # Red text color
+                "border": 1,
+                "locked": True,
+            }
+        )
+
+        # First column format
         first_col_formater = workbook.add_format(
             {
                 "bold": True,
                 "text_wrap": False,
                 "valign": "center",
-                "fg_color": "#ADD8E6",
+                "fg_color": "#B9DADE",  # Light blue
                 "border": 1,
                 "locked": True,
             }
@@ -107,7 +123,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
             # Write the column headers with the defined format.
             for col_num, value in enumerate(df.columns.values):
                 try:
-                    worksheet.write(0, col_num + 1, value, header_formater)
+                    worksheet.write(0, col_num, value, header_formater)
                 except Exception as e:
                     stderr.print(f"Error writing header at column {col_num + 1}: {e}")
 
@@ -124,10 +140,10 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
             # Write the column headers with the defined format.
             for col_num in range(0, len(df.columns)):
                 for row_num in range(0, len(df)):
-                    if row_num < 3:
+                    if row_num < 4:
                         try:
                             worksheet.write(
-                                row_num + 1,
+                                row_num,
                                 col_num + 1,
                                 df.iloc[row_num, col_num],
                                 header_formater,
@@ -136,11 +152,23 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                             stderr.print(
                                 f"Error writing first column at row {row_num}: {e}"
                             )
-
+                        if row_num == 0 and col_num >= 1 and sheet == "METADATA_LAB":
+                            try:
+                                worksheet.write(
+                                    row_num,
+                                    col_num,
+                                    df.iloc[row_num, col_num],
+                                    red_header_formater,  # Aplicar formato
+                                )
+                            except Exception as e:
+                                stderr.print(
+                                    f"Error writing first row at column {col_num}: {e}"
+                                )
+            print(df.index)
             # Write the first column with the defined format.
             for index_num, index_val in enumerate(df.index):
                 try:
-                    worksheet.write(index_num + 1, 0, index_val, first_col_formater)
+                    worksheet.write(index_num, 0, index_val, first_col_formater)
                 except Exception as e:
                     stderr.print(f"Error writing first column at row {row_num}: {e}")
     except Exception as e:
