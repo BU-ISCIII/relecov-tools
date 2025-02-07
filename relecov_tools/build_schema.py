@@ -18,6 +18,8 @@ from relecov_tools.config_json import ConfigJson
 from datetime import datetime
 from openpyxl.worksheet.datavalidation import DataValidation
 
+pd.set_option('future.no_silent_downcasting', True)
+
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
@@ -357,8 +359,8 @@ class SchemaBuilder:
                             continue
                         # Record the required value for each property
                         if (
-                            "required" in db_feature_key
-                            or "required" == schema_feature_key
+                            "required" in db_feature_key or
+                            "required" == schema_feature_key
                         ):
                             is_required = str(db_features_dic[db_feature_key])
                             if is_required != "nan":
@@ -839,13 +841,9 @@ class SchemaBuilder:
 
                     for col in ws_version.columns:
                         max_length = 0
-                        column = col[0].column_letter
                         for cell in col:
-                            try:
-                                if len(str(cell.value)) > max_length:
-                                    max_length = len(cell.value)
-                            except:
-                                pass
+                            if len(str(cell.value)) > max_length:
+                                max_length = len(cell.value)
                         adjusted_width = max_length + 2
                         column_widths.append(adjusted_width)
 
