@@ -383,6 +383,7 @@ class SchemaBuilder:
                     if values == "Y":
                         required_property_unique.append(key)
             schema_draft["required"] = required_property_unique
+            schema_draft["version"] = self.version
 
             # Return new schema
             return schema_draft
@@ -483,7 +484,7 @@ class SchemaBuilder:
             if not self.version:
                 raise ValueError("The next_version variable is not set.")
 
-            path_to_save = f"{self.output_folder}/relecov_schema_v{self.version}.json"
+            path_to_save = f"{self.output_folder}/relecov_schema.json"
             with open(path_to_save, "w") as schema_file:
                 json.dump(json_data, schema_file, ensure_ascii=False, indent=4)
             log.info(f"New JSON schema saved to: {path_to_save}")
