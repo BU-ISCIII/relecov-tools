@@ -312,10 +312,11 @@ class SchemaBuilder:
             # List of properties to check in the features dictionary (it maps values between database features and json schema features):
             #       key[db_feature_key]: value[schema_feature_key]
             features_to_check = {
-                "type": "type",
                 "enum": "enum",
                 "examples": "examples",
                 "ontology_id": "ontology",
+                "type": "type",
+                "format": "format",
                 "description": "description",
                 "classification": "classification",
                 "label_name": "label",
@@ -357,7 +358,7 @@ class SchemaBuilder:
                                 f"[INFO] Feature {db_feature_key} is not present in database ({self.excel_file_path})"
                             )
                             continue
-                        # Record the required value for each property
+                        
                         if (
                             "required" in db_feature_key
                             or "required" == schema_feature_key

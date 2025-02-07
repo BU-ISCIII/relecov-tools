@@ -11,12 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Code contributions to the release:
 
 - [Pablo Mata](https://github.com/shettland)
+- [Alejandro Bernabeu](https://github.com/aberdur)
 
 ### Modules
 
 #### Added enhancements
 
 - Added a more robust datatype handling in utils.py read_csv_file_return_dict() method [#379](https://github.com/BU-ISCIII/relecov-tools/pull/379)
+- Improved relecov template generator and version control [#382](https://github.com/BU-ISCIII/relecov-tools/pull/382)
 
 #### Fixes
 
