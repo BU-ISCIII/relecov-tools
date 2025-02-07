@@ -159,7 +159,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                                     row_num,
                                     col_num,
                                     df.iloc[row_num, col_num],
-                                    red_header_formater,  # Aplicar formato
+                                    red_header_formater,  # Apply format
                                 )
                             except Exception as e:
                                 stderr.print(
