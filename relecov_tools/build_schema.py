@@ -59,9 +59,9 @@ class SchemaBuilder:
             self.output_folder = out_dir
 
         # Get version option
+        self.version = version
         if not self.version:
             raise ValueError("The next_version variable is not set.")
-        self.version = version
 
         # Validate show diff option
         if not show_diff:
