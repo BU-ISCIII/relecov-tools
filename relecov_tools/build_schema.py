@@ -59,6 +59,8 @@ class SchemaBuilder:
             self.output_folder = out_dir
 
         # Get version option
+        if not self.version:
+            raise ValueError("The next_version variable is not set.")
         self.version = version
 
         # Validate show diff option
@@ -358,7 +360,6 @@ class SchemaBuilder:
                                 f"[INFO] Feature {db_feature_key} is not present in database ({self.excel_file_path})"
                             )
                             continue
-                        
                         if (
                             "required" in db_feature_key
                             or "required" == schema_feature_key
@@ -482,9 +483,6 @@ class SchemaBuilder:
             bool: True if the schema was successfully saved, False otherwise.
         """
         try:
-            if not self.version:
-                raise ValueError("The next_version variable is not set.")
-
             path_to_save = f"{self.output_folder}/relecov_schema.json"
             with open(path_to_save, "w") as schema_file:
                 json.dump(json_data, schema_file, ensure_ascii=False, indent=4)
