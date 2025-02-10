@@ -19,6 +19,7 @@ Code contributions to the release:
 
 - Added a more robust datatype handling in utils.py read_csv_file_return_dict() method [#379](https://github.com/BU-ISCIII/relecov-tools/pull/379)
 - Improved relecov template generator and version control [#382](https://github.com/BU-ISCIII/relecov-tools/pull/382)
+- Added "host_age" control in validation module [#385](https://github.com/BU-ISCIII/relecov-tools/pull/385)
 
 #### Fixes
 
