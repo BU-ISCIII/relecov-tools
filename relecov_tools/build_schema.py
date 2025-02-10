@@ -123,6 +123,7 @@ class SchemaBuilder:
                 stderr.print(f"[orange]Configuration key error: {key_error}")
                 sys.exit(1)
 
+    # TODO: Validation of values?
     def validate_database_definition(self, json_data):
         """Validate the mandatory features of each property in json_data.
         Validate the mandatory features of each property in json_data.
@@ -135,7 +136,7 @@ class SchemaBuilder:
             or None if all mandatory features are present
         """
         # Check mandatory key features to build a json schema
-        notvalid_properties = {}
+        missing_features = []
         mandatory_features = [
             "enum",
             "examples",
@@ -148,19 +149,16 @@ class SchemaBuilder:
             "required (Y/N)",
             "complex_field (Y/N)",
         ]
-        # Iterate over each property in json_data
+        # Iterate property in json_data
         for j_key, j_value in json_data.items():
-            missing_features = []
             for feature in mandatory_features:
                 if feature not in j_value:
-                    missing_features.append(feature)
-
-            if missing_features:
-                notvalid_properties[j_key] = missing_features
+                    if feature not in missing_features:
+                        missing_features.append(feature)
 
         # Summarize validation
-        if notvalid_properties:
-            return notvalid_properties
+        if len(missing_features) > 0 :
+            return missing_features
         else:
             return None
 
@@ -200,10 +198,10 @@ class SchemaBuilder:
 
         if validation_out:
             log.error(
-                f"({caller_method}:{sheet_id}) Validation of database content falied. Missing mandatory features in: {validation_out}"
+                f"({caller_method}:{sheet_id}) Validation of database content falied. Properties have missing mandatory features: {', '.join(validation_out)}"
             )
             stderr.print(
-                f"({caller_method}:{sheet_id}) [red]Validation of database content falied. Missing mandatory features in: {validation_out}"
+                f"({caller_method}:{sheet_id}) [red]Validation of database content falied. Properties have missing mandatory features: {', '.join(validation_out)}"
             )
             sys.exit(1)
         else:
