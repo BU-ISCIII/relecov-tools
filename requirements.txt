@@ -15,3 +15,4 @@ bs4==0.0.2
 tabulate
 pandas
 jinja2>=3.0.0
+semantic_version
