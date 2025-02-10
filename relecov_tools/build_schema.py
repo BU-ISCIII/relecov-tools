@@ -28,7 +28,7 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
-
+# TODO: implement descriptive stats in a dataframe summarizing number of properties, type etc.
 class SchemaBuilder:
     def __init__(
         self,
@@ -61,9 +61,14 @@ class SchemaBuilder:
                 self.output_folder = relecov_tools.utils.prompt_create_outdir(path=None, out_dir=out_dir)
 
         # Get version option
+        if not version:
+            # If not defined, then ask via prompt
+            self.version =  relecov_tools.utils.prompt_text(
+                "Write the desired version using semantic versioning:"
+            )
         self.version = version
-        if not self.version:
-            raise ValueError("The next_version variable is not set.")
+        if not relecov_tools.utils.validate_semantic_version(self.version):
+            raise ValueError("[red]Error: Invalid version format")
 
         # Validate show diff option
         if not show_diff:
@@ -223,7 +228,8 @@ class SchemaBuilder:
         """
         draft_template = (
             relecov_tools.assets.schema_utils.jsonschema_draft.create_draft(
-                self.draft_version, True
+                draft_version=self.draft_version,
+                required_items=True
             )
         )
         return draft_template
@@ -310,6 +316,15 @@ class SchemaBuilder:
         Returns:
             schema_draft (dict): The newly created JSON Schema.
         """
+        # Fill schema draft header
+        # FIXME: it gets 'relecov-tools' instead of RELECOV
+        project_name = relecov_tools.utils.get_package_name()
+        schema_draft["$id"] = relecov_tools.utils.get_schema_url()
+        schema_draft["title"] = f"{project_name} Schema."
+        schema_draft["description"] = f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
+        schema_draft["version"] = self.version
+
+        # Fill schema properties
         try:
             # List of properties to check in the features dictionary (it maps values between database features and json schema features):
             #       key[db_feature_key]: value[schema_feature_key]
@@ -385,7 +400,6 @@ class SchemaBuilder:
                     if values == "Y":
                         required_property_unique.append(key)
             schema_draft["required"] = required_property_unique
-            schema_draft["version"] = self.version
 
             # Return new schema
             return schema_draft
