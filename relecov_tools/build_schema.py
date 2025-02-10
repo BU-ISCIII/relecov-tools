@@ -44,7 +44,7 @@ class SchemaBuilder:
         It reads the database definition from an Excel file and allows customization of the schema generation process.
         """
         self.excel_file_path = excel_file_path
-        # Validate input variables
+        # Validate input data
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
             log.error("A valid Excel file path must be provided.")
             raise ValueError("A valid Excel file path must be provided.")
@@ -53,10 +53,12 @@ class SchemaBuilder:
             raise ValueError("The Excel file must have a .xlsx extension.")
 
         # Validate output folder creation
-        if not out_dir or not os.path.isfile(out_dir):
-            self.output_folder = relecov_tools.utils.prompt_create_outdir(None, out_dir)
+        if not out_dir:
+            self.output_folder = relecov_tools.utils.prompt_create_outdir(path=None, out_dir=None)
         else:
-            self.output_folder = out_dir
+            self.output_folder = os.path.abspath(out_dir)
+            if not os.path.exists(self.output_folder):
+                self.output_folder = relecov_tools.utils.prompt_create_outdir(path=None, out_dir=out_dir)
 
         # Get version option
         self.version = version
