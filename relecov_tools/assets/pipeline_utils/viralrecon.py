@@ -485,9 +485,7 @@ def property_evaluation(data):
     invalid_data = []
     errors = {}
     for sample in data:
-        sample_id = sample.get(
-            "sequencing_sample_id"
-        )
+        sample_id = sample.get("sequencing_sample_id")
         host_age = sample.get(host_age_field)
         try:
             host_age = float(host_age)
