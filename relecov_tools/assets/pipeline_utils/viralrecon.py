@@ -469,3 +469,39 @@ def quality_control_evaluation(data):
                 f"Error processing sample {sample.get('sequencing_sample_id', 'unknown')}: {e}"
             )
     return data
+
+
+def property_evaluation(data):
+    """Validate the 'host_age' field for each sample in the dataset.
+
+    Args:
+        data (list): List of dictionaries representing JSON data.
+
+    Returns:
+        tuple: (valid_data, invalid_data, errors)
+    """
+    host_age_field = "host_age"
+    valid_data = []
+    invalid_data = []
+    errors = {}
+    for sample in data:
+        sample_id = sample.get(
+            "sequencing_sample_id"
+        )
+        host_age = sample.get(host_age_field)
+        try:
+            host_age = float(host_age)
+        except (TypeError, ValueError):
+            host_age = None
+
+        if host_age is None or not (0 <= host_age <= 120):
+            error_text = f"Sample {sample_id}: Error in column ({host_age_field}) - Invalid age {int(host_age)}. Must be a number between 0 and 120."
+            if error_text not in errors:
+                errors[error_text] = 1
+            else:
+                errors[error_text] += 1
+            invalid_data.append(sample)
+        else:
+            valid_data.append(sample)
+
+    return valid_data, invalid_data, errors
