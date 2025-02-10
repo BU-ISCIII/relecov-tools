@@ -495,7 +495,7 @@ def property_evaluation(data):
             host_age = None
 
         if host_age is None or not (0 <= host_age <= 120):
-            error_text = f"Sample {sample_id}: Error in column ({host_age_field}) - Invalid age {int(host_age)}. Must be a number between 0 and 120."
+            error_text = f"Sample {sample_id}: Error in column ({host_age_field}) - Invalid age {host_age}. Must be a number between 0 and 120."
             if error_text not in errors:
                 errors[error_text] = 1
             else:
