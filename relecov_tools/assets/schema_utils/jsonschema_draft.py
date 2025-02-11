@@ -3,7 +3,6 @@ import sys
 import rich.console
 
 import relecov_tools.utils
-import pkg_resources
 import jsonschema
 from jsonschema import Draft202012Validator
 
