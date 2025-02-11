@@ -12,6 +12,7 @@ Code contributions to the release:
 
 - [Pablo Mata](https://github.com/shettland)
 - [Alejandro Bernabeu](https://github.com/aberdur)
+- [Daniel Valle-Millares](https://github.com/Daniel-VM)
 
 ### Modules
 
@@ -25,6 +26,7 @@ Code contributions to the release:
 #### Changed
 
 - Temporarily changed bioinfo_config 'quality_control' requirement to false [#379](https://github.com/BU-ISCIII/relecov-tools/pull/379)
+- Improve and fix minor issues in build_schema.py [#387](https://github.com/BU-ISCIII/relecov-tools/pull/387)
 
 #### Removed
 
