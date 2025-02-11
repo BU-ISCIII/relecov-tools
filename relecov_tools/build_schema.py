@@ -392,7 +392,9 @@ class SchemaBuilder:
                             if is_required != "nan":
                                 required_property[property_id] = is_required
                         elif db_feature_key == "options":
-                            options_value = str(db_features_dic.get("options", "")).strip()
+                            options_value = str(
+                                db_features_dic.get("options", "")
+                            ).strip()
                             if options_value:
                                 options_dict = {}
                                 options_list = options_value.split(",")
