@@ -551,6 +551,7 @@ def adjust_sheet_size(sheet, wrap_text=True, col_width=30):
             value = col_width
         sheet.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = value
 
+
 def validate_semantic_version(version):
     try:
         ver = semantic_version.Version(version)
@@ -562,7 +563,7 @@ def validate_semantic_version(version):
 def get_package_name():
     """Get project name"""
     try:
-        package_name = importlib.metadata.metadata(__name__.split('.')[0])["Name"]
+        package_name = importlib.metadata.metadata(__name__.split(".")[0])["Name"]
         return package_name
     except importlib.metadata.PackageNotFoundError:
         return "unknown_package"
@@ -585,8 +586,7 @@ def get_schema_url():
     """Generates the schema url dinamically"""
     package_name = get_package_name()
     branch_name = get_git_branch()
-
     base_url = "https://github.com/BU-ISCIII"
     schema_path = f"{package_name}/blob/{branch_name}/{package_name.replace('-','_')}/schema/relecov_schema.json"
-    
+
     return f"{base_url}/{schema_path}"

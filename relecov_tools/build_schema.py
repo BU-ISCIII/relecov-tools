@@ -28,6 +28,7 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
+
 # TODO: implement descriptive stats in a dataframe summarizing number of properties, type etc.
 class SchemaBuilder:
     def __init__(
@@ -54,16 +55,20 @@ class SchemaBuilder:
 
         # Validate output folder creation
         if not out_dir:
-            self.output_folder = relecov_tools.utils.prompt_create_outdir(path=None, out_dir=None)
+            self.output_folder = relecov_tools.utils.prompt_create_outdir(
+                path=None, out_dir=None
+            )
         else:
             self.output_folder = os.path.abspath(out_dir)
             if not os.path.exists(self.output_folder):
-                self.output_folder = relecov_tools.utils.prompt_create_outdir(path=None, out_dir=out_dir)
+                self.output_folder = relecov_tools.utils.prompt_create_outdir(
+                    path=None, out_dir=out_dir
+                )
 
         # Get version option
         if not version:
             # If not defined, then ask via prompt
-            self.version =  relecov_tools.utils.prompt_text(
+            self.version = relecov_tools.utils.prompt_text(
                 "Write the desired version using semantic versioning:"
             )
         self.version = version
@@ -162,7 +167,7 @@ class SchemaBuilder:
                         missing_features.append(feature)
 
         # Summarize validation
-        if len(missing_features) > 0 :
+        if len(missing_features) > 0:
             return missing_features
         else:
             return None
@@ -228,8 +233,7 @@ class SchemaBuilder:
         """
         draft_template = (
             relecov_tools.assets.schema_utils.jsonschema_draft.create_draft(
-                draft_version=self.draft_version,
-                required_items=True
+                draft_version=self.draft_version, required_items=True
             )
         )
         return draft_template
@@ -323,7 +327,9 @@ class SchemaBuilder:
         project_name = relecov_tools.utils.get_package_name()
         new_schema["$id"] = relecov_tools.utils.get_schema_url()
         new_schema["title"] = f"{project_name} Schema."
-        new_schema["description"] = f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
+        new_schema["description"] = (
+            f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
+        )
         new_schema["version"] = self.version
 
         # Fill schema properties
@@ -401,7 +407,7 @@ class SchemaBuilder:
                 for key, values in required_property.items():
                     if values == "Y":
                         required_property_unique.append(key)
-            # TODO: So far it appears at the end of the new json schema. Ideally it should be placed before the properties statement. 
+            # TODO: So far it appears at the end of the new json schema. Ideally it should be placed before the properties statement.
             new_schema["required"] = required_property_unique
 
             # Return new schema
