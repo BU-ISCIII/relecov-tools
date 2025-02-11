@@ -268,6 +268,7 @@ class SchemaBuilder:
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
         return json_dict
 
+    # TODO: needs validation
     def complex_jsonschema_object(self, property_id, features_dict):
         """
         Create a complex (nested) JSON Schema object for a given property ID.
@@ -310,25 +311,26 @@ class SchemaBuilder:
         Build a new JSON Schema based on the provided JSON data and draft template.
 
         Parameters:
-        json_data (dict): The JSON data representing the database definition.
-        schema_template (dict): The JSON Schema draft template.
+        json_data (dict): Dictionary containing the properties and values of the database definition.
+        schema_draft (dict): The JSON Schema draft template.
 
         Returns:
             schema_draft (dict): The newly created JSON Schema.
         """
-        # Fill schema draft header
+        # Fill schema header
         # FIXME: it gets 'relecov-tools' instead of RELECOV
+        new_schema = schema_draft
         project_name = relecov_tools.utils.get_package_name()
-        schema_draft["$id"] = relecov_tools.utils.get_schema_url()
-        schema_draft["title"] = f"{project_name} Schema."
-        schema_draft["description"] = f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
-        schema_draft["version"] = self.version
+        new_schema["$id"] = relecov_tools.utils.get_schema_url()
+        new_schema["title"] = f"{project_name} Schema."
+        new_schema["description"] = f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
+        new_schema["version"] = self.version
 
         # Fill schema properties
         try:
             # List of properties to check in the features dictionary (it maps values between database features and json schema features):
             #       key[db_feature_key]: value[schema_feature_key]
-            features_to_check = {
+            mapping_features = {
                 "enum": "enum",
                 "examples": "examples",
                 "ontology_id": "ontology",
@@ -346,7 +348,7 @@ class SchemaBuilder:
             # Read property_ids in the database.
             #   Perform checks and create (for each property) feature object like:
             #       {'example':'A', 'ontology': 'B'...}.
-            #   Finally this objet will be written to the draft schema.
+            #   Finally this objet will be written to the new schema.
             for property_id, db_features_dic in json_data.items():
                 schema_property = {}
                 required_property = {}
@@ -354,7 +356,7 @@ class SchemaBuilder:
                 # Parse property_ids that needs to be incorporated as complex fields in json_schema
                 if json_data[property_id].get("complex_field (Y/N)") == "Y":
                     complex_json_feature = self.complex_jsonschema_object(
-                        property_id, features_to_check
+                        property_id, mapping_features
                     )
                     if complex_json_feature:
                         schema_property["type"] = "array"
@@ -365,7 +367,7 @@ class SchemaBuilder:
                         ]
                 # For those that follows standard format, add them to json schema as well.
                 else:
-                    for db_feature_key, schema_feature_key in features_to_check.items():
+                    for db_feature_key, schema_feature_key in mapping_features.items():
                         # Verifiy that db_feature_key is present in the database (processed excel (aka 'json_data'))
                         if db_feature_key not in db_features_dic:
                             log.info(
@@ -393,16 +395,17 @@ class SchemaBuilder:
                             else:
                                 continue
                 # Finally, send schema_property object to the new json schema draft.
-                schema_draft["properties"][property_id] = schema_property
+                new_schema["properties"][property_id] = schema_property
 
                 # Add to schema draft the recorded porperty_ids.
                 for key, values in required_property.items():
                     if values == "Y":
                         required_property_unique.append(key)
-            schema_draft["required"] = required_property_unique
+            # TODO: So far it appears at the end of the new json schema. Ideally it should be placed before the properties statement. 
+            new_schema["required"] = required_property_unique
 
             # Return new schema
-            return schema_draft
+            return new_schema
 
         except Exception as e:
             log.error(f"Error building schema: {str(e)}")
