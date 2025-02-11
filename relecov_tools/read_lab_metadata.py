@@ -394,9 +394,6 @@ class RelecovMetadata:
             ws_metadata_lab, heading_row_number = relecov_tools.utils.read_excel_file(
                 self.metadata_file, alt_sheet, header_flag, leave_empty=False
             )
-        alt_header_dict = self.configuration.get_topic_data(
-            "lab_metadata", "alt_heading_equivalences"
-        )
         valid_metadata_rows = []
         included_sample_ids = []
         row_number = heading_row_number
@@ -408,6 +405,7 @@ class RelecovMetadata:
             except KeyError:
                 self.logsum.add_error(entry=f"No {sample_id_col} found in excel file")
                 continue
+            # Validations on the sample_id
             if sample_id in included_sample_ids:
                 log_text = f"Skipped duplicated sample {sample_id} in row {row_number}. Sequencing sample id must be unique"
                 self.logsum.add_warning(entry=log_text)
@@ -419,12 +417,41 @@ class RelecovMetadata:
                 continue
             included_sample_ids.append(sample_id)
             for key in row.keys():
-                # skip the first column of the Metadata lab file
                 if header_flag in key:
                     continue
-                if row[key] is None or "not provided" in str(row[key]).lower():
+                value = row[key]
+                # Omitting empty or not provided values
+                if value is None or "not provided" in str(value).lower():
                     log_text = f"{key} not provided for sample {sample_id}"
                     self.logsum.add_warning(sample=sample_id, entry=log_text)
+                    continue
+                # Get JSON schema type
+                schema_key = self.label_prop_dict.get(key, key)
+                schema_type = (
+                    self.relecov_sch_json["properties"]
+                    .get(schema_key, {})
+                    .get("type", "string")
+                )
+                # Conversion of values according to expected type
+                try:
+                    if schema_type == "integer":
+                        try:
+                            value = int(float(value))
+                        except (ValueError, TypeError):
+                            value = str(value).strip()
+                    elif schema_type == "number":
+                        try:
+                            value = int(float(value))
+                        except (ValueError, TypeError):
+                            value = float(value).strip()
+                    elif schema_type == "boolean":
+                        value = str(value).strip().lower() in ["true", "yes", "1"]
+                    elif schema_type == "string":
+                        value = str(value).strip()
+                except (ValueError, TypeError) as e:
+                    log_text = f"Type conversion error for {key} (expected {schema_type}): {value}. {str(e)}"
+                    self.logsum.add_error(sample=sample_id, entry=log_text)
+                    stderr.print(f"[red]{log_text}")
                     continue
                 if "date" in key.lower():
                     # Check if date is a string. Format YYYY/MM/DD to YYYY-MM-DD
@@ -453,31 +480,14 @@ class RelecovMetadata:
                     logtxt = f"Non-date field {key} provided as date. Parsed as int"
                     self.logsum.add_warning(sample=sample_id, entry=logtxt)
                     row[key] = str(relecov_tools.utils.excel_date_to_num(row[key]))
-                if self.alternative_heading:
-                    alt_key = alt_header_dict.get(key)
-                if row[key] is not None or "not provided" not in str(row[key]).lower():
-                    try:
-                        property_row[self.label_prop_dict[key]] = str(row[key]).strip()
-                    except KeyError as e:
-                        if self.alternative_heading:
-                            try:
-                                property_row[self.label_prop_dict[alt_key]] = str(
-                                    row[key]
-                                ).strip()
-                                continue
-                            except KeyError:
-                                pass
-                        log_text = f"Error when mapping the label {str(e)}"
-                        self.logsum.add_error(sample=sample_id, entry=log_text)
-                        stderr.print(f"[red]{log_text}")
-                        continue
+                property_row[schema_key] = value
             valid_metadata_rows.append(property_row)
-
         return valid_metadata_rows
 
     def create_metadata_json(self):
         stderr.print("[blue]Reading Lab Metadata Excel File")
         valid_metadata_rows = self.read_metadata_file()
+        stderr.print(f"[green]Processed {len(valid_metadata_rows)} valid metadata rows")
         clean_metadata_rows, missing_samples = self.match_to_json(valid_metadata_rows)
         if missing_samples:
             num_miss = len(missing_samples)
