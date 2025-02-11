@@ -342,6 +342,7 @@ class SchemaBuilder:
                 "ontology_id": "ontology",
                 "type": "type",
                 "format": "format",
+                "options": "options",
                 "description": "description",
                 "classification": "classification",
                 "label_name": "label",
@@ -390,6 +391,26 @@ class SchemaBuilder:
                             is_required = str(db_features_dic[db_feature_key])
                             if is_required != "nan":
                                 required_property[property_id] = is_required
+                        elif db_feature_key == "options":
+                            options_value = str(db_features_dic.get("options", "")).strip()
+                            if options_value:
+                                options_dict = {}
+                                options_list = options_value.split(",")
+
+                                for option in options_list:
+                                    key_value = option.split(":")
+                                    if len(key_value) == 2:
+                                        key = key_value[0].strip()
+                                        value = key_value[1].strip()
+                                        try:
+                                            if "." in value:
+                                                value = float(value)
+                                            else:
+                                                value = int(value)
+                                        except ValueError:
+                                            pass
+                                        options_dict[key] = value
+                                schema_property.update(options_dict)
                         else:
                             std_json_feature = self.standard_jsonschema_object(
                                 db_features_dic, db_feature_key
