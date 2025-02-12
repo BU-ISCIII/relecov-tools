@@ -145,7 +145,6 @@ class SchemaBuilder:
             dict: A dictionary containing errors found, categorized by:
                 - Missing features
                 - Duplicate enums
-                - Invalid example types
                 - Incorrect date formats
         """
         log_errors = {
