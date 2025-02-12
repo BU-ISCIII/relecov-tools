@@ -886,6 +886,46 @@ class SchemaBuilder:
                 ws_metadata = wb["METADATA_LAB"]
                 ws_metadata.freeze_panes = "D1"
                 ws_metadata.delete_rows(5)
+                host_age_col = None
+                host_age_months_col = None
+                for cell in ws_metadata[4]:
+                    if cell.value == "Host Age":
+                        host_age_col = cell.column_letter
+                    elif cell.value == "Host Age Months":
+                        host_age_months_col = cell.column_letter
+                        print(host_age_months_col)
+                if host_age_col:
+                    age_range = f"{host_age_col}5:{host_age_col}1000"
+                    age_validation = DataValidation(
+                        type="whole", 
+                        operator="between",
+                        formula1="3",
+                        formula2="110",
+                        showErrorMessage=True
+                    )
+                    age_validation.error = "El valor debe estar entre 3 y 110 años. Si es inferior a 3 debe introducir los meses en la columna [Host Age Months]"
+                    age_validation.errorTitle = "Valor no permitido"
+
+                    ws_metadata.add_data_validation(age_validation)
+                    age_validation.add(age_range)
+
+                    ws_metadata.add_data_validation(age_validation)
+                    age_validation.add(age_range)
+
+                if host_age_months_col:
+                    age_months_range = f"{host_age_months_col}5:{host_age_months_col}1000"
+                    age_months_validation = DataValidation(
+                        type="whole",
+                        operator="between",
+                        formula1="0",
+                        formula2="35",
+                        showErrorMessage=True
+                    )
+                    age_months_validation.error = "El valor debe estar entre 0 y 35 meses."
+                    age_months_validation.errorTitle = "Valor no permitido"
+
+                    ws_metadata.add_data_validation(age_months_validation)
+                    age_months_validation.add(age_months_range)
                 ws_dropdowns = (
                     wb.create_sheet("DROPDOWNS")
                     if "DROPDOWNS" not in wb.sheetnames
