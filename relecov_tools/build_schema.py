@@ -897,11 +897,11 @@ class SchemaBuilder:
                 if host_age_col:
                     age_range = f"{host_age_col}5:{host_age_col}1000"
                     age_validation = DataValidation(
-                        type="whole", 
+                        type="whole",
                         operator="between",
                         formula1="3",
                         formula2="110",
-                        showErrorMessage=True
+                        showErrorMessage=True,
                     )
                     age_validation.error = "El valor debe estar entre 3 y 110 años. Si es inferior a 3 debe introducir los meses en la columna [Host Age Months]"
                     age_validation.errorTitle = "Valor no permitido"
@@ -913,15 +913,19 @@ class SchemaBuilder:
                     age_validation.add(age_range)
 
                 if host_age_months_col:
-                    age_months_range = f"{host_age_months_col}5:{host_age_months_col}1000"
+                    age_months_range = (
+                        f"{host_age_months_col}5:{host_age_months_col}1000"
+                    )
                     age_months_validation = DataValidation(
                         type="whole",
                         operator="between",
                         formula1="0",
                         formula2="35",
-                        showErrorMessage=True
+                        showErrorMessage=True,
                     )
-                    age_months_validation.error = "El valor debe estar entre 0 y 35 meses."
+                    age_months_validation.error = (
+                        "El valor debe estar entre 0 y 35 meses."
+                    )
                     age_months_validation.errorTitle = "Valor no permitido"
 
                     ws_metadata.add_data_validation(age_months_validation)
