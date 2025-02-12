@@ -715,7 +715,7 @@ def build_schema(input_file, schema_base, draft_version, diff, out_dir, version)
         schema_update = relecov_tools.build_schema.SchemaBuilder(
             input_file, schema_base, draft_version, diff, out_dir, version
         )
-        
+
         # Build new schema
         new_schema = schema_update.handle_build_schema()
         if not new_schema:

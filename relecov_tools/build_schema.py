@@ -975,7 +975,6 @@ class SchemaBuilder:
             stderr.print(f"[red]Error in create_metadatalab_excel: {e}")
             return None
 
-
     def summarize_schema(self, json_schema):
         """
         Generate summary statistics for a JSON Schema and display it in tabular format.
@@ -996,7 +995,7 @@ class SchemaBuilder:
         # Iterate over properties
         for _, prop_details in properties.items():
             prop_type = prop_details.get("type", "unknown")
-            
+
             # Count types
             type_counts[prop_type] = type_counts.get(prop_type, 0) + 1
 
@@ -1069,7 +1068,6 @@ class SchemaBuilder:
         except AttributeError:
             print(outdir_df.to_string(index=False))
 
-
     def handle_build_schema(self):
         # Load xlsx database and convert into json format
         log.info("Start reading xlsx database")
@@ -1112,6 +1110,6 @@ class SchemaBuilder:
         )
         if promp_answ:
             self.create_metadatalab_excel(new_schema_json)
-        
+
         # Return new schema
         return new_schema_json
