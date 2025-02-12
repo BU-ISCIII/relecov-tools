@@ -441,7 +441,7 @@ class RelecovMetadata:
                             value = str(value).strip()
                     elif schema_type == "number":
                         try:
-                            value = int(float(value))
+                            value = float(value)
                         except (ValueError, TypeError):
                             value = float(value).strip()
                     elif schema_type == "boolean":
