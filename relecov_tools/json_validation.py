@@ -110,7 +110,9 @@ class SchemaValidation:
         """Validate data instances against a validated json schema"""
 
         # create validator
-        validator = Draft202012Validator(self.json_schema, format_checker=FormatChecker())
+        validator = Draft202012Validator(
+            self.json_schema, format_checker=FormatChecker()
+        )
         schema_props = self.json_schema["properties"]
 
         validated_json_data = []
