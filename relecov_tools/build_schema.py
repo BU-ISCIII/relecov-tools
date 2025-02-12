@@ -341,7 +341,6 @@ class SchemaBuilder:
                 "examples": "examples",
                 "ontology_id": "ontology",
                 "type": "type",
-                "format": "format",
                 "options": "options",
                 "description": "description",
                 "classification": "classification",
