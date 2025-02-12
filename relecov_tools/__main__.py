@@ -710,14 +710,23 @@ def pipeline_manager(input, template, output, config, folder_names):
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file/s")
 def build_schema(input_file, schema_base, draft_version, diff, out_dir, version):
     """Generates and updates JSON Schema files from Excel-based database definitions."""
-    schema_update = relecov_tools.build_schema.SchemaBuilder(
-        input_file, schema_base, draft_version, diff, out_dir, version
-    )
+    # Build new schema
     try:
-        schema_update.handle_build_schema()
+        schema_update = relecov_tools.build_schema.SchemaBuilder(
+            input_file, schema_base, draft_version, diff, out_dir, version
+        )
+        
+        # Build new schema
+        new_schema = schema_update.handle_build_schema()
+        if not new_schema:
+            log.error("Schema build returned None. Skipping schema summary.")
+            return
+
+        # Generate schema summary
+        schema_update.summarize_schema(new_schema)
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        log.exception(f"Error while building schema: {e}")
+        raise RuntimeError("... Schema building failed. Check logs for details.")
 
 
 @relecov_tools_cli.command(help_priority=15)
