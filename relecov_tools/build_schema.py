@@ -894,7 +894,7 @@ class SchemaBuilder:
                         host_age_col = cell.column_letter
                     elif cell.value == "Host Age Months":
                         host_age_months_col = cell.column_letter
-                    elif "Date" in str(cell.value):  # Verificar si la celda contiene "Date"
+                    elif "Date" in str(cell.value):
                         date_columns.append(cell.column_letter)
                 if host_age_col:
                     age_range = f"{host_age_col}5:{host_age_col}1000"
@@ -935,12 +935,11 @@ class SchemaBuilder:
 
                 for date_col in date_columns:
                     date_range = f"{date_col}5:{date_col}1000"
-                    
-                    # Fórmula que valida que la fecha siga el formato YYYY-MM-DD
+
                     date_validation = DataValidation(
-                        type="custom",  # Usar validación personalizada
+                        type="custom",
                         formula1=f'ISNUMBER(DATEVALUE(TEXT({date_col}5, "yyyy-mm-dd")))',
-                        showErrorMessage=True
+                        showErrorMessage=True,
                     )
                     date_validation.error = "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12)."
                     date_validation.errorTitle = "Formato de fecha incorrecto"
