@@ -133,20 +133,28 @@ class SchemaBuilder:
                 stderr.print(f"[orange]Configuration key error: {key_error}")
                 sys.exit(1)
 
-    # TODO: Validation of values?
     def validate_database_definition(self, json_data):
-        """Validate the mandatory features of each property in json_data.
-        Validate the mandatory features of each property in json_data.
+        """Validate the mandatory features and ensure:
+        - No duplicate enum values in the JSON schema.
+        - Date formats follow 'YYYY-MM-DD'.
 
         Args:
-        json_data (dict): The JSON data representing the database definition.
+            json_data (dict): The JSON data representing the database definition.
 
         Returns:
-            dict or None: A dictionary with properties that are missing mandatory/invalid features,
-            or None if all mandatory features are present
+            dict: A dictionary containing errors found, categorized by:
+                - Missing features
+                - Duplicate enums
+                - Invalid example types
+                - Incorrect date formats
         """
-        # Check mandatory key features to build a json schema
-        missing_features = []
+        log_errors = {
+            "missing_features": {},
+            "duplicate_enums": {},
+            "invalid_example_types": {},
+            "invalid_date_formats": {},
+        }
+
         mandatory_features = [
             "enum",
             "examples",
@@ -159,18 +167,62 @@ class SchemaBuilder:
             "required (Y/N)",
             "complex_field (Y/N)",
         ]
-        # Iterate property in json_data
-        for j_key, j_value in json_data.items():
-            for feature in mandatory_features:
-                if feature not in j_value:
-                    if feature not in missing_features:
-                        missing_features.append(feature)
 
-        # Summarize validation
-        if len(missing_features) > 0:
-            return missing_features
+        # Iterate over properties in json_data
+        for prop_name, prop_features in json_data.items():
+            missing_features = [feature for feature in mandatory_features if feature not in prop_features]
+            if missing_features:
+                log_errors["missing_features"][prop_name] = missing_features            
+
+            # Check for duplicate enum values
+            if prop_features.get("enum"):
+                if not pd.isna(prop_features["enum"]): 
+                    enum_values = prop_features["enum"].split(', ')
+                    # Verify that enum has no duplicates
+                    if len(enum_values) != len(set(enum_values)):
+                        duplicates = [value for value in set(enum_values) if enum_values.count(value) > 1]
+                        log_errors["duplicate_enums"][prop_name] = duplicates
+
+            # Check date format for properties with type=string and format=date
+            if "type" in prop_features and prop_features["type"] == "string" and prop_features.get("format") == "date":
+                example = prop_features.get("examples")
+                if example:
+                    if isinstance(example, datetime):
+                        example = example.strftime("%Y-%m-%d")
+                    if isinstance(example, str):
+                        try:
+                            datetime.strptime(example, "%Y-%m-%d")
+                        except ValueError:
+                            if prop_name not in log_errors["invalid_date_formats"]:
+                                log_errors["invalid_date_formats"][prop_name] = []
+                            log_errors["invalid_date_formats"][prop_name].append(
+                                f"Invalid date format '{example}', expected 'YYYY-MM-DD'"
+                            )
+
+        # return log errors if any
+        if any(log_errors.values()):
+            stderr.print("[red]\t- Database Validation Failed")
+
+            # Convert log_errors dictionary to DataFrame
+            df_errors = pd.DataFrame([
+                {"Error Category": category, "Field": field, "Details": ", ".join(details) if isinstance(details, list) else details}
+                for category, errors in log_errors.items()
+                for field, details in errors.items()
+            ])
+
+            # Save errors to file
+            error_file_path = f"{self.output_folder}/schema_validation_errors.csv"
+            df_errors.to_csv(error_file_path, index=False, encoding='utf-8')
+            stderr.print(f"\t- Log errors saved to:\n\t{error_file_path}")
+
+            # Ask user whether to continue or stop execution
+            if not relecov_tools.utils.prompt_yn_question("Errors found in database values. Do you want to continue? (Y/N)"):
+                return log_errors
         else:
-            return None
+            stderr.print("[green]\t- Database validation passed")
+
+        # If no errors found
+        return None
 
     def read_database_definition(self, sheet_id="main"):
         """Reads the database definition from an Excel sheet and converts it into JSON format.
@@ -205,22 +257,9 @@ class SchemaBuilder:
 
         # Perform validation of database content
         validation_out = self.validate_database_definition(json_data)
-
         if validation_out:
-            log.error(
-                f"({caller_method}:{sheet_id}) Validation of database content falied. Properties have missing mandatory features: {', '.join(validation_out)}"
-            )
-            stderr.print(
-                f"({caller_method}:{sheet_id}) [red]Validation of database content falied. Properties have missing mandatory features: {', '.join(validation_out)}"
-            )
-            sys.exit(1)
+            sys.exit()
         else:
-            log.info(
-                f"({caller_method}:{sheet_id}) Validation of database content passed."
-            )
-            stderr.print(
-                f"({caller_method}:{sheet_id}) [green]Validation of database content passed."
-            )
             return json_data
 
     def create_schema_draft_template(self):
@@ -935,7 +974,6 @@ class SchemaBuilder:
         self.verify_schema(new_schema_json)
 
         # Compare base vs new schema and saves new JSON schema
-        stderr.print(self.show_diff)
         if self.show_diff:
             schema_diff = self.get_schema_diff(base_schema_json, new_schema_json)
         else:
