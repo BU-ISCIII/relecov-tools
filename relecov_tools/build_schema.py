@@ -192,8 +192,7 @@ class SchemaBuilder:
 
             # Check date format for properties with type=string and format=date
             if (
-                "type" in prop_features
-                and prop_features["type"] == "string"
+                prop_features["type"] == "string"
                 and prop_features.get("format") == "date"
             ):
                 example = prop_features.get("examples")
