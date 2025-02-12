@@ -17,6 +17,7 @@ import shutil
 from itertools import islice, product
 from Bio import SeqIO
 from rich.console import Console
+from rich.table import Table
 from datetime import datetime
 from tabulate import tabulate
 import openpyxl.utils

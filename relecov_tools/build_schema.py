@@ -29,7 +29,6 @@ stderr = rich.console.Console(
 )
 
 
-# TODO: implement descriptive stats in a dataframe summarizing number of properties, type etc.
 class SchemaBuilder:
     def __init__(
         self,
@@ -212,7 +211,6 @@ class SchemaBuilder:
         # return log errors if any
         if any(log_errors.values()):
             stderr.print("[red]\t- Database Validation Failed")
-
             # Convert log_errors dictionary to DataFrame
             df_errors = pd.DataFrame(
                 [
@@ -231,6 +229,12 @@ class SchemaBuilder:
             # Save errors to file
             error_file_path = f"{self.output_folder}/schema_validation_errors.csv"
             df_errors.to_csv(error_file_path, index=False, encoding="utf-8")
+
+            # Provide errors to user in rich table format:
+            relecov_tools.utils.display_dataframe_to_user(
+                name="Schema Validation Errors",
+                dataframe=df_errors
+            )
             stderr.print(f"\t- Log errors saved to:\n\t{error_file_path}")
 
             # Ask user whether to continue or stop execution
@@ -971,6 +975,101 @@ class SchemaBuilder:
             stderr.print(f"[red]Error in create_metadatalab_excel: {e}")
             return None
 
+
+    def summarize_schema(self, json_schema):
+        """
+        Generate summary statistics for a JSON Schema and display it in tabular format.
+
+        Args:
+            json_schema (dict): The JSON Schema to analyze.
+
+        Returns:
+            None: Displays the table directly to stdout.
+        """
+        properties = json_schema.get("properties", {})
+        # Initialize counters
+        total_properties = len(properties)
+        type_counts = {}
+        enum_count = 0
+        free_text_count = 0
+
+        # Iterate over properties
+        for _, prop_details in properties.items():
+            prop_type = prop_details.get("type", "unknown")
+            
+            # Count types
+            type_counts[prop_type] = type_counts.get(prop_type, 0) + 1
+
+            # Count enum vs free text
+            if "enum" in prop_details:
+                enum_count += 1
+            else:
+                free_text_count += 1
+
+        # Prepare summary data
+        summary_data = {
+            "Total Properties": [total_properties],
+            "String Properties": [type_counts.get("string", 0)],
+            "Integer Properties": [type_counts.get("integer", 0)],
+            "Number Properties": [type_counts.get("number", 0)],
+            "Boolean Properties": [type_counts.get("boolean", 0)],
+            "Object Properties": [type_counts.get("object", 0)],
+            "Array Properties": [type_counts.get("array", 0)],
+            "Enum Properties": [enum_count],
+            "Free Text Properties": [free_text_count],
+        }
+        summary_df = pd.DataFrame(summary_data)
+
+        # Display summary using rich table (if available) or print raw
+        try:
+            relecov_tools.utils.display_dataframe_to_user(
+                name="JSON Schema Summary",
+                dataframe=summary_df
+            )
+        except AttributeError:
+            print(summary_df.to_string(index=False))
+
+        def shorten_path(path, max_length=50):
+            """Shortens long paths by keeping first and last segments while adding ellipsis in the middle."""
+            if len(path) <= max_length:
+                return path  # No need to shorten
+
+            parts = path.split(os.sep)  # Split into parts
+            if len(parts) > 3:
+                return os.sep.join([parts[0], "..."] + parts[-2:])  # Keep first, last two, and replace middle
+            return path  # If it's already short, return as is
+
+        # Folder containing results
+        outdir_data = {
+            "Description": [
+                "Output Folder",
+                "New JSON Schema",
+                "Old JSON Schema",
+                "Schema Diff File",
+                "Metadata Template File",
+            ],
+            "Path": [
+                shorten_path(self.output_folder),
+                shorten_path(f"{self.output_folder}/relecov_schema.json"),
+                shorten_path(self.base_schema_path),
+                shorten_path(f"{self.output_folder}/build_schema_diff.txt"),
+                shorten_path(f"{self.output_folder}/Relecov_metadata_template_v*.xlsx"),
+            ],
+        }
+
+        # Convert to DataFrame
+        outdir_df = pd.DataFrame(outdir_data)
+
+        # Display summary using rich table or print raw if unavailable
+        try:
+            relecov_tools.utils.display_dataframe_to_user(
+                name="JSON Results Overview",
+                dataframe=outdir_df
+            )
+        except AttributeError:
+            print(outdir_df.to_string(index=False))
+
+
     def handle_build_schema(self):
         # Load xlsx database and convert into json format
         log.info("Start reading xlsx database")
@@ -1013,3 +1112,6 @@ class SchemaBuilder:
         )
         if promp_answ:
             self.create_metadatalab_excel(new_schema_json)
+        
+        # Return new schema
+        return new_schema_json
