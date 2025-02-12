@@ -170,21 +170,33 @@ class SchemaBuilder:
 
         # Iterate over properties in json_data
         for prop_name, prop_features in json_data.items():
-            missing_features = [feature for feature in mandatory_features if feature not in prop_features]
+            missing_features = [
+                feature
+                for feature in mandatory_features
+                if feature not in prop_features
+            ]
             if missing_features:
-                log_errors["missing_features"][prop_name] = missing_features            
+                log_errors["missing_features"][prop_name] = missing_features
 
             # Check for duplicate enum values
             if prop_features.get("enum"):
-                if not pd.isna(prop_features["enum"]): 
-                    enum_values = prop_features["enum"].split(', ')
+                if not pd.isna(prop_features["enum"]):
+                    enum_values = prop_features["enum"].split(", ")
                     # Verify that enum has no duplicates
                     if len(enum_values) != len(set(enum_values)):
-                        duplicates = [value for value in set(enum_values) if enum_values.count(value) > 1]
+                        duplicates = [
+                            value
+                            for value in set(enum_values)
+                            if enum_values.count(value) > 1
+                        ]
                         log_errors["duplicate_enums"][prop_name] = duplicates
 
             # Check date format for properties with type=string and format=date
-            if "type" in prop_features and prop_features["type"] == "string" and prop_features.get("format") == "date":
+            if (
+                "type" in prop_features
+                and prop_features["type"] == "string"
+                and prop_features.get("format") == "date"
+            ):
                 example = prop_features.get("examples")
                 if example:
                     if isinstance(example, datetime):
@@ -204,19 +216,29 @@ class SchemaBuilder:
             stderr.print("[red]\t- Database Validation Failed")
 
             # Convert log_errors dictionary to DataFrame
-            df_errors = pd.DataFrame([
-                {"Error Category": category, "Field": field, "Details": ", ".join(details) if isinstance(details, list) else details}
-                for category, errors in log_errors.items()
-                for field, details in errors.items()
-            ])
+            df_errors = pd.DataFrame(
+                [
+                    {
+                        "Error Category": category,
+                        "Field": field,
+                        "Details": (
+                            ", ".join(details) if isinstance(details, list) else details
+                        ),
+                    }
+                    for category, errors in log_errors.items()
+                    for field, details in errors.items()
+                ]
+            )
 
             # Save errors to file
             error_file_path = f"{self.output_folder}/schema_validation_errors.csv"
-            df_errors.to_csv(error_file_path, index=False, encoding='utf-8')
+            df_errors.to_csv(error_file_path, index=False, encoding="utf-8")
             stderr.print(f"\t- Log errors saved to:\n\t{error_file_path}")
 
             # Ask user whether to continue or stop execution
-            if not relecov_tools.utils.prompt_yn_question("Errors found in database values. Do you want to continue? (Y/N)"):
+            if not relecov_tools.utils.prompt_yn_question(
+                "Errors found in database values. Do you want to continue? (Y/N)"
+            ):
                 return log_errors
         else:
             stderr.print("[green]\t- Database validation passed")
