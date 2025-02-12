@@ -17,6 +17,7 @@ import shutil
 from itertools import islice, product
 from Bio import SeqIO
 from rich.console import Console
+from rich.table import Table
 from datetime import datetime
 from tabulate import tabulate
 import openpyxl.utils
@@ -590,3 +591,33 @@ def get_schema_url():
     schema_path = f"{package_name}/blob/{branch_name}/{package_name.replace('-','_')}/schema/relecov_schema.json"
 
     return f"{base_url}/{schema_path}"
+
+
+def display_dataframe_to_user(name: str, dataframe: pd.DataFrame):
+    """
+    Display a Pandas DataFrame in a formatted table using Rich.
+
+    Args:
+        name (str): Title of the table.
+        dataframe (pd.DataFrame): The DataFrame to display.
+    """
+    console = Console()
+
+    # If DataFrame is empty, show a message
+    if dataframe.empty:
+        console.print(f"[bold red]{name} - No Data Available[/bold red]")
+        return
+
+    # Create a Rich Table
+    table = Table(title=name, show_lines=True)
+
+    # Add columns
+    for col in dataframe.columns:
+        table.add_column(col, justify="left", style="cyan", no_wrap=True)
+
+    # Add rows
+    for _, row in dataframe.iterrows():
+        table.add_row(*[str(value) for value in row])
+
+    # Display the table
+    console.print(table)
