@@ -22,6 +22,7 @@ Code contributions to the release:
 - Improved relecov template generator and version control [#382](https://github.com/BU-ISCIII/relecov-tools/pull/382)
 - Improve "options" interpretation in build-schema and update read-lab-metadata field type [#388](https://github.com/BU-ISCIII/relecov-tools/pull/388)
 - Enhance validation of database definitinon values [#389](https://github.com/BU-ISCIII/relecov-tools/pull/389)
+- Add schema summary method to build-schema module [#391](https://github.com/BU-ISCIII/relecov-tools/pull/391)
 
 #### Fixes
 

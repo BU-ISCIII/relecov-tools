@@ -232,8 +232,7 @@ class SchemaBuilder:
 
             # Provide errors to user in rich table format:
             relecov_tools.utils.display_dataframe_to_user(
-                name="Schema Validation Errors",
-                dataframe=df_errors
+                name="Schema Validation Errors", dataframe=df_errors
             )
             stderr.print(f"\t- Log errors saved to:\n\t{error_file_path}")
 
@@ -1022,8 +1021,7 @@ class SchemaBuilder:
         # Display summary using rich table (if available) or print raw
         try:
             relecov_tools.utils.display_dataframe_to_user(
-                name="JSON Schema Summary",
-                dataframe=summary_df
+                name="JSON Schema Summary", dataframe=summary_df
             )
         except AttributeError:
             print(summary_df.to_string(index=False))
@@ -1035,7 +1033,9 @@ class SchemaBuilder:
 
             parts = path.split(os.sep)  # Split into parts
             if len(parts) > 3:
-                return os.sep.join([parts[0], "..."] + parts[-2:])  # Keep first, last two, and replace middle
+                return os.sep.join(
+                    [parts[0], "..."] + parts[-2:]
+                )  # Keep first, last two, and replace middle
             return path  # If it's already short, return as is
 
         # Folder containing results
@@ -1062,8 +1062,7 @@ class SchemaBuilder:
         # Display summary using rich table or print raw if unavailable
         try:
             relecov_tools.utils.display_dataframe_to_user(
-                name="JSON Results Overview",
-                dataframe=outdir_df
+                name="JSON Results Overview", dataframe=outdir_df
             )
         except AttributeError:
             print(outdir_df.to_string(index=False))
