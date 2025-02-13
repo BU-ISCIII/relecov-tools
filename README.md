@@ -28,6 +28,7 @@ relecov-tools is a set of helper tools for the assembly of the different element
       - [wrapper](#wrapper)
       - [logs-to-excel](#logs-to-excel)
     - [build-schema](#build-schema)
+      - [Mandatory Files](#mandatory-files)
       - [Mandatory Fields](#mandatory-fields)
       - [custom logs](#custom-logs)
     - [Python package mode](#python-package-mode)
@@ -294,13 +295,14 @@ Options:
 ```
 
 ### build-schema
-The `build-schema` module provides functionality to generate and manage JSON Schema files based on database definitions from Excel spreadsheets. It automates the creation of JSON Schemas, including validation, drafting, and comparison with existing schemas.
+The `build-schema` module provides functionality to generate and manage JSON Schema files based on database definitions from Excel spreadsheets. It automates the creation of JSON Schemas, including validation, drafting, and comparison with existing schemas. Uses the generated JSON schema to create a structured Excel template.
 
 ```
 Usage: relecov-tools build-schema [OPTIONS]
 
   Generates and updates JSON Schema files from Excel-based database
   definitions.
+  Uses the generated JSON schema to create a structured Excel template.
 
 Options:
   -i, --input_file PATH     Path to the Excel document containing the database
@@ -316,10 +318,13 @@ Options:
                             schema.org/specification-links
   --version                 Specifies the version of the metadata template to generate.
   -d, --diff BOOLEAN        Prints a changelog/diff between the base and
-                            incoming versions of the schema.
+                            incoming versions of the schema. Required for the generation 
+                            of the JSON schema.
   -o, --out_dir PATH        Path to save output file/s
   --help                    Show this message and exit.
 ```
+#### Mandatory Files
+Prepare in your output folder the latest version of Excel to compile the history of changes. To generate the template and retain the history of modifications or previous versions, the latest template with its change history must be present in the specified output directory (--out_dir).
 
 #### Mandatory Fields
 Ensure that the fields below are properly defined as headers in your Excel sheet (database definition):
@@ -337,7 +342,7 @@ required (Y/N): Indicates if the property is required (Y) or optional (N).
 complex_field (Y/N): Indicates if the property is a complex (nested) field (Y) or a standard field (N).
 ```
 
-#### custom logs
+#### Custom logs
 After executing each of these modules, you may find a custom log report in json format named "DATE_EXECUTED-MODULE_log_summary.json. These custom log summaries can be useful to detect errors in metadata in order to fix them and/or notify the users.
 
 ### Python package mode
