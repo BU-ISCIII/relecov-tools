@@ -556,7 +556,10 @@ class SchemaBuilder:
             stderr.print(
                 "[yellow]Differences found between the existing schema and the newly generated schema."
             )
-            return self.print_save_schema_diff(diff_lines)
+            if self.show_diff:
+                return self.print_save_schema_diff(diff_lines)
+            else:
+                return
 
     def print_save_schema_diff(self, diff_lines=None):
         # Set user's choices
@@ -1092,19 +1095,11 @@ class SchemaBuilder:
         # Verify new schema follows json schema specification rules.
         self.verify_schema(new_schema_json)
 
-        # Compare base vs new schema and saves new JSON schema
-        if self.show_diff:
-            schema_diff = self.get_schema_diff(base_schema_json, new_schema_json)
-        else:
-            schema_diff = None
+        # Compare base vs new schema and print/saves differences (--diff = True)
+        self.get_schema_diff(base_schema_json, new_schema_json)
 
-        if schema_diff:
-            self.save_new_schema(new_schema_json)
-        else:
-            log.info(f"No changes found against base schema ({self.base_schema_path}).")
-            stderr.print(
-                f"[green]No changes found against base schema ({self.base_schema_path})."
-            )
+        # Saves new JSON schema
+        self.save_new_schema(new_schema_json)
 
         # Create metadata lab template
         promp_answ = relecov_tools.utils.prompt_yn_question(
