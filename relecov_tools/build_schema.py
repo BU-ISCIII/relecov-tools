@@ -886,7 +886,9 @@ class SchemaBuilder:
                 ws_metadata = wb["METADATA_LAB"]
                 ws_metadata.freeze_panes = "D1"
                 ws_metadata.delete_rows(5)
-                relecov_tools.assets.schema_utils.metadatalab_template.create_condition(ws_metadata)
+                relecov_tools.assets.schema_utils.metadatalab_template.create_condition(
+                    ws_metadata
+                )
                 ws_dropdowns = (
                     wb.create_sheet("DROPDOWNS")
                     if "DROPDOWNS" not in wb.sheetnames

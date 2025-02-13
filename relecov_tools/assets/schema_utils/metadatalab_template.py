@@ -175,6 +175,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
     except Exception as e:
         stderr.print(f"Error in excel_formater: {e}")
 
+
 def create_condition(ws_metadata):
     """This function creates conditions on METADATA_LAB template sheet"""
     host_age_col = None
@@ -205,9 +206,7 @@ def create_condition(ws_metadata):
             age_validation.add(age_range)
 
         if host_age_months_col:
-            age_months_range = (
-                f"{host_age_months_col}5:{host_age_months_col}1000"
-            )
+            age_months_range = f"{host_age_months_col}5:{host_age_months_col}1000"
             age_months_validation = DataValidation(
                 type="whole",
                 operator="between",
@@ -215,9 +214,7 @@ def create_condition(ws_metadata):
                 formula2="35",
                 showErrorMessage=True,
             )
-            age_months_validation.error = (
-                "El valor debe estar entre 0 y 35 meses."
-            )
+            age_months_validation.error = "El valor debe estar entre 0 y 35 meses."
             age_months_validation.errorTitle = "Valor no permitido"
             ws_metadata.add_data_validation(age_months_validation)
             age_months_validation.add(age_months_range)
@@ -229,7 +226,9 @@ def create_condition(ws_metadata):
                 formula1=f'ISNUMBER(DATEVALUE(TEXT({date_col}5, "yyyy-mm-dd")))',
                 showErrorMessage=True,
             )
-            date_validation.error = "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12)."
+            date_validation.error = (
+                "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12)."
+            )
             date_validation.errorTitle = "Formato de fecha incorrecto"
             ws_metadata.add_data_validation(date_validation)
             date_validation.add(date_range)
