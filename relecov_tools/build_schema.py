@@ -559,7 +559,7 @@ class SchemaBuilder:
             if self.show_diff:
                 return self.print_save_schema_diff(diff_lines)
             else:
-                return
+                return None
 
     def print_save_schema_diff(self, diff_lines=None):
         # Set user's choices
