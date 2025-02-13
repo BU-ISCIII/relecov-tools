@@ -233,4 +233,4 @@ def create_condition(ws_metadata):
             date_validation.errorTitle = "Formato de fecha incorrecto"
             ws_metadata.add_data_validation(date_validation)
             date_validation.add(date_range)
-        return ws_metadata
+    return ws_metadata
