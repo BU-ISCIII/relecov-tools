@@ -261,6 +261,7 @@ class BioinfoMetadata:
             try:
                 files_dict[key]
                 stderr.print(f"[blue]Start processing {self.software_name}.{key}")
+                log.info(f"Start processing {self.software_name}.{key}")
             except KeyError:
                 self.log_report.update_log_report(
                     method_name,
@@ -887,6 +888,7 @@ class BioinfoMetadata:
                 try:
                     file_path = files_dict[key]
                     stderr.print(f"[blue]Processing splitted file: {file_path}")
+                    log.info(f"Processing splitted file: {file_path}")
                 except KeyError:
                     self.log_report.update_log_report(
                         method_name,
