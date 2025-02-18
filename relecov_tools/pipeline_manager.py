@@ -350,6 +350,8 @@ class PipelineManager:
         Returns:
 
         """
+        log.info("Initiating pipeline-manager process")
+
         # collect json with all validated samples
         init_date = datetime.datetime.strptime("20220101", "%Y%m%d").date()
         join_validate, latest_date = self.join_valid_items(

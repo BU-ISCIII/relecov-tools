@@ -931,6 +931,8 @@ class BioinfoMetadata:
         Returns:
             bool: True if the bioinfo file creation process was successful.
         """
+        log.info("Initiating read-bioinfo-metadata process")
+
         # Find and validate bioinfo files
         stderr.print("[blue]Scanning input directory...")
         files_found_dict = self.scann_directory()

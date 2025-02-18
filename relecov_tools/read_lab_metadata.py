@@ -485,6 +485,7 @@ class RelecovMetadata:
         return valid_metadata_rows
 
     def create_metadata_json(self):
+        log.info("Initiating read-lab-metadata process")
         stderr.print("[blue]Reading Lab Metadata Excel File")
         valid_metadata_rows = self.read_metadata_file()
         stderr.print(f"[green]Processed {len(valid_metadata_rows)} valid metadata rows")

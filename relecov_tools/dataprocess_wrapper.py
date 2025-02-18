@@ -256,6 +256,7 @@ class ProcessWrapper:
         and validation modules. The logs from each module are merged into a single log-summary.
         These merged logs are then used to create an excel report of all the processes
         """
+        log.info("Starting with wrapper")
         finished_folders, download_logs = self.exec_download(self.download_params)
         if not finished_folders:
             stderr.print("[red]No valid folders found to process")
