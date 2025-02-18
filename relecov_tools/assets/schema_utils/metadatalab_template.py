@@ -103,7 +103,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                 "text_wrap": False,
                 "valign": "top",
                 "fg_color": "#B9DADE",  # Light blue background
-                "color": "#E05959",  # Red text color
+                "color": "#f60606",  # Red text color
                 "border": 1,
                 "locked": True,
             }
@@ -117,6 +117,13 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                 "valign": "center",
                 "fg_color": "#B9DADE",  # Light blue
                 "border": 1,
+                "locked": True,
+            }
+        )
+
+        cell_formater = workbook.add_format(
+            {
+                "border": 1,  # Apply border to every cell
                 "locked": True,
             }
         )
@@ -138,6 +145,15 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                 except Exception as e:
                     stderr.print(f"Error writing first column at row {row_num}: {e}")
 
+            for row_num in range(1, len(df) + 1):
+                for col_num in range(1, len(df.columns)):
+                    try:
+                        worksheet.write(
+                            row_num, col_num, df.iloc[row_num - 1, col_num], cell_formater
+                        )
+                    except Exception as e:
+                        stderr.print(f"Error writing cell at row {row_num}, column {col_num}: {e}")
+
         if sheet == "METADATA_LAB" or sheet == "DATA_VALIDATION":
             # Write the column headers with the defined format.
             for col_num in range(0, len(df.columns)):
@@ -154,13 +170,13 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                             stderr.print(
                                 f"Error writing first column at row {row_num}: {e}"
                             )
-                        if row_num == 0 and col_num >= 1 and sheet == "METADATA_LAB":
+                        if row_num == 0 and col_num >= 0 and sheet == "METADATA_LAB":
                             try:
                                 worksheet.write(
                                     row_num,
-                                    col_num,
+                                    col_num + 1,
                                     df.iloc[row_num, col_num],
-                                    red_header_formater,  # Apply format
+                                    red_header_formater,
                                 )
                             except Exception as e:
                                 stderr.print(
@@ -175,61 +191,36 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
     except Exception as e:
         stderr.print(f"Error in excel_formater: {e}")
 
-
-def create_condition(ws_metadata):
+def create_condition(ws_metadata, conditions):
     """This function creates conditions on METADATA_LAB template sheet"""
-    host_age_col = None
-    host_age_months_col = None
-    date_columns = []
+    column_map = {}
     for cell in ws_metadata[4]:
-        if cell.value == "Host Age":
-            host_age_col = cell.column_letter
-        elif cell.value == "Host Age Months":
-            host_age_months_col = cell.column_letter
-        elif "Date" in str(cell.value):
-            date_columns.append(cell.column_letter)
-        if host_age_col:
-            age_range = f"{host_age_col}5:{host_age_col}1000"
-            age_validation = DataValidation(
-                type="whole",
-                operator="between",
-                formula1="3",
-                formula2="110",
-                showErrorMessage=True,
-            )
-            age_validation.error = "El valor debe estar entre 3 y 110 años. Si es inferior a 3 debe introducir los meses en la columna [Host Age Months]"
-            age_validation.errorTitle = "Valor no permitido"
-            ws_metadata.add_data_validation(age_validation)
-            age_validation.add(age_range)
+        if cell.value in conditions:
+            column_map[cell.value] = cell.column_letter
 
-            ws_metadata.add_data_validation(age_validation)
-            age_validation.add(age_range)
+    for field, rules in conditions.items():
+        col_letter = column_map.get(field)
+        if col_letter:
+            start_row = rules.get("header_row_idx", 5)
+            end_row = rules.get("max_rows", 1000)
+            validation_type = rules.get("validation_type")
+            formula1 = rules.get("formula1", "").replace("{col_letter}", col_letter)
+            formula2 = rules.get("formula2")
+            error_message = rules.get("error_message", "Valor no permitido")
+            error_title = rules.get("error_title", "Error")
 
-        if host_age_months_col:
-            age_months_range = f"{host_age_months_col}5:{host_age_months_col}1000"
-            age_months_validation = DataValidation(
-                type="whole",
-                operator="between",
-                formula1="0",
-                formula2="35",
-                showErrorMessage=True,
-            )
-            age_months_validation.error = "El valor debe estar entre 0 y 35 meses."
-            age_months_validation.errorTitle = "Valor no permitido"
-            ws_metadata.add_data_validation(age_months_validation)
-            age_months_validation.add(age_months_range)
-
-        for date_col in date_columns:
-            date_range = f"{date_col}5:{date_col}1000"
-            date_validation = DataValidation(
-                type="custom",
-                formula1=f'ISNUMBER(DATEVALUE(TEXT({date_col}5, "yyyy-mm-dd")))',
-                showErrorMessage=True,
-            )
-            date_validation.error = (
-                "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12)."
-            )
-            date_validation.errorTitle = "Formato de fecha incorrecto"
-            ws_metadata.add_data_validation(date_validation)
-            date_validation.add(date_range)
+            cell_range = f"{col_letter}{start_row}:{col_letter}{end_row}"
+            
+            if validation_type:
+                validation = DataValidation(
+                    type=validation_type,
+                    operator=rules.get("operator", "between"),
+                    formula1=formula1,
+                    formula2=formula2,
+                    showErrorMessage=True,
+                )
+                validation.error = error_message
+                validation.errorTitle = error_title
+                ws_metadata.add_data_validation(validation)
+                validation.add(cell_range)
     return ws_metadata
