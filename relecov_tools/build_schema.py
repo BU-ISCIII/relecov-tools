@@ -74,7 +74,7 @@ class SchemaBuilder:
         self.version = version
         if not relecov_tools.utils.validate_semantic_version(self.version):
             raise ValueError("[red]Error: Invalid version format")
-        
+
         # Get version option
         # Parse build-schema configuration
         self.build_schema_json_file = os.path.join(
@@ -82,9 +82,7 @@ class SchemaBuilder:
         )
 
         if project is None:
-            project = relecov_tools.utils.prompt_text(
-                "Write the desired project:"
-            )
+            project = relecov_tools.utils.prompt_text("Write the desired project:")
         self.project = project
 
         available_projects = self.get_available_projects(self.build_schema_json_file)
@@ -93,8 +91,12 @@ class SchemaBuilder:
         if self.project in available_projects:
             self.project_config = build_schema_config.get_configuration(self.project)
         else:
-            log.error(f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}")
-            stderr.print(f"[red]No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}")
+            log.error(
+                f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
+            )
+            stderr.print(
+                f"[red]No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
+            )
             sys.exit(1)
 
         # Validate show diff option
@@ -269,7 +271,7 @@ class SchemaBuilder:
 
         # If no errors found
         return None
-    
+
     def get_available_projects(self, json):
         """Get list of available software in configuration
 
@@ -789,7 +791,7 @@ class SchemaBuilder:
                 log.error(f"Error creating overview sheet: {e}")
                 stderr.print(f"Error creating overview sheet: {e}")
                 return None
-            
+
             # Create Metadata LAB sheet
             try:
                 metadatalab_header = ["REQUERIDO", "EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
@@ -983,10 +985,12 @@ class SchemaBuilder:
                             try:
                                 if len(str(cell.value)) > max_length:
                                     max_length = len(cell.value)
-                            except:
+                            except Exception:
                                 pass
-                        adjusted_width = (max_length + 2)
-                        ws_overview.column_dimensions[column].width = min(adjusted_width, column_width)
+                        adjusted_width = max_length + 2
+                        ws_overview.column_dimensions[column].width = min(
+                            adjusted_width, column_width
+                        )
 
                     # Enable text wrapping for the entire sheet
                     for row in ws_overview.iter_rows():
