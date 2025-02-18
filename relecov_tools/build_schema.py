@@ -38,6 +38,7 @@ class SchemaBuilder:
         show_diff=None,
         out_dir=None,
         version=None,
+        project=None,
     ):
         """
         Initialize the SchemaBuilder class. This class generates a JSON Schema file based on the provided draft version.
@@ -73,6 +74,28 @@ class SchemaBuilder:
         self.version = version
         if not relecov_tools.utils.validate_semantic_version(self.version):
             raise ValueError("[red]Error: Invalid version format")
+        
+        # Get version option
+        # Parse build-schema configuration
+        self.build_schema_json_file = os.path.join(
+            os.path.dirname(__file__), "conf", "build_schema_config.json"
+        )
+
+        if project is None:
+            project = relecov_tools.utils.prompt_text(
+                "Write the desired project:"
+            )
+        self.project = project
+
+        available_projects = self.get_available_projects(self.build_schema_json_file)
+        build_schema_config = ConfigJson(self.build_schema_json_file)
+
+        if self.project in available_projects:
+            self.project_config = build_schema_config.get_configuration(self.project)
+        else:
+            log.error(f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}")
+            stderr.print(f"[red]No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}")
+            sys.exit(1)
 
         # Validate show diff option
         if not show_diff:
@@ -246,6 +269,19 @@ class SchemaBuilder:
 
         # If no errors found
         return None
+    
+    def get_available_projects(self, json):
+        """Get list of available software in configuration
+
+        Args:
+            json (str): Path to bioinfo configuration json file.
+
+        Returns:
+            available_software: List containing available software defined in json.
+        """
+        config = relecov_tools.utils.read_json_file(json)
+        available_software = list(config.keys())
+        return available_software
 
     def read_database_definition(self, sheet_id="main"):
         """Reads the database definition from an Excel sheet and converts it into JSON format.
@@ -720,30 +756,6 @@ class SchemaBuilder:
                 stderr.print(f"Error processing schema properties: {e}")
                 return None
 
-            # Overview sheet
-            try:
-                overview_header = [
-                    "Label name",
-                    "Description",
-                    "Group",
-                    "Mandatory (Y/N)",
-                    "Example",
-                    "METADATA_LAB COLUMN",
-                ]
-                df_overview = pd.DataFrame(
-                    columns=[col_name for col_name in overview_header]
-                )
-                df_overview["Label name"] = df["label"]
-                df_overview["Description"] = df["description"]
-                df_overview["Group"] = df["classification"]
-                df_overview["Mandatory (Y/N)"] = df["required"]
-                df_overview["Example"] = df["examples"].apply(
-                    lambda x: x[0] if isinstance(x, list) else x
-                )
-            except Exception as e:
-                log.error(f"Error creating overview sheet: {e}")
-                stderr.print(f"Error creating overview sheet: {e}")
-                return None
             # Ensure 'header' column exists before filtering
             if "header" in df.columns:
                 df["header"] = df["header"].astype(str).str.strip()
@@ -753,13 +765,40 @@ class SchemaBuilder:
                     "No se encontró la columna 'header', usando df sin filtrar."
                 )
                 df_filtered = df
+
+            # Overview sheet
+            try:
+                overview_header = [
+                    "Label name",
+                    "Description",
+                    "Group",
+                    "Mandatory (Y/N)",
+                    "Example",
+                ]
+                df_overview = pd.DataFrame(
+                    columns=[col_name for col_name in overview_header]
+                )
+                df_overview["Label name"] = df_filtered["label"]
+                df_overview["Description"] = df_filtered["description"]
+                df_overview["Group"] = df_filtered["classification"]
+                df_overview["Mandatory (Y/N)"] = df_filtered["required"]
+                df_overview["Example"] = df_filtered["examples"].apply(
+                    lambda x: x[0] if isinstance(x, list) else x
+                )
+            except Exception as e:
+                log.error(f"Error creating overview sheet: {e}")
+                stderr.print(f"Error creating overview sheet: {e}")
+                return None
+            
             # Create Metadata LAB sheet
             try:
                 metadatalab_header = ["REQUERIDO", "EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
                 df_metadata = pd.DataFrame(
                     columns=[col_name for col_name in metadatalab_header]
                 )
-                df_metadata["REQUERIDO"] = df_filtered["required"]
+                df_metadata["REQUERIDO"] = df_filtered["required"].apply(
+                    lambda x: "YES" if str(x).upper() in ["Y", "YES"] else ""
+                )
                 df_metadata["EJEMPLOS"] = df_filtered["examples"].apply(
                     lambda x: x[0] if isinstance(x, list) else x
                 )
@@ -887,10 +926,10 @@ class SchemaBuilder:
             try:
                 wb = openpyxl.load_workbook(out_file)
                 ws_metadata = wb["METADATA_LAB"]
-                ws_metadata.freeze_panes = "D1"
+                ws_metadata.freeze_panes = "E1"
                 ws_metadata.delete_rows(5)
                 relecov_tools.assets.schema_utils.metadatalab_template.create_condition(
-                    ws_metadata
+                    ws_metadata, self.project_config
                 )
                 ws_dropdowns = (
                     wb.create_sheet("DROPDOWNS")
@@ -936,6 +975,23 @@ class SchemaBuilder:
 
                 if "OVERVIEW" in wb.sheetnames:
                     ws_overview = wb["OVERVIEW"]
+                    column_width = 35
+                    for col in ws_overview.columns:
+                        max_length = 0
+                        column = col[0].column_letter  # Get the column name
+                        for cell in col:
+                            try:
+                                if len(str(cell.value)) > max_length:
+                                    max_length = len(cell.value)
+                            except:
+                                pass
+                        adjusted_width = (max_length + 2)
+                        ws_overview.column_dimensions[column].width = min(adjusted_width, column_width)
+
+                    # Enable text wrapping for the entire sheet
+                    for row in ws_overview.iter_rows():
+                        for cell in row:
+                            cell.alignment = openpyxl.styles.Alignment(wrap_text=True)
                     ws_overview.protection.sheet = True
                     ws_overview.protection.password = "password123"
 
