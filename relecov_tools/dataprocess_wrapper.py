@@ -200,7 +200,9 @@ class ProcessWrapper:
             stderr.print(
                 f"[blue]Cleaning successfully validated files from {remote_dir}"
             )
-            log.info(f"Cleaning successfully validated files from remote dir: {remote_dir}")
+            log.info(
+                f"Cleaning successfully validated files from remote dir: {remote_dir}"
+            )
             file_fields = ("sequence_file_R1_fastq", "sequence_file_R2_fastq")
             valid_sampfiles = [
                 f.get(key) for key in file_fields for f in valid_json_data

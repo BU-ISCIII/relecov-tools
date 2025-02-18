@@ -303,7 +303,7 @@ class RelecovMetadata:
             )
             log.warning(
                 "No ontology could be added in:\n%s",
-                "\n".join(f"{x} - {y} samples" for x, y in ontology_errors.items())
+                "\n".join(f"{x} - {y} samples" for x, y in ontology_errors.items()),
             )
 
         return m_data
