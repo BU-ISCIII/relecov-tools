@@ -245,6 +245,7 @@ class SftpRelecov:
         """
         try:
             self.sftp.remove(file_name)
+            log.info("%s Deleted from remote server", file_name)
             return True
         except FileNotFoundError:
             log.error("File %s not found", file_name)
