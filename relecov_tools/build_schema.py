@@ -288,8 +288,8 @@ class SchemaBuilder:
         """
         config = relecov_tools.utils.read_json_file(json)
         # available_software = list(config.keys())
-        vailable_projects = list(config.get("projects", {}).keys())
-        return vailable_projects
+        available_projects = list(config.get("projects", {}).keys())
+        return available_projects
 
     def read_database_definition(self, sheet_id="main"):
         """Reads the database definition from an Excel sheet and converts it into JSON format.
