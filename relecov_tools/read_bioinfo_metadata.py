@@ -80,6 +80,7 @@ class BioinfoMetadata:
         output_folder=None,
         software=None,
     ):
+        log.info("Initiating read-bioinfo-metadata process")
         # Init process log
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
@@ -931,7 +932,6 @@ class BioinfoMetadata:
         Returns:
             bool: True if the bioinfo file creation process was successful.
         """
-        log.info("Initiating read-bioinfo-metadata process")
 
         # Find and validate bioinfo files
         stderr.print("[blue]Scanning input directory...")

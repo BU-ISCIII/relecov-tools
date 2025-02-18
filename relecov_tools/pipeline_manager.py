@@ -28,6 +28,7 @@ class PipelineManager:
         pipeline_conf_file=None,
         folder_list=None,
     ):
+        log.info("Initiating pipeline-manager process")
         self.current_date = datetime.date.today().strftime("%Y%m%d")
         if input_folder is None:
             self.input_folder = relecov_tools.utils.prompt_path(
@@ -350,8 +351,6 @@ class PipelineManager:
         Returns:
 
         """
-        log.info("Initiating pipeline-manager process")
-
         # collect json with all validated samples
         init_date = datetime.datetime.strptime("20220101", "%Y%m%d").date()
         join_validate, latest_date = self.join_valid_items(

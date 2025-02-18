@@ -31,6 +31,7 @@ class SchemaValidation:
     ):
         """Validate json file against the schema"""
         config_json = ConfigJson()
+        log.info("Initiating validation process")
         if json_schema_file is None:
             schema_name = config_json.get_topic_data("json_schemas", "relecov_schema")
             json_schema_file = os.path.join(
@@ -268,7 +269,6 @@ class SchemaValidation:
         """Validate samples from metadata, create an excel with invalid samples,
         and a json file with the validated ones
         """
-        log.info("Initiating validation process")
         self.validate_schema()
         valid_json_data, invalid_json = self.validate_instances()
         if not invalid_json:
