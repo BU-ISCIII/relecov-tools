@@ -8,6 +8,7 @@
             "collector_name": "Not Provided"
         },
         "metadata_lab_heading": [
+            "Organism",
             "Public Health sample id (SIVIES)",
             "Sample ID given by originating laboratory",
             "Sample ID given by the submitting laboratory",
