@@ -931,7 +931,7 @@ class SchemaBuilder:
                 ws_metadata.freeze_panes = "E1"
                 ws_metadata.delete_rows(5)
                 relecov_tools.assets.schema_utils.metadatalab_template.create_condition(
-                    ws_metadata, self.project_config
+                    ws_metadata, self.project_config, df_filtered
                 )
                 ws_dropdowns = (
                     wb.create_sheet("DROPDOWNS")

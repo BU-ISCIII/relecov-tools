@@ -1,6 +1,6 @@
 {
-    "viralrecon": {
-        "Host Age Years": {
+    "relecov": {
+        "host_age_years": {
             "header_row_idx": 5,
             "max_rows": 1000,
             "validation_type": "whole",
@@ -10,7 +10,7 @@
             "error_message": "El valor debe estar entre 3 y 110 años. Si es inferior a 3 años, debe rellenar la siguiente columna: [Host Age Months].",
             "error_title": "Valor no permitido"
         },
-        "Host Age Months": {
+        "host_age_months": {
             "header_row_idx": 5,
             "max_rows": 1000,
             "validation_type": "whole",
@@ -20,7 +20,7 @@
             "error_message": "El valor debe estar entre 0 y 35 meses.",
             "error_title": "Valor no permitido"
         },
-        "Sample Collection Date": {
+        "sample_collection_date": {
             "header_row_idx": 5,
             "max_rows": 1000,
             "validation_type": "custom",
@@ -28,7 +28,7 @@
             "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
             "error_title": "Formato de fecha incorrecto"
         },
-        "Sample Received Date": {
+        "sample_received_date": {
             "header_row_idx": 5,
             "max_rows": 1000,
             "validation_type": "custom",
@@ -36,7 +36,7 @@
             "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
             "error_title": "Formato de fecha incorrecto"
         },
-        "Sequencing Date": {
+        "sequencing_date": {
             "header_row_idx": 5,
             "max_rows": 1000,
             "validation_type": "custom",
@@ -46,7 +46,7 @@
         }
     },
     "mepram": {
-        "Host Age Test": {
+        "host_age_test": {
             "header_row_idx": 5,
             "max_rows": 1000,
             "validation_type": "whole",
@@ -54,16 +54,6 @@
             "formula1": "3",
             "formula2": "110",
             "error_message": "El valor debe estar entre 3 y 110 años.",
-            "error_title": "Valor no permitido"
-        },
-        "Host Age Months Test": {
-            "header_row_idx": 5,
-            "max_rows": 1000,
-            "validation_type": "whole",
-            "operator": "between",
-            "formula1": "0",
-            "formula2": "35",
-            "error_message": "El valor debe estar entre 0 y 35 meses.",
             "error_title": "Valor no permitido"
         }
     }

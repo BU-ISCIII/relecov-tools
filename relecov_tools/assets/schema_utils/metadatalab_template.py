@@ -197,15 +197,18 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
         stderr.print(f"Error in excel_formater: {e}")
 
 
-def create_condition(ws_metadata, conditions):
+def create_condition(ws_metadata, conditions, df_filtered):
     """This function creates conditions on METADATA_LAB template sheet"""
+    label_to_property = dict(zip(df_filtered["label"], df_filtered["property_id"]))
     column_map = {}
-    for cell in ws_metadata[4]:
-        if cell.value in conditions:
-            column_map[cell.value] = cell.column_letter
 
-    for field, rules in conditions.items():
-        col_letter = column_map.get(field)
+    for cell in ws_metadata[4]:
+        property_id = label_to_property.get(cell.value)
+        if property_id in conditions:
+            column_map[property_id] = cell.column_letter
+
+    for property_id, rules in conditions.items():
+        col_letter = column_map.get(property_id)
         if col_letter:
             start_row = rules.get("header_row_idx", 5)
             end_row = rules.get("max_rows", 1000)
