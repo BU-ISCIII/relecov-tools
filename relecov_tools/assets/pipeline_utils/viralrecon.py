@@ -93,6 +93,7 @@ class LongTableParse:
             lines = fh.readlines()
 
         stderr.print("[green]\tSuccessful checking heading fields")
+        log.info("Successful checking heading fields")
         heading_index = {}
         headings_from_csv = lines[0].strip().split(",")
         for heading in self.long_table_heading.values():
@@ -128,6 +129,7 @@ class LongTableParse:
                 variant_dict["Gene"] = line_s[heading_index["GENE"]]
                 samp_dict[sample].append(variant_dict)
         stderr.print("[green]\tSuccessful parsing data")
+        log.info("Successful parsing long table data")
         return samp_dict
 
     def convert_to_json(self, samp_dict):
@@ -186,6 +188,7 @@ class LongTableParse:
                 stderr.print(
                     "[green]\tParsed data successfully saved to file:", file_path
                 )
+                log.info("Parsed data successfully saved to file: %s", file_path)
             except Exception as e:
                 stderr.print("[red]\tError saving parsed data to file:", str(e))
                 log.error("Error saving parsed data to file: %s", e)
@@ -196,6 +199,7 @@ class LongTableParse:
                 stderr.print(
                     "[green]\tParsed data successfully saved to file:", file_path
                 )
+                log.info("Parsed data successfully saved to file: %s", file_path)
             except Exception as e:
                 stderr.print("[red]\tError saving parsed data to file:", str(e))
                 log.error("Error saving parsed data to file: %s", e)
@@ -385,6 +389,7 @@ def parse_long_table(files_list, batch_date, output_folder=None):
         # Saving long table data into a file
         long_table.save_to_file(long_table_data, batch_date)
         stderr.print("[green]\tProcess completed")
+        log.info("Long table process completed")
     elif len(files_list) > 1:
         method_log_report.update_log_report(
             method_name,
