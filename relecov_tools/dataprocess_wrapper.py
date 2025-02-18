@@ -67,6 +67,7 @@ class ProcessWrapper:
         module_args.remove("self")
         module_valid_params = {x: y for x, y in params.items() if x in module_args}
         if not module_valid_params:
+            log.error(f"Invalid params for {module} in config file")
             stderr.print(f"[red]Invalid params for {module} in config file")
             sys.exit(1)
         return module_valid_params
@@ -184,6 +185,7 @@ class ProcessWrapper:
             key_name=key, logs_list=[{key: folder_logs}, read_meta_logs, validate_logs]
         )
         stderr.print(f"[green]Merged logs from all processes in {local_folder}")
+        log.info(f"Merged logs from all processes in {local_folder}")
         sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(key)
         sftp_dirs_paths = [os.path.join(key, d) for d in sftp_dirs]
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
@@ -198,7 +200,7 @@ class ProcessWrapper:
             stderr.print(
                 f"[blue]Cleaning successfully validated files from {remote_dir}"
             )
-            log.info("Cleaning successfully validated files from remote dir")
+            log.info(f"Cleaning successfully validated files from remote dir: {remote_dir}")
             file_fields = ("sequence_file_R1_fastq", "sequence_file_R2_fastq")
             valid_sampfiles = [
                 f.get(key) for key in file_fields for f in valid_json_data
@@ -260,8 +262,10 @@ class ProcessWrapper:
         finished_folders, download_logs = self.exec_download(self.download_params)
         if not finished_folders:
             stderr.print("[red]No valid folders found to process")
+            log.error("No valid folders found to process")
             sys.exit(1)
         stderr.print(f"[blue]Processing {len(finished_folders)} downloaded folders...")
+        log.info(f"Processing {len(finished_folders)} downloaded folders.")
         counter = 0
         for key, folder_logs in download_logs.items():
             folder = folder_logs.get("path")
