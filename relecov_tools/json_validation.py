@@ -54,6 +54,7 @@ class SchemaValidation:
         # Read and check json to validate file
         if not os.path.isfile(json_data_file):
             stderr.print("[red] Json file does not exists")
+            log.error("Json file does not exists")
             sys.exit(1)
         self.json_data_file = json_data_file
         out_path = os.path.dirname(os.path.realpath(self.json_data_file))
@@ -63,10 +64,13 @@ class SchemaValidation:
         )
 
         stderr.print("[blue] Reading the json file")
+        log.info("Reading the json file")
         self.json_data = relecov_tools.utils.read_json_file(json_data_file)
         if isinstance(self.json_data, dict):
             stderr.print(f"[red]Invalid json file content in {json_data_file}.")
             stderr.print("Should be a list of dicts. Create it with read-lab-metadata")
+            log.error(f"[red]Invalid json file content in {json_data_file}.")
+            log.error("Should be a list of dicts. Create it with read-lab-metadata")
             sys.exit(1)
         self.metadata = metadata
         try:
@@ -123,6 +127,7 @@ class SchemaValidation:
             log_text = f"Logs keys set to None. Reason: {self.SAMPLE_FIELD_ERROR}"
             self.logsum.add_warning(sample=self.sample_id_field, entry=log_text)
         stderr.print("[blue] Start processing the json file")
+        log.info("Start processing the json file")
         for item_row in self.json_data:
             # validate(instance=item_row, schema=json_schema)
             sample_id_value = item_row.get(self.sample_id_field)
@@ -158,6 +163,7 @@ class SchemaValidation:
         stderr.print("[blue] --------------------")
         stderr.print("[blue] VALIDATION SUMMARY")
         stderr.print("[blue] --------------------")
+        log.info("Validation summary:")
         for error_type in errors.keys():
             num_of_errors = str(errors[error_type])
             field_with_error = str(error_keys[error_type])
@@ -196,6 +202,7 @@ class SchemaValidation:
             sys.exit(1)
         sample_list = []
         stderr.print("Start preparation of invalid samples")
+        log.info("Start preparation of invalid samples")
         for row in invalid_json:
             sample_list.append(str(row[self.sample_id_field]))
         wb = openpyxl.load_workbook(metadata)
@@ -239,6 +246,7 @@ class SchemaValidation:
         os.makedirs(out_folder, exist_ok=True)
         new_name = "invalid_" + os.path.basename(metadata)
         m_file = os.path.join(out_folder, new_name)
+        log.info("Saving excel file with the invalid samples")
         stderr.print("Saving excel file with the invalid samples")
         wb.save(m_file)
         return
@@ -252,7 +260,7 @@ class SchemaValidation:
         """
         file_name = "_".join(["validated", os.path.basename(self.json_data_file)])
         file_path = os.path.join(out_folder, file_name)
-        log.info("Saving Json file with the validated samples as %s", file_name)
+        log.info("Saving Json file with the validated samples in %s", file_path)
         relecov_tools.utils.write_json_fo_file(valid_json_data, file_path)
         return
 
@@ -265,6 +273,7 @@ class SchemaValidation:
         valid_json_data, invalid_json = self.validate_instances()
         if not invalid_json:
             stderr.print("[green]Sucessful validation, no invalid file created!!")
+            log.info("Sucessful validation, no invalid file created.")
         else:
             log_text = "Summary: %s valid and %s invalid samples"
             self.logsum.add_warning(
