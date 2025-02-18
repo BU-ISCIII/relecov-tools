@@ -260,6 +260,7 @@ class SchemaValidation:
         """Validate samples from metadata, create an excel with invalid samples,
         and a json file with the validated ones
         """
+        log.info("Initiating validation process")
         self.validate_schema()
         valid_json_data, invalid_json = self.validate_instances()
         if not invalid_json:
