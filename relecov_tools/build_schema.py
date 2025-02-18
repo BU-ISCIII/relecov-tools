@@ -86,10 +86,13 @@ class SchemaBuilder:
         self.project = project
 
         available_projects = self.get_available_projects(self.build_schema_json_file)
+
         build_schema_config = ConfigJson(self.build_schema_json_file)
+        config_data = build_schema_config.get_configuration("projects")  # Obtener solo la sección "projects"
+        self.configurables = config_data.get("configurables", {})
 
         if self.project in available_projects:
-            self.project_config = build_schema_config.get_configuration(self.project)
+            self.project_config = config_data.get(self.project, {})
         else:
             log.error(
                 f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
@@ -282,8 +285,9 @@ class SchemaBuilder:
             available_software: List containing available software defined in json.
         """
         config = relecov_tools.utils.read_json_file(json)
-        available_software = list(config.keys())
-        return available_software
+       #available_software = list(config.keys())
+        vailable_projects = list(config.get("projects", {}).keys())
+        return vailable_projects
 
     def read_database_definition(self, sheet_id="main"):
         """Reads the database definition from an Excel sheet and converts it into JSON format.
@@ -928,7 +932,7 @@ class SchemaBuilder:
             try:
                 wb = openpyxl.load_workbook(out_file)
                 ws_metadata = wb["METADATA_LAB"]
-                ws_metadata.freeze_panes = "E1"
+                ws_metadata.freeze_panes = self.configurables.get("freeze_panel", "D1")
                 ws_metadata.delete_rows(5)
                 relecov_tools.assets.schema_utils.metadatalab_template.create_condition(
                     ws_metadata, self.project_config, df_filtered
@@ -996,18 +1000,19 @@ class SchemaBuilder:
                     for row in ws_overview.iter_rows():
                         for cell in row:
                             cell.alignment = openpyxl.styles.Alignment(wrap_text=True)
+
                     ws_overview.protection.sheet = True
-                    ws_overview.protection.password = "password123"
+                    ws_overview.protection.password = self.configurables.get("protection.password", "")
 
                 if "DATA_VALIDATION" in wb.sheetnames:
                     ws_data_validation = wb["DATA_VALIDATION"]
                     ws_data_validation.protection.sheet = True
-                    ws_data_validation.protection.password = "password123"
+                    ws_data_validation.protection.password = self.configurables.get("protection.password", "")
 
                 if "VERSION" in wb.sheetnames:
                     ws_data_validation = wb["VERSION"]
                     ws_data_validation.protection.sheet = True
-                    ws_data_validation.protection.password = "password123"
+                    ws_data_validation.protection.password = self.configurables.get("protection.password", "")
 
                     ws_version = wb["VERSION"]
                     column_widths = []
