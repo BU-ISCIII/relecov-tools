@@ -1,6 +1,6 @@
 {
     "viralrecon": {
-        "Host Age": {
+        "Host Age Years": {
             "header_row_idx": 5,
             "max_rows": 1000,
             "validation_type": "whole",
