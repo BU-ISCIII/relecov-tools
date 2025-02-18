@@ -25,9 +25,11 @@ Code contributions to the release:
 - Add schema summary method to build-schema module [#391](https://github.com/BU-ISCIII/relecov-tools/pull/391)
 - Implement conditioning on Host_Age and Host_Age_Months [#392](https://github.com/BU-ISCIII/relecov-tools/pull/392)
 - Fix schema generation dependence on --diff parameter [#394](https://github.com/BU-ISCIII/relecov-tools/pull/392)
-- Update template conditions project dependent [#394](https://github.com/BU-ISCIII/relecov-tools/pull/392)
+- Update template conditions project dependent [#404](https://github.com/BU-ISCIII/relecov-tools/pull/404)
 
 #### Fixes
+
+- Fix linting when Pull Request is closed [#404](https://github.com/BU-ISCIII/relecov-tools/pull/404)
 
 #### Changed
 
