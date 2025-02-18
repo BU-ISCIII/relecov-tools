@@ -48,6 +48,7 @@ class DownloadManager:
         target_folders=None,
     ):
         """Initializes the sftp object"""
+        log.info("Initiating download process")
         config_json = ConfigJson()
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
@@ -1061,7 +1062,6 @@ class DownloadManager:
         Args:
             target_folders (dict): dictionary
         """
-        log.info("Initiating download process")
         main_folder = self.platform_storage_folder
         try:
             os.makedirs(main_folder, exist_ok=True)
