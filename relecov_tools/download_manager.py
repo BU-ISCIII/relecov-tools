@@ -387,6 +387,7 @@ class DownloadManager:
                 try:
                     s_name = str(row[index_sampleID]).strip()
                 except ValueError as e:
+                    log.error("Unable to convert to string. %s", e)
                     stderr.print("[red]Unable to convert to string. ", e)
                     continue
                 if s_name in sample_file_dict:
@@ -399,7 +400,7 @@ class DownloadManager:
                     self.include_error(error_text % str(row[index_sampleID]), s_name)
                     row_complete = False
                 if row[index_layout] == "Single" and row[index_fastq_r2] is not None:
-                    error_text = "Sample %s is single-end, but R1&R2 given"
+                    error_text = "Sample %s is single-end, but R1 and R2 were given"
                     self.include_error(error_text % str(row[index_sampleID]), s_name)
                     row_complete = False
                 if row_complete:
@@ -556,6 +557,7 @@ class DownloadManager:
             raise FileNotFoundError(
                 "No files from metadata found in %s" % remote_folder
             )
+        log.info("Finished validating files based on metadata")
         stderr.print("[blue]Finished validating files based on metadata")
         return sample_files_dict, local_meta_file
 
@@ -567,6 +569,7 @@ class DownloadManager:
             files (list(str), optional): list of target filenames in remote repository
             skip_seqs (bool, optional): Skip sequencing files based on extension
         """
+        log.info(f"Deleting files in remote {remote_folder}.")
         stderr.print(f"[blue]Deleting files in remote {remote_folder}...")
         if files is None:
             files_to_remove = self.relecov_sftp.get_file_list(remote_folder)
@@ -580,7 +583,6 @@ class DownloadManager:
                 self.relecov_sftp.remove_file(
                     os.path.join(remote_folder, os.path.basename(file))
                 )
-                log.info("%s Deleted from remote server", file)
             except (IOError, PermissionError) as e:
                 log.error(f"Could not delete remote file {file}: {e}")
                 stderr.print(f"Could not delete remote file {file}. Error: {e}")
@@ -1049,7 +1051,6 @@ class DownloadManager:
                 if not corrupted:
                     error_text = "Sample %s skipped: missing files in sftp"
                     self.include_error(str(error_text % sample), sample=sample)
-                log.error(str(error_text % sample))
                 del processed_dict[sample]
         return processed_dict
 
@@ -1087,7 +1088,7 @@ class DownloadManager:
                     folder, local_folder
                 )
             except (FileNotFoundError, IOError, PermissionError, MetadataError) as fail:
-                log.error(fail)
+                log.error("%s, skipped", fail)
                 stderr.print(f"[red]{fail}, skipped")
                 self.include_error(fail)
                 continue
@@ -1119,6 +1120,7 @@ class DownloadManager:
                 )
                 # try to download the files again to discard errors during download
                 if corrupted:
+                    log.info("Found md5 mismatches, downloading again.")
                     stderr.print("[gold1]Found md5 mismatches, downloading again...")
                     self.get_remote_folder_files(folder, local_folder, corrupted)
                     saved_files, corrupted = self.verify_md5_checksum(
@@ -1236,6 +1238,7 @@ class DownloadManager:
                     )
                 except Exception as e:
                     log.error("Could not create logsum for %s: %s" % (folder, str(e)))
+            log.info(f"Finished processing {folder}")
             stderr.print(f"[green]Finished processing {folder}")
             self.finished_folders[folder] = list(files_md5_dict.keys())
         return
@@ -1266,6 +1269,7 @@ class DownloadManager:
                 self.current_folder = folder
                 self.delete_remote_files(folder)
                 self.clean_remote_folder(folder)
+                log.info(f"Delete process finished in {folder}")
                 stderr.print(f"Delete process finished in {folder}")
         else:
             target_folders, processed_folders = self.merge_subfolders(target_folders)
@@ -1290,5 +1294,7 @@ class DownloadManager:
                 self.delete_remote_files(folder, skip_seqs=True)
                 self.clean_remote_folder(folder)
                 stderr.print(f"Delete process finished in remote {folder}")
+                log.info(f"Delete process finished in remote {folder}")
+        log.info("Finished download module execution")
         stderr.print("Finished execution")
         return
