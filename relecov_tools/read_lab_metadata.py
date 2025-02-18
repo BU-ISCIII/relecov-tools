@@ -44,8 +44,10 @@ class RelecovMetadata:
 
         if sample_list_file is None:
             stderr.print("[yellow]No samples_data.json file provided")
+            log.error("No samples_data.json file provided")
             if not os.path.isdir(str(files_folder)):
                 stderr.print("[red]No samples file nor valid files folder provided")
+                log.error("No samples file nor valid files folder provided")
                 sys.exit(1)
             self.files_folder = os.path.abspath(files_folder)
 
@@ -298,6 +300,11 @@ class RelecovMetadata:
                 "[red] No ontology could be added in:\n",
                 "\n".join({f"{x} - {y} samples" for x, y in ontology_errors.items()}),
             )
+            log.warning(
+                "No ontology could be added in:\n%s",
+                "\n".join(f"{x} - {y} samples" for x, y in ontology_errors.items())
+            )
+
         return m_data
 
     def process_from_json(self, m_data, json_fields):
@@ -338,15 +345,18 @@ class RelecovMetadata:
 
         for key, values in self.json_req_files.items():
             stderr.print(f"[blue]Processing {key}")
+            log.info(f"Processing {key}")
             f_path = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "conf", values["file"]
             )
             values["j_data"] = relecov_tools.utils.read_json_file(f_path)
             metadata = self.process_from_json(metadata, values)
             stderr.print(f"[green]Processed {key}")
+            log.info(f"Processed {key}")
 
         # Include Sample information data from sample json file
         stderr.print("[blue]Processing sample data file")
+        log.info("Processing sample data file")
         s_json = {}
         # TODO: Change sequencing_sample_id for some unique ID used in RELECOV database
         s_json["map_field"] = "sequencing_sample_id"
@@ -357,6 +367,7 @@ class RelecovMetadata:
             s_json["j_data"] = self.get_samples_files_data(metadata)
         metadata = self.process_from_json(metadata, s_json)
         stderr.print("[green]Processed sample data file.")
+        log.info("Processed sample data file.")
         return metadata
 
     def read_configuration_json_files(self):
@@ -391,6 +402,7 @@ class RelecovMetadata:
             sample_id_col = self.metadata_processing.get("alternative_sample_id_col")
             logtxt = f"No excel sheet named {meta_sheet}. Using {alt_sheet}"
             stderr.print(f"[yellow]{logtxt}")
+            log.error(f"{logtxt}")
             ws_metadata_lab, heading_row_number = relecov_tools.utils.read_excel_file(
                 self.metadata_file, alt_sheet, header_flag, leave_empty=False
             )
@@ -489,6 +501,7 @@ class RelecovMetadata:
         stderr.print("[blue]Reading Lab Metadata Excel File")
         valid_metadata_rows = self.read_metadata_file()
         stderr.print(f"[green]Processed {len(valid_metadata_rows)} valid metadata rows")
+        log.info(f"Processed {len(valid_metadata_rows)} valid metadata rows")
         clean_metadata_rows, missing_samples = self.match_to_json(valid_metadata_rows)
         if missing_samples:
             num_miss = len(missing_samples)
@@ -497,9 +510,11 @@ class RelecovMetadata:
             stderr.print(f"[yellow]{num_miss} samples missing:\n{missing_samples}")
         # Continue by adding extra information
         stderr.print("[blue]Including additional information")
+        log.info("Including additional information")
 
         extended_metadata = self.adding_fields(clean_metadata_rows)
         stderr.print("[blue]Including post processing information")
+        log.info("Including post processing information")
         extended_metadata = self.adding_post_processing(extended_metadata)
         extended_metadata = self.adding_copy_from_other_field(extended_metadata)
         extended_metadata = self.adding_fixed_fields(extended_metadata)
@@ -513,5 +528,6 @@ class RelecovMetadata:
         os.makedirs(self.output_folder, exist_ok=True)
         self.logsum.create_error_summary(called_module="read-lab-metadata")
         file_path = os.path.join(self.output_folder, file_name)
+        log.info("Writting output json file %s", file_path)
         relecov_tools.utils.write_json_fo_file(completed_metadata, file_path)
         return True
