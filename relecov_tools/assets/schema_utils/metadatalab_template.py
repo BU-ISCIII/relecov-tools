@@ -149,10 +149,15 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                 for col_num in range(1, len(df.columns)):
                     try:
                         worksheet.write(
-                            row_num, col_num, df.iloc[row_num - 1, col_num], cell_formater
+                            row_num,
+                            col_num,
+                            df.iloc[row_num - 1, col_num],
+                            cell_formater,
                         )
                     except Exception as e:
-                        stderr.print(f"Error writing cell at row {row_num}, column {col_num}: {e}")
+                        stderr.print(
+                            f"Error writing cell at row {row_num}, column {col_num}: {e}"
+                        )
 
         if sheet == "METADATA_LAB" or sheet == "DATA_VALIDATION":
             # Write the column headers with the defined format.
@@ -191,6 +196,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
     except Exception as e:
         stderr.print(f"Error in excel_formater: {e}")
 
+
 def create_condition(ws_metadata, conditions):
     """This function creates conditions on METADATA_LAB template sheet"""
     column_map = {}
@@ -210,7 +216,7 @@ def create_condition(ws_metadata, conditions):
             error_title = rules.get("error_title", "Error")
 
             cell_range = f"{col_letter}{start_row}:{col_letter}{end_row}"
-            
+
             if validation_type:
                 validation = DataValidation(
                     type=validation_type,
