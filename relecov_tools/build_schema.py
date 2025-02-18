@@ -88,7 +88,9 @@ class SchemaBuilder:
         available_projects = self.get_available_projects(self.build_schema_json_file)
 
         build_schema_config = ConfigJson(self.build_schema_json_file)
-        config_data = build_schema_config.get_configuration("projects")  # Obtener solo la sección "projects"
+        config_data = build_schema_config.get_configuration(
+            "projects"
+        )  # Obtener solo la sección "projects"
         self.configurables = config_data.get("configurables", {})
 
         if self.project in available_projects:
@@ -285,7 +287,7 @@ class SchemaBuilder:
             available_software: List containing available software defined in json.
         """
         config = relecov_tools.utils.read_json_file(json)
-       #available_software = list(config.keys())
+        # available_software = list(config.keys())
         vailable_projects = list(config.get("projects", {}).keys())
         return vailable_projects
 
@@ -1002,17 +1004,23 @@ class SchemaBuilder:
                             cell.alignment = openpyxl.styles.Alignment(wrap_text=True)
 
                     ws_overview.protection.sheet = True
-                    ws_overview.protection.password = self.configurables.get("protection.password", "")
+                    ws_overview.protection.password = self.configurables.get(
+                        "protection.password", ""
+                    )
 
                 if "DATA_VALIDATION" in wb.sheetnames:
                     ws_data_validation = wb["DATA_VALIDATION"]
                     ws_data_validation.protection.sheet = True
-                    ws_data_validation.protection.password = self.configurables.get("protection.password", "")
+                    ws_data_validation.protection.password = self.configurables.get(
+                        "protection.password", ""
+                    )
 
                 if "VERSION" in wb.sheetnames:
                     ws_data_validation = wb["VERSION"]
                     ws_data_validation.protection.sheet = True
-                    ws_data_validation.protection.password = self.configurables.get("protection.password", "")
+                    ws_data_validation.protection.password = self.configurables.get(
+                        "protection.password", ""
+                    )
 
                     ws_version = wb["VERSION"]
                     column_widths = []
