@@ -707,13 +707,14 @@ def pipeline_manager(input, template, output, config, folder_names):
     help="Prints a changelog/diff between the base and incoming versions of the schema.",
 )
 @click.option("--version", help="Specify the schema version.")
+@click.option("-p", "--project", help="Specficy the project to build the metadata template.")
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file/s")
-def build_schema(input_file, schema_base, draft_version, diff, out_dir, version):
+def build_schema(input_file, schema_base, draft_version, diff, out_dir, version, project):
     """Generates and updates JSON Schema files from Excel-based database definitions."""
     # Build new schema
     try:
         schema_update = relecov_tools.build_schema.SchemaBuilder(
-            input_file, schema_base, draft_version, diff, out_dir, version
+            input_file, schema_base, draft_version, diff, out_dir, version, project
         )
 
         # Build new schema
