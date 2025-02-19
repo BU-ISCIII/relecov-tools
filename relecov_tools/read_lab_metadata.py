@@ -236,8 +236,8 @@ class RelecovMetadata:
                 m_data[idx]["tax_id"] = organism_mapping[organism]["tax_id"]
                 m_data[idx]["host_disease"] = organism_mapping[organism]["host_disease"]
             else:
-                m_data[idx]["tax_id"] = "Unknown [LOINC:LA4489-6]"
-                m_data[idx]["host_disease"] = "Unknown [LOINC:LA4489-6]"
+                m_data[idx]["tax_id"] = "Unknown [SNOMED:261665006]"
+                m_data[idx]["host_disease"] = "Unknown [SNOMED:261665006]"
             for key, value in p_data.items():
                 m_data[idx][key] = value
             m_data[idx]["schema_name"] = self.schema_name
