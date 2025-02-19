@@ -54,8 +54,8 @@ class SchemaValidation:
 
         # Read and check json to validate file
         if not os.path.isfile(json_data_file):
-            stderr.print("[red] Json file does not exists")
-            log.error("Json file does not exists")
+            stderr.print("[red] Json file does not exist")
+            log.error("Json file does not exist")
             sys.exit(1)
         self.json_data_file = json_data_file
         out_path = os.path.dirname(os.path.realpath(self.json_data_file))

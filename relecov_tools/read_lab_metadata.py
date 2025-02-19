@@ -45,7 +45,7 @@ class RelecovMetadata:
 
         if sample_list_file is None:
             stderr.print("[yellow]No samples_data.json file provided")
-            log.error("No samples_data.json file provided")
+            log.warning("No samples_data.json file provided")
             if not os.path.isdir(str(files_folder)):
                 stderr.print("[red]No samples file nor valid files folder provided")
                 log.error("No samples file nor valid files folder provided")
