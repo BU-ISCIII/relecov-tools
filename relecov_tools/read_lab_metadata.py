@@ -226,7 +226,16 @@ class RelecovMetadata:
     def adding_fixed_fields(self, m_data):
         """Include fixed data that are always the same for every sample"""
         p_data = self.configuration.get_topic_data("lab_metadata", "fixed_fields")
+        organism_mapping = self.configuration.get_topic_data("lab_metadata", "organism_mapping")
+
         for idx in range(len(m_data)):
+            organism = m_data[idx].get("organism", "")
+            if organism in organism_mapping:
+                m_data[idx]["tax_id"] = organism_mapping[organism]["tax_id"]
+                m_data[idx]["host_disease"] = organism_mapping[organism]["host_disease"]
+            else:
+                m_data[idx]["tax_id"] = "Unknown"
+                m_data[idx]["host_disease"] = "Unknown"
             for key, value in p_data.items():
                 m_data[idx][key] = value
             m_data[idx]["schema_name"] = self.schema_name
@@ -285,16 +294,16 @@ class RelecovMetadata:
         for idx in range(len(m_data)):
             for key, e_values in enum_dict.items():
                 if key in m_data[idx]:
-                    if m_data[idx][key] in e_values:
-                        m_data[idx][key] = e_values[m_data[idx][key]]
+                    current_value = m_data[idx][key]
+                    if re.search(r" \[\w+:.*\]$", current_value):
+                        continue  # If already has ontology, do nothing.
+                    if current_value in e_values:
+                        m_data[idx][key] = e_values[current_value]
                     else:
                         sample_id = m_data[idx]["sequencing_sample_id"]
-                        log_text = f"No ontology found for {m_data[idx][key]} in {key}"
+                        log_text = f"No ontology found for {current_value} in {key}"
                         self.logsum.add_warning(sample=sample_id, entry=log_text)
-                        try:
-                            ontology_errors[key] += 1
-                        except KeyError:
-                            ontology_errors[key] = 1
+                        ontology_errors[key] = ontology_errors.get(key, 0) + 1
                         continue
         if len(ontology_errors) >= 1:
             stderr.print(
