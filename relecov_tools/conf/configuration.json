@@ -1,11 +1,22 @@
 {
     "lab_metadata": {
         "fixed_fields": {
-            "host_disease": "COVID-19",
-            "tax_id": "2697049",
-            "organism": "Severe acute respiratory syndrome coronavirus 2",
             "study_type": "Whole Genome Sequencing",
             "collector_name": "Not Provided"
+        },
+        "organism_mapping": {
+            "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]": {
+                "tax_id": "2697049",
+                "host_disease": "COVID-19 [SNOMED:840539006]"
+            },
+            "Respiratory syncytial virus [SNOMED:6415009]": {
+                "tax_id": "1281",
+                "host_disease": "Respiratory Syncytial Virus Infection [SNOMED:55735004]"
+            },
+            "Influenza virus [SNOMED:725894000]": {
+                "tax_id": "11320",
+                "host_disease": "Influenza Infection [SNOMED:408687004]"
+            }
         },
         "metadata_lab_heading": [
             "Organism",
