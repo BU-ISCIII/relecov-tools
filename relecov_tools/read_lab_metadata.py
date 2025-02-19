@@ -226,7 +226,9 @@ class RelecovMetadata:
     def adding_fixed_fields(self, m_data):
         """Include fixed data that are always the same for every sample"""
         p_data = self.configuration.get_topic_data("lab_metadata", "fixed_fields")
-        organism_mapping = self.configuration.get_topic_data("lab_metadata", "organism_mapping")
+        organism_mapping = self.configuration.get_topic_data(
+            "lab_metadata", "organism_mapping"
+        )
 
         for idx in range(len(m_data)):
             organism = m_data[idx].get("organism", "")
