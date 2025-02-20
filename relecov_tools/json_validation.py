@@ -262,7 +262,7 @@ class SchemaValidation:
         file_name = "_".join(["validated", os.path.basename(self.json_data_file)])
         file_path = os.path.join(out_folder, file_name)
         log.info("Saving Json file with the validated samples in %s", file_path)
-        relecov_tools.utils.write_json_fo_file(valid_json_data, file_path)
+        relecov_tools.utils.write_json_to_file(valid_json_data, file_path)
         return
 
     def validate(self):

@@ -189,7 +189,7 @@ class RelecovMetadata:
         try:
             filename = "_".join(["samples_data", self.lab_code, self.date + ".json"])
             file_path = os.path.join(self.output_folder, filename)
-            relecov_tools.utils.write_json_fo_file(j_data, file_path)
+            relecov_tools.utils.write_json_to_file(j_data, file_path)
         except Exception:
             log.error("Could not output samples_data.json file to output folder")
         return j_data
@@ -540,5 +540,5 @@ class RelecovMetadata:
         self.logsum.create_error_summary(called_module="read-lab-metadata")
         file_path = os.path.join(self.output_folder, file_name)
         log.info("Writting output json file %s", file_path)
-        relecov_tools.utils.write_json_fo_file(completed_metadata, file_path)
+        relecov_tools.utils.write_json_to_file(completed_metadata, file_path)
         return True
