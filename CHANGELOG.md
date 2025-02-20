@@ -27,6 +27,7 @@ Code contributions to the release:
 - Fix schema generation dependence on --diff parameter [#394](https://github.com/BU-ISCIII/relecov-tools/pull/392)
 - Update template conditions project dependent [#404](https://github.com/BU-ISCIII/relecov-tools/pull/404)
 - Auto-fill tax_id and host_disease based on organism fields [#407](https://github.com/BU-ISCIII/relecov-tools/pull/407)
+- Implement Pull Request Template [#410](https://github.com/BU-ISCIII/relecov-tools/pull/410)
 
 #### Fixes
 
