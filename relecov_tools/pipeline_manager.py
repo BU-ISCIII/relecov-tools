@@ -23,7 +23,7 @@ class PipelineManager:
     def __init__(
         self,
         input_folder=None,
-        template=None,
+        templates_root=None,
         output_folder=None,
         pipeline_conf_file=None,
         folder_list=None,
@@ -40,15 +40,17 @@ class PipelineManager:
             log.error("Input folder %s does not exist ", self.input_folder)
             stderr.print("[red] Input folder " + self.input_folder + " does not exist")
             sys.exit(1)
-        if template is None:
-            self.template = relecov_tools.utils.prompt_path(
-                msg="Select the path which contains the template structure"
+        if templates_root is None:
+            self.templates_root = relecov_tools.utils.prompt_path(
+                msg="Select the folder path which contains the templates"
             )
         else:
-            self.template = template
-        if not os.path.exists(self.template):
-            log.error("Template folder %s does not exist ", self.template)
-            stderr.print("[red] Template folder " + self.template + " does not exist")
+            self.templates_root = templates_root
+        if not os.path.exists(self.templates_root):
+            log.error("Template folder %s does not exist ", self.templates_root)
+            stderr.print(
+                "[red] Template folder " + self.templates_root + " does not exist"
+            )
             sys.exit(1)
         if pipeline_conf_file is None:
             pipeline_conf_file = os.path.join(
@@ -75,19 +77,13 @@ class PipelineManager:
             "sample_stored_folder",
             "sample_link_folder",
             "doc_folder",
+            "organism_config",
         ]
         missing_conf = [k for k in required_conf if k not in config_data]
         if missing_conf:
             log.error("Invalid pipeline config file. Missing %s", missing_conf)
             stderr.print(f"[red]Invalid pipeline config file. Missing {missing_conf}")
             sys.exit(1)
-        if "group_by_fields" in config_data:
-            logtxt = "Data will be grouped by the following fields: %s"
-            log.info(logtxt % str(config_data["group_by_fields"]))
-            self.keys_to_split = config_data["group_by_fields"]
-        else:
-            log.warning("No group_by_fields found in config, Data won't be grouped")
-            self.keys_to_split = []
         if output_folder is None:
             output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
@@ -107,6 +103,7 @@ class PipelineManager:
         self.copied_sample_folder = config_data["sample_stored_folder"]
         self.linked_sample_folder = config_data["sample_link_folder"]
         self.doc_folder = config_data["doc_folder"]
+        self.organism_config = config_data["organism_config"]
 
     def get_latest_lab_folders(self, initial_date):
         """Get latest folder with the newest date
@@ -340,43 +337,64 @@ class PipelineManager:
             list_of_jsons_by_key.extend(self.split_data_by_key(group, next_keys))
         return list_of_jsons_by_key
 
-    def pipeline_exc(self):
-        """Prepare folder for analysis in HPC
-        Copies template selected as input
-        Copies RAW data with sequencing id as fastq file names
-        Creates samples_id.txt
+    def split_samples_by_organism(self, join_validate):
+        """Split the input JSON into groups for each organism, which will later
+        be analysed differently depending on its configuration.
 
         Args:
+            join_validate (list(dict)): Merged JSON from all the ones found
 
         Returns:
-
+            jsons_by_organism_dict(dict): Dictionary with {organism1:splitted_json1}
+            with the result from split_data_by_key() for each group of samples from
+            a certain organism.
         """
-        # collect json with all validated samples
-        init_date = datetime.datetime.strptime("20220101", "%Y%m%d").date()
-        join_validate, latest_date = self.join_valid_items(
-            input_folder=self.input_folder,
-            initial_date=init_date,
-            folder_list=self.folder_list,
-        )
-        latest_date = str(latest_date).replace("-", "")
-        if len(join_validate) == 0:
-            stderr.print("[yellow]No samples were found. Aborting")
-            sys.exit(0)
-        if self.keys_to_split:
-            stderr.print(f"[blue]Splitting samples based on {self.keys_to_split}...")
-            splitted_json = self.split_data_by_key(join_validate, self.keys_to_split)
-            stderr.print(f"[blue]Data splitted into {len(splitted_json)} groups")
-        else:
-            splitted_json = [join_validate]
-        # iterate over the sample_data to copy the fastq files in the output folder
+        jsons_by_organism_dict = {}
+        for organism, org_conf in self.organism_config.items():
+            org_samples = [x for x in join_validate if x.get("organism") == organism]
+            if not org_samples:
+                log.info(f"No samples found for organism: {organism}")
+                continue
+            if "group_by_fields" in org_conf.keys():
+                logtxt = "Data for %s will be grouped by the following fields: %s"
+                log.info(logtxt % (organism, str(org_conf["group_by_fields"])))
+                keys_to_split = org_conf["group_by_fields"]
+            else:
+                log.warning(
+                    f"No group_by_fields found for {organism}. Data won't be grouped"
+                )
+                keys_to_split = []
+            splitted_json = self.split_data_by_key(org_samples, keys_to_split)
+            jsons_by_organism_dict[organism] = splitted_json
+        return jsons_by_organism_dict
+
+    def process_samples(self, splitted_json, org_conf, latest_date):
+        """Create the output folder, the required template for the pipeline and
+        all the files necessary for each group of samples depending on the organism
+        config given. Copy the samples and log the ones that could not be copied.
+
+        Args:
+            splitted_json (list(list)): List of jsons, one for each group
+            org_conf (dict): organism params from configuration.json
+            latest_date (str): Latest date found. Used to tag the analysis folder
+
+        Returns:
+            global_samp_errors(dict): Dictionary holding the samples with errors for
+            each group
+        """
         global_samp_errors = {}
+        keys_to_split = org_conf.get("group_by_fields", [])
+        # iterate over the sample_data to copy the fastq files in the output folder
         for idx, list_of_samples in enumerate(splitted_json, start=1):
-            group_tag = f"{latest_date}_GROUP{idx:02d}"
+            group_tag = f"{latest_date}_{org_conf['service_tag']}{idx:02d}"
             log.info("Processing group %s", group_tag)
-            fields = {
-                k: v for k, v in list_of_samples[0].items() if k in self.keys_to_split
-            }
-            stderr.print(f"[blue]Processing group {group_tag} with fields: {fields}...")
+            fields = {k: list_of_samples[0].get(k, "") for k in keys_to_split}
+            if keys_to_split:
+                logtxt = f"[blue]Processing group {group_tag} with fields: {fields}..."
+                stderr.print(logtxt)
+            else:
+                logtxt = f"[blue]Processing group {group_tag}"
+                stderr.print(logtxt)
             group_outfolder = os.path.join(
                 self.output_folder, self.out_folder_namevar % group_tag
             )
@@ -392,7 +410,10 @@ class PipelineManager:
             log.info("Creating folder for group %s", group_tag)
             stderr.print(f"[blue]Creating folder for group {group_tag}")
             # copy template folder and subfolders in output folder
-            shutil.copytree(self.template, group_outfolder)
+            shutil.copytree(
+                os.path.join(self.templates_root, org_conf["pipeline_template"]),
+                group_outfolder,
+            )
             # Check for possible duplicates
             log.info("Samples to copy %s", len(samples_data))
             # Extract the sequencing_sample_id from the list of dictionaries
@@ -437,27 +458,68 @@ class PipelineManager:
             stderr.print(
                 f"[blue]Generating sample_id.txt file in {group_analysis_folder}..."
             )
+
             with open(os.path.join(group_analysis_folder, "samples_id.txt"), "w") as f:
                 for sample_id in sample_ids:
                     f.write(f"{sample_id}\n")
             group_info = os.path.join(group_doc_folder, "group_fields.json")
-            relecov_tools.utils.write_json_fo_file(fields, group_info)
+            relecov_tools.utils.write_json_to_file(fields, group_info)
             log.info(f"Group fields info saved in {group_info}")
 
             json_filename = os.path.join(
                 group_doc_folder, f"{group_tag}_validate_batch.json"
             )
-            relecov_tools.utils.write_json_fo_file(final_valid_samples, json_filename)
+            relecov_tools.utils.write_json_to_file(final_valid_samples, json_filename)
             log.info("Successfully created pipeline folder. Ready to launch")
             stderr.print(f"[blue]Folder {group_outfolder} finished. Ready to launch")
-        error_ocurred = False
-        for group, samples in global_samp_errors.items():
-            if not samples:
+            return global_samp_errors
+
+    def pipeline_exc(self):
+        """Prepare folder for analysis in HPC
+        Copies template selected as input
+        Copies RAW data with sequencing id as fastq file names
+        Creates samples_id.txt
+
+        Args:
+
+        Returns:
+
+        """
+        # collect json with all validated samples
+        init_date = datetime.datetime.strptime("20220101", "%Y%m%d").date()
+        join_validate, latest_date = self.join_valid_items(
+            input_folder=self.input_folder,
+            initial_date=init_date,
+            folder_list=self.folder_list,
+        )
+        latest_date = str(latest_date).replace("-", "")
+        if len(join_validate) == 0:
+            stderr.print("[yellow]No samples were found. Aborting")
+            sys.exit(0)
+        jsons_by_organism_dict = self.split_samples_by_organism(join_validate)
+        if not jsons_by_organism_dict:
+            log.error("No samples found for any of the organisms in config")
+            raise ValueError("No samples found for any of the organisms in config")
+        global_samp_errors = {}
+        for organism, splitted_json in jsons_by_organism_dict.items():
+            stderr.print(f"[blue]Processing samples for organism: {organism}")
+            samp_errors = self.process_samples(
+                splitted_json, self.organism_config[organism], latest_date
+            )
+            global_samp_errors[organism] = samp_errors
+
+        for organism, org_samp_errors in global_samp_errors.items():
+            if all(not v for v in org_samp_errors.values()):
+                logtxt = f"All samples were copied successfully for {organism}!!"
+                log.info(logtxt)
+                stderr.print(f"[green]{logtxt}")
                 continue
-            log.error("Group %s received error for samples: %s" % (group, samples))
-            error_ocurred = True
-        if not error_ocurred:
-            stderr.print("[green]All samples were copied successfully!!")
+            else:
+                log.error(f"Found errors during sample copying for {organism}: ")
+            for group, samples in org_samp_errors.items():
+                if not samples:
+                    continue
+                log.error("Group %s received error for samples: %s" % (group, samples))
         log.info("Finished execution")
         stderr.print("Finished execution")
         return
