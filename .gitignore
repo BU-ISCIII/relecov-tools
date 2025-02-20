@@ -130,3 +130,6 @@ dmypy.json
 
 # (Ad-hoc files)
 .nextflow*
+
+# CI testing stuff
+.github/*_event.json
