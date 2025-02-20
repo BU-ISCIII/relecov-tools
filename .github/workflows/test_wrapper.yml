@@ -1,13 +1,11 @@
 name: test_wrapper
 
 on:
-  pull_request_target:
-    types: [opened, reopened, synchronize]
+  push:
     branches: "**"
-
-concurrency:
-  group: ${{ github.repository }}-test_wrapper
-  cancel-in-progress: false
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    branches: "**"
   
 jobs:
   security_check:
