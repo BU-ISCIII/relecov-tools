@@ -865,7 +865,7 @@ class BioinfoMetadata:
             else:
                 merged_metadata.append(item)
 
-        relecov_tools.utils.write_json_fo_file(merged_metadata, batch_filepath)
+        relecov_tools.utils.write_json_to_file(merged_metadata, batch_filepath)
         return merged_metadata
 
     def save_merged_files(self, files_dict, batch_date, output_folder=None):
@@ -994,7 +994,7 @@ class BioinfoMetadata:
                 )
                 batch_data = self.merge_metadata(batch_filepath, batch_data)
             else:
-                relecov_tools.utils.write_json_fo_file(batch_data, batch_filepath)
+                relecov_tools.utils.write_json_to_file(batch_data, batch_filepath)
             for sample in batch_data:
                 self.log_report.logsum.feed_key(
                     key=batch_dir, sample=sample.get("sequencing_sample_id")
@@ -1025,7 +1025,7 @@ class BioinfoMetadata:
             )
             batch_data = self.merge_metadata(file_path, self.j_data)
         else:
-            relecov_tools.utils.write_json_fo_file(self.j_data, file_path)
+            relecov_tools.utils.write_json_to_file(self.j_data, file_path)
         stderr.print(f"[green]Sucessful creation of bioinfo analyis file: {file_path}")
         self.log_report.logsum.create_error_summary(
             called_module="read-bioinfo-metadata", logs=self.log_report.logsum.logs

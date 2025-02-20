@@ -284,7 +284,7 @@ def save_local_md5(file_name, md5_value):
     return True
 
 
-def write_json_fo_file(data, file_name):
+def write_json_to_file(data, file_name):
     """Write metadata to json file"""
     with open(file_name, "w", encoding="utf-8") as fh:
         fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))

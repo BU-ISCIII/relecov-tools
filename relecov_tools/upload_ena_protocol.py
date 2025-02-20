@@ -296,7 +296,7 @@ class EnaUpload:
         updated_json_name = (
             os.path.splitext(os.path.basename(self.source_json_file))[0] + suffix
         )
-        relecov_tools.utils.write_json_fo_file(updated_json, updated_json_name)
+        relecov_tools.utils.write_json_to_file(updated_json, updated_json_name)
 
         self.save_tables(updated_schemas_df, date)
         return
