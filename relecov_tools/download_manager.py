@@ -302,8 +302,8 @@ class DownloadManager:
         if dup_samples_list:
             error_text = "Multiple samples in metadata pointing to the same file: %s"
             self.include_warning(error_text % clean_duplicated_dict)
-            stderr.print(f"[Orange]{error_text}")
-            stderr.print("[Orange]These samples won't be processed: ", unique_dup_samples_list)
+            stderr.print(f"[yellow]{error_text % clean_duplicated_dict}")
+            stderr.print("[yellow]These samples won't be processed: ", unique_dup_samples_list)
             for fastq, samples in clean_duplicated_dict.items():
                 [self.include_error(str(error_text % fastq), samp) for samp in samples]
 
