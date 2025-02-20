@@ -645,9 +645,9 @@ def metadata_homogeneizer(institution, directory, output):
 )
 @click.option(
     "-t",
-    "--template",
+    "--templates_root",
     type=click.Path(),
-    help="select the pipeline template folder to be copied in the output folder",
+    help="Path to folder containing the pipeline templates from buisciii-tools",
 )
 @click.option(
     "-c",
@@ -663,13 +663,13 @@ def metadata_homogeneizer(institution, directory, output):
     default=None,
     help="Folder basenames to process. Target folders names should match the given dates. E.g. ... -f folder1 -f folder2 -f folder3",
 )
-def pipeline_manager(input, template, output, config, folder_names):
+def pipeline_manager(input, templates_root, output, config, folder_names):
     """
     Create the symbolic links for the samples which are validated to prepare for
     bioinformatics pipeline execution.
     """
     new_launch = relecov_tools.pipeline_manager.PipelineManager(
-        input, template, output, config, folder_names
+        input, templates_root, output, config, folder_names
     )
     try:
         new_launch.pipeline_exc()
