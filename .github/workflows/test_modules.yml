@@ -19,11 +19,13 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: '3.9.16'
+
     - name: Checkout code
       uses: actions/checkout@v3
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: 0
+
     - name: Install package and dependencies
       run: |
         pip install -r requirements.txt
@@ -63,13 +65,23 @@ jobs:
         pip install -r requirements.txt
         pip install .
 
-    - name: Run each module tests
+    - name: Run read-lab-metadata module
+      if: matrix.modules == 'read-lab-metadata'
       run: |
-        if [ "${{ matrix.modules }}" == "read-lab-metadata" ]; then
-          relecov-tools read-lab-metadata -m tests/data/read_lab_metadata/metadata_lab_test.xlsx -s tests/data/read_lab_metadata/samples_data_test.json -o $OUTPUT_LOCATION
-        elif [ "${{ matrix.modules }}" == "validate" ]; then
-          relecov-tools validate -j tests/data/map_validate/processed_metadata_lab_test.json -s relecov_tools/schema/relecov_schema.json -m tests/data/map_validate/metadata_lab_test.xlsx -o $OUTPUT_LOCATION
-        fi
+        relecov-tools read-lab-metadata \
+            -m tests/data/read_lab_metadata/metadata_lab_test.xlsx \
+            -s tests/data/read_lab_metadata/samples_data_test.json \
+            -o $OUTPUT_LOCATION
+
+    - name: Run validate module
+      if: matrix.modules == 'validate'
+      run: |
+        relecov-tools validate \
+            -j tests/data/map_validate/processed_metadata_lab_test.json \
+            -s relecov_tools/schema/relecov_schema.json \
+            -m tests/data/map_validate/metadata_lab_test.xlsx \
+            -o $OUTPUT_LOCATION
+
       env:
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
     - name: Upload output file
