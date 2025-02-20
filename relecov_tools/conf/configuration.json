@@ -451,12 +451,33 @@
         "analysis_folder": "ANALYSIS",
         "sample_stored_folder": "RAW",
         "sample_link_folder": "00-reads",
-        "group_by_fields": [
-            "organism",
-            "sequencing_instrument_platform",
-            "enrichment_panel",
-            "enrichment_panel_version"
-        ]
+        "organism_config": {
+            "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]": {
+                "pipeline_template": "viralrecon",
+                "service_tag": "SARSCOV2",
+                "group_by_fields": [
+                    "sequencing_instrument_platform",
+                    "enrichment_panel",
+                    "enrichment_panel_version"
+                ]
+            },
+            "Respiratory syncytial virus [SNOMED:6415009]": {
+                "pipeline_template": "IRMA",
+                "service_tag": "GENOMERSV",
+                "group_by_fields": [
+                    "sequencing_instrument_platform",
+                    "enrichment_panel",
+                    "enrichment_panel_version"
+                ]
+            },
+            "Influenza virus [SNOMED:725894000]": {
+                "pipeline_template": "IRMA",
+                "service_tag": "GENOMEFLU",
+                "group_by_fields": [
+                    "sequencing_instrument_platform"
+                ]
+            }
+        }
     },
     "mail_sender":{
         "delivery_template_path_file": "./relecov_tools/templates/",
