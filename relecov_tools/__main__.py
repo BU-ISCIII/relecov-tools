@@ -710,15 +710,20 @@ def pipeline_manager(input, templates_root, output, config, folder_names):
 @click.option(
     "-p", "--project", help="Specficy the project to build the metadata template."
 )
+@click.option(
+    "--non-interactive",
+    is_flag=True,
+    help="Run the script without user interaction, using default values."
+)
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file/s")
 def build_schema(
-    input_file, schema_base, draft_version, diff, out_dir, version, project
+    input_file, schema_base, draft_version, diff, out_dir, version, project, non_interactive
 ):
     """Generates and updates JSON Schema files from Excel-based database definitions."""
     # Build new schema
     try:
         schema_update = relecov_tools.build_schema.SchemaBuilder(
-            input_file, schema_base, draft_version, diff, out_dir, version, project
+            input_file, schema_base, draft_version, diff, out_dir, version, project, non_interactive
         )
 
         # Build new schema
