@@ -94,10 +94,12 @@ jobs:
         relecov-tools build-schema \
             -i tests/data/build_schema/metadata_mapping_file.xlsx \
             --version $SCHEMA_DEFAULT_VERSION \
+            --project $PROJECT_NAME \
             --non-interactive \
             -o $OUTPUT_LOCATION
       env:
         SCHEMA_DEFAULT_VERSION: "3.0.0"
+        PROJECT_NAME: "relecov"
 
     - name: Upload output file
       uses: actions/upload-artifact@v4
