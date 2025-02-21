@@ -39,12 +39,14 @@ class SchemaBuilder:
         out_dir=None,
         version=None,
         project=None,
+        non_interactive=False,
     ):
         """
         Initialize the SchemaBuilder class. This class generates a JSON Schema file based on the provided draft version.
         It reads the database definition from an Excel file and allows customization of the schema generation process.
         """
         self.excel_file_path = excel_file_path
+        self.non_interactive = non_interactive
         # Validate input data
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
             log.error("A valid Excel file path must be provided.")
@@ -111,11 +113,13 @@ class SchemaBuilder:
             self.show_diff = True
 
         # Validate json schema draft version
-        self.draft_version = (
-            relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(
-                draft_version
-            )
-        )
+        if not draft_version:
+            if self.non_interactive:
+                self.draft_version = "2020-12"
+            else:
+                self.draft_version = relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(draft_version)
+        else:
+            self.draft_version = relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(draft_version)
 
         # Validate base schema
         if base_schema_path is not None:
@@ -267,9 +271,11 @@ class SchemaBuilder:
             stderr.print(f"\t- Log errors saved to:\n\t{error_file_path}")
 
             # Ask user whether to continue or stop execution
-            if not relecov_tools.utils.prompt_yn_question(
+            if self.non_interactive or relecov_tools.utils.prompt_yn_question(
                 "Errors found in database values. Do you want to continue? (Y/N)"
             ):
+                pass
+            else:
                 return log_errors
         else:
             stderr.print("[green]\t- Database validation passed")
@@ -608,8 +614,10 @@ class SchemaBuilder:
     def print_save_schema_diff(self, diff_lines=None):
         # Set user's choices
         choices = ["Print to standard output (stdout)", "Save to file", "Both"]
-        diff_output_choice = relecov_tools.utils.prompt_selection(
-            "How would you like to print the diff between schemes?:", choices
+        diff_output_choice = (
+            "Save to file" if self.non_interactive else relecov_tools.utils.prompt_selection(
+                "How would you like to print the diff between schemes?:", choices
+            )
         )
         if diff_output_choice in ["Print to standard output (stdout)", "Both"]:
             for line in diff_lines:
@@ -671,8 +679,10 @@ class SchemaBuilder:
         try:
             # Retrieve existing files in the output directory
             output_files = os.listdir(self.output_folder)
-            notes_control_input = input(
-                "\033[93mEnter a note about changes made to the schema: \033[0m"
+            notes_control_input = (
+                "Auto-generated update" if self.non_interactive else input(
+                    "\033[93mEnter a note about changes made to the schema: \033[0m"
+                )
             )
             # Identify existing template files
             template_files = [
@@ -1175,10 +1185,9 @@ class SchemaBuilder:
         self.save_new_schema(new_schema_json)
 
         # Create metadata lab template
-        promp_answ = relecov_tools.utils.prompt_yn_question(
+        if self.non_interactive or relecov_tools.utils.prompt_yn_question(
             "Do you want to create a metadata lab file?:"
-        )
-        if promp_answ:
+        ):
             self.create_metadatalab_excel(new_schema_json)
 
         # Return new schema
