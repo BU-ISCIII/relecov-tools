@@ -32,6 +32,7 @@ Code contributions to the release:
 - Implement Pull Request Template [#410](https://github.com/BU-ISCIII/relecov-tools/pull/410)
 - Now pipeline-manager splits by organism-template first [#412](https://github.com/BU-ISCIII/relecov-tools/pull/412)
 - Implement non-interactive execution of build-schema module [#416](https://github.com/BU-ISCIII/relecov-tools/pull/416)
+- Add repeated samples to test data [#413](https://github.com/BU-ISCIII/relecov-tools/pull/413)
 
 #### Fixes
 
