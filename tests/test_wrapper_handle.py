@@ -55,19 +55,6 @@ def generate_config_yaml(user, password, download_option, target_folders):
 def prepare_remote_test(**kwargs):
     # First clean the repository.
     print("Initating sftp module")
-    conf_file = generate_config_yaml(
-        kwargs["user"],
-        kwargs["password"],
-        kwargs["download_option"],
-        kwargs["target_folders"],
-    )
-
-    # Iniciar DownloadManager con conf_file y output_location
-    print("Initiating SFTP module")
-    wrapper_manager = ProcessWrapper(
-        config_file=conf_file,
-        output_folder=kwargs["output_location"],
-    )
 
     download_manager = DownloadManager(
         user=kwargs["user"],
@@ -86,6 +73,7 @@ def prepare_remote_test(**kwargs):
     remote_folders = download_manager.relecov_sftp.list_remote_folders(
         ".", recursive=True
     )
+    print("Connection opened with sftp")
     clean_folders = [folder.replace("./", "") for folder in remote_folders]
     print("Cleaning folders")
     for folder in clean_folders:
@@ -117,6 +105,21 @@ def prepare_remote_test(**kwargs):
             download_manager.relecov_sftp.upload_file(local_path, remote_path)
 
     download_manager.relecov_sftp.close_connection()
+
+    print("Initiating wrapper configuration")
+    conf_file = generate_config_yaml(
+        kwargs["user"],
+        kwargs["password"],
+        kwargs["download_option"],
+        kwargs["target_folders"],
+    )
+
+    # Iniciar DownloadManager con conf_file y output_location
+    print("Initiating SFTP module")
+    wrapper_manager = ProcessWrapper(
+        config_file=conf_file,
+        output_folder=kwargs["output_location"],
+    )
 
     # Test download_module
     def test_download(wrapper_manager):
