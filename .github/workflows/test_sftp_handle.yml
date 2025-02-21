@@ -65,6 +65,7 @@ jobs:
 
   test_wrapper:
     needs: test_sftp_handle
+    if: github.repository_owner == 'BU-ISCIII'
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
