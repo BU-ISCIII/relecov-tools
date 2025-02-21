@@ -117,9 +117,15 @@ class SchemaBuilder:
             if self.non_interactive:
                 self.draft_version = "2020-12"
             else:
-                self.draft_version = relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(draft_version)
+                self.draft_version = relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(
+                    draft_version
+                )
         else:
-            self.draft_version = relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(draft_version)
+            self.draft_version = (
+                relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(
+                    draft_version
+                )
+            )
 
         # Validate base schema
         if base_schema_path is not None:
@@ -615,7 +621,9 @@ class SchemaBuilder:
         # Set user's choices
         choices = ["Print to standard output (stdout)", "Save to file", "Both"]
         diff_output_choice = (
-            "Save to file" if self.non_interactive else relecov_tools.utils.prompt_selection(
+            "Save to file"
+            if self.non_interactive
+            else relecov_tools.utils.prompt_selection(
                 "How would you like to print the diff between schemes?:", choices
             )
         )
@@ -680,7 +688,9 @@ class SchemaBuilder:
             # Retrieve existing files in the output directory
             output_files = os.listdir(self.output_folder)
             notes_control_input = (
-                "Auto-generated update" if self.non_interactive else input(
+                "Auto-generated update"
+                if self.non_interactive
+                else input(
                     "\033[93mEnter a note about changes made to the schema: \033[0m"
                 )
             )
