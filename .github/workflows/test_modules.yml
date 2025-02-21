@@ -46,9 +46,15 @@ jobs:
     strategy:
       max-parallel: 3
       matrix:
-        modules: ["read-lab-metadata", "read-bioinfo-metadata", "validate"]
-    steps:
+        SCH_VER:
+          - "3.0.0"
+        modules: 
+        - "read-lab-metadata"
+        - "read-bioinfo-metadata"
+        - "validate"
+        - "build-schema"
 
+    steps:
     - name: Set up Python 3.9.16
       uses: actions/setup-python@v3
       with:
@@ -82,8 +88,16 @@ jobs:
             -m tests/data/map_validate/metadata_lab_test.xlsx \
             -o $OUTPUT_LOCATION
 
+    - name: Run build-schema module
+      if: matrix.modules == 'build-schema'
+      run: |
+        relecov-tools build-schema \
+            -i tests/data/build_schema/metadata_mapping_file.xlsx \
+            --version ${{ matrix.SCH_VER }} \
+            -o $OUTPUT_LOCATION
       env:
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
+
     - name: Upload output file
       uses: actions/upload-artifact@v4
       with:
