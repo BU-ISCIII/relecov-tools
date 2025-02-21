@@ -1300,6 +1300,10 @@ class DownloadManager:
                 self.clean_remote_folder(folder)
                 stderr.print(f"Delete process finished in remote {folder}")
                 log.info(f"Delete process finished in remote {folder}")
+            invalid_folders = [key for key in target_folders if key not in folders_to_clean]
+            for folder in invalid_folders:
+                self.rename_remote_folder(folder)
+                log.info("Renamed tmp processing folder: %s", folder)
         log.info("Finished download module execution")
         stderr.print("Finished execution")
         return
