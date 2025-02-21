@@ -38,30 +38,30 @@ jobs:
         modules: ["wrapper"]
             
     steps:
-      - name: Set up Python 3.9.16
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.9.16'
+    - name: Set up Python 3.9.16
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.9.16'
             
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
             
-      - name: Install package and dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install .
+    - name: Install package and dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install .
       
-      - name: Run wrapper tests
-        run: |
-          python3 tests/test_wrapper_handle.py --download_option ${{ matrix.download_options }} ${{ matrix.target_folders }}
-        env:
-          TEST_USER: ${{ secrets.TEST_USER }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-          TEST_PORT: ${{ secrets.TEST_PORT }}
-          OUTPUT_LOCATION: ${{ github.workspace }}/tests/
+    - name: Run wrapper tests
+      run: |
+        python3 tests/test_wrapper_handle.py --download_option ${{ matrix.download_options }} ${{ matrix.target_folders }}
+      env:
+        TEST_USER: ${{ secrets.TEST_USER }}
+        TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+        TEST_PORT: ${{ secrets.TEST_PORT }}
+        OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
   test_sftp_handle:
     needs: test_wrapper
