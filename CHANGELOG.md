@@ -29,6 +29,7 @@ Code contributions to the release:
 - Update template conditions project dependent [#404](https://github.com/BU-ISCIII/relecov-tools/pull/404)
 - Auto-fill tax_id and host_disease based on organism fields [#407](https://github.com/BU-ISCIII/relecov-tools/pull/407)
 - Implement Pull Request Template [#410](https://github.com/BU-ISCIII/relecov-tools/pull/410)
+- Now pipeline-manager splits by organism-template first [#412](https://github.com/BU-ISCIII/relecov-tools/pull/412)
 
 #### Fixes
 
@@ -38,6 +39,7 @@ Code contributions to the release:
 
 - Temporarily changed bioinfo_config 'quality_control' requirement to false [#379](https://github.com/BU-ISCIII/relecov-tools/pull/379)
 - Improve and fix minor issues in build_schema.py [#404](https://github.com/BU-ISCIII/relecov-tools/pull/404)
+- Changed utils.write_json_fo_file() name to write_json_to_file() [#412](https://github.com/BU-ISCIII/relecov-tools/pull/412)
 
 #### Removed
 
