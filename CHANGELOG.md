@@ -30,6 +30,7 @@ Code contributions to the release:
 - Auto-fill tax_id and host_disease based on organism fields [#407](https://github.com/BU-ISCIII/relecov-tools/pull/407)
 - Implement Pull Request Template [#410](https://github.com/BU-ISCIII/relecov-tools/pull/410)
 - Now pipeline-manager splits by organism-template first [#412](https://github.com/BU-ISCIII/relecov-tools/pull/412)
+- Implement non-interactive execution of build-schema module [#416](https://github.com/BU-ISCIII/relecov-tools/pull/416)
 
 #### Fixes
 
