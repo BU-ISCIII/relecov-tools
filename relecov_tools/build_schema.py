@@ -118,7 +118,11 @@ class SchemaBuilder:
             self.draft_version = "2020-12"
         else:
             # Usamos check_valid_version para asignar la versión válida
-            self.draft_version = relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(draft_version)
+            self.draft_version = (
+                relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(
+                    draft_version
+                )
+            )
 
         # Validate base schema
         if base_schema_path is not None:
