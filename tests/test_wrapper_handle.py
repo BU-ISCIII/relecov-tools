@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import os
 import sys
+import yaml
 import argparse
 from relecov_tools.download_manager import DownloadManager
-
+from relecov_tools.dataprocess_wrapper import ProcessWrapper
 
 def main():
     parser = argparse.ArgumentParser()
@@ -25,10 +26,41 @@ def main():
     }
     prepare_remote_test(**val_dict)
 
+def generate_config_yaml(user, password, download_option, target_folders):
+    """Genera el archivo wrapper_config.yaml con la estructura deseada."""
+    config_data = {
+        "download": {
+            "user": user,
+            "passwd": password,
+            "download_option": download_option,
+            "target_folders": target_folders,
+        },
+        "read-lab-metadata": {
+            "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
+            "sample_list_file": "tests/data/read_lab_metadata/samples_data_test.json",
+        },
+        "validate": {
+            "json_schema_file": "relecov_tools/schema/relecov_schema.json",
+        },
+    }
+
+    with open("wrapper_config.yaml", "w") as file:
+        yaml.dump(config_data, file, default_flow_style=False)
+
+    return "wrapper_config.yaml"
 
 def prepare_remote_test(**kwargs):
     # First clean the repository.
     print("Initating sftp module")
+    conf_file = generate_config_yaml(kwargs["user"], kwargs["password"], kwargs["download_option"], kwargs["target_folders"])
+    
+    # Iniciar DownloadManager con conf_file y output_location
+    print("Initiating SFTP module")
+    wrapper_manager = ProcessWrapper(
+        conf_file=conf_file,
+        output_location=kwargs["output_location"],
+    )
+
     download_manager = DownloadManager(
         user=kwargs["user"],
         passwd=kwargs["password"],
@@ -76,6 +108,12 @@ def prepare_remote_test(**kwargs):
             download_manager.relecov_sftp.upload_file(local_path, remote_path)
 
     download_manager.relecov_sftp.close_connection()
+
+    # Test download_module
+    def test_download(wrapper_manager):
+        wrapper_manager.run_wrapper()
+
+    test_download(wrapper_manager)
 
 
 if __name__ == "__main__":

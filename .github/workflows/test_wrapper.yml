@@ -25,7 +25,7 @@ jobs:
         echo "Job originally triggered by ${{ github.actor }}"
         exit 1
       
-  test_sftp_handle:
+  test_wrapper:
     needs: security_check
     if: github.repository_owner == 'BU-ISCIII'
     runs-on: ubuntu-latest
@@ -33,7 +33,7 @@ jobs:
       max-parallel: 1
       matrix:
         download_options: ["download_only", "download_clean", "delete_only"]
-        target_folders: ["", "-t COD-test-1"]
+        target_folders: ["", "-t COD-test-2"]
         modules: ["wrapper"]
       
     steps:
@@ -53,38 +53,12 @@ jobs:
         pip install -r requirements.txt
         pip install .
 
-    - name: Generate config.yml
-      if: matrix.modules == 'wrapper'
+    - name: Run wrapper tests
       run: |
-        echo "download:" > wrapper_config.yaml
-        echo "  user: \"${WRAPPER_USER}\"" >> wrapper_config.yaml
-        echo "  passwd: \"${WRAPPER_PASSWORD}\"" >> wrapper_config.yaml
-        echo "  download_option: \"download_clean\"" >> wrapper_config.yaml
-        echo "read-lab-metadata:" >> wrapper_config.yaml
-        echo "  metadata_file: \"tests/data/read_lab_metadata/metadata_lab_test.xlsx\"" >> wrapper_config.yaml
-        echo "  sample_list_file: \"tests/data/read_lab_metadata/samples_data_test.json\"" >> wrapper_config.yaml
-        echo "validate:" >> wrapper_config.yaml
-        echo "  json_schema_file: \"relecov_tools/schema/relecov_schema.json\"" >> wrapper_config.yaml
-      env:
-        WRAPPER_USER: ${{ secrets.WRAPPER_USER }}
-        WRAPPER_PASSWORD: ${{ secrets.WRAPPER_PASS }}
-      
-    - name: Run sftp_handle tests
-      run: |
-        python3 tests/test_upload_sftp.py --download_option ${{ matrix.download_options }} ${{ matrix.target_folders }}
-
-        cat wrapper_config.yaml
-
-        if [ "${{ matrix.modules }}" == "wrapper" ]; then
-          relecov-tools wrapper -c wrapper_config.yaml -o $OUTPUT_LOCATION
-        fi
-
-        rm -f wrapper_config.yaml
+        python3 tests/test_wrapper_handle.py --download_option ${{ matrix.download_options }} ${{ matrix.target_folders }}
       env:
         TEST_USER: ${{ secrets.TEST_USER }}
         TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-        WRAPPER_USER: ${{ secrets.WRAPPER_USER }}
-        WRAPPER_PASSWORD: ${{ secrets.WRAPPER_PASS }}
         TEST_PORT: ${{ secrets.TEST_PORT }}
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
       
