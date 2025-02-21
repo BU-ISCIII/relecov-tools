@@ -51,6 +51,8 @@ jobs:
         - "read-bioinfo-metadata"
         - "validate"
         - "build-schema"
+    env:
+      OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
     steps:
     - name: Set up Python 3.9.16
@@ -95,7 +97,6 @@ jobs:
             -o $OUTPUT_LOCATION
       env:
         SCHEMA_DEFAULT_VERSION: "3.0.0"
-        OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
     - name: Upload output file
       uses: actions/upload-artifact@v4
