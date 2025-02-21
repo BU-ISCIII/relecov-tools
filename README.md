@@ -343,8 +343,13 @@ Options:
   -v, --draft_version TEXT  Version of the JSON schema specification to be
                             used. Example: '2020-12'. See: https://json-
                             schema.org/specification-links
-  --version                 Specifies the version of the metadata template to generate.
-  -d, --diff BOOLEAN        Prints a changelog/diff between the base and
+  --version           TEXT  Specifies the version of the metadata template to 
+                            generate.
+  -p, --project       TEXT  Specify the project you want to generate the schema   
+                            and template for.
+  --non-interactive BOOLEAN executes the module by assigning the default interactive 
+                            parameters
+  -d, --diff        BOOLEAN Prints a changelog/diff between the base and
                             incoming versions of the schema. Required for the generation 
                             of the JSON schema.
   -o, --out_dir PATH        Path to save output file/s
