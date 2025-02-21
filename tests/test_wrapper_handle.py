@@ -65,8 +65,8 @@ def prepare_remote_test(**kwargs):
     # Iniciar DownloadManager con conf_file y output_location
     print("Initiating SFTP module")
     wrapper_manager = ProcessWrapper(
-        conf_file=conf_file,
-        output_location=kwargs["output_location"],
+        config_file=conf_file,
+        output_folder=kwargs["output_location"],
     )
 
     download_manager = DownloadManager(
