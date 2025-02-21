@@ -64,7 +64,7 @@ jobs:
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
   test_wrapper:
-    needs: [security_check, test_sftp_handle]
+    needs: test_sftp_handle
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
