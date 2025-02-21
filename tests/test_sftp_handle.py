@@ -60,8 +60,8 @@ def prepare_remote_test(**kwargs):
     data_loc = "tests/data/sftp_handle"
     folder_files_dict = {folder: files for folder, _, files in os.walk(data_loc)}
     print("Uploading files to sftp...")
-    print(f"Files to upload: {files}")
     for folder, files in folder_files_dict.items():
+        print(f"Files to upload: {files}")
         if "datatest" in folder:
             remote_dir = "COD-test-1"
         elif "empty_test" in folder:
