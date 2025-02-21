@@ -40,6 +40,7 @@ Code contributions to the release:
 - Temporarily changed bioinfo_config 'quality_control' requirement to false [#379](https://github.com/BU-ISCIII/relecov-tools/pull/379)
 - Improve and fix minor issues in build_schema.py [#404](https://github.com/BU-ISCIII/relecov-tools/pull/404)
 - Changed utils.write_json_fo_file() name to write_json_to_file() [#412](https://github.com/BU-ISCIII/relecov-tools/pull/412)
+- Changed pipeline-manager --template param to --templates_root, now points to root folder [#412](https://github.com/BU-ISCIII/relecov-tools/pull/412)
 
 #### Removed
 
