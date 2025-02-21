@@ -18,6 +18,7 @@ Code contributions to the release:
 
 #### Added enhancements
 
+- Add documentation for `bioinfo_config.json` in README [#415](https://github.com/BU-ISCIII/relecov-tools/pull/415)
 - Added a more robust datatype handling in utils.py read_csv_file_return_dict() method [#379](https://github.com/BU-ISCIII/relecov-tools/pull/379)
 - Improved relecov template generator and version control [#382](https://github.com/BU-ISCIII/relecov-tools/pull/382)
 - Improve "options" interpretation in build-schema and update read-lab-metadata field type [#388](https://github.com/BU-ISCIII/relecov-tools/pull/388)
