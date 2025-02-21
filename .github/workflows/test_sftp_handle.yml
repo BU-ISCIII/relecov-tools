@@ -63,9 +63,17 @@ jobs:
         TEST_PORT: ${{ secrets.TEST_PORT }}
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
+    - name: Run wrapper tests
+      run: |
+        python3 tests/test_wrapper_handle.py --download_option ${{ matrix.download_options }} ${{ matrix.target_folders }}
+      env:
+        TEST_USER: ${{ secrets.TEST_USER }}
+        TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+        TEST_PORT: ${{ secrets.TEST_PORT }}
+        OUTPUT_LOCATION: ${{ github.workspace }}/tests/
+
   test_wrapper:
     needs: test_sftp_handle
-    if: github.repository_owner == 'BU-ISCIII'
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
