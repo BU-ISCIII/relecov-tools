@@ -114,7 +114,6 @@ class SchemaBuilder:
 
         # Validate json schema draft version
         if not draft_version and self.non_interactive:
-            # Asignamos la última versión si está en modo no interactivo
             self.draft_version = "2020-12"
         else:
             # Usamos check_valid_version para asignar la versión válida
