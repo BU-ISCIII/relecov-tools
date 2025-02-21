@@ -54,7 +54,7 @@ jobs:
         pip install -r requirements.txt
         pip install .
       
-    - name: Run wrapper tests
+    - name: Run Wrapper tests
       run: |
         python3 tests/test_wrapper_handle.py --download_option ${{ matrix.download_options }} ${{ matrix.target_folders }}
       env:
@@ -98,6 +98,7 @@ jobs:
         TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
         TEST_PORT: ${{ secrets.TEST_PORT }}
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
+
 
 
       
