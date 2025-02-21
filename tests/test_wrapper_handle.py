@@ -6,6 +6,7 @@ import argparse
 from relecov_tools.download_manager import DownloadManager
 from relecov_tools.dataprocess_wrapper import ProcessWrapper
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -25,6 +26,7 @@ def main():
         "target_folders": args.target_folders,
     }
     prepare_remote_test(**val_dict)
+
 
 def generate_config_yaml(user, password, download_option, target_folders):
     """Genera el archivo wrapper_config.yaml con la estructura deseada."""
@@ -49,11 +51,17 @@ def generate_config_yaml(user, password, download_option, target_folders):
 
     return "wrapper_config.yaml"
 
+
 def prepare_remote_test(**kwargs):
     # First clean the repository.
     print("Initating sftp module")
-    conf_file = generate_config_yaml(kwargs["user"], kwargs["password"], kwargs["download_option"], kwargs["target_folders"])
-    
+    conf_file = generate_config_yaml(
+        kwargs["user"],
+        kwargs["password"],
+        kwargs["download_option"],
+        kwargs["target_folders"],
+    )
+
     # Iniciar DownloadManager con conf_file y output_location
     print("Initiating SFTP module")
     wrapper_manager = ProcessWrapper(
