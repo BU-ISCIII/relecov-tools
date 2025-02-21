@@ -78,6 +78,7 @@ def prepare_remote_test(**kwargs):
         target_folders=kwargs["target_folders"],
     )
     print("Openning connection to sftp")
+    print(os.environ["TEST_PORT"])
     download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
     if not download_manager.relecov_sftp.open_connection():
         print("Could not open connection to remote sftp")
