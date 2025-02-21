@@ -297,13 +297,21 @@ class DownloadManager:
             k: v for k, v in sample_file_dict.items() if k not in dup_samples_list
         }
         clean_sample_dict = {key: sample_file_dict[key] for key in non_duplicated_keys}
-        clean_duplicated_dict = {k: [samp for samp in v if "_remove_" not in samp] for k, v in inverted_dict.items() if len(v) > 1}
-        unique_dup_samples_list = list({samp for dups in clean_duplicated_dict.values() for samp in dups})
+        clean_duplicated_dict = {
+            k: [samp for samp in v if "_remove_" not in samp]
+            for k, v in inverted_dict.items()
+            if len(v) > 1
+        }
+        unique_dup_samples_list = list(
+            {samp for dups in clean_duplicated_dict.values() for samp in dups}
+        )
         if dup_samples_list:
             error_text = "Multiple samples in metadata pointing to the same file: %s"
             self.include_warning(error_text % clean_duplicated_dict)
             stderr.print(f"[yellow]{error_text % clean_duplicated_dict}")
-            stderr.print("[yellow]These samples won't be processed: ", unique_dup_samples_list)
+            stderr.print(
+                "[yellow]These samples won't be processed: ", unique_dup_samples_list
+            )
             for fastq, samples in clean_duplicated_dict.items():
                 [self.include_error(str(error_text % fastq), samp) for samp in samples]
 
@@ -394,7 +402,12 @@ class DownloadManager:
                     stderr.print("[red]Unable to convert to string. ", e)
                     continue
                 if s_name in sample_file_dict:
-                    if row[index_fastq_r1] == sample_file_dict[s_name]["sequence_file_R1_fastq"] or row[index_fastq_r2] == sample_file_dict[s_name]["sequence_file_R2_fastq"]:
+                    if (
+                        row[index_fastq_r1]
+                        == sample_file_dict[s_name]["sequence_file_R1_fastq"]
+                        or row[index_fastq_r2]
+                        == sample_file_dict[s_name]["sequence_file_R2_fastq"]
+                    ):
                         s_name = s_name + "_remove_" + str(counter)
                     else:
                         log_text = "Found more samples with the same Sample ID given for sequencing. Only the first one remains."
@@ -1300,7 +1313,9 @@ class DownloadManager:
                 self.clean_remote_folder(folder)
                 stderr.print(f"Delete process finished in remote {folder}")
                 log.info(f"Delete process finished in remote {folder}")
-            invalid_folders = [key for key in target_folders if key not in folders_to_clean]
+            invalid_folders = [
+                key for key in target_folders if key not in folders_to_clean
+            ]
             for folder in invalid_folders:
                 self.rename_remote_folder(folder)
                 log.info("Renamed tmp processing folder: %s", folder)
