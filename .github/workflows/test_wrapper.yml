@@ -26,8 +26,7 @@ jobs:
         exit 1
       
   test_wrapper:
-    needs: security_check
-    if: github.repository_owner == 'BU-ISCIII'
+    needs: [security_check, test_sftp_handle]
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
