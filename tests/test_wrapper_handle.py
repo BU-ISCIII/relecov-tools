@@ -65,7 +65,6 @@ def prepare_remote_test(**kwargs):
         target_folders=kwargs["target_folders"],
     )
     print("Openning connection to sftp")
-    print(os.environ["TEST_PORT"])
     download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
     if not download_manager.relecov_sftp.open_connection():
         print("Could not open connection to remote sftp")
@@ -114,18 +113,16 @@ def prepare_remote_test(**kwargs):
         kwargs["target_folders"],
     )
 
-    # Iniciar DownloadManager con conf_file y output_location
-    print("Initiating SFTP module")
+    print("Initiating Wrapper")
     wrapper_manager = ProcessWrapper(
         config_file=conf_file,
         output_folder=kwargs["output_location"],
     )
 
-    # Test download_module
-    def test_download(wrapper_manager):
+    def test_wrapper(wrapper_manager):
         wrapper_manager.run_wrapper()
 
-    test_download(wrapper_manager)
+    test_wrapper(wrapper_manager)
 
 
 if __name__ == "__main__":
