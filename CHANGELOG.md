@@ -13,6 +13,7 @@ Code contributions to the release:
 - [Pablo Mata](https://github.com/shettland)
 - [Alejandro Bernabeu](https://github.com/aberdur)
 - [Daniel Valle-Millares](https://github.com/Daniel-VM)
+- [Victor Lopez](https://github.com/victor5lm)
 
 ### Modules
 
@@ -34,6 +35,7 @@ Code contributions to the release:
 - Now pipeline-manager splits by organism-template first [#412](https://github.com/BU-ISCIII/relecov-tools/pull/412)
 - Implement non-interactive execution of build-schema module [#416](https://github.com/BU-ISCIII/relecov-tools/pull/416)
 - Add repeated samples to test data [#413](https://github.com/BU-ISCIII/relecov-tools/pull/413)
+- Add create_summary_tables.py to assets to process data from a given epidemiological week [#418](https://github.com/BU-ISCIII/relecov-tools/pull/418)
 
 #### Fixes
 
