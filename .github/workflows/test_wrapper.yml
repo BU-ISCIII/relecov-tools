@@ -1,4 +1,4 @@
-name: test_sftp_handle
+name: test_wrapper
 
 on:
   pull_request:
@@ -6,29 +6,11 @@ on:
     branches: "**"
 
 concurrency:
-  group: ${{ github.repository }}-test_sftp_handle
+  group: ${{ github.repository }}-test_wrapper
   cancel-in-progress: false
   
 jobs:
-  security_check:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Get User Permission
-      id: checkAccess
-      uses: actions-cool/check-user-permission@v2
-      with:
-        require: write
-        username: ${{ github.triggering_actor }}
-    - name: Check User Permission
-      if: steps.checkAccess.outputs.require-result == 'false'
-      run: |
-        echo "${{ github.triggering_actor }} does not have permissions on this repo."
-        echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
-        echo "Job originally triggered by ${{ github.actor }}"
-        exit 1
-
-  test_wrapper_old:
-    needs: security_check  
+  test_wrapper:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
@@ -42,7 +24,7 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: '3.9.16'
-            
+
     - name: Checkout code
       uses: actions/checkout@v3
       with:
@@ -64,7 +46,7 @@ jobs:
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
   test_sftp_handle:
-    needs: test_wrapper_old
+    needs: test_wrapper
     if: github.repository_owner == 'BU-ISCIII'
     runs-on: ubuntu-latest
     strategy:
@@ -98,3 +80,4 @@ jobs:
         TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
         TEST_PORT: ${{ secrets.TEST_PORT }}
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
+        
