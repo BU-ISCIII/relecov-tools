@@ -5,9 +5,9 @@
 # By default, all data will be stored in a folder called surveillance_files.
 # Within this folder, different subfolders will be created, each one referring to a certain epidemiological week.
 # Inside each subfolder, the following items are stored:
-## - epidemiological_data.xlsx: an excel file containing lineage information for all the samples from a given week. This information is also aggregated in another sheet.
-## - variant_data.csv: a .csv file containing information regarding the variants identified for all the samples associated to a given week.
-## - consensus_files: a subfolder containing all the consensus.fa files obtained after the analysis of samples.
+# - epidemiological_data.xlsx: an excel file containing lineage information for all the samples from a given week. This information is also aggregated in another sheet.
+# - variant_data.csv: a .csv file containing information regarding the variants identified for all the samples associated to a given week.
+# - consensus_files: a subfolder containing all the consensus.fa files obtained after the analysis of samples.
 
 # =============================================================
 
@@ -18,20 +18,20 @@
 # This script can either read these files if they are all stored within the same location, or read .txt files which indicate the paths to these files.
 
 # Use the -i option to indicate the path where these files are.
-## Example: python3 create_summary_tables.py -i ./path
+# Example: python3 create_summary_tables.py -i ./path
 
 # If your files are located in different locations, use the -b and -l options to indicate the names of the .txt files that must contain the paths to the .json files.
-## Example: python3 create_summary_tables.py -b bioinfo_files.txt -l long_table_files.txt
-## Example of what .txt files look like (considering this script is being run from /data/bioinfoshare/UCCT_Relecov):
-### COD-2402-AND-HUCSC/20240604104459/long_table_20241119092541.json
-### COD-2402-AND-HUCSC/20240911160822/long_table_20241118182618.json
-### COD-2403-CAT-HUVH/20240409103006/long_table_20240912110739.json
+# Example: python3 create_summary_tables.py -b bioinfo_files.txt -l long_table_files.txt
+# Example of what .txt files look like (considering this script is being run from /data/bioinfoshare/UCCT_Relecov):
+# COD-2402-AND-HUCSC/20240604104459/long_table_20241119092541.json
+# COD-2402-AND-HUCSC/20240911160822/long_table_20241118182618.json
+# COD-2403-CAT-HUVH/20240409103006/long_table_20240912110739.json
 
 # If you want to copy the consensus.fa files into each subfolder, write the -c or --copy-fasta option when running the script.
-## Example: python3 create_summary_tables.py -b bioinfo_files.txt -l long_table_files.txt -c
+# Example: python3 create_summary_tables.py -b bioinfo_files.txt -l long_table_files.txt -c
 
 # If you want to generate data only in relation to a certain epidemiological week, use the -w option (using the YYYY-WW format).
-## Example: python3 create_summary_tables.py -b bioinfo_files.txt -l long_table_files.txt -w 2025-01
+# Example: python3 create_summary_tables.py -b bioinfo_files.txt -l long_table_files.txt -w 2025-01
 
 # =============================================================
 
@@ -41,6 +41,7 @@ import argparse
 import shutil
 import pandas as pd
 from datetime import datetime
+
 
 # Function to determine the epidemiological week associated to a certain date.
 def get_epi_week(date_str):
