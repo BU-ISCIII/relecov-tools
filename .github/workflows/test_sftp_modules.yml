@@ -56,7 +56,7 @@ jobs:
       
     - name: Run sftp_handle tests
       run: |
-        python3 tests/test_sftp_handle.py --download_option ${{ matrix.download_options }} ${{ matrix.target_folders }}
+        python3 tests/test_sftp_modules.py --download_option ${{ matrix.download_options }} ${{ matrix.target_folders }}
       env:
         TEST_USER: ${{ secrets.TEST_USER }}
         TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
