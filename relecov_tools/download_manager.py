@@ -1167,6 +1167,23 @@ class DownloadManager:
                 stderr.print(f"[red]{error_text}")
                 self.include_warning(error_text)
 
+            to_remove = set()
+            for sample_id, files in list(valid_filedict.items()):
+                if any(files.get(key) in corrupted for key in ["sequence_file_R1_fastq", "sequence_file_R2_fastq"]):
+                    to_remove.update(files.values())
+
+            # Delete corrupted files before proceeding
+            for file_name in to_remove:
+                path = os.path.join(local_folder, file_name)
+                try:
+                    os.remove(path)
+                    log.info("File %s was removed because it was corrupted", file_name)
+                    corrupted.append(file_name)
+                except (FileNotFoundError, PermissionError, OSError) as e:
+                    error_text = "Could not remove corrupted file %s: %s"
+                    log.error(error_text % (path, e))
+                    stderr.print(f"[red]{error_text % (path, e)}")
+
             seqs_fetchlist = [
                 fi for fi in fetched_files if fi.endswith(tuple(self.allowed_file_ext))
             ]
@@ -1192,24 +1209,6 @@ class DownloadManager:
                 full_f_path = os.path.join(local_folder, file)
                 if not relecov_tools.utils.check_gzip_integrity(full_f_path):
                     corrupted.append(file)
-
-            for sample_id, files in list(valid_filedict.items()):
-                if any(
-                    files.get(key) in corrupted
-                    for key in ["sequence_file_R1_fastq", "sequence_file_R2_fastq"]
-                ):
-                    for file_name in files.values():
-                        path = os.path.join(local_folder, file_name)
-                        try:
-                            os.remove(path)
-                            log.info(
-                                "File %s was removed because it was corrupted",
-                                file_name,
-                            )
-                        except (FileNotFoundError, PermissionError, OSError) as e:
-                            error_text = "Could not remove corrupted file %s: %s"
-                            log.error(error_text % (path, e))
-                            stderr.print(f"[red]{error_text % (path, e)}")
 
             not_md5sum = []
             if remote_md5sum:
