@@ -29,7 +29,7 @@ def main():
 
 
 def generate_config_yaml(user, password, download_option, target_folders):
-    """Genera el archivo wrapper_config.yaml con la estructura deseada."""
+    """Generate the wrapper_config.yaml file with the desired structure."""
     config_data = {
         "download": {
             "user": user,
