@@ -113,6 +113,13 @@ def prepare_remote_test(**kwargs):
         kwargs["target_folders"],
     )
 
+    print("Yml generation")
+    import os
+    if os.path.exists("wrapper_config.yaml"):
+        print("✅ wrapper_config.yaml was created successfully.")
+    else:
+        print("❌ wrapper_config.yaml is missing!")
+
     print("Initiating Wrapper")
     wrapper_manager = ProcessWrapper(
         config_file=conf_file,
