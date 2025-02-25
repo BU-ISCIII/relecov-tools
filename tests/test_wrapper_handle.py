@@ -112,7 +112,7 @@ def prepare_remote_test(**kwargs):
         kwargs["download_option"],
         kwargs["target_folders"],
     )
-    
+
     print("Initiating Wrapper")
     wrapper_manager = ProcessWrapper(
         config_file=conf_file,
