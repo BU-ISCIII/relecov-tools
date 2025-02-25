@@ -114,7 +114,6 @@ def prepare_remote_test(**kwargs):
     )
 
     print("Yml generation")
-    import os
     if os.path.exists("wrapper_config.yaml"):
         print("✅ wrapper_config.yaml was created successfully.")
     else:
