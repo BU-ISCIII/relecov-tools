@@ -105,13 +105,13 @@ def prepare_remote_test(**kwargs):
 
     download_manager.relecov_sftp.close_connection()
 
-    print("Initiating wrapper configuration")
-    conf_file = generate_config_yaml(
-        kwargs["user"],
-        kwargs["password"],
-        kwargs["download_option"],
-        kwargs["target_folders"],
-    )
+    # print("Initiating wrapper configuration")
+    # conf_file = generate_config_yaml(
+    #     kwargs["user"],
+    #     kwargs["password"],
+    #     kwargs["download_option"],
+    #     kwargs["target_folders"],
+    # )
 
     config_data = {
         "download": {
