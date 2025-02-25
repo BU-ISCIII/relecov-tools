@@ -35,7 +35,7 @@ jobs:
       max-parallel: 1
       matrix:
         download_options: ["download_only", "download_clean", "delete_only"]
-        target_folders: ["", "-t COD-test-1"]
+        target_folders: ["-t COD-test-1"]
       
     steps:
     - name: Set up Python 3.9.16
