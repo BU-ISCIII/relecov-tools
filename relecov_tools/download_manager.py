@@ -1169,7 +1169,10 @@ class DownloadManager:
 
             to_remove = set()
             for sample_id, files in list(valid_filedict.items()):
-                if any(files.get(key) in corrupted for key in ["sequence_file_R1_fastq", "sequence_file_R2_fastq"]):
+                if any(
+                    files.get(key) in corrupted
+                    for key in ["sequence_file_R1_fastq", "sequence_file_R2_fastq"]
+                ):
                     to_remove.update(files.values())
 
             # Delete corrupted files before proceeding
