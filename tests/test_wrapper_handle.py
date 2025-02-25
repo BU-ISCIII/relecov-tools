@@ -51,7 +51,7 @@ def generate_config_yaml(user, password, download_option, target_folders):
 
     # return "wrapper_config.yaml"
 
-    template_path = "tests/template_config.yaml"
+    template_path = "tests/template_config.yml"
 
     # Cargar la plantilla YAML
     with open(template_path, "r") as file:
@@ -64,7 +64,7 @@ def generate_config_yaml(user, password, download_option, target_folders):
     config_data["download"]["target_folders"] = target_folders
 
     # Guardar el archivo modificado
-    output_path = "wrapper_config.yaml"
+    output_path = "wrapper_config.yml"
     with open(output_path, "w") as file:
         yaml.dump(config_data, file, default_flow_style=False)
 
