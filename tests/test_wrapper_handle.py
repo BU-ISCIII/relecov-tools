@@ -30,26 +30,45 @@ def main():
 
 def generate_config_yaml(user, password, download_option, target_folders):
     """Generate the wrapper_config.yaml file with the desired structure."""
-    config_data = {
-        "download": {
-            "user": user,
-            "passwd": password,
-            "download_option": download_option,
-            "target_folders": target_folders,
-        },
-        "read-lab-metadata": {
-            "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
-            "sample_list_file": "tests/data/read_lab_metadata/samples_data_test.json",
-        },
-        "validate": {
-            "json_schema_file": "relecov_tools/schema/relecov_schema.json",
-        },
-    }
+    # config_data = {
+    #     "download": {
+    #         "user": user,
+    #         "passwd": password,
+    #         "download_option": download_option,
+    #         "target_folders": target_folders,
+    #     },
+    #     "read-lab-metadata": {
+    #         "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
+    #         "sample_list_file": "tests/data/read_lab_metadata/samples_data_test.json",
+    #     },
+    #     "validate": {
+    #         "json_schema_file": "relecov_tools/schema/relecov_schema.json",
+    #     },
+    # }
 
-    with open("wrapper_config.yaml", "w") as file:
+    # with open("wrapper_config.yaml", "w") as file:
+    #     yaml.dump(config_data, file, default_flow_style=False)
+
+    # return "wrapper_config.yaml"
+
+    template_path = "tests/template_config.yaml"
+
+    # Cargar la plantilla YAML
+    with open(template_path, "r") as file:
+        config_data = yaml.safe_load(file)
+
+    # Rellenar los campos dinámicos
+    config_data["download"]["user"] = user
+    config_data["download"]["passwd"] = password
+    config_data["download"]["download_option"] = download_option
+    config_data["download"]["target_folders"] = target_folders
+
+    # Guardar el archivo modificado
+    output_path = "wrapper_config.yaml"
+    with open(output_path, "w") as file:
         yaml.dump(config_data, file, default_flow_style=False)
 
-    return "wrapper_config.yaml"
+    return output_path
 
 
 def prepare_remote_test(**kwargs):
