@@ -35,7 +35,7 @@ def generate_config_yaml(user, password, download_option, target_folders):
             "user": user,
             "passwd": password,
             "download_option": download_option,
-            "target_folders" : target_folders,
+            "target_folders": target_folders,
         },
         "read-lab-metadata": {
             "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
