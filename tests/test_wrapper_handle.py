@@ -110,6 +110,7 @@ def prepare_remote_test(**kwargs):
         kwargs["user"],
         kwargs["password"],
         kwargs["download_option"],
+        kwargs["target_folders"]
     )
 
     print("Initiating Wrapper")
@@ -126,6 +127,9 @@ def prepare_remote_test(**kwargs):
     ]
     wrapper_manager.config_data["download"]["output_location"] = kwargs[
         "output_location"
+    ]
+    wrapper_manager.config_data["download"]["target_folders"] = kwargs[
+        "target_folders"
     ]
 
     wrapper_manager.config_data["read-lab-metadata"][
