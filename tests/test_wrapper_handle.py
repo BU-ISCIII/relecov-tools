@@ -105,7 +105,7 @@ def prepare_remote_test(**kwargs):
 
     download_manager.relecov_sftp.close_connection()
 
-    # print("Initiating wrapper configuration")
+    print("Initiating wrapper configuration")
     # conf_file = generate_config_yaml(
     #     kwargs["user"],
     #     kwargs["password"],
@@ -113,10 +113,7 @@ def prepare_remote_test(**kwargs):
     # )
 
     print("Initiating Wrapper")
-    wrapper_manager = ProcessWrapper(
-        config_file="wrapper_config.yaml",
-        output_folder=kwargs["output_location"],
-    )
+    wrapper_manager = ProcessWrapper()
 
     wrapper_manager.config_data["download"]["user"] = kwargs["user"]
     wrapper_manager.config_data["download"]["passwd"] = kwargs["password"]
