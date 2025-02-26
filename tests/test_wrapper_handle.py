@@ -118,7 +118,7 @@ def prepare_remote_test(**kwargs):
         output_folder=kwargs["output_location"],
     )
 
-    print("Update Wrapper params")
+    print("Update Wrapper param")
     wrapper_manager.config_data["download"]["user"] = kwargs["user"]
     wrapper_manager.config_data["download"]["passwd"] = kwargs["password"]
     wrapper_manager.config_data["download"]["download_option"] = kwargs[
