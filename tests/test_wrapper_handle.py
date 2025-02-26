@@ -50,6 +50,7 @@ def main():
 
 #     return "wrapper_config.yaml"
 
+
 def prepare_remote_test(**kwargs):
     # First clean the repository.
     print("Initating sftp module")
@@ -115,19 +116,29 @@ def prepare_remote_test(**kwargs):
         config_file="wrapper_config.yaml",
         output_folder=kwargs["output_location"],
     )
-    
+
     wrapper_manager.config_data["download"]["user"] = kwargs["user"]
     wrapper_manager.config_data["download"]["passwd"] = kwargs["password"]
-    wrapper_manager.config_data["download"]["download_option"] = kwargs["download_option"]
-    wrapper_manager.config_data["download"]["output_location"] = kwargs["output_location"]
+    wrapper_manager.config_data["download"]["download_option"] = kwargs[
+        "download_option"
+    ]
+    wrapper_manager.config_data["download"]["output_location"] = kwargs[
+        "output_location"
+    ]
 
-    wrapper_manager.config_data["read-lab-metadata"]["metadata_file"] = "tests/data/read_lab_metadata/metadata_lab_test.xlsx"
-    wrapper_manager.config_data["read-lab-metadata"]["sample_list_file"] = "tests/data/read_lab_metadata/samples_data_test.json"
+    wrapper_manager.config_data["read-lab-metadata"][
+        "metadata_file"
+    ] = "tests/data/read_lab_metadata/metadata_lab_test.xlsx"
+    wrapper_manager.config_data["read-lab-metadata"][
+        "sample_list_file"
+    ] = "tests/data/read_lab_metadata/samples_data_test.json"
 
-    wrapper_manager.config_data["validate"]["json_schema_file"] = "relecov_tools/schema/relecov_schema.json"
+    wrapper_manager.config_data["validate"][
+        "json_schema_file"
+    ] = "relecov_tools/schema/relecov_schema.json"
 
     wrapper_manager.download_params = wrapper_manager.clean_module_params(
-    "DownloadManager", wrapper_manager.config_data["download"]
+        "DownloadManager", wrapper_manager.config_data["download"]
     )
     wrapper_manager.readmeta_params = wrapper_manager.clean_module_params(
         "RelecovMetadata", wrapper_manager.config_data["read-lab-metadata"]
