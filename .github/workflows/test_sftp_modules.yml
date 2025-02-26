@@ -71,7 +71,6 @@ jobs:
       max-parallel: 1
       matrix:
         download_options: ["download_only", "download_clean"]
-        target_folders: ["-t COD-test-1"]
             
     steps:
     - name: Set up Python 3.9.16
@@ -92,7 +91,7 @@ jobs:
             
     - name: Run Wrapper tests
       run: |
-        python3 tests/test_wrapper_handle.py --download_option ${{ matrix.download_options }} ${{ matrix.target_folders }}
+        python3 tests/test_wrapper_handle.py --download_option ${{ matrix.download_options }}
       env:
         TEST_USER: ${{ secrets.TEST_USER }}
         TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
