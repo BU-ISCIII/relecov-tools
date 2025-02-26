@@ -28,48 +28,27 @@ def main():
     prepare_remote_test(**val_dict)
 
 
-def generate_config_yaml(user, password, download_option, target_folders):
-    """Generate the wrapper_config.yaml file with the desired structure."""
-    # config_data = {
-    #     "download": {
-    #         "user": user,
-    #         "passwd": password,
-    #         "download_option": download_option,
-    #         "target_folders": target_folders,
-    #     },
-    #     "read-lab-metadata": {
-    #         "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
-    #         "sample_list_file": "tests/data/read_lab_metadata/samples_data_test.json",
-    #     },
-    #     "validate": {
-    #         "json_schema_file": "relecov_tools/schema/relecov_schema.json",
-    #     },
-    # }
+# def generate_config_yaml(user, password, download_option, target_folders):
+#     """Generate the wrapper_config.yaml file with the desired structure."""
+#     config_data = {
+#         "download": {
+#             "user": user,
+#             "passwd": password,
+#             "download_option": download_option,
+#         },
+#         "read-lab-metadata": {
+#             "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
+#             "sample_list_file": "tests/data/read_lab_metadata/samples_data_test.json",
+#         },
+#         "validate": {
+#             "json_schema_file": "relecov_tools/schema/relecov_schema.json",
+#         },
+#     }
 
-    # with open("wrapper_config.yaml", "w") as file:
-    #     yaml.dump(config_data, file, default_flow_style=False)
+#     with open("wrapper_config.yaml", "w") as file:
+#         yaml.dump(config_data, file, default_flow_style=False)
 
-    # return "wrapper_config.yaml"
-
-    template_path = "tests/template_config.yml"
-
-    # Cargar la plantilla YAML
-    with open(template_path, "r") as file:
-        config_data = yaml.safe_load(file)
-
-    # Rellenar los campos dinámicos
-    config_data["download"]["user"] = user
-    config_data["download"]["passwd"] = password
-    config_data["download"]["download_option"] = download_option
-    config_data["download"]["target_folders"] = target_folders
-
-    # Guardar el archivo modificado
-    output_path = "wrapper_config.yml"
-    with open(output_path, "w") as file:
-        yaml.dump(config_data, file, default_flow_style=False)
-
-    return output_path
-
+#     return "wrapper_config.yaml"
 
 def prepare_remote_test(**kwargs):
     # First clean the repository.
@@ -124,18 +103,37 @@ def prepare_remote_test(**kwargs):
 
     download_manager.relecov_sftp.close_connection()
 
-    print("Initiating wrapper configuration")
-    conf_file = generate_config_yaml(
-        kwargs["user"],
-        kwargs["password"],
-        kwargs["download_option"],
-        kwargs["target_folders"],
-    )
+    # print("Initiating wrapper configuration")
+    # conf_file = generate_config_yaml(
+    #     kwargs["user"],
+    #     kwargs["password"],
+    #     kwargs["download_option"],
+    # )
 
     print("Initiating Wrapper")
     wrapper_manager = ProcessWrapper(
-        config_file=conf_file,
+        config_file="wrapper_config.yaml",
         output_folder=kwargs["output_location"],
+    )
+    
+    wrapper_manager.config_data["download"]["user"] = kwargs["user"]
+    wrapper_manager.config_data["download"]["passwd"] = kwargs["password"]
+    wrapper_manager.config_data["download"]["download_option"] = kwargs["download_option"]
+    wrapper_manager.config_data["download"]["output_location"] = kwargs["output_location"]
+
+    wrapper_manager.config_data["read-lab-metadata"]["metadata_file"] = "tests/data/read_lab_metadata/metadata_lab_test.xlsx"
+    wrapper_manager.config_data["read-lab-metadata"]["sample_list_file"] = "tests/data/read_lab_metadata/samples_data_test.json"
+
+    wrapper_manager.config_data["validate"]["json_schema_file"] = "relecov_tools/schema/relecov_schema.json"
+
+    wrapper_manager.download_params = wrapper_manager.clean_module_params(
+    "DownloadManager", wrapper_manager.config_data["download"]
+    )
+    wrapper_manager.readmeta_params = wrapper_manager.clean_module_params(
+        "RelecovMetadata", wrapper_manager.config_data["read-lab-metadata"]
+    )
+    wrapper_manager.validate_params = wrapper_manager.clean_module_params(
+        "SchemaValidation", wrapper_manager.config_data["validate"]
     )
 
     def test_wrapper(wrapper_manager):
