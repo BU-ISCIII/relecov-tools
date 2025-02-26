@@ -44,7 +44,7 @@ jobs:
   test_all_modules:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 3
+      max-parallel: 4
       matrix:
         modules: 
         - "read-lab-metadata"
