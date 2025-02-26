@@ -2,8 +2,7 @@
 import os
 import sys
 import argparse
-
-# import yml
+import yaml
 from relecov_tools.download_manager import DownloadManager
 from relecov_tools.dataprocess_wrapper import ProcessWrapper
 
@@ -29,27 +28,27 @@ def main():
     prepare_remote_test(**val_dict)
 
 
-# def generate_config_yaml(user, password, download_option, target_folders):
-#     """Generate the wrapper_config.yaml file with the desired structure."""
-#     config_data = {
-#         "download": {
-#             "user": user,
-#             "passwd": password,
-#             "download_option": download_option,
-#         },
-#         "read-lab-metadata": {
-#             "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
-#             "sample_list_file": "tests/data/read_lab_metadata/samples_data_test.json",
-#         },
-#         "validate": {
-#             "json_schema_file": "relecov_tools/schema/relecov_schema.json",
-#         },
-#     }
+def generate_config_yaml(user, password, download_option, target_folders):
+    """Generate the wrapper_config.yaml file with the desired structure."""
+    config_data = {
+        "download": {
+            "user": user,
+            "passwd": password,
+            "download_option": download_option,
+        },
+        "read-lab-metadata": {
+            "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
+            "sample_list_file": "tests/data/read_lab_metadata/samples_data_test.json",
+        },
+        "validate": {
+            "json_schema_file": "relecov_tools/schema/relecov_schema.json",
+        },
+    }
 
-#     with open("wrapper_config.yaml", "w") as file:
-#         yaml.dump(config_data, file, default_flow_style=False)
+    with open("wrapper_config.yaml", "w") as file:
+        yaml.dump(config_data, file, default_flow_style=False)
 
-#     return "wrapper_config.yaml"
+    return "wrapper_config.yaml"
 
 
 def prepare_remote_test(**kwargs):
@@ -106,14 +105,15 @@ def prepare_remote_test(**kwargs):
     download_manager.relecov_sftp.close_connection()
 
     print("Initiating wrapper configuration")
-    # conf_file = generate_config_yaml(
-    #     kwargs["user"],
-    #     kwargs["password"],
-    #     kwargs["download_option"],
-    # )
+    conf_file = generate_config_yaml(
+        kwargs["user"],
+        kwargs["password"],
+        kwargs["download_option"],
+    )
 
     print("Initiating Wrapper")
     wrapper_manager = ProcessWrapper(
+        config_file=conf_file,
         output_folder=kwargs["output_location"],
     )
 
