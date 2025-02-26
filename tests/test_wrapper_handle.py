@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import sys
-#import yaml
 import argparse
 from relecov_tools.download_manager import DownloadManager
 from relecov_tools.dataprocess_wrapper import ProcessWrapper
