@@ -28,12 +28,12 @@ def main():
     prepare_remote_test(**val_dict)
 
 
-def generate_config_yaml(user, password, download_option, target_folders):
+def generate_config_yaml(download_option, target_folders):
     """Generate the wrapper_config.yaml file with the desired structure."""
     config_data = {
         "download": {
-            "user": user,
-            "passwd": password,
+            "user": "",
+            "passwd": "",
             "download_option": download_option,
             "target_folders": target_folders,
         },
@@ -105,15 +105,13 @@ def prepare_remote_test(**kwargs):
 
     download_manager.relecov_sftp.close_connection()
 
-    print("Initiating wrapper configuration")
+    print("Create Intermediate YML")
     conf_file = generate_config_yaml(
-        "user",
-        "password",
         kwargs["download_option"],
         kwargs["target_folders"],
     )
 
-    print("Initiating Wrapper")
+    print("Initiating ProcessWrapper")
     wrapper_manager = ProcessWrapper(
         config_file=conf_file,
         output_folder=kwargs["output_location"],
@@ -121,14 +119,19 @@ def prepare_remote_test(**kwargs):
 
     print("Update Wrapper params")
     wrapper_manager.download_params = {
-        "user": kwargs["user"],
-        "passwd": kwargs["password"],
+        "user": os.environ["TEST_USER"],
+        "passwd": os.environ["TEST_PASSWORD"],
         "download_option": kwargs["download_option"],
         "output_location": kwargs["output_location"],
         "target_folders": kwargs["target_folders"],
     }
 
-    wrapper_manager.run_wrapper()
+    download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
+
+    def test_wrapper(wrapper_manager):
+        wrapper_manager.run_wrapper()
+
+    test_wrapper(wrapper_manager)
 
 
 if __name__ == "__main__":
