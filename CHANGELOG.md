@@ -37,6 +37,7 @@ Code contributions to the release:
 - Add repeated samples to test data [#413](https://github.com/BU-ISCIII/relecov-tools/pull/413)
 - Add create_summary_tables.py to assets to process data from a given epidemiological week [#418](https://github.com/BU-ISCIII/relecov-tools/pull/418)
 - Add wrapper to github actions (test_sftp_modules) [#409](https://github.com/BU-ISCIII/relecov-tools/pull/409)
+- Remove wrapper from github actions (test_sftp_modules) [#421](https://github.com/BU-ISCIII/relecov-tools/pull/421)
 
 #### Fixes
 
