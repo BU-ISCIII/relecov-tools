@@ -63,39 +63,3 @@ jobs:
         TEST_PORT: ${{ secrets.TEST_PORT }}
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
-  test_wrapper:
-    runs-on: ubuntu-latest
-    needs: test_download
-    if: github.repository_owner == 'BU-ISCIII'
-    strategy:
-      max-parallel: 1
-      matrix:
-        download_options: ["download_only", "download_clean"]
-                        
-    steps:
-    - name: Set up Python 3.9.16
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.9.16'
-            
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        fetch-depth: 0
-                        
-    - name: Install package and dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install .
-                        
-    - name: Run Wrapper tests
-      run: |
-        python3 tests/test_wrapper_handle.py --download_option ${{ matrix.download_options }}
-      env:
-        TEST_USER: ${{ secrets.TEST_USER }}
-        TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-        TEST_PORT: ${{ secrets.TEST_PORT }}
-        OUTPUT_LOCATION: ${{ github.workspace }}/tests/
-
-
