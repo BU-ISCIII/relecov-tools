@@ -1,39 +1,39 @@
 #!/bin/bash
 
-# Verificar si se proporcionaron dos argumentos
+# Check if two arguments were provided
 if [ "$#" -ne 2 ]; then
-    echo "Uso: $0 <fichero1> <fichero2>"
+    echo "Usage: $0 <all_samples_file> <new_samples_file>"
     exit 1
 fi
 
-# Asignar los argumentos a variables
-fichero1="$1"
-fichero2="$2"
+# Assign arguments to variables
+all_samples_file="$1"
+new_samples_file="$2"
 
-# Verificar si los ficheros existen
-if [ ! -f "$fichero1" ] || [ ! -f "$fichero2" ]; then
-    echo "Ambos ficheros deben existir."
+# Check if the files exist
+if [ ! -f "$all_samples_file" ] || [ ! -f "$new_samples_file" ]; then
+    echo "Both files must exist."
     exit 1
 fi
 
-# Buscar duplicados en el segundo fichero
-repetidas_en_segundo=$(sort "$fichero2" | uniq -d)
+# Find duplicates in the second file
+duplicates_in_new_file=$(sort "$new_samples_file" | uniq -d)
 
-if [ -n "$repetidas_en_segundo" ]; then
-    echo "El segundo fichero tiene muestras repetidas. Estas muestras son:"
-    echo "$repetidas_en_segundo"
+if [ -n "$duplicates_in_new_file" ]; then
+    echo "New samples file contains duplicate samples. These samples are:"
+    echo "$duplicates_in_new_file"
     exit 0
 fi
 
-# Buscar muestras repetidas entre los dos ficheros
-repetidas=$(grep -Fxf "$fichero1" "$fichero2")
+# Find repeated samples between the two files
+duplicates=$(grep -Fxf "$all_samples_file" "$new_samples_file")
 
-if [ -n "$repetidas" ]; then
-    # Si hay muestras repetidas entre los dos ficheros
-    echo "El segundo fichero tiene muestras que ya están en el primero. Estas muestras son:"
-    echo "$repetidas"
+if [ -n "$duplicates" ]; then
+    # If there are duplicate samples between the two files
+    echo "The second file contains samples that are already in the first file. These samples are:"
+    echo "$duplicates"
 else
-    # Si todas las muestras son nuevas
-    echo "Todas las muestras han sido añadidas al primer fichero."
-    cat "$fichero2" >> "$fichero1"
+    # If all samples are new
+    echo "All samples have been added to the first file."
+    cat "$new_samples_file" >> "$all_samples_file"
 fi
