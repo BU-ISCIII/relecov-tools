@@ -1,5 +1,4 @@
-""" Main relecov package file.
-"""
+""" Main relecov package file."""
 
 import pkg_resources
 
