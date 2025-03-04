@@ -110,26 +110,10 @@ def prepare_remote_test(**kwargs):
         kwargs["download_option"],
         kwargs["target_folders"],
     )
-    
-    print("Initiating Wrapper")
-    config_data = {
-        "download": {
-            "user": kwargs["user"],
-            "passwd": kwargs["password"],
-            "download_option": kwargs["download_option"],
-            "target_folders": kwargs["target_folders"],
-        },
-        "read-lab-metadata": {
-            "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
-            "sample_list_file": "tests/data/read_lab_metadata/samples_data_test.json",
-        },
-        "validate": {
-            "json_schema_file": "relecov_tools/schema/relecov_schema.json",
-        },
-    }
 
+    print("Initiating ProcessWrapper")
     wrapper_manager = ProcessWrapper(
-        config_file=config_data,
+        config_file=conf_file,
         output_folder=kwargs["output_location"],
     )
 
