@@ -990,7 +990,7 @@ class SchemaBuilder:
                             showErrorMessage=True,
                         )
                         dropdown.error = "El valor ingresado no es válido. Seleccione un valor de la lista desplegable."
-                        dropdown.errorTitle = "Invalid entry"
+                        dropdown.errorTitle = "Valor no permitido"
                         dropdown.prompt = f"Select a value for {property_id}"
                         dropdown.promptTitle = "Value selection"
 
