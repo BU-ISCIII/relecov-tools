@@ -986,9 +986,10 @@ class SchemaBuilder:
                         dropdown = DataValidation(
                             type="list",
                             formula1=f"{dropdown_range_address}",
-                            allow_blank=True,
+                            allow_blank=False,
+                            showErrorMessage = True,
                         )
-                        dropdown.error = "Invalid value"
+                        dropdown.error = "El valor ingresado no es válido. Seleccione un valor de la lista desplegable."
                         dropdown.errorTitle = "Invalid entry"
                         dropdown.prompt = f"Select a value for {property_id}"
                         dropdown.promptTitle = "Value selection"
