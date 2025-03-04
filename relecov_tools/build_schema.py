@@ -987,7 +987,7 @@ class SchemaBuilder:
                             type="list",
                             formula1=f"{dropdown_range_address}",
                             allow_blank=False,
-                            showErrorMessage = True,
+                            showErrorMessage=True,
                         )
                         dropdown.error = "El valor ingresado no es válido. Seleccione un valor de la lista desplegable."
                         dropdown.errorTitle = "Invalid entry"
