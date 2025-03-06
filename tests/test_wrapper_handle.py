@@ -127,6 +127,7 @@ def prepare_remote_test(**kwargs):
     }
 
     wrapper_manager.download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
+
     def test_wrapper(wrapper_manager):
         wrapper_manager.run_wrapper()
 
