@@ -20,7 +20,7 @@
         },
         "metadata_lab_heading": [
             "Organism",
-            "Public Health sample id (SIVIES)",
+            "Public Health sample id (SIVIRA)",
             "Sample ID given by originating laboratory",
             "Sample ID given by the submitting laboratory",
             "Sample ID given in the microbiology lab",
@@ -41,7 +41,8 @@
             "Environmental System",
             "Collection Device",
             "Host",
-            "Host Age",
+            "Host Age Years",
+            "Host Age Months",
             "Host Gender",
             "Sequencing Date",
             "Nucleic acid extraction protocol",
@@ -66,7 +67,13 @@
             "Diagnostic Pcr Ct Value-2",
             "Authors",
             "Sequence file R1 fastq",
-            "Sequence file R2 fastq"
+            "Sequence file R2 fastq", 
+            "Vaccinated",
+            "Specific medication for treatment or prophylaxis",
+            "Hospitalization",
+            "Admission to intensive care unit",
+            "Death",
+            "Immunosuppression"
         ],
         "alt_heading_equivalences": {
             "Sample ID": "Sample ID given for sequencing",
