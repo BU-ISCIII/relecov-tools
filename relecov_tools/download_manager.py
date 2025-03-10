@@ -344,8 +344,9 @@ class DownloadManager:
             error_text = "Header could not be found for excel file %s"
             raise MetadataError(str(error_text % os.path.basename(meta_f_path)))
         for cell in ws_metadata_lab[header_row]:
-            cell.value = cell.value.strip()
-        metadata_header = [x.value for x in ws_metadata_lab[header_row]]
+            if cell.value is not None:
+                cell.value = cell.value.strip()
+        metadata_header = [x.value for x in ws_metadata_lab[header_row] if x.value is not None]
         meta_column_list = self.metadata_lab_heading
         if meta_column_list != metadata_header[1:]:
             diffs = [
