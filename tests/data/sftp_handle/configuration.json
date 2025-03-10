@@ -1,14 +1,26 @@
 {
     "lab_metadata": {
         "fixed_fields": {
-            "host_disease": "COVID-19",
-            "tax_id": "2697049",
-            "organism": "Severe acute respiratory syndrome coronavirus 2",
             "study_type": "Whole Genome Sequencing",
             "collector_name": "Not Provided"
         },
+        "organism_mapping": {
+            "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]": {
+                "tax_id": "2697049",
+                "host_disease": "COVID-19 [SNOMED:840539006]"
+            },
+            "Respiratory syncytial virus [SNOMED:6415009]": {
+                "tax_id": "1281",
+                "host_disease": "Respiratory Syncytial Virus Infection [SNOMED:55735004]"
+            },
+            "Influenza virus [SNOMED:725894000]": {
+                "tax_id": "11320",
+                "host_disease": "Influenza Infection [SNOMED:408687004]"
+            }
+        },
         "metadata_lab_heading": [
-            "Public Health sample id (SIVIES)",
+            "Organism",
+            "Public Health sample id (SIVIRA)",
             "Sample ID given by originating laboratory",
             "Sample ID given by the submitting laboratory",
             "Sample ID given in the microbiology lab",
@@ -29,7 +41,8 @@
             "Environmental System",
             "Collection Device",
             "Host",
-            "Host Age",
+            "Host Age Years",
+            "Host Age Months",
             "Host Gender",
             "Sequencing Date",
             "Nucleic acid extraction protocol",
@@ -54,8 +67,36 @@
             "Diagnostic Pcr Ct Value-2",
             "Authors",
             "Sequence file R1 fastq",
-            "Sequence file R2 fastq"
+            "Sequence file R2 fastq", 
+            "Vaccinated",
+            "Specific medication for treatment or prophylaxis",
+            "Hospitalization",
+            "Admission to intensive care unit",
+            "Death",
+            "Immunosuppression"
         ],
+        "alt_heading_equivalences": {
+            "Sample ID": "Sample ID given for sequencing",
+            "LAB ID" : "Originating Laboratory",
+            "Sequencing date\n Formato: YYYY-MM-DD" : "Sequencing Date",
+            "Commercial All-in-one library kit" : "Commercial All-in-one library kit",
+            "Library preparation kit " : "Library Preparation Kit",
+            "Enrichment protocol" : "Enrichment Protocol",
+            "if enrichment protocol is Other, specify" : "If Enrichment Protocol Is Other, Specify",
+            "Amplicon protocol" : "Enrichment panel/assay",
+            "if enrichment panel/assay is Other, specify" : "If Enrichment panel/assay Is Other, Specify",
+            "Amplicon version" : "Enrichment panel/assay version",
+            "Number Of Samples In Run" : "Number Of Samples In Run",
+            "Number of variants with effect (missense, frameshit, stop codon)" : "Number of variants with effect",
+            "Sequencing platforms (Illumina, Nanopore, IonTorrent, PacBio, other)" : "Sequencing Instrument Model",
+            "Variant designation table filename" : "Lineage analysis file",
+            "Library preparation kit" : "Library Preparation Kit",
+            "Library layout" : "Library Layout",
+            "Read lenght" : "Read length",
+            "SARS-CoV-2 Lineage designation" : "Lineage designation",
+            "fastq filename R1" : "Sequence file R1 fastq",
+            "fastq filename R2" : "Sequence file R2 fastq"
+        },
         "lab_metadata_req_json": {
             "laboratory_data": {
                 "file": "laboratory_address.json",
@@ -204,8 +245,12 @@
             "sftp_port": "22"
         },
         "metadata_processing": {
+            "sample_id_col": "Sample ID given for sequencing",
             "header_flag": "CAMPO",
-            "excel_sheet": "METADATA_LAB"
+            "excel_sheet": "METADATA_LAB",
+            "alternative_sheet": "5.Viral Characterisation and Se",
+            "alternative_flag": "CAMPO",
+            "alternative_sample_id_col": "Sample ID given for sequencing"
         },
         "abort_if_md5_mismatch": "False",
         "platform_storage_folder": "/tmp/relecov",
@@ -215,7 +260,10 @@
             ".fq",
             ".fq.gz",
             ".fasta",
-            ".fasta.gz"
+            ".fasta.gz",
+            ".fa",
+            ".fa.gz",
+            "bam"
         ],
         "allowed_download_options": [
             "download_only",
@@ -231,145 +279,55 @@
     "GISAID_configuration": {
         "submitter": "GISAID_ID"
     },
-    "external_url": {
-        "iskylims": {
-            "server": "http://relecov-iskylims.isciiides.es",
-            "url": "/wetlab/api/",
-            "store_samples": "createSampleData",
-            "url_project_fields": "sampleProjectFields",
-            "url_sample_fields": "sampleFields",
-            "param_sample_project": "project",
-            "project_name": "relecov",
-            "token": ""
-        },
-        "relecov": {
-            "server": "http://relecov-platform.isciiides.es",
-            "url": "/api/",
+    "upload_database": {
+        "platform":{
+            "iskylims": {
+                "server_url": "http://relecov-iskylims.isciiides.es",
+                "api_url": "/wetlab/api/",
+                "store_samples": "create-sample",
+                "url_project_fields": "projects-fields",
+                "url_sample_fields": "sample-fields",
+                "param_sample_project": "project",
+                "project_name": "relecov",
+                "token": ""
+            },
+            "relecov": {
+            "server_url": "http://relecov-platform.isciiides.es",
+            "api_url": "/api/",
             "store_samples": "createSampleData",
             "bioinfodata": "createBioinfoData",
             "variantdata": "createVariantData",
             "sftp_info": "sftpInfo",
             "token": ""
-        }
-    },
-    "iskylims_fixed_values": {
-        "patientCore": "",
-        "sampleProject": "Relecov",
-        "onlyRecorded": "Yes",
-        "sampleLocation": "Not defined"
-    },
-    "relecov_sample_metadata": [
-        "authors",
-        "collecting_institution",
-        "collecting_lab_sample_id",
-        "ena_broker_name",
-        "ena_sample_accession",
-        "gisaid_accession_id",
-        "gisaid_virus_name",
-        "microbiology_lab_sample_id",
-        "r1_fastq_filepath",
-        "r2_fastq_filepath",
-        "schema_name",
-        "schema_version",
-        "sequencing_date",
-        "sequence_file_R1_md5",
-        "sequence_file_R2_md5",
-        "sequence_file_R1_fastq",
-        "sequence_file_R2_fastq",
-        "sequencing_sample_id",
-        "submitting_lab_sample_id"
-    ],
-    "bioinfo_analysis": {
-        "fixed_values": {
-            "assembly": "Not Provided [GENEPIO:0001668]",
-            "assembly_params": "Not Provided [GENEPIO:0001668]",
-            "bioinformatics_protocol_software_name": "nf-core/viralrecon",
-            "commercial_open_source_both": "Open Source",
-            "consensus_params": "-p vcf -f",
-            "consensus_sequence_software_name": "BCFTOOLS_CONSENSUS",
-            "dehosting_method_software_name": "KRAKEN2_KRAKEN2",
-            "depth_of_coverage_threshold": ">10x",
-            "if_assembly_other": "Not Provided [GENEPIO:0001668]",
-            "if_bioinformatic_protocol_is_other_specify": "Not Provided [GENEPIO:0001668]",
-            "if_consensus_other": "Not Provided [GENEPIO:0001668]",
-            "if_lineage_identification_other": "Not Provided [GENEPIO:0001668]",
-            "if_mapping_other": "Not Provided [GENEPIO:0001668]",
-            "if_preprocessing_other": "Not Provided [GENEPIO:0001668]",
-            "lineage_analysis_software_name": "pangolin",
-            "mapping_params": "--seed 1",
-            "mapping_software_name": "BOWTIE2_ALIGN",
-            "preprocessing_params": "--cut_front --cut_tail --trim_poly_x --cut_mean_quality 30 --qualified_quality_phred 30 --unqualified_percent_limit 10 --length_required 50",
-            "preprocessing_software_name": "FASTP",
-            "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20 -m 10",
-            "variant_calling_software_name": "IVAR_VARIANTS"
-        },
-        "feed_empty_fields":{
-            "lineage_analysis_date": "Not Provided [GENEPIO:0001668]",
-            "consensus_sequence_name": "Not Provided [GENEPIO:0001668]"
-        },
-        "required_file": {
-            "variants_metrics": "summary_variants_metrics_mqc.csv",
-            "versions": "software_versions.yml",
-            "mapping_stats": "mapping_illumina_stats.tab"
-        },
-        "mapping_consensus": [
-            "consensus_genome_length",
-            "consensus_sequence_filename",
-            "consensus_sequence_filepath",
-            "consensus_sequence_md5",
-            "number_of_base_pairs_sequenced"
-        ],
-        "mapping_pangolin": {
-            "variant_name": "scorpio_call",
-            "lineage_name": "lineage",
-            "lineage_algorithm_software_version": "version",
-            "lineage_analysis_software_version": "pangolin_version",
-            "lineage_analysis_scorpio_version": "scorpio_version",
-            "lineage_analysis_constellation_version": "constellation_version"
-        },
-        "mapping_stats": {
-            "analysis_date": "analysis_date",
-            "depth_of_coverage_value": "medianDPcoveragevirus",
-            "number_of_variants_in_consensus": "Variantsinconsensusx10",
-            "number_of_variants_with_effect": "MissenseVariants",
-            "per_genome_greater_10x": "Coverage>10x(%)",
-            "per_Ns": "%Ns10x",
-            "per_reads_host": "%readshost",
-            "per_reads_virus": "%readsvirus",
-            "per_unmapped": "%unmapedreads",
-            "qc_filtered": "totalreads",
-            "reference_genome_accession": "Virussequence",
-            "read_length": "read_length"
-        },
-        "mapping_variant_metrics": {
-            "ns_per_100_kbp": "# Ns per 100kb consensus"
-        },
-        "mapping_version": {
-            "bioinformatics_protocol_software_version": {
-                "Workflow": "nf-core/viralrecon"
-            },
-            "consensus_sequence_software_version": {
-                "BCFTOOLS_CONSENSUS": "bcftools"
-            },
-            "dehosting_method_software_version": {
-                "KRAKEN2_KRAKEN2": "kraken2"
-            },
-            "mapping_software_version": {
-                "BOWTIE2_ALIGN": "bowtie2"
-            },
-            "preprocessing_software_version": {
-                "FASTP": "fastp"
-            },
-            "variant_calling_software_version": {
-                "IVAR_VARIANTS": "ivar"
             }
         },
-        "required_fields_from_lab_json": {
-            "read_length": "number_of_base_pairs_sequenced",
-            "schema_name": "schema_name",
-            "schema_version": "schema_version",
-            "sequencing_sample_id": "sequencing_sample_id"
-        }
+        "iskylims_fixed_values": {
+            "patient_core": "",
+            "sample_project": "Relecov",
+            "only_recorded": "Yes",
+            "sample_location": "Not defined"
+        },
+        "relecov_sample_metadata": [
+            "authors",
+            "collecting_institution",
+            "collecting_lab_sample_id",
+            "ena_broker_name",
+            "ena_sample_accession",
+            "gisaid_accession_id",
+            "gisaid_virus_name",
+            "microbiology_lab_sample_id",
+            "r1_fastq_filepath",
+            "r2_fastq_filepath",
+            "schema_name",
+            "schema_version",
+            "sequencing_date",
+            "sequence_file_R1_md5",
+            "sequence_file_R2_md5",
+            "sequence_file_R1_fastq",
+            "sequence_file_R2_fastq",
+            "sequencing_sample_id",
+            "submitting_lab_sample_id"
+        ]
     },
     "ENA_fields": {
         "ENA_configuration": {
@@ -492,5 +450,49 @@
                 "fastq_r2_md5"
             ]
         }
+    },
+    "pipeline_manager": {
+        "analysis_group": "RLV",
+        "analysis_user": "icasas_C",
+        "doc_folder": "DOC",
+        "analysis_folder": "ANALYSIS",
+        "sample_stored_folder": "RAW",
+        "sample_link_folder": "00-reads",
+        "organism_config": {
+            "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]": {
+                "pipeline_template": "viralrecon",
+                "service_tag": "SARSCOV2",
+                "group_by_fields": [
+                    "sequencing_instrument_platform",
+                    "enrichment_panel",
+                    "enrichment_panel_version"
+                ]
+            },
+            "Respiratory syncytial virus [SNOMED:6415009]": {
+                "pipeline_template": "IRMA",
+                "service_tag": "GENOMERSV",
+                "group_by_fields": [
+                    "sequencing_instrument_platform",
+                    "enrichment_panel",
+                    "enrichment_panel_version"
+                ]
+            },
+            "Influenza virus [SNOMED:725894000]": {
+                "pipeline_template": "IRMA",
+                "service_tag": "GENOMEFLU",
+                "group_by_fields": [
+                    "sequencing_instrument_platform"
+                ]
+            }
+        }
+    },
+    "mail_sender":{
+        "delivery_template_path_file": "./relecov_tools/templates/",
+        "email_host": "mx2.isciii.es",
+        "email_port": "587",
+        "email_host_user": "bioinformatica@isciii.es", 
+        "email_use_tls": "True",
+        "yaml_cred_path": "~/buisciii_config.yml",
+        "institutions_guide_path": "/data/bioinfoshare/UCCT_Relecov/statics/institutions_guide.json"
     }
 }
