@@ -2,24 +2,24 @@
     "210141": {
         "fastq_r1_md5": "eab8b05ef27f4f5cba5cddf6ad627de2",
         "fastq_r2_md5": "d82a37aa970df2b8bf8f547ca7c18ac8",
-        "r1_fastq_filepath": "/media/data/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
-        "r2_fastq_filepath": "/media/data/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
+        "r1_fastq_filepath": "/media/data/bioinfoshare/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
+        "r2_fastq_filepath": "/media/data/bioinfoshare/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
         "sequence_file_R1_fastq": "210141_R1.fastq.gz",
         "sequence_file_R2_fastq": "210141_R2.fastq.gz"
     },
     "2018086": {
         "fastq_r1_md5": "b5242d60471e5a5a97b35531dbbe8c30",
         "fastq_r2_md5": "57525c5a1ec992098e652aa01b366d69",
-        "r1_fastq_filepath": "/media/data/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
-        "r2_fastq_filepath": "/media/data/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
+        "r1_fastq_filepath": "/media/data/bioinfoshare/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
+        "r2_fastq_filepath": "/media/data/bioinfoshare/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
         "sequence_file_R1_fastq": "2018086_R1.fastq.gz",
         "sequence_file_R2_fastq": "2018086_R2.fastq.gz"
     },
        "2018102": {
         "fastq_r1_md5": "b5242d60471e5a5a97b35531dbbe8c30",
         "fastq_r2_md5": "57525c5a1ec992098e652aa01b366d69",
-        "r1_fastq_filepath": "/media/data/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
-        "r2_fastq_filepath": "/media/data/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
+        "r1_fastq_filepath": "/media/data/bioinfoshare/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
+        "r2_fastq_filepath": "/media/data/bioinfoshare/UCCT_Relecov/COD-2100-MAD-CNM/muestras_analizadas_viralrecon_20220720",
         "sequence_file_R1_fastq": "2018102_R1.fastq.gz",
         "sequence_file_R2_fastq": "2018102_R2.fastq.gz"
     }
