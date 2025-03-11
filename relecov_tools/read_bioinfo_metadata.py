@@ -212,6 +212,8 @@ class BioinfoMetadata:
         method_name = f"{self.validate_software_mandatory_files.__name__}"
         missing_required = []
         for key in self.software_config:
+            if key == "fixed_values":
+                continue
             if self.software_config[key].get("required") is True:
                 try:
                     files_dict[key]
@@ -224,7 +226,7 @@ class BioinfoMetadata:
             self.log_report.update_log_report(
                 method_name,
                 "error",
-                f"Missing mandatory files in {self.software_name}.{key}:{', '.join(missing_required)}",
+                f"Missing mandatory files in {self.software_name}:{', '.join(missing_required)}",
             )
             sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         else:
@@ -676,7 +678,11 @@ class BioinfoMetadata:
                                 file_path = file
                                 break  # Exit loop if match found
                 path_key = f"{self.software_name}_filepath_{key}"
-                row[path_key] = file_path
+                if file_path != "Not Provided [GENEPIO:0001668]":
+                    analysis_results_path = os.path.join(self.output_folder, "analysis_results", os.path.basename(file_path))
+                    row[path_key] = analysis_results_path
+                else:
+                    row[path_key] = file_path
                 if self.software_config[key].get("extract"):
                     self.extract_file(
                         file=file_path,

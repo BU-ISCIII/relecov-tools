@@ -106,6 +106,7 @@
             "multiple_samples": true,
             "required": true,
             "function": null,
+            "extract": true,
             "content": {
                 "ns_per_100_kbp": "# Ns per 100kb consensus"
             }
@@ -122,6 +123,7 @@
             "required": true,
             "multiple_samples": true,
             "function": null,
+            "extract": true,
             "content": {
                 "software_version": {
                     "bioinformatics_protocol_software_version": "nf-core/viralrecon",
