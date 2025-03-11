@@ -107,19 +107,19 @@ def prepare_remote_test(**kwargs):
     download_manager.relecov_sftp.close_connection()
 
     print("Create Intermediate YML")
-    conf_file = generate_config_yaml(
+    conf_file = generate_config_yaml(  # Generate the YAML config file
         kwargs["download_option"],
         kwargs["target_folders"],
     )
 
     print("Initiating ProcessWrapper")
-    wrapper_manager = ProcessWrapper(
+    wrapper_manager = ProcessWrapper(  # Initialize ProcessWrapper with the config file
         config_file=conf_file,
         output_folder=kwargs["output_location"],
     )
 
     print("Update Wrapper params")
-    wrapper_manager.download_params = {
+    wrapper_manager.download_params = {  # Set download parameters
         "user": os.environ["TEST_USER"],
         "passwd": os.environ["TEST_PASSWORD"],
         "download_option": kwargs["download_option"],
@@ -129,9 +129,9 @@ def prepare_remote_test(**kwargs):
     }
 
     def test_wrapper(wrapper_manager):
-        wrapper_manager.run_wrapper()
+        wrapper_manager.run_wrapper()  # Execute the wrapper process
 
-    test_wrapper(wrapper_manager)
+    test_wrapper(wrapper_manager)  # Run the wrapper function
 
 
 if __name__ == "__main__":
