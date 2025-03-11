@@ -19,6 +19,7 @@ Code contributions to the release:
 
 #### Added enhancements
 
+- Added custom validator to extend validation exceptions [#429](https://github.com/BU-ISCIII/relecov-tools/pull/429)
 - Refactor GitHub Actions & Add build-schema Step [#417](https://github.com/BU-ISCIII/relecov-tools/pull/417)
 - Add documentation for `bioinfo_config.json` in README [#415](https://github.com/BU-ISCIII/relecov-tools/pull/415)
 - Added a more robust datatype handling in utils.py read_csv_file_return_dict() method [#379](https://github.com/BU-ISCIII/relecov-tools/pull/379)
