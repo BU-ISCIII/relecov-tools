@@ -126,7 +126,12 @@ def prepare_remote_test(**kwargs):
         "target_folders": kwargs["target_folders"],
     }
 
-    wrapper_manager.download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
+    # wrapper_manager.download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
+
+    if wrapper_manager.download_manager is not None:
+        wrapper_manager.download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
+    else:
+        print("Warning: `download_manager` is not initialized yet. Skipping SFTP port assignment.")
 
     def test_wrapper(wrapper_manager):
         wrapper_manager.run_wrapper()
