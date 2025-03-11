@@ -60,7 +60,6 @@ class ProcessWrapper:
             "SchemaValidation", self.config_data["validate"]
         )
         self.date = datetime.today().strftime("%Y%m%d%H%M%S")
-        self.download_manager = None
 
     def clean_module_params(self, module, params):
         active_module = eval(module)
@@ -75,6 +74,9 @@ class ProcessWrapper:
 
     def exec_download(self, download_params):
         download_manager = DownloadManager(**download_params)
+        if "sftp_port" in download_params:
+            download_manager.relecov_sftp.sftp_port = int(download_params["sftp_port"])
+            print(f"✅ SFTP port assigned: {self.download_manager.relecov_sftp.sftp_port}")
         download_manager.execute_process()
         finished_folders = download_manager.finished_folders
         download_logs = self.wrapper_logsum.prepare_final_logs(
