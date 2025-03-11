@@ -679,7 +679,11 @@ class BioinfoMetadata:
                                 break  # Exit loop if match found
                 path_key = f"{self.software_name}_filepath_{key}"
                 if file_path != "Not Provided [GENEPIO:0001668]":
-                    analysis_results_path = os.path.join(self.output_folder, "analysis_results", os.path.basename(file_path))
+                    analysis_results_path = os.path.join(
+                        self.output_folder,
+                        "analysis_results",
+                        os.path.basename(file_path),
+                    )
                     row[path_key] = analysis_results_path
                 else:
                     row[path_key] = file_path
