@@ -60,6 +60,7 @@ class ProcessWrapper:
             "SchemaValidation", self.config_data["validate"]
         )
         self.date = datetime.today().strftime("%Y%m%d%H%M%S")
+        self.download_manager = None
 
     def clean_module_params(self, module, params):
         active_module = eval(module)
