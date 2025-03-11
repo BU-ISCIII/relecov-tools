@@ -8,8 +8,10 @@ import openpyxl
 
 import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
+import relecov_tools.assets.schema_utils.custom_validators
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.log_summary import LogSum
+
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -112,9 +114,9 @@ class SchemaValidation:
         return sample_id_field
 
     def validate_instances(self):
-        """Validate data instances against a validated json schema"""
+        """Validate data instances against a validated JSON schema"""
 
-        # create validator
+        # Create validator
         validator = Draft202012Validator(
             self.json_schema, format_checker=FormatChecker()
         )
@@ -124,40 +126,55 @@ class SchemaValidation:
         invalid_json = []
         errors = {}
         error_keys = {}
+
         if self.sample_id_field is None:
             log_text = f"Logs keys set to None. Reason: {self.SAMPLE_FIELD_ERROR}"
             self.logsum.add_warning(sample=self.sample_id_field, entry=log_text)
-        stderr.print("[blue] Start processing the json file")
-        log.info("Start processing the json file")
+
+        stderr.print("[blue] Start processing the JSON file")
+        log.info("Start processing the JSON file")
+
         for item_row in self.json_data:
-            # validate(instance=item_row, schema=json_schema)
             sample_id_value = item_row.get(self.sample_id_field)
-            if validator.is_valid(item_row):
+
+            # Collect all errors (don't raise immediately)
+            validation_errors = list(validator.iter_errors(item_row))
+
+            # Run the custom validator to check if errors should be ignored
+            validation_errors = relecov_tools.assets.schema_utils.custom_validators.validate_with_exceptions(
+                self.json_schema, item_row, validation_errors
+            )
+            if not validation_errors:
                 validated_json_data.append(item_row)
                 self.logsum.feed_key(sample=sample_id_value)
             else:
-                # Count error types
-                for error in validator.iter_errors(item_row):
+                # Process remaining errors
+                for error in validation_errors:
+                    # Extract the error field name
                     if error.validator == "required":
                         error_field = [
                             f for f in error.validator_value if f in error.message
                         ][0]
                     else:
                         error_field = error.absolute_path[0]
+
+                    # Try to get the human-readable label from the schema
                     try:
                         err_field_label = schema_props[error_field]["label"]
                     except KeyError:
-                        log.error("Could not extract label for %s" % error_field)
+                        log.error(f"Could not extract label for {error_field}")
                         err_field_label = error_field
-                    error.message.replace(error_field, err_field_label)
+
+                    # Format the error message
+                    error.message = error.message.replace(error_field, err_field_label)
                     error_text = f"Error in column {err_field_label}: {error.message}"
+
+                    # Log errors for summary
                     error_keys[error.message] = error_field
-                    if error.message in errors:
-                        errors[error.message] += 1
-                    else:
-                        errors[error.message] = 1
+                    errors[error.message] = errors.get(error.message, 0) + 1
                     self.logsum.add_error(sample=sample_id_value, entry=error_text)
-                # append row with errors
+
+                # Add the invalid row to the list
                 invalid_json.append(item_row)
 
         # Summarize errors
@@ -165,11 +182,9 @@ class SchemaValidation:
         stderr.print("[blue] VALIDATION SUMMARY")
         stderr.print("[blue] --------------------")
         log.info("Validation summary:")
-        for error_type in errors.keys():
-            num_of_errors = str(errors[error_type])
-            field_with_error = str(error_keys[error_type])
-            error_text = "{} samples failed validation for {}:\n{}"
-            error_text = error_text.format(num_of_errors, field_with_error, error_type)
+        for error_type, count in errors.items():
+            field_with_error = error_keys[error_type]
+            error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type}"
             self.logsum.add_warning(entry=error_text)
             stderr.print(f"[red]{error_text}")
             stderr.print("[red] --------------------")
