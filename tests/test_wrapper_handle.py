@@ -24,6 +24,7 @@ def main():
         "download_option": args.download_option,
         "output_location": os.environ["OUTPUT_LOCATION"],
         "target_folders": args.target_folders,
+        "sftp_port": os.environ["TEST_PORT"],
     }
     prepare_remote_test(**val_dict)
 
@@ -124,6 +125,7 @@ def prepare_remote_test(**kwargs):
         "download_option": kwargs["download_option"],
         "output_location": kwargs["output_location"],
         "target_folders": kwargs["target_folders"],
+        "sftp_port": kwargs["sftp_port"],
     }
 
     # wrapper_manager.download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
