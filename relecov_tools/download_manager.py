@@ -150,7 +150,9 @@ class DownloadManager:
         path_parts = folder.split("/")
         cod_folder = path_parts[0]
         batch_folder = path_parts[-1].replace("_tmp_processing", "")
-        local_folder_path = os.path.join(platform_storage_folder, cod_folder, batch_folder)
+        local_folder_path = os.path.join(
+            platform_storage_folder, cod_folder, batch_folder
+        )
         os.makedirs(local_folder_path, exist_ok=True)
         log.info("Created the folder to download files %s", local_folder_path)
         return local_folder_path
