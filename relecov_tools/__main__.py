@@ -172,6 +172,14 @@ def relecov_tools_cli(verbose, log_file):
     default=None,
     help="Flag: Select which folders will be targeted giving [paths] or via prompt",
 )
+@click.option(
+    "-s",
+    "--subfolder",
+    is_flag=False,
+    flag_value="ALL",
+    default="RELECOV",
+    help="Flag: Specify which subfolder to process (default: RELECOV)",
+)
 def download(
     user,
     password,
@@ -179,6 +187,7 @@ def download(
     download_option,
     output_location,
     target_folders,
+    subfolder,
 ):
     """Download files located in sftp server."""
     download_manager = relecov_tools.download_manager.DownloadManager(
@@ -188,6 +197,7 @@ def download(
         download_option,
         output_location,
         target_folders,
+        subfolder,
     )
     try:
         download_manager.execute_process()
