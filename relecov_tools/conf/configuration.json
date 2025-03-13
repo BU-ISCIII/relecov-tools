@@ -241,7 +241,7 @@
     },
     "sftp_handle": {
         "sftp_connection": {
-            "sftp_server": "sftprelecov.isciii.es",
+            "sftp_server": "sftpgenvigies.isciii.es",
             "sftp_port": "22"
         },
         "metadata_processing": {
