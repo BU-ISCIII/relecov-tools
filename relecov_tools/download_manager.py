@@ -147,13 +147,12 @@ class DownloadManager:
         """
         log.info("Creating folder %s to download files", folder)
         platform_storage_folder = self.platform_storage_folder
-        if platform_storage_folder == folder:
-            local_folder_path = platform_storage_folder
-        else:
-            folder = folder.strip("_tmp_processing")
-            local_folder_path = os.path.join(platform_storage_folder, folder)
+        path_parts = folder.split("/")
+        cod_folder = path_parts[0]
+        batch_folder = path_parts[-1].replace("_tmp_processing", "")
+        local_folder_path = os.path.join(platform_storage_folder, cod_folder, batch_folder)
         os.makedirs(local_folder_path, exist_ok=True)
-        log.info("created the folder to download files %s", local_folder_path)
+        log.info("Created the folder to download files %s", local_folder_path)
         return local_folder_path
 
     def get_remote_folder_files(self, folder, local_folder, file_list):
