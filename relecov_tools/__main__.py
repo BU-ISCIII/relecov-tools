@@ -2,6 +2,7 @@
 import logging
 import os
 import json
+import sys
 
 # from rich.prompt import Confirm
 import click
@@ -123,7 +124,15 @@ class CustomHelpOrder(click.Group):
 @click.option(
     "-l", "--log-file", help="Save a verbose log to a file.", metavar="<filename>"
 )
-def relecov_tools_cli(verbose, log_file):
+@click.option(
+    "-d",
+    "--debug",
+    is_flag=True,
+    default=False,
+    help="Show the full traceback on error for debugging purposes.",
+)
+@click.pass_context
+def relecov_tools_cli(ctx, verbose, log_file, debug):
     # Set the base logger to output DEBUG
     log.setLevel(logging.DEBUG)
 
@@ -138,6 +147,9 @@ def relecov_tools_cli(verbose, log_file):
         )
         log.addHandler(log_fh)
         log.info(f"RELECOV-tools version {__version__}")
+    
+    ctx.ensure_object(dict)  # Asegura que ctx.obj es un diccionario
+    ctx.obj["debug"] = debug  # Guarda el flag de debug
 
 
 # sftp
@@ -173,6 +185,7 @@ def relecov_tools_cli(verbose, log_file):
     default=None,
     help="Flag: Select which folders will be targeted giving [paths] or via prompt",
 )
+<<<<<<< HEAD
 @click.option(
     "-s",
     "--subfolder",
@@ -181,7 +194,11 @@ def relecov_tools_cli(verbose, log_file):
     default="RELECOV",
     help="Flag: Specify which subfolder to process (default: RELECOV)",
 )
+=======
+@click.pass_context
+>>>>>>> 1540f24 (Added --debug flag for enhanced troubleshooting)
 def download(
+    ctx,
     user,
     password,
     conf_file,
@@ -190,6 +207,7 @@ def download(
     target_folders,
     subfolder,
 ):
+    debug = ctx.obj.get("debug", False)
     """Download files located in sftp server."""
     download_manager = relecov_tools.download_manager.DownloadManager(
         user,
@@ -203,8 +221,11 @@ def download(
     try:
         download_manager.execute_process()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 # metadata
@@ -231,7 +252,9 @@ def download(
     type=click.Path(),
     help="Path to folder where samples files are located",
 )
-def read_lab_metadata(metadata_file, sample_list_file, metadata_out, files_folder):
+@click.pass_context
+def read_lab_metadata(ctx, metadata_file, sample_list_file, metadata_out, files_folder):
+    debug = ctx.obj.get("debug", False)
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
@@ -241,8 +264,11 @@ def read_lab_metadata(metadata_file, sample_list_file, metadata_out, files_folde
     try:
         new_metadata.create_metadata_json()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 # validation
@@ -263,7 +289,9 @@ def read_lab_metadata(metadata_file, sample_list_file, metadata_out, files_folde
     default=None,
     help="Optional: Name of the sheet in excel file to validate.",
 )
-def validate(json_file, json_schema, metadata, out_folder, excel_sheet):
+@click.pass_context
+def validate(ctx, json_file, json_schema, metadata, out_folder, excel_sheet):
+    debug = ctx.obj.get("debug", False)
     """Validate json file against schema."""
     validation = relecov_tools.json_validation.SchemaValidation(
         json_file, json_schema, metadata, out_folder, excel_sheet
@@ -271,8 +299,11 @@ def validate(json_file, json_schema, metadata, out_folder, excel_sheet):
     try:
         validation.validate()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 # send-email
@@ -312,7 +343,9 @@ def validate(json_file, json_schema, metadata, out_folder, excel_sheet):
     required=False,
     default=None,
 )
-def send_mail(validate_file, receiver_email, attachments, template_path, email_psswd):
+@click.pass_context
+def send_mail(ctx, validate_file, receiver_email, attachments, template_path, email_psswd):
+    debug = ctx.obj.get("debug", False)
     """
     Send a sample validation report by mail.
     """
@@ -398,8 +431,11 @@ def send_mail(validate_file, receiver_email, attachments, template_path, email_p
             final_receiver_email, subject, email_body, attachments, email_psswd
         )
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 # mapping to ENA schema
@@ -414,7 +450,9 @@ def send_mail(validate_file, receiver_email, attachments, template_path, email_p
 )
 @click.option("-f", "--schema_file", help="file with the custom schema")
 @click.option("-o", "--output", help="File name and path to store the mapped json")
-def map(origin_schema, json_data, destination_schema, schema_file, output):
+@click.pass_context
+def map(ctx, origin_schema, json_data, destination_schema, schema_file, output):
+    debug = ctx.obj.get("debug", False)
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
     new_schema = relecov_tools.map_schema.MappingSchema(
         origin_schema, json_data, destination_schema, schema_file, output
@@ -422,8 +460,11 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
     try:
         new_schema.map_to_data_to_new_schema()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 # upload to ENA
@@ -443,7 +484,9 @@ def map(origin_schema, json_data, destination_schema, schema_file, output):
 @click.option("--upload_fastq", is_flag=True, default=False, help="Upload fastq files")
 @click.option("-m", "--metadata_types", help="List of metadata xml types to submit")
 @click.option("-o", "--output_path", help="output folder for the xml generated files")
+@click.pass_context
 def upload_to_ena(
+    ctx,
     user,
     password,
     center,
@@ -455,6 +498,7 @@ def upload_to_ena(
     upload_fastq,
     output_path,
 ):
+    debug = ctx.obj.get("debug", False)
     """parse data to create xml files to upload to ena"""
     upload_ena = relecov_tools.upload_ena_protocol.EnaUpload(
         user=user,
@@ -471,8 +515,11 @@ def upload_to_ena(
     try:
         upload_ena.upload()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 # upload to GISAID
@@ -512,7 +559,9 @@ def upload_to_ena(
     default=False,
     help="input fasta is gziped. Default: False",
 )
+@click.pass_context
 def upload_to_gisaid(
+    ctx,
     user,
     password,
     client_id,
@@ -525,6 +574,7 @@ def upload_to_gisaid(
     single,
     gzip,
 ):
+    debug = ctx.obj.get("debug", False)
     """parsed data to create files to upload to gisaid"""
     upload_gisaid = relecov_tools.gisaid_upload.GisaidUpload(
         user,
@@ -542,8 +592,11 @@ def upload_to_gisaid(
     try:
         upload_gisaid.gisaid_upload()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 @relecov_tools_cli.command(help_priority=9)
@@ -579,7 +632,9 @@ def upload_to_gisaid(
     default=False,
     help="Sequentially run every update option",
 )
-def update_db(user, password, json, type, platform, server_url, full_update):
+@click.pass_context
+def update_db(ctx, user, password, json, type, platform, server_url, full_update):
+    debug = ctx.obj.get("debug", False)
     """upload the information included in json file to the database"""
     update_database_obj = relecov_tools.upload_database.UpdateDatabase(
         user, password, json, type, platform, server_url, full_update
@@ -587,8 +642,11 @@ def update_db(user, password, json, type, platform, server_url, full_update):
     try:
         update_database_obj.update_db()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 # read metadata bioinformatics
@@ -602,7 +660,9 @@ def update_db(user, password, json, type, platform, server_url, full_update):
 @click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file")
 @click.option("-s", "--software_name", help="Name of the software/pipeline used.")
-def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
+@click.pass_context
+def read_bioinfo_metadata(ctx, json_file, input_folder, out_dir, software_name):
+    debug = ctx.obj.get("debug", False)
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
@@ -615,8 +675,11 @@ def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
     try:
         new_bioinfo_metadata.create_bioinfo_file()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 # read metadata bioinformatics
@@ -634,7 +697,9 @@ def read_bioinfo_metadata(json_file, input_folder, out_dir, software_name):
     help="Folder where are located the additional files",
 )
 @click.option("-o", "--output", type=click.Path(), help="Path to save json output")
-def metadata_homogeneizer(institution, directory, output):
+@click.pass_context
+def metadata_homogeneizer(ctx, institution, directory, output):
+    debug = ctx.obj.get("debug", False)
     """Parse institution metadata lab to the one used in relecov"""
     new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
         institution, directory, output
@@ -642,8 +707,11 @@ def metadata_homogeneizer(institution, directory, output):
     try:
         new_parse.converting_metadata()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 # creating symbolic links
@@ -674,7 +742,9 @@ def metadata_homogeneizer(institution, directory, output):
     default=None,
     help="Folder basenames to process. Target folders names should match the given dates. E.g. ... -f folder1 -f folder2 -f folder3",
 )
-def pipeline_manager(input, templates_root, output, config, folder_names):
+@click.pass_context
+def pipeline_manager(ctx, input, templates_root, output, config, folder_names):
+    debug = ctx.obj.get("debug", False)
     """
     Create the symbolic links for the samples which are validated to prepare for
     bioinformatics pipeline execution.
@@ -685,8 +755,11 @@ def pipeline_manager(input, templates_root, output, config, folder_names):
     try:
         new_launch.pipeline_exc()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 # schema builder
@@ -727,7 +800,9 @@ def pipeline_manager(input, templates_root, output, config, folder_names):
     help="Run the script without user interaction, using default values.",
 )
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file/s")
+@click.pass_context
 def build_schema(
+    ctx,
     input_file,
     schema_base,
     draft_version,
@@ -737,6 +812,7 @@ def build_schema(
     project,
     non_interactive,
 ):
+    debug = ctx.obj.get("debug", False)
     """Generates and updates JSON Schema files from Excel-based database definitions."""
     # Build new schema
     try:
@@ -760,8 +836,11 @@ def build_schema(
         # Generate schema summary
         schema_update.summarize_schema(new_schema)
     except Exception as e:
-        log.exception(f"Error while building schema: {e}")
-        raise RuntimeError("... Schema building failed. Check logs for details.")
+        if debug:
+            log.error(f"Error while building schema: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 @relecov_tools_cli.command(help_priority=15)
@@ -786,7 +865,9 @@ def build_schema(
     required=True,
     multiple=True,
 )
-def logs_to_excel(lab_code, output_folder, files):
+@click.pass_context
+def logs_to_excel(ctx, lab_code, output_folder, files):
+    debug = ctx.obj.get("debug", False)
     """Creates a merged xlsx report from all the log summary jsons given as input"""
     all_logs = []
     full_paths = [os.path.realpath(f) for f in files]
@@ -809,8 +890,11 @@ def logs_to_excel(lab_code, output_folder, files):
         excel_outpath = os.path.join(output_folder, lab_code + "_logs_report.xlsx")
         logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 @relecov_tools_cli.command(help_priority=16)
@@ -828,7 +912,9 @@ def logs_to_excel(lab_code, output_folder, files):
     help="Path to folder where global results are saved [required]",
     required=False,
 )
-def wrapper(config_file, output_folder):
+@click.pass_context
+def wrapper(ctx, config_file, output_folder):
+    debug = ctx.obj.get("debug", False)
     """Executes the modules in config file sequentially"""
     process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(
         config_file=config_file, output_folder=output_folder
@@ -836,8 +922,11 @@ def wrapper(config_file, output_folder):
     try:
         process_wrapper.run_wrapper()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 @relecov_tools_cli.command(help_priority=17)
