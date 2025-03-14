@@ -203,6 +203,22 @@ class BioinfoMetadata:
             self.log_report.print_log_report(method_name, ["valid", "warning"])
             return files_found
 
+    def validate_samplenames(self):
+        """Validate that the sequencing_sample_id from the JSON input is present in the samples_id.txt.
+
+        Raises:
+            ValueError: If no sample from the JSON input matches the samples in the samples_id.txt.
+        """
+        samplesid_path = os.path.join(self.input_folder, "samples_id.txt")
+        with open(samplesid_path, 'r') as file:
+            samplesid_list = [line.strip() for line in file.readlines()]
+        json_samples = [sample["sequencing_sample_id"] for sample in self.j_data]
+        matching_samples = set(json_samples).intersection(samplesid_list)
+        if not matching_samples:
+            raise ValueError("No sample from the JSON input matches the samples in the provided analysis folder.")
+        else:
+            print(f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet.")
+
     def validate_software_mandatory_files(self, files_dict):
         """Validates the presence of all mandatory files as defined in the software configuration JSON.
 
@@ -953,6 +969,9 @@ class BioinfoMetadata:
             bool: True if the bioinfo file creation process was successful.
         """
 
+        # Check samplesheet for matching samples
+        self.validate_samplenames()
+        
         # Find and validate bioinfo files
         stderr.print("[blue]Scanning input directory...")
         files_found_dict = self.scann_directory()
