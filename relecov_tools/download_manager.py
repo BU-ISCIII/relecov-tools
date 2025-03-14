@@ -687,7 +687,7 @@ class DownloadManager:
             unique_files = list(set(files))
             for file in unique_files:
                 if not file.endswith(tuple(self.allowed_file_ext)):
-                    continue  # Omitir archivos no deseados
+                    continue
 
                 file_dest = os.path.join(folder, os.path.basename(file))
                 if file_dest in successful_files:
