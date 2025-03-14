@@ -27,6 +27,7 @@ import relecov_tools.upload_ena_protocol
 import relecov_tools.pipeline_manager
 import relecov_tools.build_schema
 import relecov_tools.dataprocess_wrapper
+import relecov_tools.upload_results
 
 log = logging.getLogger()
 
@@ -838,6 +839,26 @@ def wrapper(config_file, output_folder):
         log.exception(f"EXCEPTION FOUND: {e}")
         raise
 
+@relecov_tools_cli.command(help_priority=17)
+@click.option("-u", "--user", help="User name for login to sftp server")
+@click.option("-p", "--password", help="password for the user to login")
+@click.option("-b", "--batch_id", help="Batch from....")
+def upload_results(
+    user,
+    password,
+    batch_id,
+):
+    """Upload batch results to sftp server."""
+    upload_sftp = relecov_tools.upload_results.UploadSftp(
+        user,
+        password,
+        batch_id,
+    )
+    try:
+        upload_sftp.execute_process()
+    except Exception as e:
+        log.exception(f"EXCEPTION FOUND: {e}")
+        raise
 
 if __name__ == "__main__":
     run_relecov_tools()
