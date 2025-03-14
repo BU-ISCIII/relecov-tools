@@ -34,7 +34,7 @@
             "content": {
                 "per_sgene_ambiguous": "S-Gene_Ambiguous_Percentage",
                 "per_sgene_coverage": "S-Gene_Coverage_Percentage",
-                "per_ldmutations": "% LDMutations",
+                "per_ldmutations": "%LDMutations",
                 "number_of_sgene_frameshifts": "S-Gene_Frameshifts",
                 "number_of_unambiguous_bases": "Total_Unambiguous_Bases",
                 "number_of_Ns": "Total_Ns_count"
