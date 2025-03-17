@@ -115,8 +115,8 @@ class UploadSftp:
             try:
                 sftp.chdir(remote_dir)  # Try to change to the directory
             except FileNotFoundError:
-                stderr.print(f"[yellow]Directory {remote_dir} not found. Creating...")
-                sftp.mkdir(remote_dir)
+                stderr.print(f"[red]Directory {remote_dir} not found. Failed to upload file to sftp.")
+                return False
 
             # Upload the compressed file
             stderr.print(f"[blue]Uploading {zip_path} to {remote_file_path} in SFTP...")
