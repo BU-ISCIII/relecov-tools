@@ -56,7 +56,7 @@
             "examples": [
                 "202203144"
             ],
-            "ontology": "0",
+            "ontology": "GENEPIO:0001148",
             "type": "string",
             "description": "Sample ID provided by the submitting laboratory that delivers the sample. The submitting laboratory is requested in column K",
             "classification": "Sequencing",
@@ -2462,7 +2462,7 @@
             "examples": [
                 "55"
             ],
-            "ontology": "SNOMED 424144002",
+            "ontology": "SNOMED:424144002",
             "type": "integer",
             "minimum": 3,
             "maximum": 120,
@@ -2476,7 +2476,7 @@
             "examples": [
                 "14"
             ],
-            "ontology": "LOINC:LA33639-8\t",
+            "ontology": "LOINC:LA33639-8",
             "type": "integer",
             "minimum": 0,
             "maximum": 36,
@@ -2503,7 +2503,7 @@
             "examples": [
                 "Female"
             ],
-            "ontology": "SNOMED 263495000",
+            "ontology": "SNOMED:263495000",
             "type": "string",
             "description": "The gender of the host at the time of sample collection. Recomended",
             "classification": "Host information",
@@ -4072,7 +4072,7 @@
             "examples": [
                 "Illumina"
             ],
-            "ontology": "GENEPIO_0000071",
+            "ontology": "GENEPIO:0000071",
             "type": "string",
             "description": "A sequencing plaform (brand) is a name of a company that produces sequencer equipment.",
             "classification": "Sequencing",
@@ -4204,7 +4204,7 @@
             "examples": [
                 "2.4.1"
             ],
-            "ontology": "LOINC:LA20883-7\t",
+            "ontology": "LOINC:LA20883-7",
             "type": "string",
             "description": "The method version used to remove host reads from the pathogen sequence.",
             "classification": "Bioinformatic Analysis fields",
@@ -4252,7 +4252,7 @@
             "examples": [
                 "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
             ],
-            "ontology": "LOINC:LA20883-7\t",
+            "ontology": "LOINC:LA20883-7",
             "type": "string",
             "description": "The version number of the bioinformatics protocol used.",
             "classification": "Bioinformatic Analysis fields",
@@ -4293,7 +4293,7 @@
             "examples": [
                 "v5.3.1"
             ],
-            "ontology": "LOINC:LA20883-7\t",
+            "ontology": "LOINC:LA20883-7",
             "type": "string",
             "description": "Version of the preprocessing software used.",
             "classification": "Bioinformatic Analysis fields",
@@ -4341,7 +4341,7 @@
             "examples": [
                 "v7.0.1"
             ],
-            "ontology": "LOINC:LA20883-7\t",
+            "ontology": "LOINC:LA20883-7",
             "type": "string",
             "description": "Version of the mapper used.",
             "classification": "Bioinformatic Analysis fields",
@@ -4449,7 +4449,7 @@
             "examples": [
                 "v4.1"
             ],
-            "ontology": "LOINC:LA20883-7\t",
+            "ontology": "LOINC:LA20883-7",
             "type": "string",
             "description": "Variant calling software version",
             "classification": "Bioinformatic Variants",
@@ -4898,7 +4898,7 @@
             "examples": [
                 "P17157_1007"
             ],
-            "ontology": "0",
+            "ontology": "BU_ISCIII:045",
             "type": "string",
             "description": "Broker name",
             "classification": "Public databases",
