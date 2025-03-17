@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 stderr = Console(stderr=True, style="dim", highlight=False, force_terminal=relecov_tools.utils.rich_force_colors())
 
 class UploadSftp:
-    def __init__(self, user=None, passwd=None, batch_id=None, template_path=None):
+    def __init__(self, user=None, passwd=None, batch_id=None, template_path=None, project="Relecov"):
         """Starts the SFTP upload process"""
         log.info(f"Beginning upload process for batch: {batch_id}")
 
@@ -49,6 +49,7 @@ class UploadSftp:
         self.template_path = template_path
         self.email_sender = relecov_tools.mail.EmailSender(config, template_path)
         self.guide = config.get("institutions_guide_path")
+        self.project = project
 
     def find_cod_for_batch(self):
         """Find all COD* folders containing the batch_id"""
@@ -71,7 +72,7 @@ class UploadSftp:
 
         return matching_cod
 
-    def compress_results(self, batch_data):
+    def compress_results(self, batch_data, cod):
         """Compress the analysis_results folder with a random password"""
         batch_path = batch_data["path"]
         batch = batch_data["batch"]
@@ -82,7 +83,7 @@ class UploadSftp:
             return None, None, None
 
         password = token_hex(8).encode()  # Creates a random password
-        zip_filename = f"{batch}_results_{datetime.now().strftime('%Y%m%d%H%M%S')}.zip"
+        zip_filename = f"{cod}_{batch}_analysis_results_{self.project}_{datetime.now().strftime('%Y%m%d%H%M%S')}.zip"
         zip_path = os.path.join(batch_path, zip_filename)
 
         with pyzipper.AESZipFile(zip_path, 'w', compression=pyzipper.ZIP_DEFLATED, encryption=pyzipper.WZ_AES) as zipf:
@@ -172,7 +173,7 @@ class UploadSftp:
         for cod, batch_data in cod_batches.items():
             stderr.print(f"Processing batch {batch_data['batch']} in {cod}")
 
-            zip_path, password, zip_filename = self.compress_results(batch_data)
+            zip_path, password, zip_filename = self.compress_results(batch_data, cod)
             if zip_path:
                 success = self.upload_to_sftp(zip_path, cod)
                 if success:
