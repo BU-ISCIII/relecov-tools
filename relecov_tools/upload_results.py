@@ -51,9 +51,9 @@ class UploadSftp:
         self.guide = config.get("institutions_guide_path")
 
     def find_cod_for_batch(self):
-        """Find all COD-* folders containing the batch_id"""
+        """Find all COD* folders containing the batch_id"""
         base_dir = os.getcwd()  # This module should be run in root directory
-        cod_dirs = [d for d in os.listdir(base_dir) if os.path.isdir(d) and d.startswith("COD-")]
+        cod_dirs = [d for d in os.listdir(base_dir) if os.path.isdir(d) and d.startswith("COD")]
 
         matching_cod = {}
 
@@ -66,7 +66,7 @@ class UploadSftp:
                 }
 
         if not matching_cod:
-            stderr.print(f"[red]Batch {self.batch_id} was not found in any COD-* folder.")
+            stderr.print(f"[red]Batch {self.batch_id} was not found in any COD* folder.")
             sys.exit(1)
 
         return matching_cod
