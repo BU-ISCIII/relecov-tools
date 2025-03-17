@@ -326,6 +326,7 @@
             "sequence_file_R1_fastq",
             "sequence_file_R2_fastq",
             "sequencing_sample_id",
+            "submitting_institution",
             "submitting_lab_sample_id"
         ]
     },
