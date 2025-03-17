@@ -106,7 +106,7 @@ class EmailSender:
             print("The e-mail password could not be found.")
             return
 
-        default_cc = "vmlopez@isciii.es"
+        default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart()
         msg["From"] = sender_email
         msg["To"] = ", ".join(receiver_email)
