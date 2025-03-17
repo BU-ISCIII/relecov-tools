@@ -173,8 +173,9 @@ class SftpRelecov:
                     file_list.extend(self.get_file_list(full_path))
                 elif stat.S_ISREG(content.st_mode):
                     file_list.append(full_path)
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             log.error(f"Folder not found: {folder_name}")
+            raise e
         return file_list
 
     @reconnect_if_fail(n_times=3, sleep_time=30)
