@@ -47,10 +47,11 @@ jobs:
       max-parallel: 4
       matrix:
         modules: 
-        - "read-lab-metadata"
-        - "read-bioinfo-metadata"
-        - "validate"
-        - "build-schema"
+          - "read-lab-metadata"
+          - "read-bioinfo-metadata"
+          - "validate-default"
+          - "validate-exception"
+          - "build-schema"
     env:
       OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
@@ -79,14 +80,23 @@ jobs:
             -s tests/data/read_lab_metadata/samples_data_test.json \
             -o $OUTPUT_LOCATION
 
-    - name: Run validate module
-      if: matrix.modules == 'validate'
+    - name: Run validate module (default)
+      if: matrix.modules == 'validate-default'
       run: |
-        relecov-tools validate \
-            -j tests/data/map_validate/processed_metadata_lab_test.json \
-            -s relecov_tools/schema/relecov_schema.json \
-            -m tests/data/map_validate/metadata_lab_test.xlsx \
-            -o $OUTPUT_LOCATION
+          relecov-tools validate \
+              -j tests/data/map_validate/processed_metadata_lab_test.json \
+              -s relecov_tools/schema/relecov_schema.json \
+              -m tests/data/map_validate/metadata_lab_test.xlsx \
+              -o $OUTPUT_LOCATION
+
+    - name: Run validate module (with exceptions)
+      if: matrix.modules == 'validate-exception'
+      run: |
+          relecov-tools validate \
+              -j tests/data/map_validate/processed_metadata_lab_validate_exception_test.json \
+              -s tests/json_schema/relecov_schema_2-1-0_mod.json \
+              -m tests/data/map_validate/metadata_lab_test.xlsx \
+              -o $OUTPUT_LOCATION
 
     - name: Run build-schema module
       if: matrix.modules == 'build-schema'
