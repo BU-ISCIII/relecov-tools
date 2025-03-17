@@ -50,6 +50,9 @@ class UploadSftp:
         self.email_sender = relecov_tools.mail.EmailSender(config, template_path)
         self.guide = config.get("institutions_guide_path")
         self.project = project
+        if self.project not in ["Relecov", "Redlabra"]:
+            stderr.print("[red]Error: Only valid projects: Relecov / Redlabra.")
+            sys.exit(1)
 
     def find_cod_for_batch(self):
         """Find all COD* folders containing the batch_id"""
