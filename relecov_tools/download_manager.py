@@ -46,7 +46,7 @@ class DownloadManager:
         download_option=None,
         output_location=None,
         target_folders=None,
-        subfolder="RELECOV",
+        subfolder=None,
     ):
         """Initializes the sftp object"""
         log.info("Initiating download process")
@@ -615,6 +615,7 @@ class DownloadManager:
                         f"[red]Could not delete remote file {matched_path}. Error: {e}"
                     )
             else:
+                log.warning(f"File not found before deletion: {file}")
                 stderr.print(f"[red]File not found before deletion: {file}")
         return
 
