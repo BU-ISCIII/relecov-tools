@@ -45,6 +45,7 @@ Code contributions to the release:
 - Update Test Data for new Schema & Modify JSON Filepaths in read-bioinfo-metadata [#427](https://github.com/BU-ISCIII/relecov-tools/pull/427)
 - Update download Module to Process Data by Laboratory COD and Project Subfolder [#431](https://github.com/BU-ISCIII/relecov-tools/pull/431)
 - Created new `upload-results` for uploading analysis_results folder back to every COD folder in sftp. [#433](https://github.com/BU-ISCIII/relecov-tools/pull/433)
+- Update relecov_schema.json to 3.0.0dev version [#435](https://github.com/BU-ISCIII/relecov-tools/pull/435)
 
 #### Fixes
 
