@@ -14,6 +14,7 @@ Code contributions to the release:
 - [Alejandro Bernabeu](https://github.com/aberdur)
 - [Daniel Valle-Millares](https://github.com/Daniel-VM)
 - [Victor Lopez](https://github.com/victor5lm)
+- [Jaime Ozáez](https://github.com/jaimeozaez)
 
 ### Modules
 
@@ -43,6 +44,7 @@ Code contributions to the release:
 - Test SFTP Login by Updating Port Assignment in wrapper_manager [#426](https://github.com/BU-ISCIII/relecov-tools/pull/426)
 - Update Test Data for new Schema & Modify JSON Filepaths in read-bioinfo-metadata [#427](https://github.com/BU-ISCIII/relecov-tools/pull/427)
 - Update download Module to Process Data by Laboratory COD and Project Subfolder [#431](https://github.com/BU-ISCIII/relecov-tools/pull/431)
+- Created new `upload-results` for uploading analysis_results folder back to every COD folder in sftp. [#433](https://github.com/BU-ISCIII/relecov-tools/pull/433)
 
 #### Fixes
 
