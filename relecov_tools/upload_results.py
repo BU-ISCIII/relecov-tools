@@ -4,7 +4,6 @@ import sys
 import logging
 import pyzipper
 import json
-import paramiko
 import relecov_tools.utils
 import relecov_tools.sftp_client
 import relecov_tools.mail
