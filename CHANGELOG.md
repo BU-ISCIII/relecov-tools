@@ -46,6 +46,7 @@ Code contributions to the release:
 
 #### Fixes
 
+- Fixed configuration to include mandatory values needed when interacting with Relecov API [#436](https://github.com/BU-ISCIII/relecov-tools/pull/436)
 - Fix linting when Pull Request is closed [#404](https://github.com/BU-ISCIII/relecov-tools/pull/404)
 - Fix removal of samples with repeated sampleID and .fastq files [#413](https://github.com/BU-ISCIII/relecov-tools/pull/413)
 - Fix renaming of folders withou any valid sample [#413](https://github.com/BU-ISCIII/relecov-tools/pull/413)
