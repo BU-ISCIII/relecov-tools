@@ -843,16 +843,19 @@ def wrapper(config_file, output_folder):
 @click.option("-u", "--user", help="User name for login to sftp server")
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-b", "--batch_id", help="Batch from....")
+@click.option("-t", "--template_path", help="Path to relecov-tools templates folder")
 def upload_results(
     user,
     password,
     batch_id,
+    template_path
 ):
     """Upload batch results to sftp server."""
     upload_sftp = relecov_tools.upload_results.UploadSftp(
         user,
         password,
         batch_id,
+        template_path
     )
     try:
         upload_sftp.execute_process()
