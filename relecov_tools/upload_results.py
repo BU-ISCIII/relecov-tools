@@ -121,7 +121,7 @@ class UploadSftp:
 
         except Exception as e:
             log.error(f"Error uploading file to SFTP: {e}")
-            stderr.print(f"[red]Unespected error: {e}")
+            stderr.print(f"[red]Unexpected error: {e}")
             return False
 
         finally:
