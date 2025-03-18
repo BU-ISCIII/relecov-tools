@@ -1302,7 +1302,7 @@
       "examples": [
         "e.g ena-EXPERIMENT-KAROLINSKA INSITUTET-29-07-2020-14:50:07:151-1"
       ],
-      "ontology": "NCIT:C47911",
+      "ontology": "NCIT:C117058",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
