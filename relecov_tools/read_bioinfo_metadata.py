@@ -668,6 +668,13 @@ class BioinfoMetadata:
                 )
                 continue
             sample_name = row["sequencing_sample_id"]
+            if base_cod_path is None:
+                self.log_report.update_log_report(
+                    method_name,
+                    "error",
+                    f"No 'r1_fastq_filepath' found for sample {sample_name}. Unable to generate paths.",
+                )
+                continue
             for key, values in files_found_dict.items():
                 file_path = "Not Provided [GENEPIO:0001668]"
                 if values:  # Check if value is not empty
