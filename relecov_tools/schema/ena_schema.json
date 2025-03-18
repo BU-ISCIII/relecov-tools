@@ -1271,7 +1271,7 @@
       "examples": [
         "experiment_alias_7a"
       ],
-      "ontology": "NCIT_C42790",
+      "ontology": "NCIT:C42790",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
