@@ -703,7 +703,7 @@
       ]
     },
     "host_age": {
-      "ontology": "GENEPIO:0001392",
+      "ontology": "SNOMED:424144002",
       "type": "string",
       "description": "Age of host at the time of sampling.",
       "examples": [
@@ -779,7 +779,7 @@
         "Missing [LOINC:LA14698-7]",
         "Restricted Access [GENEPIO:0001810]"
       ],
-      "ontology": "GENEPIO:0001395",
+      "ontology": "SNOMED:263495000",
       "type": "string",
       "description": "The gender of the host at the time of sample collection.",
       "examples": [
