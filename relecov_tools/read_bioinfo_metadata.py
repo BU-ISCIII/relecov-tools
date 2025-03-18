@@ -659,6 +659,7 @@ class BioinfoMetadata:
         multiple_sample_files = self.get_multiple_sample_files()
         for row in j_data:
             row["bioinfo_metadata_file"] = self.out_filename
+            base_cod_path = row.get("r1_fastq_filepath")
             if not row.get("sequencing_sample_id"):
                 self.log_report.update_log_report(
                     method_name,
@@ -678,10 +679,9 @@ class BioinfoMetadata:
                                 file_path = file
                                 break  # Exit loop if match found
                 path_key = f"{self.software_name}_filepath_{key}"
-                base_execution_path = os.getcwd()
                 if file_path != "Not Provided [GENEPIO:0001668]":
                     analysis_results_path = os.path.join(
-                        base_execution_path,
+                        base_cod_path,
                         "analysis_results",
                         os.path.basename(file_path),
                     )
