@@ -659,7 +659,6 @@ class BioinfoMetadata:
         multiple_sample_files = self.get_multiple_sample_files()
         for row in j_data:
             row["bioinfo_metadata_file"] = self.out_filename
-            base_cod_path = row.get("r1_fastq_filepath")
             if not row.get("sequencing_sample_id"):
                 self.log_report.update_log_report(
                     method_name,
@@ -668,6 +667,7 @@ class BioinfoMetadata:
                 )
                 continue
             sample_name = row["sequencing_sample_id"]
+            base_cod_path = row.get("r1_fastq_filepath")
             if base_cod_path is None:
                 self.log_report.update_log_report(
                     method_name,
