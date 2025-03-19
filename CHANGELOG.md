@@ -48,6 +48,7 @@ Code contributions to the release:
 - Created new `upload-results` for uploading analysis_results folder back to every COD folder in sftp. [#433](https://github.com/BU-ISCIII/relecov-tools/pull/433)
 - Update relecov_schema.json to 3.0.0dev version [#435](https://github.com/BU-ISCIII/relecov-tools/pull/435)
 - Fix viralrecon_filepaths Path in read-bioinfo-metadata Module [#438](https://github.com/BU-ISCIII/relecov-tools/pull/438)
+- Fix adding_ontology_to_enum when enum has no ontology [#439](https://github.com/BU-ISCIII/relecov-tools/pull/439)
 
 #### Fixes
 
