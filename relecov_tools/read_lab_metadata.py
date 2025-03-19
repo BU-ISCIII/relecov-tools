@@ -284,6 +284,7 @@ class RelecovMetadata:
         """
         enum_dict = {}
         for prop, values in self.relecov_sch_json["properties"].items():
+            enum_values = values.get("enum")
             ontologies_present = any(
                 isinstance(enum, str) and re.search(r" \[\w+:.*\]$", enum)
                 for enum in enum_values
