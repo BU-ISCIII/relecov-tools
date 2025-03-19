@@ -284,11 +284,6 @@ class RelecovMetadata:
         """
         enum_dict = {}
         for prop, values in self.relecov_sch_json["properties"].items():
-            if not isinstance(values, dict):
-                continue
-            enum_values = values.get("enum")
-            if not isinstance(enum_values, list):
-                continue
             ontologies_present = any(
                 isinstance(enum, str) and re.search(r" \[\w+:.*\]$", enum)
                 for enum in enum_values
