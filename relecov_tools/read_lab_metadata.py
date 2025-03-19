@@ -86,9 +86,9 @@ class RelecovMetadata:
                 self.relecov_sch_json, "2020-12"
             )
         except Exception as e:
-            log.critical("JSON schema is not valid: %s", str(e))
-            stderr.print(f"[red]Critical error: JSON schema is not valid.\n{str(e)}")
-            raise ValueError(f"JSON schema is not valid: {str(e)}")
+            log.error("JSON schema is not valid: %s", str(e))
+            stderr.print(f"[red]Error: JSON schema is not valid.\n{str(e)}")
+            raise
 
         self.label_prop_dict = {}
 
