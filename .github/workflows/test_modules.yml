@@ -47,10 +47,10 @@ jobs:
       max-parallel: 4
       matrix:
         modules: 
-          - "read-lab-metadata"
-          - "read-bioinfo-metadata"
-          - "validate"
-          - "build-schema"
+        - "read-lab-metadata"
+        - "read-bioinfo-metadata"
+        - "validate"
+        - "build-schema"
     env:
       OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
@@ -75,28 +75,28 @@ jobs:
       if: matrix.modules == 'read-lab-metadata'
       run: |
         relecov-tools read-lab-metadata \
-            -m tests/data/read_lab_metadata/metadata_lab_test.xlsx \
-            -s tests/data/read_lab_metadata/samples_data_test.json \
-            -o $OUTPUT_LOCATION
+          -m tests/data/read_lab_metadata/metadata_lab_test.xlsx \
+          -s tests/data/read_lab_metadata/samples_data_test.json \
+          -o $OUTPUT_LOCATION
 
     - name: Run validate module (default)
       if: matrix.modules == 'validate'
       run: |
-          relecov-tools validate \
-              -j tests/data/map_validate/processed_metadata_lab_test.json \
-              -s relecov_tools/schema/relecov_schema.json \
-              -m tests/data/map_validate/metadata_lab_test.xlsx \
-              -o $OUTPUT_LOCATION
+        relecov-tools validate \
+          -j tests/data/map_validate/processed_metadata_lab_test.json \
+          -s relecov_tools/schema/relecov_schema.json \
+          -m tests/data/map_validate/metadata_lab_test.xlsx \
+          -o $OUTPUT_LOCATION
 
     - name: Run build-schema module
       if: matrix.modules == 'build-schema'
       run: |
         relecov-tools build-schema \
-            -i tests/data/build_schema/metadata_mapping_file.xlsx \
-            --version $SCHEMA_DEFAULT_VERSION \
-            --project $PROJECT_NAME \
-            --non-interactive \
-            -o $OUTPUT_LOCATION
+          -i tests/data/build_schema/metadata_mapping_file.xlsx \
+          --version $SCHEMA_DEFAULT_VERSION \
+          --project $PROJECT_NAME \
+          --non-interactive \
+          -o $OUTPUT_LOCATION
       env:
         SCHEMA_DEFAULT_VERSION: "3.0.0"
         PROJECT_NAME: "relecov"
