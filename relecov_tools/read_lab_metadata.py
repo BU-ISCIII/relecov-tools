@@ -289,7 +289,10 @@ class RelecovMetadata:
             enum_values = values.get("enum")
             if not isinstance(enum_values, list):
                 continue
-            ontologies_present = any(isinstance(enum, str) and re.search(r" \[\w+:.*\]$", enum) for enum in enum_values)
+            ontologies_present = any(
+                isinstance(enum, str) and re.search(r" \[\w+:.*\]$", enum)
+                for enum in enum_values
+            )
             if not ontologies_present:
                 continue
             if "enum" in values:
