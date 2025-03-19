@@ -80,6 +80,16 @@ class RelecovMetadata:
 
         with open(relecov_sch_path, "r") as fh:
             self.relecov_sch_json = json.load(fh)
+
+        try:
+            relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(
+                self.relecov_sch_json, "2020-12"
+            )
+        except Exception as e:
+            log.critical("JSON schema is not valid: %s", str(e))
+            stderr.print(f"[red]Critical error: JSON schema is not valid.\n{str(e)}")
+            raise ValueError(f"JSON schema is not valid: {str(e)}")
+
         self.label_prop_dict = {}
 
         for prop, values in self.relecov_sch_json["properties"].items():
