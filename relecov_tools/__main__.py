@@ -185,7 +185,6 @@ def relecov_tools_cli(ctx, verbose, log_file, debug):
     default=None,
     help="Flag: Select which folders will be targeted giving [paths] or via prompt",
 )
-<<<<<<< HEAD
 @click.option(
     "-s",
     "--subfolder",
@@ -194,9 +193,7 @@ def relecov_tools_cli(ctx, verbose, log_file, debug):
     default="RELECOV",
     help="Flag: Specify which subfolder to process (default: RELECOV)",
 )
-=======
 @click.pass_context
->>>>>>> 1540f24 (Added --debug flag for enhanced troubleshooting)
 def download(
     ctx,
     user,
