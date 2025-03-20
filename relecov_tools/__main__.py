@@ -147,7 +147,7 @@ def relecov_tools_cli(ctx, verbose, log_file, debug):
         )
         log.addHandler(log_fh)
         log.info(f"RELECOV-tools version {__version__}")
-    
+
     ctx.ensure_object(dict)  # Asegura que ctx.obj es un diccionario
     ctx.obj["debug"] = debug  # Guarda el flag de debug
 

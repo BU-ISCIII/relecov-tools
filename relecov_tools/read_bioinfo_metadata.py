@@ -971,7 +971,7 @@ class BioinfoMetadata:
 
         # Check samplesheet for matching samples
         self.validate_samplenames()
-        
+
         # Find and validate bioinfo files
         stderr.print("[blue]Scanning input directory...")
         files_found_dict = self.scann_directory()
