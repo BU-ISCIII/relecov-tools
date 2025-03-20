@@ -210,14 +210,18 @@ class BioinfoMetadata:
             ValueError: If no sample from the JSON input matches the samples in the samples_id.txt.
         """
         samplesid_path = os.path.join(self.input_folder, "samples_id.txt")
-        with open(samplesid_path, 'r') as file:
+        with open(samplesid_path, "r") as file:
             samplesid_list = [line.strip() for line in file.readlines()]
         json_samples = [sample["sequencing_sample_id"] for sample in self.j_data]
         matching_samples = set(json_samples).intersection(samplesid_list)
         if not matching_samples:
-            raise ValueError("No sample from the JSON input matches the samples in the provided analysis folder.")
+            raise ValueError(
+                "No sample from the JSON input matches the samples in the provided analysis folder."
+            )
         else:
-            print(f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet.")
+            print(
+                f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
+            )
 
     def validate_software_mandatory_files(self, files_dict):
         """Validates the presence of all mandatory files as defined in the software configuration JSON.

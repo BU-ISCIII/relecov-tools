@@ -341,7 +341,9 @@ def validate(ctx, json_file, json_schema, metadata, out_folder, excel_sheet):
     default=None,
 )
 @click.pass_context
-def send_mail(ctx, validate_file, receiver_email, attachments, template_path, email_psswd):
+def send_mail(
+    ctx, validate_file, receiver_email, attachments, template_path, email_psswd
+):
     debug = ctx.obj.get("debug", False)
     """
     Send a sample validation report by mail.
