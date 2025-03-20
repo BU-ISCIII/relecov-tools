@@ -204,8 +204,8 @@ def download(
     target_folders,
     subfolder,
 ):
-    debug = ctx.obj.get("debug", False)
     """Download files located in sftp server."""
+    debug = ctx.obj.get("debug", False)
     download_manager = relecov_tools.download_manager.DownloadManager(
         user,
         password,
@@ -288,8 +288,8 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, metadata_out, files_
 )
 @click.pass_context
 def validate(ctx, json_file, json_schema, metadata, out_folder, excel_sheet):
-    debug = ctx.obj.get("debug", False)
     """Validate json file against schema."""
+    debug = ctx.obj.get("debug", False)
     validation = relecov_tools.json_validation.SchemaValidation(
         json_file, json_schema, metadata, out_folder, excel_sheet
     )
@@ -344,10 +344,10 @@ def validate(ctx, json_file, json_schema, metadata, out_folder, excel_sheet):
 def send_mail(
     ctx, validate_file, receiver_email, attachments, template_path, email_psswd
 ):
-    debug = ctx.obj.get("debug", False)
     """
     Send a sample validation report by mail.
     """
+    debug = ctx.obj.get("debug", False)
     config_loader = relecov_tools.config_json.ConfigJson()
     config = config_loader.get_configuration("mail_sender")
     if not config:
@@ -451,8 +451,8 @@ def send_mail(
 @click.option("-o", "--output", help="File name and path to store the mapped json")
 @click.pass_context
 def map(ctx, origin_schema, json_data, destination_schema, schema_file, output):
-    debug = ctx.obj.get("debug", False)
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
+    debug = ctx.obj.get("debug", False)
     new_schema = relecov_tools.map_schema.MappingSchema(
         origin_schema, json_data, destination_schema, schema_file, output
     )
@@ -497,8 +497,8 @@ def upload_to_ena(
     upload_fastq,
     output_path,
 ):
-    debug = ctx.obj.get("debug", False)
     """parse data to create xml files to upload to ena"""
+    debug = ctx.obj.get("debug", False)
     upload_ena = relecov_tools.upload_ena_protocol.EnaUpload(
         user=user,
         passwd=password,
@@ -573,8 +573,8 @@ def upload_to_gisaid(
     single,
     gzip,
 ):
-    debug = ctx.obj.get("debug", False)
     """parsed data to create files to upload to gisaid"""
+    debug = ctx.obj.get("debug", False)
     upload_gisaid = relecov_tools.gisaid_upload.GisaidUpload(
         user,
         password,
@@ -633,8 +633,8 @@ def upload_to_gisaid(
 )
 @click.pass_context
 def update_db(ctx, user, password, json, type, platform, server_url, full_update):
-    debug = ctx.obj.get("debug", False)
     """upload the information included in json file to the database"""
+    debug = ctx.obj.get("debug", False)
     update_database_obj = relecov_tools.upload_database.UpdateDatabase(
         user, password, json, type, platform, server_url, full_update
     )
@@ -661,10 +661,10 @@ def update_db(ctx, user, password, json, type, platform, server_url, full_update
 @click.option("-s", "--software_name", help="Name of the software/pipeline used.")
 @click.pass_context
 def read_bioinfo_metadata(ctx, json_file, input_folder, out_dir, software_name):
-    debug = ctx.obj.get("debug", False)
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
+    debug = ctx.obj.get("debug", False)
     new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
         json_file,
         input_folder,
@@ -698,8 +698,8 @@ def read_bioinfo_metadata(ctx, json_file, input_folder, out_dir, software_name):
 @click.option("-o", "--output", type=click.Path(), help="Path to save json output")
 @click.pass_context
 def metadata_homogeneizer(ctx, institution, directory, output):
-    debug = ctx.obj.get("debug", False)
     """Parse institution metadata lab to the one used in relecov"""
+    debug = ctx.obj.get("debug", False)
     new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
         institution, directory, output
     )
@@ -743,11 +743,11 @@ def metadata_homogeneizer(ctx, institution, directory, output):
 )
 @click.pass_context
 def pipeline_manager(ctx, input, templates_root, output, config, folder_names):
-    debug = ctx.obj.get("debug", False)
     """
     Create the symbolic links for the samples which are validated to prepare for
     bioinformatics pipeline execution.
     """
+    debug = ctx.obj.get("debug", False)
     new_launch = relecov_tools.pipeline_manager.PipelineManager(
         input, templates_root, output, config, folder_names
     )
@@ -811,8 +811,8 @@ def build_schema(
     project,
     non_interactive,
 ):
-    debug = ctx.obj.get("debug", False)
     """Generates and updates JSON Schema files from Excel-based database definitions."""
+    debug = ctx.obj.get("debug", False)
     # Build new schema
     try:
         schema_update = relecov_tools.build_schema.SchemaBuilder(
@@ -866,8 +866,8 @@ def build_schema(
 )
 @click.pass_context
 def logs_to_excel(ctx, lab_code, output_folder, files):
-    debug = ctx.obj.get("debug", False)
     """Creates a merged xlsx report from all the log summary jsons given as input"""
+    debug = ctx.obj.get("debug", False)
     all_logs = []
     full_paths = [os.path.realpath(f) for f in files]
     for file in full_paths:
@@ -913,8 +913,8 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
 )
 @click.pass_context
 def wrapper(ctx, config_file, output_folder):
-    debug = ctx.obj.get("debug", False)
     """Executes the modules in config file sequentially"""
+    debug = ctx.obj.get("debug", False)
     process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(
         config_file=config_file, output_folder=output_folder
     )
