@@ -936,16 +936,21 @@ def wrapper(ctx, config_file, output_folder):
 @click.option(
     "-r", "--project", default="Relecov", help="Project to which the samples belong"
 )
-def upload_results(user, password, batch_id, template_path, project):
+@click.pass_context
+def upload_results(ctx, user, password, batch_id, template_path, project):
     """Upload batch results to sftp server."""
+    debug = ctx.obj.get("debug", False)
     upload_sftp = relecov_tools.upload_results.UploadSftp(
         user, password, batch_id, template_path, project
     )
     try:
         upload_sftp.execute_process()
     except Exception as e:
-        log.exception(f"EXCEPTION FOUND: {e}")
-        raise
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
 
 
 if __name__ == "__main__":
