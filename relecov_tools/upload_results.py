@@ -43,6 +43,7 @@ class UploadSftp:
 
         config_json = ConfigJson()
         config = config_json.get_configuration("mail_sender")
+        sftp_config = config_json.get_configuration("sftp_handle")
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
@@ -65,10 +66,10 @@ class UploadSftp:
         self.template_path = template_path
         self.email_sender = relecov_tools.mail.EmailSender(config, template_path)
         self.guide = config.get("institutions_guide_path")
+        self.analysis_folder = sftp_config.get("analysis_results_folder")
         self.project = project
         if self.project not in ["Relecov", "Redlabra"]:
-            stderr.print("[red]Error: Only valid projects: Relecov / Redlabra.")
-            sys.exit(1)
+            raise ValueError("Error: Only valid projects: Relecov / Redlabra.")
 
     def find_cod_for_batch(self):
         """Find all COD* folders containing the batch_id"""
@@ -85,12 +86,7 @@ class UploadSftp:
                 matching_cod[cod] = {"batch": self.batch_id, "path": batch_path}
 
         if not matching_cod:
-            stderr.print(
-                f"[red]Batch {self.batch_id} was not found in any COD* folder."
-            )
-            sys.exit(1)
-
-        return matching_cod
+            raise FileNotFoundError(f"Batch {self.batch_id} was not found in any COD* folder.")
 
     def compress_results(self, batch_data, cod):
         """Compress the analysis_results folder with a random password"""
@@ -136,7 +132,7 @@ class UploadSftp:
         sftp = self.relecov_sftp.sftp
 
         # Define the remote path where the file is to be uploaded
-        remote_dir = f"/{cod}/ANALYSIS_RESULTS"
+        remote_dir = f"/{cod}/{self.analysis_folder}"
         remote_file_path = f"{remote_dir}/{os.path.basename(zip_path)}"
 
         try:
