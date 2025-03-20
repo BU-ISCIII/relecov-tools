@@ -253,6 +253,7 @@
             "alternative_sample_id_col": "Sample ID given for sequencing"
         },
         "abort_if_md5_mismatch": "False",
+        "analysis_results_folder": "ANALYSIS_RESULTS",
         "platform_storage_folder": "/tmp/relecov",
         "allowed_file_extensions": [
             ".fastq.gz",
