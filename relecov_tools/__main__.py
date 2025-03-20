@@ -251,10 +251,10 @@ def download(
 )
 @click.pass_context
 def read_lab_metadata(ctx, metadata_file, sample_list_file, metadata_out, files_folder):
-    debug = ctx.obj.get("debug", False)
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
+    debug = ctx.obj.get("debug", False)
     new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(
         metadata_file, sample_list_file, metadata_out, files_folder
     )
