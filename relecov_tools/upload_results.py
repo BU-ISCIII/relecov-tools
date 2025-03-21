@@ -34,12 +34,10 @@ class UploadSftp:
         log.info(f"Beginning upload process for batch: {batch_id}")
 
         if not batch_id:
-            stderr.print("[red]Error: You must provide a batch_id as an argument.")
-            sys.exit(1)
+            raise ValueError("Error: You must provide a batch_id as an argument.")
 
         if not template_path:
-            stderr.print("[red]Error: You must provide a template_path as an argument.")
-            sys.exit(1)
+            raise ValueError("Error: You must provide a template_path as an argument.")
 
         config_json = ConfigJson()
         config = config_json.get_configuration("mail_sender")
@@ -86,7 +84,9 @@ class UploadSftp:
                 matching_cod[cod] = {"batch": self.batch_id, "path": batch_path}
 
         if not matching_cod:
-            raise FileNotFoundError(f"Batch {self.batch_id} was not found in any COD* folder.")
+            raise FileNotFoundError(
+                f"Batch {self.batch_id} was not found in any COD* folder."
+            )
 
     def compress_results(self, batch_data, cod):
         """Compress the analysis_results folder with a random password"""
