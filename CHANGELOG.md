@@ -57,6 +57,7 @@ Code contributions to the release:
 - Fix removal of samples with repeated sampleID and .fastq files [#413](https://github.com/BU-ISCIII/relecov-tools/pull/413)
 - Fix renaming of folders withou any valid sample [#413](https://github.com/BU-ISCIII/relecov-tools/pull/413)
 - Fix download module when deleting corrupted pair-end data [#419](https://github.com/BU-ISCIII/relecov-tools/pull/419)
+- Fixed the upload_results module to handle exceptions properly [#441](https://github.com/BU-ISCIII/relecov-tools/pull/441)
 
 #### Changed
 
