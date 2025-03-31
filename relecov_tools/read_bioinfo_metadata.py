@@ -687,12 +687,12 @@ class BioinfoMetadata:
                 )
                 continue
             sample_name = row["sequencing_sample_id"]
-            base_cod_path = row.get("r1_fastq_filepath")
+            base_cod_path = row.get("sequence_file_path_R1_fastq")
             if base_cod_path is None:
                 self.log_report.update_log_report(
                     method_name,
                     "error",
-                    f"No 'r1_fastq_filepath' found for sample {sample_name}. Unable to generate paths.",
+                    f"No 'sequence_file_path_R1_fastq' found for sample {sample_name}. Unable to generate paths.",
                 )
                 continue
             for key, values in files_found_dict.items():
@@ -718,7 +718,7 @@ class BioinfoMetadata:
                 if self.software_config[key].get("extract"):
                     self.extract_file(
                         file=file_path,
-                        dest_folder=row.get("r1_fastq_filepath"),
+                        dest_folder=row.get("sequence_file_path_R1_fastq"),
                         sample_name=sample_name,
                         path_key=path_key,
                     )
@@ -813,11 +813,11 @@ class BioinfoMetadata:
             data_by_batch (dict(list(dict))): Dictionary containing parts of j_data corresponding to each
             different folder with samples (batch) included in the original json metadata used as input
         """
-        unique_batchs = set([x.get("r1_fastq_filepath") for x in j_data])
+        unique_batchs = set([x.get("sequence_file_path_R1_fastq") for x in j_data])
         data_by_batch = {batch_dir: {} for batch_dir in unique_batchs}
         for batch_dir in data_by_batch.keys():
             data_by_batch[batch_dir]["j_data"] = [
-                samp for samp in j_data if samp.get("r1_fastq_filepath") == batch_dir
+                samp for samp in j_data if samp.get("sequence_file_path_R1_fastq") == batch_dir
             ]
         return data_by_batch
 

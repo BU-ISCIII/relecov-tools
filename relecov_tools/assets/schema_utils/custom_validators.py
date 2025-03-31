@@ -31,4 +31,4 @@ def validate_with_exceptions(schema, data, errors):
         # Keep all other errors
         filtered_errors.append(error)
 
-    return
+    return filtered_errors
