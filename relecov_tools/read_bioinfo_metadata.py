@@ -817,7 +817,9 @@ class BioinfoMetadata:
         data_by_batch = {batch_dir: {} for batch_dir in unique_batchs}
         for batch_dir in data_by_batch.keys():
             data_by_batch[batch_dir]["j_data"] = [
-                samp for samp in j_data if samp.get("sequence_file_path_R1_fastq") == batch_dir
+                samp
+                for samp in j_data
+                if samp.get("sequence_file_path_R1_fastq") == batch_dir
             ]
         return data_by_batch
 
