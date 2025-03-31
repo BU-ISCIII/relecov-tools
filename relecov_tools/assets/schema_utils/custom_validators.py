@@ -2,10 +2,21 @@
 
 
 def validate_with_exceptions(schema, data, errors):
-    """Filter out type errors for:
-    - integer/float fields containing 'Not Provided'
-    - string fields with format: date containing 'Not Provided'
-    - return filtered errors.
+    """Filter validation errors based on known exceptions.
+
+    This function filters out specific validation errors from the provided list 
+    of errors based on exceptions defined in the schema. It allows:
+      - Numeric fields (integer/float) to contain the placeholder 
+        'Not Provided [GENEPIO:0001668]'.
+      - String fields with format 'date' to contain the same placeholder.
+
+    Args:
+        schema (dict): Dictionary representing the JSON schema.
+        data (dict): The input data being validated.
+        errors (list): List of validation errors returned by a JSON schema validator.
+
+    Returns:
+        filtered_errors (list): List of validation errors excluding known exceptions.
     """
     filtered_errors = []
 
