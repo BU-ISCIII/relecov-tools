@@ -2959,14 +2959,13 @@
         },
         "library_source": {
             "enum": [
-                "genomic single cell [EDAM:4028]",
-                "Transcriptomic [NCIT:C153189]",
-                "nan",
-                "metagenomic [NCIT:C201925]",
-                "metatranscriptomic [NCIT:C201926]",
-                "synthetic [BAO:0003073]",
-                "viral rna [GENEPIO:0001972]",
-                "Other [NCIT:C17649]",
+                "Genomic single cell  [EDAM:4028]", 
+                "Transcriptomic [NCIT:C153189]", 
+                "Metagenomic [NCIT:C201925]", 
+                "Metatranscriptomic [NCIT:C201926]", 
+                "Synthetic [BAO:0003073]", 
+                "Viral rna [NCIT:C204811]", 
+                "Other [NCIT:C17649]", 
                 "Not Provided [SNOMED:434941000124101]"
             ],
             "examples": [
