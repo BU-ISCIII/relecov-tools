@@ -4,9 +4,9 @@
 def validate_with_exceptions(schema, data, errors):
     """Filter validation errors based on known exceptions.
 
-    This function filters out specific validation errors from the provided list 
+    This function filters out specific validation errors from the provided list
     of errors based on exceptions defined in the schema. It allows:
-      - Numeric fields (integer/float) to contain the placeholder 
+      - Numeric fields (integer/float) to contain the placeholder
         'Not Provided [GENEPIO:0001668]'.
       - String fields with format 'date' to contain the same placeholder.
 
