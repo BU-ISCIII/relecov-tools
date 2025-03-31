@@ -4,7 +4,9 @@
 def validate_with_exceptions(schema, data, errors):
     """Filter out type errors for:
     - integer/float fields containing 'Not Provided'
-    - string fields with format: date containing 'Not Provided'"""
+    - string fields with format: date containing 'Not Provided'
+    - return filtered errors.
+    """
     filtered_errors = []
 
     for error in errors:
