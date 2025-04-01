@@ -866,7 +866,7 @@ def build_schema(
 )
 @click.pass_context
 def logs_to_excel(ctx, lab_code, output_folder, files):
-    """Creates a merged xlsx report from all the log summary jsons given as input"""
+    """Creates a merged xlsx and Json report from all the log summary jsons given as input"""
     debug = ctx.obj.get("debug", False)
     all_logs = []
     full_paths = [os.path.realpath(f) for f in files]
@@ -886,8 +886,12 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
     try:
         merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
         final_logs = logsum.prepare_final_logs(logs=merged_logs)
-        excel_outpath = os.path.join(output_folder, lab_code + "_logs_report.xlsx")
+        output_filepath = os.path.join(output_folder, lab_code + "_logs_report")
+        excel_outpath = output_filepath + ".xlsx"
         logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
+        json_outpath = output_filepath + ".json"
+        relecov_tools.utils.write_json_to_file(final_logs, json_outpath)
+        print(f"[green]Successfully created logs Json in {json_outpath}")
     except Exception as e:
         if debug:
             log.error(f"EXCEPTION FOUND: {e}")
