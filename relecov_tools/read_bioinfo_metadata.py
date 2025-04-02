@@ -1027,6 +1027,15 @@ class BioinfoMetadata:
             tag = "bioinfo_lab_metadata_"
             batch_filename = tag + lab_code + "_" + batch_date + ".json"
             batch_filepath = os.path.join(batch_dir, batch_filename)
+            try:
+                qc_func = eval(f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation")
+                qc_data = qc_func(batch_data)
+                for sample in batch_data:
+                    sample_id = sample.get("sequencing_sample_id")
+                    if sample_id in qc_data:
+                        sample.update(qc_data[sample_id])
+            except Exception as e:
+                log.warning(f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}")
             if os.path.exists(batch_filepath):
                 stderr.print(
                     f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
@@ -1056,8 +1065,6 @@ class BioinfoMetadata:
         batch_filename = tag + batch_dates + ".json"
         stderr.print("[blue]Writting output json file")
         file_path = os.path.join(out_path, batch_filename)
-        qc_statement = f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation(self.j_data)"
-        exec(qc_statement)
         if os.path.exists(file_path):
             stderr.print(
                 f"[blue]Bioinfo metadata {file_path} file already exists. Merging new data if possible."
