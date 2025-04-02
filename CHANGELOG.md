@@ -51,6 +51,7 @@ Code contributions to the release:
 - Fix adding_ontology_to_enum when enum has no ontology [#439](https://github.com/BU-ISCIII/relecov-tools/pull/439)
 - Update relecov_schema.json and read-bioinfo-metadata to v3.0.0 [#442](https://github.com/BU-ISCIII/relecov-tools/pull/442)
 - Now logs-to-excel also creates a Json file with merged logs [#445](https://github.com/BU-ISCIII/relecov-tools/pull/445)
+- Fix read-bioinfo-metadata: Evaluate qc_test at Batch Level and Handle Non-Evaluable %LDMutations [#447](https://github.com/BU-ISCIII/relecov-tools/pull/447)
 
 #### Fixes
 
