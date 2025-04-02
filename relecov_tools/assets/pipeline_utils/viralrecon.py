@@ -466,7 +466,7 @@ def quality_control_evaluation(data):
     """
     log_report = BioinfoReportLog()
     method_name = f"{quality_control_evaluation.__name__}"
-    
+
     def safe_float(x):
         try:
             return float(x)
@@ -480,14 +480,19 @@ def quality_control_evaluation(data):
             return None
 
     conditions = {
-        "per_sgene_ambiguous": lambda x: safe_float(x) is not None and safe_float(x) < 10,
-        "per_sgene_coverage": lambda x: safe_float(x) is not None and safe_float(x) > 98,
+        "per_sgene_ambiguous": lambda x: safe_float(x) is not None
+        and safe_float(x) < 10,
+        "per_sgene_coverage": lambda x: safe_float(x) is not None
+        and safe_float(x) > 98,
         "per_ldmutations": lambda x: (
-            True if isinstance(x, str) and "Not Evaluable" in x
+            True
+            if isinstance(x, str) and "Not Evaluable" in x
             else safe_float(x) is not None and safe_float(x) > 60
         ),
-        "number_of_sgene_frameshifts": lambda x: safe_int(x) is not None and safe_int(x) == 0,
-        "number_of_unambiguous_bases": lambda x: safe_int(x) is not None and safe_int(x) > 24000,
+        "number_of_sgene_frameshifts": lambda x: safe_int(x) is not None
+        and safe_int(x) == 0,
+        "number_of_unambiguous_bases": lambda x: safe_int(x) is not None
+        and safe_int(x) > 24000,
         "number_of_Ns": lambda x: safe_int(x) is not None and safe_int(x) < 5000,
         "qc_filtered": lambda x: safe_int(x) is not None and safe_int(x) > 50000,
         "per_reads_host": lambda x: safe_float(x) is not None and safe_float(x) < 20,
@@ -502,9 +507,15 @@ def quality_control_evaluation(data):
                     qc_status = "fail"
                     break
             sample["qc_test"] = qc_status
-            log_report.update_log_report(method_name, "valid", f"{sample.get('sequencing_sample_id')} evaluated: {qc_status}")
+            log_report.update_log_report(
+                method_name,
+                "valid",
+                f"{sample.get('sequencing_sample_id')} evaluated: {qc_status}",
+            )
         except Exception as e:
             sample["qc_test"] = "fail"
             sample_id = sample.get("sequencing_sample_id", "unknown")
-            log_report.update_log_report(method_name, "warning", f"Error evaluating sample {sample_id}: {e}")
+            log_report.update_log_report(
+                method_name, "warning", f"Error evaluating sample {sample_id}: {e}"
+            )
     return data
