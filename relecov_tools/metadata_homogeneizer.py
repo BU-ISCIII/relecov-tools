@@ -218,7 +218,7 @@ class MetadataHomogeneizer:
 
         else:
             if data == {'ERROR': 'not valid format'}:
-                raise ValueError(f"Unknown error during processing of {file_data["file_name"]}")
+                raise ValueError(f"Unknown error during processing of {file_data['file_name']}")
             func_name = file_data["function"]
             stderr.print("[yellow] Start processing function " + func_name)
             exec(
