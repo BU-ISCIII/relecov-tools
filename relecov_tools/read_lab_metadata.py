@@ -131,7 +131,7 @@ class RelecovMetadata:
             try:
                 return relecov_tools.utils.calculate_md5(file)
             except IOError:
-                return "Not Provided [GENEPIO:0001668]"
+                return "Not Provided [SNOMED:434941000124101]"
 
         # The files are and md5file are supposed to be located together
         dir_path = self.files_folder
@@ -363,11 +363,48 @@ class RelecovMetadata:
                         continue
                     # TODO: Include Not Provided as a configuration field
                     fields_to_add = {
-                        x: "Not Provided [GENEPIO:0001668]"
+                        x: "Not Provided [SNOMED:434941000124101]"
                         for x in json_fields["adding_fields"]
                     }
                     m_data[idx].update(fields_to_add)
         return m_data
+    
+    def infer_file_format_from_schema(self, metadata):
+        """Infer the file_format field based on the extension in sequence_file_R1_fastq,
+        using enum values (con ontología) directamente desde el schema."""
+
+        extension_map = {
+            ".fastq": "FASTQ",
+            ".fastq.gz": "FASTQ",
+            ".fq": "FASTQ",
+            ".fq.gz": "FASTQ",
+            ".bam": "BAM",
+            ".cram": "CRAM",
+        }
+
+        file_format_enum = self.relecov_sch_json["properties"].get("file_format", {}).get("enum", [])
+        keyword_to_enum = {}
+
+        for item in file_format_enum:
+            match = re.match(r"^([A-Z]+)", item)
+            if match:
+                keyword = match.group(1)
+                keyword_to_enum[keyword] = item
+
+        for row in metadata:
+            r1_file = row.get("sequence_file_R1_fastq", "").lower()
+            file_format_val = None
+            for ext, keyword in extension_map.items():
+                if r1_file.endswith(ext.lower()):
+                    file_format_val = keyword_to_enum.get(keyword)
+                    break
+
+            if file_format_val:
+                row["file_format"] = file_format_val
+            else:
+                row["file_format"] = "Not Provided [SNOMED:434941000124101]"
+
+        return metadata
 
     def adding_fields(self, metadata):
         """Add information located inside various json file as fields"""
@@ -395,6 +432,7 @@ class RelecovMetadata:
         else:
             s_json["j_data"] = self.get_samples_files_data(metadata)
         metadata = self.process_from_json(metadata, s_json)
+        metadata = self.infer_file_format_from_schema(metadata)
         stderr.print("[green]Processed sample data file.")
         log.info("Processed sample data file.")
         return metadata
@@ -475,20 +513,7 @@ class RelecovMetadata:
                 )
                 # Conversion of values according to expected type
                 try:
-                    if schema_type == "integer":
-                        try:
-                            value = int(float(value))
-                        except (ValueError, TypeError):
-                            value = str(value).strip()
-                    elif schema_type == "number":
-                        try:
-                            value = float(value)
-                        except (ValueError, TypeError):
-                            value = float(value).strip()
-                    elif schema_type == "boolean":
-                        value = str(value).strip().lower() in ["true", "yes", "1"]
-                    elif schema_type == "string":
-                        value = str(value).strip()
+                    value = relecov_tools.utils.cast_value_to_schema_type(value, schema_type)
                 except (ValueError, TypeError) as e:
                     log_text = f"Type conversion error for {key} (expected {schema_type}): {value}. {str(e)}"
                     self.logsum.add_error(sample=sample_id, entry=log_text)
