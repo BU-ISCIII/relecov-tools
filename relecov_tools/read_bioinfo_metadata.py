@@ -4,11 +4,9 @@ import sys
 import logging
 import rich.console
 import re
-import shutil
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-import pandas as pd
 import relecov_tools.utils
 from relecov_tools.assets.pipeline_utils.batch_handler import BatchHandler
 from relecov_tools.assets.pipeline_utils import json_utils
