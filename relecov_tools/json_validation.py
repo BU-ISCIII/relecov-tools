@@ -150,14 +150,6 @@ class SchemaValidation:
             else:
                 # Process remaining errors
                 for error in validation_errors:
-                    # Extract the error field name
-                    # if error.validator == "required":
-                    #     error_field = [
-                    #         f for f in error.validator_value if f in error.message
-                    #     ][0]
-                    # else:
-                    #     error_field = error.absolute_path[0]
-
                     try:
                         if error.validator == "required":
                             # Extrae el nombre del campo del mensaje de error

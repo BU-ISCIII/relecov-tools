@@ -368,7 +368,7 @@ class RelecovMetadata:
                     }
                     m_data[idx].update(fields_to_add)
         return m_data
-    
+
     def infer_file_format_from_schema(self, metadata):
         """Infer the file_format field based on the extension in sequence_file_R1_fastq,
         using enum values (con ontología) directamente desde el schema."""
@@ -382,7 +382,9 @@ class RelecovMetadata:
             ".cram": "CRAM",
         }
 
-        file_format_enum = self.relecov_sch_json["properties"].get("file_format", {}).get("enum", [])
+        file_format_enum = (
+            self.relecov_sch_json["properties"].get("file_format", {}).get("enum", [])
+        )
         keyword_to_enum = {}
 
         for item in file_format_enum:
@@ -513,7 +515,9 @@ class RelecovMetadata:
                 )
                 # Conversion of values according to expected type
                 try:
-                    value = relecov_tools.utils.cast_value_to_schema_type(value, schema_type)
+                    value = relecov_tools.utils.cast_value_to_schema_type(
+                        value, schema_type
+                    )
                 except (ValueError, TypeError) as e:
                     log_text = f"Type conversion error for {key} (expected {schema_type}): {value}. {str(e)}"
                     self.logsum.add_error(sample=sample_id, entry=log_text)

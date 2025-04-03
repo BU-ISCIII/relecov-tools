@@ -622,6 +622,7 @@ def display_dataframe_to_user(name: str, dataframe: pd.DataFrame):
     # Display the table
     console.print(table)
 
+
 def load_schema(schema_path: str) -> dict:
     """
     Load a JSON schema from the specified file path.
