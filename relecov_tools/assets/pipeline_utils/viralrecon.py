@@ -76,7 +76,7 @@ class LongTableParse:
         """Check if long table file has all mandatory fields defined in
         configuration file
         """
-        for field in self.long_table_heading:
+        for field in self.long_table_heading.values():
             if field not in heading:
                 log.error("Incorrect format file. %s is missing", field)
                 stderr.print(f"[red]Incorrect Format. {field} is missing in file")

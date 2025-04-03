@@ -2959,7 +2959,7 @@
         },
         "library_source": {
             "enum": [
-                "Genomic single cell  [EDAM:4028]",
+                "Genomic single cell [EDAM:4028]",
                 "Transcriptomic [NCIT:C153189]",
                 "Metagenomic [NCIT:C201925]",
                 "Metatranscriptomic [NCIT:C201926]",
