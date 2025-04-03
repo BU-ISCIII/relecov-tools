@@ -468,7 +468,8 @@ def quality_control_evaluation(data):
     method_name = f"{quality_control_evaluation.__name__}"
 
     conditions = {
-        "per_sgene_ambiguous": lambda x: isinstance(x, (int, float)) and float(x) < 10.0,
+        "per_sgene_ambiguous": lambda x: isinstance(x, (int, float))
+        and float(x) < 10.0,
         "per_sgene_coverage": lambda x: isinstance(x, (int, float)) and float(x) > 98.0,
         "per_ldmutations": lambda x: (
             True
