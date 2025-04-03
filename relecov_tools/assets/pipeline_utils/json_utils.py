@@ -8,6 +8,7 @@ import relecov_tools.utils
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(stderr=True, style="dim", highlight=False)
 
+
 def extract_file(file, dest_folder, sample_name=None, path_key=None, log_report=None):
     dest_folder = os.path.join(dest_folder, "analysis_results")
     os.makedirs(dest_folder, exist_ok=True)
@@ -18,8 +19,9 @@ def extract_file(file, dest_folder, sample_name=None, path_key=None, log_report=
     if file == "Not Provided [SNOMED:434941000124101]":
         if log_report:
             log_report.update_log_report(
-                "extract_file", "warning",
-                f"File for {path_key} not provided in sample {sample_name}"
+                "extract_file",
+                "warning",
+                f"File for {path_key} not provided in sample {sample_name}",
             )
         return False
     try:
@@ -48,7 +50,8 @@ def merge_metadata(batch_filepath, batch_data):
                 )
                 log.error(
                     "Sample %s has different data in %s and new metadata. Can't merge.",
-                    sample_id, batch_filepath
+                    sample_id,
+                    batch_filepath,
                 )
                 sys.exit(1)
         else:
@@ -58,7 +61,16 @@ def merge_metadata(batch_filepath, batch_data):
     return merged_metadata
 
 
-def mapping_over_table(j_data, map_data, mapping_fields, table_name, schema_types, software_name, config_key, log_report):
+def mapping_over_table(
+    j_data,
+    map_data,
+    mapping_fields,
+    table_name,
+    schema_types,
+    software_name,
+    config_key,
+    log_report,
+):
     method_name = f"mapping_over_table:{software_name}.{config_key}"
     errors = []
     field_errors = {}
@@ -69,7 +81,7 @@ def mapping_over_table(j_data, map_data, mapping_fields, table_name, schema_type
             log_report.update_log_report(
                 method_name,
                 "warning",
-                f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...'
+                f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
             )
             continue
         sample_name = row["sequencing_sample_id"]
@@ -78,11 +90,18 @@ def mapping_over_table(j_data, map_data, mapping_fields, table_name, schema_type
                 expected_type = schema_types.get(field, {}).get("type", "string")
                 try:
                     raw_value = map_data[sample_name][value]
-                    if raw_value is None or str(raw_value).strip().lower() in ["", "none"]:
+                    if raw_value is None or str(raw_value).strip().lower() in [
+                        "",
+                        "none",
+                    ]:
                         row[field] = "Not Provided [SNOMED:434941000124101]"
-                        field_errors.setdefault(sample_name, {})[field] = "Empty or None"
+                        field_errors.setdefault(sample_name, {})[
+                            field
+                        ] = "Empty or None"
                         continue
-                    casted_value = relecov_tools.utils.cast_value_to_schema_type(raw_value, expected_type)
+                    casted_value = relecov_tools.utils.cast_value_to_schema_type(
+                        raw_value, expected_type
+                    )
                     row[field] = casted_value
                     field_valid[sample_name] = {field: value}
                 except KeyError as e:
@@ -103,25 +122,23 @@ def mapping_over_table(j_data, map_data, mapping_fields, table_name, schema_type
         log_report.update_log_report(
             method_name,
             "warning",
-            f"{len(errors)} samples missing in '{table_name}': {', '.join(errors)}"
+            f"{len(errors)} samples missing in '{table_name}': {', '.join(errors)}",
         )
     else:
         log_report.update_log_report(
             method_name,
             "valid",
-            f"All samples were successfully found in {table_name}."
+            f"All samples were successfully found in {table_name}.",
         )
     if field_errors:
         log_report.update_log_report(
-            method_name,
-            "warning",
-            f"Missing fields in {table_name}:\n\t{field_errors}"
+            method_name, "warning", f"Missing fields in {table_name}:\n\t{field_errors}"
         )
     else:
         log_report.update_log_report(
             method_name,
             "valid",
-            f"Successfully mapped fields in {', '.join(field_valid.keys())}"
+            f"Successfully mapped fields in {', '.join(field_valid.keys())}",
         )
     log_report.print_log_report(method_name, ["valid", "warning"])
     return j_data

@@ -478,7 +478,8 @@ def quality_control_evaluation(data):
         "per_sgene_ambiguous": lambda x: is_number(x) and float(x) < 10,
         "per_sgene_coverage": lambda x: is_number(x) and float(x) > 98,
         "per_ldmutations": lambda x: (
-            True if isinstance(x, str) and "Not Evaluable" in x
+            True
+            if isinstance(x, str) and "Not Evaluable" in x
             else is_number(x) and float(x) > 60
         ),
         "number_of_sgene_frameshifts": lambda x: is_number(x) and int(x) == 0,

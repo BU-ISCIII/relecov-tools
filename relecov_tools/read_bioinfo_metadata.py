@@ -130,10 +130,14 @@ class BioinfoMetadata:
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
             )
         self.software_name = software
-        available_software = relecov_tools.utils.get_available_software(self.bioinfo_json_file)
+        available_software = relecov_tools.utils.get_available_software(
+            self.bioinfo_json_file
+        )
         bioinfo_config = ConfigJson(self.bioinfo_json_file)
 
-        self.schema_path = os.path.join(os.path.dirname(__file__), "schema", "relecov_schema.json")
+        self.schema_path = os.path.join(
+            os.path.dirname(__file__), "schema", "relecov_schema.json"
+        )
         self.bioinfo_schema = relecov_tools.utils.load_schema(self.schema_path)
 
         if self.software_name in available_software:
@@ -294,15 +298,15 @@ class BioinfoMetadata:
                 continue
             if data_to_map:
                 j_data_mapped = json_utils.mapping_over_table(
-                                    j_data=j_data,
-                                    map_data=data_to_map,
-                                    mapping_fields=self.software_config[key]["content"],
-                                    table_name=files_dict[key],
-                                    schema_types=self.bioinfo_schema.get("properties", {}),
-                                    software_name=self.software_name,
-                                    config_key=self.current_config_key,
-                                    log_report=self.log_report
-                                )
+                    j_data=j_data,
+                    map_data=data_to_map,
+                    mapping_fields=self.software_config[key]["content"],
+                    table_name=files_dict[key],
+                    schema_types=self.bioinfo_schema.get("properties", {}),
+                    software_name=self.software_name,
+                    config_key=self.current_config_key,
+                    log_report=self.log_report,
+                )
             else:
                 self.log_report.update_log_report(
                     method_name,
@@ -640,7 +644,7 @@ class BioinfoMetadata:
                         dest_folder=row.get("sequence_file_path_R1_fastq"),
                         sample_name=sample_name,
                         path_key=path_key,
-                        log_report=self.log_report
+                        log_report=self.log_report,
                     )
         self.log_report.print_log_report(method_name, ["warning"])
         if sample_name_error == 0:
@@ -765,7 +769,6 @@ class BioinfoMetadata:
         stderr.print("[blue]Validating required files...")
         self.validate_software_mandatory_files(files_found_dict)
         # Split files found based on each batch of samples
-        # data_by_batch = self.split_data_by_batch(self.j_data)
         self.batch_handler = BatchHandler(self.j_data)
         data_by_batch = self.batch_handler.split_by_batch()
         batch_dates = []
@@ -794,7 +797,6 @@ class BioinfoMetadata:
             stderr.print(f"[blue]Processing data from {batch_dir}")
             batch_data = batch_dict["j_data"]
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
-            #self.split_tables_by_batch(files_found_dict, sufix, batch_data, batch_dir)
             for key, files in files_found_dict.items():
                 if not self.software_config[key].get("split_by_batch"):
                     continue
@@ -805,14 +807,24 @@ class BioinfoMetadata:
                         self.batch_handler.extract_batch_rows_to_file(
                             file=file,
                             sufix=sufix,
-                            batch_samples=[s.get("sequencing_sample_id") for s in batch_data],
+                            batch_samples=[
+                                s.get("sequencing_sample_id") for s in batch_data
+                            ],
                             output_dir=batch_dir,
                             header_pos=header_pos,
                             sample_colpos=sample_colpos,
                         )
                     except Exception as e:
-                        log_type = "error" if self.software_config[key].get("required") else "warning"
-                        self.log_report.update_log_report("split_tables_by_batch", log_type, f"Could not create batch table for {file}: {e}")
+                        log_type = (
+                            "error"
+                            if self.software_config[key].get("required")
+                            else "warning"
+                        )
+                        self.log_report.update_log_report(
+                            "split_tables_by_batch",
+                            log_type,
+                            f"Could not create batch table for {file}: {e}",
+                        )
 
             batch_data = self.add_bioinfo_results_metadata(
                 files_found_dict, batch_data, sufix, batch_date, batch_dir
