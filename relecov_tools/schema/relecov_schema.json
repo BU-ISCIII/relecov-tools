@@ -4633,7 +4633,7 @@
                 "153812"
             ],
             "ontology": "NCIT:C171338",
-            "type": "string",
+            "type": "integer",
             "description": "Percentage of read that pass quality control threshold",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "%QC filtered",
@@ -5034,7 +5034,8 @@
             "enum": [
                 "BAM [EDAM:2572]",
                 "CRAM [EDAM:3462]",
-                "FASTQ [EDAM:1930]"
+                "FASTQ [EDAM:1930]",
+                "FASTA [EDAM:1929]"
             ],
             "examples": [
                 "BAM,CRAM,FASTQ"

@@ -371,7 +371,7 @@ class RelecovMetadata:
 
     def infer_file_format_from_schema(self, metadata):
         """Infer the file_format field based on the extension in sequence_file_R1_fastq,
-        using enum values (con ontología) directamente desde el schema."""
+        using enum values (with ontology) directly from the schema."""
 
         extension_map = {
             ".fastq": "FASTQ",
@@ -380,6 +380,8 @@ class RelecovMetadata:
             ".fq.gz": "FASTQ",
             ".bam": "BAM",
             ".cram": "CRAM",
+            ".fasta": "FASTA",
+            ".fa": "FASTA",
         }
 
         file_format_enum = (
