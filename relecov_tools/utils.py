@@ -621,3 +621,62 @@ def display_dataframe_to_user(name: str, dataframe: pd.DataFrame):
 
     # Display the table
     console.print(table)
+
+def load_schema(schema_path: str) -> dict:
+    """
+    Load a JSON schema from the specified file path.
+
+    Args:
+        schema_path (str): The file path to the JSON schema.
+
+    Returns:
+        dict: Parsed schema as a Python dictionary.
+    """
+    with open(schema_path) as f:
+        return json.load(f)
+
+
+def get_available_software(json_path: str) -> list:
+    """
+    Retrieve available software names from a bioinfo configuration JSON file.
+
+    Args:
+        json_path (str): Path to the bioinfo configuration file.
+
+    Returns:
+        list: A list of available software/tools defined in the configuration.
+    """
+    config = read_json_file(json_path)
+    return list(config.keys())
+
+
+def cast_value_to_schema_type(value, expected_type: str):
+    """
+    Cast a value to the expected JSON schema type.
+
+    Args:
+        value (any): The input value to be cast.
+        expected_type (str): Target data type from the schema. Options: "integer", "number", "boolean", "string".
+
+    Returns:
+        any: The value cast to the appropriate type, or a string fallback if casting fails.
+    """
+    try:
+        if expected_type == "integer":
+            try:
+                return int(float(value))
+            except (ValueError, TypeError):
+                return str(value).strip()
+        elif expected_type == "number":
+            try:
+                return float(value)
+            except (ValueError, TypeError):
+                return str(value).strip()
+        elif expected_type == "boolean":
+            return str(value).strip().lower() in ["true", "yes", "1"]
+        elif expected_type == "string":
+            return str(value).strip()
+        else:
+            return str(value).strip()
+    except Exception:
+        return str(value).strip()
