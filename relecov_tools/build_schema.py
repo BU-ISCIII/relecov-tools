@@ -544,6 +544,21 @@ class SchemaBuilder:
                         required_property_unique.append(key)
             # TODO: So far it appears at the end of the new json schema. Ideally it should be placed before the properties statement.
             new_schema["required"] = required_property_unique
+            grouped_anyof = {}
+
+            for prop_id, prop_data in json_data.items():
+                group = str(prop_data.get("conditional_required_group", "")).strip()
+                if group and group.lower() != "nan":
+                    grouped_anyof.setdefault(group, []).append(prop_id)
+            anyof_rules = []
+            for props in grouped_anyof.values():
+                if len(props) >= 1:
+                    anyof_rules.extend([{"required": [prop]} for prop in props])
+                    for prop in props:
+                        if prop in required_property_unique:
+                            required_property_unique.remove(prop)
+            if anyof_rules:
+                new_schema["anyOf"] = anyof_rules
 
             # Return new schema
             return new_schema
