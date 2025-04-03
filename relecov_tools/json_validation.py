@@ -154,6 +154,7 @@ class SchemaValidation:
                         if error.validator == "required":
                             error_field = list(error.message.split("'"))[1]
                         elif error.validator == "anyOf":
+                            # Combinar todos los campos que fallaron en los bloques "required"
                             missing_fields = []
                             for cond in error.validator_value:
                                 if isinstance(cond, dict) and "required" in cond:
@@ -162,10 +163,10 @@ class SchemaValidation:
                         elif error.absolute_path:
                             error_field = str(error.absolute_path[0])
                         else:
-                            error_field = "unknown"
+                            error_field = error.validator or error.message
                     except Exception as ex:
                         log.warning(f"Error extracting error_field from: {error}, {ex}")
-                        error_field = "unknown"
+                        error_field = str(error)
 
                     # Try to get the human-readable label from the schema
                     try:

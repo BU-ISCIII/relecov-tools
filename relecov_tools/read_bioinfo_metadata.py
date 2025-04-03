@@ -4,12 +4,12 @@ import sys
 import logging
 import rich.console
 import re
+import shutil
 from bs4 import BeautifulSoup
 from datetime import datetime
 
+import pandas as pd
 import relecov_tools.utils
-from relecov_tools.assets.pipeline_utils.batch_handler import BatchHandler
-from relecov_tools.assets.pipeline_utils import json_utils
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.log_summary import LogSum
 
@@ -198,6 +198,89 @@ class BioinfoMetadata:
             self.log_report.print_log_report(method_name, ["valid", "warning"])
             return files_found
 
+    def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
+        """Maps bioinformatics metadata from map_data to j_data based on the mapping_fields.
+        Args:
+            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
+            map_data (dict(dict{str:str})): A dictionary containing bioinfo metadata handled by the method handling_files().
+            mapping_fields (dict{str:str}): A dictionary of mapping fields defined in the 'content' definition under each software scope (see conf/bioinfo.config).
+            table_name (str): Path to the mapping file/table.
+        Returns:
+            j_data: updated j_data with bioinformatic metadata mapped in it.
+        """
+        method_name = f"{self.mapping_over_table.__name__}:{self.software_name}.{self.current_config_key}"
+        errors = []
+        field_errors = {}
+        field_valid = {}
+        for row in j_data:
+            # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
+            #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
+            if not row.get("sequencing_sample_id"):
+                self.log_report.update_log_report(
+                    method_name,
+                    "warning",
+                    f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
+                )
+                continue
+            sample_name = row["sequencing_sample_id"]
+            if sample_name in map_data.keys():
+                for field, value in mapping_fields.items():
+                    try:
+                        raw_val = map_data[sample_name][value]
+                        expected_type = (
+                            self.bioinfo_schema["properties"]
+                            .get(field, {})
+                            .get("type", "string")
+                        )
+                        row[field] = relecov_tools.utils.cast_value_to_schema_type(
+                            raw_val, expected_type
+                        )
+                        field_valid[sample_name] = {field: value}
+                    except KeyError as e:
+                        field_errors[sample_name] = {field: e}
+                        row[field] = "Not Provided [GENEPIO:0001668]"
+                        continue
+            else:
+                errors.append(sample_name)
+                for field in mapping_fields.keys():
+                    row[field] = "Not Provided [GENEPIO:0001668]"
+        # work around when map_data comes from several per-sample tables/files instead of single table
+        if len(table_name) > 2:
+            table_name = os.path.dirname(table_name[0])
+        else:
+            table_name = table_name[0]
+        # Parse missing sample errors
+        if errors:
+            lenerrs = len(errors)
+            self.log_report.update_log_report(
+                method_name,
+                "warning",
+                f"{lenerrs} samples missing in '{table_name}': {', '.join(errors)}.",
+            )
+        else:
+            self.log_report.update_log_report(
+                method_name,
+                "valid",
+                f"All samples were successfully found in {table_name}.",
+            )
+        # Parse missing fields errors
+        # TODO: this stdout can be improved
+        if len(field_errors) > 0:
+            self.log_report.update_log_report(
+                method_name,
+                "warning",
+                f"Missing fields in {table_name}:\n\t{field_errors}",
+            )
+        else:
+            self.log_report.update_log_report(
+                method_name,
+                "valid",
+                f"Successfully mapped fields in {', '.join(field_valid.keys())}.",
+            )
+        # Print report
+        self.log_report.print_log_report(method_name, ["valid", "warning"])
+        return j_data
+
     def validate_samplenames(self):
         """Validate that the sequencing_sample_id from the JSON input is present in the samples_id.txt.
 
@@ -295,15 +378,11 @@ class BioinfoMetadata:
             if not mapping_fields:
                 continue
             if data_to_map:
-                j_data_mapped = json_utils.mapping_over_table(
+                j_data_mapped = self.mapping_over_table(
                     j_data=j_data,
                     map_data=data_to_map,
                     mapping_fields=self.software_config[key]["content"],
                     table_name=files_dict[key],
-                    schema_types=self.bioinfo_schema.get("properties", {}),
-                    software_name=self.software_name,
-                    config_key=self.current_config_key,
-                    log_report=self.log_report,
                 )
             else:
                 self.log_report.update_log_report(
@@ -637,12 +716,11 @@ class BioinfoMetadata:
                 else:
                     row[path_key] = file_path
                 if self.software_config[key].get("extract"):
-                    json_utils.extract_file(
+                    self.extract_file(
                         file=file_path,
                         dest_folder=row.get("sequence_file_path_R1_fastq"),
                         sample_name=sample_name,
                         path_key=path_key,
-                        log_report=self.log_report,
                     )
         self.log_report.print_log_report(method_name, ["warning"])
         if sample_name_error == 0:
@@ -690,6 +768,139 @@ class BioinfoMetadata:
                 f"No valid sample-index-column defined in '{self.software_name}.{config_key}'. Using default instead.",
             )
         return sample_idx_colpos
+
+    def extract_file(self, file, dest_folder, sample_name=None, path_key=None):
+        """Copy input file to the given destination, include sample name and key in log
+        Args:
+            file (str): Path the file that is going to be copied
+            dest_folder (str): Folder with files from batch of samples
+            sample_name (str, optional): Name of the sample in metadata. Defaults to None.
+            path_key (str, optional): Metadata field for the file. Defaults to None.
+        Returns:
+            bool: True if the process was successful, else False
+        """
+        dest_folder = os.path.join(dest_folder, "analysis_results")
+        os.makedirs(dest_folder, exist_ok=True)
+        out_filepath = os.path.join(dest_folder, os.path.basename(file))
+        if os.path.isfile(out_filepath):
+            return True
+        if file == "Not Provided [GENEPIO:0001668]":
+            self.log_report.update_log_report(
+                self.extract_file.__name__,
+                "warning",
+                f"File for {path_key} not provided in sample {sample_name}",
+            )
+            return False
+        try:
+            shutil.copy(file, out_filepath)
+        except (IOError, PermissionError) as e:
+            self.log_report.update_log_report(
+                self.extract_file.__name__, "warning", f"Could not extract {file}: {e}"
+            )
+            return False
+        return True
+
+    def split_data_by_batch(self, j_data):
+        """Split metadata from json for each batch of samples found according to folder location of the samples.
+        Args:
+            files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
+            j_data (list(dict)): List of dictionaries, one per sample, including metadata for that sample
+        Returns:
+            data_by_batch (dict(list(dict))): Dictionary containing parts of j_data corresponding to each
+            different folder with samples (batch) included in the original json metadata used as input
+        """
+        unique_batchs = set([x.get("sequence_file_path_R1_fastq") for x in j_data])
+        data_by_batch = {batch_dir: {} for batch_dir in unique_batchs}
+        for batch_dir in data_by_batch.keys():
+            data_by_batch[batch_dir]["j_data"] = [
+                samp
+                for samp in j_data
+                if samp.get("sequence_file_path_R1_fastq") == batch_dir
+            ]
+        return data_by_batch
+
+    def split_tables_by_batch(self, files_found_dict, sufix, batch_data, output_dir):
+        """Filter table content to output a new table containing only the samples present in given metadata
+        Args:
+            files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
+            sufix (str): Sufix to be added to the new table file name.
+            batch_data (list(dict)): Metadata corresponding to a single folder with samples (folder)
+            output_dir (str): Output location for the generated tabular file
+        """
+
+        def extract_batch_rows_to_file(file, sufix):
+            """Create a new table file only with rows matching samples in batch_data"""
+            extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
+            file_extension = os.path.splitext(file)[1]
+            file_df = pd.read_csv(
+                file, sep=extdict.get(file_extension), header=header_pos
+            )
+            sample_col = file_df.columns[sample_colpos]
+            file_df[sample_col] = file_df[sample_col].astype(str)
+            file_df = file_df[file_df[sample_col].isin(batch_samples)]
+
+            base, ext = os.path.splitext(os.path.basename(file))
+            new_filename = f"{base}_{sufix}{ext}"
+            os.makedirs(os.path.join(output_dir, "analysis_results"), exist_ok=True)
+            output_path = os.path.join(output_dir, "analysis_results", new_filename)
+            file_df.to_csv(output_path, index=False, sep=extdict.get(file_extension))
+            return
+
+        method_name = self.split_tables_by_batch.__name__
+        namekey = "sequencing_sample_id"
+        batch_samples = [row.get(namekey) for row in batch_data]
+        for key, files in files_found_dict.items():
+            if not self.software_config[key].get("split_by_batch"):
+                continue
+            header_pos = self.software_config[key].get("header_row_idx", 1) - 1
+            sample_colpos = self.get_sample_idx_colpos(key)
+            for file in files:
+                try:
+                    extract_batch_rows_to_file(file, sufix)
+                except Exception as e:
+                    if self.software_config[key].get("required"):
+                        log_type = "error"
+                    else:
+                        log_type = "warning"
+                    self.log_report.update_log_report(
+                        method_name,
+                        log_type,
+                        f"Could not create batch table for {file}: {e}",
+                    )
+        self.log_report.print_log_report(method_name, ["valid", "warning", "error"])
+        return
+
+    def merge_metadata(self, batch_filepath, batch_data):
+        """
+        Merge metadata json if sample does not exist in the metadata file
+        Args:
+            batch_filepath (str): Path to save the json file with the metadata.
+            batch_data (dict): A dictionary containing metadata of the samples.
+        Returns:
+            None
+        """
+        merged_metadata = relecov_tools.utils.read_json_file(batch_filepath)
+        prev_metadata_dict = {
+            item["sequencing_sample_id"]: item for item in merged_metadata
+        }
+        for item in batch_data:
+            sample_id = item["sequencing_sample_id"]
+            if sample_id in prev_metadata_dict:
+                # When sample already in metadata, checking whether dictionary is the same
+                if prev_metadata_dict[sample_id] != item:
+                    stderr.print(
+                        f"[red] Sample {sample_id} has different data in {batch_filepath} and new metadata. Can't merge."
+                    )
+                    log.error(
+                        "Sample %s has different data in %s and new metadata. Can't merge."
+                        % (sample_id, batch_filepath)
+                    )
+                    sys.exit(1)
+            else:
+                merged_metadata.append(item)
+
+        relecov_tools.utils.write_json_to_file(merged_metadata, batch_filepath)
+        return merged_metadata
 
     def save_merged_files(self, files_dict, batch_date, output_folder=None):
         """
@@ -767,8 +978,7 @@ class BioinfoMetadata:
         stderr.print("[blue]Validating required files...")
         self.validate_software_mandatory_files(files_found_dict)
         # Split files found based on each batch of samples
-        self.batch_handler = BatchHandler(self.j_data)
-        data_by_batch = self.batch_handler.split_by_batch()
+        data_by_batch = self.split_data_by_batch(self.j_data)
         batch_dates = []
         sufix = datetime.now().strftime("%Y%m%d%H%M%S")
         # Get batch date for all the samples
@@ -795,35 +1005,7 @@ class BioinfoMetadata:
             stderr.print(f"[blue]Processing data from {batch_dir}")
             batch_data = batch_dict["j_data"]
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
-            for key, files in files_found_dict.items():
-                if not self.software_config[key].get("split_by_batch"):
-                    continue
-                header_pos = self.software_config[key].get("header_row_idx", 1) - 1
-                sample_colpos = self.get_sample_idx_colpos(key)
-                for file in files:
-                    try:
-                        self.batch_handler.extract_batch_rows_to_file(
-                            file=file,
-                            sufix=sufix,
-                            batch_samples=[
-                                s.get("sequencing_sample_id") for s in batch_data
-                            ],
-                            output_dir=batch_dir,
-                            header_pos=header_pos,
-                            sample_colpos=sample_colpos,
-                        )
-                    except Exception as e:
-                        log_type = (
-                            "error"
-                            if self.software_config[key].get("required")
-                            else "warning"
-                        )
-                        self.log_report.update_log_report(
-                            "split_tables_by_batch",
-                            log_type,
-                            f"Could not create batch table for {file}: {e}",
-                        )
-
+            self.split_tables_by_batch(files_found_dict, sufix, batch_data, batch_dir)
             batch_data = self.add_bioinfo_results_metadata(
                 files_found_dict, batch_data, sufix, batch_date, batch_dir
             )
@@ -860,7 +1042,7 @@ class BioinfoMetadata:
                     "Bioinfo metadata %s file already exists. Merging new data if possible."
                     % batch_filepath
                 )
-                batch_data = json_utils.merge_metadata(batch_filepath, batch_data)
+                batch_data = self.merge_metadata(batch_filepath, batch_data)
             else:
                 relecov_tools.utils.write_json_to_file(batch_data, batch_filepath)
             for sample in batch_data:
@@ -889,7 +1071,7 @@ class BioinfoMetadata:
                 "Bioinfo metadata %s file already exists. Merging new data if possible."
                 % file_path
             )
-            batch_data = json_utils.merge_metadata(file_path, self.j_data)
+            batch_data = self.merge_metadata(file_path, self.j_data)
         else:
             relecov_tools.utils.write_json_to_file(self.j_data, file_path)
         stderr.print(f"[green]Sucessful creation of bioinfo analyis file: {file_path}")

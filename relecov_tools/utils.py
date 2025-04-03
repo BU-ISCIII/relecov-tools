@@ -662,22 +662,23 @@ def cast_value_to_schema_type(value, expected_type: str):
     Returns:
         any: The value cast to the appropriate type, or a string fallback if casting fails.
     """
-    try:
-        if expected_type == "integer":
-            try:
-                return int(float(value))
-            except (ValueError, TypeError):
-                return str(value).strip()
-        elif expected_type == "number":
-            try:
-                return float(value)
-            except (ValueError, TypeError):
-                return str(value).strip()
-        elif expected_type == "boolean":
-            return str(value).strip().lower() in ["true", "yes", "1"]
-        elif expected_type == "string":
-            return str(value).strip()
-        else:
-            return str(value).strip()
-    except Exception:
+    if expected_type == "integer":
+        try:
+            return int(float(value))
+        except (ValueError, TypeError):
+            pass
+    elif expected_type == "number":
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            pass
+    elif expected_type == "boolean":
+        return str(value).strip().lower() in ["true", "yes", "1"]
+    elif expected_type == "string":
         return str(value).strip()
+
+    # Fallback if casting fails or type is unknown
+    try:
+        return str(value).strip()
+    except Exception:
+        return value
