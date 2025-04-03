@@ -676,9 +676,8 @@ def cast_value_to_schema_type(value, expected_type: str):
         return str(value).strip().lower() in ["true", "yes", "1"]
     elif expected_type == "string":
         return str(value).strip()
-
-    # Fallback if casting fails or type is unknown
-    try:
-        return str(value).strip()
-    except Exception:
-        return value
+    else:
+        try:
+            return str(value).strip()
+        except Exception:
+            return value
