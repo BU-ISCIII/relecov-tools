@@ -152,10 +152,8 @@ class SchemaValidation:
                 for error in validation_errors:
                     try:
                         if error.validator == "required":
-                            # Extrae el nombre del campo del mensaje de error
                             error_field = list(error.message.split("'"))[1]
                         elif error.validator == "anyOf":
-                            # Combinar todos los campos que fallaron en los bloques "required"
                             missing_fields = []
                             for cond in error.validator_value:
                                 if isinstance(cond, dict) and "required" in cond:
