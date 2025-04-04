@@ -659,8 +659,14 @@ def update_db(ctx, user, password, json, type, platform, server_url, full_update
 @click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
 @click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file")
 @click.option("-s", "--software_name", help="Name of the software/pipeline used.")
+@click.option(
+    "--update",
+    is_flag=True,
+    default=False,
+    help="If the output file already exists, ask if you want to update it.",
+)
 @click.pass_context
-def read_bioinfo_metadata(ctx, json_file, input_folder, out_dir, software_name):
+def read_bioinfo_metadata(ctx, json_file, input_folder, out_dir, software_name, update):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
@@ -670,6 +676,7 @@ def read_bioinfo_metadata(ctx, json_file, input_folder, out_dir, software_name):
         input_folder,
         out_dir,
         software_name,
+        update,
     )
     try:
         new_bioinfo_metadata.create_bioinfo_file()
