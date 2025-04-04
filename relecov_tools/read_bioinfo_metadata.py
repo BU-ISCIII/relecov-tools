@@ -7,6 +7,7 @@ import re
 import shutil
 from bs4 import BeautifulSoup
 from datetime import datetime
+from rich.prompt import Prompt
 
 import pandas as pd
 import relecov_tools.utils
@@ -79,6 +80,7 @@ class BioinfoMetadata:
         input_folder=None,
         output_folder=None,
         software=None,
+        update=False,
     ):
         log.info("Initiating read-bioinfo-metadata process")
         # Init process log
@@ -110,6 +112,7 @@ class BioinfoMetadata:
         # Initialize j_data object
         stderr.print("[blue]Reading lab metadata json")
         self.j_data = self.collect_info_from_lab_json()
+        self.update = update
 
         # Parse input/output folder
         if input_folder is None:
@@ -872,33 +875,67 @@ class BioinfoMetadata:
 
     def merge_metadata(self, batch_filepath, batch_data):
         """
-        Merge metadata json if sample does not exist in the metadata file
+        Merge metadata json if sample does not exist in the metadata file,
+        or prompt the user to update if --update flag is provided and sample differs.
+
         Args:
             batch_filepath (str): Path to save the json file with the metadata.
-            batch_data (dict): A dictionary containing metadata of the samples.
+            batch_data (list): A list of dictionaries containing metadata of the samples.
+
         Returns:
-            None
+            merged_metadata (list): The updated list of metadata entries.
         """
         merged_metadata = relecov_tools.utils.read_json_file(batch_filepath)
         prev_metadata_dict = {
             item["sequencing_sample_id"]: item for item in merged_metadata
         }
+
+        overwrite_all = False
+
         for item in batch_data:
             sample_id = item["sequencing_sample_id"]
             if sample_id in prev_metadata_dict:
-                # When sample already in metadata, checking whether dictionary is the same
                 if prev_metadata_dict[sample_id] != item:
-                    stderr.print(
-                        f"[red] Sample {sample_id} has different data in {batch_filepath} and new metadata. Can't merge."
-                    )
-                    log.error(
-                        "Sample %s has different data in %s and new metadata. Can't merge."
-                        % (sample_id, batch_filepath)
-                    )
-                    sys.exit(1)
+                    if self.update:
+                        if not overwrite_all:
+                            stderr.print(
+                                f"[red]Sample '{sample_id}' has different metadata than the existing entry in {batch_filepath}."
+                            )
+                            response = Prompt.ask(
+                                "[yellow]Do you want to overwrite this sample?",
+                                choices=["y", "n", "all"],
+                                default="n",
+                            )
+                            if response == "all":
+                                overwrite_all = True
+                                stderr.print(
+                                    "[green]All subsequent samples will be overwritten automatically."
+                                )
+                                prev_metadata_dict[sample_id] = item
+                            elif response == "y":
+                                prev_metadata_dict[sample_id] = item
+                                stderr.print(f"[green]Sample '{sample_id}' updated.")
+                            else:
+                                stderr.print(
+                                    f"[blue]Skipping update for sample '{sample_id}'."
+                                )
+                        else:
+                            prev_metadata_dict[sample_id] = item
+                            stderr.print(f"[green]Sample '{sample_id}' updated (auto).")
+                    else:
+                        stderr.print(
+                            f"[red]Sample '{sample_id}' has different data in {batch_filepath} and new metadata. Can't merge."
+                        )
+                        log.error(
+                            "Sample %s has different data in %s and new metadata. Can't merge.",
+                            sample_id,
+                            batch_filepath,
+                        )
+                        sys.exit(1)
             else:
-                merged_metadata.append(item)
+                prev_metadata_dict[sample_id] = item
 
+        merged_metadata = list(prev_metadata_dict.values())
         relecov_tools.utils.write_json_to_file(merged_metadata, batch_filepath)
         return merged_metadata
 
