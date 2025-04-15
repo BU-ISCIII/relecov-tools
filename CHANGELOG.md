@@ -15,12 +15,12 @@ Code contributions to the release:
 - [Daniel Valle-Millares](https://github.com/Daniel-VM)
 - [Victor Lopez](https://github.com/victor5lm)
 - [Jaime Ozáez](https://github.com/jaimeozaez)
+- [Juan Ledesma](https://github.com/juanledesma78)
 
 ### Modules
 
 #### Added enhancements
 
-- Modified create_summary_tables.py to add new columns in epidemiological_data.xlsh (Pangolin software and database version and analysis date) [#454](https://github.com/BU-ISCIII/relecov-tools/pull/454)
 - Added git CI test for json schema exception scenarios [#434](https://github.com/BU-ISCIII/relecov-tools/pull/434)
 - Added custom validator to extend validation exceptions [#429](https://github.com/BU-ISCIII/relecov-tools/pull/429)
 - Refactor GitHub Actions & Add build-schema Step [#417](https://github.com/BU-ISCIII/relecov-tools/pull/417)
@@ -55,6 +55,7 @@ Code contributions to the release:
 - Fix read-bioinfo-metadata: Evaluate qc_test at Batch Level and Handle Non-Evaluable %LDMutations [#447](https://github.com/BU-ISCIII/relecov-tools/pull/447)
 - Enhance Schema Modularity, Formatting, and Conditional Validation Across Metadata Modules [#448](https://github.com/BU-ISCIII/relecov-tools/pull/448)
 - Add --update Flag to Allow Metadata Update in read-bioinfo-metadata Module [#451](https://github.com/BU-ISCIII/relecov-tools/pull/451)
+- Modified create_summary_tables.py to add new columns in epidemiological_data.xlsh (Pangolin software and database version and analysis date) [#454](https://github.com/BU-ISCIII/relecov-tools/pull/454)
 
 #### Fixes
 
