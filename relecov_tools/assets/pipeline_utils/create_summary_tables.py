@@ -248,39 +248,39 @@ def process_json_files(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Se procesan archivos JSON para asignar semanas epidemiológicas a las muestras analizadas y generar tablas relativas al linaje y las variantes para dichas muestras"
+        description="JSON files are processed in order to asssign epidemiological weeks to each  analysed sample and to generate tables with lineage and variant information for each sample "
     )
     parser.add_argument(
         "-i",
         "--input",
-        help="Directorio que contenga archivos llamados bioinfo_lab_metadata_*.json y long_table_*.json (deben estar en el mismo directorio)",
+        help=" Directoy containing files called bioinfo_lab_metadata_*.json and long_table_*.json (both JSON files must be in the same directory)",
     )
     parser.add_argument(
         "-b",
         "--metadata-list",
-        help="Archivo .txt con rutas de archivos JSON a procesar para la generación de las tablas con la información sin agregar y agregada (bioinfo_lab_metadata_*.json)",
+        help="File .txt with paths to those JSON files to be processed for generating the table with information on aggregated and non-aggregated data (bioinfo_lab_metadata_*.json)",
     )
     parser.add_argument(
         "-l",
         "--long-table-list",
-        help="Archivo .txt con rutas de archivos JSON a procesar para la generación del .csv de variantes (long_table_*.json)",
+        help="File .txt with paths to those JSON files to be processed for generating the variant report in csv format (long_table_*.json)",
     )
     parser.add_argument(
         "-o",
         "--output",
         default="surveillance_files",
-        help="Directorio donde se guardan las tablas (surveillance_files por defecto)",
+        help="Directory where the generated tables are saved (surveillance_files, by default)",
     )
     parser.add_argument(
         "-w",
         "--week",
-        help="Semana epidemiológica de interés (escribir la semana usando el formato YYYY-WW)",
+        help="Epidemiological week of intestest (format: YYYY-WW)",
     )
     parser.add_argument(
         "-c",
         "--copy-fasta",
         action="store_true",
-        help="Copiar ficheros consensus.fa en un subdirectorio llamado consensus_files (es necesario llamar explícitamente a este argumento)",
+        help="Copy files consensus.fa in a subdirectory called consensus_files (this argument must be provided to enable the feature)",
     )
 
     args = parser.parse_args()
