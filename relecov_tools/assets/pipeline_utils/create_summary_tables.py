@@ -11,30 +11,6 @@
 
 # =============================================================
 
-# =============================================================
-# EXAMPLES OF USE
-
-# This script processes bioinfo_lab_metadata*.json and long_table_*.json files.
-# This script can either read these files if they are all stored within the same location, or read .txt files which indicate the paths to these files.
-
-# Use the -i option to indicate the path where these files are.
-# Example: python3 create_summary_tables.py -i ./path
-
-# If your files are located in different locations, use the -b and -l options to indicate the names of the .txt files that must contain the paths to the .json files.
-# Example: python3 create_summary_tables.py -b bioinfo_files.txt -l long_table_files.txt
-# Example of what .txt files look like (considering this script is being run from /data/bioinfoshare/UCCT_Relecov):
-# COD-2402-AND-HUCSC/20240604104459/long_table_20241119092541.json
-# COD-2402-AND-HUCSC/20240911160822/long_table_20241118182618.json
-# COD-2403-CAT-HUVH/20240409103006/long_table_20240912110739.json
-
-# If you want to copy the consensus.fa files into each subfolder, write the -c or --copy-fasta option when running the script.
-# Example: python3 create_summary_tables.py -b bioinfo_files.txt -l long_table_files.txt -c
-
-# If you want to generate data only in relation to a certain epidemiological week, use the -w option (using the YYYY-WW format).
-# Example: python3 create_summary_tables.py -b bioinfo_files.txt -l long_table_files.txt -w 2025-01
-
-# =============================================================
-
 import os
 import json
 import argparse
@@ -104,6 +80,13 @@ def process_json_files(
                         week = get_epi_week(sample["sample_collection_date"])
                         if specified_week and week != specified_week:
                             continue
+
+                        #   Format change so that the date of analysis_date and sample_colletion_date have same format
+                        original_date_format = sample.get("analysis_date", "-")
+                        analysis_date = datetime.strptime(
+                            original_date_format, "%Y%m%d"
+                        ).strftime("%Y-%m-%d")
+
                         all_data.append(
                             {
                                 "HOSPITAL_ID": sample.get(
@@ -111,7 +94,16 @@ def process_json_files(
                                 ),
                                 "HOSPITAL": sample.get("collecting_institution", "-"),
                                 "PROVINCE": sample.get("geo_loc_region", "-"),
-                                "SAMPLE_ID": sample.get("sequencing_sample_id", "-"),
+                                "ANALYSIS_DATE": analysis_date,
+                                "PANGOLIN_SOFTWARE_VERSION": sample.get(
+                                    "lineage_analysis_software_version", "-"
+                                ),
+                                "PANGOLIN_DATABASE_VERSION": sample.get(
+                                    "pangolin_database_version", "-"
+                                ),
+                                "SAMPLE_ID": str(
+                                    sample.get("sequencing_sample_id", "-")
+                                ),  # str to prevent from having issues between excel and pandas with digital and characters
                                 "SAMPLE_COLLECTION_DATE": sample.get(
                                     "sample_collection_date", "-"
                                 ),
@@ -167,11 +159,32 @@ def process_json_files(
         os.makedirs(week_dir, exist_ok=True)
 
         week_df = df[df["WEEK"] == week]
+        excel_file = os.path.join(week_dir, "epidemiological_data.xlsx")
+
+        existing_sample_ids = set()
+        existing_week_df = pd.DataFrame()
+
+        if os.path.exists(excel_file):
+            # Check if xlsx file exists, read data and list the SAMPLE_ID
+            with pd.ExcelFile(excel_file) as reader:
+                existing_week_df = reader.parse(
+                    "per_sample_data", dtype=str
+                )  # str ensures no mofications are done between what excel has and what the dataframe reads
+                existing_sample_ids = set(existing_week_df["SAMPLE_ID"])
+
+        # only new samples are added
+        week_df = week_df[~week_df["SAMPLE_ID"].astype(str).isin(existing_sample_ids)]
+
+        if week_df.empty:
+            print(f"No new samples for week {week}. Skipping.")
+            continue
+
+        # concatenate new records to those already in the excel file
+        week_df = pd.concat([existing_week_df, week_df], ignore_index=True)
         aggregated_df = (
             week_df.groupby("LINEAGE").size().reset_index(name="NUMBER_SAMPLES")
         )
 
-        excel_file = os.path.join(week_dir, "epidemiological_data.xlsx")
         with pd.ExcelWriter(excel_file) as writer:
             week_df.to_excel(writer, sheet_name="per_sample_data", index=False)
             aggregated_df.to_excel(writer, sheet_name="aggregated_data", index=False)
@@ -220,43 +233,54 @@ def process_json_files(
         if variant_data:
             variant_df = pd.DataFrame(variant_data)
             variant_csv = os.path.join(week_dir, "variant_data.csv")
-            variant_df.to_csv(variant_csv, index=False)
-            print(f"Variant data stored in {variant_csv}")
+
+        if os.path.exists(variant_csv):
+            existing_df = pd.read_csv(variant_csv, dtype=str)
+            final_df = pd.concat([existing_df, variant_df], ignore_index=True)
+            final_variant_df = final_df.drop_duplicates()
+
+        else:
+            final_variant_df = variant_df
+
+        final_variant_df.to_csv(variant_csv, index=False)
+        print(f"Variant data stored in {variant_csv}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="JSON files are processed in order to generate lineage and variant tables in relation to all samples associated to a given epidemiological week"
+        description="Se procesan archivos JSON para asignar semanas epidemiológicas a las muestras analizadas y generar tablas relativas al linaje y las variantes para dichas muestras"
     )
     parser.add_argument(
         "-i",
         "--input",
-        help="Directory that contains bioinfo_lab_metadata_*.json and long_table_*.json files (they all must be stored within the same directory)",
+        help="Directorio que contenga archivos llamados bioinfo_lab_metadata_*.json y long_table_*.json (deben estar en el mismo directorio)",
     )
     parser.add_argument(
         "-b",
         "--metadata-list",
-        help=".txt file with paths pointing to the JSON files needed to create the .xlsx file for lineage data (bioinfo_lab_metadata_*.json)",
+        help="Archivo .txt con rutas de archivos JSON a procesar para la generación de las tablas con la información sin agregar y agregada (bioinfo_lab_metadata_*.json)",
     )
     parser.add_argument(
         "-l",
         "--long-table-list",
-        help=".txt file with paths pointing to the JSON files needed to create the .csv file for variant information (long_table_*.json)",
+        help="Archivo .txt con rutas de archivos JSON a procesar para la generación del .csv de variantes (long_table_*.json)",
     )
     parser.add_argument(
         "-o",
         "--output",
         default="surveillance_files",
-        help="Directory where tables are stored (surveillance_files by default)",
+        help="Directorio donde se guardan las tablas (surveillance_files por defecto)",
     )
     parser.add_argument(
-        "-w", "--week", help="Epidemiological week of interest (use the YYYY-WW format)"
+        "-w",
+        "--week",
+        help="Semana epidemiológica de interés (escribir la semana usando el formato YYYY-WW)",
     )
     parser.add_argument(
         "-c",
         "--copy-fasta",
         action="store_true",
-        help="Copy of all consensus.fa files into a subfolder called consensus_files (you must explicitly call this option)",
+        help="Copiar ficheros consensus.fa en un subdirectorio llamado consensus_files (es necesario llamar explícitamente a este argumento)",
     )
 
     args = parser.parse_args()
