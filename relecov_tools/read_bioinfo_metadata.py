@@ -462,7 +462,6 @@ class BioinfoMetadata:
         )
         raise ValueError(self.log_report.print_log_report(method_name, ["error"]))
 
-
     def handling_files(self, file_list, sufix, output_folder, batch_date):
         """Handles different file formats to extract data regardless of their structure.
         The goal is to extract the data contained in files specified in ${file_list},
