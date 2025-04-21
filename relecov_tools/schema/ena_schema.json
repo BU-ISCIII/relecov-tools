@@ -72,7 +72,7 @@
       "examples": [
         "3/19/2020"
       ],
-      "ontology": "GENEPIO:0001174",
+      "ontology": "SNOMED:399445004",
       "type": "string",
       "description": "The date on which the sample was collected.",
       "format": "date",
@@ -84,7 +84,7 @@
       "examples": [
         "3/21/2020"
       ],
-      "ontology": "NCIT:C93644",
+      "ontology": "SNOMED:281271004",
       "type": "string",
       "description": "The date on which the sample was received.",
       "format": "date",
@@ -931,7 +931,7 @@
       "examples": [
         "3e69af1f875fab020aed82f5edbc1f03"
       ],
-      "ontology": "MS_1000569",
+      "ontology": "NCIT:C171276",
       "type": "string",
       "description": "",
       "clasification": "Bioinformatics and QC metrics",
