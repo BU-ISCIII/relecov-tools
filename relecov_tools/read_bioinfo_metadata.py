@@ -431,7 +431,7 @@ class BioinfoMetadata:
             return {}
 
         if conf_tab_name.endswith(".gz"):
-            inner_ext = os.path.splitext(conf_tab_name[:-3])[1]
+            inner_ext = os.path.splitext(conf_tab_name.strip(".gz"))[1]
             if inner_ext in extdict:
                 self.log_report.update_log_report(
                     method_name,
@@ -447,11 +447,11 @@ class BioinfoMetadata:
                     sep=extdict[file_ext],
                     key_position=sample_idx_colpos,
                 )
-            except Exception as e:
+            except FileNotFoundError as e:
                 self.log_report.update_log_report(
                     method_name,
                     "error",
-                    f"Failed to read tabular file '{file_list[0]}': {e}",
+                    f"Tabular file not found: '{file_list[0]}': {e}",
                 )
                 raise
 
