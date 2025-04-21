@@ -358,6 +358,7 @@ class BioinfoMetadata:
         for key in self.software_config.keys():
             # Update bioinfo cofiguration key/scope
             self.current_config_key = key
+            map_method_name = f"{method_name}:{self.software_name}.{key}"
             # This skip files that will be parsed with other methods
             if key == "workflow_summary" or key == "fixed_values":
                 continue
@@ -373,12 +374,24 @@ class BioinfoMetadata:
                 )
                 continue
             # Handling files
+            if self.software_config[key].get("map", True) is False:
+                msg = f"File '{self.software_name}.{key}' was processed but skipped from mapping as defined in config."
+                self.log_report.update_log_report(map_method_name, "warning", msg)
+                self.log_report.print_log_report(map_method_name, ["warning"])
+                continue
+
             data_to_map = self.handling_files(
                 files_dict[key], sufix, output_folder, batch_date
             )
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
             if not mapping_fields:
+                self.log_report.update_log_report(
+                    map_method_name,
+                    "warning",
+                    f"No metadata found to perform mapping from '{self.software_name}.{key}' despite 'content' fields being defined.",
+                )
+                self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
             if data_to_map:
                 j_data_mapped = self.mapping_over_table(
@@ -410,31 +423,45 @@ class BioinfoMetadata:
         """
         method_name = f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_tables.__name__}"
         file_ext = os.path.splitext(conf_tab_name)[1]
-        # Parsing key position
         sample_idx_colpos = self.get_sample_idx_colpos(self.current_config_key)
         extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
-        if file_ext in extdict.keys():
-            data = relecov_tools.utils.read_csv_file_return_dict(
-                file_name=file_list[0],
-                sep=extdict.get(file_ext),
-                key_position=sample_idx_colpos,
-            )
-            return data
-        elif conf_tab_name.endswith(".gz"):
-            self.log_report.update_log_report(
-                method_name,
-                "warning",
-                f".gz files are not supported yet for data extraction: {conf_tab_name}",
-            )
-            data = {}
-        else:
-            self.log_report.update_log_report(
-                method_name,
-                "error",
-                f"Unrecognized defined file name extension '{file_ext}' in '{conf_tab_name}'.",
-            )
-            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
-        return data
+        mapping_fields = self.software_config[self.current_config_key].get("content")
+
+        if not mapping_fields:
+            return {}
+
+        if conf_tab_name.endswith(".gz"):
+            inner_ext = os.path.splitext(conf_tab_name[:-3])[1]
+            if inner_ext in extdict:
+                self.log_report.update_log_report(
+                    method_name,
+                    "warning",
+                    f"Expected tabular file '{conf_tab_name}' is compressed and cannot be processed.",
+                )
+            return {}
+
+        if file_ext in extdict:
+            try:
+                return relecov_tools.utils.read_csv_file_return_dict(
+                    file_name=file_list[0],
+                    sep=extdict[file_ext],
+                    key_position=sample_idx_colpos,
+                )
+            except Exception as e:
+                self.log_report.update_log_report(
+                    method_name,
+                    "error",
+                    f"Failed to read tabular file '{file_list[0]}': {e}",
+                )
+                raise
+
+        self.log_report.update_log_report(
+            method_name,
+            "error",
+            f"Unrecognized defined file name extension '{file_ext}' in '{conf_tab_name}'.",
+        )
+        raise ValueError(self.log_report.print_log_report(method_name, ["error"]))
+
 
     def handling_files(self, file_list, sufix, output_folder, batch_date):
         """Handles different file formats to extract data regardless of their structure.
