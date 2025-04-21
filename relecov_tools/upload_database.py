@@ -53,6 +53,10 @@ class UpdateDatabase:
             stderr.print(f"[red] json data file {json_file} does not exist")
             sys.exit(1)
         self.json_data = relecov_tools.utils.read_json_file(json_file)
+        for row in self.json_data:
+            for key, value in row.items():
+                if not isinstance(value, str):
+                    row[key] = str(value)
         self.json_file = json_file
         schema = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
