@@ -64,6 +64,7 @@
             "required": true,
             "multiple_samples": true,
             "split_by_batch": true,
+            "map": false,
             "function": "parse_long_table",
             "content": {
                 "sample" : "SAMPLE",
