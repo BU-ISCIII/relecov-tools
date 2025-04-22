@@ -453,14 +453,16 @@ class BioinfoMetadata:
                     "error",
                     f"Tabular file not found: '{file_list[0]}': {e}",
                 )
-                raise
-
-        self.log_report.update_log_report(
-            method_name,
-            "error",
-            f"Unrecognized defined file name extension '{file_ext}' in '{conf_tab_name}'.",
-        )
-        raise ValueError(self.log_report.print_log_report(method_name, ["error"]))
+                raise FileNotFoundError(
+                    f"Tabular file not found: '{file_list[0]}'"
+                ) from e
+        else:
+            self.log_report.update_log_report(
+                method_name,
+                "error",
+                f"Unrecognized defined file name extension '{file_ext}' in '{conf_tab_name}'.",
+            )
+            raise ValueError(self.log_report.print_log_report(method_name, ["error"]))
 
     def handling_files(self, file_list, sufix, output_folder, batch_date):
         """Handles different file formats to extract data regardless of their structure.

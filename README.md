@@ -189,6 +189,7 @@ Within each software block, the keys correspond to different analysis stages or 
 | `function`        | Name of a custom processing function (if applicable). Functions should be located in `assets/pipeline_utils`. | String or `null`   |
 | `multiple_samples`| Specifies if the file contains data for multiple samples.                                                    | Boolean            |
 | `split_by_batch`  | Indicates whether data should be separated by batches.                                                       | Boolean            |
+| `map`  | Indicates whether the file's values should be mapped into the final metadata (`j_data`). If set to `false`, the file is still processed (e.g., to generate the `long_table`), but its content will not be included in `j_data`.                                                       | Boolean            |
 | `extract`         | If `true`, instructs the module to extract data from the file’s content.                                     | Boolean            |
 | `content`         | Dictionary mapping standardized parameter names to the corresponding columns in the source file.             | Object             |
 
