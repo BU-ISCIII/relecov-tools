@@ -59,6 +59,7 @@ Code contributions to the release:
 - Add --update Flag to Allow Metadata Update in read-bioinfo-metadata Module [#451](https://github.com/BU-ISCIII/relecov-tools/pull/451)
 - Modified create_summary_tables.py to add new columns in epidemiological_data.xlsh (Pangolin software and database version and analysis date) [#454](https://github.com/BU-ISCIII/relecov-tools/pull/454)
 - Improve Warning Handling for .gz Files and variants_long_table.csv in read-bioinfo-metadata [#457](https://github.com/BU-ISCIII/relecov-tools/pull/457)
+- Add Tracking Summary of Samples per COD and Destination Folder in pipeline-manager [#463](https://github.com/BU-ISCIII/relecov-tools/pull/463)
 
 #### Fixes
 
