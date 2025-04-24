@@ -227,7 +227,9 @@ class PipelineManager:
         for sample in samples_data:
             sample_id = sample["sequencing_sample_id"]
             # fetch the file extension
-            ext_found = re.match(r".*(fastq.*|bam)", sample["sequence_file_path_R1_fastq"])
+            ext_found = re.match(
+                r".*(fastq.*|bam)", sample["sequence_file_path_R1_fastq"]
+            )
             if not ext_found:
                 log.error("No valid file extension found for %s", sample_id)
                 samp_errors[sample_id].append(sample["sequence_file_path_R1_fastq"])
@@ -303,8 +305,12 @@ class PipelineManager:
                 sample["sequence_file_path_R2_fastq"] = os.path.join(
                     item["sequence_file_path_R2_fastq"], item["sequence_file_R2_fastq"]
                 )
-            match = re.search(r"(COD-\d{4}-[A-Z]+-[A-Z]+)", item["sequence_file_path_R1_fastq"])
-            sample["lab_code"] = match.group(1) if match else "Missing [LOINC:LA14698-7]"
+            match = re.search(
+                r"(COD-\d{4}-[A-Z]+-[A-Z]+)", item["sequence_file_path_R1_fastq"]
+            )
+            sample["lab_code"] = (
+                match.group(1) if match else "Missing [LOINC:LA14698-7]"
+            )
             samples_data.append(sample)
         return samples_data
 
@@ -458,9 +464,13 @@ class PipelineManager:
 
             errors_by_cod = defaultdict(set)
             for sample_id in samp_errors:
-                matching_samples = [s for s in samples_data if s["sequencing_sample_id"] == sample_id]
+                matching_samples = [
+                    s for s in samples_data if s["sequencing_sample_id"] == sample_id
+                ]
                 if matching_samples:
-                    codename = matching_samples[0].get("lab_code", "Missing [LOINC:LA14698-7]")
+                    codename = matching_samples[0].get(
+                        "lab_code", "Missing [LOINC:LA14698-7]"
+                    )
                 else:
                     codename = "Missing [LOINC:LA14698-7]"
                 errors_by_cod[codename].add(sample_id)
@@ -468,7 +478,9 @@ class PipelineManager:
             for codename, samples in samples_by_cod.items():
                 total = len(samples)
                 copied = total - len(errors_by_cod.get(codename, []))
-                msg = f"{copied}/{total} samples from {codename} copied to {dest_folder}"
+                msg = (
+                    f"{copied}/{total} samples from {codename} copied to {dest_folder}"
+                )
                 log.info(msg)
                 stderr.print(msg)
 
