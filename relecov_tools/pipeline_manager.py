@@ -5,7 +5,7 @@ import os
 import re
 import shutil
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 
 import rich.console
 import relecov_tools.utils
@@ -227,10 +227,10 @@ class PipelineManager:
         for sample in samples_data:
             sample_id = sample["sequencing_sample_id"]
             # fetch the file extension
-            ext_found = re.match(r".*(fastq.*|bam)", sample["r1_fastq_filepath"])
+            ext_found = re.match(r".*(fastq.*|bam)", sample["sequence_file_path_R1_fastq"])
             if not ext_found:
                 log.error("No valid file extension found for %s", sample_id)
-                samp_errors[sample_id].append(sample["r1_fastq_filepath"])
+                samp_errors[sample_id].append(sample["sequence_file_path_R1_fastq"])
                 continue
             ext = ext_found.group(1)
             seq_r1_sample_id = sample["sequencing_sample_id"] + "_R1." + ext
@@ -241,7 +241,7 @@ class PipelineManager:
             log.info("Copying sample %s", sample)
             stderr.print("[blue] Copying sample: ", sample["sequencing_sample_id"])
             try:
-                shutil.copy(sample["r1_fastq_filepath"], sample_raw_r1)
+                shutil.copy(sample["sequence_file_path_R1_fastq"], sample_raw_r1)
                 # create simlink for the r1
                 r1_link_path = os.path.join(links_folder, seq_r1_sample_id)
                 r1_link_path_ori = os.path.join("../../RAW", seq_r1_sample_id)
@@ -249,12 +249,12 @@ class PipelineManager:
             except FileNotFoundError as e:
                 log.error("File not found %s", e)
                 samp_errors[sample_id] = []
-                samp_errors[sample_id].append(sample["r1_fastq_filepath"])
-                if "r2_fastq_filepath" in sample:
-                    samp_errors[sample_id].append(sample["r2_fastq_filepath"])
+                samp_errors[sample_id].append(sample["sequence_file_path_R1_fastq"])
+                if "sequence_file_path_R2_fastq" in sample:
+                    samp_errors[sample_id].append(sample["sequence_file_path_R2_fastq"])
                 continue
             # check if there is a r2 file
-            if "r2_fastq_filepath" in sample:
+            if "sequence_file_path_R2_fastq" in sample:
                 seq_r2_sample_id = sample["sequencing_sample_id"] + "_R2." + ext
                 sample_raw_r2 = os.path.join(
                     output_folder,
@@ -262,7 +262,7 @@ class PipelineManager:
                     seq_r2_sample_id,
                 )
                 try:
-                    shutil.copy(sample["r2_fastq_filepath"], sample_raw_r2)
+                    shutil.copy(sample["sequence_file_path_R2_fastq"], sample_raw_r2)
                     r2_link_path = os.path.join(links_folder, seq_r2_sample_id)
                     r2_link_path_ori = os.path.join("../../RAW", seq_r2_sample_id)
                     os.symlink(r2_link_path_ori, r2_link_path)
@@ -270,14 +270,14 @@ class PipelineManager:
                     log.error("File not found %s", e)
                     if not samp_errors.get(sample_id):
                         samp_errors[sample_id] = []
-                    samp_errors[sample_id].append(sample["r2_fastq_filepath"])
+                    samp_errors[sample_id].append(sample["sequence_file_path_R2_fastq"])
                     continue
         return samp_errors
 
     def create_samples_data(self, json_data):
         """Creates a copy of the json_data but only with relevant keys to copy files.
-        Here 'r1_fastq_filepath' is created joining the original 'r1_fastq_filepath'
-        and 'sequence_file_R1_fastq' fields. The same goes for 'r2_fastq_filepath'
+        Here 'sequence_file_path_R1_fastq' is created joining the original 'sequence_file_path_R1_fastq'
+        and 'sequence_file_R1_fastq' fields. The same goes for 'sequence_file_path_R2_fastq'
 
         Args:
             json_data (list(dict)): Samples metadata in a list of dictionaries
@@ -287,8 +287,8 @@ class PipelineManager:
                 [
                   {
                     "sequencing_sample_id":XXXX,
-                    "r1_fastq_filepath": XXXX,
-                    "r2_fastq_filepath":XXXX
+                    "sequence_file_path_R1_fastq": XXXX,
+                    "sequence_file_path_R2_fastq":XXXX
                   }
                 ]
         """
@@ -296,13 +296,15 @@ class PipelineManager:
         for item in json_data:
             sample = {}
             sample["sequencing_sample_id"] = item["sequencing_sample_id"]
-            sample["r1_fastq_filepath"] = os.path.join(
-                item["r1_fastq_filepath"], item["sequence_file_R1_fastq"]
+            sample["sequence_file_path_R1_fastq"] = os.path.join(
+                item["sequence_file_path_R1_fastq"], item["sequence_file_R1_fastq"]
             )
-            if "r2_fastq_filepath" in item:
-                sample["r2_fastq_filepath"] = os.path.join(
-                    item["r2_fastq_filepath"], item["sequence_file_R2_fastq"]
+            if "sequence_file_path_R2_fastq" in item:
+                sample["sequence_file_path_R2_fastq"] = os.path.join(
+                    item["sequence_file_path_R2_fastq"], item["sequence_file_R2_fastq"]
                 )
+            match = re.search(r"(COD-\d{4}-[A-Z]+-[A-Z]+)", item["sequence_file_path_R1_fastq"])
+            sample["lab_code"] = match.group(1) if match else "Missing [LOINC:LA14698-7]"
             samples_data.append(sample)
         return samples_data
 
@@ -446,6 +448,30 @@ class PipelineManager:
             copied_samps_log = f"Group {group_tag}: {samples_copied} samples copied out of {len(list_of_samples)}"
             log.info(copied_samps_log)
             stderr.print(copied_samps_log)
+
+            dest_folder = os.path.join(group_outfolder, self.copied_sample_folder)
+
+            samples_by_cod = defaultdict(list)
+            for s in samples_data:
+                codename = s.get("lab_code", "Missing [LOINC:LA14698-7]")
+                samples_by_cod[codename].append(s["sequencing_sample_id"])
+
+            errors_by_cod = defaultdict(set)
+            for sample_id in samp_errors:
+                matching_samples = [s for s in samples_data if s["sequencing_sample_id"] == sample_id]
+                if matching_samples:
+                    codename = matching_samples[0].get("lab_code", "Missing [LOINC:LA14698-7]")
+                else:
+                    codename = "Missing [LOINC:LA14698-7]"
+                errors_by_cod[codename].add(sample_id)
+
+            for codename, samples in samples_by_cod.items():
+                total = len(samples)
+                copied = total - len(errors_by_cod.get(codename, []))
+                msg = f"{copied}/{total} samples from {codename} copied to {dest_folder}"
+                log.info(msg)
+                stderr.print(msg)
+
             final_valid_samples = [
                 x
                 for x in list_of_samples
@@ -472,7 +498,7 @@ class PipelineManager:
             relecov_tools.utils.write_json_to_file(final_valid_samples, json_filename)
             log.info("Successfully created pipeline folder. Ready to launch")
             stderr.print(f"[blue]Folder {group_outfolder} finished. Ready to launch")
-            return global_samp_errors
+        return global_samp_errors
 
     def pipeline_exc(self):
         """Prepare folder for analysis in HPC
