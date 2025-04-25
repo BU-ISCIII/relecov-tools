@@ -7,8 +7,10 @@ import relecov_tools.utils
 from relecov_tools.log_summary import LogSum
 from relecov_tools.config_json import ConfigJson
 
-class BaseModule():
+
+class BaseModule:
     """Base module Class to handle logs for all modules in the package"""
+
     # These variables should only be activated via CLI using --hex-code
     _global_hex_code = None
     _cli_log_file = None
@@ -17,6 +19,7 @@ class BaseModule():
     _active_process = False
     _current_version = None
     _cli_command = None
+
     def __init__(self, output_directory: str = None, called_module: str = None):
         """Set logs output path based on the module being executed
 
@@ -30,16 +33,20 @@ class BaseModule():
         self.log.info(f"CLI command executed: {BaseModule._cli_command}")
         if called_module is None:
             called_module = self.log.name
-        self.called_module = called_module.replace("relecov_tools.", "").replace("-", "_")
+        self.called_module = called_module.replace("relecov_tools.", "").replace(
+            "-", "_"
+        )
         self.batch_id = "temp_id"
-        
+
         config = ConfigJson(extra_config=True)
         logs_config = config.get_configuration("logs_config")
         if self.called_module in logs_config.get("modules_outpath", {}):
             output_directory = logs_config["modules_outpath"][self.called_module]
         else:
             if output_directory is None:
-                output_directory = logs_config.get("default_outpath", "/tmp/relecov_tools")
+                output_directory = logs_config.get(
+                    "default_outpath", "/tmp/relecov_tools"
+                )
         output_directory = os.path.realpath(output_directory)
         if BaseModule._global_hex_code is None:
             if BaseModule._cli_log_file:
@@ -59,7 +66,9 @@ class BaseModule():
         else:
             # First time this class is initialized, set root handler and move cli-log-file
             if not self.log.handlers:
-                handler = BaseModule.set_log_handler(self.final_log_path, level=logging.DEBUG)
+                handler = BaseModule.set_log_handler(
+                    self.final_log_path, level=logging.DEBUG
+                )
                 self.log.addHandler(handler)
             self.redirect_logs(
                 self.final_log_path, old_log_path=BaseModule._cli_log_file
@@ -69,7 +78,6 @@ class BaseModule():
         self.basemod_outdir = output_directory
         # Set this after the first module starts in case it calls other modules
         BaseModule._active_process = True
-
 
     @staticmethod
     def set_log_handler(log_filepath, level=logging.DEBUG, only_stream=False):
@@ -87,7 +95,11 @@ class BaseModule():
         )
         return log_fh
 
-    def redirect_logs(self, new_log_path: str, old_log_path: str = None, ):
+    def redirect_logs(
+        self,
+        new_log_path: str,
+        old_log_path: str = None,
+    ):
         """
         Move output log file to destination while keeping track of past logs.
         Keep folder destination if self.cli_log_path is activated.
@@ -104,15 +116,22 @@ class BaseModule():
                 )
             else:
                 # Cannot redirect log file
-                self.log.error("Could not redirect log file, no new destination nor active logsum")
+                self.log.error(
+                    "Could not redirect log file, no new destination nor active logsum"
+                )
                 return
         if log_file == new_log_path:
-            self.log.debug("log_file and new_log_path are the same, no redirection needed")
+            self.log.debug(
+                "log_file and new_log_path are the same, no redirection needed"
+            )
             return
         if BaseModule._cli_log_file:
-            self.log.warning("--log-path activated via CLI. Logs output folder wont change")
+            self.log.warning(
+                "--log-path activated via CLI. Logs output folder wont change"
+            )
             new_log_path = os.path.join(
-                os.path.dirname(BaseModule._cli_log_file), os.path.basename(new_log_path)
+                os.path.dirname(BaseModule._cli_log_file),
+                os.path.basename(new_log_path),
             )
         try:
             os.rename(log_file, new_log_path)
@@ -138,7 +157,6 @@ class BaseModule():
         self.log.addHandler(new_handler)
         self.log.info(f"Redirected logs from {log_file} to {new_log_path}")
         return
-    
 
     def get_log_file(self):
         """Retrieve the output path for the active logger"""
@@ -154,9 +172,15 @@ class BaseModule():
         else:
             err_txt = "Could not retrieve log-file: "
             if len(module_handlers) == 0:
-                self.log.error(err_txt + f"No output log-file defined for module {self.called_module}")
+                self.log.error(
+                    err_txt
+                    + f"No output log-file defined for module {self.called_module}"
+                )
             else:
-                self.log.error(err_txt + f"Too many handlers defined for module {self.called_module}: {module_handlers}")
+                self.log.error(
+                    err_txt
+                    + f"Too many handlers defined for module {self.called_module}: {module_handlers}"
+                )
             return ""
 
     def parent_log_summary(self, *args, **kwargs):
@@ -165,7 +189,7 @@ class BaseModule():
             kwargs["output_location"] = self.basemod_outdir
         self.base_logsum = LogSum(**kwargs)
         return self.base_logsum
-    
+
     def parent_create_error_summary(self, *args, **kwargs):
         """Output log summary in the same folder as log file if filepath is not given"""
         sum_filepath = self.final_log_path.replace(".log", "_log_summary.json")
@@ -173,16 +197,18 @@ class BaseModule():
             kwargs["filepath"] = sum_filepath
         self.base_logsum.create_error_summary(**kwargs)
         return
-    
+
     def set_batch_id(self, batch_id):
         """Set batch_id variable and rename log file to include this tag"""
         if self.batch_id == "temp_id":
             self.log.debug(f"Setting batch_id as {batch_id}...")
             self.batch_id = str(batch_id)
-        self.final_log_path = self.tag_filename(self.final_log_path).replace("_temp_id", "")
+        self.final_log_path = self.tag_filename(self.final_log_path).replace(
+            "_temp_id", ""
+        )
         self.redirect_logs(self.final_log_path)
         return
-    
+
     def tag_filename(self, filename: str):
         """Include hexadecimal code and batch_id in filename to avoid duplication"""
         tag = self.batch_id + "_" + self.hex
