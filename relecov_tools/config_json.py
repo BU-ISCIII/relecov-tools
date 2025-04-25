@@ -3,7 +3,6 @@ import json
 import os
 import yaml
 import logging
-import rich
 
 import relecov_tools.utils
 
@@ -149,7 +148,7 @@ class ConfigJson:
                 additional_config = {config_name: file_content}
             summary["Included"].extend([k for k in additional_config.keys()])
         relecov_tools.utils.write_json_to_file(additional_config, EXTRA_CONFIG_PATH)
-        log.info(f"Finished including extra configuration")
+        log.info("Finished including extra configuration")
         print("Update summary:")
         for state, changes in summary.items():
             print(state, ":\n", "\n".join([str(msg) for msg in changes]))
