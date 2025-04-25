@@ -27,7 +27,6 @@ def main():
 
 
 def prepare_remote_test(**kwargs):
-    # First clean the repository.
     print("Initating sftp module")
     download_manager = DownloadManager(
         user=kwargs["user"],
@@ -37,26 +36,31 @@ def prepare_remote_test(**kwargs):
         output_location=kwargs["output_location"],
         target_folders=kwargs["target_folders"],
     )
+
     print("Openning connection to sftp")
     download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
     if not download_manager.relecov_sftp.open_connection():
         print("Could not open connection to remote sftp")
         sys.exit(1)
-    remote_folders = download_manager.relecov_sftp.list_remote_folders(
-        ".", recursive=True
-    )
-    clean_folders = [folder.replace("./", "") for folder in remote_folders]
-    print("Cleaning folders")
-    for folder in clean_folders:
-        if len(folder.split("/")) < 2:
-            continue
-        filelist = download_manager.relecov_sftp.get_file_list(folder)
-        for file in filelist:
-            download_manager.relecov_sftp.remove_file(file)
-        print(f"Removing remote folder {folder}")
-        download_manager.relecov_sftp.remove_dir(folder)
 
-    # Upload the test dataset to the sftp.
+    print("Cleaning folders inside RELECOV")
+    base_paths = ["COD-test-1/RELECOV", "COD-test-2/RELECOV"]
+    for base_path in base_paths:
+        remote_folders = download_manager.relecov_sftp.list_remote_folders(base_path, recursive=True)
+        # Ordenar en orden inverso para eliminar subcarpetas antes
+        remote_folders = sorted(remote_folders, reverse=True)
+        for folder in remote_folders:
+            folder = folder.replace("./", "")
+            filelist = download_manager.relecov_sftp.get_file_list(folder)
+            for file in filelist:
+                print(f"Removing file {file}")
+                download_manager.relecov_sftp.remove_file(file)
+            try:
+                print(f"Removing folder {folder}")
+                download_manager.relecov_sftp.remove_dir(folder)
+            except Exception as e:
+                print(f"Could not remove folder {folder}: {e}")
+
     data_loc = "tests/data/sftp_handle"
     folder_files_dict = {folder: files for folder, _, files in os.walk(data_loc)}
     print("Uploading files to sftp...")
@@ -77,11 +81,11 @@ def prepare_remote_test(**kwargs):
 
     download_manager.relecov_sftp.close_connection()
 
-    # Test download_module
     def test_download(download_manager):
         download_manager.execute_process()
 
     test_download(download_manager)
+
 
 
 if __name__ == "__main__":
