@@ -305,12 +305,6 @@ class PipelineManager:
                 sample["sequence_file_path_R2_fastq"] = os.path.join(
                     item["sequence_file_path_R2_fastq"], item["sequence_file_R2_fastq"]
                 )
-            match = re.search(
-                r"(COD-\d{4}-[A-Z]+-[A-Z]+)", item["sequence_file_path_R1_fastq"]
-            )
-            sample["lab_code"] = (
-                match.group(1) if match else "Missing [LOINC:LA14698-7]"
-            )
             samples_data.append(sample)
         return samples_data
 
@@ -457,30 +451,32 @@ class PipelineManager:
 
             dest_folder = os.path.join(group_outfolder, self.copied_sample_folder)
 
-            samples_by_cod = defaultdict(list)
+            samples_by_path = defaultdict(list)
             for s in samples_data:
-                codename = s.get("lab_code", "Missing [LOINC:LA14698-7]")
-                samples_by_cod[codename].append(s["sequencing_sample_id"])
+                institution_path = os.path.dirname(
+                    s.get("sequence_file_path_R1_fastq", "Missing [LOINC:LA14698-7]")
+                )
+                samples_by_path[institution_path].append(s["sequencing_sample_id"])
 
-            errors_by_cod = defaultdict(set)
+            errors_by_path = defaultdict(set)
             for sample_id in samp_errors:
                 matching_samples = [
                     s for s in samples_data if s["sequencing_sample_id"] == sample_id
                 ]
                 if matching_samples:
-                    codename = matching_samples[0].get(
-                        "lab_code", "Missing [LOINC:LA14698-7]"
+                    institution_path = os.path.dirname(
+                        matching_samples[0].get(
+                            "sequence_file_path_R1_fastq", "Missing [LOINC:LA14698-7]"
+                        )
                     )
                 else:
-                    codename = "Missing [LOINC:LA14698-7]"
-                errors_by_cod[codename].add(sample_id)
+                    institution_path = "Missing [LOINC:LA14698-7]"
+                errors_by_path[institution_path].add(sample_id)
 
-            for codename, samples in samples_by_cod.items():
+            for institution_path, samples in samples_by_path.items():
                 total = len(samples)
-                copied = total - len(errors_by_cod.get(codename, []))
-                msg = (
-                    f"{copied}/{total} samples from {codename} copied to {dest_folder}"
-                )
+                copied = total - len(errors_by_path.get(institution_path, []))
+                msg = f"{copied}/{total} samples from {institution_path} copied to {dest_folder}"
                 log.info(msg)
                 stderr.print(msg)
 
