@@ -685,21 +685,23 @@ def cast_value_to_schema_type(value, expected_type: str):
 
 
 def get_safe_hex(output_folder, length=3):
-    """Return an unique hexadecimal code that does not repeat in any file 
+    """Return an unique hexadecimal code that does not repeat in any file
     of the given output directory
 
     Args:
         output_folder (str): Folder where files will be checked
         length (int): Number of bytes for the code. Character length will be doubled
-    
+
     Returns:
         hex_id (str): Non-repeating hexadecimal code
     """
+
     def get_new_hex(hex_id, output_folder):
         """Recursive search for new hexadecimal codes if exist"""
         if any(hex_id in x for x in os.listdir(output_folder)):
             return get_new_hex(token_hex(length).upper(), output_folder)
         else:
             return token_hex(length).upper()
+
     hex_id = get_new_hex(token_hex(length).upper(), output_folder)
     return hex_id

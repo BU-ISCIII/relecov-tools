@@ -1056,9 +1056,7 @@ class BioinfoMetadata(BaseModule):
             lab_code = first_sample.get(
                 "submitting_institution_id", batch_dir.split("/")[-2]
             )
-            batch_date = first_sample.get(
-                "batch_id", batch_dir.split("/")[-1]
-            )
+            batch_date = first_sample.get("batch_id", batch_dir.split("/")[-1])
             self.set_batch_id(batch_date)
             self.log_report.logsum.feed_key(batch_dir)
             stderr.print(f"[blue]Processing data from {batch_dir}")

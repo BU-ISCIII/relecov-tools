@@ -24,7 +24,7 @@ stderr = Console(
 )
 
 
-class LogSum():
+class LogSum:
     def __init__(
         self,
         output_location: str = None,

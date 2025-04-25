@@ -196,7 +196,9 @@ class ProcessWrapper(BaseModule):
         # As all folders are merged into one during download, there should only be 1 folder
         if not valid_dirs or len(valid_dirs) >= 2:
             # If all samples were valid during download and download_clean is used, the original folder might have been deleted
-            self.log.warning("Couldnt find %s folder in remote sftp. Creating new one", key)
+            self.log.warning(
+                "Couldnt find %s folder in remote sftp. Creating new one", key
+            )
             remote_dir = os.path.join(key, self.batch_id + "_invalid_samples")
             self.download_manager.relecov_sftp.make_dir(remote_dir)
         else:
@@ -255,7 +257,9 @@ class ProcessWrapper(BaseModule):
                     "Could not upload %s report to remote %s" % (key, local_folder)
                 )
         else:
-            self.log.error("Could not find xlsx report for %s in %s" % (key, local_folder))
+            self.log.error(
+                "Could not find xlsx report for %s in %s" % (key, local_folder)
+            )
         return merged_logs
 
     def run_wrapper(self):

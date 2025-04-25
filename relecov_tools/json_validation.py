@@ -72,7 +72,9 @@ class SchemaValidation(BaseModule):
             stderr.print(f"[red]Invalid json file content in {json_data_file}.")
             stderr.print("Should be a list of dicts. Create it with read-lab-metadata")
             self.log.error(f"[red]Invalid json file content in {json_data_file}.")
-            self.log.error("Should be a list of dicts. Create it with read-lab-metadata")
+            self.log.error(
+                "Should be a list of dicts. Create it with read-lab-metadata"
+            )
             raise TypeError(f"Invalid json file content in {json_data_file}")
         try:
             batch_id = self.json_data[0].get("batch_id")
@@ -172,7 +174,9 @@ class SchemaValidation(BaseModule):
                         else:
                             error_field = error.validator or error.message
                     except Exception as ex:
-                        self.log.warning(f"Error extracting error_field from: {error}, {ex}")
+                        self.log.warning(
+                            f"Error extracting error_field from: {error}, {ex}"
+                        )
                         error_field = str(error)
 
                     # Try to get the human-readable label from the schema

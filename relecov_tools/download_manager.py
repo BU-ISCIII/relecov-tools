@@ -113,7 +113,9 @@ class DownloadManager(BaseModule):
             sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
             self.target_folders = self.target_folders.split(",")
-        self.logsum = self.parent_log_summary(output_location=self.platform_storage_folder)
+        self.logsum = self.parent_log_summary(
+            output_location=self.platform_storage_folder
+        )
         if sftp_passwd is None:
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
         self.metadata_lab_heading = config_json.get_topic_data(
@@ -186,7 +188,9 @@ class DownloadManager(BaseModule):
                         fetched_files.append(os.path.basename(file))
                         break
                 else:
-                    self.log.warning("Couldn't fetch %s from %s after 3 tries", file, folder)
+                    self.log.warning(
+                        "Couldn't fetch %s from %s after 3 tries", file, folder
+                    )
         return fetched_files
 
     def find_remote_md5sum(self, folder, pattern="md5sum"):
@@ -486,7 +490,9 @@ class DownloadManager(BaseModule):
         os.makedirs(self.platform_storage_folder, exist_ok=True)
         if len(meta_files) > 1:
             # Merging multiple excel files into a single one
-            self.log.warning(f"[yellow]Merging multiple metadata files in {remote_folder}")
+            self.log.warning(
+                f"[yellow]Merging multiple metadata files in {remote_folder}"
+            )
             metadata_ws = self.metadata_processing.get("excel_sheet")
             header_flag = self.metadata_processing.get("header_flag")
             local_meta_list = []
@@ -631,7 +637,9 @@ class DownloadManager(BaseModule):
                     self.finished_folders[new_name] = self.finished_folders.pop(
                         remote_folder
                     )
-                self.log.info("Successfully renamed %s to %s" % (remote_folder, new_name))
+                self.log.info(
+                    "Successfully renamed %s to %s" % (remote_folder, new_name)
+                )
             except (OSError, PermissionError) as e:
                 log_text = f"Could not rename remote {remote_folder}. Error: {e}"
                 self.log.error(log_text)
@@ -995,7 +1003,9 @@ class DownloadManager(BaseModule):
         else:
             target_folders = [tf for tf in self.target_folders if tf in clean_root_list]
         if not target_folders:
-            self.log.error("No remote folders matching selection %s", self.target_folders)
+            self.log.error(
+                "No remote folders matching selection %s", self.target_folders
+            )
             stderr.print("Found no remote folders matching selection")
             stderr.print(f"List of remote folders: {str(clean_root_list)}")
             raise ValueError(
@@ -1008,7 +1018,9 @@ class DownloadManager(BaseModule):
                     targeted_folder, recursive=True
                 )
             except (FileNotFoundError, OSError) as e:
-                self.log.error(f"Error during sftp listing. {targeted_folder} skipped:", e)
+                self.log.error(
+                    f"Error during sftp listing. {targeted_folder} skipped:", e
+                )
                 continue
             for folder in subfolders:
                 if folder.startswith(f"{targeted_folder}/{self.subfolder}"):
@@ -1203,7 +1215,9 @@ class DownloadManager(BaseModule):
                 path = os.path.join(local_folder, file_name)
                 try:
                     os.remove(path)
-                    self.log.info("File %s was removed because it was corrupted", file_name)
+                    self.log.info(
+                        "File %s was removed because it was corrupted", file_name
+                    )
                     corrupted.append(file_name)
                 except (FileNotFoundError, PermissionError, OSError) as e:
                     error_text = "Could not remove corrupted file %s: %s"
@@ -1252,7 +1266,9 @@ class DownloadManager(BaseModule):
                             self.log.warning(error_text % f_name)
                             not_md5sum.append(f_name)
                         else:
-                            self.log.info("File %s was compressed, creating md5hash", f_name)
+                            self.log.info(
+                                "File %s was compressed, creating md5hash", f_name
+                            )
                         files_md5_dict[f_name] = relecov_tools.utils.calculate_md5(path)
             else:
                 md5_hashes = [
@@ -1280,7 +1296,9 @@ class DownloadManager(BaseModule):
                         },
                     )
                 except Exception as e:
-                    self.log.error("Could not create logsum for %s: %s" % (folder, str(e)))
+                    self.log.error(
+                        "Could not create logsum for %s: %s" % (folder, str(e))
+                    )
             self.log.info(f"Finished processing {folder}")
             stderr.print(f"[green]Finished processing {folder}")
             self.finished_folders[folder] = list(files_md5_dict.keys())
@@ -1340,7 +1358,9 @@ class DownloadManager(BaseModule):
         self.relecov_sftp.close_connection()
         stderr.print(f"Processed {len(processed_folders)} folders: {processed_folders}")
         if self.logsum.logs:
-            self.log.info("Printing process summary to %s", self.platform_storage_folder)
+            self.log.info(
+                "Printing process summary to %s", self.platform_storage_folder
+            )
             self.parent_create_error_summary(called_module="download")
         else:
             self.log.info("Process log summary was empty. Not generated.")

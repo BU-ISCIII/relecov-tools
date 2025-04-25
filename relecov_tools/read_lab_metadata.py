@@ -46,15 +46,21 @@ class RelecovMetadata(BaseModule):
             if not os.path.isdir(str(files_folder)):
                 stderr.print("[red]No samples file nor valid files folder provided")
                 self.log.error("No samples file nor valid files folder provided")
-                raise FileNotFoundError("No samples file nor valid files folder provided")
+                raise FileNotFoundError(
+                    "No samples file nor valid files folder provided"
+                )
             self.files_folder = os.path.abspath(files_folder)
 
         self.sample_list_file = sample_list_file
 
         if sample_list_file is not None and not os.path.exists(sample_list_file):
-            self.log.error("Sample information file %s does not exist ", sample_list_file)
+            self.log.error(
+                "Sample information file %s does not exist ", sample_list_file
+            )
             stderr.print("[red] Samples file " + sample_list_file + " does not exist")
-            raise FileNotFoundError("Sample information file %s does not exist ", sample_list_file)
+            raise FileNotFoundError(
+                "Sample information file %s does not exist ", sample_list_file
+            )
 
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
@@ -443,7 +449,9 @@ class RelecovMetadata(BaseModule):
         else:
             s_json["j_data"] = self.get_samples_files_data(metadata)
         if not s_json["j_data"]:
-            self.log.warning(f"Samples file {self.sample_list_file} is empty. All samples will be included")
+            self.log.warning(
+                f"Samples file {self.sample_list_file} is empty. All samples will be included"
+            )
             s_json["j_data"] = self.get_samples_files_data(metadata)
         first_sample = s_json["j_data"][list(s_json["j_data"].keys())[0]]
         batch_id = first_sample.get("batch_id")
@@ -553,7 +561,9 @@ class RelecovMetadata(BaseModule):
                     else:
                         try:
                             row[key] = str(int(float(str(row[key]))))
-                            self.log.info("Date given as an integer. Understood as a year")
+                            self.log.info(
+                                "Date given as an integer. Understood as a year"
+                            )
                         except (ValueError, TypeError):
                             log_text = f"Invalid date format in {key}: {row[key]}"
                             self.logsum.add_error(sample=sample_id, entry=log_text)
