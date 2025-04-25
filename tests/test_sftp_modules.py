@@ -46,8 +46,9 @@ def prepare_remote_test(**kwargs):
     print("Cleaning folders inside RELECOV")
     base_paths = ["COD-test-1/RELECOV", "COD-test-2/RELECOV"]
     for base_path in base_paths:
-        remote_folders = download_manager.relecov_sftp.list_remote_folders(base_path, recursive=True)
-        # Ordenar en orden inverso para eliminar subcarpetas antes
+        remote_folders = download_manager.relecov_sftp.list_remote_folders(
+            base_path, recursive=True
+        )
         remote_folders = sorted(remote_folders, reverse=True)
         for folder in remote_folders:
             folder = folder.replace("./", "")
@@ -85,7 +86,6 @@ def prepare_remote_test(**kwargs):
         download_manager.execute_process()
 
     test_download(download_manager)
-
 
 
 if __name__ == "__main__":
