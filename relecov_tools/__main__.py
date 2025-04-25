@@ -3,6 +3,7 @@ import logging
 import os
 import json
 import sys
+from datetime import datetime
 
 # from rich.prompt import Confirm
 import click
@@ -29,6 +30,7 @@ import relecov_tools.pipeline_manager
 import relecov_tools.build_schema
 import relecov_tools.dataprocess_wrapper
 import relecov_tools.upload_results
+import relecov_tools.base_module
 
 log = logging.getLogger()
 
@@ -122,7 +124,10 @@ class CustomHelpOrder(click.Group):
     help="Print verbose output to the console.",
 )
 @click.option(
-    "-l", "--log-file", help="Save a verbose log to a file.", metavar="<filename>"
+    "-l",
+    "--log-path",
+    default=None,
+    help="Creates log file in given folder. Uses default path in config or tmp empty.",
 )
 @click.option(
     "-d",
@@ -131,22 +136,62 @@ class CustomHelpOrder(click.Group):
     default=False,
     help="Show the full traceback on error for debugging purposes.",
 )
+@click.option(
+    "-h",
+    "--hex-code",
+    default=None,
+    help="Define hexadecimal code. This might overwrite existing files with the same hex-code",
+)
 @click.pass_context
-def relecov_tools_cli(ctx, verbose, log_file, debug):
-    # Set the base logger to output DEBUG
-    log.setLevel(logging.DEBUG)
-
+def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
+    if debug:
+        # Set the base logger to output everything
+        level = logging.DEBUG
+    else:
+        # Set the base logger to hide DEBUG messages
+        level = logging.INFO
+    log.setLevel(level)
+    if verbose:
+        stream_handler = relecov_tools.base_module.BaseModule.set_log_handler(
+            None, level=level, only_stream=True
+        )
+        log.addHandler(stream_handler)
+    if hex_code is not None:
+        relecov_tools.base_module.BaseModule._global_hex_code = str(hex_code)
     # Set up logs to a file if we asked for one
-    if log_file:
-        log_fh = logging.FileHandler(log_file, encoding="utf-8")
-        log_fh.setLevel(logging.DEBUG)
-        log_fh.setFormatter(
-            logging.Formatter(
-                "[%(asctime)s] %(name)-20s [%(levelname)-7s]  %(message)s"
-            )
+    called_module = str(ctx.invoked_subcommand).replace("-", "_")
+    config = relecov_tools.config_json.ConfigJson(extra_config=True)
+    logs_config = config.get_configuration("logs_config")
+    default_outpath = logs_config.get("default_outpath", "/tmp/relecov_tools")
+    if log_path is None:
+        log_path = logs_config.get("modules_outpath", {}).get(called_module)
+        if not log_path:
+            log_path = os.path.join(default_outpath, called_module)
+    current_datetime = datetime.today().strftime("%Y%m%d%-H%M%S")
+    log_filepath = os.path.join(
+        log_path, "_".join([called_module, current_datetime]) + ".log"
+    )
+    relecov_tools.base_module.BaseModule._cli_log_file = log_filepath
+
+    try:
+        os.makedirs(log_path, exist_ok=True)
+        log_fh = relecov_tools.base_module.BaseModule.set_log_handler(
+            log_filepath, level=level
         )
         log.addHandler(log_fh)
-        log.info(f"RELECOV-tools version {__version__}")
+    except Exception:
+        log_filepath = os.path.join(
+            default_outpath, "_".join([called_module, "temp"]) + ".log"
+        )
+        os.makedirs(default_outpath, exist_ok=True)
+        log_fh = relecov_tools.base_module.BaseModule.set_log_handler(
+            log_filepath, level=level
+        )
+        log.addHandler(log_fh)
+        log.warning(f"Invalid --log-path {log_path}. Using {log_filepath} instead")
+    log.info(f"RELECOV-tools version {__version__}")
+    cli_command = " ".join(sys.argv)
+    log.info(f"Cli executed command: {cli_command}")
 
     ctx.ensure_object(dict)  # Asegura que ctx.obj es un diccionario
     ctx.obj["debug"] = debug  # Guarda el flag de debug
