@@ -1,0 +1,26 @@
+# THIS INITIAL CONFIG SHOULD BE SET AFTER INSTALLATION
+# MAKE A COPY OF THIS FILE IN YOUR HOME AND CONFIGURE IT TO YOUR NEEDS
+# THEN RUN: relecov_tools add-extra-config --config_file path/to/initial_config_copy.yaml
+logs_config:
+    default_outpath:
+        /tmp/
+    modules_outpath:
+        process_wrapper: /tmp/wrapper
+        download_manager: /tmp/download
+        pipeline_manager: /tmp/pipeline_manager
+        bioinfo_metadata: /tmp/read_bioinfo_metadata
+
+institutions_config:
+    COD-XXXX:
+        institution_resp: Example responsible,
+        institution_name: Example Hospital,
+        email_receiver: receiver@email.com
+
+mail_sender:
+    delivery_template_path_file": path/to/relecov-tools/relecov_tools/templates/,
+    email_host": host,
+    email_port": 587,
+    email_host_user": email_user, 
+    email_use_tls": True,
+    yaml_cred_path": ~/buisciii_config.yml,
+    institutions_guide_path": /path/to/institutions_guide.json
