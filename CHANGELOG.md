@@ -19,6 +19,8 @@ Code contributions to the release:
 
 ### Modules
 
+- New module add-extra-config for additional custom config [#464](https://github.com/BU-ISCIII/relecov-tools/pull/464)
+
 #### Added enhancements
 
 - Added git CI test for json schema exception scenarios [#434](https://github.com/BU-ISCIII/relecov-tools/pull/434)
