@@ -286,7 +286,7 @@
     "upload_database": {
         "platform":{
             "iskylims": {
-                "server_url": "http://127.0.0.1:8001",
+                "server_url": "relecov-iskylims.isciiides.es",
                 "api_url": "/wetlab/api/",
                 "store_samples": "create-sample",
                 "url_project_fields": "projects-fields",
@@ -296,7 +296,7 @@
                 "token": ""
             },
             "relecov": {
-            "server_url": "http://0.0.0.0:8000/",
+            "server_url": "relecov-platform.isciiides.es",
             "api_url": "/api/",
             "store_samples": "createSampleData",
             "bioinfodata": "createBioinfoData",
