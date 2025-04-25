@@ -13,8 +13,8 @@ import rich.console
 import rich.logging
 import rich.traceback
 
+import relecov_tools.config_json
 import relecov_tools.utils
-import relecov_tools.assets.pipeline_utils.viralrecon
 import relecov_tools.read_lab_metadata
 import relecov_tools.download_manager
 import relecov_tools.json_validation
