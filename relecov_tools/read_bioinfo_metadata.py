@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import sys
-import logging
 import rich.console
 import re
 import shutil
