@@ -171,7 +171,6 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
     log_filepath = os.path.join(
         log_path, "_".join([called_module, current_datetime]) + ".log"
     )
-    relecov_tools.base_module.BaseModule._cli_log_file = log_filepath
 
     try:
         os.makedirs(log_path, exist_ok=True)
@@ -189,10 +188,10 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
         )
         log.addHandler(log_fh)
         log.warning(f"Invalid --log-path {log_path}. Using {log_filepath} instead")
-    log.info(f"RELECOV-tools version {__version__}")
+    relecov_tools.base_module.BaseModule._cli_log_file = os.path.realpath(log_filepath)
     cli_command = " ".join(sys.argv)
-    log.info(f"Cli executed command: {cli_command}")
-
+    relecov_tools.base_module.BaseModule._cli_command = cli_command
+    relecov_tools.base_module.BaseModule._current_version = __version__
     ctx.ensure_object(dict)  # Asegura que ctx.obj es un diccionario
     ctx.obj["debug"] = debug  # Guarda el flag de debug
 

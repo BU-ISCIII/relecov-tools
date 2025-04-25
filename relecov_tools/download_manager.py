@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import copy
-import logging
 import json
-import sys
 import os
 import yaml
 import warnings
@@ -50,7 +48,7 @@ class DownloadManager(BaseModule):
         """Initializes the sftp object"""
         super().__init__(output_directory=output_location, called_module="download")
         self.log.info("Initiating download process")
-        config_json = ConfigJson()
+        config_json = ConfigJson(extra_config=True)
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
@@ -1012,7 +1010,6 @@ class DownloadManager(BaseModule):
             except (FileNotFoundError, OSError) as e:
                 self.log.error(f"Error during sftp listing. {targeted_folder} skipped:", e)
                 continue
-
             for folder in subfolders:
                 if folder.startswith(f"{targeted_folder}/{self.subfolder}"):
                     full_path = os.path.normpath(folder)
