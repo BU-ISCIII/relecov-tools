@@ -12,12 +12,13 @@ log = logging.getLogger(__name__)
 # TODO: Make this path configurable too
 EXTRA_CONFIG_PATH = os.path.expanduser("~/.relecov_tools/extra_config.json")
 
+
 # pass test
 class ConfigJson:
     def __init__(
         self,
         json_file=os.path.join(os.path.dirname(__file__), "conf", "configuration.json"),
-        extra_config=False
+        extra_config=False,
     ):
         """Load config content in configuration.json and additional config if required
 
@@ -37,10 +38,13 @@ class ConfigJson:
                 except (OSError, json.JSONDecodeError) as e:
                     log.warning(f"Could not load extra config: {e}")
             else:
-                log.warning(f"Could not load extra config: {EXTRA_CONFIG_PATH} does not exist")
-                log.warning("Run ``relecov-tools add_extra_config`` to include additional configuration")
+                log.warning(
+                    f"Could not load extra config: {EXTRA_CONFIG_PATH} does not exist"
+                )
+                log.warning(
+                    "Run ``relecov-tools add_extra_config`` to include additional configuration"
+                )
         self.topic_config = list(self.json_data.keys())
-
 
     def get_configuration(self, topic):
         """Obtain the topic configuration from json data"""
@@ -48,9 +52,9 @@ class ConfigJson:
             return self.json_data[topic]
         return None
 
-
     def get_topic_data(self, topic, found):
         """Obtain from topic any forward items from json data"""
+
         def get_recursive(subtopic, found):
             if isinstance(subtopic, dict):
                 for key, val in subtopic.items():
@@ -62,14 +66,13 @@ class ConfigJson:
                             return result
             else:
                 return None
-        
+
         if topic not in self.json_data.keys():
             return None
         if found in self.json_data[topic]:
             return self.json_data[topic][found]
         else:
             return get_recursive(self.json_data[topic], found)
-
 
     def include_extra_config(self, config_file, config_name=None, force=False):
         """Include given file content as additional configuration for later usage.
@@ -82,11 +85,14 @@ class ConfigJson:
         Raises:
             ValueError: If provided config_file does not have a supported extension.
         """
+
         def validate_new_config(config_name, current_conf, force=False):
             """Check if config_name is already in configuration"""
             if config_name in current_conf.keys():
                 if force:
-                    log.info(f"`{config_name}` already in config. Replacing its content...")
+                    log.info(
+                        f"`{config_name}` already in config. Replacing its content..."
+                    )
                     return True
                 else:
                     err_txt = f"Cannot add `{config_name}`: already in config. Set `force` to force replacement"
@@ -125,7 +131,9 @@ class ConfigJson:
             elif config_file.endswith((".yaml", ".yml")):
                 file_content = yaml.load(fh, Loader=yaml.FullLoader)
             else:
-                raise ValueError(f"config_file {config_file} extension is not supported. Use: {valid_exts}")
+                raise ValueError(
+                    f"config_file {config_file} extension is not supported. Use: {valid_exts}"
+                )
         if additional_config is not None:
             if config_name is None:
                 rec_merge_config(additional_config, file_content, force=force)
@@ -146,7 +154,6 @@ class ConfigJson:
         for state, changes in summary.items():
             print(state, ":\n", "\n".join([str(msg) for msg in changes]))
         return
-
 
     def remove_extra_config(self, config_name):
         """Remove key from extra_config configuration file
