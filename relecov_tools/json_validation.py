@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import logging
 import rich.console
 from jsonschema import Draft202012Validator, FormatChecker
 import sys
@@ -10,11 +9,9 @@ import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
 import relecov_tools.assets.schema_utils.custom_validators
 from relecov_tools.config_json import ConfigJson
-from relecov_tools.log_summary import LogSum
 from relecov_tools.base_module import BaseModule
 
 
-log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -35,7 +32,7 @@ class SchemaValidation(BaseModule):
         """Validate json file against the schema"""
         super().__init__(output_directory=out_folder, called_module=__name__)
         config_json = ConfigJson()
-        log.info("Initiating validation process")
+        self.log.info("Initiating validation process")
         if json_schema_file is None:
             schema_name = config_json.get_topic_data("json_schemas", "relecov_schema")
             json_schema_file = os.path.join(
@@ -59,7 +56,7 @@ class SchemaValidation(BaseModule):
         # Read and check json to validate file
         if not os.path.isfile(json_data_file):
             stderr.print("[red] Json file does not exist")
-            log.error("Json file does not exist")
+            self.log.error("Json file does not exist")
             sys.exit(1)
         self.json_data_file = json_data_file
         out_path = os.path.dirname(os.path.realpath(self.json_data_file))
@@ -69,13 +66,13 @@ class SchemaValidation(BaseModule):
         )
 
         stderr.print("[blue] Reading the json file")
-        log.info("Reading the json file")
+        self.log.info("Reading the json file")
         self.json_data = relecov_tools.utils.read_json_file(json_data_file)
         if not isinstance(self.json_data, list):
             stderr.print(f"[red]Invalid json file content in {json_data_file}.")
             stderr.print("Should be a list of dicts. Create it with read-lab-metadata")
-            log.error(f"[red]Invalid json file content in {json_data_file}.")
-            log.error("Should be a list of dicts. Create it with read-lab-metadata")
+            self.log.error(f"[red]Invalid json file content in {json_data_file}.")
+            self.log.error("Should be a list of dicts. Create it with read-lab-metadata")
             raise TypeError(f"Invalid json file content in {json_data_file}")
         try:
             batch_id = self.json_data[0].get("batch_id")
@@ -97,7 +94,7 @@ class SchemaValidation(BaseModule):
             try:
                 self.excel_sheet = conf_subdata["excel_sheet"]
             except KeyError:
-                log.error("Default metadata sheet name should be in config file")
+                self.log.error("Default metadata sheet name should be in config file")
                 raise
         else:
             self.excel_sheet = excel_sheet
@@ -143,7 +140,7 @@ class SchemaValidation(BaseModule):
             self.logsum.add_warning(sample=self.sample_id_field, entry=log_text)
 
         stderr.print("[blue] Start processing the JSON file")
-        log.info("Start processing the JSON file")
+        self.log.info("Start processing the JSON file")
 
         for item_row in self.json_data:
             sample_id_value = item_row.get(self.sample_id_field)
@@ -175,14 +172,14 @@ class SchemaValidation(BaseModule):
                         else:
                             error_field = error.validator or error.message
                     except Exception as ex:
-                        log.warning(f"Error extracting error_field from: {error}, {ex}")
+                        self.log.warning(f"Error extracting error_field from: {error}, {ex}")
                         error_field = str(error)
 
                     # Try to get the human-readable label from the schema
                     try:
                         err_field_label = schema_props[error_field]["label"]
                     except KeyError:
-                        log.error(f"Could not extract label for {error_field}")
+                        self.log.error(f"Could not extract label for {error_field}")
                         err_field_label = error_field
 
                     # Format the error message
@@ -201,7 +198,7 @@ class SchemaValidation(BaseModule):
         stderr.print("[blue] --------------------")
         stderr.print("[blue] VALIDATION SUMMARY")
         stderr.print("[blue] --------------------")
-        log.info("Validation summary:")
+        self.log.info("Validation summary:")
         for error_type, count in errors.items():
             field_with_error = error_keys[error_type]
             error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type}"
@@ -222,14 +219,14 @@ class SchemaValidation(BaseModule):
             log_text = f"Invalid excel file won't be created: {self.SAMPLE_FIELD_ERROR}"
             self.logsum.add_error(entry=log_text)
             return
-        log.error("Some of the samples in json metadata were not validated")
+        self.log.error("Some of the samples in json metadata were not validated")
         stderr.print("[red] Some of the Samples are not validate")
         if metadata is None:
             metadata = relecov_tools.utils.prompt_path(
                 msg="Select the metadata file to select those not-validated samples."
             )
         if not os.path.isfile(metadata):
-            log.error("Metadata file %s does not exist", metadata)
+            self.log.error("Metadata file %s does not exist", metadata)
             stderr.print(
                 "[red] Unable to create excel file for invalid samples. Metadata file ",
                 metadata,
@@ -238,7 +235,7 @@ class SchemaValidation(BaseModule):
             sys.exit(1)
         sample_list = []
         stderr.print("Start preparation of invalid samples")
-        log.info("Start preparation of invalid samples")
+        self.log.info("Start preparation of invalid samples")
         for row in invalid_json:
             sample_list.append(str(row[self.sample_id_field]))
         wb = openpyxl.load_workbook(metadata)
@@ -246,7 +243,7 @@ class SchemaValidation(BaseModule):
             ws_sheet = wb[self.excel_sheet]
         except KeyError:
             logtxt = f"No sheet named {self.excel_sheet} could be found in {metadata}"
-            log.error(logtxt)
+            self.log.error(logtxt)
             raise
         tag = "Sample ID given for sequencing"
         seq_id_col = [idx for idx, cell in enumerate(ws_sheet[1]) if tag in cell.value]
@@ -272,7 +269,7 @@ class SchemaValidation(BaseModule):
                 try:
                     ws_sheet.delete_rows(idx)
                 except TypeError as e:
-                    log.error(
+                    self.log.error(
                         "Unable to delete row %s from metadata file because of",
                         idx,
                         e,
@@ -282,7 +279,7 @@ class SchemaValidation(BaseModule):
         os.makedirs(out_folder, exist_ok=True)
         new_name = "invalid_" + os.path.basename(metadata)
         m_file = os.path.join(out_folder, new_name)
-        log.info("Saving excel file with the invalid samples")
+        self.log.info("Saving excel file with the invalid samples")
         stderr.print("Saving excel file with the invalid samples")
         wb.save(m_file)
         return
@@ -296,7 +293,7 @@ class SchemaValidation(BaseModule):
         """
         file_name = "_".join(["validated", os.path.basename(self.json_data_file)])
         file_path = os.path.join(out_folder, file_name)
-        log.info("Saving Json file with the validated samples in %s", file_path)
+        self.log.info("Saving Json file with the validated samples in %s", file_path)
         relecov_tools.utils.write_json_to_file(valid_json_data, file_path)
         return
 
@@ -308,7 +305,7 @@ class SchemaValidation(BaseModule):
         valid_json_data, invalid_json = self.validate_instances()
         if not invalid_json:
             stderr.print("[green]Sucessful validation, no invalid file created!!")
-            log.info("Sucessful validation, no invalid file created.")
+            self.log.info("Sucessful validation, no invalid file created.")
         else:
             log_text = "Summary: %s valid and %s invalid samples"
             self.logsum.add_warning(

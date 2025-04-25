@@ -15,6 +15,8 @@ class BaseModule():
     # This indicates that there is already a process functioning,
     # therefore you should create new log handlers instead of redirecting
     _active_process = False
+    _current_version = None
+    _cli_command = None
     def __init__(self, output_directory: str = None, called_module: str = None):
         """Set logs output path based on the module being executed
 
@@ -22,12 +24,14 @@ class BaseModule():
             output_directory (str, optional): Output folder to save called module logs. Defaults to None.
             called_module (str, optional): Name of the module being executed. Defaults to None.
         """
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(f"{__class__.__module__}.{called_module}")
         self.log.propagate = True
+        self.log.info(f"RELECOV-tools version {BaseModule._current_version}")
+        self.log.info(f"CLI command executed: {BaseModule._cli_command}")
         if called_module is None:
             called_module = self.log.name
         self.called_module = called_module.replace("relecov_tools.", "").replace("-", "_")
-        self.batch_id = datetime.now().strftime("%Y%m%d%H%M%S")
+        self.batch_id = "temp_id"
         
         config = ConfigJson(extra_config=True)
         logs_config = config.get_configuration("logs_config")
@@ -53,11 +57,13 @@ class BaseModule():
             handler = BaseModule.set_log_handler(self.final_log_path, level=log_level)
             self.log.addHandler(handler)
         else:
+            # First time this class is initialized, set root handler and move cli-log-file
             if not self.log.handlers:
                 handler = BaseModule.set_log_handler(self.final_log_path, level=logging.DEBUG)
                 self.log.addHandler(handler)
-            else:
-                self.redirect_logs(self.final_log_path)
+            self.redirect_logs(
+                self.final_log_path, old_log_path=BaseModule._cli_log_file
+            )
 
         self.base_logsum = None
         self.basemod_outdir = output_directory
@@ -81,12 +87,15 @@ class BaseModule():
         )
         return log_fh
 
-    def redirect_logs(self, new_log_path: str = None):
+    def redirect_logs(self, new_log_path: str, old_log_path: str = None, ):
         """
         Move output log file to destination while keeping track of past logs.
         Keep folder destination if self.cli_log_path is activated.
         """
-        log_file = self.get_log_file()
+        if old_log_path is None:
+            log_file = self.get_log_file()
+        else:
+            log_file = old_log_path
         if new_log_path is None:
             if self.base_logsum is not None:
                 outdir = self.base_logsum.output_location
@@ -116,14 +125,13 @@ class BaseModule():
             except OSError as e:
                 self.log.error(f"Could not redirect {log_file} to {new_log_path}: {e}")
                 return
-        import pdb; pdb.set_trace("AFTER COPY OR RENAME")
         for handler in self.log.handlers:
             if isinstance(handler, logging.FileHandler):
                 if self.called_module in handler.baseFilename:
                     self.log.debug(f"Removing handler for {handler.baseFilename}...")
                     self.log.removeHandler(handler)
                     handler.close()
-        
+
         new_handler = self.set_log_handler(
             new_log_path, level=self.log.getEffectiveLevel()
         )
@@ -168,8 +176,10 @@ class BaseModule():
     
     def set_batch_id(self, batch_id):
         """Set batch_id variable and rename log file to include this tag"""
-        self.batch_id = str(batch_id)
-        self.final_log_path = self.tag_filename(self.final_log_path)
+        if self.batch_id == "temp_id":
+            self.log.debug(f"Setting batch_id as {batch_id}...")
+            self.batch_id = str(batch_id)
+        self.final_log_path = self.tag_filename(self.final_log_path).replace("_temp_id", "")
         self.redirect_logs(self.final_log_path)
         return
     
@@ -181,5 +191,4 @@ class BaseModule():
             if mark in base_name:
                 base_name = base_name.replace("_" + mark, "")
                 self.log.debug(f"{filename} already includes {name}: {mark}.")
-        import pdb; pdb.set_trace()
         return str(base_name) + "_" + tag + str(extension)

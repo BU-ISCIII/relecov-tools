@@ -1,10 +1,7 @@
 #!/usr/bin/env python
-import logging
 import re
 import yaml
 import os
-import sys
-from datetime import datetime
 import inspect
 import rich.console
 from relecov_tools.download_manager import DownloadManager
@@ -13,8 +10,6 @@ from relecov_tools.json_validation import SchemaValidation
 from relecov_tools.base_module import BaseModule
 import relecov_tools.utils
 
-"""log = logging.getLogger(__name__)
-"""
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
