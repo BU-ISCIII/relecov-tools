@@ -284,7 +284,7 @@ class LogSum:
             logs = self.logs
         else:
             if not isinstance(logs, dict):
-                log.error(f"Logs input must be a dict. No output file generated.")
+                log.error("Logs input must be a dict. No output file generated.")
                 stderr.print("[red]Logs input must be a dict. No output file.")
                 return
         final_logs = self.prepare_final_logs(logs)

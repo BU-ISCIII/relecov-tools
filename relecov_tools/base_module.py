@@ -1,7 +1,6 @@
 import logging
 import os
 import shutil
-from datetime import datetime
 
 import relecov_tools.utils
 from relecov_tools.log_summary import LogSum
@@ -135,8 +134,8 @@ class BaseModule:
             )
         try:
             os.rename(log_file, new_log_path)
+        except OSError:
             self.log.debug(f"Could not rename {log_file}, trying to copy and delete...")
-        except OSError as e:
             try:
                 shutil.copy(log_file, new_log_path)
                 os.remove(log_file)

@@ -12,10 +12,8 @@ from rich.prompt import Prompt
 import pandas as pd
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
-from relecov_tools.log_summary import LogSum
 from relecov_tools.base_module import BaseModule
 
-log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -84,7 +82,7 @@ class BioinfoMetadata(BaseModule):
         software=None,
         update=False,
     ):
-        log.info("Initiating read-bioinfo-metadata process")
+        self.log.info("Initiating read-bioinfo-metadata process")
         super().__init__(output_directory=output_folder, called_module=__name__)
         # Init process log
         if output_folder is None:
@@ -368,7 +366,7 @@ class BioinfoMetadata(BaseModule):
             try:
                 files_dict[key]
                 stderr.print(f"[blue]Start processing {self.software_name}.{key}")
-                log.info(f"Start processing {self.software_name}.{key}")
+                self.log.info(f"Start processing {self.software_name}.{key}")
             except KeyError:
                 self.log_report.update_log_report(
                     method_name,
@@ -957,7 +955,7 @@ class BioinfoMetadata(BaseModule):
                         stderr.print(
                             f"[red]Sample '{sample_id}' has different data in {batch_filepath} and new metadata. Can't merge."
                         )
-                        log.error(
+                        self.log.error(
                             "Sample %s has different data in %s and new metadata. Can't merge.",
                             sample_id,
                             batch_filepath,
@@ -990,7 +988,7 @@ class BioinfoMetadata(BaseModule):
                 try:
                     file_path = files_dict[key]
                     stderr.print(f"[blue]Processing splitted file: {file_path}")
-                    log.info(f"Processing splitted file: {file_path}")
+                    self.log.info(f"Processing splitted file: {file_path}")
                 except KeyError:
                     self.log_report.update_log_report(
                         method_name,
@@ -1088,14 +1086,14 @@ class BioinfoMetadata(BaseModule):
                     if sample_id in qc_data:
                         sample.update(qc_data[sample_id])
             except Exception as e:
-                log.warning(
+                self.log.warning(
                     f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
                 )
             if os.path.exists(batch_filepath):
                 stderr.print(
                     f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
                 )
-                log.info(
+                self.log.info(
                     "Bioinfo metadata %s file already exists. Merging new data if possible."
                     % batch_filepath
                 )
@@ -1106,7 +1104,7 @@ class BioinfoMetadata(BaseModule):
                 self.log_report.logsum.feed_key(
                     key=batch_dir, sample=sample.get("sequencing_sample_id")
                 )
-            log.info("Created output json file: %s" % batch_filepath)
+            self.log.info("Created output json file: %s" % batch_filepath)
             stderr.print(f"[green]Created batch json file: {batch_filepath}")
 
         year = str(datetime.now().year)
@@ -1126,7 +1124,7 @@ class BioinfoMetadata(BaseModule):
             stderr.print(
                 "[orange]More than one batch date in the same json data. Using current date as batch date."
             )
-            log.info(
+            self.log.info(
                 "More than one batch date in the same json data. Using current date as batch date."
             )
             batch_date = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -1139,7 +1137,7 @@ class BioinfoMetadata(BaseModule):
             stderr.print(
                 f"[blue]Bioinfo metadata {file_path} file already exists. Merging new data if possible."
             )
-            log.info(
+            self.log.info(
                 "Bioinfo metadata %s file already exists. Merging new data if possible."
                 % file_path
             )
