@@ -8,8 +8,8 @@ import re
 from datetime import datetime as dtime
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
-import relecov_tools.json_schema
 from relecov_tools.log_summary import LogSum
+from relecov_tools.base_module import BaseModule
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -20,7 +20,7 @@ stderr = rich.console.Console(
 )
 
 
-class RelecovMetadata:
+class RelecovMetadata(BaseModule):
     def __init__(
         self,
         metadata_file=None,
@@ -28,6 +28,7 @@ class RelecovMetadata:
         output_folder=None,
         files_folder=None,
     ):
+        super().__init__(output_directory=output_folder, called_module=__name__)
         log.info("Initiating read-lab-metadata process")
         if metadata_file is None:
             self.metadata_file = relecov_tools.utils.prompt_path(
@@ -41,7 +42,7 @@ class RelecovMetadata:
             stderr.print(
                 "[red] Metadata file " + self.metadata_file + " does not exist"
             )
-            sys.exit(1)
+            raise FileNotFoundError(f"Metadata file {self.metadata_file} not found")
 
         if sample_list_file is None:
             stderr.print("[yellow]No samples_data.json file provided")
@@ -49,7 +50,7 @@ class RelecovMetadata:
             if not os.path.isdir(str(files_folder)):
                 stderr.print("[red]No samples file nor valid files folder provided")
                 log.error("No samples file nor valid files folder provided")
-                sys.exit(1)
+                raise FileNotFoundError("No samples file nor valid files folder provided")
             self.files_folder = os.path.abspath(files_folder)
 
         self.sample_list_file = sample_list_file
@@ -57,7 +58,7 @@ class RelecovMetadata:
         if sample_list_file is not None and not os.path.exists(sample_list_file):
             log.error("Sample information file %s does not exist ", sample_list_file)
             stderr.print("[red] Samples file " + sample_list_file + " does not exist")
-            sys.exit(1)
+            raise FileNotFoundError("Sample information file %s does not exist ", sample_list_file)
 
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
@@ -65,18 +66,20 @@ class RelecovMetadata:
             )
         else:
             self.output_folder = output_folder
-        out_path = os.path.realpath(self.output_folder)
-        self.lab_code = out_path.split("/")[-2]
-        self.logsum = LogSum(
-            output_location=self.output_folder, unique_key=self.lab_code, path=out_path
-        )
-        config_json = ConfigJson()
+        config_json = ConfigJson(extra_config=True)
         # TODO: remove hardcoded schema selection
         relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
         relecov_sch_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
         )
         self.configuration = config_json
+        self.institution_config = config_json.get_configuration("institutions_config")
+
+        out_path = os.path.realpath(self.output_folder)
+        self.lab_code = out_path.split("/")[-2]
+        self.logsum = self.parent_log_summary(
+            output_location=self.output_folder, unique_key=self.lab_code, path=out_path
+        )
 
         with open(relecov_sch_path, "r") as fh:
             self.relecov_sch_json = json.load(fh)
@@ -167,6 +170,11 @@ class RelecovMetadata:
             r2_md5 = md5_dict.get(r2_file)
             files_dict["sequence_file_R1_fastq"] = r1_file
             files_dict["r1_fastq_filepath"] = dir_path
+            batch_id = dir_path.split("/")[-1]
+            logtxt = f"Setting batch_id to {batch_id} based on download dir: {dir_path}"
+            stderr.print(f"[yellow]{logtxt}")
+            log.info(logtxt)
+            files_dict["batch_id"] = dir_path.split("/")[-1]
             if not os.path.exists(os.path.join(dir_path, r1_file)):
                 self.logsum.add_error(
                     sample=sample_id, entry="Provided R1 file not found after download"
@@ -197,8 +205,9 @@ class RelecovMetadata:
         if not any(val for val in j_data.values()):
             raise FileNotFoundError(f"No files found for the samples in {dir_path}")
         try:
-            filename = "_".join(["samples_data", self.lab_code, self.date + ".json"])
-            file_path = os.path.join(self.output_folder, filename)
+            samples_filename = "_".join(["samples_data", self.lab_code + ".json"])
+            samples_filename = self.tag_filename(filename=samples_filename)
+            file_path = os.path.join(self.output_folder, samples_filename)
             relecov_tools.utils.write_json_to_file(j_data, file_path)
         except Exception:
             log.error("Could not output samples_data.json file to output folder")
@@ -424,6 +433,12 @@ class RelecovMetadata:
             stderr.print(f"[green]Processed {key}")
             log.info(f"Processed {key}")
 
+        if self.institution_config:
+            log.info("Updating laboratory code from institutions_config...")
+            lab_code = relecov_tools.util.get_lab_code(metadata[0].get("submitting_institution"))
+            if lab_code:
+                self.logsum.rename_log_key(self.lab_code, lab_code)
+                self.lab_code = lab_code
         # Include Sample information data from sample json file
         stderr.print("[blue]Processing sample data file")
         log.info("Processing sample data file")
@@ -435,6 +450,16 @@ class RelecovMetadata:
             s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
         else:
             s_json["j_data"] = self.get_samples_files_data(metadata)
+        if not s_json["j_data"]:
+            log.warning(f"Samples file {self.sample_list_file} is empty. All samples will be included")
+            s_json["j_data"] = self.get_samples_files_data(metadata)
+        first_sample = s_json["j_data"][list(s_json["j_data"].keys())[0]]
+        batch_id = first_sample.get("batch_id")
+        if not batch_id:
+            # If created with download module, batch_id will be the name of the folder
+            batch_id = first_sample.get("r1_fastq_filepath", self.date).split("/")[-1]
+        # This will declare self.batch_id in BaseModule() which will be used later
+        self.set_batch_id(batch_id)
         metadata = self.process_from_json(metadata, s_json)
         metadata = self.infer_file_format_from_schema(metadata)
         stderr.print("[green]Processed sample data file.")
@@ -579,13 +604,15 @@ class RelecovMetadata:
         extended_metadata = self.adding_fixed_fields(extended_metadata)
         completed_metadata = self.adding_ontology_to_enum(extended_metadata)
         if not completed_metadata:
+            log.warning("Metadata was completely empty. No output file generated")
             stderr.print("Metadata was completely empty. No output file generated")
-            sys.exit(0)
-        file_code = "lab_metadata_" + self.lab_code + "_"
-        file_name = file_code + self.date + ".json"
+            return
+        file_code = "_".join(["lab_metadata", self.lab_code]) + ".json"
+        file_name = self.tag_filename(filename=file_code)
         stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_folder, exist_ok=True)
-        self.logsum.create_error_summary(called_module="read-lab-metadata")
+        # Creating log summary
+        self.parent_create_error_summary()
         file_path = os.path.join(self.output_folder, file_name)
         log.info("Writting output json file %s", file_path)
         relecov_tools.utils.write_json_to_file(completed_metadata, file_path)

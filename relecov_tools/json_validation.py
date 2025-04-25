@@ -11,6 +11,7 @@ import relecov_tools.assets.schema_utils.jsonschema_draft
 import relecov_tools.assets.schema_utils.custom_validators
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.log_summary import LogSum
+from relecov_tools.base_module import BaseModule
 
 
 log = logging.getLogger(__name__)
@@ -22,7 +23,7 @@ stderr = rich.console.Console(
 )
 
 
-class SchemaValidation:
+class SchemaValidation(BaseModule):
     def __init__(
         self,
         json_data_file=None,
@@ -32,6 +33,7 @@ class SchemaValidation:
         excel_sheet=None,
     ):
         """Validate json file against the schema"""
+        super().__init__(output_directory=out_folder, called_module=__name__)
         config_json = ConfigJson()
         log.info("Initiating validation process")
         if json_schema_file is None:
@@ -62,19 +64,28 @@ class SchemaValidation:
         self.json_data_file = json_data_file
         out_path = os.path.dirname(os.path.realpath(self.json_data_file))
         self.lab_code = out_path.split("/")[-2]
-        self.logsum = LogSum(
+        self.logsum = self.parent_log_summary(
             output_location=self.out_folder, unique_key=self.lab_code, path=out_path
         )
 
         stderr.print("[blue] Reading the json file")
         log.info("Reading the json file")
         self.json_data = relecov_tools.utils.read_json_file(json_data_file)
-        if isinstance(self.json_data, dict):
+        if not isinstance(self.json_data, list):
             stderr.print(f"[red]Invalid json file content in {json_data_file}.")
             stderr.print("Should be a list of dicts. Create it with read-lab-metadata")
             log.error(f"[red]Invalid json file content in {json_data_file}.")
             log.error("Should be a list of dicts. Create it with read-lab-metadata")
-            sys.exit(1)
+            raise TypeError(f"Invalid json file content in {json_data_file}")
+        try:
+            batch_id = self.json_data[0].get("batch_id")
+        except IndexError:
+            raise IndexError(f"Provided json file {json_data_file} is empty")
+        except AttributeError:
+            raise AttributeError(f"Invalid json file content in {json_data_file}")
+        if batch_id is not None:
+            self.set_batch_id(batch_id)
+
         self.metadata = metadata
         try:
             self.sample_id_field = self.get_sample_id_field()
@@ -310,5 +321,5 @@ class SchemaValidation:
             log_text = "All the samples were invalid. No valid file created"
             self.logsum.add_error(entry=log_text)
             stderr.print(f"[red]{log_text}")
-        self.logsum.create_error_summary(called_module="validate")
+        self.parent_create_error_summary(called_module="validate")
         return valid_json_data, invalid_json

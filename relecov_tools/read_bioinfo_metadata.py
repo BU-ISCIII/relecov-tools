@@ -13,6 +13,7 @@ import pandas as pd
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.log_summary import LogSum
+from relecov_tools.base_module import BaseModule
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -23,13 +24,14 @@ stderr = rich.console.Console(
 )
 
 
-class BioinfoReportLog:
+class BioinfoReportLog(BaseModule):
     def __init__(self, log_report=None, output_folder="/tmp/"):
+        super().__init__(output_directory=output_folder, called_module=__name__)
         if not log_report:
             self.report = {"error": {}, "valid": {}, "warning": {}}
         else:
             self.report = log_report
-        self.logsum = LogSum(output_location=output_folder)
+        self.logsum = self.parent_log_summary(output_location=output_folder)
 
     def update_log_report(self, method_name, status, message):
         """Update the progress log report with the given method name, status, and message.
@@ -73,7 +75,7 @@ class BioinfoReportLog:
 
 
 # TODO: Add method to validate bioinfo_config.json file requirements.
-class BioinfoMetadata:
+class BioinfoMetadata(BaseModule):
     def __init__(
         self,
         readlabmeta_json_file=None,
@@ -83,6 +85,7 @@ class BioinfoMetadata:
         update=False,
     ):
         log.info("Initiating read-bioinfo-metadata process")
+        super().__init__(output_directory=output_folder, called_module=__name__)
         # Init process log
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
@@ -967,7 +970,7 @@ class BioinfoMetadata:
         relecov_tools.utils.write_json_to_file(merged_metadata, batch_filepath)
         return merged_metadata
 
-    def save_merged_files(self, files_dict, batch_date, output_folder=None):
+    def save_merged_files(self, files_dict):
         """
         Process and save files that where split by cod and that have a function to be processed
 
@@ -1044,31 +1047,21 @@ class BioinfoMetadata:
         self.validate_software_mandatory_files(files_found_dict)
         # Split files found based on each batch of samples
         data_by_batch = self.split_data_by_batch(self.j_data)
-        batch_dates = []
         sufix = datetime.now().strftime("%Y%m%d%H%M%S")
-        # Get batch date for all the samples
-        for batch_dir, batch_dict in data_by_batch.items():
-            if batch_dir.split("/")[-1] not in batch_dates:
-                batch_dates.append(batch_dir.split("/")[-1])
-
-        if len(batch_dates) == 1:
-            batch_dates = str(batch_dates[0])
-        else:
-            stderr.print(
-                "[orange]More than one batch date in the same json data. Using current date as batch date."
-            )
-            log.info(
-                "More than one batch date in the same json data. Using current date as batch date."
-            )
-            batch_dates = datetime.now().strftime("%Y%m%d%H%M%S")
 
         # Add bioinfo metadata to j_data
         for batch_dir, batch_dict in data_by_batch.items():
-            lab_code = batch_dir.split("/")[-2]
-            batch_date = batch_dir.split("/")[-1]
+            batch_data = batch_dict["j_data"]
+            first_sample = batch_data[0]
+            lab_code = first_sample.get(
+                "submitting_institution_id", batch_dir.split("/")[-2]
+            )
+            batch_date = first_sample.get(
+                "batch_id", batch_dir.split("/")[-1]
+            )
+            self.set_batch_id(batch_date)
             self.log_report.logsum.feed_key(batch_dir)
             stderr.print(f"[blue]Processing data from {batch_dir}")
-            batch_data = batch_dict["j_data"]
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
             self.split_tables_by_batch(files_found_dict, sufix, batch_data, batch_dir)
             batch_data = self.add_bioinfo_results_metadata(
@@ -1084,7 +1077,8 @@ class BioinfoMetadata:
             stderr.print("[blue]Adding files path to read lab metadata")
             batch_data = self.add_bioinfo_files_path(files_found_dict, batch_data)
             tag = "bioinfo_lab_metadata_"
-            batch_filename = tag + lab_code + "_" + batch_date + ".json"
+            batch_filename = tag + lab_code + ".json"
+            batch_filename = self.tag_filename(batch_filename)
             batch_filepath = os.path.join(batch_dir, batch_filename)
             try:
                 qc_func = eval(
@@ -1121,11 +1115,26 @@ class BioinfoMetadata:
         out_path = os.path.join(self.output_folder, year)
         os.makedirs(out_path, exist_ok=True)
 
-        tag = "bioinfo_lab_metadata_"
         stderr.print("[blue]Saving previously splitted files to output directory")
+        batch_dates = []
+        # Get batch date for all the samples
+        for batch_dir, batch_dict in data_by_batch.items():
+            if batch_dir.split("/")[-1] not in batch_dates:
+                batch_dates.append(batch_dir.split("/")[-1])
 
-        self.save_merged_files(files_found_dict, batch_dates, out_path)
-        batch_filename = tag + batch_dates + ".json"
+        if len(batch_dates) == 1:
+            batch_date = str(batch_dates[0])
+        else:
+            stderr.print(
+                "[orange]More than one batch date in the same json data. Using current date as batch date."
+            )
+            log.info(
+                "More than one batch date in the same json data. Using current date as batch date."
+            )
+            batch_date = datetime.now().strftime("%Y%m%d%H%M%S")
+        self.set_batch_id(batch_date)
+        self.save_merged_files(files_found_dict, batch_date, out_path)
+        batch_filename = self.tag_filename("bioinfo_lab_metadata" + ".json")
         stderr.print("[blue]Writting output json file")
         file_path = os.path.join(out_path, batch_filename)
         if os.path.exists(file_path):
@@ -1140,7 +1149,7 @@ class BioinfoMetadata:
         else:
             relecov_tools.utils.write_json_to_file(self.j_data, file_path)
         stderr.print(f"[green]Sucessful creation of bioinfo analyis file: {file_path}")
-        self.log_report.logsum.create_error_summary(
+        self.parent_create_error_summary(
             called_module="read-bioinfo-metadata", logs=self.log_report.logsum.logs
         )
         return True

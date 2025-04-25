@@ -133,3 +133,6 @@ dmypy.json
 
 # CI testing stuff
 .github/*_event.json
+
+# Custom config file
+relecov_tools/conf/initial_config.yaml

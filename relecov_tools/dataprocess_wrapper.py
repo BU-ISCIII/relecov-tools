@@ -10,10 +10,11 @@ import rich.console
 from relecov_tools.download_manager import DownloadManager
 from relecov_tools.read_lab_metadata import RelecovMetadata
 from relecov_tools.json_validation import SchemaValidation
-import relecov_tools.log_summary
+from relecov_tools.base_module import BaseModule
 import relecov_tools.utils
 
-log = logging.getLogger(__name__)
+"""log = logging.getLogger(__name__)
+"""
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -22,31 +23,32 @@ stderr = rich.console.Console(
 )
 
 
-class ProcessWrapper:
+class ProcessWrapper(BaseModule):
     """
     Always fill all the arguments for the class in the config file, leave its value
     if you dont want to use that argument e.g.(target_folders:  ) -> (target_folders = None)
     """
 
     def __init__(self, config_file: str = None, output_folder: str = None):
+        super().__init__(output_directory=output_folder, called_module="wrapper")
         if not os.path.isdir(str(output_folder)):
-            sys.exit(FileNotFoundError(f"Output folder {output_folder} is not valid"))
+            raise FileNotFoundError(f"Output folder {output_folder} is not valid")
         else:
             self.output_folder = output_folder
         if not os.path.isfile(str(config_file)):
-            sys.exit(FileNotFoundError(f"Config file {config_file} is not a file"))
+            raise FileNotFoundError(f"Config file {config_file} is not a file")
         else:
             try:
                 self.config_data = relecov_tools.utils.read_yml_file(config_file)
                 # Config file should include a key
             except yaml.YAMLError as e:
-                sys.exit(yaml.YAMLError(f"Invalid config file: {e}"))
+                raise yaml.YAMLError(f"Invalid config file: {e}")
         output_regex = ("out_folder", "output_folder", "output_location")
         for key, val in self.config_data.items():
             for arg in output_regex:
                 if val == arg:
                     self.config_data[key] = self.output_folder
-        self.wrapper_logsum = relecov_tools.log_summary.LogSum(
+        self.wrapper_logsum = self.parent_log_summary(
             output_location=os.path.join(self.output_folder, "logs")
         )
         self.config_data["download"].update({"output_location": output_folder})
@@ -59,7 +61,6 @@ class ProcessWrapper:
         self.validate_params = self.clean_module_params(
             "SchemaValidation", self.config_data["validate"]
         )
-        self.date = datetime.today().strftime("%Y%m%d%H%M%S")
 
     def clean_module_params(self, module, params):
         active_module = eval(module)
@@ -67,14 +68,16 @@ class ProcessWrapper:
         module_args.remove("self")
         module_valid_params = {x: y for x, y in params.items() if x in module_args}
         if not module_valid_params:
-            log.error(f"Invalid params for {module} in config file")
+            self.log.error(f"Invalid params for {module} in config file")
             stderr.print(f"[red]Invalid params for {module} in config file")
-            sys.exit(1)
+            raise ValueError(f"Invalid params for {module}. Use: {module_args}")
         return module_valid_params
 
     def exec_download(self, download_params):
         if "sftp_port" in download_params:
             sftp_port = download_params.pop("sftp_port", None)
+        else:
+            sftp_port = None
         download_manager = DownloadManager(**download_params)
         if sftp_port is not None:
             download_manager.relecov_sftp.sftp_port = int(sftp_port)
@@ -143,7 +146,7 @@ class ProcessWrapper:
                         continue
                     loc_path = os.path.join(local_dir, file)
                     sftp_path = os.path.join(remote_dir, file)
-                    log.info("Uploading %s to remote %s" % (loc_path, remote_dir))
+                    self.log.info("Uploading %s to remote %s" % (loc_path, remote_dir))
                     uploaded = self.download_manager.relecov_sftp.upload_file(
                         loc_path, sftp_path
                     )
@@ -155,6 +158,7 @@ class ProcessWrapper:
             return uploaded_files
 
         local_folder = folder_logs.get("path")
+        self.log.info(f"Working in downloaded local folder {local_folder}")
         if not local_folder:
             raise ValueError(f"Couldnt find local path for {key} in log after download")
         files = [os.path.join(local_folder, file) for file in os.listdir(local_folder)]
@@ -190,22 +194,22 @@ class ProcessWrapper:
             key_name=key, logs_list=[{key: folder_logs}, read_meta_logs, validate_logs]
         )
         stderr.print(f"[green]Merged logs from all processes in {local_folder}")
-        log.info(f"Merged logs from all processes in {local_folder}")
+        self.log.info(f"Merged logs from all processes in {local_folder}")
         sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(key)
         sftp_dirs_paths = [os.path.join(key, d) for d in sftp_dirs]
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
         # As all folders are merged into one during download, there should only be 1 folder
         if not valid_dirs or len(valid_dirs) >= 2:
             # If all samples were valid during download and download_clean is used, the original folder might have been deleted
-            log.warning("Couldnt find %s folder in remote sftp. Creating new one", key)
-            remote_dir = os.path.join(key, self.date + "_invalid_samples")
+            self.log.warning("Couldnt find %s folder in remote sftp. Creating new one", key)
+            remote_dir = os.path.join(key, self.batch_id + "_invalid_samples")
             self.download_manager.relecov_sftp.make_dir(remote_dir)
         else:
             remote_dir = valid_dirs[0]
             stderr.print(
                 f"[blue]Cleaning successfully validated files from {remote_dir}"
             )
-            log.info(
+            self.log.info(
                 f"Cleaning successfully validated files from remote dir: {remote_dir}"
             )
             file_fields = ("sequence_file_R1_fastq", "sequence_file_R2_fastq")
@@ -226,7 +230,7 @@ class ProcessWrapper:
                 x for x in os.listdir(assets) if re.search("metadata_templat.*.xlsx", x)
             ][0]
             sftp_path = os.path.join(remote_dir, os.path.basename(metadata_template))
-            log.info("Uploading invalid files and template to %s", remote_dir)
+            self.log.info("Uploading invalid files and template to %s", remote_dir)
             stderr.print(f"[blue]Uploading invalid files and template to {remote_dir}")
             self.download_manager.relecov_sftp.upload_file(
                 os.path.join(assets, metadata_template), sftp_path
@@ -234,7 +238,7 @@ class ProcessWrapper:
             # Upload all the files that failed validation process back to sftp
             upload_files_from_json(invalid_json, remote_dir)
         else:
-            log.info("No invalid samples in %s", key)
+            self.log.info("No invalid samples in %s", key)
             stderr.print(f"[green]No invalid samples were found for {key} !!!")
         log_filepath = os.path.join(local_folder, str(key) + "_metadata_report.json")
         self.wrapper_logsum.create_error_summary(
@@ -247,16 +251,16 @@ class ProcessWrapper:
             f for f in os.listdir(local_folder) if re.search("metadata_report.xlsx", f)
         ]
         if xlsx_report_files:
-            log.info("Uploading %s xlsx report to remote %s" % (key, remote_dir))
+            self.log.info("Uploading %s xlsx report to remote %s" % (key, remote_dir))
             local_xlsx = os.path.join(local_folder, xlsx_report_files[0])
             remote_xlsx = os.path.join(remote_dir, xlsx_report_files[0])
             up = self.download_manager.relecov_sftp.upload_file(local_xlsx, remote_xlsx)
             if not up:
-                log.error(
+                self.log.error(
                     "Could not upload %s report to remote %s" % (key, local_folder)
                 )
         else:
-            log.error("Could not find xlsx report for %s in %s" % (key, local_folder))
+            self.log.error("Could not find xlsx report for %s in %s" % (key, local_folder))
         return merged_logs
 
     def run_wrapper(self):
@@ -265,36 +269,38 @@ class ProcessWrapper:
         and validation modules. The logs from each module are merged into a single log-summary.
         These merged logs are then used to create an excel report of all the processes
         """
-        log.info("Starting with wrapper")
+        self.log.info("Starting with wrapper")
         finished_folders, download_logs = self.exec_download(self.download_params)
+        self.set_batch_id(self.download_manager.batch_id)
         if not finished_folders:
             stderr.print("[red]No valid folders found to process")
-            log.error("No valid folders found to process")
-            sys.exit(1)
+            self.log.error("No valid folders found to process")
+            raise FileNotFoundError("No valid folders found to process")
         stderr.print(f"[blue]Processing {len(finished_folders)} downloaded folders...")
-        log.info(f"Processing {len(finished_folders)} downloaded folders.")
+        self.log.info(f"Processing {len(finished_folders)} downloaded folders.")
         counter = 0
         for key, folder_logs in download_logs.items():
             folder = folder_logs.get("path")
             if not folder:
-                log.error(f"Skipped folder {key}. Logs do not include path field")
+                self.log.error(f"Skipped folder {key}. Logs do not include path field")
                 continue
             if not folder_logs.get("valid"):
-                log.error(f"Folder {key} is set as invalid in logs. Skipped.")
+                self.log.error(f"Folder {key} is set as invalid in logs. Skipped.")
                 continue
             counter += 1
             logtxt = "Processing folder %s/%s: %s with local path %s"
-            log.info(logtxt % (counter, str(len(finished_folders)), key, folder))
+            self.log.info(logtxt % (counter, str(len(finished_folders)), key, folder))
             stderr.print(logtxt % (counter, str(len(finished_folders)), key, folder))
             try:
                 merged_logs = self.process_folder(finished_folders, key, folder_logs)
             except (FileNotFoundError, ValueError) as e:
-                log.error(f"Could not process folder {key}: {e}")
+                self.log.error(f"Could not process folder {key}: {e}")
                 folder_logs["errors"].append(f"Could not process folder {key}: {e}")
                 log_filepath = os.path.join(
-                    folder, self.date + "_" + str(key) + "_wrapper_summary.json"
+                    folder, self.batch_id + "_" + str(key) + "_wrapper_log_summary.json"
                 )
-                self.wrapper_logsum.create_error_summary(
+                log_filepath = self.add_hex_to_filename
+                self.parent_create_error_summary(
                     called_module="metadata",
                     filepath=log_filepath,
                     logs={key: folder_logs},
@@ -302,7 +308,7 @@ class ProcessWrapper:
                 )
                 continue
             self.wrapper_logsum.logs[key] = merged_logs[key]
-        self.wrapper_logsum.create_error_summary(
+        self.parent_create_error_summary(
             called_module="wrapper",
             to_excel=True,
         )

@@ -1,4 +1,7 @@
 {
+    "logs_config": {
+        "default_outpath": "/tmp/"
+    },
     "lab_metadata": {
         "fixed_fields": {
             "study_type": "Whole Genome Sequencing",
@@ -283,7 +286,7 @@
     "upload_database": {
         "platform":{
             "iskylims": {
-                "server_url": "http://relecov-iskylims.isciiides.es",
+                "server_url": "http://127.0.0.1:8001",
                 "api_url": "/wetlab/api/",
                 "store_samples": "create-sample",
                 "url_project_fields": "projects-fields",
@@ -293,7 +296,7 @@
                 "token": ""
             },
             "relecov": {
-            "server_url": "http://relecov-platform.isciiides.es",
+            "server_url": "http://0.0.0.0:8000/",
             "api_url": "/api/",
             "store_samples": "createSampleData",
             "bioinfodata": "createBioinfoData",
