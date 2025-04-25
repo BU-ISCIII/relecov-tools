@@ -9,6 +9,7 @@ from collections import Counter, defaultdict
 
 import rich.console
 import relecov_tools.utils
+from relecov_tools.base_module import BaseModule
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -19,7 +20,7 @@ stderr = rich.console.Console(
 )
 
 
-class PipelineManager:
+class PipelineManager(BaseModule):
     def __init__(
         self,
         input_folder=None,
@@ -29,6 +30,7 @@ class PipelineManager:
         folder_list=None,
     ):
         log.info("Initiating pipeline-manager process")
+        super().__init__(output_directory=output_folder, called_module=__name__)
         self.current_date = datetime.date.today().strftime("%Y%m%d")
         if input_folder is None:
             self.input_folder = relecov_tools.utils.prompt_path(

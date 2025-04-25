@@ -12,6 +12,7 @@ from datetime import datetime
 from collections import OrderedDict
 from relecov_tools.utils import rich_force_colors
 import relecov_tools.utils
+from relecov_tools.config_json import ConfigJson
 
 
 log = logging.getLogger(__name__)
@@ -23,18 +24,26 @@ stderr = Console(
 )
 
 
-class LogSum:
+class LogSum():
     def __init__(
         self,
         output_location: str = None,
         unique_key: str = None,
         path: str = None,
     ):
-        if not os.path.isdir(str(output_location)):
-            try:
-                os.makedirs(output_location, exist_ok=True)
-            except IOError:
-                raise IOError(f"Logs output folder {output_location} does not exist")
+        if output_location is not None:
+            if not os.path.isdir(str(output_location)):
+                try:
+                    os.makedirs(output_location, exist_ok=True)
+                except IOError:
+                    raise IOError(f"Logs output folder {output_location} doesnt exist")
+        else:
+            log.info("No output_location provided, selecting it from config...")
+            config_json = ConfigJson(extra_config=True)
+            logs_config = config_json.get_configuration("logs_config")
+            output_location = logs_config.get("default_outpath", "/tmp")
+
+        log.info(f"Log summary outpath set to {output_location}")
         self.output_location = output_location
         # if unique_key is given, all entries will be saved inside that key by default
         if unique_key:
@@ -275,15 +284,17 @@ class LogSum:
             logs = self.logs
         else:
             if not isinstance(logs, dict):
+                log.error(f"Logs input must be a dict. No output file generated.")
                 stderr.print("[red]Logs input must be a dict. No output file.")
                 return
         final_logs = self.prepare_final_logs(logs)
         if not called_module:
-            try:
-                called_module = [
-                    f.function for f in inspect.stack() if "__main__.py" in f.filename
-                ][0]
-            except IndexError:
+            traceback_functions = [
+                f.function for f in inspect.stack() if "__main__.py" in f.filename
+            ]
+            if traceback_functions:
+                called_module = traceback_functions[0]
+            else:
                 called_module = ""
         if not filepath:
             date = datetime.today().strftime("%Y%m%d%-H%M%S")
@@ -308,6 +319,19 @@ class LogSum:
                 stderr.print(f"[red]Error exporting logs to file: {e}")
                 log.error("Error exporting logs to file: %s", str(e))
                 f.write(str(final_logs))
+        return
+
+    def rename_log_key(self, old_key, new_key):
+        """Rename a key in the logs
+
+        Args:
+            old_key (str): Current key name
+            new_key (str): New key name
+        """
+        if old_key in self.base_logsum.logs.keys():
+            self.logs[new_key] = self.logs.pop(old_key)
+        else:
+            log.warning(f"Could not rename logsum key {old_key}: key not in logs")
         return
 
     @staticmethod
