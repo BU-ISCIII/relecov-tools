@@ -62,9 +62,9 @@ def prepare_remote_test(**kwargs):
     print("Uploading files to sftp...")
     for folder, files in folder_files_dict.items():
         if "datatest" in folder:
-            remote_dir = "COD-test-1"
+            remote_dir = "COD-test-1/RELECOV"
         elif "empty_test" in folder:
-            remote_dir = "COD-test-2"
+            remote_dir = "COD-test-2/RELECOV"
         else:
             continue
         base_folder = folder.split("/")[-1]
