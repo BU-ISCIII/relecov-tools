@@ -206,16 +206,16 @@ def download(
 ):
     """Download files located in sftp server."""
     debug = ctx.obj.get("debug", False)
-    download_manager = relecov_tools.download_manager.DownloadManager(
-        user,
-        password,
-        conf_file,
-        download_option,
-        output_location,
-        target_folders,
-        subfolder,
-    )
     try:
+        download_manager = relecov_tools.download_manager.DownloadManager(
+            user,
+            password,
+            conf_file,
+            download_option,
+            output_location,
+            target_folders,
+            subfolder,
+        )
         download_manager.execute_process()
     except Exception as e:
         if debug:
@@ -962,6 +962,54 @@ def upload_results(ctx, user, password, batch_id, template_path, project):
             raise
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
+
+
+@relecov_tools_cli.command(help_priority=1)
+@click.option(
+    "-n",
+    "--config_name",
+    default=None,
+    help="Name of the config key that will be added"
+)
+@click.option(
+    "-f",
+    "--config_file",
+    default=None,
+    help="Path to the input file: Json or Yaml format"
+)
+@click.option(
+    "--force",
+    is_flag=True,
+    default=False,
+    help="Force replacement of existing configuration if needed"
+)
+@click.option(
+    "--clear_config",
+    is_flag=True,
+    default=False,
+    help="Remove given config_name from extra config: Use with empty --config_name to remove all"
+)
+@click.pass_context
+def add_extra_config(ctx, config_name, config_file, force, clear_config):
+    """Save given file content as additional configuration"""
+    debug = ctx.obj.get("debug", False)
+    try:
+        config_json = relecov_tools.config_json.ConfigJson(extra_config=True)
+        if clear_config:
+            config_json.remove_extra_config(config_name)
+        else:
+            config_json.include_extra_config(
+                config_file,
+                config_name=config_name,
+                force=force
+            )
+    except Exception as e:
+        if debug:
+            log.error(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            sys.exit(f"EXCEPTION FOUND: {e}")
+
 
 
 if __name__ == "__main__":
