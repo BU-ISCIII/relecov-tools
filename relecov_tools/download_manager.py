@@ -1030,12 +1030,6 @@ class DownloadManager(BaseModule):
 
                         if list_files:
                             folders_to_process[full_path] = list_files
-                        else:
-                            deeper_subfolders = self.relecov_sftp.list_remote_folders(full_path, recursive=True)
-                            for sub_subfolder in deeper_subfolders:
-                                deeper_files = self.relecov_sftp.get_file_list(sub_subfolder)
-                                if deeper_files:
-                                    folders_to_process[os.path.normpath(sub_subfolder)] = deeper_files
                     except FileNotFoundError:
                         self.log.error(
                             f"Subfolder {self.subfolder} not found in {targeted_folder}"
