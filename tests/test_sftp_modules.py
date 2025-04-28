@@ -52,15 +52,25 @@ def prepare_remote_test(**kwargs):
         remote_folders = sorted(remote_folders, reverse=True)
         for folder in remote_folders:
             folder = folder.replace("./", "")
+            if folder == base_path:
+                continue
+
             filelist = download_manager.relecov_sftp.get_file_list(folder)
             for file in filelist:
                 print(f"Removing file {file}")
                 download_manager.relecov_sftp.remove_file(file)
-            try:
-                print(f"Removing folder {folder}")
-                download_manager.relecov_sftp.remove_dir(folder)
-            except Exception as e:
-                print(f"Could not remove folder {folder}: {e}")
+
+            if "tmp_processing" in folder or "invalid_samples" in folder:
+                try:
+                    print(f"Removing special folder {folder}")
+                    download_manager.relecov_sftp.remove_dir(folder)
+                except Exception as e:
+                    print(f"Could not remove folder {folder}: {e}")
+
+        filelist_base = download_manager.relecov_sftp.get_file_list(base_path)
+        for file in filelist_base:
+            print(f"Removing file {file} in {base_path}")
+            download_manager.relecov_sftp.remove_file(file)
 
     data_loc = "tests/data/sftp_handle"
     folder_files_dict = {folder: files for folder, _, files in os.walk(data_loc)}
