@@ -1075,19 +1075,20 @@ class BioinfoMetadata(BaseModule):
             batch_filename = tag + lab_code + ".json"
             batch_filename = self.tag_filename(batch_filename)
             batch_filepath = os.path.join(batch_dir, batch_filename)
-            try:
-                qc_func = eval(
-                    f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation"
-                )
-                qc_data = qc_func(batch_data)
-                for sample in batch_data:
-                    sample_id = sample.get("sequencing_sample_id")
-                    if sample_id in qc_data:
-                        sample.update(qc_data[sample_id])
-            except Exception as e:
-                self.log.warning(
-                    f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
-                )
+            if self.software_name == "viralrecon":
+                try:
+                    qc_func = eval(
+                        f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation"
+                    )
+                    qc_data = qc_func(batch_data)
+                    for sample in batch_data:
+                        sample_id = sample.get("sequencing_sample_id")
+                        if sample_id in qc_data:
+                            sample.update(qc_data[sample_id])
+                except Exception as e:
+                    log.warning(
+                        f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
+                    )
             if os.path.exists(batch_filepath):
                 stderr.print(
                     f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
