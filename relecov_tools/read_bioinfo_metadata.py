@@ -1085,9 +1085,14 @@ class BioinfoMetadata(BaseModule):
                         sample_id = sample.get("sequencing_sample_id")
                         if sample_id in qc_data:
                             sample.update(qc_data[sample_id])
-                except Exception as e:
-                    log.warning(
-                        f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
+                except (AttributeError, NameError, TypeError, ValueError) as e:
+                    self.log_report.update_log_report(
+                        self.create_bioinfo_file.__name__,
+                        "warning",
+                        f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}",
+                    )
+                    stderr.print(
+                        f"[orange]Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
                     )
             if os.path.exists(batch_filepath):
                 stderr.print(
