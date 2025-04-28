@@ -1324,7 +1324,7 @@ class DownloadManager(BaseModule):
             raise ConnectionError("Unable to establish sftp connection")
         target_folders = self.select_target_folders()
         if not any(self.subfolder in folder for folder in target_folders.keys()):
-            log.info(
+            self.log.info(
                 "No folders with subfolder '%s' found, merging subfolders first",
                 self.subfolder,
             )
