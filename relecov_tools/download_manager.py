@@ -266,7 +266,7 @@ class DownloadManager(BaseModule):
                 samples_to_delete.append(sample)
                 continue
             # TODO: Move these keys to configuration.json
-            values["r1_fastq_filepath"] = local_folder
+            values["sequence_file_path_R1_fastq"] = local_folder
             values["fastq_r1_md5"] = md5_dict.get(values["sequence_file_R1_fastq"])
             values["batch_id"] = self.batch_id
             if values.get("sequence_file_R2_fastq"):
@@ -286,7 +286,7 @@ class DownloadManager(BaseModule):
         Args:
             sample_file_dict (dict(str:dict(str:str))): dictionary with sample_name
             as keys and a dict for both R1 filename and/or R2 if paired-end reads
-            and fastq-file paths. e.g. {sample1:{r1_fastq_filepath:sample1.fastq.gz}}
+            and fastq-file paths. e.g. {sample1:{sequence_file_path_R1_fastq:sample1.fastq.gz}}
 
         Returns:
             clean_sample_dict: sample_dictionary without duplications in values
@@ -1323,6 +1323,12 @@ class DownloadManager(BaseModule):
             stderr.print("[red]Unable to establish sftp connection")
             raise ConnectionError("Unable to establish sftp connection")
         target_folders = self.select_target_folders()
+        if not any(self.subfolder in folder for folder in target_folders.keys()):
+            log.info("No folders with subfolder '%s' found, merging subfolders first", self.subfolder)
+            stderr.print(f"[yellow]No folders with subfolder '{self.subfolder}' found, merging subfolders first")
+            target_folders, processed_folders = self.merge_subfolders(target_folders)
+        else:
+            processed_folders = list(target_folders.keys())
         if self.download_option == "delete_only":
             self.log.info("Initiating delete_only process")
             processed_folders = list(target_folders.keys())
