@@ -35,7 +35,7 @@ def prepare_remote_test(**kwargs):
         download_option=kwargs["download_option"],
         output_location=kwargs["output_location"],
         target_folders=kwargs["target_folders"],
-        subfolder="RELECOV"
+        subfolder="RELECOV",
     )
 
     print("Opening connection to sftp")

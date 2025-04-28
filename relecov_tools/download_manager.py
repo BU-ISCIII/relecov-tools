@@ -1322,17 +1322,6 @@ class DownloadManager(BaseModule):
             stderr.print("[red]Unable to establish sftp connection")
             raise ConnectionError("Unable to establish sftp connection")
         target_folders = self.select_target_folders()
-        if not any(self.subfolder in folder for folder in target_folders.keys()):
-            self.log.info(
-                "No folders with subfolder '%s' found, merging subfolders first",
-                self.subfolder,
-            )
-            stderr.print(
-                f"[yellow]No folders with subfolder '{self.subfolder}' found, merging subfolders first"
-            )
-            target_folders, processed_folders = self.merge_subfolders(target_folders)
-        else:
-            processed_folders = list(target_folders.keys())
         if self.download_option == "delete_only":
             self.log.info("Initiating delete_only process")
             processed_folders = list(target_folders.keys())
