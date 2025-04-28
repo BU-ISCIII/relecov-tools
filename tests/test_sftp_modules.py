@@ -91,11 +91,6 @@ def prepare_remote_test(**kwargs):
             download_manager.relecov_sftp.upload_file(local_path, remote_path)
 
     download_manager.relecov_sftp.close_connection()
-    print("Reopenning connection to sftp")
-    download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
-    if not download_manager.relecov_sftp.open_connection():
-        print("Could not open connection to remote sftp")
-        sys.exit(1)
 
     def test_download(download_manager):
         download_manager.execute_process()
