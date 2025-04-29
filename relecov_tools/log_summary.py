@@ -226,9 +226,28 @@ class LogSum:
                 new_sheet = workbook.create_sheet(name)
                 new_sheet.append(header)
             regex = r"[\[\]]"  # Regex to remove lists brackets
+            
+            valid = logs.get("Valid", True)
+            errors = logs.get("Errors", [])
+            warnings = logs.get("Warnings", [])
+            
+            errors = reg_remover(errors, regex)
+            
+            warnings_list = warnings if isinstance(warnings, list) else [warnings]
+            truncated_warnings = []
+            max_warning_lenght = 150
+            
+            for warning in warnings_list:
+                warnings_str = str(warning)
+                if len(warnings_str) > max_warning_lenght:
+                    warnings_str = warnings_str[:max_warning_lenght] + "..."
+                truncated_warnings.append(warnings_str)
+            warnings_cleaned = "; ".join(truncated_warnings)
+            
             workbook["Global Report"].append(
-                [reg_remover(x, regex) for k, x in logs.items() if k != "samples"]
+                [str(valid), errors, warnings_cleaned]
             )
+            
             regex = r"\[.*?\]"  # Regex to remove ontology annotations between brackets
             for sample, slog in samples_logs.items():
                 clean_errors = [reg_remover(x, regex) for x in slog["errors"]]
