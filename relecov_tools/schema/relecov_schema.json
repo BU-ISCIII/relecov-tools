@@ -4104,7 +4104,7 @@
                 "75"
             ],
             "ontology": "NCIT:C153362",
-            "type": "string",
+            "type": "integer",
             "description": "The number of nucleotides successfully ordered from each side of a nucleic acid fragment obtained after the completion of a sequencing process.",
             "classification": "Sequencing",
             "label": "Read count",
