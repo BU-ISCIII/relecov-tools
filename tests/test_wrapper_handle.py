@@ -100,11 +100,9 @@ def prepare_remote_test(**kwargs):
             remote_dir = "COD-test-2/RELECOV"
         else:
             continue
-        base_folder = folder.split("/")[-1]
-        download_manager.relecov_sftp.make_dir(os.path.join(remote_dir, base_folder))
-        print(f"Uploading files from {base_folder}")
+        print(f"Uploading files from {folder}")
         for file in files:
-            remote_path = os.path.join(remote_dir, base_folder, file)
+            remote_path = os.path.join(remote_dir, file)
             local_path = os.path.join(os.path.abspath(folder), file)
             download_manager.relecov_sftp.upload_file(local_path, remote_path)
 
