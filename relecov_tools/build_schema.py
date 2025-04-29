@@ -1040,14 +1040,14 @@ class SchemaBuilder:
                     # )
 
                     # if "DATA_VALIDATION" in wb.sheetnames:
-                    ws_data_validation = wb["DATA_VALIDATION"]
+                    # ws_data_validation = wb["DATA_VALIDATION"]
                     # ws_data_validation.protection.sheet = True
                     # ws_data_validation.protection.password = self.configurables.get(
                     #     "protection.password", ""
                     # )
 
                     # if "VERSION" in wb.sheetnames:
-                    ws_data_validation = wb["VERSION"]
+                    # ws_data_validation = wb["VERSION"]
                     # ws_data_validation.protection.sheet = True
                     # ws_data_validation.protection.password = self.configurables.get(
                     #     "protection.password", ""
