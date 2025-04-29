@@ -92,37 +92,6 @@ def prepare_remote_test(**kwargs):
     download_manager.relecov_sftp.close_connection()
 
     def test_download(download_manager):
-        print("Waiting for files to be ready in SFTP...")
-        download_manager.relecov_sftp.open_connection()
-
-        print("Checking if folders have been merged already...")
-        remote_dirs = download_manager.relecov_sftp.list_remote_folders(
-            ".", recursive=True
-        )
-        tmp_processing_present = any(
-            "tmp_processing" in folder for folder in remote_dirs
-        )
-
-        if not tmp_processing_present:
-            print("Merging subfolders manually before starting download...")
-            folders_to_process = {}
-            for folder in remote_dirs:
-                folder = folder.replace("./", "")
-                try:
-                    files_in_folder = download_manager.relecov_sftp.get_file_list(
-                        folder
-                    )
-                    if files_in_folder:
-                        folders_to_process[folder] = files_in_folder
-                except Exception:
-                    continue
-
-            if not folders_to_process:
-                raise RuntimeError("No folders found to merge, cannot continue")
-
-            download_manager.merge_subfolders(folders_to_process)
-
-        print("Starting download process...")
         download_manager.execute_process()
 
     test_download(download_manager)
