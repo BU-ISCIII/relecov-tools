@@ -37,6 +37,7 @@ def generate_config_yaml(download_option, target_folders):
             "passwd": "",
             "download_option": download_option,
             "target_folders": target_folders,
+            "subfolder": "RELECOV",
         },
         "read-lab-metadata": {
             "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
@@ -64,6 +65,7 @@ def prepare_remote_test(**kwargs):
         download_option=kwargs["download_option"],
         output_location=kwargs["output_location"],
         target_folders=kwargs["target_folders"],
+        subfolder="RELECOV",
     )
     print("Openning connection to sftp")
     download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
