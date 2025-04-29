@@ -128,7 +128,7 @@ class ProcessWrapper(BaseModule):
         def upload_files_from_json(invalid_json, remote_dir):
             """Upload the files in a given json with samples metadata"""
             for sample in invalid_json:
-                local_dir = sample.get("r1_fastq_filepath")
+                local_dir = sample.get("sequence_file_path_R1_fastq")
                 # files_keys = [key for key in sample.keys() if "_file_" in key]
                 sample_files = (
                     sample.get("sequence_file_R1_fastq"),
