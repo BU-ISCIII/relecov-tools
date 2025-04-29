@@ -2646,6 +2646,10 @@
                 "xGen SC2 Midnight1200 Amplicon Panel",
                 "ViroKey SQ FLEX SARS-CoV-2 Primer Set",
                 "NEBNext VarSkip Short SARS-CoV-2 primers",
+                "Illumina Microbial Amplicon Prep-Influenza A/B",
+                "Illumina Respiratory Pathogen ID/AMR Enrichment Panel",
+                "Illumina Viral Surveillance Panel v2",
+                "Twist Bioscience Respiratory Virus Research Panel",
                 "Other [NCIT:C17649]"
             ],
             "examples": [
@@ -2691,6 +2695,7 @@
                 "xGen SC2 Midnight1200 Amplicon Panel",
                 "ViroKey SQ FLEX SARS-CoV-2 Primer Set",
                 "NEBNext VarSkip Short SARS-CoV-2 primers",
+                "Illumina Viral Surveillance Panel v2",
                 "Other [NCIT:C17649]"
             ],
             "examples": [
