@@ -72,6 +72,7 @@ Code contributions to the release:
 - Update-db now converts data to string prior to API request to avoid crashing [#455](https://github.com/BU-ISCIII/relecov-tools/pull/455)
 - Fixed recursive generation of build/lib/build/lib from pyproject.toml [#455](https://github.com/BU-ISCIII/relecov-tools/pull/455)
 - Update Quality Control Test in read-bioinfo-metadata to Be Project-Dependent [#467](https://github.com/BU-ISCIII/relecov-tools/pull/467)
+- Fixed datetime generation, avoiding the omission of number zero in case of hours of a single digit [#472](https://github.com/BU-ISCIII/relecov-tools/pull/472)
 
 #### Changed
 
