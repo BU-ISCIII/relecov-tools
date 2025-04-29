@@ -135,7 +135,7 @@ class DownloadManager(BaseModule):
             conf_file, sftp_user, sftp_passwd
         )
         self.finished_folders = {}
-        self.set_batch_id(datetime.today().strftime("%Y%m%d%-H%M%S"))
+        self.set_batch_id(datetime.today().strftime("%Y%m%d%H%M%S"))
 
     def create_local_folder(self, folder):
         """Create folder to download files in local path using date
