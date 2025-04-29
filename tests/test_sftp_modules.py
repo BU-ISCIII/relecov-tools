@@ -76,7 +76,6 @@ def prepare_remote_test(**kwargs):
     data_loc = "tests/data/sftp_handle"
     folder_files_dict = {folder: files for folder, _, files in os.walk(data_loc)}
     print("Uploading files to sftp...")
-    uploaded_folders = []
     for folder, files in folder_files_dict.items():
         if "datatest" in folder:
             remote_dir = "COD-test-1/RELECOV"
@@ -84,13 +83,9 @@ def prepare_remote_test(**kwargs):
             remote_dir = "COD-test-2/RELECOV"
         else:
             continue
-        base_folder = folder.split("/")[-1]
-        remote_folder_path = os.path.join(remote_dir, base_folder)
-        download_manager.relecov_sftp.make_dir(remote_folder_path)
-        uploaded_folders.append(remote_folder_path)
-        print(f"Uploading files from {base_folder}")
+        print(f"Uploading files from {folder}")
         for file in files:
-            remote_path = os.path.join(remote_folder_path, file)
+            remote_path = os.path.join(remote_dir, file)
             local_path = os.path.join(os.path.abspath(folder), file)
             download_manager.relecov_sftp.upload_file(local_path, remote_path)
 

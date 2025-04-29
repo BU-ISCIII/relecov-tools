@@ -1030,6 +1030,7 @@ class DownloadManager(BaseModule):
 
                         if list_files:
                             folders_to_process[full_path] = list_files
+
                     except FileNotFoundError:
                         self.log.error(
                             f"Subfolder {self.subfolder} not found in {targeted_folder}"
