@@ -140,6 +140,7 @@ def prepare_remote_test(**kwargs):
         "output_location": kwargs["output_location"],
         "target_folders": kwargs["target_folders"],
         "sftp_port": kwargs["sftp_port"],
+        "subfolder": "RELECOV",
     }
 
     def test_wrapper(wrapper_manager):
