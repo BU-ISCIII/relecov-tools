@@ -1034,24 +1034,24 @@ class SchemaBuilder:
                         for cell in row:
                             cell.alignment = openpyxl.styles.Alignment(wrap_text=True)
 
-                    ws_overview.protection.sheet = True
-                    ws_overview.protection.password = self.configurables.get(
-                        "protection.password", ""
-                    )
+                    # ws_overview.protection.sheet = True
+                    # ws_overview.protection.password = self.configurables.get(
+                    #     "protection.password", ""
+                    # )
 
-                if "DATA_VALIDATION" in wb.sheetnames:
+                    # if "DATA_VALIDATION" in wb.sheetnames:
                     ws_data_validation = wb["DATA_VALIDATION"]
-                    ws_data_validation.protection.sheet = True
-                    ws_data_validation.protection.password = self.configurables.get(
-                        "protection.password", ""
-                    )
+                    # ws_data_validation.protection.sheet = True
+                    # ws_data_validation.protection.password = self.configurables.get(
+                    #     "protection.password", ""
+                    # )
 
-                if "VERSION" in wb.sheetnames:
+                    # if "VERSION" in wb.sheetnames:
                     ws_data_validation = wb["VERSION"]
-                    ws_data_validation.protection.sheet = True
-                    ws_data_validation.protection.password = self.configurables.get(
-                        "protection.password", ""
-                    )
+                    # ws_data_validation.protection.sheet = True
+                    # ws_data_validation.protection.password = self.configurables.get(
+                    #     "protection.password", ""
+                    # )
 
                     ws_version = wb["VERSION"]
                     column_widths = []
@@ -1071,8 +1071,8 @@ class SchemaBuilder:
                         ].width = width
 
                 ws_dropdowns.sheet_state = "hidden"
-                ws_dropdowns.protection.sheet = True
-                ws_dropdowns.protection.password = "password123"
+                # ws_dropdowns.protection.sheet = True
+                # ws_dropdowns.protection.password = "password123"
 
                 wb.save(out_file)
             except Exception as e:
