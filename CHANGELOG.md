@@ -71,6 +71,7 @@ Code contributions to the release:
 - Fixed the upload_results module to handle exceptions properly [#441](https://github.com/BU-ISCIII/relecov-tools/pull/441)
 - Update-db now converts data to string prior to API request to avoid crashing [#455](https://github.com/BU-ISCIII/relecov-tools/pull/455)
 - Fixed recursive generation of build/lib/build/lib from pyproject.toml [#455](https://github.com/BU-ISCIII/relecov-tools/pull/455)
+- Update Quality Control Test in read-bioinfo-metadata to Be Project-Dependent [#467](https://github.com/BU-ISCIII/relecov-tools/pull/467)
 
 #### Changed
 
