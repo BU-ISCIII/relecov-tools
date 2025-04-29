@@ -171,7 +171,8 @@ class ProcessWrapper(BaseModule):
         )
         read_meta_logs = self.exec_read_metadata(self.readmeta_params)
         metadata_json = [
-            x for x in os.listdir(local_folder) if re.search("lab_metadata.*.json", x)
+            x for x in os.listdir(local_folder)
+            if re.search(r"lab_metadata.*\.json$", x) and not x.endswith("_log_summary.json")
         ]
         if not metadata_json:
             raise ValueError("No metadata json found after read-lab-metadata")
