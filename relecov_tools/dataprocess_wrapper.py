@@ -315,7 +315,7 @@ class ProcessWrapper(BaseModule):
             except (FileNotFoundError, ValueError) as e:
                 self.log.error(f"Could not process folder {key}: {e}")
                 folder_logs["errors"].append(f"Could not process folder {key}: {e}")
-                log_filepath = os.path.join(folder, self.tag_filename(f"wrapper_{key}", extension=".json"))
+                log_filepath = os.path.join(folder, self.tag_filename(f"wrapper_{key}.json"))
                 log_filepath = log_filepath.replace(".json", "_log_summary.json")
                 self.parent_create_error_summary(
                     called_module="metadata",
