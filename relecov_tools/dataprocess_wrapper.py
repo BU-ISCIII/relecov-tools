@@ -196,6 +196,20 @@ class ProcessWrapper(BaseModule):
         sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(key)
         sftp_dirs_paths = [os.path.join(key, d) for d in sftp_dirs]
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
+
+        if not valid_dirs:
+            subfolder = getattr(self.download_manager, "subfolder", None)
+            if subfolder:
+                key_subfolder = os.path.join(key, subfolder)
+                try:
+                    sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(key_subfolder)
+                    sftp_dirs_paths = [os.path.join(key_subfolder, d) for d in sftp_dirs]
+                    valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
+                except FileNotFoundError as e:
+                    warn_msg = f"Subfolder {key_subfolder} not found in remote SFTP: {e}"
+                    self.log.warning(warn_msg)
+                    stderr.print(f"[yellow]{warn_msg}")
+
         # As all folders are merged into one during download, there should only be 1 folder
         if not valid_dirs or len(valid_dirs) >= 2:
             # If all samples were valid during download and download_clean is used, the original folder might have been deleted
@@ -222,6 +236,9 @@ class ProcessWrapper(BaseModule):
             self.download_manager.delete_remote_files(remote_dir, files=valid_files)
             self.download_manager.delete_remote_files(remote_dir, skip_seqs=True)
             self.download_manager.clean_remote_folder(remote_dir)
+        subfolder = getattr(self.download_manager, "subfolder", None)
+        if subfolder and subfolder not in remote_dir:
+            remote_dir = os.path.join(key, subfolder)
         if invalid_json:
             logtxt = f"Found {len(invalid_json)} invalid samples in {key}"
             self.wrapper_logsum.add_warning(key=key, entry=logtxt)
@@ -298,10 +315,8 @@ class ProcessWrapper(BaseModule):
             except (FileNotFoundError, ValueError) as e:
                 self.log.error(f"Could not process folder {key}: {e}")
                 folder_logs["errors"].append(f"Could not process folder {key}: {e}")
-                log_filepath = os.path.join(
-                    folder, self.batch_id + "_" + str(key) + "_wrapper_log_summary.json"
-                )
-                log_filepath = self.add_hex_to_filename
+                log_filepath = os.path.join(folder, self.tag_filename(f"wrapper_{key}", extension=".json"))
+                log_filepath = log_filepath.replace(".json", "_log_summary.json")
                 self.parent_create_error_summary(
                     called_module="metadata",
                     filepath=log_filepath,
