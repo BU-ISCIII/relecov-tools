@@ -227,9 +227,9 @@ class LogSum:
                 new_sheet.append(header)
             regex = r"[\[\]]"  # Regex to remove lists brackets
 
-            valid = logs.get("Valid", True)
-            errors = logs.get("Errors", [])
-            warnings = logs.get("Warnings", [])
+            valid = logs.get("valid", True)
+            errors = logs.get("errors", [])
+            warnings = logs.get("warnings", [])
 
             errors = reg_remover(errors, regex)
 
