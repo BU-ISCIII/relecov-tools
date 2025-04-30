@@ -125,9 +125,6 @@ class SftpRelecov:
             return [folder_name]
 
         def recursive_list(folder_name):
-            invalid_folders = ["D-2435-", "D-2403-"]
-            if any(f in folder_name for f in invalid_folders):
-                return directory_list
             try:
                 attribute_list = self.sftp.listdir_attr(folder_name)
             except (FileNotFoundError, OSError) as e:
