@@ -125,6 +125,9 @@ class SftpRelecov:
             return [folder_name]
 
         def recursive_list(folder_name):
+            invalid_folders = ["D-2435-", "D-2403-"]
+            if any(f in folder_name for f in invalid_folders):
+                return directory_list
             try:
                 attribute_list = self.sftp.listdir_attr(folder_name)
             except (FileNotFoundError, OSError) as e:
@@ -140,11 +143,13 @@ class SftpRelecov:
             return directory_list
 
         if recursive:
+            log.debug("Listing recursive")
             directory_list = recursive_list(folder_name)
             if folder_name != ".":
                 directory_list.append(folder_name)
             return directory_list
         try:
+            log.debug("Listing content in folders...")
             directory_list = [
                 item.filename for item in content_list if stat.S_ISDIR(item.st_mode)
             ]
