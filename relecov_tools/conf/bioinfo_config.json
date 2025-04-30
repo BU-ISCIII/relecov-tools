@@ -153,7 +153,7 @@
             "if_assembly_other": "Not Provided [GENEPIO:0001668]",
             "if_bioinformatic_protocol_is_other_specify": "Not Provided [GENEPIO:0001668]",
             "if_consensus_other": "Not Provided [GENEPIO:0001668]",
-            "if_lineage_identification_other": "Not Provided [GENEPIO:0001668]",
+            "if_lineage_assignment_other": "Not Provided [GENEPIO:0001668]",
             "if_mapping_other": "Not Provided [GENEPIO:0001668]",
             "if_preprocessing_other": "Not Provided [GENEPIO:0001668]",
             "lineage_analysis_software_name": "pangolin",
