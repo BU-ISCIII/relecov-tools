@@ -16,6 +16,7 @@ Code contributions to the release:
 - [Victor Lopez](https://github.com/victor5lm)
 - [Jaime Ozáez](https://github.com/jaimeozaez)
 - [Juan Ledesma](https://github.com/juanledesma78)
+- [Sergio Olmos](https://github.com/OPSergio)
 
 ### Modules
 
@@ -60,6 +61,7 @@ Code contributions to the release:
 - Modified create_summary_tables.py to add new columns in epidemiological_data.xlsh (Pangolin software and database version and analysis date) [#454](https://github.com/BU-ISCIII/relecov-tools/pull/454)
 - Improve Warning Handling for .gz Files and variants_long_table.csv in read-bioinfo-metadata [#457](https://github.com/BU-ISCIII/relecov-tools/pull/457)
 - Add Tracking Summary of Samples per COD and Destination Folder in pipeline-manager [#463](https://github.com/BU-ISCIII/relecov-tools/pull/463)
+- Improves the formatting of the Global Report sheet in the summary Excel by truncating overly long warnings individually [#474](https://github.com/BU-ISCIII/relecov-tools/pull/474)
 
 #### Fixes
 
