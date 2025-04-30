@@ -150,7 +150,7 @@ class BaseModule:
                     self.log.removeHandler(handler)
                     handler.close()
 
-        new_handler = self.set_log_handler(
+        new_handler = BaseModule.set_log_handler(
             new_log_path, level=self.log.getEffectiveLevel()
         )
         self.log.addHandler(new_handler)
