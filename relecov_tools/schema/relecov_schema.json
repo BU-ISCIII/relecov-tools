@@ -5173,6 +5173,18 @@
             "fill_mode": "batch",
             "header": "N"
         },
+        "if_lineage_assignment_other": {
+            "examples": [
+                "Custom Pipeline"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Other software used to determine lineage.",
+            "classification": "Lineage fields",
+            "label": "Other Lineage Assignment Software",
+            "fill_mode": "batch",
+            "header": "N"
+        },
         "lineage_analysis_software_version": {
             "examples": [
                 "2.2.1"
