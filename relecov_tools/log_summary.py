@@ -228,23 +228,37 @@ class LogSum:
             regex = r"[\[\]]"  # Regex to remove lists brackets
 
             valid = logs.get("valid", True)
-            errors = logs.get("errors", [])
             warnings = logs.get("warnings", [])
-
-            errors = reg_remover(errors, regex)
 
             warnings_list = warnings if isinstance(warnings, list) else [warnings]
             truncated_warnings = []
-            max_warning_lenght = 150
+            max_lenght = 150
 
             for warning in warnings_list:
                 warnings_str = str(warning)
-                if len(warnings_str) > max_warning_lenght:
-                    warnings_str = warnings_str[:max_warning_lenght] + "..."
+                if len(warnings_str) > max_lenght:
+                    warnings_str = warnings_str[:max_lenght] + "..."
                 truncated_warnings.append(warnings_str)
             warnings_cleaned = "; ".join(truncated_warnings)
 
-            workbook["Global Report"].append([str(valid), errors, warnings_cleaned])
+            errors_list = logs.get("errors", [])
+            errors_list = (
+                errors_list if isinstance(errors_list, list) else [errors_list]
+            )
+
+            truncated_errors = []
+
+            for err in errors_list:
+                err_str = reg_remover(str(err), regex)
+                if len(err_str) > max_lenght:
+                    err_str = err_str[:max_lenght] + "..."
+                truncated_errors.append(err_str)
+
+            errors_cleaned = "; ".join(truncated_errors)
+
+            workbook["Global Report"].append(
+                [str(valid), errors_cleaned, warnings_cleaned]
+            )
 
             regex = r"\[.*?\]"  # Regex to remove ontology annotations between brackets
             for sample, slog in samples_logs.items():
