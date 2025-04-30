@@ -202,11 +202,19 @@ class ProcessWrapper(BaseModule):
             if subfolder:
                 key_subfolder = os.path.join(key, subfolder)
                 try:
-                    sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(key_subfolder)
-                    sftp_dirs_paths = [os.path.join(key_subfolder, d) for d in sftp_dirs]
-                    valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
+                    sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(
+                        key_subfolder
+                    )
+                    sftp_dirs_paths = [
+                        os.path.join(key_subfolder, d) for d in sftp_dirs
+                    ]
+                    valid_dirs = [
+                        d for d in sftp_dirs_paths if d in finished_folders.keys()
+                    ]
                 except FileNotFoundError as e:
-                    warn_msg = f"Subfolder {key_subfolder} not found in remote SFTP: {e}"
+                    warn_msg = (
+                        f"Subfolder {key_subfolder} not found in remote SFTP: {e}"
+                    )
                     self.log.warning(warn_msg)
                     stderr.print(f"[yellow]{warn_msg}")
 
@@ -315,7 +323,9 @@ class ProcessWrapper(BaseModule):
             except (FileNotFoundError, ValueError) as e:
                 self.log.error(f"Could not process folder {key}: {e}")
                 folder_logs["errors"].append(f"Could not process folder {key}: {e}")
-                log_filepath = os.path.join(folder, self.tag_filename(f"wrapper_{key}.json"))
+                log_filepath = os.path.join(
+                    folder, self.tag_filename(f"wrapper_{key}.json")
+                )
                 log_filepath = log_filepath.replace(".json", "_log_summary.json")
                 self.parent_create_error_summary(
                     called_module="metadata",
