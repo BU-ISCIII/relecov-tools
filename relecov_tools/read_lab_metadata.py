@@ -171,7 +171,7 @@ class RelecovMetadata(BaseModule):
             r1_md5 = md5_dict.get(r1_file)
             r2_md5 = md5_dict.get(r2_file)
             files_dict["sequence_file_R1_fastq"] = r1_file
-            files_dict["r1_fastq_filepath"] = dir_path
+            files_dict["sequence_file_path_R1_fastq"] = dir_path
             batch_id = dir_path.split("/")[-1]
             logtxt = f"Setting batch_id to {batch_id} based on download dir: {dir_path}"
             stderr.print(f"[yellow]{logtxt}")
@@ -183,14 +183,14 @@ class RelecovMetadata(BaseModule):
                 )
                 continue
             if r1_md5:
-                files_dict["fastq_r1_md5"] = r1_md5
+                files_dict["sequence_file_R1_md5"] = r1_md5
             else:
-                files_dict["fastq_r1_md5"] = safely_calculate_md5(
+                files_dict["sequence_file_R1_md5"] = safely_calculate_md5(
                     os.path.join(dir_path, r1_file)
                 )
             if r2_file:
                 files_dict["sequence_file_R2_fastq"] = r2_file
-                files_dict["r2_fastq_filepath"] = dir_path
+                files_dict["sequence_file_path_R2_fastq"] = dir_path
                 if not os.path.exists(os.path.join(dir_path, r2_file)):
                     self.logsum.add_error(
                         sample=sample_id,
@@ -198,9 +198,9 @@ class RelecovMetadata(BaseModule):
                     )
                     continue
                 if r2_md5:
-                    files_dict["fastq_r2_md5"] = r2_md5
+                    files_dict["sequence_file_R2_md5"] = r2_md5
                 else:
-                    files_dict["fastq_r2_md5"] = safely_calculate_md5(
+                    files_dict["sequence_file_R2_md5"] = safely_calculate_md5(
                         os.path.join(dir_path, r1_file)
                     )
             j_data[sample_id] = files_dict
@@ -457,7 +457,7 @@ class RelecovMetadata(BaseModule):
         batch_id = first_sample.get("batch_id")
         if not batch_id:
             # If created with download module, batch_id will be the name of the folder
-            batch_id = first_sample.get("r1_fastq_filepath", self.date).split("/")[-1]
+            batch_id = first_sample.get("sequence_file_path_R1_fastq", self.date).split("/")[-1]
         # This will declare self.batch_id in BaseModule() which will be used later
         self.set_batch_id(batch_id)
         metadata = self.process_from_json(metadata, s_json)
