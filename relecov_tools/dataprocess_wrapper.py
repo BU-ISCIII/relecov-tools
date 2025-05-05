@@ -102,7 +102,7 @@ class ProcessWrapper(BaseModule):
             logs=validate_proccess.logsum.logs
         )
         return valid_json_data, invalid_json, validate_logs
-    
+
     def clean_remote_folders(self, processed_folders):
         """
         Remove all remote folders used during the current batch process, excluding
@@ -134,12 +134,16 @@ class ProcessWrapper(BaseModule):
 
             for subfolder in subfolders:
                 full_path = os.path.join(parent_dir, subfolder)
-                if subfolder.endswith("_invalid_samples") or subfolder.endswith("_tmp_processing"):
+                if subfolder.endswith("_invalid_samples") or subfolder.endswith(
+                    "_tmp_processing"
+                ):
                     self.log.info(f"Preserving folder: {full_path}")
                     continue
 
                 try:
-                    self.download_manager.delete_remote_files(full_path, skip_seqs=False)
+                    self.download_manager.delete_remote_files(
+                        full_path, skip_seqs=False
+                    )
                     self.download_manager.clean_remote_folder(full_path)
                     self.log.info(f"Cleaned remote folder: {full_path}")
                 except Exception as e:
