@@ -13,6 +13,7 @@ class BaseModule:
     # These variables should only be activated via CLI using --hex-code
     _global_hex_code = None
     _cli_log_file = None
+    _cli_log_path_param = None
     # This indicates that there is already a process functioning,
     # therefore you should create new log handlers instead of redirecting
     _active_process = False
@@ -26,7 +27,10 @@ class BaseModule:
             output_directory (str, optional): Output folder to save called module logs. Defaults to None.
             called_module (str, optional): Name of the module being executed. Defaults to None.
         """
-        self.log = logging.getLogger(f"{__class__.__module__}.{called_module}")
+        if BaseModule._active_process:
+            self.log = logging.getLogger(f"{__class__.__module__}.{called_module}")
+        else:
+            self.log = logging.getLogger()
         self.log.propagate = True
         self.log.info(f"RELECOV-tools version {BaseModule._current_version}")
         self.log.info(f"CLI command executed: {BaseModule._cli_command}")
@@ -124,12 +128,12 @@ class BaseModule:
                 "log_file and new_log_path are the same, no redirection needed"
             )
             return
-        if BaseModule._cli_log_file:
+        if BaseModule._cli_log_path_param:
             self.log.warning(
                 "--log-path activated via CLI. Logs output folder wont change"
             )
             new_log_path = os.path.join(
-                os.path.dirname(BaseModule._cli_log_file),
+                os.path.dirname(BaseModule._cli_log_path_param),
                 os.path.basename(new_log_path),
             )
         try:
