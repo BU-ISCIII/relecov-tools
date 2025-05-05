@@ -254,7 +254,7 @@ class SchemaValidation(BaseModule):
         if seq_id_col:
             id_col = seq_id_col[0]
         row_to_del = []
-        row_iterator = ws_sheet.iter_rows(min_row=1, max_row=ws_sheet.max_row)
+        row_iterator = ws_sheet.iter_rows(min_row=2, max_row=ws_sheet.max_row)
         consec_empty_rows = 0
         for row in row_iterator:
             # if no data in 10 consecutive rows, break loop
