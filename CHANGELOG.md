@@ -80,6 +80,7 @@ Code contributions to the release:
 - Reverted temporal hotfix changes for invalid sftp folders [#486](https://github.com/BU-ISCIII/relecov-tools/pull/486)
 - Fix metadata upload in dataprocess_wrapper and update schema assets to v3.0.0 [#488](https://github.com/BU-ISCIII/relecov-tools/pull/488)
 - Fixed permissions error when redirecting logs between different machines [#489](https://github.com/BU-ISCIII/relecov-tools/pull/489)
+- Included correct handling of CLI --log-path arg fixing #490 [#497](https://github.com/BU-ISCIII/relecov-tools/pull/497)
 
 #### Changed
 
