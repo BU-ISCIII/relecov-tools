@@ -267,15 +267,13 @@ class DownloadManager(BaseModule):
                 samples_to_delete.append(sample)
                 continue
             # TODO: Move these keys to configuration.json
-            values["sequence_file_path_R1_fastq"] = local_folder
-            values["sequence_file_R1_md5"] = md5_dict.get(
-                values["sequence_file_R1_fastq"]
-            )
+            values["sequence_file_path_R1"] = local_folder
+            values["sequence_file_R1_md5"] = md5_dict.get(values["sequence_file_R1"])
             values["batch_id"] = self.batch_id
-            if values.get("sequence_file_R2_fastq"):
-                values["sequence_file_path_R2_fastq"] = local_folder
+            if values.get("sequence_file_R2"):
+                values["sequence_file_path_R2"] = local_folder
                 values["sequence_file_R2_md5"] = md5_dict.get(
-                    values["sequence_file_R2_fastq"]
+                    values["sequence_file_R2"]
                 )
         if samples_to_delete:
             data = {k: v for k, v in data.items() if k not in samples_to_delete}
@@ -291,7 +289,7 @@ class DownloadManager(BaseModule):
         Args:
             sample_file_dict (dict(str:dict(str:str))): dictionary with sample_name
             as keys and a dict for both R1 filename and/or R2 if paired-end reads
-            and fastq-file paths. e.g. {sample1:{sequence_file_path_R1_fastq:sample1.fastq.gz}}
+            and fastq-file paths. e.g. {sample1:{sequence_file_path_R1:sample1.fastq.gz}}
 
         Returns:
             clean_sample_dict: sample_dictionary without duplications in values
@@ -390,8 +388,8 @@ class DownloadManager(BaseModule):
 
         Returns:
             clean_sample_dict(dict(str:{str:str})): Nested dictionary for each sample
-            {sample1: {"sequence_file_R1_fastq": "sample1_R1.fastq.gz",
-                        "sequence_file_R2_fastq": "sample1_R2.fastq.gz"},
+            {sample1: {"sequence_file_R1": "sample1_R1.fastq.gz",
+                        "sequence_file_R2": "sample1_R2.fastq.gz"},
              sample2:{...} }
         """
         if not os.path.isfile(meta_f_path):
@@ -419,9 +417,9 @@ class DownloadManager(BaseModule):
                 if s_name in sample_file_dict:
                     if (
                         row[index_fastq_r1]
-                        == sample_file_dict[s_name]["sequence_file_R1_fastq"]
+                        == sample_file_dict[s_name]["sequence_file_R1"]
                         or row[index_fastq_r2]
-                        == sample_file_dict[s_name]["sequence_file_R2_fastq"]
+                        == sample_file_dict[s_name]["sequence_file_R2"]
                     ):
                         s_name = s_name + "_remove_" + str(counter)
                     else:
@@ -441,11 +439,11 @@ class DownloadManager(BaseModule):
                     if row[index_fastq_r1] is not None:
                         sample_file_dict[s_name] = {}
                         # TODO: move these keys to configuration.json
-                        sample_file_dict[s_name]["sequence_file_R1_fastq"] = row[
+                        sample_file_dict[s_name]["sequence_file_R1"] = row[
                             index_fastq_r1
                         ].strip()
                         if row[index_fastq_r2] is not None:
-                            sample_file_dict[s_name]["sequence_file_R2_fastq"] = row[
+                            sample_file_dict[s_name]["sequence_file_R2"] = row[
                                 index_fastq_r2
                             ].strip()
                     else:
@@ -1211,7 +1209,7 @@ class DownloadManager(BaseModule):
             for sample_id, files in list(valid_filedict.items()):
                 if any(
                     files.get(key) in corrupted
-                    for key in ["sequence_file_R1_fastq", "sequence_file_R2_fastq"]
+                    for key in ["sequence_file_R1", "sequence_file_R2"]
                 ):
                     to_remove.update(files.values())
 

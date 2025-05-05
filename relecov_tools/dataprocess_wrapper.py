@@ -175,11 +175,11 @@ class ProcessWrapper(BaseModule):
         def upload_files_from_json(invalid_json, remote_dir):
             """Upload the files in a given json with samples metadata"""
             for sample in invalid_json:
-                local_dir = sample.get("sequence_file_path_R1_fastq")
+                local_dir = sample.get("sequence_file_path_R1")
                 # files_keys = [key for key in sample.keys() if "_file_" in key]
                 sample_files = (
-                    sample.get("sequence_file_R1_fastq"),
-                    sample.get("sequence_file_R2_fastq"),
+                    sample.get("sequence_file_R1"),
+                    sample.get("sequence_file_R2"),
                 )
                 ftp_files = self.download_manager.relecov_sftp.get_file_list(remote_dir)
                 uploaded_files = []
@@ -281,7 +281,7 @@ class ProcessWrapper(BaseModule):
             self.log.info(
                 f"Cleaning successfully validated files from remote dir: {remote_dir}"
             )
-            file_fields = ("sequence_file_R1_fastq", "sequence_file_R2_fastq")
+            file_fields = ("sequence_file_R1", "sequence_file_R2")
             valid_sampfiles = [
                 f.get(key) for key in file_fields for f in valid_json_data
             ]
