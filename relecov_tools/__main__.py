@@ -11,7 +11,6 @@ import relecov_tools.config_json
 import relecov_tools.download_manager
 import relecov_tools.log_summary
 import rich.console
-import rich.logging
 import rich.traceback
 
 import relecov_tools.config_json
@@ -167,6 +166,8 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
         log_path = logs_config.get("modules_outpath", {}).get(called_module)
         if not log_path:
             log_path = os.path.join(default_outpath, called_module)
+    else:
+        relecov_tools.base_module.BaseModule._cli_log_path_param = log_path
     current_datetime = datetime.today().strftime("%Y%m%d%-H%M%S")
     log_filepath = os.path.join(
         log_path, "_".join([called_module, current_datetime]) + ".log"
