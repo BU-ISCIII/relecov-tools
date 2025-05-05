@@ -267,11 +267,15 @@ class DownloadManager(BaseModule):
                 continue
             # TODO: Move these keys to configuration.json
             values["sequence_file_path_R1_fastq"] = local_folder
-            values["sequence_file_R1_md5"] = md5_dict.get(values["sequence_file_R1_fastq"])
+            values["sequence_file_R1_md5"] = md5_dict.get(
+                values["sequence_file_R1_fastq"]
+            )
             values["batch_id"] = self.batch_id
             if values.get("sequence_file_R2_fastq"):
                 values["sequence_file_path_R2_fastq"] = local_folder
-                values["sequence_file_R2_md5"] = md5_dict.get(values["sequence_file_R2_fastq"])
+                values["sequence_file_R2_md5"] = md5_dict.get(
+                    values["sequence_file_R2_fastq"]
+                )
         if samples_to_delete:
             data = {k: v for k, v in data.items() if k not in samples_to_delete}
         with open(sample_data_path, "w", encoding="utf-8") as fh:
