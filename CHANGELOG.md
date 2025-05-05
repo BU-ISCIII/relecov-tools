@@ -78,6 +78,7 @@ Code contributions to the release:
 - Temporal hotfix for invalid folders in remote sftp [#482](https://github.com/BU-ISCIII/relecov-tools/pull/482)
 - Fix subfolder handling in wrapper module [#484](https://github.com/BU-ISCIII/relecov-tools/pull/484)
 - Reverted temporal hotfix changes for invalid sftp folders [#486](https://github.com/BU-ISCIII/relecov-tools/pull/486)
+- Fix metadata upload in dataprocess_wrapper and update schema assets to v3.0.0 [#488](https://github.com/BU-ISCIII/relecov-tools/pull/488)
 - Fixed permissions error when redirecting logs between different machines [#489](https://github.com/BU-ISCIII/relecov-tools/pull/489)
 
 #### Changed
