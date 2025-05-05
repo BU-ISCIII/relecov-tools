@@ -133,16 +133,13 @@ class BaseModule:
                 os.path.basename(new_log_path),
             )
         try:
-            os.rename(log_file, new_log_path)
-        except OSError:
-            self.log.debug(f"Could not rename {log_file}, trying to copy and delete...")
-            try:
-                shutil.copy(log_file, new_log_path)
-                os.remove(log_file)
-                self.log.debug("Successful copy and delete")
-            except OSError as e:
-                self.log.error(f"Could not redirect {log_file} to {new_log_path}: {e}")
-                return
+            # Only copy file content, not permissions nor metadata
+            shutil.copyfile(log_file, new_log_path)
+            os.remove(log_file)
+            self.log.debug(f"Successful copy and delete of old log-file {log_file}")
+        except OSError as e:
+            self.log.error(f"Could not redirect {log_file} to {new_log_path}: {e}")
+            return
         for handler in self.log.handlers:
             if isinstance(handler, logging.FileHandler):
                 if self.called_module in handler.baseFilename:
