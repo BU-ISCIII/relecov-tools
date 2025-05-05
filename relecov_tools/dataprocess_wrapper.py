@@ -297,21 +297,31 @@ class ProcessWrapper(BaseModule):
         if invalid_json:
             logtxt = f"Found {len(invalid_json)} invalid samples in {key}"
             self.wrapper_logsum.add_warning(key=key, entry=logtxt)
-            assets = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
-            metadata_template = [
-                x
-                for x in os.listdir(assets)
-                if re.search(r"Relecov_metadata_template.*\.xlsx$", x)
-            ][0]
             if "tmp_processing" in remote_dir:
                 renamed_dir = remote_dir.replace("tmp_processing", "invalid_samples")
                 remote_dir = renamed_dir
-            sftp_path = os.path.join(remote_dir, os.path.basename(metadata_template))
-            self.log.info("Uploading invalid files and template to %s", remote_dir)
-            stderr.print(f"[blue]Uploading invalid files and template to {remote_dir}")
-            self.download_manager.relecov_sftp.upload_file(
-                os.path.join(assets, metadata_template), sftp_path
-            )
+
+            invalid_metadata_file = [
+                x
+                for x in os.listdir(local_folder)
+                if re.match(r"invalid_lab_metadata_.*\.xlsx$", x)
+            ]
+            if invalid_metadata_file:
+                invalid_metadata_path = os.path.join(
+                    local_folder, invalid_metadata_file[0]
+                )
+                sftp_path = os.path.join(
+                    remote_dir, os.path.basename(invalid_metadata_path)
+                )
+                self.log.info("Uploading invalid files and metadata to %s", remote_dir)
+                stderr.print(
+                    f"[blue]Uploading invalid files and metadata to {remote_dir}"
+                )
+                self.download_manager.relecov_sftp.upload_file(
+                    invalid_metadata_path, sftp_path
+                )
+            else:
+                self.log.warning("No invalid_lab_metadata_*.xlsx file found to upload")
             # Upload all the files that failed validation process back to sftp
             upload_files_from_json(invalid_json, remote_dir)
         else:
