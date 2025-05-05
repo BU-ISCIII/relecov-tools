@@ -44,7 +44,7 @@ class ProcessWrapper(BaseModule):
                 if val == arg:
                     self.config_data[key] = self.output_folder
         self.wrapper_logsum = self.parent_log_summary(
-            output_location=os.path.join(self.output_folder, "logs")
+            output_location=os.path.join(self.output_folder)
         )
         self.config_data["download"].update({"output_location": output_folder})
         self.download_params = self.clean_module_params(
