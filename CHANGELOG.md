@@ -82,6 +82,7 @@ Code contributions to the release:
 - Fixed permissions error when redirecting logs between different machines [#489](https://github.com/BU-ISCIII/relecov-tools/pull/489)
 - Fix generation and upload of invalid_*.xlsx with headers [#494](https://github.com/BU-ISCIII/relecov-tools/pull/494)
 - Included correct handling of CLI --log-path arg fixing #490 [#497](https://github.com/BU-ISCIII/relecov-tools/pull/497)
+- Update relecov_schema.json and fastq properties in relecov-tools modules [#501](https://github.com/BU-ISCIII/relecov-tools/pull/501)
 
 #### Changed
 
