@@ -301,14 +301,22 @@ class ProcessWrapper(BaseModule):
                 renamed_dir = remote_dir.replace("tmp_processing", "invalid_samples")
                 remote_dir = renamed_dir
 
-            invalid_metadata_file = [
+            invalid_metadata_files = [
                 x
                 for x in os.listdir(local_folder)
-                if re.match(r"invalid_lab_metadata_.*\.xlsx$", x)
+                if re.search(r"invalid_lab_metadata.*\.xlsx", x)
             ]
-            if invalid_metadata_file:
+
+            if not invalid_metadata_files:
+                self.log.warning("No invalid_lab_metadata_*.xlsx file found to upload")
+            else:
+                if len(invalid_metadata_files) > 1:
+                    self.log.warning(
+                        "Multiple invalid_lab_metadata_*.xlsx files found: %s. Uploading the first one.",
+                        invalid_metadata_files,
+                    )
                 invalid_metadata_path = os.path.join(
-                    local_folder, invalid_metadata_file[0]
+                    local_folder, invalid_metadata_files[0]
                 )
                 sftp_path = os.path.join(
                     remote_dir, os.path.basename(invalid_metadata_path)
@@ -320,8 +328,6 @@ class ProcessWrapper(BaseModule):
                 self.download_manager.relecov_sftp.upload_file(
                     invalid_metadata_path, sftp_path
                 )
-            else:
-                self.log.warning("No invalid_lab_metadata_*.xlsx file found to upload")
             # Upload all the files that failed validation process back to sftp
             upload_files_from_json(invalid_json, remote_dir)
         else:
