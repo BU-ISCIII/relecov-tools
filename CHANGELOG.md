@@ -77,6 +77,7 @@ Code contributions to the release:
 - Fixed datetime generation, avoiding the omission of number zero in case of hours of a single digit [#472](https://github.com/BU-ISCIII/relecov-tools/pull/472)
 - Temporal hotfix for invalid folders in remote sftp [#482](https://github.com/BU-ISCIII/relecov-tools/pull/482)
 - Fix subfolder handling in wrapper module [#484](https://github.com/BU-ISCIII/relecov-tools/pull/484)
+- Reverted temporal hotfix changes for invalid sftp folders [#486](https://github.com/BU-ISCIII/relecov-tools/pull/486)
 
 #### Changed
 
