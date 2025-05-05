@@ -159,8 +159,8 @@ class RelecovMetadata(BaseModule):
         for sample in clean_metadata_rows:
             sample_id = str(sample.get("sequencing_sample_id"))
             files_dict = {}
-            r1_file = sample.get("sequence_file_R1_fastq")
-            r2_file = sample.get("sequence_file_R2_fastq")
+            r1_file = sample.get("sequence_file_R1")
+            r2_file = sample.get("sequence_file_R2")
             if not r1_file:
                 self.logsum.add_error(
                     sample=sample_id,
@@ -170,8 +170,8 @@ class RelecovMetadata(BaseModule):
                 continue
             r1_md5 = md5_dict.get(r1_file)
             r2_md5 = md5_dict.get(r2_file)
-            files_dict["sequence_file_R1_fastq"] = r1_file
-            files_dict["sequence_file_path_R1_fastq"] = dir_path
+            files_dict["sequence_file_R1"] = r1_file
+            files_dict["sequence_file_path_R1"] = dir_path
             batch_id = dir_path.split("/")[-1]
             logtxt = f"Setting batch_id to {batch_id} based on download dir: {dir_path}"
             stderr.print(f"[yellow]{logtxt}")
@@ -189,8 +189,8 @@ class RelecovMetadata(BaseModule):
                     os.path.join(dir_path, r1_file)
                 )
             if r2_file:
-                files_dict["sequence_file_R2_fastq"] = r2_file
-                files_dict["sequence_file_path_R2_fastq"] = dir_path
+                files_dict["sequence_file_R2"] = r2_file
+                files_dict["sequence_file_path_R2"] = dir_path
                 if not os.path.exists(os.path.join(dir_path, r2_file)):
                     self.logsum.add_error(
                         sample=sample_id,
@@ -381,7 +381,7 @@ class RelecovMetadata(BaseModule):
         return m_data
 
     def infer_file_format_from_schema(self, metadata):
-        """Infer the file_format field based on the extension in sequence_file_R1_fastq,
+        """Infer the file_format field based on the extension in sequence_file_R1,
         using enum values (with ontology) directly from the schema."""
 
         extension_map = {
@@ -407,7 +407,7 @@ class RelecovMetadata(BaseModule):
                 keyword_to_enum[keyword] = item
 
         for row in metadata:
-            r1_file = row.get("sequence_file_R1_fastq", "").lower()
+            r1_file = row.get("sequence_file_R1", "").lower()
             file_format_val = None
             for ext, keyword in extension_map.items():
                 if r1_file.endswith(ext.lower()):
@@ -457,9 +457,9 @@ class RelecovMetadata(BaseModule):
         batch_id = first_sample.get("batch_id")
         if not batch_id:
             # If created with download module, batch_id will be the name of the folder
-            batch_id = first_sample.get("sequence_file_path_R1_fastq", self.date).split(
-                "/"
-            )[-1]
+            batch_id = first_sample.get("sequence_file_path_R1", self.date).split("/")[
+                -1
+            ]
         # This will declare self.batch_id in BaseModule() which will be used later
         self.set_batch_id(batch_id)
         metadata = self.process_from_json(metadata, s_json)
