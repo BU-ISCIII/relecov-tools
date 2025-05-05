@@ -156,12 +156,12 @@
             "isolate_sample_id": "sequencing_sample_id"
         },
         "samples_json_fields": [
-            "fastq_r1_md5",
-            "fastq_r2_md5",
+            "sequence_file_R1_md5",
+            "sequence_file_R2_md5",
             "sequence_file_R1_fastq",
             "sequence_file_R2_fastq",
-            "r1_fastq_filepath",
-            "r2_fastq_filepath"
+            "sequence_file_path_R1_fastq",
+            "sequence_file_path_R2_fastq"
         ]
     },
     "long_table_heading": [
@@ -320,8 +320,8 @@
             "gisaid_accession_id",
             "gisaid_virus_name",
             "microbiology_lab_sample_id",
-            "r1_fastq_filepath",
-            "r2_fastq_filepath",
+            "sequence_file_path_R1_fastq",
+            "sequence_file_path_R2_fastq",
             "schema_name",
             "schema_version",
             "sequencing_date",
@@ -426,12 +426,12 @@
                 "library_selection",
                 "library_strategy"
             ],
-            "r1_fastq_filepath": [
-                "r1_fastq_filepath",
+            "sequence_file_path_R1_fastq": [
+                "sequence_file_path_R1_fastq",
                 "sequence_file_R1_fastq"
             ],
-            "r2_fastq_filepath": [
-                "r2_fastq_filepath",
+            "sequence_file_path_R2_fastq": [
+                "sequence_file_path_R2_fastq",
                 "sequence_file_R2_fastq"
             ],
             "experiment_alias": [
@@ -451,8 +451,8 @@
                 "sequence_file_R2_fastq"
             ],
             "file_checksum": [
-                "fastq_r1_md5",
-                "fastq_r2_md5"
+                "sequence_file_R1_md5",
+                "sequence_file_R2_md5"
             ]
         }
     },
