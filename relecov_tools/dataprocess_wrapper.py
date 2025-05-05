@@ -252,7 +252,9 @@ class ProcessWrapper(BaseModule):
             self.wrapper_logsum.add_warning(key=key, entry=logtxt)
             assets = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
             metadata_template = [
-                x for x in os.listdir(assets) if re.search(r"Relecov_metadata_template.*\.xlsx$", x)
+                x
+                for x in os.listdir(assets)
+                if re.search(r"Relecov_metadata_template.*\.xlsx$", x)
             ][0]
             if "tmp_processing" in remote_dir:
                 renamed_dir = remote_dir.replace("tmp_processing", "invalid_samples")
