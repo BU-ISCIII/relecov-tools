@@ -887,7 +887,7 @@
       "fill_mode": "batch",
       "minLenght": "1"
     },
-    "sequence_file_R1_fastq": {
+    "sequence_file_R1": {
       "examples": [
         "ABC123_S1_L001_R1_001.fastq.gz"
       ],
@@ -895,9 +895,9 @@
       "type": "string",
       "description": "The user-specified filename of the r1 FASTQ file.",
       "clasification": "Bioinformatics and QC metrics",
-      "label": "Sequence file R1 fastq"
+      "label": "Sequence file R1"
     },
-    "sequence_file_R2_fastq": {
+    "sequence_file_R2": {
       "examples": [
         "ABC123_S1_L001_R2_001.fastq.gz"
       ],
@@ -905,9 +905,9 @@
       "type": "string",
       "description": "The user-specified filename of the r2 FASTQ file.",
       "clasification": "Bioinformatics and QC metrics",
-      "label": "Sequence file R2 fastq"
+      "label": "Sequence file R2"
     },
-    "r1_fastq_filepath": {
+    "sequence_file_path_R1": {
       "examples": [
         "/User/Documents/RespLab/Data/"
       ],
@@ -917,7 +917,7 @@
       "clasification": "Bioinformatics and QC metrics",
       "label": "Filepath R1 fastq"
     },
-    "r2_fastq_filepath": {
+    "sequence_file_path_R2": {
       "examples": [
         "/User/Documents/RespLab/Data/"
       ],

@@ -3442,7 +3442,7 @@
             "examples": [
                 "Female"
             ],
-            "ontology": "SNOMED 263495000",
+            "ontology": "SNOMED:263495000",
             "type": "string",
             "description": "The gender of the host at the time of sample collection. Recomended",
             "classification": "Host information",
