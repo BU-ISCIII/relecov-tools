@@ -240,7 +240,7 @@ class SftpRelecov:
             log.error(error_txt)
             stderr.print(f"[red]{error_txt}")
             return False
-        
+
     @reconnect_if_fail(n_times=3, sleep_time=30)
     def copy_file(self, source_path, dest_path):
         """Copy a file within the SFTP by downloading and re-uploading.
