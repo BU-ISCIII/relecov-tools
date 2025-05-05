@@ -242,30 +242,6 @@ class SftpRelecov:
             return False
 
     @reconnect_if_fail(n_times=3, sleep_time=30)
-    def copy_file(self, source_path, dest_path):
-        """Copy a file within the SFTP by downloading and re-uploading.
-
-        Args:
-            source_path (str): path to the original file on the SFTP
-            dest_path (str): path to the copy on the SFTP
-
-        Returns:
-            bool: True if the copy was successful, False otherwise
-        """
-
-        try:
-            with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-                tmp_local = tmp_file.name
-            self.sftp.get(source_path, tmp_local)
-            self.sftp.put(tmp_local, dest_path)
-            os.remove(tmp_local)
-            return True
-        except Exception as e:
-            log.error(f"Failed to copy file from {source_path} to {dest_path}: {e}")
-            stderr.print(f"[red]Failed to copy file from {source_path} to {dest_path}")
-            return False
-
-    @reconnect_if_fail(n_times=3, sleep_time=30)
     def remove_file(self, file_name):
         """Remove a file from remote sftp
 
