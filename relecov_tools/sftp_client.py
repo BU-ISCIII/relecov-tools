@@ -5,7 +5,6 @@ import rich.console
 import stat
 import sys
 import time
-import tempfile
 from relecov_tools.config_json import ConfigJson
 import relecov_tools.utils
 
