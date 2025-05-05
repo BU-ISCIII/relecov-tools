@@ -707,7 +707,7 @@ class DownloadManager(BaseModule):
                 if file_dest in successful_files:
                     continue
                 try:
-                    self.relecov_sftp.copy_file(file, file_dest)
+                    self.relecov_sftp.rename_file(file, file_dest)
                     successful_files.append(file_dest)
                 except OSError as e:
                     self.log.error(f"Error moving file {file} to {file_dest}: {e}")
