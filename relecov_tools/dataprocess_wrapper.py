@@ -252,8 +252,11 @@ class ProcessWrapper(BaseModule):
             self.wrapper_logsum.add_warning(key=key, entry=logtxt)
             assets = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
             metadata_template = [
-                x for x in os.listdir(assets) if re.search("metadata_templat.*.xlsx", x)
+                x for x in os.listdir(assets) if re.search(r"Relecov_metadata_template.*\.xlsx$", x)
             ][0]
+            if "tmp_processing" in remote_dir:
+                renamed_dir = remote_dir.replace("tmp_processing", "invalid_samples")
+                remote_dir = renamed_dir
             sftp_path = os.path.join(remote_dir, os.path.basename(metadata_template))
             self.log.info("Uploading invalid files and template to %s", remote_dir)
             stderr.print(f"[blue]Uploading invalid files and template to {remote_dir}")
@@ -275,7 +278,7 @@ class ProcessWrapper(BaseModule):
         xlsx_report_files = [
             f for f in os.listdir(local_folder) if re.search("metadata_report.xlsx", f)
         ]
-        if xlsx_report_files:
+        if xlsx_report_files and invalid_json:
             self.log.info("Uploading %s xlsx report to remote %s" % (key, remote_dir))
             local_xlsx = os.path.join(local_folder, xlsx_report_files[0])
             remote_xlsx = os.path.join(remote_dir, xlsx_report_files[0])
@@ -284,7 +287,7 @@ class ProcessWrapper(BaseModule):
                 self.log.error(
                     "Could not upload %s report to remote %s" % (key, local_folder)
                 )
-        else:
+        elif not xlsx_report_files and invalid_json:
             self.log.error(
                 "Could not find xlsx report for %s in %s" % (key, local_folder)
             )
