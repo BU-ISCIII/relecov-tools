@@ -2,7 +2,6 @@
 import re
 import yaml
 import os
-import copy
 import inspect
 import rich.console
 from relecov_tools.download_manager import DownloadManager
