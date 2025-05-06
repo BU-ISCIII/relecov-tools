@@ -356,7 +356,12 @@ class RelecovMetadata(BaseModule):
             sample_id = str(m_data[idx].get("sequencing_sample_id"))
             if m_data[idx].get(map_field):
                 try:
-                    m_data[idx].update(json_data[m_data[idx][map_field]])
+                    adding_data = {
+                        k: v
+                        for k, v in json_data[m_data[idx][map_field]].items()
+                        if k in json_fields["adding_fields"]
+                    }
+                    m_data[idx].update(adding_data)
                 except KeyError as error:
                     clean_error = re.sub("[\[].*?[\]]", "", str(error.args[0]))
                     if str(clean_error).lower().strip() == "not provided":
