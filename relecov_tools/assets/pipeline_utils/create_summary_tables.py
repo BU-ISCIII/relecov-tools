@@ -31,6 +31,8 @@ def process_json_files(
     input_dir=None,
     metadata_list=None,
     long_table_list=None,
+    metadata_file=None,
+    long_table_file=None,
     output_dir="surveillance_files",
     specified_week=None,
     copy_fasta=False,
@@ -41,6 +43,8 @@ def process_json_files(
     if metadata_list:
         with open(metadata_list, "r", encoding="utf-8") as f:
             bioinfo_files = [line.strip() for line in f if line.strip()]
+    elif metadata_file:
+        bioinfo_files = [metadata_file]
     elif input_dir:
         bioinfo_files = [
             os.path.join(input_dir, filename)
@@ -53,6 +57,8 @@ def process_json_files(
     if long_table_list:
         with open(long_table_list, "r", encoding="utf-8") as f:
             long_table_files = [line.strip() for line in f if line.strip()]
+    elif long_table_file:
+        long_table_files = [long_table_file]
     elif input_dir:
         long_table_files = [
             os.path.join(input_dir, filename)
@@ -266,6 +272,16 @@ if __name__ == "__main__":
         help="File .txt with paths to those JSON files to be processed for generating the variant report in csv format (long_table_*.json)",
     )
     parser.add_argument(
+        "-m",
+        "--metadata-file",
+        help="Direct path to a single bioinfo_lab_metadata_*.json file to process and to add to the tables if they already exist",
+    )
+    parser.add_argument(
+        "-t",
+        "--long-table-file",
+        help="Direct path to a single long_table_*.json file to process and to add to the tables if they already exist",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         default="surveillance_files",
@@ -284,10 +300,19 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    # Validate that either input directory or file lists or individual files are provided
+    if not (args.input or args.metadata_list or args.metadata_file):
+        parser.error("Either --input, --metadata-list, or --metadata-file must be provided")
+    if not (args.input or args.long_table_list or args.long_table_file):
+        parser.error("Either --input, --long-table-list, or --long-table-file must be provided")
+    
     process_json_files(
         args.input,
         args.metadata_list,
         args.long_table_list,
+        args.metadata_file,
+        args.long_table_file,
         args.output,
         args.week,
         args.copy_fasta,
