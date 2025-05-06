@@ -1,0 +1,11 @@
+# THIS INITIAL CONFIG SHOULD BE SET AFTER INSTALLATION
+# MAKE A COPY OF THIS FILE IN YOUR HOME AND CONFIGURE IT TO YOUR NEEDS
+# THEN RUN: relecov-tools add-extra-config --config_file path/to/initial_config_copy.yaml
+logs_config:
+    default_outpath:
+        /tmp/
+    modules_outpath:
+        wrapper: /tmp/wrapper
+        download: /tmp/download
+        pipeline_manager: /tmp/pipeline_manager
+        read_bioinfo_metadata: /tmp/read_bioinfo_metadata

@@ -162,8 +162,8 @@ class MappingSchema:
             map_sample_dict = OrderedDict()
             for item, value in mapping_schema_dict.items():
                 try:
-                    data[value] = data[value].split(" [", 1)[0]
-
+                    if isinstance(data[value], str):
+                        data[value] = data[value].split(" [", 1)[0]
                     map_sample_dict[item] = data[value]
                 except KeyError as e:
                     log.info("Property %s not set in the source data", e)

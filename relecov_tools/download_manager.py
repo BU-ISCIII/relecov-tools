@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import copy
-import logging
 import json
-import sys
 import os
 import yaml
 import warnings
@@ -18,12 +16,11 @@ from openpyxl import load_workbook as openpyxl_load_workbook
 from pandas import read_excel, ExcelWriter, concat
 from pandas.errors import ParserError, EmptyDataError
 from relecov_tools.config_json import ConfigJson
-from relecov_tools.log_summary import LogSum
-
+from relecov_tools.base_module import BaseModule
 
 # from relecov_tools.rest_api import RestApi
 
-log = logging.getLogger(__name__)
+"""log = logging.getLogger(__name__)"""
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -37,7 +34,7 @@ class MetadataError(Exception):
         super().__init__(message)
 
 
-class DownloadManager:
+class DownloadManager(BaseModule):
     def __init__(
         self,
         user=None,
@@ -46,15 +43,19 @@ class DownloadManager:
         download_option=None,
         output_location=None,
         target_folders=None,
+        subfolder=None,
     ):
         """Initializes the sftp object"""
-        config_json = ConfigJson()
+        super().__init__(output_directory=output_location, called_module="download")
+        self.log.info("Initiating download process")
+        config_json = ConfigJson(extra_config=True)
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
         sftp_user = user
         sftp_passwd = passwd
         self.target_folders = target_folders
+        self.subfolder = subfolder
         self.allowed_download_options = config_json.get_topic_data(
             "sftp_handle", "allowed_download_options"
         )
@@ -78,11 +79,11 @@ class DownloadManager:
             )
         else:
             if not os.path.isfile(conf_file):
-                log.error("Configuration file %s does not exists", conf_file)
+                self.log.error("Configuration file %s does not exists", conf_file)
                 stderr.print(
                     "[red] Configuration file does not exist. " + conf_file + "!"
                 )
-                sys.exit(1)
+                raise FileNotFoundError(f"Config file {conf_file} does not exists")
             with open(conf_file, "r") as fh:
                 config = yaml.load(fh, Loader=yaml.FullLoader)
             try:
@@ -98,21 +99,23 @@ class DownloadManager:
                 sftp_user = config["sftp_user"]
                 sftp_passwd = config["sftp_passwd"]
             except KeyError as e:
-                log.error("Invalid configuration file %s", e)
-                stderr.print(f"[red] Invalid configuration file {e} !")
-                sys.exit(1)
+                self.log.error("Invalid configuration file. Missing %s", e)
+                stderr.print(f"[red] Invalid configuration file. Missing {e} !")
+                raise ValueError(f"Invalid configuration file. Missing {e}")
         if output_location is not None:
             if os.path.isdir(output_location):
                 self.platform_storage_folder = os.path.realpath(output_location)
             else:
-                log.error("Output location does not exist, aborting")
+                self.log.error("Output location does not exist, aborting")
                 stderr.print("[red] Output location does not exist, aborting")
-                sys.exit(1)
+                raise FileNotFoundError(f"Output dir does not exist {output_location}")
         if sftp_user is None:
             sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
             self.target_folders = self.target_folders.split(",")
-        self.logsum = LogSum(output_location=self.platform_storage_folder)
+        self.logsum = self.parent_log_summary(
+            output_location=self.platform_storage_folder
+        )
         if sftp_passwd is None:
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
         self.metadata_lab_heading = config_json.get_topic_data(
@@ -132,6 +135,8 @@ class DownloadManager:
             conf_file, sftp_user, sftp_passwd
         )
         self.finished_folders = {}
+        self.set_batch_id(datetime.today().strftime("%Y%m%d%H%M%S"))
+        self.defer_cleanup = False
 
     def create_local_folder(self, folder):
         """Create folder to download files in local path using date
@@ -142,15 +147,16 @@ class DownloadManager:
         Returns:
             local_folder_path(str): path to the new created folder
         """
-        log.info("Creating folder %s to download files", folder)
+        self.log.info("Creating folder %s to download files", folder)
         platform_storage_folder = self.platform_storage_folder
-        if platform_storage_folder == folder:
-            local_folder_path = platform_storage_folder
-        else:
-            folder = folder.strip("_tmp_processing")
-            local_folder_path = os.path.join(platform_storage_folder, folder)
+        path_parts = folder.split("/")
+        cod_folder = path_parts[0]
+        batch_folder = path_parts[-1].replace("_tmp_processing", "")
+        local_folder_path = os.path.join(
+            platform_storage_folder, cod_folder, batch_folder
+        )
         os.makedirs(local_folder_path, exist_ok=True)
-        log.info("created the folder to download files %s", local_folder_path)
+        self.log.info("Created the folder to download files %s", local_folder_path)
         return local_folder_path
 
     def get_remote_folder_files(self, folder, local_folder, file_list):
@@ -167,7 +173,7 @@ class DownloadManager:
         """
 
         fetched_files = list()
-        log.info("Trying to fetch files in remote server")
+        self.log.info("Trying to fetch files in remote server")
         stderr.print(f"Fetching {len(file_list)} files from {folder}")
         for file in file_list:
             file_to_fetch = os.path.join(folder, os.path.basename(file))
@@ -183,7 +189,9 @@ class DownloadManager:
                         fetched_files.append(os.path.basename(file))
                         break
                 else:
-                    log.warning("Couldn't fetch %s from %s after 3 tries", file, folder)
+                    self.log.warning(
+                        "Couldn't fetch %s from %s after 3 tries", file, folder
+                    )
         return fetched_files
 
     def find_remote_md5sum(self, folder, pattern="md5sum"):
@@ -208,7 +216,7 @@ class DownloadManager:
         required_retransmition = []
         successful_files = []
         # fetch the md5 file if exists
-        log.info("Searching for local md5 file")
+        self.log.info("Searching for local md5 file")
         stderr.print("[blue]Verifying file integrity in md5 hashes")
         avoid_chars = self.avoidable_characters
         hash_dict = relecov_tools.utils.read_md5_checksum(fetched_md5, avoid_chars)
@@ -224,10 +232,10 @@ class DownloadManager:
             f_path = os.path.join(local_folder, f_name)
             if hash_dict[f_name] == relecov_tools.utils.calculate_md5(f_path):
                 successful_files.append(f_name)
-                log.info("Successful file download for %s", f_name)
+                self.log.info("Successful file download for %s", f_name)
             else:
                 required_retransmition.append(f_name)
-                log.warning("%s requested file re-sending", f_name)
+                self.log.warning("%s requested file re-sending", f_name)
         return successful_files, required_retransmition
 
     def create_files_with_metadata_info(
@@ -243,13 +251,13 @@ class DownloadManager:
             metadata_file (str): Name of the downloaded metadata file to rename it
         """
         samples_to_delete = []
-        prefix_file_name = "_".join(local_folder.split("/")[-2:])
-        prefix_file_name = prefix_file_name.replace("_tmp_processing", "")
+        lab_code = local_folder.split("/")[-2]
         # TODO: Move these prefixes to configuration.json
-        new_metadata_file = "lab_metadata_" + prefix_file_name + ".xlsx"
-        sample_data_file = "samples_data_" + prefix_file_name + ".json"
+        file_tag = self.batch_id + "_" + self.hex
+        new_meta_file = "lab_metadata_" + lab_code + "_" + file_tag + ".xlsx"
+        sample_data_file = "samples_data_" + lab_code + "_" + file_tag + ".json"
         sample_data_path = os.path.join(local_folder, sample_data_file)
-        os.rename(metadata_file, os.path.join(local_folder, new_metadata_file))
+        os.rename(metadata_file, os.path.join(local_folder, new_meta_file))
         error_text = "Sample %s incomplete. Not added to final Json"
 
         data = copy.deepcopy(samples_dict)
@@ -259,17 +267,20 @@ class DownloadManager:
                 samples_to_delete.append(sample)
                 continue
             # TODO: Move these keys to configuration.json
-            values["r1_fastq_filepath"] = local_folder
-            values["fastq_r1_md5"] = md5_dict.get(values["sequence_file_R1_fastq"])
-            if values.get("sequence_file_R2_fastq"):
-                values["r2_fastq_filepath"] = local_folder
-                values["fastq_r2_md5"] = md5_dict.get(values["sequence_file_R2_fastq"])
+            values["sequence_file_path_R1"] = local_folder
+            values["sequence_file_R1_md5"] = md5_dict.get(values["sequence_file_R1"])
+            values["batch_id"] = self.batch_id
+            if values.get("sequence_file_R2"):
+                values["sequence_file_path_R2"] = local_folder
+                values["sequence_file_R2_md5"] = md5_dict.get(
+                    values["sequence_file_R2"]
+                )
         if samples_to_delete:
             data = {k: v for k, v in data.items() if k not in samples_to_delete}
         with open(sample_data_path, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
         # Feed accessible dict with necessary information for wrapper to work
-        log.info("Successfully created samples json file %s", sample_data_path)
+        self.log.info("Successfully created samples json file %s", sample_data_path)
         return
 
     def remove_duplicated_values(self, sample_file_dict):
@@ -278,7 +289,7 @@ class DownloadManager:
         Args:
             sample_file_dict (dict(str:dict(str:str))): dictionary with sample_name
             as keys and a dict for both R1 filename and/or R2 if paired-end reads
-            and fastq-file paths. e.g. {sample1:{r1_fastq_filepath:sample1.fastq.gz}}
+            and fastq-file paths. e.g. {sample1:{sequence_file_path_R1:sample1.fastq.gz}}
 
         Returns:
             clean_sample_dict: sample_dictionary without duplications in values
@@ -296,12 +307,22 @@ class DownloadManager:
             k: v for k, v in sample_file_dict.items() if k not in dup_samples_list
         }
         clean_sample_dict = {key: sample_file_dict[key] for key in non_duplicated_keys}
+        clean_duplicated_dict = {
+            k: [samp for samp in v if "_remove_" not in samp]
+            for k, v in inverted_dict.items()
+            if len(v) > 1
+        }
+        unique_dup_samples_list = list(
+            {samp for dups in clean_duplicated_dict.values() for samp in dups}
+        )
         if dup_samples_list:
             error_text = "Multiple samples in metadata pointing to the same file: %s"
-            self.include_warning(error_text % duplicated_dict)
-            stderr.print(f"[Orange]{error_text}")
-            stderr.print("[Orange]These samples won't be processed: ", dup_samples_list)
-            for fastq, samples in duplicated_dict.items():
+            self.include_warning(error_text % clean_duplicated_dict)
+            stderr.print(f"[yellow]{error_text % clean_duplicated_dict}")
+            stderr.print(
+                "[yellow]These samples won't be processed: ", unique_dup_samples_list
+            )
+            for fastq, samples in clean_duplicated_dict.items():
                 [self.include_error(str(error_text % fastq), samp) for samp in samples]
 
         return clean_sample_dict
@@ -333,8 +354,11 @@ class DownloadManager:
             error_text = "Header could not be found for excel file %s"
             raise MetadataError(str(error_text % os.path.basename(meta_f_path)))
         for cell in ws_metadata_lab[header_row]:
-            cell.value = cell.value.strip()
-        metadata_header = [x.value for x in ws_metadata_lab[header_row]]
+            if cell.value is not None:
+                cell.value = cell.value.strip()
+        metadata_header = [
+            x.value for x in ws_metadata_lab[header_row] if x.value is not None
+        ]
         meta_column_list = self.metadata_lab_heading
         if meta_column_list != metadata_header[1:]:
             diffs = [
@@ -342,7 +366,7 @@ class DownloadManager:
                 for x in set(metadata_header[1:] + meta_column_list)
                 if x not in meta_column_list or x not in metadata_header
             ]
-            log.error(
+            self.log.error(
                 "Config field metadata_lab_heading is different from .xlsx header"
             )
             stderr.print(
@@ -364,12 +388,12 @@ class DownloadManager:
 
         Returns:
             clean_sample_dict(dict(str:{str:str})): Nested dictionary for each sample
-            {sample1: {"sequence_file_R1_fastq": "sample1_R1.fastq.gz",
-                        "sequence_file_R2_fastq": "sample1_R2.fastq.gz"},
+            {sample1: {"sequence_file_R1": "sample1_R1.fastq.gz",
+                        "sequence_file_R2": "sample1_R2.fastq.gz"},
              sample2:{...} }
         """
         if not os.path.isfile(meta_f_path):
-            log.error("Metadata file does not exist on %s", local_folder)
+            self.log.error("Metadata file does not exist on %s", local_folder)
             stderr.print("[red] METADATA_LAB.xlsx do not exist in" + local_folder)
             return False
         sample_file_dict = {}
@@ -377,8 +401,8 @@ class DownloadManager:
         # TODO Include these columns in config
         index_sampleID = meta_header.index("Sample ID given for sequencing")
         index_layout = meta_header.index("Library Layout")
-        index_fastq_r1 = meta_header.index("Sequence file R1 fastq")
-        index_fastq_r2 = meta_header.index("Sequence file R2 fastq")
+        index_fastq_r1 = meta_header.index("Sequence file R1")
+        index_fastq_r2 = meta_header.index("Sequence file R2")
         counter = header_row
         for row in islice(metadata_ws.values, header_row, metadata_ws.max_row):
             counter += 1
@@ -387,30 +411,39 @@ class DownloadManager:
                 try:
                     s_name = str(row[index_sampleID]).strip()
                 except ValueError as e:
+                    self.log.error("Unable to convert to string. %s", e)
                     stderr.print("[red]Unable to convert to string. ", e)
                     continue
                 if s_name in sample_file_dict:
-                    log_text = "Found more samples with the same Sample ID given for sequencing. Only the first one remains."
-                    stderr.print(log_text)
-                    self.include_warning(log_text, sample=s_name)
-                    continue
+                    if (
+                        row[index_fastq_r1]
+                        == sample_file_dict[s_name]["sequence_file_R1"]
+                        or row[index_fastq_r2]
+                        == sample_file_dict[s_name]["sequence_file_R2"]
+                    ):
+                        s_name = s_name + "_remove_" + str(counter)
+                    else:
+                        log_text = "Found more samples with the same Sample ID given for sequencing. Only the first one remains."
+                        stderr.print(log_text)
+                        self.include_warning(log_text, sample=s_name)
+                        continue
                 if row[index_layout] == "Paired" and row[index_fastq_r2] is None:
                     error_text = "Sample %s is paired-end, but no R2 given"
                     self.include_error(error_text % str(row[index_sampleID]), s_name)
                     row_complete = False
                 if row[index_layout] == "Single" and row[index_fastq_r2] is not None:
-                    error_text = "Sample %s is single-end, but R1&R2 given"
+                    error_text = "Sample %s is single-end, but R1 and R2 were given"
                     self.include_error(error_text % str(row[index_sampleID]), s_name)
                     row_complete = False
                 if row_complete:
                     if row[index_fastq_r1] is not None:
                         sample_file_dict[s_name] = {}
                         # TODO: move these keys to configuration.json
-                        sample_file_dict[s_name]["sequence_file_R1_fastq"] = row[
+                        sample_file_dict[s_name]["sequence_file_R1"] = row[
                             index_fastq_r1
                         ].strip()
                         if row[index_fastq_r2] is not None:
-                            sample_file_dict[s_name]["sequence_file_R2_fastq"] = row[
+                            sample_file_dict[s_name]["sequence_file_R2"] = row[
                                 index_fastq_r2
                             ].strip()
                     else:
@@ -448,7 +481,7 @@ class DownloadManager:
                 self.relecov_sftp.get_from_sftp(target_meta_file, local_meta_file)
             except (IOError, PermissionError) as e:
                 raise type(e)(f"[red]Unable to fetch metadata file {e}")
-            log.info(
+            self.log.info(
                 "Obtained metadata file %s from %s",
                 local_meta_file,
                 remote_folder,
@@ -460,7 +493,9 @@ class DownloadManager:
         os.makedirs(self.platform_storage_folder, exist_ok=True)
         if len(meta_files) > 1:
             # Merging multiple excel files into a single one
-            log.warning(f"[yellow]Merging multiple metadata files in {remote_folder}")
+            self.log.warning(
+                f"[yellow]Merging multiple metadata files in {remote_folder}"
+            )
             metadata_ws = self.metadata_processing.get("excel_sheet")
             header_flag = self.metadata_processing.get("header_flag")
             local_meta_list = []
@@ -532,10 +567,10 @@ class DownloadManager:
             sum([list(fi.values()) for _, fi in sample_files_dict.items()], [])
         )
         if sorted(filtered_files_list) == sorted(metafiles_list):
-            log.info("Files in %s match with metadata file", remote_folder)
+            self.log.info("Files in %s match with metadata file", remote_folder)
         else:
             log_text = "Some files in %s do not match the ones described in metadata"
-            log.warning(log_text % remote_folder)
+            self.log.warning(log_text % remote_folder)
             stderr.print(f"[gold1]{log_text % remote_folder}")
             set_list = set(metafiles_list)
             mismatch_files = [fi for fi in filtered_files_list if fi not in set_list]
@@ -548,7 +583,7 @@ class DownloadManager:
                 error_text2 = "Files in metadata missing in folder: %s"
                 self.include_warning(error_text2 % str(mismatch_rev))
             # Try to check if the metadata filename lacks the proper extension
-            log.info("Trying to match files without proper file extension")
+            self.log.info("Trying to match files without proper file extension")
             sample_files_dict = self.process_filedict(
                 sample_files_dict, filtered_files_list
             )
@@ -556,41 +591,48 @@ class DownloadManager:
             raise FileNotFoundError(
                 "No files from metadata found in %s" % remote_folder
             )
+        self.log.info("Finished validating files based on metadata")
         stderr.print("[blue]Finished validating files based on metadata")
         return sample_files_dict, local_meta_file
 
     def delete_remote_files(self, remote_folder, files=None, skip_seqs=False):
-        """Delete files from remote folder
+        """Delete files from remote folder.
 
         Args:
-            remote_folder (str): path to folder in remote repository
-            files (list(str), optional): list of target filenames in remote repository
-            skip_seqs (bool, optional): Skip sequencing files based on extension
+            remote_folder (str): Path to folder in remote repository.
+            files (list(str), optional): List of target filenames in remote repository.
+            skip_seqs (bool, optional): Skip sequencing files based on extension.
         """
+        self.log.info(f"Deleting files in remote {remote_folder}.")
         stderr.print(f"[blue]Deleting files in remote {remote_folder}...")
+        all_files = self.relecov_sftp.get_file_list(remote_folder)
+        file_paths = {os.path.basename(f): f for f in all_files}
         if files is None:
-            files_to_remove = self.relecov_sftp.get_file_list(remote_folder)
+            files_to_remove = all_files
         else:
             files_to_remove = files
         for file in files_to_remove:
-            if skip_seqs is True:
-                if file.endswith(tuple(self.allowed_file_ext)):
-                    continue
-            try:
-                self.relecov_sftp.remove_file(
-                    os.path.join(remote_folder, os.path.basename(file))
-                )
-                log.info("%s Deleted from remote server", file)
-            except (IOError, PermissionError) as e:
-                log.error(f"Could not delete remote file {file}: {e}")
-                stderr.print(f"Could not delete remote file {file}. Error: {e}")
+            if skip_seqs and file.endswith(tuple(self.allowed_file_ext)):
+                continue
+            matched_path = file_paths.get(os.path.basename(file))
+            if matched_path:
+                try:
+                    self.relecov_sftp.remove_file(matched_path)
+                except (IOError, PermissionError) as e:
+                    self.log.error(f"Could not delete remote file {matched_path}: {e}")
+                    stderr.print(
+                        f"[red]Could not delete remote file {matched_path}. Error: {e}"
+                    )
+            else:
+                self.log.warning(f"File not found before deletion: {file}")
+                stderr.print(f"[red]File not found before deletion: {file}")
         return
 
     def rename_remote_folder(self, remote_folder):
         if "tmp_processing" in remote_folder:
             new_name = remote_folder.replace("tmp_processing", "invalid_samples")
             if new_name == remote_folder:
-                log.warning("Remote folder %s was already renamed", remote_folder)
+                self.log.warning("Remote folder %s was already renamed", remote_folder)
                 return
             try:
                 self.relecov_sftp.rename_file(remote_folder, new_name)
@@ -598,12 +640,14 @@ class DownloadManager:
                     self.finished_folders[new_name] = self.finished_folders.pop(
                         remote_folder
                     )
-                log.info("Successfully renamed %s to %s" % (remote_folder, new_name))
+                self.log.info(
+                    "Successfully renamed %s to %s" % (remote_folder, new_name)
+                )
             except (OSError, PermissionError) as e:
                 log_text = f"Could not rename remote {remote_folder}. Error: {e}"
-                log.error(log_text)
+                self.log.error(log_text)
         else:
-            log.warning(
+            self.log.warning(
                 "No `tmp_processing` pattern in %s, not renamed" % remote_folder
             )
         return
@@ -618,22 +662,22 @@ class DownloadManager:
         def remove_client_dir(remote_folder):
             # Never remove a folder in the top level
             if len(remote_folder.replace("./", "").split("/")) >= 2:
-                log.info("Trying to remove %s", remote_folder)
+                self.log.info("Trying to remove %s", remote_folder)
                 try:
                     self.relecov_sftp.remove_dir(remote_folder)
-                    log.info("Successfully removed %s", remote_folder)
+                    self.log.info("Successfully removed %s", remote_folder)
                 except (OSError, PermissionError) as e:
                     log_text = f"Could not delete remote {remote_folder}. Error: {e}"
-                    log.error(log_text)
+                    self.log.error(log_text)
                     stderr.print(log_text)
             else:
-                log.info("%s is a top-level folder. Not removed", remote_folder)
+                self.log.info("%s is a top-level folder. Not removed", remote_folder)
 
         remote_folder_files = self.relecov_sftp.get_file_list(remote_folder)
         if remote_folder_files:
             self.rename_remote_folder(remote_folder)
             log_text = f"Remote folder {remote_folder} not empty. Not removed"
-            log.warning(log_text)
+            self.log.warning(log_text)
         else:
             remove_client_dir(remote_folder)
         return
@@ -647,26 +691,25 @@ class DownloadManager:
         Returns:
             folders_with_metadata (dict(str:list)): Same dict updated with files successfully moved
         """
-        log.info("Moving remote files to each temporal processing folder")
+        self.log.info("Moving remote files to each temporal processing folder")
         stderr.print("[blue]Moving remote files to each temporal processing folder")
         for folder, files in folders_with_metadata.items():
             self.current_folder = folder.split("/")[0]
             successful_files = []
-            for file in files:
+            unique_files = list(set(files))
+            for file in unique_files:
                 if not file.endswith(tuple(self.allowed_file_ext)):
                     continue
+
                 file_dest = os.path.join(folder, os.path.basename(file))
+                if file_dest in successful_files:
+                    continue
                 try:
-                    # Paramiko.SSHClient.sftp_open does not have a method to copy files
                     self.relecov_sftp.rename_file(file, file_dest)
                     successful_files.append(file_dest)
-                except OSError:
-                    if file in folders_with_metadata[folder]:
-                        error_text = "File named %s already in %s. Skipped"
-                        self.include_warning(error_text % (file, self.current_folder))
-                    else:
-                        error_text = "Error while moving file %s"
-                        self.include_error(error_text % file)
+                except OSError as e:
+                    self.log.error(f"Error moving file {file} to {file_dest}: {e}")
+                    stderr.print(f"[red]Error moving file {file} to {file_dest}: {e}")
             folders_with_metadata[folder] = successful_files
         return folders_with_metadata
 
@@ -730,7 +773,7 @@ class DownloadManager:
 
         for folder, files in folders_with_metadata.items():
             self.current_folder = folder.split("/")[0]
-            log.info("Merging md5sum files from %s...", self.current_folder)
+            self.log.info("Merging md5sum files from %s...", self.current_folder)
             stderr.print(f"[blue]Merging md5sum files from {self.current_folder}...")
             md5flags = [".md5", "md5sum", "md5checksum"]
             md5sumlist = [fi for fi in files if any(flag in fi for flag in md5flags)]
@@ -770,9 +813,11 @@ class DownloadManager:
             if meta_sheet:
                 merged_df[meta_sheet] = concat(
                     [merged_df[meta_sheet], table[meta_sheet]], ignore_index=True
-                )
+                ).drop_duplicates()
             else:
-                merged_df = concat([merged_df, table], ignore_index=True)
+                merged_df = concat(
+                    [merged_df, table], ignore_index=True
+                ).drop_duplicates()
         return merged_df
 
     def excel_to_df(self, excel_file, metadata_sheet, header_flag):
@@ -820,7 +865,7 @@ class DownloadManager:
         metadata_ws = self.metadata_processing.get("excel_sheet")
         header_flag = self.metadata_processing.get("header_flag")
         output_location = self.platform_storage_folder
-        date_and_time = datetime.today().strftime("%Y%m%d%-H%M%S")
+        date_and_time = self.batch_id
         exts = self.allowed_file_ext
 
         def upload_merged_df(merged_excel_path, last_main_folder, merged_df):
@@ -861,11 +906,11 @@ class DownloadManager:
         folders_with_metadata = {}
         processed_folders = []
         merged_df = merged_excel_path = last_main_folder = excel_name = None
-        log.info("Setting %s remote folders...", str(len(target_folders.keys())))
+        self.log.info("Setting %s remote folders...", str(len(target_folders.keys())))
         stderr.print(f"[blue]Setting {len(target_folders.keys())} remote folders...")
         for folder in sorted(target_folders.keys()):
             if "invalid_samples" in folder:
-                log.warning("Skipped invalid_samples folder %s", folder)
+                self.log.warning("Skipped invalid_samples folder %s", folder)
                 continue
             self.current_folder = folder
             # Include the folder in the final process log summary
@@ -881,13 +926,14 @@ class DownloadManager:
             # Taking the main folder for each lab as reference for merge and logs
             main_folder = folder.split("/")[0]
             self.current_folder = main_folder
-            temporal_foldername = "_".join([date_and_time, "tmp_processing"])
-            temp_folder = os.path.join(main_folder, temporal_foldername)
+            tmp_folder_parent = os.path.join(main_folder, self.subfolder)
+            temporal_foldername = f"{date_and_time}_tmp_processing"
+            temp_folder = os.path.join(tmp_folder_parent, temporal_foldername)
             # Get every file except the excel ones as they are going to be merged
             filelist = [fi for fi in target_folders[folder] if not fi.endswith(".xlsx")]
             if not folders_with_metadata.get(temp_folder):
                 log_text = "Trying to merge metadata from %s in %s"
-                log.info(log_text % (main_folder, temp_folder))
+                self.log.info(log_text % (main_folder, temp_folder))
                 stderr.print(f"[blue]{log_text % (main_folder, temp_folder)}")
                 if merged_df:
                     # Write the previous merged metadata df before overriding it
@@ -934,12 +980,12 @@ class DownloadManager:
         # Move all the files from each subfolder into its tmp_processing folder
         clean_target_folders = self.move_processing_fastqs(merged_md5_folders)
         log_text = "Remote folders merged into %s folders. Proceed with processing"
-        log.info(log_text % len(clean_target_folders.keys()))
+        self.log.info(log_text % len(clean_target_folders.keys()))
         stderr.print(f"[green]{log_text % len(clean_target_folders.keys())}")
         return clean_target_folders, processed_folders
 
     def select_target_folders(self):
-        """Find the selected folders in remote if given, else select every folder
+        """Find the selected folders in remote if given, else select every folder.
 
         Returns:
             folders_to_process (dict(str:list)): Dictionary with folders and their files
@@ -947,12 +993,12 @@ class DownloadManager:
         root_directory_list = self.relecov_sftp.list_remote_folders(".", recursive=True)
         clean_root_list = [folder.replace("./", "") for folder in root_directory_list]
         if not root_directory_list:
-            log.error("Error while listing folders in remote. Aborting")
-            sys.exit(1)
+            self.log.error("Error while listing folders in remote. Aborting")
+            raise ConnectionError("Error while listing folders in remote")
         if self.target_folders is None:
             target_folders = clean_root_list
         elif self.target_folders[0] == "ALL":
-            log.info("Showing folders from remote SFTP for user selection")
+            self.log.info("Showing folders from remote SFTP for user selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
                 msg="Select the folders that will be targeted",
                 choices=sorted(clean_root_list),
@@ -960,31 +1006,44 @@ class DownloadManager:
         else:
             target_folders = [tf for tf in self.target_folders if tf in clean_root_list]
         if not target_folders:
-            log.error("No remote folders matching selection %s", self.target_folders)
+            self.log.error(
+                "No remote folders matching selection %s", self.target_folders
+            )
             stderr.print("Found no remote folders matching selection")
             stderr.print(f"List of remote folders: {str(clean_root_list)}")
-            sys.exit(1)
+            raise ValueError(
+                f"Found no remote folders matching selection {self.target_folders}"
+            )
         folders_to_process = {}
         for targeted_folder in target_folders:
             try:
-                full_folders = self.relecov_sftp.list_remote_folders(
+                subfolders = self.relecov_sftp.list_remote_folders(
                     targeted_folder, recursive=True
                 )
             except (FileNotFoundError, OSError) as e:
-                log.error(f"Error during sftp listing. {targeted_folder} skipped:", e)
+                self.log.error(
+                    f"Error during sftp listing. {targeted_folder} skipped:", e
+                )
                 continue
-            for folder in full_folders:
-                list_files = self.relecov_sftp.get_file_list(folder)
-                if list_files:
-                    folders_to_process[folder] = list_files
-                else:
-                    log.info("%s is empty", folder)
-                    continue
+            for folder in subfolders:
+                if folder.startswith(f"{targeted_folder}/{self.subfolder}"):
+                    full_path = os.path.normpath(folder)
+                    try:
+                        list_files = self.relecov_sftp.get_file_list(full_path)
+
+                        if list_files:
+                            folders_to_process[full_path] = list_files
+
+                    except FileNotFoundError:
+                        self.log.error(
+                            f"Subfolder {self.subfolder} not found in {targeted_folder}"
+                        )
+                        continue
         if len(folders_to_process) == 0:
-            log.info("Exiting process, folders were empty.")
-            log.error("There are no files in the selected folders.")
+            self.log.info("Exiting process, folders were empty.")
+            self.log.error("There are no files in the selected folders.")
             self.relecov_sftp.close_connection()
-            sys.exit(0)
+            raise FileNotFoundError(f"Target folders are empty: {target_folders}")
         return folders_to_process
 
     def compress_and_update(self, fetched_files, files_to_compress, local_folder):
@@ -1010,7 +1069,7 @@ class DownloadManager:
             try:
                 os.remove(f_path)
             except (FileNotFoundError, PermissionError) as e:
-                log.warning(f"Could not delete file: {e}")
+                self.log.warning(f"Could not delete file: {e}")
         fetched_files = [
             (fi + ".gz" if fi in compressed_files else fi) for fi in fetched_files
         ]
@@ -1049,7 +1108,6 @@ class DownloadManager:
                 if not corrupted:
                     error_text = "Sample %s skipped: missing files in sftp"
                     self.include_error(str(error_text % sample), sample=sample)
-                log.error(str(error_text % sample))
                 del processed_dict[sample]
         return processed_dict
 
@@ -1060,13 +1118,12 @@ class DownloadManager:
         Args:
             target_folders (dict): dictionary
         """
-        log.info("Initiating download process")
         main_folder = self.platform_storage_folder
         try:
             os.makedirs(main_folder, exist_ok=True)
         except OSError as e:
-            log.error("You do not have permissions to create folder %s", e)
-            sys.exit(1)
+            self.log.error("You do not have permissions to create folder %s", e)
+            raise
         folders_to_download = target_folders
         for folder in folders_to_download.keys():
             self.current_folder = folder.split("/")[0]
@@ -1077,7 +1134,7 @@ class DownloadManager:
                 pass
             # Check if the connection has been closed due to time limit
             self.relecov_sftp.open_connection()
-            log.info("Processing folder %s", folder)
+            self.log.info("Processing folder %s", folder)
             stderr.print("[blue]Processing folder " + folder)
             # Validate that the files are the ones described in metadata.
 
@@ -1087,7 +1144,7 @@ class DownloadManager:
                     folder, local_folder
                 )
             except (FileNotFoundError, IOError, PermissionError, MetadataError) as fail:
-                log.error(fail)
+                self.log.error("%s, skipped", fail)
                 stderr.print(f"[red]{fail}, skipped")
                 self.include_error(fail)
                 continue
@@ -1103,7 +1160,7 @@ class DownloadManager:
                 stderr.print(f"{error_text}")
                 self.include_error(error_text)
                 continue
-            log.info("Finished download for folder: %s", folder)
+            self.log.info("Finished download for folder: %s", folder)
             stderr.print(f"Finished download for folder {folder}")
             remote_md5sum = self.find_remote_md5sum(folder)
             if remote_md5sum:
@@ -1119,6 +1176,7 @@ class DownloadManager:
                 )
                 # try to download the files again to discard errors during download
                 if corrupted:
+                    self.log.info("Found md5 mismatches, downloading again.")
                     stderr.print("[gold1]Found md5 mismatches, downloading again...")
                     self.get_remote_folder_files(folder, local_folder, corrupted)
                     saved_files, corrupted = self.verify_md5_checksum(
@@ -1139,13 +1197,35 @@ class DownloadManager:
                 hash_dict = relecov_tools.utils.read_md5_checksum(
                     fetched_md5, self.avoidable_characters
                 )
-                log.info("Finished md5 check for folder: %s", folder)
+                self.log.info("Finished md5 check for folder: %s", folder)
                 stderr.print(f"[blue]Finished md5 verification for folder {folder}")
             else:
                 corrupted = []
                 error_text = "No single md5sum file could be found in %s" % folder
                 stderr.print(f"[red]{error_text}")
                 self.include_warning(error_text)
+
+            to_remove = set()
+            for sample_id, files in list(valid_filedict.items()):
+                if any(
+                    files.get(key) in corrupted
+                    for key in ["sequence_file_R1", "sequence_file_R2"]
+                ):
+                    to_remove.update(files.values())
+
+            # Delete corrupted files before proceeding
+            for file_name in to_remove:
+                path = os.path.join(local_folder, file_name)
+                try:
+                    os.remove(path)
+                    self.log.info(
+                        "File %s was removed because it was corrupted", file_name
+                    )
+                    corrupted.append(file_name)
+                except (FileNotFoundError, PermissionError, OSError) as e:
+                    error_text = "Could not remove corrupted file %s: %s"
+                    self.log.error(error_text % (path, e))
+                    stderr.print(f"[red]{error_text % (path, e)}")
 
             seqs_fetchlist = [
                 fi for fi in fetched_files if fi.endswith(tuple(self.allowed_file_ext))
@@ -1159,7 +1239,7 @@ class DownloadManager:
             ]
             if files_to_compress:
                 comp_files = str(len(files_to_compress))
-                log.info("Found %s uncompressed files, compressing...", comp_files)
+                self.log.info("Found %s uncompressed files, compressing...", comp_files)
                 stderr.print(f"Found {comp_files} uncompressed files, compressing...")
                 clean_fetchlist = self.compress_and_update(
                     seqs_fetchlist, files_to_compress, local_folder
@@ -1172,24 +1252,6 @@ class DownloadManager:
                 full_f_path = os.path.join(local_folder, file)
                 if not relecov_tools.utils.check_gzip_integrity(full_f_path):
                     corrupted.append(file)
-
-            for sample_id, files in list(valid_filedict.items()):
-                if any(
-                    files.get(key) in corrupted
-                    for key in ["sequence_file_R1_fastq", "sequence_file_R2_fastq"]
-                ):
-                    for file_name in files.values():
-                        path = os.path.join(local_folder, file_name)
-                        try:
-                            os.remove(path)
-                            log.info(
-                                "File %s was removed because it was corrupted",
-                                file_name,
-                            )
-                        except (FileNotFoundError, PermissionError, OSError) as e:
-                            error_text = "Could not remove corrupted file %s: %s"
-                            log.error(error_text % (path, e))
-                            stderr.print(f"[red]{error_text % (path, e)}")
 
             not_md5sum = []
             if remote_md5sum:
@@ -1204,10 +1266,12 @@ class DownloadManager:
                     else:
                         if not str(f_name).rstrip(".gz") in files_to_compress:
                             error_text = "File %s not found in md5sum. Creating hash"
-                            log.warning(error_text % f_name)
+                            self.log.warning(error_text % f_name)
                             not_md5sum.append(f_name)
                         else:
-                            log.info("File %s was compressed, creating md5hash", f_name)
+                            self.log.info(
+                                "File %s was compressed, creating md5hash", f_name
+                            )
                         files_md5_dict[f_name] = relecov_tools.utils.calculate_md5(path)
             else:
                 md5_hashes = [
@@ -1228,14 +1292,17 @@ class DownloadManager:
                 try:
                     folder_basename = os.path.basename(local_folder.rstrip("/"))
                     log_name = folder_basename + "_download_log_summary.json"
-                    self.logsum.create_error_summary(
+                    self.parent_create_error_summary(
                         filepath=os.path.join(local_folder, log_name),
                         logs={
                             self.current_folder: self.logsum.logs[self.current_folder]
                         },
                     )
                 except Exception as e:
-                    log.error("Could not create logsum for %s: %s" % (folder, str(e)))
+                    self.log.error(
+                        "Could not create logsum for %s: %s" % (folder, str(e))
+                    )
+            self.log.info(f"Finished processing {folder}")
             stderr.print(f"[green]Finished processing {folder}")
             self.finished_folders[folder] = list(files_md5_dict.keys())
         return
@@ -1255,18 +1322,38 @@ class DownloadManager:
     def execute_process(self):
         """Executes different processes depending on the download_option"""
         if not self.relecov_sftp.open_connection():
-            log.error("Unable to establish connection towards sftp server")
+            self.log.error("Unable to establish connection towards sftp server")
             stderr.print("[red]Unable to establish sftp connection")
-            sys.exit(1)
+            raise ConnectionError("Unable to establish sftp connection")
         target_folders = self.select_target_folders()
         if self.download_option == "delete_only":
-            log.info("Initiating delete_only process")
-            processed_folders = target_folders.keys()
+            self.log.info("Initiating delete_only process")
+            processed_folders = list(target_folders.keys())
+            all_folders = []
             for folder in processed_folders:
+                subfolders = self.relecov_sftp.list_remote_folders(
+                    folder, recursive=True
+                )
+                all_folders.extend(subfolders)
+            all_folders.extend(processed_folders)
+            project_folders = {
+                folder for folder in processed_folders if folder.count("/") == 1
+            }
+            all_folders = sorted(
+                set(all_folders) - project_folders,
+                key=lambda x: x.count("/"),
+                reverse=True,
+            )
+            for folder in all_folders:
                 self.current_folder = folder
                 self.delete_remote_files(folder)
                 self.clean_remote_folder(folder)
+                self.log.info(f"Delete process finished in {folder}")
                 stderr.print(f"Delete process finished in {folder}")
+            for project_folder in project_folders:
+                self.delete_remote_files(project_folder)
+                self.log.info(f"Cleaned project folder: {project_folder}")
+                stderr.print(f"Cleaned project folder: {project_folder}")
         else:
             target_folders, processed_folders = self.merge_subfolders(target_folders)
             self.download(target_folders)
@@ -1274,21 +1361,65 @@ class DownloadManager:
         self.relecov_sftp.close_connection()
         stderr.print(f"Processed {len(processed_folders)} folders: {processed_folders}")
         if self.logsum.logs:
-            log.info("Printing process summary to %s", self.platform_storage_folder)
-            self.logsum.create_error_summary(called_module="download")
+            self.log.info(
+                "Printing process summary to %s", self.platform_storage_folder
+            )
+            self.parent_create_error_summary(called_module="download")
         else:
-            log.info("Process log summary was empty. Not generated.")
+            self.log.info("Process log summary was empty. Not generated.")
+        processed_folders = list(
+            set(os.path.normpath(folder) for folder in processed_folders)
+        )
         # If download_option is "download_clean", remove
         # sftp folder content after download is finished
-        if self.download_option == "download_clean":
-            for folder in processed_folders:
-                self.delete_remote_files(folder, skip_seqs=True)
-                self.clean_remote_folder(folder)
+        if self.download_option == "download_clean" and not self.defer_cleanup:
+            normal_folders = {
+                folder
+                for folder in processed_folders
+                if "_tmp_processing" not in folder
+            }
+            for folder in normal_folders:
+                if self.relecov_sftp.get_file_list(folder):
+                    self.delete_remote_files(folder, skip_seqs=True)
+                    self.clean_remote_folder(folder)
             folders_to_clean = copy.deepcopy(self.finished_folders)
             for folder, downloaded_files in folders_to_clean.items():
-                self.delete_remote_files(folder, files=downloaded_files)
-                self.delete_remote_files(folder, skip_seqs=True)
-                self.clean_remote_folder(folder)
-                stderr.print(f"Delete process finished in remote {folder}")
+                if self.relecov_sftp.get_file_list(folder):
+                    self.delete_remote_files(folder, files=downloaded_files)
+                    self.clean_remote_folder(folder)
+                    self.log.info(f"Delete process finished in remote {folder}")
+
+            invalid_folders = [
+                key for key in target_folders if key not in folders_to_clean
+            ]
+            for folder in invalid_folders:
+                self.rename_remote_folder(folder)
+                self.log.info(f"Renamed tmp processing folder: {folder}")
+
+            cleaned_folders = []
+            for folder in processed_folders:
+                normalized_folder = os.path.normpath(folder)
+                if normalized_folder not in cleaned_folders:
+                    cleaned_folders.append(normalized_folder)
+
+            for folder in cleaned_folders:
+                if self.relecov_sftp.get_file_list(folder):
+                    all_subfolders = self.relecov_sftp.list_remote_folders(
+                        folder, recursive=True
+                    )
+                    all_subfolders.sort(key=lambda x: x.count("/"), reverse=True)
+
+                    for subfolder in all_subfolders:
+                        if not self.relecov_sftp.get_file_list(subfolder):
+                            self.clean_remote_folder(subfolder)
+                            self.log.info(
+                                f"Checked and removed empty subfolder: {subfolder}"
+                            )
+
+                    if not self.relecov_sftp.get_file_list(folder):
+                        self.clean_remote_folder(folder)
+                        self.log.info(f"Checked and removed empty folder: {folder}")
+
+        self.log.info("Finished download module execution")
         stderr.print("Finished execution")
         return

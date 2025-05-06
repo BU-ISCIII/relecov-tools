@@ -1,0 +1,66 @@
+{
+    "projects" : {
+        "relecov": {
+            "host_age_years": {
+                "header_row_idx": 5,
+                "max_rows": 1000,
+                "validation_type": "whole",
+                "operator": "between",
+                "formula1": "3",
+                "formula2": "110",
+                "error_message": "El valor debe estar entre 3 y 110 años. Si es inferior a 3 años, debe rellenar la siguiente columna: [Host Age Months].",
+                "error_title": "Valor no permitido"
+            },
+            "host_age_months": {
+                "header_row_idx": 5,
+                "max_rows": 1000,
+                "validation_type": "whole",
+                "operator": "between",
+                "formula1": "0",
+                "formula2": "35",
+                "error_message": "El valor debe estar entre 0 y 35 meses.",
+                "error_title": "Valor no permitido"
+            },
+            "sample_collection_date": {
+                "header_row_idx": 4,
+                "max_rows": 4,
+                "validation_type": "custom",
+                "formula1": "ISNUMBER(DATEVALUE(TEXT({col_letter}5, \"yyyy-mm-dd\")))",
+                "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
+                "error_title": "Formato de fecha incorrecto"
+            },
+            "sample_received_date": {
+                "header_row_idx": 4,
+                "max_rows": 4,
+                "validation_type": "custom",
+                "formula1": "ISNUMBER(DATEVALUE(TEXT({col_letter}5, \"yyyy-mm-dd\")))",
+                "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
+                "error_title": "Formato de fecha incorrecto"
+            },
+            "sequencing_date": {
+                "header_row_idx": 4,
+                "max_rows": 4,
+                "validation_type": "custom",
+                "formula1": "ISNUMBER(DATEVALUE(TEXT({col_letter}5, \"yyyy-mm-dd\")))",
+                "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
+                "error_title": "Formato de fecha incorrecto"
+            }
+        },
+        "mepram": {
+            "host_age_test": {
+                "header_row_idx": 5,
+                "max_rows": 1000,
+                "validation_type": "whole",
+                "operator": "between",
+                "formula1": "3",
+                "formula2": "110",
+                "error_message": "El valor debe estar entre 3 y 110 años.",
+                "error_title": "Valor no permitido"
+            }
+        }
+    },
+    "configurables" : {
+        "freeze_panel" : "E1",
+        "protection.password" : "password123"
+    }
+}

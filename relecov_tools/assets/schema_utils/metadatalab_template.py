@@ -5,6 +5,7 @@ import pandas as pd
 
 
 import relecov_tools.utils
+from openpyxl.worksheet.datavalidation import DataValidation
 
 
 log = logging.getLogger(__name__)
@@ -80,25 +81,49 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
         workbook = writer.book
         worksheet = writer.sheets[sheet]
 
-        # setup excel format
+        # Set up general column width
         worksheet.set_column(0, len(df.columns), 30)
+
+        # General header format
         header_formater = workbook.add_format(
             {
                 "bold": True,
                 "text_wrap": False,
                 "valign": "top",
-                "fg_color": "#ADD8E6",
+                "fg_color": "#B9DADE",  # Light blue
                 "border": 1,
                 "locked": True,
             }
         )
+
+        # Custom header format for METADATA_LAB (red text starting from column 2)
+        red_header_formater = workbook.add_format(
+            {
+                "bold": True,
+                "text_wrap": False,
+                "valign": "top",
+                "fg_color": "#B9DADE",  # Light blue background
+                "color": "#f60606",  # Red text color
+                "border": 1,
+                "locked": True,
+            }
+        )
+
+        # First column format
         first_col_formater = workbook.add_format(
             {
                 "bold": True,
                 "text_wrap": False,
                 "valign": "center",
-                "fg_color": "#ADD8E6",
+                "fg_color": "#B9DADE",  # Light blue
                 "border": 1,
+                "locked": True,
+            }
+        )
+
+        cell_formater = workbook.add_format(
+            {
+                "border": 1,  # Apply border to every cell
                 "locked": True,
             }
         )
@@ -107,7 +132,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
             # Write the column headers with the defined format.
             for col_num, value in enumerate(df.columns.values):
                 try:
-                    worksheet.write(0, col_num + 1, value, header_formater)
+                    worksheet.write(0, col_num, value, header_formater)
                 except Exception as e:
                     stderr.print(f"Error writing header at column {col_num + 1}: {e}")
 
@@ -120,14 +145,28 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                 except Exception as e:
                     stderr.print(f"Error writing first column at row {row_num}: {e}")
 
+            for row_num in range(1, len(df) + 1):
+                for col_num in range(1, len(df.columns)):
+                    try:
+                        worksheet.write(
+                            row_num,
+                            col_num,
+                            df.iloc[row_num - 1, col_num],
+                            cell_formater,
+                        )
+                    except Exception as e:
+                        stderr.print(
+                            f"Error writing cell at row {row_num}, column {col_num}: {e}"
+                        )
+
         if sheet == "METADATA_LAB" or sheet == "DATA_VALIDATION":
             # Write the column headers with the defined format.
             for col_num in range(0, len(df.columns)):
                 for row_num in range(0, len(df)):
-                    if row_num < 3:
+                    if row_num < 4:
                         try:
                             worksheet.write(
-                                row_num + 1,
+                                row_num,
                                 col_num + 1,
                                 df.iloc[row_num, col_num],
                                 header_formater,
@@ -136,12 +175,61 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                             stderr.print(
                                 f"Error writing first column at row {row_num}: {e}"
                             )
-
+                        if row_num == 0 and col_num >= 0 and sheet == "METADATA_LAB":
+                            try:
+                                worksheet.write(
+                                    row_num,
+                                    col_num + 1,
+                                    df.iloc[row_num, col_num],
+                                    red_header_formater,
+                                )
+                            except Exception as e:
+                                stderr.print(
+                                    f"Error writing first row at column {col_num}: {e}"
+                                )
             # Write the first column with the defined format.
             for index_num, index_val in enumerate(df.index):
                 try:
-                    worksheet.write(index_num + 1, 0, index_val, first_col_formater)
+                    worksheet.write(index_num, 0, index_val, first_col_formater)
                 except Exception as e:
                     stderr.print(f"Error writing first column at row {row_num}: {e}")
     except Exception as e:
         stderr.print(f"Error in excel_formater: {e}")
+
+
+def create_condition(ws_metadata, conditions, df_filtered):
+    """This function creates conditions on METADATA_LAB template sheet"""
+    label_to_property = dict(zip(df_filtered["label"], df_filtered["property_id"]))
+    column_map = {}
+
+    for cell in ws_metadata[4]:
+        property_id = label_to_property.get(cell.value)
+        if property_id in conditions:
+            column_map[property_id] = cell.column_letter
+
+    for property_id, rules in conditions.items():
+        col_letter = column_map.get(property_id)
+        if col_letter:
+            start_row = rules.get("header_row_idx", 5)
+            end_row = rules.get("max_rows", 1000)
+            validation_type = rules.get("validation_type")
+            formula1 = rules.get("formula1", "").replace("{col_letter}", col_letter)
+            formula2 = rules.get("formula2")
+            error_message = rules.get("error_message", "Valor no permitido")
+            error_title = rules.get("error_title", "Error")
+
+            cell_range = f"{col_letter}{start_row}:{col_letter}{end_row}"
+
+            if validation_type:
+                validation = DataValidation(
+                    type=validation_type,
+                    operator=rules.get("operator", "between"),
+                    formula1=formula1,
+                    formula2=formula2,
+                    showErrorMessage=True,
+                )
+                validation.error = error_message
+                validation.errorTitle = error_title
+                ws_metadata.add_data_validation(validation)
+                validation.add(cell_range)
+    return ws_metadata

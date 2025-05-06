@@ -140,11 +140,13 @@ class SftpRelecov:
             return directory_list
 
         if recursive:
+            log.debug("Listing recursive")
             directory_list = recursive_list(folder_name)
             if folder_name != ".":
                 directory_list.append(folder_name)
             return directory_list
         try:
+            log.debug("Listing content in folders...")
             directory_list = [
                 item.filename for item in content_list if stat.S_ISDIR(item.st_mode)
             ]
@@ -165,12 +167,17 @@ class SftpRelecov:
         """
         log.info("Listing files in %s", folder_name)
         file_list = []
-        content_list = self.sftp.listdir_attr(folder_name)
-        file_list = [
-            os.path.join(folder_name, content.filename)
-            for content in content_list
-            if stat.S_ISREG(content.st_mode)
-        ]
+        try:
+            content_list = self.sftp.listdir_attr(folder_name)
+            for content in content_list:
+                full_path = os.path.join(folder_name, content.filename)
+                if stat.S_ISDIR(content.st_mode):
+                    file_list.extend(self.get_file_list(full_path))
+                elif stat.S_ISREG(content.st_mode):
+                    file_list.append(full_path)
+        except FileNotFoundError as e:
+            log.error(f"Folder not found: {folder_name}")
+            raise e
         return file_list
 
     @reconnect_if_fail(n_times=3, sleep_time=30)
@@ -245,6 +252,7 @@ class SftpRelecov:
         """
         try:
             self.sftp.remove(file_name)
+            log.info("%s Deleted from remote server", file_name)
             return True
         except FileNotFoundError:
             log.error("File %s not found", file_name)

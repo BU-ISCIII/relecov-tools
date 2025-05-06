@@ -53,6 +53,10 @@ class UpdateDatabase:
             stderr.print(f"[red] json data file {json_file} does not exist")
             sys.exit(1)
         self.json_data = relecov_tools.utils.read_json_file(json_file)
+        for row in self.json_data:
+            for key, value in row.items():
+                if not isinstance(value, str):
+                    row[key] = str(value)
         self.json_file = json_file
         schema = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
@@ -114,10 +118,11 @@ class UpdateDatabase:
         for row in self.json_data:
             s_dict = {}
             for key, value in row.items():
-                found_ontology = re.search(r"(.+) \[\w+:.*", value)
-                if found_ontology:
-                    # remove the ontology data from item value
-                    value = found_ontology.group(1)
+                if isinstance(value, str):
+                    found_ontology = re.search(r"(.+) \[\w+:.*", value)
+                    if found_ontology:
+                        # remove the ontology data from item value
+                        value = found_ontology.group(1)
                 if key in s_project_fields:
                     s_dict[key] = value
                 if key in s_fields:
@@ -384,5 +389,5 @@ class UpdateDatabase:
         else:
             self.start_api(self.platform)
             self.store_data(self.type_of_info, self.platform)
-        self.logsum.create_error_summary(called_module="update-db")
+        self.parent_create_error_summary(called_module="update-db")
         return

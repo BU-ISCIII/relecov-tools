@@ -1,14 +1,29 @@
 {
+    "logs_config": {
+        "default_outpath": "/tmp/"
+    },
     "lab_metadata": {
         "fixed_fields": {
-            "host_disease": "COVID-19",
-            "tax_id": "2697049",
-            "organism": "Severe acute respiratory syndrome coronavirus 2",
             "study_type": "Whole Genome Sequencing",
             "collector_name": "Not Provided"
         },
+        "organism_mapping": {
+            "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]": {
+                "tax_id": "2697049",
+                "host_disease": "COVID-19 [SNOMED:840539006]"
+            },
+            "Respiratory syncytial virus [SNOMED:6415009]": {
+                "tax_id": "1281",
+                "host_disease": "Respiratory Syncytial Virus Infection [SNOMED:55735004]"
+            },
+            "Influenza virus [SNOMED:725894000]": {
+                "tax_id": "11320",
+                "host_disease": "Influenza Infection [SNOMED:408687004]"
+            }
+        },
         "metadata_lab_heading": [
-            "Public Health sample id (SIVIES)",
+            "Organism",
+            "Public Health sample id (SIVIRA)",
             "Sample ID given by originating laboratory",
             "Sample ID given by the submitting laboratory",
             "Sample ID given in the microbiology lab",
@@ -29,8 +44,15 @@
             "Environmental System",
             "Collection Device",
             "Host",
-            "Host Age",
+            "Host Age Years",
+            "Host Age Months",
             "Host Gender",
+            "Vaccinated",
+            "Specific medication for treatment or prophylaxis",
+            "Hospitalization",
+            "Admission to intensive care unit",
+            "Death",
+            "Immunosuppression",
             "Sequencing Date",
             "Nucleic acid extraction protocol",
             "Commercial All-in-one library kit",
@@ -53,8 +75,8 @@
             "Gene Name 2",
             "Diagnostic Pcr Ct Value-2",
             "Authors",
-            "Sequence file R1 fastq",
-            "Sequence file R2 fastq"
+            "Sequence file R1",
+            "Sequence file R2"
         ],
         "alt_heading_equivalences": {
             "Sample ID": "Sample ID given for sequencing",
@@ -99,15 +121,6 @@
                   "geo_loc_longitude"
                 ]
             },
-            "submitting_data": {
-                "file": "laboratory_address.json",
-                "map_field": "collecting_institution",
-                "adding_fields": [
-                    "submitting_institution",
-                    "submitting_institution_address",
-                    "submitting_institution_email"
-                ]
-            },
             "specimen_source_splitting": {
                 "file": "anatomical_material_collection_method.json",
                 "map_field": "specimen_source",
@@ -134,12 +147,12 @@
             "isolate_sample_id": "sequencing_sample_id"
         },
         "samples_json_fields": [
-            "fastq_r1_md5",
-            "fastq_r2_md5",
-            "sequence_file_R1_fastq",
-            "sequence_file_R2_fastq",
-            "r1_fastq_filepath",
-            "r2_fastq_filepath"
+            "sequence_file_R1_md5",
+            "sequence_file_R2_md5",
+            "sequence_file_R1",
+            "sequence_file_R2",
+            "sequence_file_path_R1",
+            "sequence_file_path_R2"
         ]
     },
     "long_table_heading": [
@@ -222,7 +235,7 @@
     },
     "sftp_handle": {
         "sftp_connection": {
-            "sftp_server": "sftprelecov.isciii.es",
+            "sftp_server": "sftpgenvigies.isciii.es",
             "sftp_port": "22"
         },
         "metadata_processing": {
@@ -234,6 +247,7 @@
             "alternative_sample_id_col": "Sample ID given for sequencing"
         },
         "abort_if_md5_mismatch": "False",
+        "analysis_results_folder": "ANALYSIS_RESULTS",
         "platform_storage_folder": "/tmp/relecov",
         "allowed_file_extensions": [
             ".fastq.gz",
@@ -263,7 +277,7 @@
     "upload_database": {
         "platform":{
             "iskylims": {
-                "server_url": "http://relecov-iskylims.isciiides.es",
+                "server_url": "relecov-iskylims.isciiides.es",
                 "api_url": "/wetlab/api/",
                 "store_samples": "create-sample",
                 "url_project_fields": "projects-fields",
@@ -273,7 +287,7 @@
                 "token": ""
             },
             "relecov": {
-            "server_url": "http://relecov-platform.isciiides.es",
+            "server_url": "relecov-platform.isciiides.es",
             "api_url": "/api/",
             "store_samples": "createSampleData",
             "bioinfodata": "createBioinfoData",
@@ -297,16 +311,17 @@
             "gisaid_accession_id",
             "gisaid_virus_name",
             "microbiology_lab_sample_id",
-            "r1_fastq_filepath",
-            "r2_fastq_filepath",
+            "sequence_file_path_R1",
+            "sequence_file_path_R2",
             "schema_name",
             "schema_version",
             "sequencing_date",
             "sequence_file_R1_md5",
             "sequence_file_R2_md5",
-            "sequence_file_R1_fastq",
-            "sequence_file_R2_fastq",
+            "sequence_file_R1",
+            "sequence_file_R2",
             "sequencing_sample_id",
+            "submitting_institution",
             "submitting_lab_sample_id"
         ]
     },
@@ -402,13 +417,13 @@
                 "library_selection",
                 "library_strategy"
             ],
-            "r1_fastq_filepath": [
-                "r1_fastq_filepath",
-                "sequence_file_R1_fastq"
+            "sequence_file_path_R1": [
+                "sequence_file_path_R1",
+                "sequence_file_R1"
             ],
-            "r2_fastq_filepath": [
-                "r2_fastq_filepath",
-                "sequence_file_R2_fastq"
+            "sequence_file_path_R2": [
+                "sequence_file_path_R2",
+                "sequence_file_R2"
             ],
             "experiment_alias": [
                 "isolate_sample_id",
@@ -423,12 +438,12 @@
                 "isolate_sample_id"
             ],
             "file_name": [
-                "sequence_file_R1_fastq",
-                "sequence_file_R2_fastq"
+                "sequence_file_R1",
+                "sequence_file_R2"
             ],
             "file_checksum": [
-                "fastq_r1_md5",
-                "fastq_r2_md5"
+                "sequence_file_R1_md5",
+                "sequence_file_R2_md5"
             ]
         }
     },
@@ -439,12 +454,33 @@
         "analysis_folder": "ANALYSIS",
         "sample_stored_folder": "RAW",
         "sample_link_folder": "00-reads",
-        "group_by_fields": [
-            "organism",
-            "sequencing_instrument_platform",
-            "enrichment_panel",
-            "enrichment_panel_version"
-        ]
+        "organism_config": {
+            "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]": {
+                "pipeline_template": "viralrecon",
+                "service_tag": "SARSCOV2",
+                "group_by_fields": [
+                    "sequencing_instrument_platform",
+                    "enrichment_panel",
+                    "enrichment_panel_version"
+                ]
+            },
+            "Respiratory syncytial virus [SNOMED:6415009]": {
+                "pipeline_template": "IRMA",
+                "service_tag": "GENOMERSV",
+                "group_by_fields": [
+                    "sequencing_instrument_platform",
+                    "enrichment_panel",
+                    "enrichment_panel_version"
+                ]
+            },
+            "Influenza virus [SNOMED:725894000]": {
+                "pipeline_templates": ["IRMA", "taxprofiler"],
+                "service_tag": "GENOMEFLU",
+                "group_by_fields": [
+                    "sequencing_instrument_platform"
+                ]
+            }
+        }
     },
     "mail_sender":{
         "delivery_template_path_file": "./relecov_tools/templates/",

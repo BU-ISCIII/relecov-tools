@@ -17,11 +17,16 @@ import shutil
 from itertools import islice, product
 from Bio import SeqIO
 from rich.console import Console
+from rich.table import Table
 from datetime import datetime
 from tabulate import tabulate
+from secrets import token_hex
 import openpyxl.utils
 import openpyxl.styles
-
+import pandas as pd
+import semantic_version
+import subprocess
+import importlib.metadata
 
 log = logging.getLogger(__name__)
 
@@ -142,39 +147,24 @@ def excel_date_to_num(date):
         return None
 
 
-def read_csv_file_return_dict(file_name, sep=None, key_position=None):
-    """Read csv or tsv file, according to separator, and return a dictionary
+def read_csv_file_return_dict(file_name, sep=None, key_position=0):
+    """Read csv or tsv file, according to separator (sep), and return a dictionary
     where the main key is the first column, if key position is None otherwise
     the index value of the key position is used as key. If sep is None then
-    try to assert a separator automaticallly depending on file extension.
+    try to assert a separator automatically depending on file extension.
     """
-    try:
-        with open(file_name, "r") as fh:
-            lines = fh.readlines()
-    except FileNotFoundError:
-        raise
     if sep is None:
         file_extension = os.path.splitext(file_name)[1]
         extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
         # Use space as a default separator, None would also be valid
         sep = extdict.get(file_extension, " ")
-    heading = lines[0].strip().split(sep)
-    if len(heading) == 1:
-        return {"ERROR": "not valid format"}
-    file_data = {}
-    for line in lines[1:]:
-        line_s = line.strip().split(sep)
-        if key_position is None:
-            file_data[line_s[0]] = {}
-            for idx in range(1, len(heading)):
-                file_data[line_s[0]][heading[idx]] = line_s[idx]
-        else:
-            file_data[line_s[key_position]] = {}
-            for idx in range(len(heading)):
-                if idx == key_position:
-                    continue
-                file_data[line_s[key_position]][heading[idx]] = line_s[idx]
-
+    try:
+        # Read all columns as strings to avoid parsing IDs as float buy try to infer datatypes afterwards
+        file_df = pd.read_csv(file_name, sep=sep, dtype="string").convert_dtypes()
+    except FileNotFoundError:
+        raise
+    key_column = file_df.columns[key_position]
+    file_data = file_df.set_index(key_column).to_dict(orient="index")
     return file_data
 
 
@@ -295,7 +285,7 @@ def save_local_md5(file_name, md5_value):
     return True
 
 
-def write_json_fo_file(data, file_name):
+def write_json_to_file(data, file_name):
     """Write metadata to json file"""
     with open(file_name, "w", encoding="utf-8") as fh:
         fh.write(json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False))
@@ -562,3 +552,156 @@ def adjust_sheet_size(sheet, wrap_text=True, col_width=30):
         if value < col_width:
             value = col_width
         sheet.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = value
+
+
+def validate_semantic_version(version):
+    try:
+        ver = semantic_version.Version(version)
+        return ver
+    except ValueError:
+        return None
+
+
+def get_package_name():
+    """Get project name"""
+    try:
+        package_name = importlib.metadata.metadata(__name__.split(".")[0])["Name"]
+        return package_name
+    except importlib.metadata.PackageNotFoundError:
+        return "unknown_package"
+
+
+def get_git_branch():
+    """Get current git branch"""
+    try:
+        branch = (
+            subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+            .strip()
+            .decode("utf-8")
+        )
+        return branch
+    except Exception:
+        return "main"  # if not able to retrieve git branch, add fixed value
+
+
+def get_schema_url():
+    """Generates the schema url dinamically"""
+    package_name = get_package_name()
+    branch_name = get_git_branch()
+    base_url = "https://github.com/BU-ISCIII"
+    schema_path = f"{package_name}/blob/{branch_name}/{package_name.replace('-','_')}/schema/relecov_schema.json"
+
+    return f"{base_url}/{schema_path}"
+
+
+def display_dataframe_to_user(name: str, dataframe: pd.DataFrame):
+    """
+    Display a Pandas DataFrame in a formatted table using Rich.
+
+    Args:
+        name (str): Title of the table.
+        dataframe (pd.DataFrame): The DataFrame to display.
+    """
+    console = Console()
+
+    # If DataFrame is empty, show a message
+    if dataframe.empty:
+        console.print(f"[bold red]{name} - No Data Available[/bold red]")
+        return
+
+    # Create a Rich Table
+    table = Table(title=name, show_lines=True)
+
+    # Add columns
+    for col in dataframe.columns:
+        table.add_column(col, justify="left", style="cyan", no_wrap=True)
+
+    # Add rows
+    for _, row in dataframe.iterrows():
+        table.add_row(*[str(value) for value in row])
+
+    # Display the table
+    console.print(table)
+
+
+def load_schema(schema_path: str) -> dict:
+    """
+    Load a JSON schema from the specified file path.
+
+    Args:
+        schema_path (str): The file path to the JSON schema.
+
+    Returns:
+        dict: Parsed schema as a Python dictionary.
+    """
+    with open(schema_path) as f:
+        return json.load(f)
+
+
+def get_available_software(json_path: str) -> list:
+    """
+    Retrieve available software names from a bioinfo configuration JSON file.
+
+    Args:
+        json_path (str): Path to the bioinfo configuration file.
+
+    Returns:
+        list: A list of available software/tools defined in the configuration.
+    """
+    config = read_json_file(json_path)
+    return list(config.keys())
+
+
+def cast_value_to_schema_type(value, expected_type: str):
+    """
+    Cast a value to the expected JSON schema type.
+
+    Args:
+        value (any): The input value to be cast.
+        expected_type (str): Target data type from the schema. Options: "integer", "number", "boolean", "string".
+
+    Returns:
+        any: The value cast to the appropriate type, or a string fallback if casting fails.
+    """
+    if expected_type == "integer":
+        try:
+            return int(float(value))
+        except (ValueError, TypeError):
+            pass
+    elif expected_type == "number":
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            pass
+    elif expected_type == "boolean":
+        return str(value).strip().lower() in ["true", "yes", "1"]
+    elif expected_type == "string":
+        return str(value).strip()
+    else:
+        try:
+            return str(value).strip()
+        except Exception:
+            return value
+
+
+def get_safe_hex(output_folder, length=3):
+    """Return an unique hexadecimal code that does not repeat in any file
+    of the given output directory
+
+    Args:
+        output_folder (str): Folder where files will be checked
+        length (int): Number of bytes for the code. Character length will be doubled
+
+    Returns:
+        hex_id (str): Non-repeating hexadecimal code
+    """
+
+    def get_new_hex(hex_id, output_folder):
+        """Recursive search for new hexadecimal codes if exist"""
+        if any(hex_id in x for x in os.listdir(output_folder)):
+            return get_new_hex(token_hex(length).upper(), output_folder)
+        else:
+            return token_hex(length).upper()
+
+    hex_id = get_new_hex(token_hex(length).upper(), output_folder)
+    return hex_id

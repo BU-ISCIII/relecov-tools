@@ -72,7 +72,7 @@
       "examples": [
         "3/19/2020"
       ],
-      "ontology": "GENEPIO:0001174",
+      "ontology": "SNOMED:399445004",
       "type": "string",
       "description": "The date on which the sample was collected.",
       "format": "date",
@@ -84,7 +84,7 @@
       "examples": [
         "3/21/2020"
       ],
-      "ontology": "NCIT:C93644",
+      "ontology": "SNOMED:281271004",
       "type": "string",
       "description": "The date on which the sample was received.",
       "format": "date",
@@ -703,7 +703,7 @@
       ]
     },
     "host_age": {
-      "ontology": "GENEPIO:0001392",
+      "ontology": "SNOMED:424144002",
       "type": "string",
       "description": "Age of host at the time of sampling.",
       "examples": [
@@ -767,19 +767,19 @@
     },
     "host sex": {
       "enum": [
-        "Female [NCIT:C46110]",
-        "Male [NCIT:C46109]",
-        "Non-binary Gender [GSSO:000132]",
+        "Female [LOINC:LA3-6]",
+        "Male [LOINC:LA2-8]",
+        "Non-binary Gender [SNOMED:772004004]",
         "Transgender (assigned male at birth) [GSSO:004004]",
         "Transgender (assigned female at birth) [GSSO:004005]",
-        "Undeclared [NCIT:C110959]",
-        "Not Applicable [GENEPIO:0001619]",
-        "Not Collected [GENEPIO:0001620]",
-        "Not Provided [GENEPIO:0001668]",
-        "Missing [GENEPIO:0001618]",
+        "Undeclared [GSSO:000131]",
+        "Not Applicable [SNOMED:385432009]",
+        "Not Collected [LOINC:LA4700-6]",
+        "Not Provided [SNOMED:434941000124101]",
+        "Missing [LOINC:LA14698-7]",
         "Restricted Access [GENEPIO:0001810]"
       ],
-      "ontology": "GENEPIO:0001395",
+      "ontology": "SNOMED:263495000",
       "type": "string",
       "description": "The gender of the host at the time of sample collection.",
       "examples": [
@@ -872,14 +872,14 @@
         "Illumina [OBI:0000759]",
         "Ion Torrent [GENEPIO:0002683]",
         "PacBio [GENEPIO:0001927]",
-        "BGI",
-        "MGI",
-        "Other"
+        "BGI [GENEPIO:0004324]",
+        "MGI [GENEPIO:0004325]",
+        "Other [NCIT:C17649]"
       ],
       "examples": [
         "Illumina"
       ],
-      "ontology": "GENEPIO_0000071",
+      "ontology": "GENEPIO:0000071",
       "type": "string",
       "description": "",
       "classification": "Sequencing",
@@ -887,7 +887,7 @@
       "fill_mode": "batch",
       "minLenght": "1"
     },
-    "sequence_file_R1_fastq": {
+    "sequence_file_R1": {
       "examples": [
         "ABC123_S1_L001_R1_001.fastq.gz"
       ],
@@ -895,9 +895,9 @@
       "type": "string",
       "description": "The user-specified filename of the r1 FASTQ file.",
       "clasification": "Bioinformatics and QC metrics",
-      "label": "Sequence file R1 fastq"
+      "label": "Sequence file R1"
     },
-    "sequence_file_R2_fastq": {
+    "sequence_file_R2": {
       "examples": [
         "ABC123_S1_L001_R2_001.fastq.gz"
       ],
@@ -905,9 +905,9 @@
       "type": "string",
       "description": "The user-specified filename of the r2 FASTQ file.",
       "clasification": "Bioinformatics and QC metrics",
-      "label": "Sequence file R2 fastq"
+      "label": "Sequence file R2"
     },
-    "r1_fastq_filepath": {
+    "sequence_file_path_R1": {
       "examples": [
         "/User/Documents/RespLab/Data/"
       ],
@@ -917,7 +917,7 @@
       "clasification": "Bioinformatics and QC metrics",
       "label": "Filepath R1 fastq"
     },
-    "r2_fastq_filepath": {
+    "sequence_file_path_R2": {
       "examples": [
         "/User/Documents/RespLab/Data/"
       ],
@@ -931,7 +931,7 @@
       "examples": [
         "3e69af1f875fab020aed82f5edbc1f03"
       ],
-      "ontology": "MS_1000569",
+      "ontology": "NCIT:C171276",
       "type": "string",
       "description": "",
       "clasification": "Bioinformatics and QC metrics",
@@ -942,18 +942,19 @@
     },
     "scientific_name": {
       "enum": [
-        "Coronaviridae [NCBITaxon:11118]",
-        "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]",
-        "Not Applicable [GENEPIO:0001619]",
-        "Not Collected [GENEPIO:0001620]",
-        "Not Provided [GENEPIO:0001668]",
-        "Missing [GENEPIO:0001618]",
+        "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]",
+        "Respiratory syncytial virus [SNOMED:6415009]",
+        "Influenza virus [SNOMED:725894000]",
+        "Not Applicable [SNOMED:385432009]",
+        "Not Collected [LOINC:LA4700-6]",
+        "Not Provided [SNOMED:434941000124101]",
+        "Missing [LOINC:LA14698-7]",
         "Restricted Access [GENEPIO:0001810]"
       ],
       "examples": [
         ""
       ],
-      "ontology": "NCIT:C43459",
+      "ontology": "SNOMED:410607006",
       "type": "string",
       "description": "The taxonomic name of the organism.",
       "clasification": "Sample collection and processing",
@@ -962,8 +963,17 @@
       "table": "sample"
     },
     "hospitalisation": {
+      "enum": [
+        "Yes [SNOMED:373066001]",
+        "No [SNOMED:373067005]",
+        "Not Applicable [SNOMED:385432009]",
+        "Not Collected [LOINC:LA4700-6]",
+        "Not Provided [SNOMED:434941000124101]",
+        "Missing [LOINC:LA14698-7]",
+        "Restricted Access [GENEPIO:0001810]"
+      ],
       "examples": [],
-      "ontology": "NCIT:C25179",
+      "ontology": "LOINC:LA15417-1",
       "type": "string",
       "description": " Was the subject confined to a hospital as a result of virus infection or problems occurring secondary to virus infection?",
       "clasification": "Sample collection and processing",
@@ -1028,7 +1038,7 @@
       "examples": [
         "METAGENOMIC"
       ],
-      "ontology": "GENEPIO_0001965",
+      "ontology": "GENEPIO:0001965",
       "type": "string",
       "description": "Molecule type used to make the library.",
       "clasification": "Sequencing",
@@ -1039,16 +1049,16 @@
     },
     "library_selection": {
       "enum": [
-        "RANDOM [NCIT:C60702]",
-        "PCR [GENEPIO:0001955]",
+        "RANDOM [LOINC:LA29504-0]",
+        "PCR [LOINC:LA26418-6]",
         "RANDOM PCR [GENEPIO:0001957]",
-        "RT-PCR [GENEPIO:0001959]",
+        "RT-PCR [LOINC:LP435370-4]",
         "HMPR [GENEPIO:0001949]",
         "MF [GENEPIO:0001952]",
         "repeat fractionation",
         "size fractionation [GENEPIO:0001963]",
         "MSLL [GENEPIO:0001954]",
-        "cDNA [GENEPIO:0001962]",
+        "cDNA [NCIT:C324]",
         "ChIP [GENEPIO:0001947]",
         "MNase [GENEPIO:0001953]",
         "DNase [GENEPIO:0001948]",
@@ -1059,17 +1069,18 @@
         "MBD2 protein methyl-CpG binding domain [GENEPIO:0001951]",
         "CAGE [GENEPIO:0001942]",
         "RACE [GENEPIO:0001956]",
-        "MDA",
+        "MDA [EFO:0008800]",
         "padlock probes capture method",
-        "Oligo-dT",
+        "Oligo-dT [NCIT:C18685]",
         "Inverse rRNA selection",
-        "ChIP-Seq [GENEPIO:0001947]",
-        "Other"
+        "ChIP-Seq [NCIT:C106049]",
+        "Other [NCIT:C17649]",
+        "Not Provided [SNOMED:434941000124101]"
       ],
       "examples": [
         "RANDOM PCR"
       ],
-      "ontology": "GENEPIO_0001940",
+      "ontology": "GENEPIO:0001940",
       "type": "string",
       "description": "Library capture method.",
       "classification": "Sequencing",
@@ -1080,7 +1091,7 @@
       "examples": [
         "library_construction_protocol_1"
       ],
-      "ontology": "GENEPIO:0001450",
+      "ontology": "NCIT:C182085",
       "type": "string",
       "description": "",
       "clasification": "Sequencing",
@@ -1115,7 +1126,7 @@
       "examples": [
         "WGS"
       ],
-      "ontology": "GENEPIO_0001973",
+      "ontology": "GENEPIO:0001973",
       "type": "string",
       "description": "Overall sequencing strategy or approach.",
       "classification": "Sequencing",
@@ -1123,6 +1134,10 @@
       "fill_mode": "batch"
     },
     "library_layout": {
+      "enum": [
+        "Single-end [OBI:0002481]",
+        "Paired-end [OBI:0001852]"
+      ],
       "examples": [
         "CTS strategy"
       ],
@@ -1139,7 +1154,7 @@
       "examples": [
         "e.g PAIRED"
       ],
-      "ontology": "GENEPIO:0001450",
+      "ontology": "NCIT:C182085",
       "type": "string",
       "description": "The submitter's name for this library.",
       "clasification": "Sequencing",
@@ -1152,7 +1167,7 @@
       "examples": [
         "350"
       ],
-      "ontology": "GENEPIO_0000076",
+      "ontology": "NCIT:C153362",
       "type": "string",
       "description": "",
       "clasification": "Sequencing",
@@ -1162,7 +1177,7 @@
       "examples": [
         "experiment_title_1"
       ],
-      "ontology": "ORNASEQ_0000004",
+      "ontology": "NCIT:C181729",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1202,23 +1217,23 @@
         ""
       ],
       "enum": [
-        "Whole Genome Sequencing [NCIT:C101294]",
-        "Metagenomics [NCIT:C153191]",
-        "Transcriptome Analysis [GENEPIO:0001111]",
-        "Resequencing [NCIT:C41254]",
-        "Epigenetics [OMIT:0027036] ",
+        "Whole Genome Sequencing [SNOMED:51201000000109]",
+        "Metagenomics [LOINC:103566-6]",
+        "Transcriptome Analysis [GENEPIO:0001111",
+        "Resequencing [NCIT:C41254",
+        "Epigenetics [NCIT:C153190]",
         "Synthetic Genomics [NCIT:C84343]",
-        "Forensic or Paleo-genomics [topic:3943]",
-        "Gene Regulation Study [topic:0204]",
+        "Forensic or Paleo-genomics [EDAM:3943]",
+        "Gene Regulation Study [EDAM:0204]",
         "Cancer Genomics [NCIT:C18247]",
-        "Population Genomics [topic:3796]",
+        "Population Genomics [EDAM:3796]",
         "RNASeq [OBI:0001177]",
-        "Exome Sequencing [OBI:0002118]",
+        "Exome Sequencing [LOINC:LP248469-1]",
         "Pooled Clone Sequencing [OBI:2100402]",
         "Transcriptome Sequencing [NCIT:C124261]",
-        "Other [NCIT:C124261]"
+        "Other [NCIT:C17649]"
       ],
-      "ontology": "GENEPIO:0000156",
+      "ontology": "NCIT:C142175",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1229,7 +1244,7 @@
       "examples": [
         "Whole-genome sequences of SARS-CoV-2 from oro-pharyngeal swabs obtained from Belgian Covid-19 patients."
       ],
-      "ontology": "OPMI:0000380",
+      "ontology": "OPMI_0000380",
       "type": "string",
       "description": " Briefly describes the goals, purpose, and scope of the Study.  This need not be listed if it can be inherited from a referenced publication.",
       "clasification": "Submission ENA",
@@ -1256,7 +1271,7 @@
       "examples": [
         "experiment_alias_7a"
       ],
-      "ontology": "NCIT_C42790",
+      "ontology": "NCIT:C42790",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1270,11 +1285,11 @@
         "BAM,CRAM,FASTQ"
       ],
       "enum": [
-        "BAM [format:2572]",
-        "CRAM [format:3462]",
-        "FASTQ [format:1930]"
+        "BAM [EDAM:2572]",
+        "CRAM [EDAM:3462]",
+        "FASTQ [EDAM:1930]"
       ],
-      "ontology": "NMR:1001459",
+      "ontology": "MS:1001459",
       "type": "string",
       "description": "The run data file model.",
       "clasification": "Submission ENA",
@@ -1287,7 +1302,7 @@
       "examples": [
         "e.g ena-EXPERIMENT-KAROLINSKA INSITUTET-29-07-2020-14:50:07:151-1"
       ],
-      "ontology": "NCIT_C47911",
+      "ontology": "NCIT:C117058",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1300,7 +1315,7 @@
       "examples": [
         ""
       ],
-      "ontology": "MS_1000568",
+      "ontology": "NCIT:C171276",
       "type": "string",
       "description": "",
       "clasification": "Submission ENA",
@@ -1330,7 +1345,7 @@
       "examples": [
           ""
       ],
-      "ontology": "GENEPIO:0001517",
+      "ontology": "NCIT:C183329",
       "type": "string",
       "description": "",
       "classification": "Public databases",

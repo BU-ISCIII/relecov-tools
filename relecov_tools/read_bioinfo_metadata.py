@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 import os
 import sys
-import logging
 import rich.console
 import re
 import shutil
 from bs4 import BeautifulSoup
 from datetime import datetime
+from rich.prompt import Prompt
 
 import pandas as pd
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
-from relecov_tools.log_summary import LogSum
+from relecov_tools.base_module import BaseModule
 
-log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -22,13 +21,14 @@ stderr = rich.console.Console(
 )
 
 
-class BioinfoReportLog:
+class BioinfoReportLog(BaseModule):
     def __init__(self, log_report=None, output_folder="/tmp/"):
+        super().__init__(output_directory=output_folder, called_module=__name__)
         if not log_report:
             self.report = {"error": {}, "valid": {}, "warning": {}}
         else:
             self.report = log_report
-        self.logsum = LogSum(output_location=output_folder)
+        self.logsum = self.parent_log_summary(output_location=output_folder)
 
     def update_log_report(self, method_name, status, message):
         """Update the progress log report with the given method name, status, and message.
@@ -72,14 +72,17 @@ class BioinfoReportLog:
 
 
 # TODO: Add method to validate bioinfo_config.json file requirements.
-class BioinfoMetadata:
+class BioinfoMetadata(BaseModule):
     def __init__(
         self,
         readlabmeta_json_file=None,
         input_folder=None,
         output_folder=None,
         software=None,
+        update=False,
     ):
+        self.log.info("Initiating read-bioinfo-metadata process")
+        super().__init__(output_directory=output_folder, called_module=__name__)
         # Init process log
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
@@ -109,6 +112,7 @@ class BioinfoMetadata:
         # Initialize j_data object
         stderr.print("[blue]Reading lab metadata json")
         self.j_data = self.collect_info_from_lab_json()
+        self.update = update
 
         # Parse input/output folder
         if input_folder is None:
@@ -127,8 +131,16 @@ class BioinfoMetadata:
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
             )
         self.software_name = software
-        available_software = self.get_available_software(self.bioinfo_json_file)
+        available_software = relecov_tools.utils.get_available_software(
+            self.bioinfo_json_file
+        )
         bioinfo_config = ConfigJson(self.bioinfo_json_file)
+
+        self.schema_path = os.path.join(
+            os.path.dirname(__file__), "schema", "relecov_schema.json"
+        )
+        self.bioinfo_schema = relecov_tools.utils.load_schema(self.schema_path)
+
         if self.software_name in available_software:
             self.software_config = bioinfo_config.get_configuration(self.software_name)
         else:
@@ -140,19 +152,6 @@ class BioinfoMetadata:
             sys.exit(
                 self.log_report.print_log_report(self.__init__.__name__, ["error"])
             )
-
-    def get_available_software(self, json):
-        """Get list of available software in configuration
-
-        Args:
-            json (str): Path to bioinfo configuration json file.
-
-        Returns:
-            available_software: List containing available software defined in json.
-        """
-        config = relecov_tools.utils.read_json_file(json)
-        available_software = list(config.keys())
-        return available_software
 
     def scann_directory(self):
         """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json.
@@ -202,6 +201,109 @@ class BioinfoMetadata:
             self.log_report.print_log_report(method_name, ["valid", "warning"])
             return files_found
 
+    def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
+        """Maps bioinformatics metadata from map_data to j_data based on the mapping_fields.
+        Args:
+            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
+            map_data (dict(dict{str:str})): A dictionary containing bioinfo metadata handled by the method handling_files().
+            mapping_fields (dict{str:str}): A dictionary of mapping fields defined in the 'content' definition under each software scope (see conf/bioinfo.config).
+            table_name (str): Path to the mapping file/table.
+        Returns:
+            j_data: updated j_data with bioinformatic metadata mapped in it.
+        """
+        method_name = f"{self.mapping_over_table.__name__}:{self.software_name}.{self.current_config_key}"
+        errors = []
+        field_errors = {}
+        field_valid = {}
+        for row in j_data:
+            # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
+            #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
+            if not row.get("sequencing_sample_id"):
+                self.log_report.update_log_report(
+                    method_name,
+                    "warning",
+                    f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
+                )
+                continue
+            sample_name = row["sequencing_sample_id"]
+            if sample_name in map_data.keys():
+                for field, value in mapping_fields.items():
+                    try:
+                        raw_val = map_data[sample_name][value]
+                        expected_type = (
+                            self.bioinfo_schema["properties"]
+                            .get(field, {})
+                            .get("type", "string")
+                        )
+                        row[field] = relecov_tools.utils.cast_value_to_schema_type(
+                            raw_val, expected_type
+                        )
+                        field_valid[sample_name] = {field: value}
+                    except KeyError as e:
+                        field_errors[sample_name] = {field: e}
+                        row[field] = "Not Provided [GENEPIO:0001668]"
+                        continue
+            else:
+                errors.append(sample_name)
+                for field in mapping_fields.keys():
+                    row[field] = "Not Provided [GENEPIO:0001668]"
+        # work around when map_data comes from several per-sample tables/files instead of single table
+        if len(table_name) > 2:
+            table_name = os.path.dirname(table_name[0])
+        else:
+            table_name = table_name[0]
+        # Parse missing sample errors
+        if errors:
+            lenerrs = len(errors)
+            self.log_report.update_log_report(
+                method_name,
+                "warning",
+                f"{lenerrs} samples missing in '{table_name}': {', '.join(errors)}.",
+            )
+        else:
+            self.log_report.update_log_report(
+                method_name,
+                "valid",
+                f"All samples were successfully found in {table_name}.",
+            )
+        # Parse missing fields errors
+        # TODO: this stdout can be improved
+        if len(field_errors) > 0:
+            self.log_report.update_log_report(
+                method_name,
+                "warning",
+                f"Missing fields in {table_name}:\n\t{field_errors}",
+            )
+        else:
+            self.log_report.update_log_report(
+                method_name,
+                "valid",
+                f"Successfully mapped fields in {', '.join(field_valid.keys())}.",
+            )
+        # Print report
+        self.log_report.print_log_report(method_name, ["valid", "warning"])
+        return j_data
+
+    def validate_samplenames(self):
+        """Validate that the sequencing_sample_id from the JSON input is present in the samples_id.txt.
+
+        Raises:
+            ValueError: If no sample from the JSON input matches the samples in the samples_id.txt.
+        """
+        samplesid_path = os.path.join(self.input_folder, "samples_id.txt")
+        with open(samplesid_path, "r") as file:
+            samplesid_list = [line.strip() for line in file.readlines()]
+        json_samples = [sample["sequencing_sample_id"] for sample in self.j_data]
+        matching_samples = set(json_samples).intersection(samplesid_list)
+        if not matching_samples:
+            raise ValueError(
+                "No sample from the JSON input matches the samples in the provided analysis folder."
+            )
+        else:
+            print(
+                f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
+            )
+
     def validate_software_mandatory_files(self, files_dict):
         """Validates the presence of all mandatory files as defined in the software configuration JSON.
 
@@ -211,6 +313,8 @@ class BioinfoMetadata:
         method_name = f"{self.validate_software_mandatory_files.__name__}"
         missing_required = []
         for key in self.software_config:
+            if key == "fixed_values":
+                continue
             if self.software_config[key].get("required") is True:
                 try:
                     files_dict[key]
@@ -223,7 +327,7 @@ class BioinfoMetadata:
             self.log_report.update_log_report(
                 method_name,
                 "error",
-                f"Missing mandatory files in {self.software_name}.{key}:{', '.join(missing_required)}",
+                f"Missing mandatory files in {self.software_name}:{', '.join(missing_required)}",
             )
             sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         else:
@@ -254,12 +358,14 @@ class BioinfoMetadata:
         for key in self.software_config.keys():
             # Update bioinfo cofiguration key/scope
             self.current_config_key = key
+            map_method_name = f"{method_name}:{self.software_name}.{key}"
             # This skip files that will be parsed with other methods
             if key == "workflow_summary" or key == "fixed_values":
                 continue
             try:
                 files_dict[key]
                 stderr.print(f"[blue]Start processing {self.software_name}.{key}")
+                self.log.info(f"Start processing {self.software_name}.{key}")
             except KeyError:
                 self.log_report.update_log_report(
                     method_name,
@@ -268,12 +374,24 @@ class BioinfoMetadata:
                 )
                 continue
             # Handling files
+            if self.software_config[key].get("map", True) is False:
+                msg = f"File '{self.software_name}.{key}' was processed but skipped from mapping as defined in config."
+                self.log_report.update_log_report(map_method_name, "warning", msg)
+                self.log_report.print_log_report(map_method_name, ["warning"])
+                continue
+
             data_to_map = self.handling_files(
                 files_dict[key], sufix, output_folder, batch_date
             )
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
             if not mapping_fields:
+                self.log_report.update_log_report(
+                    map_method_name,
+                    "warning",
+                    f"No metadata found to perform mapping from '{self.software_name}.{key}' despite 'content' fields being defined.",
+                )
+                self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
             if data_to_map:
                 j_data_mapped = self.mapping_over_table(
@@ -305,31 +423,46 @@ class BioinfoMetadata:
         """
         method_name = f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_tables.__name__}"
         file_ext = os.path.splitext(conf_tab_name)[1]
-        # Parsing key position
         sample_idx_colpos = self.get_sample_idx_colpos(self.current_config_key)
         extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
-        if file_ext in extdict.keys():
-            data = relecov_tools.utils.read_csv_file_return_dict(
-                file_name=file_list[0],
-                sep=extdict.get(file_ext),
-                key_position=sample_idx_colpos,
-            )
-            return data
-        elif conf_tab_name.endswith(".gz"):
-            self.log_report.update_log_report(
-                method_name,
-                "warning",
-                f".gz files are not supported yet for data extraction: {conf_tab_name}",
-            )
-            data = {}
+        mapping_fields = self.software_config[self.current_config_key].get("content")
+
+        if not mapping_fields:
+            return {}
+
+        if conf_tab_name.endswith(".gz"):
+            inner_ext = os.path.splitext(conf_tab_name.strip(".gz"))[1]
+            if inner_ext in extdict:
+                self.log_report.update_log_report(
+                    method_name,
+                    "warning",
+                    f"Expected tabular file '{conf_tab_name}' is compressed and cannot be processed.",
+                )
+            return {}
+
+        if file_ext in extdict:
+            try:
+                return relecov_tools.utils.read_csv_file_return_dict(
+                    file_name=file_list[0],
+                    sep=extdict[file_ext],
+                    key_position=sample_idx_colpos,
+                )
+            except FileNotFoundError as e:
+                self.log_report.update_log_report(
+                    method_name,
+                    "error",
+                    f"Tabular file not found: '{file_list[0]}': {e}",
+                )
+                raise FileNotFoundError(
+                    f"Tabular file not found: '{file_list[0]}'"
+                ) from e
         else:
             self.log_report.update_log_report(
                 method_name,
                 "error",
                 f"Unrecognized defined file name extension '{file_ext}' in '{conf_tab_name}'.",
             )
-            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
-        return data
+            raise ValueError(self.log_report.print_log_report(method_name, ["error"]))
 
     def handling_files(self, file_list, sufix, output_folder, batch_date):
         """Handles different file formats to extract data regardless of their structure.
@@ -429,84 +562,6 @@ class BioinfoMetadata:
                     sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
 
-    def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
-        """Maps bioinformatics metadata from map_data to j_data based on the mapping_fields.
-
-        Args:
-            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
-            map_data (dict(dict{str:str})): A dictionary containing bioinfo metadata handled by the method handling_files().
-            mapping_fields (dict{str:str}): A dictionary of mapping fields defined in the 'content' definition under each software scope (see conf/bioinfo.config).
-            table_name (str): Path to the mapping file/table.
-
-        Returns:
-            j_data: updated j_data with bioinformatic metadata mapped in it.
-        """
-        method_name = f"{self.mapping_over_table.__name__}:{self.software_name}.{self.current_config_key}"
-        errors = []
-        field_errors = {}
-        field_valid = {}
-        for row in j_data:
-            # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
-            #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
-            if not row.get("sequencing_sample_id"):
-                self.log_report.update_log_report(
-                    method_name,
-                    "warning",
-                    f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
-                )
-                continue
-            sample_name = row["sequencing_sample_id"]
-            if sample_name in map_data.keys():
-                for field, value in mapping_fields.items():
-                    try:
-                        # FIXME: we have to allow more than one data type to make json validation module work.
-                        row[field] = str(map_data[sample_name][value])
-                        field_valid[sample_name] = {field: value}
-                    except KeyError as e:
-                        field_errors[sample_name] = {field: e}
-                        row[field] = "Not Provided [GENEPIO:0001668]"
-                        continue
-            else:
-                errors.append(sample_name)
-                for field in mapping_fields.keys():
-                    row[field] = "Not Provided [GENEPIO:0001668]"
-        # work around when map_data comes from several per-sample tables/files instead of single table
-        if len(table_name) > 2:
-            table_name = os.path.dirname(table_name[0])
-        else:
-            table_name = table_name[0]
-        # Parse missing sample errors
-        if errors:
-            lenerrs = len(errors)
-            self.log_report.update_log_report(
-                method_name,
-                "warning",
-                f"{lenerrs} samples missing in '{table_name}': {', '.join(errors)}.",
-            )
-        else:
-            self.log_report.update_log_report(
-                method_name,
-                "valid",
-                f"All samples were successfully found in {table_name}.",
-            )
-        # Parse missing fields errors
-        # TODO: this stdout can be improved
-        if len(field_errors) > 0:
-            self.log_report.update_log_report(
-                method_name,
-                "warning",
-                f"Missing fields in {table_name}:\n\t{field_errors}",
-            )
-        else:
-            self.log_report.update_log_report(
-                method_name,
-                "valid",
-                f"Successfully mapped fields in {', '.join(field_valid.keys())}.",
-            )
-        # Print report
-        self.log_report.print_log_report(method_name, ["valid", "warning"])
-        return j_data
-
     def get_multiqc_software_versions(self, file_list, j_data):
         """Reads multiqc html file, finds table containing software version info, and map it to j_data
 
@@ -584,7 +639,7 @@ class BioinfoMetadata:
                             row[key] = program_versions[value]
                         except KeyError as e:
                             field_errors[sample_name] = {value: e}
-                            row[key] = "Not Provided [GENEPIO:0001668]"
+                            row[key] = "Not Provided [SNOMED:434941000124101]"
                         continue
                     # Add software name
                     elif "software_name" in content_key:
@@ -592,7 +647,7 @@ class BioinfoMetadata:
                             row[key] = value
                         except KeyError as e:
                             field_errors[sample_name] = {value: e}
-                            row[key] = "Not Provided [GENEPIO:0001668]"
+                            row[key] = "Not Provided [SNOMED:434941000124101]"
                         continue
 
         # update progress log
@@ -641,7 +696,7 @@ class BioinfoMetadata:
         For each sample in j_data, the function assigns the corresponding file path based on the identified files in files_found_dict.
 
         If multiple files are identified per configuration item (e.g., viralrecon.mapping_consensus → *.consensus.fa), each sample in j_data receives its respective file path.
-        If no file path is located, the function appends "Not Provided [GENEPIO:0001668]" to indicate missing data.
+        If no file path is located, the function appends "Not Provided [SNOMED:434941000124101]" to indicate missing data.
 
         Args:
             files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
@@ -663,8 +718,16 @@ class BioinfoMetadata:
                 )
                 continue
             sample_name = row["sequencing_sample_id"]
+            base_cod_path = row.get("sequence_file_path_R1_fastq")
+            if base_cod_path is None:
+                self.log_report.update_log_report(
+                    method_name,
+                    "error",
+                    f"No 'sequence_file_path_R1_fastq' found for sample {sample_name}. Unable to generate paths.",
+                )
+                continue
             for key, values in files_found_dict.items():
-                file_path = "Not Provided [GENEPIO:0001668]"
+                file_path = "Not Provided [SNOMED:434941000124101]"
                 if values:  # Check if value is not empty
                     if key in multiple_sample_files:
                         file_path = values[0]
@@ -674,11 +737,19 @@ class BioinfoMetadata:
                                 file_path = file
                                 break  # Exit loop if match found
                 path_key = f"{self.software_name}_filepath_{key}"
-                row[path_key] = file_path
+                if file_path != "Not Provided [SNOMED:434941000124101]":
+                    analysis_results_path = os.path.join(
+                        base_cod_path,
+                        "analysis_results",
+                        os.path.basename(file_path),
+                    )
+                    row[path_key] = analysis_results_path
+                else:
+                    row[path_key] = file_path
                 if self.software_config[key].get("extract"):
                     self.extract_file(
                         file=file_path,
-                        dest_folder=row.get("r1_fastq_filepath"),
+                        dest_folder=row.get("sequence_file_path_R1_fastq"),
                         sample_name=sample_name,
                         path_key=path_key,
                     )
@@ -731,13 +802,11 @@ class BioinfoMetadata:
 
     def extract_file(self, file, dest_folder, sample_name=None, path_key=None):
         """Copy input file to the given destination, include sample name and key in log
-
         Args:
             file (str): Path the file that is going to be copied
             dest_folder (str): Folder with files from batch of samples
             sample_name (str, optional): Name of the sample in metadata. Defaults to None.
             path_key (str, optional): Metadata field for the file. Defaults to None.
-
         Returns:
             bool: True if the process was successful, else False
         """
@@ -754,7 +823,12 @@ class BioinfoMetadata:
             )
             return False
         try:
-            shutil.copy(file, out_filepath)
+            if re.search(r".*pangolin\.csv$", os.path.basename(file), re.IGNORECASE):
+                df = pd.read_csv(file)
+                df["lineage_analysis_date"] = datetime.now().strftime("%Y%m%d")
+                df.to_csv(out_filepath, index=False)
+            else:
+                shutil.copy(file, out_filepath)
         except (IOError, PermissionError) as e:
             self.log_report.update_log_report(
                 self.extract_file.__name__, "warning", f"Could not extract {file}: {e}"
@@ -764,26 +838,25 @@ class BioinfoMetadata:
 
     def split_data_by_batch(self, j_data):
         """Split metadata from json for each batch of samples found according to folder location of the samples.
-
         Args:
             files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
             j_data (list(dict)): List of dictionaries, one per sample, including metadata for that sample
-
         Returns:
             data_by_batch (dict(list(dict))): Dictionary containing parts of j_data corresponding to each
             different folder with samples (batch) included in the original json metadata used as input
         """
-        unique_batchs = set([x.get("r1_fastq_filepath") for x in j_data])
+        unique_batchs = set([x.get("sequence_file_path_R1_fastq") for x in j_data])
         data_by_batch = {batch_dir: {} for batch_dir in unique_batchs}
         for batch_dir in data_by_batch.keys():
             data_by_batch[batch_dir]["j_data"] = [
-                samp for samp in j_data if samp.get("r1_fastq_filepath") == batch_dir
+                samp
+                for samp in j_data
+                if samp.get("sequence_file_path_R1_fastq") == batch_dir
             ]
         return data_by_batch
 
     def split_tables_by_batch(self, files_found_dict, sufix, batch_data, output_dir):
         """Filter table content to output a new table containing only the samples present in given metadata
-
         Args:
             files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
             sufix (str): Sufix to be added to the new table file name.
@@ -835,38 +908,71 @@ class BioinfoMetadata:
 
     def merge_metadata(self, batch_filepath, batch_data):
         """
-        Merge metadata json if sample does not exist in the metadata file
+        Merge metadata json if sample does not exist in the metadata file,
+        or prompt the user to update if --update flag is provided and sample differs.
 
         Args:
             batch_filepath (str): Path to save the json file with the metadata.
-            batch_data (dict): A dictionary containing metadata of the samples.
+            batch_data (list): A list of dictionaries containing metadata of the samples.
+
         Returns:
-            None
+            merged_metadata (list): The updated list of metadata entries.
         """
         merged_metadata = relecov_tools.utils.read_json_file(batch_filepath)
         prev_metadata_dict = {
             item["sequencing_sample_id"]: item for item in merged_metadata
         }
+
+        overwrite_all = False
+
         for item in batch_data:
             sample_id = item["sequencing_sample_id"]
             if sample_id in prev_metadata_dict:
-                # When sample already in metadata, checking whether dictionary is the same
                 if prev_metadata_dict[sample_id] != item:
-                    stderr.print(
-                        f"[red] Sample {sample_id} has different data in {batch_filepath} and new metadata. Can't merge."
-                    )
-                    log.error(
-                        "Sample %s has different data in %s and new metadata. Can't merge."
-                        % (sample_id, batch_filepath)
-                    )
-                    sys.exit(1)
+                    if self.update:
+                        if not overwrite_all:
+                            stderr.print(
+                                f"[red]Sample '{sample_id}' has different metadata than the existing entry in {batch_filepath}."
+                            )
+                            response = Prompt.ask(
+                                "[yellow]Do you want to overwrite this sample?",
+                                choices=["y", "n", "all"],
+                                default="n",
+                            )
+                            if response == "all":
+                                overwrite_all = True
+                                stderr.print(
+                                    "[green]All subsequent samples will be overwritten automatically."
+                                )
+                                prev_metadata_dict[sample_id] = item
+                            elif response == "y":
+                                prev_metadata_dict[sample_id] = item
+                                stderr.print(f"[green]Sample '{sample_id}' updated.")
+                            else:
+                                stderr.print(
+                                    f"[blue]Skipping update for sample '{sample_id}'."
+                                )
+                        else:
+                            prev_metadata_dict[sample_id] = item
+                            stderr.print(f"[green]Sample '{sample_id}' updated (auto).")
+                    else:
+                        stderr.print(
+                            f"[red]Sample '{sample_id}' has different data in {batch_filepath} and new metadata. Can't merge."
+                        )
+                        self.log.error(
+                            "Sample %s has different data in %s and new metadata. Can't merge.",
+                            sample_id,
+                            batch_filepath,
+                        )
+                        sys.exit(1)
             else:
-                merged_metadata.append(item)
+                prev_metadata_dict[sample_id] = item
 
-        relecov_tools.utils.write_json_fo_file(merged_metadata, batch_filepath)
+        merged_metadata = list(prev_metadata_dict.values())
+        relecov_tools.utils.write_json_to_file(merged_metadata, batch_filepath)
         return merged_metadata
 
-    def save_merged_files(self, files_dict, batch_date, output_folder=None):
+    def save_merged_files(self, files_dict):
         """
         Process and save files that where split by cod and that have a function to be processed
 
@@ -886,6 +992,7 @@ class BioinfoMetadata:
                 try:
                     file_path = files_dict[key]
                     stderr.print(f"[blue]Processing splitted file: {file_path}")
+                    self.log.info(f"Processing splitted file: {file_path}")
                 except KeyError:
                     self.log_report.update_log_report(
                         method_name,
@@ -931,6 +1038,10 @@ class BioinfoMetadata:
         Returns:
             bool: True if the bioinfo file creation process was successful.
         """
+
+        # Check samplesheet for matching samples
+        self.validate_samplenames()
+
         # Find and validate bioinfo files
         stderr.print("[blue]Scanning input directory...")
         files_found_dict = self.scann_directory()
@@ -938,31 +1049,19 @@ class BioinfoMetadata:
         self.validate_software_mandatory_files(files_found_dict)
         # Split files found based on each batch of samples
         data_by_batch = self.split_data_by_batch(self.j_data)
-        batch_dates = []
         sufix = datetime.now().strftime("%Y%m%d%H%M%S")
-        # Get batch date for all the samples
-        for batch_dir, batch_dict in data_by_batch.items():
-            if batch_dir.split("/")[-1] not in batch_dates:
-                batch_dates.append(batch_dir.split("/")[-1])
-
-        if len(batch_dates) == 1:
-            batch_dates = str(batch_dates[0])
-        else:
-            stderr.print(
-                "[orange]More than one batch date in the same json data. Using current date as batch date."
-            )
-            log.info(
-                "More than one batch date in the same json data. Using current date as batch date."
-            )
-            batch_dates = datetime.now().strftime("%Y%m%d%H%M%S")
 
         # Add bioinfo metadata to j_data
         for batch_dir, batch_dict in data_by_batch.items():
-            lab_code = batch_dir.split("/")[-2]
-            batch_date = batch_dir.split("/")[-1]
+            batch_data = batch_dict["j_data"]
+            first_sample = batch_data[0]
+            lab_code = first_sample.get(
+                "submitting_institution_id", batch_dir.split("/")[-2]
+            )
+            batch_date = first_sample.get("batch_id", batch_dir.split("/")[-1])
+            self.set_batch_id(batch_date)
             self.log_report.logsum.feed_key(batch_dir)
             stderr.print(f"[blue]Processing data from {batch_dir}")
-            batch_data = batch_dict["j_data"]
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
             self.split_tables_by_batch(files_found_dict, sufix, batch_data, batch_dir)
             batch_data = self.add_bioinfo_results_metadata(
@@ -978,52 +1077,85 @@ class BioinfoMetadata:
             stderr.print("[blue]Adding files path to read lab metadata")
             batch_data = self.add_bioinfo_files_path(files_found_dict, batch_data)
             tag = "bioinfo_lab_metadata_"
-            batch_filename = tag + lab_code + "_" + batch_date + ".json"
+            batch_filename = tag + lab_code + ".json"
+            batch_filename = self.tag_filename(batch_filename)
             batch_filepath = os.path.join(batch_dir, batch_filename)
+            if self.software_name == "viralrecon":
+                try:
+                    qc_func = eval(
+                        f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation"
+                    )
+                    qc_data = qc_func(batch_data)
+                    for sample in batch_data:
+                        sample_id = sample.get("sequencing_sample_id")
+                        if sample_id in qc_data:
+                            sample.update(qc_data[sample_id])
+                except (AttributeError, NameError, TypeError, ValueError) as e:
+                    self.log_report.update_log_report(
+                        self.create_bioinfo_file.__name__,
+                        "warning",
+                        f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}",
+                    )
+                    stderr.print(
+                        f"[orange]Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
+                    )
             if os.path.exists(batch_filepath):
                 stderr.print(
                     f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
                 )
-                log.info(
+                self.log.info(
                     "Bioinfo metadata %s file already exists. Merging new data if possible."
                     % batch_filepath
                 )
                 batch_data = self.merge_metadata(batch_filepath, batch_data)
             else:
-                relecov_tools.utils.write_json_fo_file(batch_data, batch_filepath)
+                relecov_tools.utils.write_json_to_file(batch_data, batch_filepath)
             for sample in batch_data:
                 self.log_report.logsum.feed_key(
                     key=batch_dir, sample=sample.get("sequencing_sample_id")
                 )
-            log.info("Created output json file: %s" % batch_filepath)
+            self.log.info("Created output json file: %s" % batch_filepath)
             stderr.print(f"[green]Created batch json file: {batch_filepath}")
 
         year = str(datetime.now().year)
         out_path = os.path.join(self.output_folder, year)
         os.makedirs(out_path, exist_ok=True)
 
-        tag = "bioinfo_lab_metadata_"
         stderr.print("[blue]Saving previously splitted files to output directory")
+        batch_dates = []
+        # Get batch date for all the samples
+        for batch_dir, batch_dict in data_by_batch.items():
+            if batch_dir.split("/")[-1] not in batch_dates:
+                batch_dates.append(batch_dir.split("/")[-1])
 
-        self.save_merged_files(files_found_dict, batch_dates, out_path)
-        batch_filename = tag + batch_dates + ".json"
+        if len(batch_dates) == 1:
+            batch_date = str(batch_dates[0])
+        else:
+            stderr.print(
+                "[orange]More than one batch date in the same json data. Using current date as batch date."
+            )
+            self.log.info(
+                "More than one batch date in the same json data. Using current date as batch date."
+            )
+            batch_date = datetime.now().strftime("%Y%m%d%H%M%S")
+        self.set_batch_id(batch_date)
+        self.save_merged_files(files_found_dict, batch_date, out_path)
+        batch_filename = self.tag_filename("bioinfo_lab_metadata" + ".json")
         stderr.print("[blue]Writting output json file")
         file_path = os.path.join(out_path, batch_filename)
-        qc_statement = f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation(self.j_data)"
-        exec(qc_statement)
         if os.path.exists(file_path):
             stderr.print(
                 f"[blue]Bioinfo metadata {file_path} file already exists. Merging new data if possible."
             )
-            log.info(
+            self.log.info(
                 "Bioinfo metadata %s file already exists. Merging new data if possible."
                 % file_path
             )
             batch_data = self.merge_metadata(file_path, self.j_data)
         else:
-            relecov_tools.utils.write_json_fo_file(self.j_data, file_path)
+            relecov_tools.utils.write_json_to_file(self.j_data, file_path)
         stderr.print(f"[green]Sucessful creation of bioinfo analyis file: {file_path}")
-        self.log_report.logsum.create_error_summary(
+        self.parent_create_error_summary(
             called_module="read-bioinfo-metadata", logs=self.log_report.logsum.logs
         )
         return True

@@ -50,6 +50,8 @@ class EmailSender:
         submitting_institution_code=None,
         template_name=None,
         batch=None,
+        password=None,
+        zip_filename=None,
     ):
 
         institution_info = self.get_institution_info(submitting_institution_code)
@@ -67,6 +69,9 @@ class EmailSender:
             ),
             "additional_info": additional_info,
             "batch": batch,
+            "password": password,
+            "submitting_institution_code": submitting_institution_code,
+            "zip_filename": zip_filename,
         }
 
         templates_base_dir = os.path.dirname(self.template_path)

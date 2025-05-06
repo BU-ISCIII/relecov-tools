@@ -93,6 +93,7 @@ class LongTableParse:
             lines = fh.readlines()
 
         stderr.print("[green]\tSuccessful checking heading fields")
+        log.info("Successful checking heading fields")
         heading_index = {}
         headings_from_csv = lines[0].strip().split(",")
         for heading in self.long_table_heading.values():
@@ -128,6 +129,7 @@ class LongTableParse:
                 variant_dict["Gene"] = line_s[heading_index["GENE"]]
                 samp_dict[sample].append(variant_dict)
         stderr.print("[green]\tSuccessful parsing data")
+        log.info("Successful parsing long table data")
         return samp_dict
 
     def convert_to_json(self, samp_dict):
@@ -186,6 +188,7 @@ class LongTableParse:
                 stderr.print(
                     "[green]\tParsed data successfully saved to file:", file_path
                 )
+                log.info("Parsed data successfully saved to file: %s", file_path)
             except Exception as e:
                 stderr.print("[red]\tError saving parsed data to file:", str(e))
                 log.error("Error saving parsed data to file: %s", e)
@@ -196,6 +199,7 @@ class LongTableParse:
                 stderr.print(
                     "[green]\tParsed data successfully saved to file:", file_path
                 )
+                log.info("Parsed data successfully saved to file: %s", file_path)
             except Exception as e:
                 stderr.print("[red]\tError saving parsed data to file:", str(e))
                 log.error("Error saving parsed data to file: %s", e)
@@ -385,6 +389,7 @@ def parse_long_table(files_list, batch_date, output_folder=None):
         # Saving long table data into a file
         long_table.save_to_file(long_table_data, batch_date)
         stderr.print("[green]\tProcess completed")
+        log.info("Long table process completed")
     elif len(files_list) > 1:
         method_log_report.update_log_report(
             method_name,
@@ -443,17 +448,43 @@ def handle_consensus_fasta(files_list, batch_date, output_folder=None):
 
 
 def quality_control_evaluation(data):
-    """Evaluate the quality of the samples and add the field 'qc_test' to each 'data' entry."""
+    """Evaluates QC status for each sample based on predefined thresholds.
+
+    Parameters:
+    -----------
+    data : list of dict
+        List of sample metadata dictionaries containing metrics such as coverage,
+        ambiguity, number of Ns, %LDMutations, etc.
+
+    Returns:
+    --------
+    list of dict
+        The same list with an added 'qc_test' field per sample:
+        - 'pass' if all evaluable conditions are met
+        - 'fail' if any condition fails
+        - Ignores non-evaluable values like 'Data Not Evaluable [NCIT:C186292]'
+    """
+    log_report = BioinfoReportLog()
+    method_name = f"{quality_control_evaluation.__name__}"
+
     conditions = {
-        "per_sgene_ambiguous": lambda x: float(x) < 10,
-        "per_sgene_coverage": lambda x: float(x) > 98,
-        "per_ldmutations": lambda x: float(x) > 60,
-        "number_of_sgene_frameshifts": lambda x: int(x) == 0,
-        "number_of_unambiguous_bases": lambda x: int(x) > 24000,
-        "number_of_Ns": lambda x: int(x) < 5000,
-        "qc_filtered": lambda x: int(x) > 50000,
-        "per_reads_host": lambda x: float(x) < 20,
+        "per_sgene_ambiguous": lambda x: isinstance(x, (int, float))
+        and float(x) < 10.0,
+        "per_sgene_coverage": lambda x: isinstance(x, (int, float)) and float(x) > 98.0,
+        "per_ldmutations": lambda x: (
+            True
+            if isinstance(x, str) and "Not Evaluable" in x
+            else isinstance(x, (int, float)) and float(x) > 60.0
+        ),
+        "number_of_sgene_frameshifts": lambda x: isinstance(x, (int, float))
+        and int(x) == 0,
+        "number_of_unambiguous_bases": lambda x: isinstance(x, (int, float))
+        and int(x) > 24000,
+        "number_of_Ns": lambda x: isinstance(x, (int, float)) and int(x) < 5000,
+        "qc_filtered": lambda x: isinstance(x, (int, float)) and int(x) > 50000,
+        "per_reads_host": lambda x: isinstance(x, (int, float)) and float(x) < 20.0,
     }
+
     for sample in data:
         try:
             qc_status = "pass"
@@ -463,9 +494,15 @@ def quality_control_evaluation(data):
                     qc_status = "fail"
                     break
             sample["qc_test"] = qc_status
-        except ValueError as e:
+            log_report.update_log_report(
+                method_name,
+                "valid",
+                f"{sample.get('sequencing_sample_id')} evaluated: {qc_status}",
+            )
+        except Exception as e:
             sample["qc_test"] = "fail"
-            print(
-                f"Error processing sample {sample.get('sequencing_sample_id', 'unknown')}: {e}"
+            sample_id = sample.get("sequencing_sample_id", "unknown")
+            log_report.update_log_report(
+                method_name, "warning", f"Error evaluating sample {sample_id}: {e}"
             )
     return data

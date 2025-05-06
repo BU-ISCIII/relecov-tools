@@ -12,6 +12,7 @@ from datetime import datetime
 from collections import OrderedDict
 from relecov_tools.utils import rich_force_colors
 import relecov_tools.utils
+from relecov_tools.config_json import ConfigJson
 
 
 log = logging.getLogger(__name__)
@@ -30,11 +31,19 @@ class LogSum:
         unique_key: str = None,
         path: str = None,
     ):
-        if not os.path.isdir(str(output_location)):
-            try:
-                os.makedirs(output_location, exist_ok=True)
-            except IOError:
-                raise IOError(f"Logs output folder {output_location} does not exist")
+        if output_location is not None:
+            if not os.path.isdir(str(output_location)):
+                try:
+                    os.makedirs(output_location, exist_ok=True)
+                except IOError:
+                    raise IOError(f"Logs output folder {output_location} doesnt exist")
+        else:
+            log.info("No output_location provided, selecting it from config...")
+            config_json = ConfigJson(extra_config=True)
+            logs_config = config_json.get_configuration("logs_config")
+            output_location = logs_config.get("default_outpath", "/tmp")
+
+        log.info(f"Log summary outpath set to {output_location}")
         self.output_location = output_location
         # if unique_key is given, all entries will be saved inside that key by default
         if unique_key:
@@ -217,9 +226,40 @@ class LogSum:
                 new_sheet = workbook.create_sheet(name)
                 new_sheet.append(header)
             regex = r"[\[\]]"  # Regex to remove lists brackets
-            workbook["Global Report"].append(
-                [reg_remover(x, regex) for k, x in logs.items() if k != "samples"]
+
+            valid = logs.get("valid", True)
+            warnings = logs.get("warnings", [])
+
+            warnings_list = warnings if isinstance(warnings, list) else [warnings]
+            truncated_warnings = []
+            max_lenght = 150
+
+            for warning in warnings_list:
+                warnings_str = str(warning)
+                if len(warnings_str) > max_lenght:
+                    warnings_str = warnings_str[:max_lenght] + "..."
+                truncated_warnings.append(warnings_str)
+            warnings_cleaned = "; ".join(truncated_warnings)
+
+            errors_list = logs.get("errors", [])
+            errors_list = (
+                errors_list if isinstance(errors_list, list) else [errors_list]
             )
+
+            truncated_errors = []
+
+            for err in errors_list:
+                err_str = reg_remover(str(err), regex)
+                if len(err_str) > max_lenght:
+                    err_str = err_str[:max_lenght] + "..."
+                truncated_errors.append(err_str)
+
+            errors_cleaned = "; ".join(truncated_errors)
+
+            workbook["Global Report"].append(
+                [str(valid), errors_cleaned, warnings_cleaned]
+            )
+
             regex = r"\[.*?\]"  # Regex to remove ontology annotations between brackets
             for sample, slog in samples_logs.items():
                 clean_errors = [reg_remover(x, regex) for x in slog["errors"]]
@@ -275,15 +315,17 @@ class LogSum:
             logs = self.logs
         else:
             if not isinstance(logs, dict):
+                log.error("Logs input must be a dict. No output file generated.")
                 stderr.print("[red]Logs input must be a dict. No output file.")
                 return
         final_logs = self.prepare_final_logs(logs)
         if not called_module:
-            try:
-                called_module = [
-                    f.function for f in inspect.stack() if "__main__.py" in f.filename
-                ][0]
-            except IndexError:
+            traceback_functions = [
+                f.function for f in inspect.stack() if "__main__.py" in f.filename
+            ]
+            if traceback_functions:
+                called_module = traceback_functions[0]
+            else:
                 called_module = ""
         if not filepath:
             date = datetime.today().strftime("%Y%m%d%-H%M%S")
@@ -308,6 +350,19 @@ class LogSum:
                 stderr.print(f"[red]Error exporting logs to file: {e}")
                 log.error("Error exporting logs to file: %s", str(e))
                 f.write(str(final_logs))
+        return
+
+    def rename_log_key(self, old_key, new_key):
+        """Rename a key in the logs
+
+        Args:
+            old_key (str): Current key name
+            new_key (str): New key name
+        """
+        if old_key in self.base_logsum.logs.keys():
+            self.logs[new_key] = self.logs.pop(old_key)
+        else:
+            log.warning(f"Could not rename logsum key {old_key}: key not in logs")
         return
 
     @staticmethod

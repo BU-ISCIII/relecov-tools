@@ -4,6 +4,7 @@ import relecov_tools.json_validation
 import rich.console
 import pandas as pd
 import os
+import re
 import openpyxl
 import sys
 import json
@@ -14,7 +15,10 @@ import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
 import relecov_tools.assets.schema_utils.metadatalab_template
 from relecov_tools.config_json import ConfigJson
+from datetime import datetime
 from openpyxl.worksheet.datavalidation import DataValidation
+
+pd.set_option("future.no_silent_downcasting", True)
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -33,13 +37,17 @@ class SchemaBuilder:
         draft_version=None,
         show_diff=None,
         out_dir=None,
+        version=None,
+        project=None,
+        non_interactive=False,
     ):
         """
         Initialize the SchemaBuilder class. This class generates a JSON Schema file based on the provided draft version.
         It reads the database definition from an Excel file and allows customization of the schema generation process.
         """
         self.excel_file_path = excel_file_path
-        # Validate input variables
+        self.non_interactive = non_interactive
+        # Validate input data
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
             log.error("A valid Excel file path must be provided.")
             raise ValueError("A valid Excel file path must be provided.")
@@ -48,10 +56,55 @@ class SchemaBuilder:
             raise ValueError("The Excel file must have a .xlsx extension.")
 
         # Validate output folder creation
-        if not out_dir or not os.path.isfile(out_dir):
-            self.output_folder = relecov_tools.utils.prompt_create_outdir(None, out_dir)
+        if not out_dir:
+            self.output_folder = relecov_tools.utils.prompt_create_outdir(
+                path=None, out_dir=None
+            )
         else:
-            self.output_folder = out_dir
+            self.output_folder = os.path.abspath(out_dir)
+            if not os.path.exists(self.output_folder):
+                self.output_folder = relecov_tools.utils.prompt_create_outdir(
+                    path=None, out_dir=out_dir
+                )
+
+        # Get version option
+        if not version:
+            # If not defined, then ask via prompt
+            self.version = relecov_tools.utils.prompt_text(
+                "Write the desired version using semantic versioning:"
+            )
+        self.version = version
+        if not relecov_tools.utils.validate_semantic_version(self.version):
+            raise ValueError("[red]Error: Invalid version format")
+
+        # Get version option
+        # Parse build-schema configuration
+        self.build_schema_json_file = os.path.join(
+            os.path.dirname(__file__), "conf", "build_schema_config.json"
+        )
+
+        if project is None:
+            project = relecov_tools.utils.prompt_text("Write the desired project:")
+        self.project = project
+
+        available_projects = self.get_available_projects(self.build_schema_json_file)
+
+        build_schema_config = ConfigJson(self.build_schema_json_file)
+        config_data = build_schema_config.get_configuration(
+            "projects"
+        )  # Obtener solo la sección "projects"
+        self.configurables = config_data.get("configurables", {})
+
+        if self.project in available_projects:
+            self.project_config = config_data.get(self.project, {})
+        else:
+            log.error(
+                f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
+            )
+            stderr.print(
+                f"[red]No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
+            )
+            sys.exit(1)
 
         # Validate show diff option
         if not show_diff:
@@ -60,11 +113,14 @@ class SchemaBuilder:
             self.show_diff = True
 
         # Validate json schema draft version
-        self.draft_version = (
-            relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(
-                draft_version
+        if not draft_version and self.non_interactive:
+            self.draft_version = "2020-12"
+        else:
+            self.draft_version = (
+                relecov_tools.assets.schema_utils.jsonschema_draft.check_valid_version(
+                    draft_version
+                )
             )
-        )
 
         # Validate base schema
         if base_schema_path is not None:
@@ -112,18 +168,26 @@ class SchemaBuilder:
                 sys.exit(1)
 
     def validate_database_definition(self, json_data):
-        """Validate the mandatory features of each property in json_data.
-        Validate the mandatory features of each property in json_data.
+        """Validate the mandatory features and ensure:
+        - No duplicate enum values in the JSON schema.
+        - Date formats follow 'YYYY-MM-DD'.
 
         Args:
-        json_data (dict): The JSON data representing the database definition.
+            json_data (dict): The JSON data representing the database definition.
 
         Returns:
-            dict or None: A dictionary with properties that are missing mandatory/invalid features,
-            or None if all mandatory features are present
+            dict: A dictionary containing errors found, categorized by:
+                - Missing features
+                - Duplicate enums
+                - Incorrect date formats
         """
-        # Check mandatory key features to build a json schema
-        notvalid_properties = {}
+        log_errors = {
+            "missing_features": {},
+            "duplicate_enums": {},
+            "invalid_example_types": {},
+            "invalid_date_formats": {},
+        }
+
         mandatory_features = [
             "enum",
             "examples",
@@ -136,21 +200,103 @@ class SchemaBuilder:
             "required (Y/N)",
             "complex_field (Y/N)",
         ]
-        # Iterate over each property in json_data
-        for j_key, j_value in json_data.items():
-            missing_features = []
-            for feature in mandatory_features:
-                if feature not in j_value:
-                    missing_features.append(feature)
 
+        # Iterate over properties in json_data
+        for prop_name, prop_features in json_data.items():
+            missing_features = [
+                feature
+                for feature in mandatory_features
+                if feature not in prop_features
+            ]
             if missing_features:
-                notvalid_properties[j_key] = missing_features
+                log_errors["missing_features"][prop_name] = missing_features
 
-        # Summarize validation
-        if notvalid_properties:
-            return notvalid_properties
+            # Check for duplicate enum values
+            if prop_features.get("enum"):
+                if not pd.isna(prop_features["enum"]):
+                    enum_values = prop_features["enum"].split(", ")
+                    # Verify that enum has no duplicates
+                    if len(enum_values) != len(set(enum_values)):
+                        duplicates = [
+                            value
+                            for value in set(enum_values)
+                            if enum_values.count(value) > 1
+                        ]
+                        log_errors["duplicate_enums"][prop_name] = duplicates
+
+            # Check date format for properties with type=string and format=date
+            if (
+                prop_features["type"] == "string"
+                and prop_features.get("format") == "date"
+            ):
+                example = prop_features.get("examples")
+                if example:
+                    if isinstance(example, datetime):
+                        example = example.strftime("%Y-%m-%d")
+                    if isinstance(example, str):
+                        try:
+                            datetime.strptime(example, "%Y-%m-%d")
+                        except ValueError:
+                            if prop_name not in log_errors["invalid_date_formats"]:
+                                log_errors["invalid_date_formats"][prop_name] = []
+                            log_errors["invalid_date_formats"][prop_name].append(
+                                f"Invalid date format '{example}', expected 'YYYY-MM-DD'"
+                            )
+
+        # return log errors if any
+        if any(log_errors.values()):
+            stderr.print("[red]\t- Database Validation Failed")
+            # Convert log_errors dictionary to DataFrame
+            df_errors = pd.DataFrame(
+                [
+                    {
+                        "Error Category": category,
+                        "Field": field,
+                        "Details": (
+                            ", ".join(details) if isinstance(details, list) else details
+                        ),
+                    }
+                    for category, errors in log_errors.items()
+                    for field, details in errors.items()
+                ]
+            )
+
+            # Save errors to file
+            error_file_path = f"{self.output_folder}/schema_validation_errors.csv"
+            df_errors.to_csv(error_file_path, index=False, encoding="utf-8")
+
+            # Provide errors to user in rich table format:
+            relecov_tools.utils.display_dataframe_to_user(
+                name="Schema Validation Errors", dataframe=df_errors
+            )
+            stderr.print(f"\t- Log errors saved to:\n\t{error_file_path}")
+
+            # Ask user whether to continue or stop execution
+            if self.non_interactive or relecov_tools.utils.prompt_yn_question(
+                "Errors found in database values. Do you want to continue? (Y/N)"
+            ):
+                pass
+            else:
+                return log_errors
         else:
-            return None
+            stderr.print("[green]\t- Database validation passed")
+
+        # If no errors found
+        return None
+
+    def get_available_projects(self, json):
+        """Get list of available software in configuration
+
+        Args:
+            json (str): Path to bioinfo configuration json file.
+
+        Returns:
+            available_software: List containing available software defined in json.
+        """
+        config = relecov_tools.utils.read_json_file(json)
+        # available_software = list(config.keys())
+        available_projects = list(config.get("projects", {}).keys())
+        return available_projects
 
     def read_database_definition(self, sheet_id="main"):
         """Reads the database definition from an Excel sheet and converts it into JSON format.
@@ -185,22 +331,9 @@ class SchemaBuilder:
 
         # Perform validation of database content
         validation_out = self.validate_database_definition(json_data)
-
         if validation_out:
-            log.error(
-                f"({caller_method}:{sheet_id}) Validation of database content falied. Missing mandatory features in: {validation_out}"
-            )
-            stderr.print(
-                f"({caller_method}:{sheet_id}) [red]Validation of database content falied. Missing mandatory features in: {validation_out}"
-            )
-            sys.exit(1)
+            sys.exit()
         else:
-            log.info(
-                f"({caller_method}:{sheet_id}) Validation of database content passed."
-            )
-            stderr.print(
-                f"({caller_method}:{sheet_id}) [green]Validation of database content passed."
-            )
             return json_data
 
     def create_schema_draft_template(self):
@@ -213,7 +346,7 @@ class SchemaBuilder:
         """
         draft_template = (
             relecov_tools.assets.schema_utils.jsonschema_draft.create_draft(
-                self.draft_version, True
+                draft_version=self.draft_version, required_items=True
             )
         )
         return draft_template
@@ -252,6 +385,7 @@ class SchemaBuilder:
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
         return json_dict
 
+    # TODO: needs validation
     def complex_jsonschema_object(self, property_id, features_dict):
         """
         Create a complex (nested) JSON Schema object for a given property ID.
@@ -294,32 +428,46 @@ class SchemaBuilder:
         Build a new JSON Schema based on the provided JSON data and draft template.
 
         Parameters:
-        json_data (dict): The JSON data representing the database definition.
-        schema_template (dict): The JSON Schema draft template.
+        json_data (dict): Dictionary containing the properties and values of the database definition.
+        schema_draft (dict): The JSON Schema draft template.
 
         Returns:
             schema_draft (dict): The newly created JSON Schema.
         """
+        # Fill schema header
+        # FIXME: it gets 'relecov-tools' instead of RELECOV
+        new_schema = schema_draft
+        project_name = relecov_tools.utils.get_package_name()
+        new_schema["$id"] = relecov_tools.utils.get_schema_url()
+        new_schema["title"] = f"{project_name} Schema."
+        new_schema["description"] = (
+            f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
+        )
+        new_schema["version"] = self.version
+
+        # Fill schema properties
         try:
             # List of properties to check in the features dictionary (it maps values between database features and json schema features):
             #       key[db_feature_key]: value[schema_feature_key]
-            features_to_check = {
-                "type": "type",
+            mapping_features = {
                 "enum": "enum",
                 "examples": "examples",
                 "ontology_id": "ontology",
+                "type": "type",
+                "options": "options",
                 "description": "description",
                 "classification": "classification",
                 "label_name": "label",
                 "fill_mode": "fill_mode",
                 "required (Y/N)": "required",
+                "submitting_lab_form": "header",
             }
             required_property_unique = []
 
             # Read property_ids in the database.
             #   Perform checks and create (for each property) feature object like:
             #       {'example':'A', 'ontology': 'B'...}.
-            #   Finally this objet will be written to the draft schema.
+            #   Finally this objet will be written to the new schema.
             for property_id, db_features_dic in json_data.items():
                 schema_property = {}
                 required_property = {}
@@ -327,7 +475,7 @@ class SchemaBuilder:
                 # Parse property_ids that needs to be incorporated as complex fields in json_schema
                 if json_data[property_id].get("complex_field (Y/N)") == "Y":
                     complex_json_feature = self.complex_jsonschema_object(
-                        property_id, features_to_check
+                        property_id, mapping_features
                     )
                     if complex_json_feature:
                         schema_property["type"] = "array"
@@ -338,7 +486,7 @@ class SchemaBuilder:
                         ]
                 # For those that follows standard format, add them to json schema as well.
                 else:
-                    for db_feature_key, schema_feature_key in features_to_check.items():
+                    for db_feature_key, schema_feature_key in mapping_features.items():
                         # Verifiy that db_feature_key is present in the database (processed excel (aka 'json_data'))
                         if db_feature_key not in db_features_dic:
                             log.info(
@@ -348,7 +496,6 @@ class SchemaBuilder:
                                 f"[INFO] Feature {db_feature_key} is not present in database ({self.excel_file_path})"
                             )
                             continue
-                        # Record the required value for each property
                         if (
                             "required" in db_feature_key
                             or "required" == schema_feature_key
@@ -356,6 +503,28 @@ class SchemaBuilder:
                             is_required = str(db_features_dic[db_feature_key])
                             if is_required != "nan":
                                 required_property[property_id] = is_required
+                        elif db_feature_key == "options":
+                            options_value = str(
+                                db_features_dic.get("options", "")
+                            ).strip()
+                            if options_value:
+                                options_dict = {}
+                                options_list = options_value.split(",")
+
+                                for option in options_list:
+                                    key_value = option.split(":")
+                                    if len(key_value) == 2:
+                                        key = key_value[0].strip()
+                                        value = key_value[1].strip()
+                                        try:
+                                            if "." in value:
+                                                value = float(value)
+                                            else:
+                                                value = int(value)
+                                        except ValueError:
+                                            pass
+                                        options_dict[key] = value
+                                schema_property.update(options_dict)
                         else:
                             std_json_feature = self.standard_jsonschema_object(
                                 db_features_dic, db_feature_key
@@ -367,16 +536,32 @@ class SchemaBuilder:
                             else:
                                 continue
                 # Finally, send schema_property object to the new json schema draft.
-                schema_draft["properties"][property_id] = schema_property
+                new_schema["properties"][property_id] = schema_property
 
                 # Add to schema draft the recorded porperty_ids.
                 for key, values in required_property.items():
                     if values == "Y":
                         required_property_unique.append(key)
-            schema_draft["required"] = required_property_unique
+            # TODO: So far it appears at the end of the new json schema. Ideally it should be placed before the properties statement.
+            new_schema["required"] = required_property_unique
+            grouped_anyof = {}
+
+            for prop_id, prop_data in json_data.items():
+                group = str(prop_data.get("conditional_required_group", "")).strip()
+                if group and group.lower() != "nan":
+                    grouped_anyof.setdefault(group, []).append(prop_id)
+            anyof_rules = []
+            for props in grouped_anyof.values():
+                if len(props) >= 1:
+                    anyof_rules.extend([{"required": [prop]} for prop in props])
+                    for prop in props:
+                        if prop in required_property_unique:
+                            required_property_unique.remove(prop)
+            if anyof_rules:
+                new_schema["anyOf"] = anyof_rules
 
             # Return new schema
-            return schema_draft
+            return new_schema
 
         except Exception as e:
             log.error(f"Error building schema: {str(e)}")
@@ -424,10 +609,10 @@ class SchemaBuilder:
 
         if not diff_lines:
             log.info(
-                "No differencess were found between already installed and new generated schema. Exiting. No changes made"
+                "No differences were found between already installed and new generated schema. Exiting. No changes made"
             )
             stderr.print(
-                "[yellow]No differencess were found between already installed and new generated schema. Exiting. No changes made"
+                "[yellow]No differences were found between already installed and new generated schema. Exiting. No changes made"
             )
             return None
         else:
@@ -437,15 +622,22 @@ class SchemaBuilder:
             stderr.print(
                 "[yellow]Differences found between the existing schema and the newly generated schema."
             )
-            return self.print_save_schema_diff(diff_lines)
+            if self.show_diff:
+                return self.print_save_schema_diff(diff_lines)
+            else:
+                return None
 
     def print_save_schema_diff(self, diff_lines=None):
         # Set user's choices
-        choices = ["Print to sandard output (stdout)", "Save to file", "Both"]
-        diff_output_choice = relecov_tools.utils.prompt_selection(
-            "How would you like to print the diff between schemes?:", choices
+        choices = ["Print to standard output (stdout)", "Save to file", "Both"]
+        diff_output_choice = (
+            "Save to file"
+            if self.non_interactive
+            else relecov_tools.utils.prompt_selection(
+                "How would you like to print the diff between schemes?:", choices
+            )
         )
-        if diff_output_choice in ["Print to sandard output (stdout)", "Both"]:
+        if diff_output_choice in ["Print to standard output (stdout)", "Both"]:
             for line in diff_lines:
                 print(line)
             return True
@@ -471,7 +663,7 @@ class SchemaBuilder:
             bool: True if the schema was successfully saved, False otherwise.
         """
         try:
-            path_to_save = self.output_folder + "/relecov_schema.json"
+            path_to_save = f"{self.output_folder}/relecov_schema.json"
             with open(path_to_save, "w") as schema_file:
                 json.dump(json_data, schema_file, ensure_ascii=False, indent=4)
             log.info(f"New JSON schema saved to: {path_to_save}")
@@ -492,26 +684,94 @@ class SchemaBuilder:
     # FIXME: overview-tab - Still need to add the column that maps to tab metadatalab
     def create_metadatalab_excel(self, json_schema):
         """
-        Generate an Excel template file for Metadata LAB with three tabs: Overview, Metadata LAB, and Data Validation.
+        Generates an Excel template file for Metadata LAB with four sheets:
+        Overview, Metadata LAB, Data Validation, and Version History.
 
         Args:
-            json_schema (dict): The JSON Schema from which the Excel template is generated. It should include properties and required fields.
+            json_schema (dict): The JSON schema used to generate the template.
+                                It should include properties and required fields.
 
         Returns:
-            None: if any error occurs during the process.
+            None: If an error occurs during the process.
         """
         try:
-            # Set up metadatalab configuration
-            out_file = os.path.join(
-                self.output_folder, "metadatalab_template" + ".xlsx"
+            # Retrieve existing files in the output directory
+            output_files = os.listdir(self.output_folder)
+            notes_control_input = (
+                "Auto-generated update"
+                if self.non_interactive
+                else input(
+                    "\033[93mEnter a note about changes made to the schema: \033[0m"
+                )
             )
+            # Identify existing template files
+            template_files = [
+                f for f in output_files if f.startswith("Relecov_metadata_template")
+            ]
+            if template_files:
+                # Extract the latest version number from existing files
+                latest_file = max(
+                    template_files,
+                    key=lambda x: (
+                        re.search(r"v(\d+\.\d+\.\d+)", x).group(1)
+                        if re.search(r"v(\d+\.\d+\.\d+)", x)
+                        else "0"
+                    ),
+                )
+                match = re.search(r"v(\d+\.\d+\.\d+)", latest_file)
+                if match:
+                    # Load the latest template file and attempt to read version history
+                    out_file = os.path.join(self.output_folder, latest_file)
+                    version_history = pd.DataFrame(
+                        columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
+                    )
+
+                    try:
+                        wb = openpyxl.load_workbook(out_file)
+                        if "VERSION" in wb.sheetnames:
+                            ws_version = wb["VERSION"]
+                            data = ws_version.values
+                            columns = next(data)
+                            version_history = pd.DataFrame(data, columns=columns)
+                    except Exception as e:
+                        log.warning(f"Error reading previous VERSION sheet: {e}")
+                    next_version = self.version
+                else:
+                    next_version = "1.0.0"
+                    out_file = os.path.join(
+                        self.output_folder,
+                        f"Relecov_metadata_template_v{next_version}.xlsx",
+                    )
+            else:
+                next_version = "1.0.0"
+                out_file = os.path.join(
+                    self.output_folder,
+                    f"Relecov_metadata_template_v{next_version}.xlsx",
+                )
+            # Store versioning information
+            version_info = {
+                "FILE_VERSION": f"Relecov_metadata_template_v{next_version}",
+                "CODE": next_version,
+                "NOTES CONTROL": notes_control_input,
+                "DATE": datetime.now().strftime("%Y-%m-%d"),
+            }
+            version_history = pd.concat(
+                [version_history, pd.DataFrame([version_info])], ignore_index=True
+            )
+            out_file = os.path.join(
+                self.output_folder, f"Relecov_metadata_template_v{next_version}.xlsx"
+            )
+
+            # Define required metadata classifications
             required_classification = [
                 "Database Identifiers",
                 "Sample collection and processing",
                 "Host information",
                 "Sequencing",
-                "Pathogen Diagnostic testing",
+                "Pathogen diagnostic testing",
                 "Contributor Acknowledgement",
+                "Public databases",
+                "Bioinformatics and QC metrics fields",
             ]
             required_properties = json_schema.get("required")
             schema_properties = json_schema.get("properties")
@@ -524,6 +784,7 @@ class SchemaBuilder:
                 df = relecov_tools.assets.schema_utils.metadatalab_template.schema_properties_to_df(
                     schema_properties_flatten
                 )
+                # Filter metadata fields based on required classifications
                 df = df[df["classification"].isin(required_classification)]
                 df["required"] = df["property_id"].apply(
                     lambda x: "Y" if x in required_properties else "N"
@@ -533,6 +794,16 @@ class SchemaBuilder:
                 stderr.print(f"Error processing schema properties: {e}")
                 return None
 
+            # Ensure 'header' column exists before filtering
+            if "header" in df.columns:
+                df["header"] = df["header"].astype(str).str.strip()
+                df_filtered = df[df["header"].str.upper() == "Y"]
+            else:
+                log.warning(
+                    "No se encontró la columna 'header', usando df sin filtrar."
+                )
+                df_filtered = df
+
             # Overview sheet
             try:
                 overview_header = [
@@ -541,16 +812,15 @@ class SchemaBuilder:
                     "Group",
                     "Mandatory (Y/N)",
                     "Example",
-                    "METADATA_LAB COLUMN",
                 ]
                 df_overview = pd.DataFrame(
                     columns=[col_name for col_name in overview_header]
                 )
-                df_overview["Label name"] = df["label"]
-                df_overview["Description"] = df["description"]
-                df_overview["Group"] = df["classification"]
-                df_overview["Mandatory (Y/N)"] = df["required"]
-                df_overview["Example"] = df["examples"].apply(
+                df_overview["Label name"] = df_filtered["label"]
+                df_overview["Description"] = df_filtered["description"]
+                df_overview["Group"] = df_filtered["classification"]
+                df_overview["Mandatory (Y/N)"] = df_filtered["required"]
+                df_overview["Example"] = df_filtered["examples"].apply(
                     lambda x: x[0] if isinstance(x, list) else x
                 )
             except Exception as e:
@@ -558,24 +828,27 @@ class SchemaBuilder:
                 stderr.print(f"Error creating overview sheet: {e}")
                 return None
 
-            # MetadataLab sheet
+            # Create Metadata LAB sheet
             try:
-                metadatalab_header = ["EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
+                metadatalab_header = ["REQUERIDO", "EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
                 df_metadata = pd.DataFrame(
                     columns=[col_name for col_name in metadatalab_header]
                 )
-                df_metadata["EJEMPLOS"] = df["examples"].apply(
+                df_metadata["REQUERIDO"] = df_filtered["required"].apply(
+                    lambda x: "YES" if str(x).upper() in ["Y", "YES"] else ""
+                )
+                df_metadata["EJEMPLOS"] = df_filtered["examples"].apply(
                     lambda x: x[0] if isinstance(x, list) else x
                 )
-                df_metadata["DESCRIPCIÓN"] = df["description"]
-                df_metadata["CAMPO"] = df["label"]
+                df_metadata["DESCRIPCIÓN"] = df_filtered["description"]
+                df_metadata["CAMPO"] = df_filtered["label"]
                 df_metadata = df_metadata.transpose()
             except Exception as e:
                 log.error(f"Error creating MetadataLab sheet: {e}")
                 stderr.print(f"[red]Error creating MetadataLab sheet: {e}")
                 return None
 
-            # DataValidation sheet
+            # Create Data Validation sheet
             try:
                 datavalidation_header = ["EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
                 df_hasenum = df[(pd.notnull(df.enum))]
@@ -594,8 +867,7 @@ class SchemaBuilder:
                 return None
 
             try:
-                # Since enums have different lengths we need further processing.
-                # Convert df into dict to perform data manipulation.
+
                 enum_dict = {property: [] for property in df_hasenum["property_id"]}
                 enum_maxitems = 0
                 # Populate the dictionary with flattened lists
@@ -634,6 +906,23 @@ class SchemaBuilder:
                 stderr.print(f"[red]Error processing enums and combining data: {e}")
                 return None
 
+            #  Replace NaN, Inf values with empty strings
+            df_overview = (
+                df_overview.replace([float("inf"), float("-inf")], "")
+                .fillna("")
+                .infer_objects()
+            )
+            df_metadata = (
+                df_metadata.replace([float("inf"), float("-inf")], "")
+                .fillna("")
+                .infer_objects()
+            )
+            df_validation = (
+                df_validation.replace([float("inf"), float("-inf")], "")
+                .fillna("")
+                .infer_objects()
+            )
+
             # WRITE EXCEL
             try:
                 writer = pd.ExcelWriter(out_file, engine="xlsxwriter")
@@ -661,6 +950,7 @@ class SchemaBuilder:
                     have_index=True,
                     have_header=False,
                 )
+                version_history.to_excel(writer, sheet_name="VERSION", index=False)
                 writer.close()
                 log.info(f"Metadata lab template successfuly created in: {out_file}")
                 stderr.print(
@@ -674,7 +964,11 @@ class SchemaBuilder:
             try:
                 wb = openpyxl.load_workbook(out_file)
                 ws_metadata = wb["METADATA_LAB"]
-
+                ws_metadata.freeze_panes = self.configurables.get("freeze_panel", "D1")
+                ws_metadata.delete_rows(5)
+                relecov_tools.assets.schema_utils.metadatalab_template.create_condition(
+                    ws_metadata, self.project_config, df_filtered
+                )
                 ws_dropdowns = (
                     wb.create_sheet("DROPDOWNS")
                     if "DROPDOWNS" not in wb.sheetnames
@@ -707,16 +1001,79 @@ class SchemaBuilder:
                         dropdown = DataValidation(
                             type="list",
                             formula1=f"{dropdown_range_address}",
-                            allow_blank=True,
+                            allow_blank=False,
+                            showErrorMessage=True,
                         )
-                        dropdown.error = "Invalid value"
-                        dropdown.errorTitle = "Invalid entry"
+                        dropdown.error = "El valor ingresado no es válido. Seleccione un valor de la lista desplegable."
+                        dropdown.errorTitle = "Valor no permitido"
                         dropdown.prompt = f"Select a value for {property_id}"
                         dropdown.promptTitle = "Value selection"
 
                         ws_metadata.add_data_validation(dropdown)
                         dropdown.add(dropdown_range_metadata)
+
+                if "OVERVIEW" in wb.sheetnames:
+                    ws_overview = wb["OVERVIEW"]
+                    column_width = 35
+                    for col in ws_overview.columns:
+                        max_length = 0
+                        column = col[0].column_letter  # Get the column name
+                        for cell in col:
+                            try:
+                                if len(str(cell.value)) > max_length:
+                                    max_length = len(cell.value)
+                            except Exception:
+                                pass
+                        adjusted_width = max_length + 2
+                        ws_overview.column_dimensions[column].width = min(
+                            adjusted_width, column_width
+                        )
+
+                    # Enable text wrapping for the entire sheet
+                    for row in ws_overview.iter_rows():
+                        for cell in row:
+                            cell.alignment = openpyxl.styles.Alignment(wrap_text=True)
+
+                    # ws_overview.protection.sheet = True
+                    # ws_overview.protection.password = self.configurables.get(
+                    #     "protection.password", ""
+                    # )
+
+                    # if "DATA_VALIDATION" in wb.sheetnames:
+                    # ws_data_validation = wb["DATA_VALIDATION"]
+                    # ws_data_validation.protection.sheet = True
+                    # ws_data_validation.protection.password = self.configurables.get(
+                    #     "protection.password", ""
+                    # )
+
+                    # if "VERSION" in wb.sheetnames:
+                    # ws_data_validation = wb["VERSION"]
+                    # ws_data_validation.protection.sheet = True
+                    # ws_data_validation.protection.password = self.configurables.get(
+                    #     "protection.password", ""
+                    # )
+
+                    ws_version = wb["VERSION"]
+                    column_widths = []
+
+                    for col in ws_version.columns:
+                        max_length = 0
+                        for cell in col:
+                            if len(str(cell.value)) > max_length:
+                                max_length = len(cell.value)
+                        adjusted_width = max_length + 2
+                        column_widths.append(adjusted_width)
+
+                    # Apply the calculated column width
+                    for i, width in enumerate(column_widths):
+                        ws_version.column_dimensions[
+                            openpyxl.utils.get_column_letter(i + 1)
+                        ].width = width
+
                 ws_dropdowns.sheet_state = "hidden"
+                # ws_dropdowns.protection.sheet = True
+                # ws_dropdowns.protection.password = "password123"
+
                 wb.save(out_file)
             except Exception as e:
                 log.error(f"Error adding dropdowns: {e}")
@@ -726,6 +1083,99 @@ class SchemaBuilder:
             log.error(f"Error in create_metadatalab_excel: {e}")
             stderr.print(f"[red]Error in create_metadatalab_excel: {e}")
             return None
+
+    def summarize_schema(self, json_schema):
+        """
+        Generate summary statistics for a JSON Schema and display it in tabular format.
+
+        Args:
+            json_schema (dict): The JSON Schema to analyze.
+
+        Returns:
+            None: Displays the table directly to stdout.
+        """
+        properties = json_schema.get("properties", {})
+        # Initialize counters
+        total_properties = len(properties)
+        type_counts = {}
+        enum_count = 0
+        free_text_count = 0
+
+        # Iterate over properties
+        for _, prop_details in properties.items():
+            prop_type = prop_details.get("type", "unknown")
+
+            # Count types
+            type_counts[prop_type] = type_counts.get(prop_type, 0) + 1
+
+            # Count enum vs free text
+            if "enum" in prop_details:
+                enum_count += 1
+            else:
+                free_text_count += 1
+
+        # Prepare summary data
+        summary_data = {
+            "Total Properties": [total_properties],
+            "String Properties": [type_counts.get("string", 0)],
+            "Integer Properties": [type_counts.get("integer", 0)],
+            "Number Properties": [type_counts.get("number", 0)],
+            "Boolean Properties": [type_counts.get("boolean", 0)],
+            "Object Properties": [type_counts.get("object", 0)],
+            "Array Properties": [type_counts.get("array", 0)],
+            "Enum Properties": [enum_count],
+            "Free Text Properties": [free_text_count],
+        }
+        summary_df = pd.DataFrame(summary_data)
+
+        # Display summary using rich table (if available) or print raw
+        try:
+            relecov_tools.utils.display_dataframe_to_user(
+                name="JSON Schema Summary", dataframe=summary_df
+            )
+        except AttributeError:
+            print(summary_df.to_string(index=False))
+
+        def shorten_path(path, max_length=50):
+            """Shortens long paths by keeping first and last segments while adding ellipsis in the middle."""
+            if len(path) <= max_length:
+                return path  # No need to shorten
+
+            parts = path.split(os.sep)  # Split into parts
+            if len(parts) > 3:
+                return os.sep.join(
+                    [parts[0], "..."] + parts[-2:]
+                )  # Keep first, last two, and replace middle
+            return path  # If it's already short, return as is
+
+        # Folder containing results
+        outdir_data = {
+            "Description": [
+                "Output Folder",
+                "New JSON Schema",
+                "Old JSON Schema",
+                "Schema Diff File",
+                "Metadata Template File",
+            ],
+            "Path": [
+                shorten_path(self.output_folder),
+                shorten_path(f"{self.output_folder}/relecov_schema.json"),
+                shorten_path(self.base_schema_path),
+                shorten_path(f"{self.output_folder}/build_schema_diff.txt"),
+                shorten_path(f"{self.output_folder}/Relecov_metadata_template_v*.xlsx"),
+            ],
+        }
+
+        # Convert to DataFrame
+        outdir_df = pd.DataFrame(outdir_data)
+
+        # Display summary using rich table or print raw if unavailable
+        try:
+            relecov_tools.utils.display_dataframe_to_user(
+                name="JSON Results Overview", dataframe=outdir_df
+            )
+        except AttributeError:
+            print(outdir_df.to_string(index=False))
 
     def handle_build_schema(self):
         # Load xlsx database and convert into json format
@@ -749,24 +1199,17 @@ class SchemaBuilder:
         # Verify new schema follows json schema specification rules.
         self.verify_schema(new_schema_json)
 
-        # Compare base vs new schema and saves new JSON schema
-        stderr.print(self.show_diff)
-        if self.show_diff:
-            schema_diff = self.get_schema_diff(base_schema_json, new_schema_json)
-        else:
-            schema_diff = None
+        # Compare base vs new schema and print/saves differences (--diff = True)
+        self.get_schema_diff(base_schema_json, new_schema_json)
 
-        if schema_diff:
-            self.save_new_schema(new_schema_json)
-        else:
-            log.info(f"No changes found against base schema ({self.base_schema_path}).")
-            stderr.print(
-                f"[green]No changes found against base schema ({self.base_schema_path})."
-            )
+        # Saves new JSON schema
+        self.save_new_schema(new_schema_json)
 
         # Create metadata lab template
-        promp_answ = relecov_tools.utils.prompt_yn_question(
+        if self.non_interactive or relecov_tools.utils.prompt_yn_question(
             "Do you want to create a metadata lab file?:"
-        )
-        if promp_answ:
+        ):
             self.create_metadatalab_excel(new_schema_json)
+
+        # Return new schema
+        return new_schema_json
