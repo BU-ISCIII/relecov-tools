@@ -411,11 +411,27 @@ class PipelineManager(BaseModule):
             # Create a folder for the group of samples and copy the files there
             log.info("Creating folder for group %s", group_tag)
             stderr.print(f"[blue]Creating folder for group {group_tag}")
-            # copy template folder and subfolders in output folder
-            shutil.copytree(
-                os.path.join(self.templates_root, org_conf["pipeline_template"]),
-                group_outfolder,
-            )
+            
+            pipeline_templates = org_conf.get("pipeline_templates")
+            if pipeline_templates:
+                for template_name in pipeline_templates:
+                    template_path = os.path.join(self.templates_root, template_name)
+                    if not os.path.exists(template_path):
+                        log.warning(f"Template {template_path} does not exist. Skipping.")
+                        continue
+                    for item in os.listdir(template_path):
+                        s = os.path.join(template_path, item)
+                        d = os.path.join(group_outfolder, item)
+                        if os.path.isdir(s):
+                            shutil.copytree(s, d, dirs_exist_ok=True)
+                        else:
+                            shutil.copy2(s, d)
+            else:
+                template_name = org_conf["pipeline_template"]
+                shutil.copytree(
+                    os.path.join(self.templates_root, template_name),
+                    group_outfolder,
+                )
             # Check for possible duplicates
             log.info("Samples to copy %s", len(samples_data))
             # Extract the sequencing_sample_id from the list of dictionaries
