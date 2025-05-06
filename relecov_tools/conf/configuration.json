@@ -47,6 +47,12 @@
             "Host Age Years",
             "Host Age Months",
             "Host Gender",
+            "Vaccinated",
+            "Specific medication for treatment or prophylaxis",
+            "Hospitalization",
+            "Admission to intensive care unit",
+            "Death",
+            "Immunosuppression",
             "Sequencing Date",
             "Nucleic acid extraction protocol",
             "Commercial All-in-one library kit",
@@ -70,13 +76,7 @@
             "Diagnostic Pcr Ct Value-2",
             "Authors",
             "Sequence file R1",
-            "Sequence file R2", 
-            "Vaccinated",
-            "Specific medication for treatment or prophylaxis",
-            "Hospitalization",
-            "Admission to intensive care unit",
-            "Death",
-            "Immunosuppression"
+            "Sequence file R2"
         ],
         "alt_heading_equivalences": {
             "Sample ID": "Sample ID given for sequencing",
