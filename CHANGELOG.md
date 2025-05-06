@@ -84,6 +84,7 @@ Code contributions to the release:
 - Fix generation and upload of invalid_*.xlsx with headers [#494](https://github.com/BU-ISCIII/relecov-tools/pull/494)
 - Included correct handling of CLI --log-path arg fixing #490 [#497](https://github.com/BU-ISCIII/relecov-tools/pull/497)
 - Update relecov_schema.json and fastq properties in relecov-tools modules [#501](https://github.com/BU-ISCIII/relecov-tools/pull/501)
+- Fix header order in configuration.json [#505](https://github.com/BU-ISCIII/relecov-tools/pull/505)
 
 #### Changed
 
