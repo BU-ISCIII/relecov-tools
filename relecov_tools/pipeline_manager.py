@@ -229,12 +229,10 @@ class PipelineManager(BaseModule):
         for sample in samples_data:
             sample_id = sample["sequencing_sample_id"]
             # fetch the file extension
-            ext_found = re.match(
-                r".*(fastq.*|bam)", sample["sequence_file_path_R1_fastq"]
-            )
+            ext_found = re.match(r".*(fastq.*|bam)", sample["sequence_file_path_R1"])
             if not ext_found:
                 log.error("No valid file extension found for %s", sample_id)
-                samp_errors[sample_id].append(sample["sequence_file_path_R1_fastq"])
+                samp_errors[sample_id].append(sample["sequence_file_path_R1"])
                 continue
             ext = ext_found.group(1)
             seq_r1_sample_id = sample["sequencing_sample_id"] + "_R1." + ext
@@ -245,7 +243,7 @@ class PipelineManager(BaseModule):
             log.info("Copying sample %s", sample)
             stderr.print("[blue] Copying sample: ", sample["sequencing_sample_id"])
             try:
-                shutil.copy(sample["sequence_file_path_R1_fastq"], sample_raw_r1)
+                shutil.copy(sample["sequence_file_path_R1"], sample_raw_r1)
                 # create simlink for the r1
                 r1_link_path = os.path.join(links_folder, seq_r1_sample_id)
                 r1_link_path_ori = os.path.join("../../RAW", seq_r1_sample_id)
@@ -253,12 +251,12 @@ class PipelineManager(BaseModule):
             except FileNotFoundError as e:
                 log.error("File not found %s", e)
                 samp_errors[sample_id] = []
-                samp_errors[sample_id].append(sample["sequence_file_path_R1_fastq"])
-                if "sequence_file_path_R2_fastq" in sample:
-                    samp_errors[sample_id].append(sample["sequence_file_path_R2_fastq"])
+                samp_errors[sample_id].append(sample["sequence_file_path_R1"])
+                if "sequence_file_path_R2" in sample:
+                    samp_errors[sample_id].append(sample["sequence_file_path_R2"])
                 continue
             # check if there is a r2 file
-            if "sequence_file_path_R2_fastq" in sample:
+            if "sequence_file_path_R2" in sample:
                 seq_r2_sample_id = sample["sequencing_sample_id"] + "_R2." + ext
                 sample_raw_r2 = os.path.join(
                     output_folder,
@@ -266,7 +264,7 @@ class PipelineManager(BaseModule):
                     seq_r2_sample_id,
                 )
                 try:
-                    shutil.copy(sample["sequence_file_path_R2_fastq"], sample_raw_r2)
+                    shutil.copy(sample["sequence_file_path_R2"], sample_raw_r2)
                     r2_link_path = os.path.join(links_folder, seq_r2_sample_id)
                     r2_link_path_ori = os.path.join("../../RAW", seq_r2_sample_id)
                     os.symlink(r2_link_path_ori, r2_link_path)
@@ -274,14 +272,14 @@ class PipelineManager(BaseModule):
                     log.error("File not found %s", e)
                     if not samp_errors.get(sample_id):
                         samp_errors[sample_id] = []
-                    samp_errors[sample_id].append(sample["sequence_file_path_R2_fastq"])
+                    samp_errors[sample_id].append(sample["sequence_file_path_R2"])
                     continue
         return samp_errors
 
     def create_samples_data(self, json_data):
         """Creates a copy of the json_data but only with relevant keys to copy files.
-        Here 'sequence_file_path_R1_fastq' is created joining the original 'sequence_file_path_R1_fastq'
-        and 'sequence_file_R1_fastq' fields. The same goes for 'sequence_file_path_R2_fastq'
+        Here 'sequence_file_path_R1' is created joining the original 'sequence_file_path_R1'
+        and 'sequence_file_R1' fields. The same goes for 'sequence_file_path_R2'
 
         Args:
             json_data (list(dict)): Samples metadata in a list of dictionaries
@@ -291,8 +289,8 @@ class PipelineManager(BaseModule):
                 [
                   {
                     "sequencing_sample_id":XXXX,
-                    "sequence_file_path_R1_fastq": XXXX,
-                    "sequence_file_path_R2_fastq":XXXX
+                    "sequence_file_path_R1": XXXX,
+                    "sequence_file_path_R2":XXXX
                   }
                 ]
         """
@@ -300,12 +298,12 @@ class PipelineManager(BaseModule):
         for item in json_data:
             sample = {}
             sample["sequencing_sample_id"] = item["sequencing_sample_id"]
-            sample["sequence_file_path_R1_fastq"] = os.path.join(
-                item["sequence_file_path_R1_fastq"], item["sequence_file_R1_fastq"]
+            sample["sequence_file_path_R1"] = os.path.join(
+                item["sequence_file_path_R1"], item["sequence_file_R1"]
             )
-            if "sequence_file_path_R2_fastq" in item:
-                sample["sequence_file_path_R2_fastq"] = os.path.join(
-                    item["sequence_file_path_R2_fastq"], item["sequence_file_R2_fastq"]
+            if "sequence_file_path_R2" in item:
+                sample["sequence_file_path_R2"] = os.path.join(
+                    item["sequence_file_path_R2"], item["sequence_file_R2"]
                 )
             samples_data.append(sample)
         return samples_data
@@ -456,7 +454,7 @@ class PipelineManager(BaseModule):
             samples_by_path = defaultdict(list)
             for s in samples_data:
                 institution_path = os.path.dirname(
-                    s.get("sequence_file_path_R1_fastq", "Missing [LOINC:LA14698-7]")
+                    s.get("sequence_file_path_R1", "Missing [LOINC:LA14698-7]")
                 )
                 samples_by_path[institution_path].append(s["sequencing_sample_id"])
 
@@ -468,7 +466,7 @@ class PipelineManager(BaseModule):
                 if matching_samples:
                     institution_path = os.path.dirname(
                         matching_samples[0].get(
-                            "sequence_file_path_R1_fastq", "Missing [LOINC:LA14698-7]"
+                            "sequence_file_path_R1", "Missing [LOINC:LA14698-7]"
                         )
                     )
                 else:
