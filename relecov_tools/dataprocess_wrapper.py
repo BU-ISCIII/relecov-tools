@@ -4,6 +4,7 @@ import yaml
 import os
 import inspect
 import rich.console
+from collections import defaultdict
 from relecov_tools.download_manager import DownloadManager
 from relecov_tools.read_lab_metadata import RelecovMetadata
 from relecov_tools.json_validation import SchemaValidation
@@ -367,5 +368,26 @@ class ProcessWrapper(BaseModule):
             called_module="wrapper",
             to_excel=True,
         )
+
+        # Logging wrapper stats
+        labs = {folder.split("/")[0] for folder in finished_folders}
+        num_labs = len(labs)
+        samples_per_lab = defaultdict(int)
+        for folder, files in finished_folders.items():
+            lab = folder.split("/")[0]
+            samples_per_lab[lab] += len(files)
+        total_count = sum(samples_per_lab.values())
+
+        stderr.print("[blue] --------------------")
+        stderr.print("[blue] WRAPPER SUMMARY")
+        stderr.print("[blue] --------------------")
+        self.log.info(f"Number of processed laboratories: {num_labs}")
+        stderr.print(f"[blue]Number of processed laboratories: {num_labs}")
+        self.log.info(f"Total number of processed files: {total_count}")
+        stderr.print(f"[blue]Total number of processed files: {total_count}")
+        stderr.print("[blue]Processed files for each laboratory")
+        for lab, count in samples_per_lab.items():
+            self.log.info(f"    {lab}: {count} files")
+            stderr.print(f"[blue]    {lab}: {count} files")
 
         return
