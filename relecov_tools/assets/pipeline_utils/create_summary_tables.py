@@ -303,10 +303,14 @@ if __name__ == "__main__":
 
     # Validate that either input directory or file lists or individual files are provided
     if not (args.input or args.metadata_list or args.metadata_file):
-        parser.error("Either --input, --metadata-list, or --metadata-file must be provided")
+        parser.error(
+            "Either --input, --metadata-list, or --metadata-file must be provided"
+        )
     if not (args.input or args.long_table_list or args.long_table_file):
-        parser.error("Either --input, --long-table-list, or --long-table-file must be provided")
-    
+        parser.error(
+            "Either --input, --long-table-list, or --long-table-file must be provided"
+        )
+
     process_json_files(
         args.input,
         args.metadata_list,
