@@ -35,6 +35,7 @@ Code contributions to the release:
 
 ### Modules
 
+- Introduced BaseModule as parent class for all other classes. Used to to handle logs. [#466](https://github.com/BU-ISCIII/relecov-tools/pull/466)
 - New module add-extra-config for additional custom config [#464](https://github.com/BU-ISCIII/relecov-tools/pull/464)
 
 #### Added enhancements
