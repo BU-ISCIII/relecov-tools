@@ -401,8 +401,8 @@ class DownloadManager(BaseModule):
         # TODO Include these columns in config
         index_sampleID = meta_header.index("Sample ID given for sequencing")
         index_layout = meta_header.index("Library Layout")
-        index_fastq_r1 = meta_header.index("Sequence file R1 fastq")
-        index_fastq_r2 = meta_header.index("Sequence file R2 fastq")
+        index_fastq_r1 = meta_header.index("Sequence file R1")
+        index_fastq_r2 = meta_header.index("Sequence file R2")
         counter = header_row
         for row in islice(metadata_ws.values, header_row, metadata_ws.max_row):
             counter += 1
