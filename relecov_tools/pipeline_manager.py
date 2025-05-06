@@ -413,7 +413,11 @@ class PipelineManager(BaseModule):
             stderr.print(f"[blue]Creating folder for group {group_tag}")
 
             pipeline_templates = org_conf.get("pipeline_templates")
-            if pipeline_templates:
+            if pipeline_templates is not None:
+                if not isinstance(pipeline_templates, list):
+                    raise ValueError(
+                        f"'pipeline_templates' must be a list, but got {type(pipeline_templates).__name__}"
+                    )
                 for template_name in pipeline_templates:
                     template_path = os.path.join(self.templates_root, template_name)
                     if not os.path.exists(template_path):
@@ -429,11 +433,20 @@ class PipelineManager(BaseModule):
                         else:
                             shutil.copy2(s, d)
             else:
+                if "pipeline_template" not in org_conf:
+                    raise ValueError(
+                        "Organism config must include either 'pipeline_templates' (list) or 'pipeline_template' (string)."
+                    )
                 template_name = org_conf["pipeline_template"]
-                shutil.copytree(
-                    os.path.join(self.templates_root, template_name),
-                    group_outfolder,
-                )
+                if not isinstance(template_name, str):
+                    raise ValueError(
+                        f"'pipeline_template' must be a string, but got {type(template_name).__name__}"
+                    )
+                template_path = os.path.join(self.templates_root, template_name)
+                if not os.path.exists(template_path):
+                    raise FileNotFoundError(f"Template {template_path} does not exist.")
+                shutil.copytree(template_path, group_outfolder)
+
             # Check for possible duplicates
             log.info("Samples to copy %s", len(samples_data))
             # Extract the sequencing_sample_id from the list of dictionaries
