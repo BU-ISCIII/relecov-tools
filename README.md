@@ -102,15 +102,10 @@ Commands:
 
 Further explanation for each argument:
 
-`--verbose`: Prints all logs as standard output, showing them to the user.
-
-`--log-path`: Use it to indicate a custom path for all logs to be saved. See [Logging functionality](#Logging_functionality) for more information.
-
-`--debug`: Activate DEBUG logs. When not provided, logs will only show the most relevant information.
-
-`--hex-code`: By default all files generated will include a date and an unique hexadecimal code which is randomly generated upon execution. 
-
-Using this argument you can pre-define the resulting hexadecimal code. NOTE: Keep in mind that this could overwrite existing files.
+- `--verbose`: Prints all logs as standard output, showing them to the user.
+- `--log-path`: Use it to indicate a custom path for all logs to be saved. See [Logging functionality](#Logging_functionality) for more information.
+- `--debug`: Activate DEBUG logs. When not provided, logs will only show the most relevant information.
+- `--hex-code`: By default all files generated will include a date and an unique hexadecimal code which is randomly generated upon execution. Using this argument you can pre-define the resulting hexadecimal code. NOTE: Keep in mind that this could overwrite existing files.
 
 
 ## Modules
