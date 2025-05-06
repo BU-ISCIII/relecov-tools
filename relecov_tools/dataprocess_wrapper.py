@@ -102,52 +102,6 @@ class ProcessWrapper(BaseModule):
         )
         return valid_json_data, invalid_json, validate_logs
 
-    def clean_remote_folders(self, processed_folders):
-        """
-        Remove all remote folders used during the current batch process, excluding
-        those reserved for temporary or invalid data.
-
-        Args:
-            processed_folders (dict): Dictionary of folders successfully processed
-            during the batch, where keys are folder paths and values are lists of
-            successfully downloaded files.
-
-        Notes:
-            - Only folders not ending in '_invalid_samples' or '_tmp_processing'
-            are targeted for cleanup.
-            - If listing or cleaning fails, the issue is logged and skipped without
-            halting execution.
-        """
-        if not processed_folders:
-            self.log.warning("No processed folders provided for cleanup.")
-            return
-
-        parent_dirs = set(os.path.dirname(folder) for folder in processed_folders)
-
-        for parent_dir in parent_dirs:
-            try:
-                subfolders = self.relecov_sftp.list_remote_folders(parent_dir)
-            except Exception as e:
-                self.log.error(f"Could not list remote folders in {parent_dir}: {e}")
-                continue
-
-            for subfolder in subfolders:
-                full_path = os.path.join(parent_dir, subfolder)
-                if subfolder.endswith("_invalid_samples") or subfolder.endswith(
-                    "_tmp_processing"
-                ):
-                    self.log.info(f"Preserving folder: {full_path}")
-                    continue
-
-                try:
-                    self.download_manager.delete_remote_files(
-                        full_path, skip_seqs=False
-                    )
-                    self.download_manager.clean_remote_folder(full_path)
-                    self.log.info(f"Cleaned remote folder: {full_path}")
-                except Exception as e:
-                    self.log.warning(f"Could not clean folder {full_path}: {e}")
-
     def process_folder(self, finished_folders, key, folder_logs):
         """Executes read-lab-metadata and validation process for the given downloaded folder.
         Merges all the log summaries generated with the ones from download process, creates
@@ -414,9 +368,4 @@ class ProcessWrapper(BaseModule):
             to_excel=True,
         )
 
-        if self.download_params.get("download_option") == "download_clean":
-            self.download_option = "download_clean"
-            self.finished_folders = self.download_manager.finished_folders
-            self.relecov_sftp = self.download_manager.relecov_sftp
-            self.clean_remote_folders(processed_folders=finished_folders)
         return
