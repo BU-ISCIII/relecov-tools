@@ -946,7 +946,9 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
             log.error(f"Couldn't extract data from {file}: {e}")
 
     if not all_logs:
-        stderr.print(f"[red]No logs extracted. Make sure the --lab_code '{lab_code}' exists in the provided files.")
+        stderr.print(
+            f"[red]No logs extracted. Make sure the --lab_code '{lab_code}' exists in the provided files."
+        )
         log.error(f"No logs extracted for lab_code '{lab_code}'.")
         exit(1)
 
