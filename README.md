@@ -204,7 +204,7 @@ Usage: relecov-tools validate [OPTIONS]
 
   Options:
     -j, --json_file TEXT    Json file to validate
-    -s, --json_schema TEXT  Json schema (default: relecov-schema)
+    -s, --json_schema_file TEXT Path to the JSON Schema file used for validation (default: relecov-schema)
     -m, --metadata PATH     Origin file containing metadata
     -o, --out_folder TEXT   Path to save validate json file
     --help                  Show this message and exit.
