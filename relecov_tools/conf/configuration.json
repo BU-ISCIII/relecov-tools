@@ -483,7 +483,7 @@
                 ]
             },
             "Influenza virus [SNOMED:725894000]": {
-                "pipeline_template": "IRMA",
+                "pipeline_templates": ["IRMA", "taxprofiler"],
                 "service_tag": "GENOMEFLU",
                 "group_by_fields": [
                     "sequencing_instrument_platform"
