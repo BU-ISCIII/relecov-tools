@@ -64,6 +64,7 @@ Code contributions to the release:
 - Improves the formatting of the Global Report sheet in the summary Excel by truncating overly long warnings and errors individually [#474](https://github.com/BU-ISCIII/relecov-tools/pull/474)
 - Updated bioinfo_config.json to add the analysis date to the lineage_analysis_date in the bioinfo-lab-metadata json file. This analysis date is also added as the last column of the pangolin .csv files [#504](https://github.com/BU-ISCIII/relecov-tools/pull/504).
 - Improve error handling and messages in logs-to-excel module [507#](https://github.com/BU-ISCIII/relecov-tools/pull/507)
+- Added summary stats logging to wrapper module [514#](https://github.com/BU-ISCIII/relecov-tools/pull/514)
 
 #### Fixes
 
