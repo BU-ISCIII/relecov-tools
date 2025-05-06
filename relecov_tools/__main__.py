@@ -927,15 +927,29 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
     for file in full_paths:
         if not os.path.exists(file):
             stderr.print(f"[red]File {file} does not exist")
+            log.error(f"File {file} does not exist")
             continue
+
+        if os.path.getsize(file) == 0:
+            stderr.print(f"[red]File {file} is empty")
+            log.error(f"File {file} is empty")
+            continue
+
         try:
             with open(file, "r") as f:
-                all_logs.append(json.load(f)[lab_code])
+                content = json.load(f)
+                if lab_code not in content:
+                    raise KeyError(f"lab_code '{lab_code}' not found in {file}")
+                all_logs.append(content[lab_code])
         except Exception as e:
-            stderr.print(f"[red]Could extract data from {file}: {e}")
+            stderr.print(f"[red]Couldn't extract data from {file}: {e}")
+            log.error(f"Couldn't extract data from {file}: {e}")
+
     if not all_logs:
-        stderr.print("All provided files were empty.")
+        stderr.print(f"[red]No logs extracted. Make sure the --lab_code '{lab_code}' exists in the provided files.")
+        log.error(f"No logs extracted for lab_code '{lab_code}'.")
         exit(1)
+
     logsum = relecov_tools.log_summary.LogSum(output_location=output_folder)
     try:
         merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
