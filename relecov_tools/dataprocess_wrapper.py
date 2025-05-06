@@ -271,7 +271,13 @@ class ProcessWrapper(BaseModule):
             self.log.warning(
                 "Couldnt find %s folder in remote sftp. Creating new one", key
             )
-            remote_dir = os.path.join(key, self.batch_id + "_invalid_samples")
+            subfolder = getattr(self.download_manager, "subfolder", None)
+            if subfolder:
+                remote_dir = os.path.join(
+                    key, subfolder, self.batch_id + "_invalid_samples"
+                )
+            else:
+                remote_dir = os.path.join(key, self.batch_id + "_invalid_samples")
             self.download_manager.relecov_sftp.make_dir(remote_dir)
         else:
             remote_dir = valid_dirs[0]
