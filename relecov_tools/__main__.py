@@ -316,7 +316,7 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, metadata_out, files_
 # validation
 @relecov_tools_cli.command(help_priority=4)
 @click.option("-j", "--json_file", help="Json file to validate")
-@click.option("-s", "--json_schema_file", help="Json schema")
+@click.option("-s", "--json_schema_file", help="Path to the JSON Schema file used for validation")
 @click.option(
     "-m",
     "--metadata",
