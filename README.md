@@ -421,7 +421,7 @@ When provided, it overrides the default logging behavior and directs all log fil
 
 How default Logs are generated (when --log-path is not used):
 Use a predefined default location found in configuration.json under `logs_config` key. If the module executed is found in
-`modules_outpath`` subkey, the log will be generated in the specified folder, otherwise it will be generated in `default_outpath/module`
+`modules_outpath` subkey, the log will be generated in the specified folder, otherwise it will be generated in `default_outpath/module`
 
 If you want your logs to be sent to custom locations depending on the module executed you can do so by using add-extra-config, providing 
 
