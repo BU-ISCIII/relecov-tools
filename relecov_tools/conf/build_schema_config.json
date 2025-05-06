@@ -23,7 +23,7 @@
             },
             "sample_collection_date": {
                 "header_row_idx": 5,
-                "max_rows": 1000,
+                "max_rows": 5,
                 "validation_type": "custom",
                 "formula1": "ISNUMBER(DATEVALUE(TEXT({col_letter}5, \"yyyy-mm-dd\")))",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
@@ -31,7 +31,7 @@
             },
             "sample_received_date": {
                 "header_row_idx": 5,
-                "max_rows": 1000,
+                "max_rows": 5,
                 "validation_type": "custom",
                 "formula1": "ISNUMBER(DATEVALUE(TEXT({col_letter}5, \"yyyy-mm-dd\")))",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
@@ -39,7 +39,7 @@
             },
             "sequencing_date": {
                 "header_row_idx": 5,
-                "max_rows": 1000,
+                "max_rows": 5,
                 "validation_type": "custom",
                 "formula1": "ISNUMBER(DATEVALUE(TEXT({col_letter}5, \"yyyy-mm-dd\")))",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
