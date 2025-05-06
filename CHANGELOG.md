@@ -66,7 +66,8 @@ Code contributions to the release:
 - Updated bioinfo_config.json to add the analysis date to the lineage_analysis_date in the bioinfo-lab-metadata json file. This analysis date is also added as the last column of the pangolin .csv files [#504](https://github.com/BU-ISCIII/relecov-tools/pull/504).
 - Improve error handling and messages in logs-to-excel module [507#](https://github.com/BU-ISCIII/relecov-tools/pull/507)
 - Add extra template handling in pipeline-manager [#511](https://github.com/BU-ISCIII/relecov-tools/pull/511).
-- Added summary stats logging to wrapper module [514#](https://github.com/BU-ISCIII/relecov-tools/pull/514)
+- Added summary stats logging to wrapper module [514#](https://github.com/BU-ISCIII/relecov-tools/pull/514).
+- Updated the create_summary_tables.py script to be able to handle single .json files directly [#526](https://github.com/BU-ISCIII/relecov-tools/pull/526).
 
 #### Fixes
 
