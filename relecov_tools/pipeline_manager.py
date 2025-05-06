@@ -411,13 +411,15 @@ class PipelineManager(BaseModule):
             # Create a folder for the group of samples and copy the files there
             log.info("Creating folder for group %s", group_tag)
             stderr.print(f"[blue]Creating folder for group {group_tag}")
-            
+
             pipeline_templates = org_conf.get("pipeline_templates")
             if pipeline_templates:
                 for template_name in pipeline_templates:
                     template_path = os.path.join(self.templates_root, template_name)
                     if not os.path.exists(template_path):
-                        log.warning(f"Template {template_path} does not exist. Skipping.")
+                        log.warning(
+                            f"Template {template_path} does not exist. Skipping."
+                        )
                         continue
                     for item in os.listdir(template_path):
                         s = os.path.join(template_path, item)
