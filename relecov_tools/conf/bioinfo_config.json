@@ -27,14 +27,14 @@
             "fn": "quality_control_report(?:_\\d{8})?\\.tsv",
             "sample_col_idx": 1,
             "header_row_idx": 1,
-            "required": false,
+            "required": true,
             "function": null,
             "multiple_samples": true,
             "split_by_batch": true,
             "content": {
                 "per_sgene_ambiguous": "S-Gene_Ambiguous_Percentage",
                 "per_sgene_coverage": "S-Gene_Coverage_Percentage",
-                "per_ldmutations": "%LDMutations",
+                "per_ldmutations": "% LDMutations",
                 "number_of_sgene_frameshifts": "S-Gene_Frameshifts",
                 "number_of_unambiguous_bases": "Total_Unambiguous_Bases",
                 "number_of_Ns": "Total_Ns_count"
@@ -64,13 +64,12 @@
             "required": true,
             "multiple_samples": true,
             "split_by_batch": true,
-            "map": false,
             "function": "parse_long_table",
             "content": {
                 "sample" : "SAMPLE",
                 "chromosome": "CHROM",
-                "pos": "POS", 
-                "alt": "ALT", 
+                "pos": "POS",
+                "alt": "ALT",
                 "ref": "REF",
                 "Filter": "FILTER",
                 "dp": "DP",
@@ -96,7 +95,7 @@
                 "consensus_genome_length" : "genome_length",
                 "consensus_sequence_filename" : "sequence_filename",
                 "consensus_sequence_filepath" : "sequence_filepath",
-                "consensus_sequence_md5" : "sequence_md5", 
+                "consensus_sequence_md5" : "sequence_md5",
                 "number_of_base_pairs_sequenced" : "number_of_base_pairs_sequenced"
             }
         },
@@ -107,7 +106,6 @@
             "multiple_samples": true,
             "required": true,
             "function": null,
-            "extract": true,
             "content": {
                 "ns_per_100_kbp": "# Ns per 100kb consensus"
             }
@@ -124,7 +122,6 @@
             "required": true,
             "multiple_samples": true,
             "function": null,
-            "extract": true,
             "content": {
                 "software_version": {
                     "bioinformatics_protocol_software_version": "nf-core/viralrecon",
@@ -153,14 +150,13 @@
             "if_assembly_other": "Not Provided [GENEPIO:0001668]",
             "if_bioinformatic_protocol_is_other_specify": "Not Provided [GENEPIO:0001668]",
             "if_consensus_other": "Not Provided [GENEPIO:0001668]",
-            "if_lineage_assignment_other": "Not Provided [GENEPIO:0001668]",
+            "if_lineage_identification_other": "Not Provided [GENEPIO:0001668]",
             "if_mapping_other": "Not Provided [GENEPIO:0001668]",
             "if_preprocessing_other": "Not Provided [GENEPIO:0001668]",
             "lineage_analysis_software_name": "pangolin",
             "mapping_params": "--seed 1",
             "preprocessing_params": "--cut_front --cut_tail --trim_poly_x --cut_mean_quality 30 --qualified_quality_phred   30    --unqualified_percent_limit 10 --length_required 50",
-            "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20   -m10",
-            "lineage_analysis_date": "Not Provided [GENEPIO:0001668]"
+            "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20   -m10"
         }
     }
 }
