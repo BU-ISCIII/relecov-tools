@@ -38,7 +38,7 @@ stderr = rich.console.Console(
     stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
 )
 
-__version__ = "1.5.0dev"
+__version__ = "1.5.0"
 
 
 def run_relecov_tools():
@@ -126,7 +126,7 @@ class CustomHelpOrder(click.Group):
     "-l",
     "--log-path",
     default=None,
-    help="Creates log file in given folder. Uses default path in config or tmp empty.",
+    help="Creates log file in given folder. Uses default path in config or tmp if empty.",
 )
 @click.option(
     "-d",
