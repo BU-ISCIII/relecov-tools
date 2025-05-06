@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.X] - 2025-05-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v.1.5.X
+
+### Credits
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [1.5.0] - 2025-05-06 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.0
 
 ### Credits
@@ -68,6 +82,7 @@ Code contributions to the release:
 - Add extra template handling in pipeline-manager [#511](https://github.com/BU-ISCIII/relecov-tools/pull/511).
 - Added summary stats logging to wrapper module [514#](https://github.com/BU-ISCIII/relecov-tools/pull/514).
 - Updated the create_summary_tables.py script to be able to handle single .json files directly [#526](https://github.com/BU-ISCIII/relecov-tools/pull/526).
+- Updated README.md for new functionalities in v1.5.0 [#527](https://github.com/BU-ISCIII/relecov-tools/pull/527)
 
 #### Fixes
 
