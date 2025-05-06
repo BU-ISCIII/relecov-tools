@@ -90,6 +90,7 @@ Code contributions to the release:
 - Changed utils.write_json_fo_file() name to write_json_to_file() [#412](https://github.com/BU-ISCIII/relecov-tools/pull/412)
 - Changed pipeline-manager --template param to --templates_root, now points to root folder [#412](https://github.com/BU-ISCIII/relecov-tools/pull/412)
 - Changed property name for consistency with the rest of the properties. [#480](https://github.com/BU-ISCIII/relecov-tools/pull/480)
+- Renamed CLI argument --json_schema to --json_schema_file in validate command for consistency with internal function arguments and YAML configuration. [#503](https://github.com/BU-ISCIII/relecov-tools/pull/503)
 
 #### Removed
 
