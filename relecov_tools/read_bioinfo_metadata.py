@@ -21,7 +21,7 @@ stderr = rich.console.Console(
 )
 
 
-class BioinfoReportLog():
+class BioinfoReportLog:
     def __init__(self, log_report=None, output_folder="/tmp/"):
         if not log_report:
             self.report = {"error": {}, "valid": {}, "warning": {}}
@@ -685,9 +685,7 @@ class BioinfoMetadata(BaseModule):
                 row["bioinfo_metadata_file"] = self.out_filename
                 for field, value in f_values.items():
                     row[field] = value
-            self.update_all_logs(
-                method_name, "valid", "Fields added successfully."
-            )
+            self.update_all_logs(method_name, "valid", "Fields added successfully.")
         except KeyError as e:
             self.update_all_logs(
                 method_name, "warning", f"Error found while adding fixed values: {e}"
@@ -760,9 +758,7 @@ class BioinfoMetadata(BaseModule):
                     )
         self.log_report.print_log_report(method_name, ["warning"])
         if sample_name_error == 0:
-            self.update_all_logs(
-                method_name, "valid", "File paths added successfully."
-            )
+            self.update_all_logs(method_name, "valid", "File paths added successfully.")
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
