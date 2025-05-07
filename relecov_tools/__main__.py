@@ -435,9 +435,9 @@ def send_mail(
 
     # Determinar el template a usar
     if template_choice == 1:
-        template_name = "jinja_template_with_errors.j2"
+        template_name = "jinja_template_with_errors_relecov.j2"
     else:
-        template_name = "jinja_template_success.j2"
+        template_name = "jinja_template_success_relecov.j2"
 
     add_info = click.confirm(
         "Would you like to add additional information in the mail?", default=False
