@@ -21,14 +21,12 @@ stderr = rich.console.Console(
 )
 
 
-class BioinfoReportLog(BaseModule):
+class BioinfoReportLog():
     def __init__(self, log_report=None, output_folder="/tmp/"):
-        super().__init__(output_directory=output_folder, called_module=__name__)
         if not log_report:
             self.report = {"error": {}, "valid": {}, "warning": {}}
         else:
             self.report = log_report
-        self.logsum = self.parent_log_summary(output_location=output_folder)
 
     def update_log_report(self, method_name, status, message):
         """Update the progress log report with the given method name, status, and message.
@@ -49,11 +47,9 @@ class BioinfoReportLog(BaseModule):
             return self.report
         elif status == "error":
             self.report["error"].setdefault(method_name, []).append(message)
-            self.logsum.add_error(key=method_name, entry=message)
             return self.report
         elif status == "warning":
             self.report["warning"].setdefault(method_name, []).append(message)
-            self.logsum.add_warning(key=method_name, entry=message)
             return self.report
         else:
             raise ValueError("Invalid status provided.")
@@ -81,8 +77,8 @@ class BioinfoMetadata(BaseModule):
         software=None,
         update=False,
     ):
-        self.log.info("Initiating read-bioinfo-metadata process")
         super().__init__(output_directory=output_folder, called_module=__name__)
+        self.log.info("Initiating read-bioinfo-metadata process")
         # Init process log
         if output_folder is None:
             self.output_folder = relecov_tools.utils.prompt_path(
@@ -90,6 +86,7 @@ class BioinfoMetadata(BaseModule):
             )
         else:
             self.output_folder = os.path.realpath(output_folder)
+        self.logsum = self.parent_log_summary(output_location=output_folder)
         self.log_report = BioinfoReportLog(output_folder=output_folder)
 
         # Parse read-lab-meta-data
@@ -98,7 +95,7 @@ class BioinfoMetadata(BaseModule):
                 msg="Select the json file that was created by the read-lab-metadata"
             )
         if not os.path.isfile(readlabmeta_json_file):
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 self.__init__.__name__,
                 "error",
                 f"file {readlabmeta_json_file} does not exist",
@@ -144,7 +141,7 @@ class BioinfoMetadata(BaseModule):
         if self.software_name in available_software:
             self.software_config = bioinfo_config.get_configuration(self.software_name)
         else:
-            self.log_report.update_log_report(
+            self.update_logs(
                 self.__init__.__name__,
                 "error",
                 f"No configuration available for '{self.software_name}'. Currently, the only available software options are:: {', '.join(available_software)}",
@@ -152,6 +149,14 @@ class BioinfoMetadata(BaseModule):
             sys.exit(
                 self.log_report.print_log_report(self.__init__.__name__, ["error"])
             )
+
+    def update_all_logs(self, method_name, status, message):
+        report = self.log_report.update_log_report(method_name, status, message)
+        if status == "error":
+            self.logsum.add_error(key=method_name, entry=message)
+        elif status == "warning":
+            self.logsum.add_warning(key=method_name, entry=message)
+        return report
 
     def scann_directory(self):
         """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json.
@@ -170,7 +175,7 @@ class BioinfoMetadata(BaseModule):
             all_scanned_things.append((root, files))
         for topic_key, topic_scope in self.software_config.items():
             if "fn" not in topic_scope:  # try/except fn
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     method_name,
                     "warning",
                     f"No 'fn' (file pattern) found in '{self.software_name}.{topic_key}'.",
@@ -186,14 +191,14 @@ class BioinfoMetadata(BaseModule):
                     files_found[topic_key] = matching_files
                     break
         if len(files_found) < 1:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name,
                 "error",
                 f"No files found in '{self.input_folder}' according to '{os.path.basename(self.bioinfo_json_file)}' file name patterns.",
             )
             sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         else:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 self.scann_directory.__name__,
                 "valid",
                 f"Scanning process succeed. Scanned {total_files} files.",
@@ -219,7 +224,7 @@ class BioinfoMetadata(BaseModule):
             # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
             #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
             if not row.get("sequencing_sample_id"):
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     method_name,
                     "warning",
                     f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
@@ -255,13 +260,13 @@ class BioinfoMetadata(BaseModule):
         # Parse missing sample errors
         if errors:
             lenerrs = len(errors)
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name,
                 "warning",
                 f"{lenerrs} samples missing in '{table_name}': {', '.join(errors)}.",
             )
         else:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name,
                 "valid",
                 f"All samples were successfully found in {table_name}.",
@@ -269,13 +274,13 @@ class BioinfoMetadata(BaseModule):
         # Parse missing fields errors
         # TODO: this stdout can be improved
         if len(field_errors) > 0:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name,
                 "warning",
                 f"Missing fields in {table_name}:\n\t{field_errors}",
             )
         else:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name,
                 "valid",
                 f"Successfully mapped fields in {', '.join(field_valid.keys())}.",
@@ -324,14 +329,14 @@ class BioinfoMetadata(BaseModule):
             else:
                 continue
         if len(missing_required) >= 1:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name,
                 "error",
                 f"Missing mandatory files in {self.software_name}:{', '.join(missing_required)}",
             )
             sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         else:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name, "valid", "Successfull validation of mandatory files."
             )
         self.log_report.print_log_report(method_name, ["valid", "warning"])
@@ -367,7 +372,7 @@ class BioinfoMetadata(BaseModule):
                 stderr.print(f"[blue]Start processing {self.software_name}.{key}")
                 self.log.info(f"Start processing {self.software_name}.{key}")
             except KeyError:
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     method_name,
                     "warning",
                     f"No file path found for '{self.software_name}.{key}'",
@@ -376,7 +381,7 @@ class BioinfoMetadata(BaseModule):
             # Handling files
             if self.software_config[key].get("map", True) is False:
                 msg = f"File '{self.software_name}.{key}' was processed but skipped from mapping as defined in config."
-                self.log_report.update_log_report(map_method_name, "warning", msg)
+                self.update_all_logs(map_method_name, "warning", msg)
                 self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
 
@@ -386,7 +391,7 @@ class BioinfoMetadata(BaseModule):
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
             if not mapping_fields:
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     map_method_name,
                     "warning",
                     f"No metadata found to perform mapping from '{self.software_name}.{key}' despite 'content' fields being defined.",
@@ -401,7 +406,7 @@ class BioinfoMetadata(BaseModule):
                     table_name=files_dict[key],
                 )
             else:
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     method_name,
                     "warning",
                     f"No metadata found to perform standard mapping when processing '{self.software_name}.{key}'",
@@ -433,7 +438,7 @@ class BioinfoMetadata(BaseModule):
         if conf_tab_name.endswith(".gz"):
             inner_ext = os.path.splitext(conf_tab_name.strip(".gz"))[1]
             if inner_ext in extdict:
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     method_name,
                     "warning",
                     f"Expected tabular file '{conf_tab_name}' is compressed and cannot be processed.",
@@ -448,7 +453,7 @@ class BioinfoMetadata(BaseModule):
                     key_position=sample_idx_colpos,
                 )
             except FileNotFoundError as e:
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     method_name,
                     "error",
                     f"Tabular file not found: '{file_list[0]}': {e}",
@@ -457,7 +462,7 @@ class BioinfoMetadata(BaseModule):
                     f"Tabular file not found: '{file_list[0]}'"
                 ) from e
         else:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name,
                 "error",
                 f"Unrecognized defined file name extension '{file_ext}' in '{conf_tab_name}'.",
@@ -532,7 +537,7 @@ class BioinfoMetadata(BaseModule):
                         + "(full_paths, batch_date, output_folder)"
                     )
                 except Exception as e:
-                    self.log_report.update_log_report(
+                    self.update_all_logs(
                         self.save_splitted_files.__name__,
                         "error",
                         f"Error occurred while parsing '{func_name}': {e}.",
@@ -554,7 +559,7 @@ class BioinfoMetadata(BaseModule):
                         + "(file_list, batch_date, output_folder)"
                     )
                 except Exception as e:
-                    self.log_report.update_log_report(
+                    self.update_all_logs(
                         self.add_bioinfo_results_metadata.__name__,
                         "error",
                         f"Error occurred while parsing '{func_name}': {e}.",
@@ -593,7 +598,7 @@ class BioinfoMetadata(BaseModule):
                         version = columns[2].text.strip()
                         program_versions[program_name] = version
                     else:
-                        self.log_report.update_log_report(
+                        self.update_all_logs(
                             method_name,
                             "error",
                             f"HTML entry error in {columns}. HTML table expected format should be \n<th> Process Name\n</th>\n<th> Software </th>\n.",
@@ -602,14 +607,14 @@ class BioinfoMetadata(BaseModule):
                             self.log_report.print_log_report(method_name, ["error"])
                         )
             else:
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     method_name,
                     "error",
                     f"Unable to locate the table containing software versions in file {f_path} under div section {div_id}.",
                 )
                 sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         else:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 self.get_multiqc_software_versions.__name__,
                 "error",
                 f"Failed to locate the required '{div_id}' div section in the '{f_path}' file.",
@@ -620,7 +625,7 @@ class BioinfoMetadata(BaseModule):
         for row in j_data:
             # Get sample name to track whether version assignment was successful or not.
             if not row.get("sequencing_sample_id"):
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     method_name,
                     "warning",
                     f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
@@ -652,13 +657,13 @@ class BioinfoMetadata(BaseModule):
 
         # update progress log
         if len(field_errors) > 0:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name,
                 "warning",
                 f"Encountered field errors while mapping data: {field_errors}",
             )
         else:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name, "valid", "Successfully field mapped data."
             )
         self.log_report.print_log_report(method_name, ["valid", "warning"])
@@ -680,11 +685,11 @@ class BioinfoMetadata(BaseModule):
                 row["bioinfo_metadata_file"] = self.out_filename
                 for field, value in f_values.items():
                     row[field] = value
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name, "valid", "Fields added successfully."
             )
         except KeyError as e:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name, "warning", f"Error found while adding fixed values: {e}"
             )
             pass
@@ -711,19 +716,19 @@ class BioinfoMetadata(BaseModule):
         for row in j_data:
             row["bioinfo_metadata_file"] = self.out_filename
             if not row.get("sequencing_sample_id"):
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     method_name,
                     "warning",
                     f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
                 )
                 continue
             sample_name = row["sequencing_sample_id"]
-            base_cod_path = row.get("sequence_file_path_R1_fastq")
+            base_cod_path = row.get("sequence_file_path_R1")
             if base_cod_path is None:
-                self.log_report.update_log_report(
+                self.update_all_logs(
                     method_name,
                     "error",
-                    f"No 'sequence_file_path_R1_fastq' found for sample {sample_name}. Unable to generate paths.",
+                    f"No 'sequence_file_path_R1' found for sample {sample_name}. Unable to generate paths.",
                 )
                 continue
             for key, values in files_found_dict.items():
@@ -749,13 +754,13 @@ class BioinfoMetadata(BaseModule):
                 if self.software_config[key].get("extract"):
                     self.extract_file(
                         file=file_path,
-                        dest_folder=row.get("sequence_file_path_R1_fastq"),
+                        dest_folder=row.get("sequence_file_path_R1"),
                         sample_name=sample_name,
                         path_key=path_key,
                     )
         self.log_report.print_log_report(method_name, ["warning"])
         if sample_name_error == 0:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 method_name, "valid", "File paths added successfully."
             )
         self.log_report.print_log_report(method_name, ["valid", "warning"])
@@ -775,7 +780,7 @@ class BioinfoMetadata(BaseModule):
                 self.readlabmeta_json_file
             )
         except ValueError:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 self.collect_info_from_lab_json.__name__,
                 "error",
                 f"Invalid lab-metadata json file: self.{self.readlabmeta_json_file}",
@@ -793,7 +798,7 @@ class BioinfoMetadata(BaseModule):
             sample_idx_colpos = self.software_config[config_key]["sample_col_idx"] - 1
         except (KeyError, TypeError):
             sample_idx_colpos = 0
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 "get_sample_idx_colpos",
                 "warning",
                 f"No valid sample-index-column defined in '{self.software_name}.{config_key}'. Using default instead.",
@@ -816,7 +821,7 @@ class BioinfoMetadata(BaseModule):
         if os.path.isfile(out_filepath):
             return True
         if file == "Not Provided [GENEPIO:0001668]":
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 self.extract_file.__name__,
                 "warning",
                 f"File for {path_key} not provided in sample {sample_name}",
@@ -830,7 +835,7 @@ class BioinfoMetadata(BaseModule):
             else:
                 shutil.copy(file, out_filepath)
         except (IOError, PermissionError) as e:
-            self.log_report.update_log_report(
+            self.update_all_logs(
                 self.extract_file.__name__, "warning", f"Could not extract {file}: {e}"
             )
             return False
@@ -845,13 +850,13 @@ class BioinfoMetadata(BaseModule):
             data_by_batch (dict(list(dict))): Dictionary containing parts of j_data corresponding to each
             different folder with samples (batch) included in the original json metadata used as input
         """
-        unique_batchs = set([x.get("sequence_file_path_R1_fastq") for x in j_data])
+        unique_batchs = set([x.get("sequence_file_path_R1") for x in j_data])
         data_by_batch = {batch_dir: {} for batch_dir in unique_batchs}
         for batch_dir in data_by_batch.keys():
             data_by_batch[batch_dir]["j_data"] = [
                 samp
                 for samp in j_data
-                if samp.get("sequence_file_path_R1_fastq") == batch_dir
+                if samp.get("sequence_file_path_R1") == batch_dir
             ]
         return data_by_batch
 
@@ -898,7 +903,7 @@ class BioinfoMetadata(BaseModule):
                         log_type = "error"
                     else:
                         log_type = "warning"
-                    self.log_report.update_log_report(
+                    self.update_all_logs(
                         method_name,
                         log_type,
                         f"Could not create batch table for {file}: {e}",
@@ -972,7 +977,7 @@ class BioinfoMetadata(BaseModule):
         relecov_tools.utils.write_json_to_file(merged_metadata, batch_filepath)
         return merged_metadata
 
-    def save_merged_files(self, files_dict):
+    def save_merged_files(self, files_dict, batch_date, output_folder=None):
         """
         Process and save files that where split by cod and that have a function to be processed
 
@@ -994,7 +999,7 @@ class BioinfoMetadata(BaseModule):
                     stderr.print(f"[blue]Processing splitted file: {file_path}")
                     self.log.info(f"Processing splitted file: {file_path}")
                 except KeyError:
-                    self.log_report.update_log_report(
+                    self.update_all_logs(
                         method_name,
                         "warning",
                         f"No file path found for '{file_path}'",
@@ -1015,7 +1020,7 @@ class BioinfoMetadata(BaseModule):
                         + "(file_path, batch_date, output_folder)"
                     )
                 except Exception as e:
-                    self.log_report.update_log_report(
+                    self.update_all_logs(
                         self.save_merged_files.__name__,
                         "error",
                         f"Error occurred while parsing '{func_name}': {e}.",
@@ -1060,7 +1065,7 @@ class BioinfoMetadata(BaseModule):
             )
             batch_date = first_sample.get("batch_id", batch_dir.split("/")[-1])
             self.set_batch_id(batch_date)
-            self.log_report.logsum.feed_key(batch_dir)
+            self.logsum.feed_key(batch_dir)
             stderr.print(f"[blue]Processing data from {batch_dir}")
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
             self.split_tables_by_batch(files_found_dict, sufix, batch_data, batch_dir)
@@ -1091,7 +1096,7 @@ class BioinfoMetadata(BaseModule):
                         if sample_id in qc_data:
                             sample.update(qc_data[sample_id])
                 except (AttributeError, NameError, TypeError, ValueError) as e:
-                    self.log_report.update_log_report(
+                    self.update_all_logs(
                         self.create_bioinfo_file.__name__,
                         "warning",
                         f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}",
@@ -1111,7 +1116,7 @@ class BioinfoMetadata(BaseModule):
             else:
                 relecov_tools.utils.write_json_to_file(batch_data, batch_filepath)
             for sample in batch_data:
-                self.log_report.logsum.feed_key(
+                self.logsum.feed_key(
                     key=batch_dir, sample=sample.get("sequencing_sample_id")
                 )
             self.log.info("Created output json file: %s" % batch_filepath)
@@ -1156,6 +1161,6 @@ class BioinfoMetadata(BaseModule):
             relecov_tools.utils.write_json_to_file(self.j_data, file_path)
         stderr.print(f"[green]Sucessful creation of bioinfo analyis file: {file_path}")
         self.parent_create_error_summary(
-            called_module="read-bioinfo-metadata", logs=self.log_report.logsum.logs
+            called_module="read-bioinfo-metadata", logs=self.logsum.logs
         )
         return True
