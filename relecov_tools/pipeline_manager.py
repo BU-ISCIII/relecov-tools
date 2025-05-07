@@ -59,7 +59,9 @@ class PipelineManager(BaseModule):
                 "configuration.json",
             )
         if not os.path.exists(pipeline_conf_file):
-            self.log.error("Pipeline config file %s does not exist ", pipeline_conf_file)
+            self.log.error(
+                "Pipeline config file %s does not exist ", pipeline_conf_file
+            )
             stderr.print(
                 "[red] Pipeline config file " + pipeline_conf_file + " does not exist"
             )
@@ -176,7 +178,9 @@ class PipelineManager(BaseModule):
             try:
                 latest_date = relecov_tools.utils.string_to_date(last_folder).date()
             except ValueError:
-                self.log.error("Failed to get date from folder names. Using last mod date")
+                self.log.error(
+                    "Failed to get date from folder names. Using last mod date"
+                )
                 latest_date = max(
                     [relecov_tools.utils.get_file_date(f) for f in folders_to_process]
                 ).date()
@@ -456,7 +460,9 @@ class PipelineManager(BaseModule):
                 sample_id for sample_id, count in id_counts.items() if count > 1
             ]
             if duplicates:
-                self.log.error("Duplicate samples in group %s: %s" % (group_tag, duplicates))
+                self.log.error(
+                    "Duplicate samples in group %s: %s" % (group_tag, duplicates)
+                )
                 stderr.print(
                     f"[red] There are duplicated samples in group {group_tag}: {duplicates}. Please handle manually"
                 )
@@ -582,7 +588,9 @@ class PipelineManager(BaseModule):
             for group, samples in org_samp_errors.items():
                 if not samples:
                     continue
-                self.log.error("Group %s received error for samples: %s" % (group, samples))
+                self.log.error(
+                    "Group %s received error for samples: %s" % (group, samples)
+                )
         self.log.info("Finished execution")
         stderr.print("Finished execution")
         return
