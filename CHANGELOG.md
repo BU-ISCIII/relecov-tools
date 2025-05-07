@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Pablo Mata](https://github.com/shettland)
+- [Alejandro Bernabeu](https://github.com/aberdur)
 
 
 #### Added enhancements
@@ -17,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed paired and single-end files validation [#537](https://github.com/BU-ISCIII/relecov-tools/pull/537)
 - Suppressed unrelated warning when extra-config is not set [#543](https://github.com/BU-ISCIII/relecov-tools/pull/543)
+- Add identifier fields to relecov_schema.json [#544](https://github.com/BU-ISCIII/relecov-tools/pull/544)
 
 #### Changed
 
