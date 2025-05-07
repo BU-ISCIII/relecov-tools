@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Added enhancements
 
+- Correctly implemented new log handling in read-bioinfo-metadata [#546](https://github.com/BU-ISCIII/relecov-tools/pull/546)
+
 #### Fixes
 
 - Fixed paired and single-end files validation [#537](https://github.com/BU-ISCIII/relecov-tools/pull/537)
