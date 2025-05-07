@@ -390,6 +390,13 @@ def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet
     required=False,
     default=None,
 )
+@click.option(
+    "-n",
+    "--additional-notes",
+    type=click.Path(exists=True),
+    required=False,
+    help="Path to a .txt file with additional notes to include in the email (optional).",
+)
 @click.pass_context
 def send_mail(
     ctx, validate_file, receiver_email, attachments, template_path, email_psswd
@@ -435,6 +442,7 @@ def send_mail(
     add_info = click.confirm(
         "Would you like to add additional information in the mail?", default=False
     )
+    
     additional_info = ""
     if add_info:
         additional_info = click.prompt("Enter additional information")
