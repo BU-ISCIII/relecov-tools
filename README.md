@@ -19,6 +19,7 @@ relecov-tools is a set of helper tools for the assembly of the different element
     - [Modules](#modules)
       - [download](#download)
       - [read-lab-metadata](#read-lab-metadata)
+      - [send-mail](#send-mail)
       - [read-bioinfo-metadata](#read-bioinfo-metadata)
       - [validate](#validate)
       - [map](#map)
@@ -176,6 +177,26 @@ Usage: relecov-tools read-metadata [OPTIONS]
 
 
 An example for the metadata excel file can be found [here](./relecov_tools/example_data/METADATA_LAB_TEST.xlsx)
+
+#### send-mail
+
+`send-mail` sends a validation summary report by email using predefined Jinja templates. It supports attachments, multiple recipients, and includes the option to add additional notes manually or via a .txt file.
+
+```
+$ relecov-tools send-email --help
+Usage: relecov-tools send-email [OPTIONS]
+
+  Send a sample validation report by mail.
+
+  Options:
+    -v, --validate-file PATH       Path to the validation summary JSON file (e.g., validate_log_summary.json) [required]
+    -r, --receiver-email TEXT      Recipient's e-mail address. If not provided, it will be extracted from the institutions guide
+    -a, --attachments PATH         Path(s) to one or more files to attach
+    -t, --template_path PATH       Path to the folder containing the email templates. If not provided, it will be loaded from the configuration file
+    -p, --email-psswd TEXT         Password for bioinformatica@isciii.es. If not provided, it will be loaded from the credentials YAML file
+    -n, --additional-notes PATH    Optional path to a .txt file with additional notes. If not provided, the user will be prompted to write notes manually or provide a path interactively
+    --help                         Show this message and exit.
+```
 
 #### read-bioinfo-metadata
 `read-bioinfo-metadata` Include the results from the Bioinformatics analysis into the Json previously created with read-lab-metadata module.
