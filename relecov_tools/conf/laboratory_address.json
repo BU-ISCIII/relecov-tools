@@ -11087,5 +11087,94 @@
         "submitting_institution": "Hospital Comarcal de Melilla",
         "submitting_institution_address": "Remonta, 2",
         "submitting_institution_email": ""
+    },
+    "Ministerio Sanidad": {
+        "collecting_institution_address": "Paseo del Prado, 18",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Ministerio Sanidad",
+        "submitting_institution_address": "Paseo del Prado, 18",
+        "submitting_institution_email": ""
+    },
+    "Analiza, S.L. Hospital Moncloa": {
+        "collecting_institution_address": "Av. de Valladolid, 83",
+        "collecting_institution_email": "info@analiza.com",
+        "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Analiza, S.L. Hospital Moncloa",
+        "submitting_institution_address": "Av. de Valladolid, 83",
+        "submitting_institution_email": "info@analiza.com"
+    },
+    "Atimmunolab": {
+        "collecting_institution_address": "Calle de la Salud, 14",
+        "collecting_institution_email": "contact@atimmunolab.com",
+        "geo_loc_state": "Comunidad Valenciana",
+        "geo_loc_region": "Valencia",
+        "geo_loc_city": "Valencia",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Atimmunolab",
+        "submitting_institution_address": "Calle de la Salud, 14",
+        "submitting_institution_email": "contact@atimmunolab.com"
+    },
+    "Centro Nacional De Microbiologia": {
+        "collecting_institution_address": "Carretera Majadahonda-Pozuelo, Km 2",
+        "collecting_institution_email": "cnm@isciii.es",
+        "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Centro Nacional De Microbiologia",
+        "submitting_institution_address": "Carretera Majadahonda-Pozuelo, Km 2",
+        "submitting_institution_email": "info@isciii.es"
+    },
+    "Presidencia Del Gobierno": {
+        "collecting_institution_address": "Complejo de la Moncloa, Av. Puerta de Hierro, s/n",
+        "collecting_institution_email": "info@isciii.es",
+        "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Presidencia Del Gobierno",
+        "submitting_institution_address": "Complejo de la Moncloa, Av. Puerta de Hierro, s/n",
+        "submitting_institution_email": "info@isciii.es"
+    },
+    "Xerencia De Xestión Integrada De Pontevedra": {
+        "collecting_institution_address": "Rúa Loureiro Crespo, 2",
+        "collecting_institution_email": "info@isciii.es",
+        "geo_loc_state": "Galicia",
+        "geo_loc_region": "Pontevedra",
+        "geo_loc_city": "Pontevedra",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Xerencia De Xestión Integrada De Pontevedra",
+        "submitting_institution_address": "Rúa Loureiro Crespo, 2",
+        "submitting_institution_email": "info@isciii.es"
+    },
+    "Consejeria De Sanidad": {
+        "collecting_institution_address": "Calle de Aduana, 29",
+        "collecting_institution_email": "info@isciii.es",
+        "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Consejeria De Sanidad",
+        "submitting_institution_address": "Calle de Aduana, 29",
+        "submitting_institution_email": "info@isciii.es"
+    },
+    "Instituto De Medicina Legal De Toledo": {
+        "collecting_institution_address": "Calle de Dinamarca, 1",
+        "collecting_institution_email": "info@isciii.es",
+        "geo_loc_state": "Castilla-La Mancha",
+        "geo_loc_region": "Toledo",
+        "geo_loc_city": "Toledo",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Instituto De Medicina Legal De Toledo",
+        "submitting_institution_address": "Calle de Dinamarca, 1",
+        "submitting_institution_email": "info@isciii.es"
     }
+
 }
