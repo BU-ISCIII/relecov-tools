@@ -441,9 +441,9 @@ def send_mail(
 
     # Determinar el template a usar
     if template_choice == 1:
-        template_name = "jinja_template_with_errors_relecov.j2"
+        template_name = "template_with_errors_relecov.j2"
     else:
-        template_name = "jinja_template_success_relecov.j2"
+        template_name = "template_success_relecov.j2"
 
     additional_info = ""
 
