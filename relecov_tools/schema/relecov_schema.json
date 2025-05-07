@@ -3011,9 +3011,9 @@
             "examples": [
                 "CODCNH: 030128"
             ],
-            "ontology": "NCIT:C70663",
+            "ontology": "SNOMED:423901009",
             "type": "string",
-            "description": "Code assigned to each institution",
+            "description": "Code assigned to each institution from REGCESS and ESRI",
             "classification": "Sample collection and processing",
             "label": "Institution code",
             "fill_mode": "sample",
