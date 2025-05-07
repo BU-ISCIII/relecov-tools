@@ -159,7 +159,10 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
         relecov_tools.base_module.BaseModule._global_hex_code = str(hex_code)
     # Set up logs to a file if we asked for one
     called_module = str(ctx.invoked_subcommand).replace("-", "_")
-    config = relecov_tools.config_json.ConfigJson(extra_config=True)
+    if os.path.isfile(relecov_tools.config_json.ConfigJson._extra_config_path):
+        config = relecov_tools.config_json.ConfigJson(extra_config=True)
+    else:
+        config = relecov_tools.config_json.ConfigJson()
     logs_config = config.get_configuration("logs_config")
     default_outpath = logs_config.get("default_outpath", "/tmp/relecov_tools")
     if log_path is None:
@@ -228,7 +231,7 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
     is_flag=False,
     flag_value="ALL",
     default=None,
-    help="Flag: Select which folders will be targeted giving [paths] or via prompt",
+    help='Flag: Select which folders will be targeted giving [paths] or via prompt. For multiple folders use ["folder1", "folder2"]',
 )
 @click.option(
     "-s",
@@ -1026,7 +1029,7 @@ def upload_results(ctx, user, password, batch_id, template_path, project):
             sys.exit(f"EXCEPTION FOUND: {e}")
 
 
-@relecov_tools_cli.command(help_priority=1)
+@relecov_tools_cli.command(help_priority=18)
 @click.option(
     "-n",
     "--config_name",
@@ -1056,7 +1059,10 @@ def add_extra_config(ctx, config_name, config_file, force, clear_config):
     """Save given file content as additional configuration"""
     debug = ctx.obj.get("debug", False)
     try:
-        config_json = relecov_tools.config_json.ConfigJson(extra_config=True)
+        if os.path.isfile(relecov_tools.config_json.ConfigJson._extra_config_path):
+            config_json = relecov_tools.config_json.ConfigJson(extra_config=True)
+        else:
+            config_json = relecov_tools.config_json.ConfigJson()
         if clear_config:
             config_json.remove_extra_config(config_name)
         else:
