@@ -136,6 +136,30 @@
             "fill_mode": "sample",
             "header": "Y"
         },
+        "unique_id": {
+            "examples": [
+                "AXM1456"
+            ],
+            "ontology": "NCIT:C70663",
+            "type": "string",
+            "description": "Unique identifier for each sample",
+            "classification": "Sample collection and processing",
+            "label": "Unique identifier",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "batch_id": {
+            "examples": [
+                "20250506140633"
+            ],
+            "ontology": "NCIT:C70663",
+            "type": "string",
+            "description": "Unique identifier for each analysis batch",
+            "classification": "Sample collection and processing",
+            "label": "Batch identifier",
+            "fill_mode": "sample",
+            "header": "N"
+        },
         "collecting_institution": {
             "enum": [
                 "Amma Horta",
@@ -2982,6 +3006,18 @@
             "label": "Sequencing Institution",
             "fill_mode": "sample",
             "header": "Y"
+        },
+        "institution_code": {
+            "examples": [
+                "CODCNH: 030128"
+            ],
+            "ontology": "NCIT:C70663",
+            "type": "string",
+            "description": "Code assigned to each institution",
+            "classification": "Sample collection and processing",
+            "label": "Institution code",
+            "fill_mode": "sample",
+            "header": "N"
         },
         "sample_collection_date": {
             "examples": [
