@@ -39,7 +39,15 @@ relecov-tools is a set of helper tools for the assembly of the different element
 ## Installation
 
 ### Bioconda
-Soon
+relecov-tools is available in Bioconda and can be installed via conda.
+
+If you already have conda installed. Do the following:
+```
+conda config --add channels bioconda
+conda create --name relecov-tools
+conda activate relecov-tools
+conda install -c bioconda relecov-tools
+```
 
 ### Pip
 relecov-tools is available in Pypi and can be installed via pip:
@@ -426,7 +434,7 @@ Use a predefined default location found in configuration.json under `logs_config
 If you want your logs to be sent to custom locations depending on the module executed you can do so by using add-extra-config, providing 
 
 #### Custom logs
-After executing each of these modules, you may find a custom log report in json format named "DATE_EXECUTED-MODULE_log_summary.json. These custom log summaries can be useful to detect errors in metadata in order to fix them and/or notify the users.
+After executing each of these modules, you may find a custom log report in json format named `EXECUTED-MODULE_<date>_hex_log_summary.json`. These custom log summaries can be useful to detect errors in metadata in order to fix them and/or notify the users.
 
 ### Python package mode
 relecov-tools is designed in a way that you can use import the different modules and use them in your own scripts, for example:
