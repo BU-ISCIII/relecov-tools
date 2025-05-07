@@ -445,10 +445,6 @@ def send_mail(
     else:
         template_name = "jinja_template_success_relecov.j2"
 
-    add_info = click.confirm(
-        "Would you like to add additional information in the mail?", default=False
-    )
-
     additional_info = ""
 
     if additional_notes:
