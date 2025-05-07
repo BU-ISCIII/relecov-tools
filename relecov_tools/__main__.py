@@ -457,7 +457,7 @@ def send_mail(
             notes_path = click.prompt(
                 "Enter the path to the .txt file", type=click.Path(exists=True)
             )
-            with open(notes_path, "r", encoding="uft-8") as f:
+            with open(notes_path, "r", encoding="utf-8") as f:
                 additional_info = f.read().strip()
         elif click.confirm(
             "Would you like to write additional notes manually?", default=False
