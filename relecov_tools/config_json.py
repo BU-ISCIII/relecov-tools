@@ -8,12 +8,12 @@ import relecov_tools.utils
 
 log = logging.getLogger(__name__)
 
-# TODO: Make this path configurable too
-EXTRA_CONFIG_PATH = os.path.expanduser("~/.relecov_tools/extra_config.json")
-
 
 # pass test
 class ConfigJson:
+    # TODO: Make this path configurable too
+    _extra_config_path = os.path.expanduser("~/.relecov_tools/extra_config.json")
+
     def __init__(
         self,
         json_file=os.path.join(os.path.dirname(__file__), "conf", "configuration.json"),
@@ -28,21 +28,31 @@ class ConfigJson:
         with open(json_file, "r", encoding="utf-8") as fh:
             self.json_data = json.load(fh)
 
+        active_extra_conf = False
         if extra_config:
-            if os.path.isfile(EXTRA_CONFIG_PATH):
+            if os.path.isfile(ConfigJson._extra_config_path):
                 try:
-                    with open(EXTRA_CONFIG_PATH, "r", encoding="utf-8") as add_fh:
+                    with open(
+                        ConfigJson._extra_config_path, "r", encoding="utf-8"
+                    ) as add_fh:
                         additional_conf = json.load(add_fh)
                     self.json_data.update(additional_conf)
+                    active_extra_conf = True
                 except (OSError, json.JSONDecodeError) as e:
-                    log.warning(f"Could not load extra config: {e}")
+                    log.warning(
+                        f"Could not load extra config: {e}. Using default instead"
+                    )
             else:
                 log.warning(
-                    f"Could not load extra config: {EXTRA_CONFIG_PATH} does not exist"
+                    f"Could not load extra config: {ConfigJson._extra_config_path} does not exist. Using default instead"
                 )
                 log.warning(
-                    "Run ``relecov-tools add_extra_config`` to include additional configuration"
+                    "Run ``relecov-tools add-extra-config`` to include additional configuration"
                 )
+        if not active_extra_conf:
+            log.debug("Running with default configuration.")
+        else:
+            log.debug("Loaded additional configuration.")
         self.topic_config = list(self.json_data.keys())
 
     def get_configuration(self, topic):
@@ -115,15 +125,15 @@ class ConfigJson:
 
         if not os.path.isfile(str(config_file)):
             raise FileNotFoundError(f"Extra config file {config_file} does not exist")
-        if os.path.isfile(EXTRA_CONFIG_PATH):
-            with open(EXTRA_CONFIG_PATH, "r", encoding="utf-8") as f:
+        if os.path.isfile(ConfigJson._extra_config_path):
+            with open(ConfigJson._extra_config_path, "r", encoding="utf-8") as f:
                 additional_config = json.load(f)
         else:
             additional_config = None
 
         summary = {"Included": [], "Canceled": []}
         valid_exts = (".json", ".yaml", ".yml")
-        os.makedirs(os.path.dirname(EXTRA_CONFIG_PATH), exist_ok=True)
+        os.makedirs(os.path.dirname(ConfigJson._extra_config_path), exist_ok=True)
         with open(config_file, "r") as fh:
             if config_file.endswith(".json"):
                 file_content = json.load(fh)
@@ -147,7 +157,9 @@ class ConfigJson:
             else:
                 additional_config = {config_name: file_content}
             summary["Included"].extend([k for k in additional_config.keys()])
-        relecov_tools.utils.write_json_to_file(additional_config, EXTRA_CONFIG_PATH)
+        relecov_tools.utils.write_json_to_file(
+            additional_config, ConfigJson._extra_config_path
+        )
         log.info("Finished including extra configuration")
         print("Update summary:")
         for state, changes in summary.items():
@@ -162,13 +174,13 @@ class ConfigJson:
         """
         if config_name is None:
             try:
-                os.remove(EXTRA_CONFIG_PATH)
+                os.remove(ConfigJson._extra_config_path)
                 log.info("Removed extra config file.")
             except OSError as e:
                 log.error(f"Could not remove extra config file: {e}")
                 return
         else:
-            with open(EXTRA_CONFIG_PATH, "r") as fh:
+            with open(ConfigJson._extra_config_path, "r") as fh:
                 additional_config = json.load(fh)
             try:
                 additional_config.pop(config_name)
@@ -178,7 +190,9 @@ class ConfigJson:
             except OSError as e:
                 log.error(f"Could not remove {config_name} key: {e}")
                 return
-            relecov_tools.utils.write_json_to_file(additional_config, EXTRA_CONFIG_PATH)
+            relecov_tools.utils.write_json_to_file(
+                additional_config, ConfigJson._extra_config_path
+            )
             log.info(f"Successfully removed {config_name} from extra config")
         print(f"Finished clearing extra config: {config_name}")
         return
