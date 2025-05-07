@@ -5,7 +5,10 @@ Estimado/a responsable de la subida de datos de secuenciación del {{ submitting
 
 El proceso de validación de los datos enviados se ha completado correctamente. Todas las muestras han sido validadas y cumplen con los estándares requeridos para su análisis.
 
-{{additional_info}}
+{% if additional_info %}
+Notas adicionales:
+{{ additional_info }}
+{% endif %}
 
 Adjunto a este correo encontrará un documento en formato Excel con un resumen de las muestras procesadas y validadas.
 
