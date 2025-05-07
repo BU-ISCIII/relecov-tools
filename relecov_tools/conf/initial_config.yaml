@@ -1,6 +1,7 @@
 # THIS INITIAL CONFIG SHOULD BE SET AFTER INSTALLATION
 # MAKE A COPY OF THIS FILE IN YOUR HOME AND CONFIGURE IT TO YOUR NEEDS
 # THEN RUN: relecov-tools add-extra-config --config_file path/to/initial_config_copy.yaml
+# NOTE: Each key in 'modules_outpath' must match with a Command as listed with `relecov-tools --help` (but with '_' instead of '-')
 logs_config:
     default_outpath:
         /tmp/
