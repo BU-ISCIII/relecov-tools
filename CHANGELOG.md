@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Fixes
 
 - Fixed paired and single-end files validation [#537](https://github.com/BU-ISCIII/relecov-tools/pull/537)
+- Suppressed unrelated warning when extra-config is not set [#543](https://github.com/BU-ISCIII/relecov-tools/pull/543)
 
 #### Changed
 
