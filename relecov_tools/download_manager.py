@@ -426,11 +426,17 @@ class DownloadManager(BaseModule):
                         stderr.print(log_text)
                         self.include_warning(log_text, sample=s_name)
                         continue
-                if "paired" in row[index_layout].lower() and row[index_fastq_r2] is None:
+                if (
+                    "paired" in row[index_layout].lower()
+                    and row[index_fastq_r2] is None
+                ):
                     error_text = "Sample %s is paired-end, but no R2 given"
                     self.include_error(error_text % str(row[index_sampleID]), s_name)
                     row_complete = False
-                if "single" in row[index_layout].lower() and row[index_fastq_r2] is not None:
+                if (
+                    "single" in row[index_layout].lower()
+                    and row[index_fastq_r2] is not None
+                ):
                     error_text = "Sample %s is single-end, but R1 and R2 were given"
                     self.include_error(error_text % str(row[index_sampleID]), s_name)
                     row_complete = False
