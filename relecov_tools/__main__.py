@@ -399,7 +399,7 @@ def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet
 )
 @click.pass_context
 def send_mail(
-    ctx, validate_file, receiver_email, attachments, template_path, email_psswd
+    ctx, validate_file, receiver_email, attachments, template_path, email_psswd, additional_notes
 ):
     """
     Send a sample validation report by mail.
@@ -444,8 +444,18 @@ def send_mail(
     )
     
     additional_info = ""
-    if add_info:
-        additional_info = click.prompt("Enter additional information")
+    
+    if additional_notes:
+        with open(additional_notes, "r", encoding="utf-8") as f:
+            additional_info = f.read().strip()
+    else:
+        if click.confirm("Would you like to add a .txt file with additional notes?", default=False):
+            notes_path = click.prompt("Enter the path to the .txt file", type=click.Path(exists=True))
+            with open(notes_path, "r", encoding="uft-8") as f:
+                additional_info = f.read().strip()
+        elif click.confirm("Would you like to write additional notes manually?", default=False):
+            additional_info = click.prompt("Enter additional information").strip()
+    
 
     institution_info = email_sender.get_institution_info(submitting_institution_code)
     if not institution_info:
@@ -455,7 +465,7 @@ def send_mail(
     email_receiver_from_json = institution_info["email_receiver"]
 
     email_body = email_sender.render_email_template(
-        additional_info,
+        additional_info=additional_info,
         invalid_count=invalid_count,
         submitting_institution_code=submitting_institution_code,
         template_name=template_name,
