@@ -13,10 +13,10 @@ logs_config:
 
 # REQUIRED: send-mail module
 mail_sender:
-    delivery_template_path_file: /home/user/path/relecov_tools/assets/mail_templates/
-    email_host: mx2.isciii.es
-    email_port: 587
-    email_host_user: bioinformatica@isciii.es
+    delivery_template_path_file: /path/templates/
+    email_host: host
+    email_port: port
+    email_host_user: email@gmail.com
     email_use_tls: True
-    yaml_cred_path: ~/buisciii_config.yml
-    institutions_guide_path: /data/bioinfoshare/UCCT_Relecov/statics/institutions_guide.json
+    yaml_cred_path: /path/credentials.yml
+    institutions_guide_path: /path/contacts.json
