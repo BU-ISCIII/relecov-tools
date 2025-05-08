@@ -380,8 +380,11 @@ class LogSum:
             old_key (str): Current key name
             new_key (str): New key name
         """
-        if old_key in self.base_logsum.logs.keys():
-            self.logs[new_key] = self.logs.pop(old_key)
+        if old_key in self.logs.keys():
+            if new_key not in self.logs.keys():
+                self.logs[new_key] = self.logs.pop(old_key)
+            else:
+                log.warning(f"Could not rename logsum key {old_key}: {new_key} already in logs")
         else:
             log.warning(f"Could not rename logsum key {old_key}: key not in logs")
         return
