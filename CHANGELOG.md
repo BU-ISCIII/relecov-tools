@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Jaime Ozáez](https://github.com/jaimeozaez)
 - [Sara Monzon](https://github.com/saramonzon)
 - [Sergio Olmos](https://github.com/OPSergio)
+- [Sarai Varona](https://github.com/svarona)
 
 #### Added enhancements
 
@@ -33,6 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Modified warning message when validating invalid date format [#557](https://github.com/BU-ISCIII/relecov-tools/pull/557)
 - Fixed wrapper and download subfolder handling and cleaning in remote sftp. [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
 - Removed noisy temporal remote folders from download_log_summary.json [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
+- Added institutions missing in SRI database to config json [#554](https://github.com/BU-ISCIII/relecov-tools/pull/554)
 
 #### Changed
 
@@ -61,6 +63,7 @@ Code contributions to the release:
 - [Juan Ledesma](https://github.com/juanledesma78)
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Sara Monzon](https://github.com/saramonzon)
+- [Sarai Varona](https://github.com/svarona)
 
 ### Modules
 
