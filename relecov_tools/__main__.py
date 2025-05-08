@@ -411,7 +411,7 @@ def send_mail(
     Send a sample validation report by mail.
     """
     debug = ctx.obj.get("debug", False)
-    config_loader = relecov_tools.config_json.ConfigJson()
+    config_loader = relecov_tools.config_json.ConfigJson(extra_config=True)
     config = config_loader.get_configuration("mail_sender")
     if not config:
         raise ValueError(
