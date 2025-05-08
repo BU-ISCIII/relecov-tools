@@ -11076,7 +11076,7 @@
         "submitting_institution_address": "Colmenar s/n",
         "submitting_institution_email": ""
     },
-    "Hospital Comarcal": {
+    "Hospital Comarcal de Melilla": {
         "collecting_institution_address": "Ctra. Remonta, 2",
         "collecting_institution_email": "inform@hcml.insalud.es",
         "collecting_institution_finalidad": "General",
@@ -11087,5 +11087,29 @@
         "submitting_institution": "Hospital Comarcal de Melilla",
         "submitting_institution_address": "Remonta, 2",
         "submitting_institution_email": ""
+    },
+    "Presidencia del Gobierno": {
+        "collecting_institution_address": "Avenida Puerta de Hierro s/n",
+        "collecting_institution_email": "",
+        "collecting_institution_finalidad": "Otra Finalidad",
+        "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Instituto de Salud Carlos III",
+        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
+        "submitting_institution_email": "info@isciii.es"
+    },
+    "Ministerio Sanidad": {
+        "collecting_institution_address": "P.º del Prado, 18, Centro",
+        "collecting_institution_email": "",
+        "collecting_institution_finalidad": "Otra Finalidad",
+        "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Instituto de Salud Carlos III",
+        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
+        "submitting_institution_email": "info@isciii.es"
     }
 }
