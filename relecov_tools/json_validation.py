@@ -187,7 +187,9 @@ class SchemaValidation(BaseModule):
                         err_field_label = error_field
                     # Format the error message
                     error.message = error.message.replace(error_field, err_field_label)
-                    if error.validator == "format" and error.validator_value == "date": # Modification of default text warning for invalid date format.
+                    if (
+                        error.validator == "format" and error.validator_value == "date"
+                    ):  # Modification of default text warning for invalid date format.
                         error_text = f"Error in column {err_field_label}: '{error.instance}' is not a valid date format. Valid format 'YYYY-MM-DD'"
                     else:
                         error_text = (
@@ -209,7 +211,9 @@ class SchemaValidation(BaseModule):
         self.log.info("Validation summary:")
         for error_type, count in errors.items():
             field_with_error = error_keys[error_type]
-            if "is not a 'date'" in error_type: # Modification of default text warning for invalid date format.
+            if (
+                "is not a 'date'" in error_type
+            ):  # Modification of default text warning for invalid date format.
                 error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type.split()[0]} is not a valid date format. Valid format 'YYYY-MM-DD"
             else:
                 error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type}"
