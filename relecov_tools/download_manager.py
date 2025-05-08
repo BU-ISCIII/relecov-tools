@@ -647,6 +647,7 @@ class DownloadManager(BaseModule):
                 self.log.info(
                     "Successfully renamed %s to %s" % (remote_folder, new_name)
                 )
+                self.logsum.rename_log_key(remote_folder, new_name)
             except (OSError, PermissionError) as e:
                 log_text = f"Could not rename remote {remote_folder}. Error: {e}"
                 self.log.error(log_text)
@@ -918,7 +919,6 @@ class DownloadManager(BaseModule):
                 continue
             self.current_folder = folder
             # Include the folder in the final process log summary
-            self.include_new_key()
             downloaded_metadata = pre_validate_folder(folder, target_folders[folder])
             if not downloaded_metadata:
                 continue
@@ -1314,6 +1314,7 @@ class DownloadManager(BaseModule):
             self.log.info(f"Finished processing {folder}")
             stderr.print(f"[green]Finished processing {folder}")
             self.finished_folders[folder] = list(files_md5_dict.keys())
+            self.finished_folders[folder].append(meta_file)
         return
 
     def include_new_key(self, sample=None):
