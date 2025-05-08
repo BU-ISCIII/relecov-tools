@@ -199,75 +199,102 @@ class LogSum:
             string = re.sub(pattern, "", string)
             return string.strip()
 
-        def feed_logs_to_excel(key, logs, excel_outpath):
+        def feed_logs_to_excel(logs, excel_outpath):
             """Feed the data from logs into an excel file, creating different
             sheets depending on the provided list from configuration file"""
-            if not logs.get("samples"):
-                try:
-                    samples_logs = logs[lab_code]["samples"]
-                except (KeyError, AttributeError) as e:
-                    stderr.print(f"[red]Could not convert log summary to excel: {e}")
-                    log.error("Could not convert log summary to excel: %s" % str(e))
-                    return
-            else:
-                samples_logs = logs.get("samples")
-            if not samples_logs:
-                logs["Warnings"].append("No samples found to report")
 
             workbook = openpyxl.Workbook()
             # TODO: Include these fields in configuration.json
-            sample_id_field = "Sample ID given for sequencing"
             sheet_names_and_headers = {
-                "Global Report": ["Valid", "Errors", "Warnings"],
-                "Samples Report": [sample_id_field, "Valid", "Errors"],
-                "Other warnings": [sample_id_field, "Valid", "Warnings"],
+                "Global Report": ["Lab_id", "Valid", "Errors", "Warnings"],
+                "Samples Report": [
+                    "Lab_id",
+                    "Sample ID given for sequencing",
+                    "Valid",
+                    "Errors",
+                ],
+                "Other warnings": [
+                    "Lab_id",
+                    "Sample ID given for sequencing",
+                    "Valid",
+                    "Warnings",
+                ],
             }
             for name, header in sheet_names_and_headers.items():
                 new_sheet = workbook.create_sheet(name)
                 new_sheet.append(header)
             regex = r"[\[\]]"  # Regex to remove lists brackets
 
-            valid = logs.get("valid", True)
-            warnings = logs.get("warnings", [])
+            for key, logs in logs.items():
+                if not logs.get("samples"):
+                    try:
+                        samples_logs = logs[key]["samples"]
+                    except (KeyError, AttributeError) as e:
+                        stderr.print(
+                            f"[red]Could not convert log summary to excel: {e}"
+                        )
+                        log.error("Could not convert log summary to excel: %s" % str(e))
+                    return
+                else:
+                    samples_logs = logs.get("samples")
+                if not samples_logs:
+                    logs["Warnings"].append("No samples found to report")
 
-            warnings_list = warnings if isinstance(warnings, list) else [warnings]
-            truncated_warnings = []
-            max_lenght = 150
+                valid = logs.get("valid", False)
+                warnings = logs.get("warnings", [])
 
-            for warning in warnings_list:
-                warnings_str = str(warning)
-                if len(warnings_str) > max_lenght:
-                    warnings_str = warnings_str[:max_lenght] + "..."
-                truncated_warnings.append(warnings_str)
-            warnings_cleaned = "; ".join(truncated_warnings)
+                warnings_list = warnings if isinstance(warnings, list) else [warnings]
+                truncated_warnings = []
+                max_lenght = 250
 
-            errors_list = logs.get("errors", [])
-            errors_list = (
-                errors_list if isinstance(errors_list, list) else [errors_list]
-            )
+                for warning in warnings_list:
+                    warnings_str = str(warning)
+                    if len(warnings_str) > max_lenght:
+                        warnings_str = warnings_str[:max_lenght] + "..."
+                    truncated_warnings.append(warnings_str)
+                warnings_cleaned = "; ".join(truncated_warnings)
 
-            truncated_errors = []
+                errors_list = logs.get("errors", [])
+                errors_list = (
+                    errors_list if isinstance(errors_list, list) else [errors_list]
+                )
 
-            for err in errors_list:
-                err_str = reg_remover(str(err), regex)
-                if len(err_str) > max_lenght:
-                    err_str = err_str[:max_lenght] + "..."
-                truncated_errors.append(err_str)
+                truncated_errors = []
 
-            errors_cleaned = "; ".join(truncated_errors)
+                for err in errors_list:
+                    err_str = reg_remover(str(err), regex)
+                    if len(err_str) > max_lenght:
+                        err_str = err_str[:max_lenght] + "..."
+                    truncated_errors.append(err_str)
 
-            workbook["Global Report"].append(
-                [str(valid), errors_cleaned, warnings_cleaned]
-            )
+                errors_cleaned = "; ".join(truncated_errors)
 
-            regex = r"\[.*?\]"  # Regex to remove ontology annotations between brackets
-            for sample, slog in samples_logs.items():
-                clean_errors = [reg_remover(x, regex) for x in slog["errors"]]
-                error_row = [sample, str(slog["valid"]), "\n ".join(clean_errors)]
-                workbook["Samples Report"].append(error_row)
-                clean_warngs = [reg_remover(x, regex) for x in slog["warnings"]]
-                warning_row = [sample, str(slog["valid"]), "\n ".join(clean_warngs)]
-                workbook["Other warnings"].append(warning_row)
+                workbook["Global Report"].append(
+                    [str(key), str(valid), errors_cleaned, warnings_cleaned]
+                )
+
+                regex = (
+                    r"\[.*?\]"  # Regex to remove ontology annotations between brackets
+                )
+                for sample, slog in samples_logs.items():
+                    clean_errors = [reg_remover(x, regex) for x in slog["errors"]]
+                    error_row = [
+                        str(key),
+                        sample,
+                        str(slog["valid"]),
+                        "\n ".join(clean_errors),
+                    ]
+                    workbook["Samples Report"].append(error_row)
+                    clean_warngs = [reg_remover(x, regex) for x in slog["warnings"]]
+                    warning_row = [
+                        str(key),
+                        sample,
+                        str(slog["valid"]),
+                        "\n ".join(clean_warngs),
+                    ]
+                    workbook["Other warnings"].append(warning_row)
+
+            # Adjusting the size of the columns in the excel file
             for name in sheet_names_and_headers.keys():
                 relecov_tools.utils.adjust_sheet_size(workbook[name])
             del workbook["Sheet"]
@@ -279,23 +306,17 @@ class LogSum:
             # TODO Translate logs to spanish using a local translator model like deepl
             return
 
-        date = datetime.today().strftime("%Y%m%d%H%M%S")
-        lab_code = list(logs.keys())[0]
         if not os.path.exists(os.path.dirname(excel_outpath)):
-            excel_outpath = os.path.join(
-                self.output_location, lab_code + "_" + date + "_report.xlsx"
-            )
+            os.makedirs(os.path.dirname(excel_outpath), exist_ok=True)
             log.warning(
-                "Given report outpath does not exist, changed to %s" % (excel_outpath)
+                "Given report outpath does not exist, created it automatically: %s",
+                os.path.dirname(excel_outpath),
             )
         file_ext = os.path.splitext(excel_outpath)[-1]
         excel_outpath = excel_outpath.replace(file_ext, ".xlsx")
-        for key, logs in logs.items():
-            if lab_code in excel_outpath:
-                lab_excelpath = excel_outpath.replace(lab_code, key)
-            else:
-                lab_excelpath = excel_outpath.replace(".xlsx", "_" + key + ".xlsx")
-            feed_logs_to_excel(key, logs, lab_excelpath)
+
+        feed_logs_to_excel(logs, excel_outpath)
+
         return
 
     def create_error_summary(

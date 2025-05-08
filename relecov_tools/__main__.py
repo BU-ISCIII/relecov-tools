@@ -958,7 +958,7 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
     try:
         merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
         final_logs = logsum.prepare_final_logs(logs=merged_logs)
-        output_filepath = os.path.join(output_folder, lab_code + "_logs_report")
+        output_filepath = os.path.join(output_folder, lab_code + "_metadata_report")
         excel_outpath = output_filepath + ".xlsx"
         logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
         json_outpath = output_filepath + ".json"
