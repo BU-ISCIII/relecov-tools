@@ -35,8 +35,6 @@ class UploadSftp:
         if not batch_id:
             raise ValueError("Error: You must provide a batch_id as an argument.")
 
-        if not template_path:
-            raise ValueError("Error: You must provide a template_path as an argument.")
 
         config_json = ConfigJson()
         config = config_json.get_configuration("mail_sender")
@@ -44,6 +42,15 @@ class UploadSftp:
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
+        
+        if not template_path:
+            template_path = config.get("delivery_template_path_file")
+
+        if not template_path or not os.path.exists(template_path):
+            raise FileNotFoundError(
+                "The template path could not be determined or does not exist. "
+                "Please provide it via --template_path or define 'delivery_template_path_file' in the configuration."
+            )
 
         self.batch_id = batch_id
         self.sftp_user = user or relecov_tools.utils.prompt_text(
@@ -179,7 +186,7 @@ class UploadSftp:
         email_body = self.email_sender.render_email_template(
             additional_info=f"Batch {batch_name} is ready.",
             submitting_institution_code=lab_code,
-            template_name="jinja_template_results.j2",
+            template_name="template_results_relecov.j2",
             batch=batch_name,
             password=zip_passwd,
             zip_filename=zip_filename,
