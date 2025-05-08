@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Included installation with bioconda in README.md [#549](https://github.com/BU-ISCIII/relecov-tools/pull/549)
 - Added support for additional notes via .txt file or manual input in `send-email` CLI [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
 - Restructured and cleaned Jinja templates and ENA templates; moved to assets/mail_templates/ | assets/ena_templates and renamed for clarity [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
+- Set default folder as RELECOV when running wrapper module [#562](https://github.com/BU-ISCIII/relecov-tools/pull/562)
 
 #### Fixes
 
