@@ -240,7 +240,7 @@ class LogSum:
                 if not samples_logs:
                     logs["Warnings"].append("No samples found to report")
 
-                valid = logs.get("valid", True)
+                valid = logs.get("valid", False)
                 warnings = logs.get("warnings", [])
 
                 warnings_list = warnings if isinstance(warnings, list) else [warnings]
