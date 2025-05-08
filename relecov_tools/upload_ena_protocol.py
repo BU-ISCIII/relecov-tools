@@ -73,7 +73,7 @@ class EnaUpload:
             self.template_path = relecov_tools.utils.prompt_path(
                 msg="Select the folder containing ENA templates"
             )
-        # e.g. template_folder = "/home/user/github_repositories/relecov-tools/relecov_tools/templates"
+        # e.g. template_folder = "/home/user/github_repositories/relecov-tools/relecov_tools/assets/ena_templates"
         else:
             self.template_path = template_path
         if not os.path.exists(self.template_path):
