@@ -197,7 +197,7 @@ class ProcessWrapper(BaseModule):
         sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(key)
         sftp_dirs_paths = [os.path.join(key, d) for d in sftp_dirs]
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
-    
+
         if not valid_dirs:
             subfolder = getattr(self.download_manager, "subfolder", None)
             if subfolder:
