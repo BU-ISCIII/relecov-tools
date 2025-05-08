@@ -1041,7 +1041,7 @@ def wrapper(ctx, config_file, output_folder):
 @click.option("-u", "--user", help="User name for login to sftp server")
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-b", "--batch_id", help="Batch from....")
-@click.option("-t", "--template_path", help="Path to relecov-tools templates folder")
+@click.option("-t", "--template_path", required=False, help="Path to relecov-tools templates folder")
 @click.option(
     "-r", "--project", default="Relecov", help="Project to which the samples belong"
 )
