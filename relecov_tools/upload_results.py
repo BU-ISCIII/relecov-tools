@@ -35,14 +35,13 @@ class UploadSftp:
         if not batch_id:
             raise ValueError("Error: You must provide a batch_id as an argument.")
 
-
         config_json = ConfigJson()
         config = config_json.get_configuration("mail_sender")
         sftp_config = config_json.get_configuration("sftp_handle")
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
-        
+
         if not template_path:
             template_path = config.get("delivery_template_path_file")
 

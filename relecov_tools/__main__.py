@@ -427,15 +427,15 @@ def send_mail(
     submitting_institution_code = list(validate_data.keys())[0]
 
     invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
-    
+
     if not template_path:
-        template_path= config.get("delivery_template_path_file")
+        template_path = config.get("delivery_template_path_file")
     if not template_path or not os.path.exists(template_path):
         raise FileNotFoundError(
             "The template path could not be determined or does not exist. "
             "Please provide it via --template_path or define 'delivery_template_path_file' in the configuration."
         )
-        
+
     email_sender = relecov_tools.mail.EmailSender(config, template_path)
 
     template_choice = click.prompt(
@@ -1041,7 +1041,12 @@ def wrapper(ctx, config_file, output_folder):
 @click.option("-u", "--user", help="User name for login to sftp server")
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-b", "--batch_id", help="Batch from....")
-@click.option("-t", "--template_path", required=False, help="Path to relecov-tools templates folder")
+@click.option(
+    "-t",
+    "--template_path",
+    required=False,
+    help="Path to relecov-tools templates folder",
+)
 @click.option(
     "-r", "--project", default="Relecov", help="Project to which the samples belong"
 )
