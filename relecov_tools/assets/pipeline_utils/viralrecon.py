@@ -494,7 +494,7 @@ def quality_control_evaluation(data):
                     if value is None or not condition(value):
                         qc_status = "fail"
                         break
-                except Exception:
+                except (TypeError, ValueError):
                     if isinstance(value, str) and "Not Evaluable" in value:
                         continue
                     qc_status = "fail"
@@ -510,7 +510,7 @@ def quality_control_evaluation(data):
                 "valid",
                 f"{sample.get('sequencing_sample_id')} evaluated: {qc_status}",
             )
-        except Exception as e:
+        except (TypeError, ValueError, AttributeError) as e:
             sample["qc_test"] = "fail"
             sample_id = sample.get("sequencing_sample_id", "unknown")
             log_report.update_log_report(
