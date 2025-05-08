@@ -513,6 +513,12 @@ def quality_control_evaluation(data):
                 try:
                     if value is None or not condition(value):
                         if is_not_evaluable(value):
+                            log.info(
+                                "%s is not evaluable for %s in sample %s",
+                                value,
+                                param,
+                                sample["sequencing_sample_id"],
+                            )
                             continue
                         qc_status = "fail"
                         op, th = thresholds[param]
