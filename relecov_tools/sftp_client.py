@@ -156,11 +156,12 @@ class SftpRelecov:
         return directory_list
 
     @reconnect_if_fail(n_times=3, sleep_time=30)
-    def get_file_list(self, folder_name):
+    def get_file_list(self, folder_name, recursive=False):
         """Return a tuple with file name and directory path from remote
 
         Args:
             folder_name (str): name of folder in remote repository
+            recursive (bool): either to list files recursively through subfolders
 
         Returns:
             file_list (list(str)): list of files in remote folder
@@ -172,7 +173,8 @@ class SftpRelecov:
             for content in content_list:
                 full_path = os.path.join(folder_name, content.filename)
                 if stat.S_ISDIR(content.st_mode):
-                    file_list.extend(self.get_file_list(full_path))
+                    if recursive is True:
+                        file_list.extend(self.get_file_list(full_path))
                 elif stat.S_ISREG(content.st_mode):
                     file_list.append(full_path)
         except FileNotFoundError as e:
