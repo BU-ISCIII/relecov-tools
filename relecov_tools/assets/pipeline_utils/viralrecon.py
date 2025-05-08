@@ -501,18 +501,18 @@ def quality_control_evaluation(data):
                     log_report.update_log_report(
                         method_name,
                         "warning",
-                        f"Sample {sample.get('sequencing_sample_id', 'unknown')} has unevaluable value for {param}: {value}",
+                        f"Sample {sample['sequencing_sample_id']} has unevaluable value for {param}: {value}"
                     )
                     break
             sample["qc_test"] = qc_status
             log_report.update_log_report(
                 method_name,
                 "valid",
-                f"{sample.get('sequencing_sample_id')} evaluated: {qc_status}",
+                f"{sample['sequencing_sample_id']} evaluated: {qc_status}",
             )
         except (TypeError, ValueError, AttributeError) as e:
             sample["qc_test"] = "fail"
-            sample_id = sample.get("sequencing_sample_id", "unknown")
+            sample_id = sample["sequencing_sample_id"]
             log_report.update_log_report(
                 method_name, "warning", f"Error evaluating sample {sample_id}: {e}"
             )
