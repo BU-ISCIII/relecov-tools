@@ -88,7 +88,10 @@ class BaseModule:
         if only_stream is True:
             log_fh = logging.StreamHandler()
         else:
-            os.makedirs(os.path.dirname(log_filepath), exist_ok=True)
+            # ensure log directory exists before generating the log file
+            dirpath = os.path.dirname(log_filepath)
+            if dirpath:
+                os.makedirs(dirpath, exist_ok=True)
             log_fh = logging.FileHandler(log_filepath, encoding="utf-8")
         log_fh.setLevel(level)
         log_fh.setFormatter(
