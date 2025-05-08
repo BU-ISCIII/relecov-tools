@@ -152,7 +152,8 @@
             "sequence_file_R1",
             "sequence_file_R2",
             "sequence_file_path_R1",
-            "sequence_file_path_R2"
+            "sequence_file_path_R2",
+            "batch_id"
         ]
     },
     "long_table_heading": [
