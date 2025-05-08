@@ -214,7 +214,7 @@ class SchemaBuilder:
             # Check for duplicate enum values
             if prop_features.get("enum"):
                 if not pd.isna(prop_features["enum"]):
-                    enum_values = prop_features["enum"].split(", ")
+                    enum_values = prop_features["enum"].split("; ")
                     # Verify that enum has no duplicates
                     if len(enum_values) != len(set(enum_values)):
                         duplicates = [
@@ -376,7 +376,7 @@ class SchemaBuilder:
             # if no value, json key won't be necessary, then avoid adding it
             if len(value) > 0:
                 if target_key == "enum":
-                    json_dict[target_key] = value.split(", ")
+                    json_dict[target_key] = value.split("; ")
                 elif target_key == "examples":
                     json_dict[target_key] = [value]
         elif target_key == "description":
