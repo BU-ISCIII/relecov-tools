@@ -31,6 +31,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix warning when perLDM is "Data Not Evaluable" [#550](https://github.com/BU-ISCIII/relecov-tools/pull/550)
 - Fixed unexpected warning message when organism field is empty [#553](https://github.com/BU-ISCIII/relecov-tools/pull/553)
 - Modified warning message when validating invalid date format [#557](https://github.com/BU-ISCIII/relecov-tools/pull/557)
+- Fixed wrapper and download subfolder handling and cleaning in remote sftp. [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
+- Removed noisy temporal remote folders from download_log_summary.json [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
 
 #### Changed
 
@@ -39,6 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Improve json to excel generation to admit excels with more than one lab [#552](https://github.com/BU-ISCIII/relecov-tools/pull/552)
 - Made --template_path optional in send-email and upload-results commands, using fallback to config key delivery_template_path_file [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
 - The configuration necessary to use the mail module is incorporated as an extra-config. [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)- Add support for qc_failed logic in viralrecon.py and update PR template [#559](https://github.com/BU-ISCIII/relecov-tools/pull/559)
+- Better handling if new_key already exists in log_summary.py-rename_log_key(). [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
 
 #### Removed
 
