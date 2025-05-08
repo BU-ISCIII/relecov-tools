@@ -490,8 +490,19 @@ def quality_control_evaluation(data):
             qc_status = "pass"
             for param, condition in conditions.items():
                 value = sample.get(param)
-                if value is None or not condition(value):
+                try:
+                    if value is None or not condition(value):
+                        qc_status = "fail"
+                        break
+                except Exception:
+                    if isinstance(value, str) and "Not Evaluable" in value:
+                        continue
                     qc_status = "fail"
+                    log_report.update_log_report(
+                        method_name,
+                        "warning",
+                        f"Sample {sample.get('sequencing_sample_id', 'unknown')} has unevaluable value for {param}: {value}"
+                    )
                     break
             sample["qc_test"] = qc_status
             log_report.update_log_report(
