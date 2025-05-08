@@ -135,7 +135,6 @@ class DownloadManager(BaseModule):
         )
         self.finished_folders = {}
         self.set_batch_id(datetime.today().strftime("%Y%m%d%H%M%S"))
-        self.defer_cleanup = False
 
     def create_local_folder(self, folder):
         """Create folder to download files in local path using date
@@ -1377,7 +1376,7 @@ class DownloadManager(BaseModule):
         )
         # If download_option is "download_clean", remove
         # sftp folder content after download is finished
-        if self.download_option == "download_clean" and not self.defer_cleanup:
+        if self.download_option == "download_clean":
             normal_folders = {
                 folder
                 for folder in processed_folders
