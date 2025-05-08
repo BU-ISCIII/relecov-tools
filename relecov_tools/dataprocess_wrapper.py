@@ -195,44 +195,24 @@ class ProcessWrapper(BaseModule):
         )
         stderr.print(f"[green]Merged logs from all processes in {local_folder}")
         self.log.info(f"Merged logs from all processes in {local_folder}")
-        sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(key)
-        sftp_dirs_paths = [os.path.join(key, d) for d in sftp_dirs]
+        subfolder = getattr(self.download_manager, "subfolder", None)
+        if subfolder and subfolder not in key:
+            main_folder = os.path.join(key, subfolder)
+        else:
+            main_folder = key
+        sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(main_folder)
+        sftp_dirs_paths = [os.path.join(main_folder, d) for d in sftp_dirs]
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
-
-        if not valid_dirs:
-            subfolder = getattr(self.download_manager, "subfolder", None)
-            if subfolder:
-                key_subfolder = os.path.join(key, subfolder)
-                try:
-                    sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(
-                        key_subfolder
-                    )
-                    sftp_dirs_paths = [
-                        os.path.join(key_subfolder, d) for d in sftp_dirs
-                    ]
-                    valid_dirs = [
-                        d for d in sftp_dirs_paths if d in finished_folders.keys()
-                    ]
-                except FileNotFoundError as e:
-                    warn_msg = (
-                        f"Subfolder {key_subfolder} not found in remote SFTP: {e}"
-                    )
-                    self.log.warning(warn_msg)
-                    stderr.print(f"[yellow]{warn_msg}")
 
         # As all folders are merged into one during download, there should only be 1 folder
         if not valid_dirs or len(valid_dirs) >= 2:
             # If all samples were valid during download and download_clean is used, the original folder might have been deleted
             self.log.warning(
-                "Couldnt find %s folder in remote sftp. Creating new one", key
+                "Couldnt find %s folder in remote sftp. Creating new one", main_folder
             )
-            subfolder = getattr(self.download_manager, "subfolder", None)
-            if subfolder:
-                remote_dir = os.path.join(
-                    key, subfolder, self.batch_id + "_invalid_samples"
-                )
-            else:
-                remote_dir = os.path.join(key, self.batch_id + "_invalid_samples")
+            remote_dir = os.path.join(
+                main_folder, self.batch_id + "_invalid_samples"
+            )
             self.download_manager.relecov_sftp.make_dir(remote_dir)
         else:
             remote_dir = valid_dirs[0]
@@ -244,17 +224,15 @@ class ProcessWrapper(BaseModule):
             )
             file_fields = ("sequence_file_R1", "sequence_file_R2")
             valid_sampfiles = [
-                f.get(key) for key in file_fields for f in valid_json_data
+                f.get(v) for v in file_fields for f in valid_json_data
             ]
+            remote_files = self.download_manager.relecov_sftp.get_file_list(remote_dir)
             valid_files = [
-                f for f in finished_folders[remote_dir] if f in valid_sampfiles
+                f for f in remote_files if f in valid_sampfiles
             ]
             self.download_manager.delete_remote_files(remote_dir, files=valid_files)
             self.download_manager.delete_remote_files(remote_dir, skip_seqs=True)
             self.download_manager.clean_remote_folder(remote_dir)
-        subfolder = getattr(self.download_manager, "subfolder", None)
-        if subfolder and subfolder not in remote_dir:
-            remote_dir = os.path.join(key, subfolder)
         if invalid_json:
             logtxt = f"Found {len(invalid_json)} invalid samples in {key}"
             self.wrapper_logsum.add_warning(key=key, entry=logtxt)
@@ -294,6 +272,7 @@ class ProcessWrapper(BaseModule):
         else:
             self.log.info("No invalid samples in %s", key)
             stderr.print(f"[green]No invalid samples were found for {key} !!!")
+            self.download_manager.clean_remote_folder(remote_dir)
         log_filepath = os.path.join(local_folder, str(key) + "_metadata_report.json")
         self.wrapper_logsum.create_error_summary(
             called_module="metadata",
