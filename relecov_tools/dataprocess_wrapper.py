@@ -364,6 +364,7 @@ class ProcessWrapper(BaseModule):
                 )
                 continue
             self.wrapper_logsum.logs[key] = merged_logs[key]
+
         self.parent_create_error_summary(
             called_module="wrapper",
             to_excel=True,
