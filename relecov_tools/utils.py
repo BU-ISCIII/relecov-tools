@@ -667,12 +667,12 @@ def cast_value_to_schema_type(value, expected_type: str):
         try:
             return int(float(value))
         except (ValueError, TypeError):
-            pass
+            return str(value).strip()
     elif expected_type == "number":
         try:
             return float(value)
         except (ValueError, TypeError):
-            pass
+            return str(value).strip()
     elif expected_type == "boolean":
         return str(value).strip().lower() in ["true", "yes", "1"]
     elif expected_type == "string":
