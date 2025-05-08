@@ -12,12 +12,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Alejandro Bernabeu](https://github.com/aberdur)
 - [Jaime Ozáez](https://github.com/jaimeozaez)
 - [Sara Monzon](https://github.com/saramonzon)
+- [Sergio Olmos](https://github.com/OPSergio)
 
 #### Added enhancements
 
 - Correctly implemented new log handling in read-bioinfo-metadata [#546](https://github.com/BU-ISCIII/relecov-tools/pull/546)
 - Implemented new BaseModule logging functionality in pipeline-manager [#549](https://github.com/BU-ISCIII/relecov-tools/pull/549)
 - Included installation with bioconda in README.md [#549](https://github.com/BU-ISCIII/relecov-tools/pull/549)
+- Added support for additional notes via .txt file or manual input in `send-email` CLI [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
+- Restructured and cleaned Jinja templates; moved to templates/email_templates/ and renamed for clarity [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
 
 #### Fixes
 
