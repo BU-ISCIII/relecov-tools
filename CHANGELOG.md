@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed deprecated sequence_file_path_R1 field in read-bioinfo-metadata [#546](https://github.com/BU-ISCIII/relecov-tools/pull/546)
 - Fix warning when perLDM is "Data Not Evaluable" [#550](https://github.com/BU-ISCIII/relecov-tools/pull/550)
 - Fixed unexpected warning message when organism field is empty [#553](https://github.com/BU-ISCIII/relecov-tools/pull/553)
+- Modified warning message when validating invalid date format [#557](https://github.com/BU-ISCIII/relecov-tools/pull/557)
 
 #### Changed
 
