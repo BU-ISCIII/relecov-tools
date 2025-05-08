@@ -4,14 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.X] - 2025-05-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v.1.5.X
+## [1.5.1dev] - 2025-05-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v.1.5.X
 
 ### Credits
 
 - [Pablo Mata](https://github.com/shettland)
 - [Alejandro Bernabeu](https://github.com/aberdur)
 - [Jaime Ozáez](https://github.com/jaimeozaez)
-
+- [Sara Monzon](https://github.com/saramonzon)
 
 #### Added enhancements
 
@@ -28,6 +28,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed unexpected warning message when organism field is empty [#553](https://github.com/BU-ISCIII/relecov-tools/pull/553)
 
 #### Changed
+
+- Improve json to excel generation to admit excels with more than one lab [#552](https://github.com/BU-ISCIII/relecov-tools/pull/552)
 
 #### Removed
 
