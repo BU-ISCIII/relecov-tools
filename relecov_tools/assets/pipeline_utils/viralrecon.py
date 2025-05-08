@@ -327,9 +327,9 @@ def handle_pangolin_data(files_list, batch_date, output_folder=None):
                 )
                 # Add custom content in pangolin
                 pango_data_key = next(iter(pango_data))
-                pango_data[pango_data_key]["lineage_analysis_date"] = (
-                    relecov_tools.utils.get_file_date(pango_file)
-                )
+                pango_data[pango_data_key][
+                    "lineage_analysis_date"
+                ] = relecov_tools.utils.get_file_date(pango_file)
                 pango_data[pango_data_key]["pangolin_database_version"] = pango_data_v
                 # Rename key in f_data
                 pango_data_updated = {

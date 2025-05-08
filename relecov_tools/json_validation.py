@@ -189,7 +189,9 @@ class SchemaValidation(BaseModule):
                     if error.validator == "format" and error.validator_value == "date":
                         error_text = f"Error in column {err_field_label}: '{error.instance}' is not a valid date format. Valid format 'YYYY-MM-DD'"
                     else:
-                        error_text = f"Error in column {err_field_label}: {error.message}"
+                        error_text = (
+                            f"Error in column {err_field_label}: {error.message}"
+                        )
 
                     # Log errors for summary
                     error_keys[error.message] = error_field
