@@ -462,58 +462,89 @@ def quality_control_evaluation(data):
         The same list with an added 'qc_test' field per sample:
         - 'pass' if all evaluable conditions are met
         - 'fail' if any condition fails
-        - Ignores non-evaluable values like 'Data Not Evaluable [NCIT:C186292]'
+        - Adds 'qc_failed' field with reasons for failure
     """
     log_report = BioinfoReportLog()
     method_name = f"{quality_control_evaluation.__name__}"
 
+    thresholds = {
+        "per_sgene_ambiguous": ("<", 10.0),
+        "per_sgene_coverage": (">", 98.0),
+        "per_ldmutations": (">", 60.0),  # except if 'Not Evaluable'
+        "number_of_sgene_frameshifts": ("==", 0),
+        "number_of_unambiguous_bases": (">", 24000),
+        "number_of_Ns": ("<", 5000),
+        "qc_filtered": (">", 50000),
+        "per_reads_host": ("<", 20.0),
+    }
+
+    def is_not_evaluable(value):
+        return isinstance(value, str) and "Not Evaluable" in value
+
+    def invert_operator(op):
+        return {">": "<", "<": ">", ">=": "<=", "<=": ">=", "==": "!=", "!=": "=="}.get(
+            op, f"NOT_{op}"
+        )
+
     conditions = {
-        "per_sgene_ambiguous": lambda x: isinstance(x, (int, float))
-        and float(x) < 10.0,
-        "per_sgene_coverage": lambda x: isinstance(x, (int, float)) and float(x) > 98.0,
-        "per_ldmutations": lambda x: (
-            True
-            if isinstance(x, str) and "Not Evaluable" in x
-            else isinstance(x, (int, float)) and float(x) > 60.0
-        ),
-        "number_of_sgene_frameshifts": lambda x: isinstance(x, (int, float))
-        and int(x) == 0,
-        "number_of_unambiguous_bases": lambda x: isinstance(x, (int, float))
-        and int(x) > 24000,
-        "number_of_Ns": lambda x: isinstance(x, (int, float)) and int(x) < 5000,
-        "qc_filtered": lambda x: isinstance(x, (int, float)) and int(x) > 50000,
-        "per_reads_host": lambda x: isinstance(x, (int, float)) and float(x) < 20.0,
+        k: (
+            (
+                lambda x, op=op, th=th: (
+                    True
+                    if is_not_evaluable(x) and k == "per_ldmutations"
+                    else (
+                        eval(f"{float(x)} {op} {th}")
+                        if isinstance(x, (int, float))
+                        else False
+                    )
+                )
+            )
+        )
+        for k, (op, th) in thresholds.items()
     }
 
     for sample in data:
         try:
             qc_status = "pass"
+            failed_reasons = []
+
             for param, condition in conditions.items():
                 value = sample.get(param)
                 try:
                     if value is None or not condition(value):
+                        if is_not_evaluable(value):
+                            continue
                         qc_status = "fail"
-                        break
+                        op, th = thresholds[param]
+                        inverted_op = invert_operator(op)
+                        failed_reasons.append(f"({param} {inverted_op} {th})")
                 except (TypeError, ValueError):
-                    if isinstance(value, str) and "Not Evaluable" in value:
+                    if is_not_evaluable(value):
                         continue
                     qc_status = "fail"
+                    failed_reasons.append(f"({param} = {value} invalid)")
                     log_report.update_log_report(
                         method_name,
                         "warning",
                         f"Sample {sample['sequencing_sample_id']} has unevaluable value for {param}: {value}",
                     )
-                    break
+
             sample["qc_test"] = qc_status
+            if qc_status == "fail" and failed_reasons:
+                sample["qc_failed"] = " -- ".join(failed_reasons)
+
             log_report.update_log_report(
                 method_name,
                 "valid",
                 f"{sample['sequencing_sample_id']} evaluated: {qc_status}",
             )
+
         except (TypeError, ValueError, AttributeError) as e:
             sample["qc_test"] = "fail"
-            sample_id = sample["sequencing_sample_id"]
+            sample["qc_failed"] = f"(evaluation_error = {str(e)})"
+            sample_id = sample.get("sequencing_sample_id", "unknown")
             log_report.update_log_report(
                 method_name, "warning", f"Error evaluating sample {sample_id}: {e}"
             )
+
     return data
