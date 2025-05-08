@@ -185,10 +185,11 @@ class SchemaValidation(BaseModule):
                     except KeyError:
                         self.log.error(f"Could not extract label for {error_field}")
                         err_field_label = error_field
-
                     # Format the error message
-                    error.message = error.message.replace(error_field, err_field_label)
-                    error_text = f"Error in column {err_field_label}: {error.message}"
+                    if error.validator == "format" and error.validator_value == "date":
+                        error_text = f"Error in column {err_field_label}: '{error.instance}' is not a valid date format. Valid format 'YYYY-MM-DD'"
+                    else:
+                        error_text = f"Error in column {err_field_label}: {error.message}"
 
                     # Log errors for summary
                     error_keys[error.message] = error_field
@@ -205,7 +206,10 @@ class SchemaValidation(BaseModule):
         self.log.info("Validation summary:")
         for error_type, count in errors.items():
             field_with_error = error_keys[error_type]
-            error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type}"
+            if "is not a 'date'" in error_type:
+                error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type.split()[0]} is not a valid date format. Valid format 'YYYY-MM-DD"
+            else:
+                error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type}"
             self.logsum.add_warning(entry=error_text)
             stderr.print(f"[red]{error_text}")
             stderr.print("[red] --------------------")
