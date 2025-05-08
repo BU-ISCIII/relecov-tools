@@ -501,7 +501,7 @@ def quality_control_evaluation(data):
                     log_report.update_log_report(
                         method_name,
                         "warning",
-                        f"Sample {sample['sequencing_sample_id']} has unevaluable value for {param}: {value}"
+                        f"Sample {sample['sequencing_sample_id']} has unevaluable value for {param}: {value}",
                     )
                     break
             sample["qc_test"] = qc_status
