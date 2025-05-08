@@ -379,9 +379,9 @@ def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet
     "-t",
     "--template_path",
     type=click.Path(exists=True),
-    required=True,
+    required=False,
     default=None,
-    help="Path to relecov-tools templates folder",
+    help="Path to relecov-tools templates folder (optional)",
 )
 @click.option(
     "-p",
@@ -427,7 +427,15 @@ def send_mail(
     submitting_institution_code = list(validate_data.keys())[0]
 
     invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
-
+    
+    if not template_path:
+        template_path= config.get("delivery_template_path_file")
+    if not template_path or not os.path.exists(template_path):
+        raise FileNotFoundError(
+            "The template path could not be determined or does not exist. "
+            "Please provide it via --template_path or define 'delivery_template_path_file' in the configuration."
+        )
+        
     email_sender = relecov_tools.mail.EmailSender(config, template_path)
 
     template_choice = click.prompt(
