@@ -48,6 +48,7 @@ class ProcessWrapper(BaseModule):
             output_location=os.path.join(self.output_folder)
         )
         self.config_data["download"].update({"output_location": output_folder})
+        self.config_data["download"].setdefault("subfolder", "RELECOV") # Set default subfolder as RELECOV. If neccesary, it can be overwritten with 'subfolder' parameter in config_file.yaml
         self.download_params = self.clean_module_params(
             "DownloadManager", self.config_data["download"]
         )
