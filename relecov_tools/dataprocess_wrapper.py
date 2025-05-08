@@ -78,7 +78,6 @@ class ProcessWrapper(BaseModule):
         if sftp_port is not None:
             download_manager.relecov_sftp.sftp_port = int(sftp_port)
             print(f"SFTP port assigned: {download_manager.relecov_sftp.sftp_port}")
-        download_manager.defer_cleanup = True
         download_manager.execute_process()
         finished_folders = download_manager.finished_folders
         download_logs = self.wrapper_logsum.prepare_final_logs(
@@ -198,7 +197,7 @@ class ProcessWrapper(BaseModule):
         sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(key)
         sftp_dirs_paths = [os.path.join(key, d) for d in sftp_dirs]
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
-
+    
         if not valid_dirs:
             subfolder = getattr(self.download_manager, "subfolder", None)
             if subfolder:
