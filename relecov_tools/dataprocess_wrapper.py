@@ -210,9 +210,7 @@ class ProcessWrapper(BaseModule):
             self.log.warning(
                 "Couldnt find %s folder in remote sftp. Creating new one", main_folder
             )
-            remote_dir = os.path.join(
-                main_folder, self.batch_id + "_invalid_samples"
-            )
+            remote_dir = os.path.join(main_folder, self.batch_id + "_invalid_samples")
             self.download_manager.relecov_sftp.make_dir(remote_dir)
         else:
             remote_dir = valid_dirs[0]
@@ -223,13 +221,9 @@ class ProcessWrapper(BaseModule):
                 f"Cleaning successfully validated files from remote dir: {remote_dir}"
             )
             file_fields = ("sequence_file_R1", "sequence_file_R2")
-            valid_sampfiles = [
-                f.get(v) for v in file_fields for f in valid_json_data
-            ]
+            valid_sampfiles = [f.get(v) for v in file_fields for f in valid_json_data]
             remote_files = self.download_manager.relecov_sftp.get_file_list(remote_dir)
-            valid_files = [
-                f for f in remote_files if f in valid_sampfiles
-            ]
+            valid_files = [f for f in remote_files if f in valid_sampfiles]
             self.download_manager.delete_remote_files(remote_dir, files=valid_files)
             self.download_manager.delete_remote_files(remote_dir, skip_seqs=True)
             self.download_manager.clean_remote_folder(remote_dir)
