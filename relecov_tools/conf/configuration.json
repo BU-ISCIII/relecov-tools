@@ -483,7 +483,7 @@
         }
     },
     "mail_sender":{
-        "delivery_template_path_file": "./relecov_tools/templates/mail_templates/",
+        "delivery_template_path_file": "./relecov_tools/assets/mail_templates/",
         "email_host": "mx2.isciii.es",
         "email_port": "587",
         "email_host_user": "bioinformatica@isciii.es", 
