@@ -440,9 +440,9 @@ class SchemaBuilder:
         project_name = relecov_tools.utils.get_package_name()
         new_schema["$id"] = relecov_tools.utils.get_schema_url()
         new_schema["title"] = f"{project_name} Schema."
-        new_schema[
-            "description"
-        ] = f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
+        new_schema["description"] = (
+            f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
+        )
         new_schema["version"] = self.version
 
         # Fill schema properties

@@ -103,9 +103,9 @@ class GisaidUpload:
     def complete_mand_fields(self, dataframe):
         """Complete mandatory empty fields with 'unknown'"""
         dataframe.loc[dataframe["covv_gender"] == "", "covv_gender"] = "unknown"
-        dataframe.loc[
-            dataframe["covv_patient_age"] == "", "covv_patient_age"
-        ] = "unknown"
+        dataframe.loc[dataframe["covv_patient_age"] == "", "covv_patient_age"] = (
+            "unknown"
+        )
 
         authors = [authors_field for authors_field in dataframe["covv_authors"]]
         if "" in authors or "unknown" in authors:
@@ -115,17 +115,17 @@ class GisaidUpload:
             )
             sys.exit(1)
 
-        dataframe.loc[
-            dataframe["covv_subm_lab_addr"] == "", "covv_subm_lab_addr"
-        ] = "unknown"
+        dataframe.loc[dataframe["covv_subm_lab_addr"] == "", "covv_subm_lab_addr"] = (
+            "unknown"
+        )
         dataframe.loc[dataframe["covv_subm_lab"] == "", "covv_subm_lab"] = "unknown"
-        dataframe.loc[
-            dataframe["covv_orig_lab_addr"] == "", "covv_orig_lab_addr"
-        ] = "unknown"
+        dataframe.loc[dataframe["covv_orig_lab_addr"] == "", "covv_orig_lab_addr"] = (
+            "unknown"
+        )
         dataframe.loc[dataframe["covv_orig_lab"] == "", "covv_orig_lab"] = "unknown"
-        dataframe.loc[
-            dataframe["covv_patient_status"] == "", "covv_patient_status"
-        ] = "unknown"
+        dataframe.loc[dataframe["covv_patient_status"] == "", "covv_patient_status"] = (
+            "unknown"
+        )
         dataframe.loc[dataframe["covv_type"] == "", "covv_type"] = "betacoronavirus"
         dataframe.loc[dataframe["covv_passage"] == "", "covv_passage"] = "Original"
 
