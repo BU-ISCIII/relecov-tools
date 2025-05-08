@@ -186,6 +186,7 @@ class SchemaValidation(BaseModule):
                         self.log.error(f"Could not extract label for {error_field}")
                         err_field_label = error_field
                     # Format the error message
+                    error.message = error.message.replace(error_field, err_field_label)
                     if error.validator == "format" and error.validator_value == "date":
                         error_text = f"Error in column {err_field_label}: '{error.instance}' is not a valid date format. Valid format 'YYYY-MM-DD'"
                     else:
