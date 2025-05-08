@@ -78,6 +78,7 @@ class ProcessWrapper(BaseModule):
         if sftp_port is not None:
             download_manager.relecov_sftp.sftp_port = int(sftp_port)
             print(f"SFTP port assigned: {download_manager.relecov_sftp.sftp_port}")
+        download_manager.defer_cleanup = True
         download_manager.execute_process()
         finished_folders = download_manager.finished_folders
         download_logs = self.wrapper_logsum.prepare_final_logs(
