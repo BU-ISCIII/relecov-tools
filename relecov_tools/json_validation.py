@@ -155,6 +155,8 @@ class SchemaValidation(BaseModule):
                 self.json_schema, item_row, validation_errors
             )
             if not validation_errors:
+                if "unique_sample_id" not in item_row:
+                    item_row["unique_sample_id"] = self.generate_unique_id()
                 validated_json_data.append(item_row)
                 self.logsum.feed_key(sample=sample_id_value)
             else:
@@ -311,6 +313,11 @@ class SchemaValidation(BaseModule):
         self.log.info("Saving Json file with the validated samples in %s", file_path)
         relecov_tools.utils.write_json_to_file(valid_json_data, file_path)
         return
+
+    def generate_unique_id(self, prefix="RLCV"):
+        """Generates an unique identifier
+        """
+        return f"{prefix}-{uuid.uuid4().hex[:12].upper()}"
 
     def validate(self):
         """Validate samples from metadata, create an excel with invalid samples,
