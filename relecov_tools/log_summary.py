@@ -207,8 +207,18 @@ class LogSum:
             # TODO: Include these fields in configuration.json
             sheet_names_and_headers = {
                 "Global Report": ["Lab_id", "Valid", "Errors", "Warnings"],
-                "Samples Report": ["Lab_id", "Sample ID given for sequencing", "Valid", "Errors"],
-                "Other warnings": ["Lab_id", "Sample ID given for sequencing", "Valid", "Warnings"],
+                "Samples Report": [
+                    "Lab_id",
+                    "Sample ID given for sequencing",
+                    "Valid",
+                    "Errors",
+                ],
+                "Other warnings": [
+                    "Lab_id",
+                    "Sample ID given for sequencing",
+                    "Valid",
+                    "Warnings",
+                ],
             }
             for name, header in sheet_names_and_headers.items():
                 new_sheet = workbook.create_sheet(name)
@@ -220,7 +230,9 @@ class LogSum:
                     try:
                         samples_logs = logs[key]["samples"]
                     except (KeyError, AttributeError) as e:
-                        stderr.print(f"[red]Could not convert log summary to excel: {e}")
+                        stderr.print(
+                            f"[red]Could not convert log summary to excel: {e}"
+                        )
                         log.error("Could not convert log summary to excel: %s" % str(e))
                     return
                 else:
@@ -261,13 +273,25 @@ class LogSum:
                     [str(key), str(valid), errors_cleaned, warnings_cleaned]
                 )
 
-                regex = r"\[.*?\]"  # Regex to remove ontology annotations between brackets
+                regex = (
+                    r"\[.*?\]"  # Regex to remove ontology annotations between brackets
+                )
                 for sample, slog in samples_logs.items():
                     clean_errors = [reg_remover(x, regex) for x in slog["errors"]]
-                    error_row = [str(key), sample, str(slog["valid"]), "\n ".join(clean_errors)]
+                    error_row = [
+                        str(key),
+                        sample,
+                        str(slog["valid"]),
+                        "\n ".join(clean_errors),
+                    ]
                     workbook["Samples Report"].append(error_row)
                     clean_warngs = [reg_remover(x, regex) for x in slog["warnings"]]
-                    warning_row = [str(key), sample, str(slog["valid"]), "\n ".join(clean_warngs)]
+                    warning_row = [
+                        str(key),
+                        sample,
+                        str(slog["valid"]),
+                        "\n ".join(clean_warngs),
+                    ]
                     workbook["Other warnings"].append(warning_row)
 
             # Adjusting the size of the columns in the excel file
@@ -286,7 +310,7 @@ class LogSum:
             os.makedirs(os.path.dirname(excel_outpath), exist_ok=True)
             log.warning(
                 "Given report outpath does not exist, created it automatically: %s",
-                os.path.dirname(excel_outpath)
+                os.path.dirname(excel_outpath),
             )
         file_ext = os.path.splitext(excel_outpath)[-1]
         excel_outpath = excel_outpath.replace(file_ext, ".xlsx")
