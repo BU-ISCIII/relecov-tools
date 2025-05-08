@@ -252,9 +252,8 @@ class DownloadManager(BaseModule):
         samples_to_delete = []
         lab_code = local_folder.split("/")[-2]
         # TODO: Move these prefixes to configuration.json
-        file_tag = self.batch_id + "_" + self.hex
-        new_meta_file = "lab_metadata_" + lab_code + "_" + file_tag + ".xlsx"
-        sample_data_file = "samples_data_" + lab_code + "_" + file_tag + ".json"
+        new_meta_file = self.tag_filename("lab_metadata_" + lab_code + ".xlsx")
+        sample_data_file = self.tag_filename("samples_data_" + lab_code + ".json")
         sample_data_path = os.path.join(local_folder, sample_data_file)
         os.rename(metadata_file, os.path.join(local_folder, new_meta_file))
         error_text = "Sample %s incomplete. Not added to final Json"
@@ -268,12 +267,12 @@ class DownloadManager(BaseModule):
             # TODO: Move these keys to configuration.json
             values["sequence_file_path_R1"] = local_folder
             values["sequence_file_R1_md5"] = md5_dict.get(values["sequence_file_R1"])
-            values["batch_id"] = self.batch_id
             if values.get("sequence_file_R2"):
                 values["sequence_file_path_R2"] = local_folder
                 values["sequence_file_R2_md5"] = md5_dict.get(
                     values["sequence_file_R2"]
                 )
+            values["batch_id"] = self.batch_id
         if samples_to_delete:
             data = {k: v for k, v in data.items() if k not in samples_to_delete}
         with open(sample_data_path, "w", encoding="utf-8") as fh:
@@ -1295,8 +1294,13 @@ class DownloadManager(BaseModule):
             if self.logsum.logs.get(self.current_folder):
                 self.logsum.logs[self.current_folder].update({"path": local_folder})
                 try:
-                    folder_basename = os.path.basename(local_folder.rstrip("/"))
-                    log_name = folder_basename + "_download_log_summary.json"
+                    log_name = "_".join(
+                        [
+                            "download",
+                            self.current_folder,
+                            self.tag_filename("log_summary.json"),
+                        ]
+                    )
                     self.parent_create_error_summary(
                         filepath=os.path.join(local_folder, log_name),
                         logs={
