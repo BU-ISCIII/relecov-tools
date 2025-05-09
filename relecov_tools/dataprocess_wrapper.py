@@ -48,6 +48,12 @@ class ProcessWrapper(BaseModule):
             output_location=os.path.join(self.output_folder)
         )
         self.config_data["download"].update({"output_location": output_folder})
+        if "subfolder" not in self.config_data["download"]:
+            self.config_data["download"].update(
+                {"subfolder": "RELECOV"}
+            )  # If subfolder is not defined or None, it is set automatically as RELECOV
+            self.log.warning("Subfolder not provided. Set to as RELECOV by default")
+            stderr.print("[yellow]Subfolder not provided. Set to RELECOV by default")
         self.download_params = self.clean_module_params(
             "DownloadManager", self.config_data["download"]
         )

@@ -934,7 +934,10 @@ class DownloadManager(BaseModule):
             # Taking the main folder for each lab as reference for merge and logs
             main_folder = folder.split("/")[0]
             self.current_folder = main_folder
-            tmp_folder_parent = os.path.join(main_folder, self.subfolder)
+            if self.subfolder is not None:
+                tmp_folder_parent = os.path.join(main_folder, self.subfolder)
+            else:
+                tmp_folder_parent = main_folder
             temporal_foldername = f"{date_and_time}_tmp_processing"
             temp_folder = os.path.join(tmp_folder_parent, temporal_foldername)
             # Get every file except the excel ones as they are going to be merged
