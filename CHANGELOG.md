@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Sara Monzon](https://github.com/saramonzon)
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Sarai Varona](https://github.com/svarona)
+- [Daniel Valle-Millares](https://github.com/Daniel-VM)
 
 #### Added enhancements
 
