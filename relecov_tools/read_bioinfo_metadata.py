@@ -104,11 +104,18 @@ class BioinfoMetadata(BaseModule):
                 self.log_report.print_log_report(self.__init__.__name__, ["error"])
             )
         self.readlabmeta_json_file = readlabmeta_json_file
-        meta_basename = os.path.basename(self.readlabmeta_json_file).split(".")[0]
-        self.out_filename = "bioinfo_" + meta_basename + ".json"
         # Initialize j_data object
         stderr.print("[blue]Reading lab metadata json")
         self.j_data = self.collect_info_from_lab_json()
+        batch_id = self.get_batch_id_from_data(self.j_data)
+        self.set_batch_id(batch_id)
+
+        meta_basename = os.path.basename(self.readlabmeta_json_file).split(".")[0]
+        if batch_id in meta_basename:
+            # File is probably tagged already from a previous process
+            self.out_filename = "bioinfo_" + meta_basename + ".json"
+        else:
+            self.out_filename = self.tag_filename("bioinfo_" + meta_basename + ".json")
         self.update = update
 
         # Parse input/output folder
