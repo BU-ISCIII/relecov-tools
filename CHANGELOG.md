@@ -117,6 +117,7 @@ Code contributions to the release:
 - Added summary stats logging to wrapper module [514#](https://github.com/BU-ISCIII/relecov-tools/pull/514).
 - Updated the create_summary_tables.py script to be able to handle single .json files directly [#526](https://github.com/BU-ISCIII/relecov-tools/pull/526).
 - Updated README.md for new functionalities in v1.5.0 [#527](https://github.com/BU-ISCIII/relecov-tools/pull/527)
+- Implement unique sample's ID generation using centralized registry [#565](https://github.com/BU-ISCIII/relecov-tools/pull/565).
 
 #### Fixes
 

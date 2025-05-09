@@ -253,11 +253,13 @@ Usage: relecov-tools validate [OPTIONS]
   Validate json file against schema.
 
   Options:
-    -j, --json_file TEXT    Json file to validate
-    -s, --json_schema_file TEXT Path to the JSON Schema file used for validation (default: relecov-schema)
-    -m, --metadata PATH     Origin file containing metadata
-    -o, --out_folder TEXT   Path to save validate json file
-    --help                  Show this message and exit.
+    -j, --json_file TEXT            Json file to validate
+    -s, --json_schema_file          TEXT Path to the JSON Schema file used for validation
+    -m, --metadata PATH             Origin file containing metadata
+    -o, --out_folder TEXT           Path to save validate json file
+    -e, --excel_sheet TEXT          Optional: Name of the sheet in excel file to validate.
+    -r, --registry TEXT             Path to registry (JSON file) with validated samples and their unique IDs.   
+    --help                          Show this message and exit.
 
 ```
 
