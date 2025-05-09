@@ -185,7 +185,7 @@ class BioinfoMetadata(BaseModule):
                 matching_files = [
                     os.path.join(tup[0], file_name)
                     for file_name in tup[1]
-                    if re.search(topic_scope["fn"], file_name)
+                    if re.search(topic_scope["fn"], os.path.join(tup[0], file_name))
                 ]
                 if len(matching_files) >= 1:
                     files_found[topic_key] = matching_files
