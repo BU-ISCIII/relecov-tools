@@ -267,6 +267,7 @@ class SchemaValidation(BaseModule):
         stderr.print("[blue] VALIDATION SUMMARY")
         stderr.print("[blue] --------------------")
         self.log.info("Validation summary:")
+        max_length = 250
         for error_type, count in errors.items():
             field_with_error = error_keys[error_type]
             if (
@@ -275,8 +276,9 @@ class SchemaValidation(BaseModule):
                 error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type.split()[0]} is not a valid date format. Valid format 'YYYY-MM-DD"
             else:
                 error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type}"
-            self.logsum.add_warning(entry=error_text)
-            stderr.print(f"[red]{error_text}")
+            truncated_msg = error_text[:max_length] + "..." if len(error_text) > max_length else error_text
+            self.logsum.add_warning(entry=truncated_msg)
+            stderr.print(f"[red]{truncated_msg}")
             stderr.print("[red] --------------------")
 
         return validated_json_data, invalid_json
