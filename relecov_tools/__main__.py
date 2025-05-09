@@ -336,12 +336,18 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, metadata_out, files_
     default=None,
     help="Optional: Name of the sheet in excel file to validate.",
 )
+@click.option(
+    "-r", "--registry",
+    required=False,
+    default=None,
+    help="Path to the JSON file containing the registered records of validated samples with their unique sample identifiers.",
+)
 @click.pass_context
-def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet):
+def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet, registry):
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
     validation = relecov_tools.json_validation.SchemaValidation(
-        json_file, json_schema_file, metadata, out_folder, excel_sheet
+        json_file, json_schema_file, metadata, out_folder, excel_sheet, registry,
     )
     try:
         validation.validate()
