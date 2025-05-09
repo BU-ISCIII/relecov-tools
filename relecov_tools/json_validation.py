@@ -138,7 +138,7 @@ class SchemaValidation(BaseModule):
         except Exception as e:
             stderr.print(f"[red]Failed to read ID registry JSON: {e}")
             self.log.error(f"Failed to read ID registry JSON: {e}")
-            sys.exit(1)
+            raise
 
     def validate_schema(self):
         """Validate json schema against draft"""
@@ -331,7 +331,7 @@ class SchemaValidation(BaseModule):
                 f"Column with tag '{tag}' not found in the second row of the Excel sheet."
             )
             stderr.print(f"[red] Column with tag '{tag}' not found. Cannot continue.")
-            sys.exit(1)
+            raise
         row_to_del = []
         row_iterator = ws_sheet.iter_rows(min_row=2, max_row=ws_sheet.max_row)
         consec_empty_rows = 0
