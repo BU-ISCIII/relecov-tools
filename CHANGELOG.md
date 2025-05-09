@@ -46,6 +46,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Made --template_path optional in send-email and upload-results commands, using fallback to config key delivery_template_path_file [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
 - The configuration necessary to use the mail module is incorporated as an extra-config. [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)- Add support for qc_failed logic in viralrecon.py and update PR template [#559](https://github.com/BU-ISCIII/relecov-tools/pull/559)
 - Better handling if new_key already exists in log_summary.py-rename_log_key(). [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
+- Truncated excessively long error and warning messages in the validation summary output. This affects only the summary section; full messages are still stored in individual sample logs. ([#568](https://github.com/BU-ISCIII/relecov-tools/pull/568))
 
 #### Removed
 
