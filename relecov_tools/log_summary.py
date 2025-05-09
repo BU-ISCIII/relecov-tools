@@ -276,9 +276,9 @@ class LogSum:
                 regex = (
                     r"\[.*?\]"  # Regex to remove ontology annotations between brackets
                 )
-                
+
                 for sample, slog in samples_logs.items():
-                    clean_errors= []
+                    clean_errors = []
                     for x in slog["errors"]:
                         err_str = reg_remover(str(x), regex)
                         if len(err_str) > max_lenght:
@@ -291,21 +291,20 @@ class LogSum:
                         "\n".join(clean_errors),
                     ]
                     workbook["Samples Report"].append(error_row)
-                    
-                    clean_warngs= []
+
+                    clean_warngs = []
                     for x in slog["warnings"]:
                         war_str = reg_remover(str(x), regex)
                         if len(war_str) > max_lenght:
-                            war_str= war_str[:max_lenght] + "..."
+                            war_str = war_str[:max_lenght] + "..."
                         clean_warngs.append(war_str)
                     warning_row = [
                         str(key),
                         sample,
                         str(slog["valid"]),
-                        "\n ".join(clean_warngs)
+                        "\n ".join(clean_warngs),
                     ]
                     workbook["Other warnings"].append(warning_row)
-                        
 
             # Adjusting the size of the columns in the excel file
             for name in sheet_names_and_headers.keys():

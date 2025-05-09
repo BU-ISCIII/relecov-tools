@@ -276,7 +276,11 @@ class SchemaValidation(BaseModule):
                 error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type.split()[0]} is not a valid date format. Valid format 'YYYY-MM-DD"
             else:
                 error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type}"
-            truncated_msg = error_text[:max_length] + "..." if len(error_text) > max_length else error_text
+            truncated_msg = (
+                error_text[:max_length] + "..."
+                if len(error_text) > max_length
+                else error_text
+            )
             self.logsum.add_warning(entry=truncated_msg)
             stderr.print(f"[red]{truncated_msg}")
             stderr.print("[red] --------------------")
