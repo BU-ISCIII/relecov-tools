@@ -333,6 +333,9 @@ class BioinfoMetadata(BaseModule):
             print(
                 f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
             )
+            self.log.info(
+                f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
+            )
 
     def validate_software_mandatory_files(self, files_dict):
         """Validates the presence of all mandatory files as defined in the software configuration JSON.
