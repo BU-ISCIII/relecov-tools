@@ -35,6 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed wrapper and download subfolder handling and cleaning in remote sftp. [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
 - Removed noisy temporal remote folders from download_log_summary.json [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
 - Added institutions missing in SRI database to config json [#554](https://github.com/BU-ISCIII/relecov-tools/pull/554)
+- Fixed anatomical material collection config file to match new enums in json_Schema [#567](https://github.com/BU-ISCIII/relecov-tools/pull/567)
 
 #### Changed
 
