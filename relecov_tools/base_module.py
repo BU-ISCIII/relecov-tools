@@ -88,7 +88,8 @@ class BaseModule:
         if only_stream is True:
             log_fh = logging.StreamHandler()
         else:
-            # ensure log directory exists before generating the log file
+            # Ensure the parent directory of the log file exists
+            # If log_filepath includes a directory, create it to avoid FileHandler errors.
             dirpath = os.path.dirname(log_filepath)
             if dirpath:
                 os.makedirs(dirpath, exist_ok=True)
