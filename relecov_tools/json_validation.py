@@ -28,6 +28,7 @@ class SchemaValidation(BaseModule):
         metadata=None,
         out_folder=None,
         excel_sheet=None,
+        registry=None,
     ):
         """Validate json file against the schema"""
         super().__init__(output_directory=out_folder, called_module=__name__)
@@ -100,6 +101,38 @@ class SchemaValidation(BaseModule):
                 raise
         else:
             self.excel_sheet = excel_sheet
+        
+        # Parse file containing sample IDs registry
+        if registry is not None and relecov_tools.utils.file_exists(registry):
+            self.registry_path = registry
+        else:
+            config_json = ConfigJson(extra_config=True)
+            try:
+                default_path = config_json.get_topic_data(
+                    "validate_config",
+                    "default_sample_id_registry"
+                )
+            except KeyError:
+                default_path = None
+
+            if default_path and relecov_tools.utils.file_exists(default_path):
+                self.registry_path = default_path
+            else:
+                stderr.print("[yellow]No valid ID registry found. Please select the file manually.")
+                prompted_path = relecov_tools.utils.prompt_path("Select the JSON file with registered unique sample IDs")
+                if relecov_tools.utils.file_exists(prompted_path):
+                    self.registry_path = prompted_path
+                else:
+                    stderr.print("[red]No valid ID registry file could be found or selected.")
+                    sys.exit(1)
+
+        # Read id registry file
+        try:
+            self.id_registry = relecov_tools.utils.read_json_file(self.registry_path)
+        except Exception as e:
+            stderr.print(f"[red]Failed to read ID registry JSON: {e}")
+            self.log.error(f"Failed to read ID registry JSON: {e}")
+            sys.exit(1)
 
     def validate_schema(self):
         """Validate json schema against draft"""

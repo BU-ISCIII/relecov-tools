@@ -2,6 +2,9 @@
     "logs_config": {
         "default_outpath": "/tmp/"
     },
+    "validate_config": {
+        "default_sample_id_registry": "/tmp/unique_sampleid_registry.json"
+    },
     "lab_metadata": {
         "fixed_fields": {
             "study_type": "Whole Genome Sequencing",
