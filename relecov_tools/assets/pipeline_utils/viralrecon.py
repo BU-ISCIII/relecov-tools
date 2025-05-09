@@ -430,9 +430,7 @@ def handle_consensus_fasta(files_list, batch_date, output_folder=None):
             "genome_length": str(len(record_fasta)),
             "sequence_filepath": os.path.dirname(consensus_file),
             "sequence_filename": sample_key,
-            "sequence_md5": relecov_tools.utils.calculate_md5(consensus_file),
-            # TODO: Not sure this is correct. If not, recover previous version: https://github.com/BU-ISCIII/relecov-tools/blob/09c00c1ddd11f7489de7757841aff506ef4b7e1d/relecov_tools/read_bioinfo_metadata.py#L211-L218
-            "number_of_base_pairs_sequenced": len(record_fasta.seq),
+            "sequence_md5": relecov_tools.utils.calculate_md5(consensus_file)
         }
 
     # Report missing consensus
