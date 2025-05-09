@@ -565,6 +565,9 @@ class PipelineManager(BaseModule):
         if len(join_validate) == 0:
             stderr.print("[yellow]No samples were found. Aborting")
             sys.exit(0)
+        batch_id = self.get_batch_id_from_data(join_validate)
+        # If more than one batch is included, current date will be set as batch_id
+        self.set_batch_id(batch_id)
         jsons_by_organism_dict = self.split_samples_by_organism(join_validate)
         if not jsons_by_organism_dict:
             self.log.error("No samples found for any of the organisms in config")

@@ -79,13 +79,12 @@ class SchemaValidation(BaseModule):
             )
             raise TypeError(f"Invalid json file content in {json_data_file}")
         try:
-            batch_id = self.json_data[0].get("batch_id")
-        except IndexError:
-            raise IndexError(f"Provided json file {json_data_file} is empty")
-        except AttributeError:
-            raise AttributeError(f"Invalid json file content in {json_data_file}")
-        if batch_id is not None:
-            self.set_batch_id(batch_id)
+            batch_id = self.get_batch_id_from_data(self.json_data)
+        except ValueError:
+            raise ValueError(f"Provided json file {json_data_file} is empty")
+        except AttributeError as e:
+            raise ValueError(f"Invalid json file content in {json_data_file}: {e}")
+        self.set_batch_id(batch_id)
 
         self.metadata = metadata
         try:
