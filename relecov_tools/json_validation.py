@@ -102,7 +102,7 @@ class SchemaValidation(BaseModule):
                 raise
         else:
             self.excel_sheet = excel_sheet
-        
+
         # Parse file containing sample IDs registry
         if registry is not None and relecov_tools.utils.file_exists(registry):
             self.registry_path = registry
@@ -110,8 +110,7 @@ class SchemaValidation(BaseModule):
             config_json = ConfigJson(extra_config=True)
             try:
                 default_path = config_json.get_topic_data(
-                    "validate_config",
-                    "default_sample_id_registry"
+                    "validate_config", "default_sample_id_registry"
                 )
             except KeyError:
                 default_path = None
@@ -119,12 +118,18 @@ class SchemaValidation(BaseModule):
             if default_path and relecov_tools.utils.file_exists(default_path):
                 self.registry_path = default_path
             else:
-                stderr.print("[yellow]No valid ID registry found. Please select the file manually.")
-                prompted_path = relecov_tools.utils.prompt_path("Select the JSON file with registered unique sample IDs")
+                stderr.print(
+                    "[yellow]No valid ID registry found. Please select the file manually."
+                )
+                prompted_path = relecov_tools.utils.prompt_path(
+                    "Select the JSON file with registered unique sample IDs"
+                )
                 if relecov_tools.utils.file_exists(prompted_path):
                     self.registry_path = prompted_path
                 else:
-                    stderr.print("[red]No valid ID registry file could be found or selected.")
+                    stderr.print(
+                        "[red]No valid ID registry file could be found or selected."
+                    )
                     sys.exit(1)
 
         # Read id registry file
@@ -314,14 +319,17 @@ class SchemaValidation(BaseModule):
             self.log.error(logtxt)
             raise
         tag = "Sample ID given for sequencing"
-        # Check if mandatory colum ($tag) is defined in metadata. 
+        # Check if mandatory colum ($tag) is defined in metadata.
         try:
             id_col = next(
-                idx for idx, cell in enumerate(ws_sheet[1])
+                idx
+                for idx, cell in enumerate(ws_sheet[1])
                 if cell.value is not None and tag in str(cell.value)
             )
         except StopIteration:
-            self.log.error(f"Column with tag '{tag}' not found in the second row of the Excel sheet.")
+            self.log.error(
+                f"Column with tag '{tag}' not found in the second row of the Excel sheet."
+            )
             stderr.print(f"[red] Column with tag '{tag}' not found. Cannot continue.")
             sys.exit(1)
         row_to_del = []
@@ -374,14 +382,14 @@ class SchemaValidation(BaseModule):
 
     def generate_incremental_unique_id(self, current_registry, prefix="RLCV"):
         """Generates an incremental unique ID using as baseline the latest record
-        in a registry. 
+        in a registry.
 
         Args:
             current_registry (dict): dict containing sample's unique IDs
             prefix (str, optional): String that preceeds the unique ID. Defaults to "RLCV".
 
         Returns:
-            string: An unique ID 
+            string: An unique ID
         """
         existing_numbers = []
         for uid in current_registry:
@@ -393,7 +401,7 @@ class SchemaValidation(BaseModule):
                     continue
         next_number = max(existing_numbers, default=0) + 1
         return f"{prefix}-{next_number:09d}"
-    
+
     def save_new_ids(self, new_ids_dict):
         """Updates sample id registry by adding sample unique ids of new validated samples.
 
@@ -401,9 +409,7 @@ class SchemaValidation(BaseModule):
             new_ids_dict (dict): Dict of new unique sample IDs.
         """
         updated_registry = {**self.id_registry, **new_ids_dict}
-        relecov_tools.utils.write_json_to_file(
-            updated_registry, self.registry_path
-        )
+        relecov_tools.utils.write_json_to_file(updated_registry, self.registry_path)
         self.log.info(f"Added {len(new_ids_dict)} new sample IDs to registry")
 
     def validate(self):
