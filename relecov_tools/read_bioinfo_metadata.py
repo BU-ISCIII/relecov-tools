@@ -559,7 +559,7 @@ class BioinfoMetadata(BaseModule):
                     )
                 except Exception as e:
                     self.update_all_logs(
-                        self.save_splitted_files.__name__,
+                        self.save_merged_files.__name__,
                         "error",
                         f"Error occurred while parsing '{func_name}': {e}.",
                     )
