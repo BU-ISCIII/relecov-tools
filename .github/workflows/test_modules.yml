@@ -86,6 +86,7 @@ jobs:
           -j tests/data/map_validate/processed_metadata_lab_test.json \
           -s relecov_tools/schema/relecov_schema.json \
           -m tests/data/map_validate/metadata_lab_test.xlsx \
+          -r tests/data/map_validate/unique_sampleid_registry.json \
           -o $OUTPUT_LOCATION
 
     - name: Run build-schema module
