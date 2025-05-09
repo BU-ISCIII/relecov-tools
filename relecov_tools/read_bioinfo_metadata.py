@@ -1085,9 +1085,10 @@ class BioinfoMetadata(BaseModule):
                 files_found_dict, batch_data, sufix, batch_date, batch_dir
             )
             stderr.print("[blue]Adding software versions to read lab metadata...")
-            batch_data = self.get_multiqc_software_versions(
-                files_found_dict["workflow_summary"], batch_data
-            )
+            if "workflow_summary" in files_found_dict:
+                batch_data = self.get_multiqc_software_versions(
+                    files_found_dict["workflow_summary"], batch_data
+                )
             stderr.print("[blue]Adding fixed values")
             batch_data = self.add_fixed_values(batch_data)
             # Adding files path
