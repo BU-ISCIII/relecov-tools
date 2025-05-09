@@ -121,6 +121,8 @@ Code contributions to the release:
 - Updated the create_summary_tables.py script to be able to handle single .json files directly [#526](https://github.com/BU-ISCIII/relecov-tools/pull/526).
 - Updated README.md for new functionalities in v1.5.0 [#527](https://github.com/BU-ISCIII/relecov-tools/pull/527)
 - Implement unique sample's ID generation using centralized registry [#565](https://github.com/BU-ISCIII/relecov-tools/pull/565).
+- Created a new method in BaseModule to extract batch_id from metadata json files so modules can use it during processing [#569](https://github.com/BU-ISCIII/relecov-tools/pull/569)
+- Implemented BaseModule standard logging functionality in all the modules that did not have it [#569](https://github.com/BU-ISCIII/relecov-tools/pull/569)
 
 #### Fixes
 
