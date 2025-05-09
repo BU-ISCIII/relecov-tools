@@ -71,6 +71,8 @@ class LogSum:
         if self.unique_key:
             key = self.unique_key
         log.error(entry)
+        truncated_entry = (entry[:250] + "...") if len(entry) > 250 else entry
+        stderr.print(f"[bold red]ERROR:[/] {truncated_entry}")
         self.update_summary(
             log_type="errors", key=key, entry=entry, sample=sample, path=path
         )
@@ -81,6 +83,8 @@ class LogSum:
         if self.unique_key:
             key = self.unique_key
         log.warning(entry)
+        truncated_entry = (entry[:250] + "...") if len(entry) > 250 else entry
+        stderr.print(f"[bold yellow]WARNING:[/] {truncated_entry}")
         self.update_summary(
             log_type="warnings", key=key, entry=entry, sample=sample, path=path
         )
