@@ -64,7 +64,6 @@
             "required": true,
             "multiple_samples": true,
             "split_by_batch": true,
-            "map": false,
             "function": "parse_long_table",
             "content": {
                 "sample" : "SAMPLE",
@@ -112,7 +111,7 @@
                 "number_of_base_pairs_sequenced": "# Input reads"
             }
         },
-        "other_files": {
+        "vcf_filename": {
             "fn": "^(?!.*tbi$).*.filtered.vcf.gz",
             "required": false,
             "function": null,
