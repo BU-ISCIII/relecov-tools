@@ -824,12 +824,7 @@ class BioinfoMetadata(BaseModule):
             )
             return False
         try:
-            if re.search(r".*pangolin\.csv$", os.path.basename(file), re.IGNORECASE):
-                df = pd.read_csv(file)
-                df["lineage_assignment_date"] = datetime.now().strftime("%Y%m%d")
-                df.to_csv(out_filepath, index=False)
-            else:
-                shutil.copy(file, out_filepath)
+            shutil.copy(file, out_filepath)                
         except (IOError, PermissionError) as e:
             self.update_all_logs(
                 self.extract_file.__name__, "warning", f"Could not extract {file}: {e}"
