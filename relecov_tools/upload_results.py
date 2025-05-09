@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import logging
 import pyzipper
 import json
 import relecov_tools.utils
@@ -10,8 +9,8 @@ from secrets import token_hex
 from datetime import datetime
 from rich.console import Console
 from relecov_tools.config_json import ConfigJson
+from relecov_tools.base_module import BaseModule
 
-log = logging.getLogger(__name__)
 stderr = Console(
     stderr=True,
     style="dim",
@@ -20,7 +19,7 @@ stderr = Console(
 )
 
 
-class UploadSftp:
+class UploadSftp(BaseModule):
     def __init__(
         self,
         user=None,
@@ -30,11 +29,12 @@ class UploadSftp:
         project="Relecov",
     ):
         """Starts the SFTP upload process"""
-        log.info(f"Beginning upload process for batch: {batch_id}")
+        super().__init__(called_module=__name__)
+        self.log.info(f"Beginning upload process for batch: {batch_id}")
 
         if not batch_id:
             raise ValueError("Error: You must provide a batch_id as an argument.")
-
+        self.set_batch_id(batch_id)
         config_json = ConfigJson()
         config = config_json.get_configuration("mail_sender")
         sftp_config = config_json.get_configuration("sftp_handle")
@@ -46,10 +46,12 @@ class UploadSftp:
             template_path = config.get("delivery_template_path_file")
 
         if not template_path or not os.path.exists(template_path):
-            raise FileNotFoundError(
+            errtxt = (
                 "The template path could not be determined or does not exist. "
                 "Please provide it via --template_path or define 'delivery_template_path_file' in the configuration."
             )
+            self.log.error(errtxt)
+            raise FileNotFoundError(errtxt)
 
         self.batch_id = batch_id
         self.sftp_user = user or relecov_tools.utils.prompt_text(
@@ -62,7 +64,7 @@ class UploadSftp:
         self.relecov_sftp = relecov_tools.sftp_client.SftpRelecov(
             username=self.sftp_user, password=self.sftp_passwd
         )
-
+        self.log.info(f"User: {self.sftp_user}, Processing batch: {self.batch_id}")
         stderr.print(f"User: {self.sftp_user}, Processing batch: {self.batch_id}")
 
         self.processed_batches = {}  # Dictionary to store results
@@ -71,8 +73,10 @@ class UploadSftp:
         self.guide = config.get("institutions_guide_path")
         self.analysis_folder = sftp_config.get("analysis_results_folder")
         self.project = project
-        if self.project not in ["Relecov", "Redlabra"]:
-            raise ValueError("Error: Only valid projects: Relecov / Redlabra.")
+        valid_projects = ["Relecov", "Redlabra"]
+        if self.project not in valid_projects:
+            self.log.error(f"Error: Only valid projects: {valid_projects}")
+            raise ValueError(f"Error: Only valid projects: {valid_projects}")
 
     def find_cod_for_batch(self):
         """Find all COD* folders containing the batch_id"""
@@ -80,7 +84,7 @@ class UploadSftp:
         cod_dirs = [
             d for d in os.listdir(base_dir) if os.path.isdir(d) and d.startswith("COD")
         ]
-
+        self.log.debug(f"List of directories found: {cod_dirs}")
         matching_cod = {}
 
         for cod in cod_dirs:
@@ -89,6 +93,7 @@ class UploadSftp:
                 matching_cod[cod] = {"batch": self.batch_id, "path": batch_path}
 
         if not matching_cod:
+            self.log.error(f"Batch {self.batch_id} was not found in any COD* folder.")
             raise FileNotFoundError(
                 f"Batch {self.batch_id} was not found in any COD* folder."
             )
@@ -100,6 +105,7 @@ class UploadSftp:
         analysis_dir = os.path.join(batch_path, "analysis_results")
 
         if not os.path.exists(analysis_dir):
+            self.log.error(f"Folder analysis_results not found in {batch_path}")
             stderr.print(f"[red]Folder analysis_results not found in {batch_path}")
             return None, None, None
 
@@ -119,6 +125,9 @@ class UploadSftp:
                         arcname = arcname[1:]  # Remove leading dot if present
                     zipf.write(file_path, arcname)
 
+        self.log.debug(
+            f"Compressed file: {zip_path} with password: {password.decode()}"
+        )
         stderr.print(
             f"[green]Compressed file: {zip_path} with password: {password.decode()}"
         )
@@ -131,6 +140,7 @@ class UploadSftp:
     def upload_to_sftp(self, zip_path, cod):
         """Upload the compressed file to the SFTP server in the ANALYSIS_RESULTS folder inside the corresponding COD"""
         if not self.relecov_sftp.open_connection():
+            self.log.error("Could not connect to SFTP server")
             stderr.print("[red]Could not connect to SFTP server")
             return False
 
@@ -145,24 +155,29 @@ class UploadSftp:
             try:
                 sftp.chdir(remote_dir)  # Try to change to the directory
             except FileNotFoundError:
-                stderr.print(
-                    f"[red]Directory {remote_dir} not found. Failed to upload file to sftp."
+                logtxt = (
+                    f"Directory {remote_dir} not found. Failed to upload file to sftp."
                 )
+                self.log.error(logtxt)
+                stderr.print(f"[red]{logtxt}")
                 return False
 
             # Upload the compressed file
+            self.log.info(f"Uploading {zip_path} to {remote_file_path} in SFTP...")
             stderr.print(f"[blue]Uploading {zip_path} to {remote_file_path} in SFTP...")
             success = self.relecov_sftp.upload_file(zip_path, remote_file_path)
 
             if success:
+                self.log.info(f"File successfully uploaded to {remote_file_path}")
                 stderr.print(f"[green]File successfully uploaded to {remote_file_path}")
                 return True
             else:
+                self.log.error(f"Error uploading {zip_path} file")
                 stderr.print(f"[red]Error uploading {zip_path} file")
                 return False
 
         except Exception as e:
-            log.error(f"Error uploading file to SFTP: {e}")
+            self.log.error(f"Error uploading file to SFTP: {e}")
             stderr.print(f"[red]Unexpected error: {e}")
             return False
 
@@ -210,6 +225,7 @@ class UploadSftp:
             institutions_data = json.load(f)
 
         for cod, batch_data in cod_batches.items():
+            self.log.info(f"Processing batch {batch_data['batch']} in {cod}")
             stderr.print(f"Processing batch {batch_data['batch']} in {cod}")
 
             zip_path, password, zip_filename = self.compress_results(batch_data, cod)
@@ -227,10 +243,9 @@ class UploadSftp:
                             "fecha": datetime.now().isoformat(),
                         }
                     )
-
-                    stderr.print(
-                        f"[green]Process completed for {batch_data['batch']} in {cod}."
-                    )
+                    logtxt = f"Process completed for {batch_data['batch']} in {cod}."
+                    self.log.info(logtxt)
+                    stderr.print(f"[green]{logtxt}")
 
                     institution_info = institutions_data.get(cod)
 

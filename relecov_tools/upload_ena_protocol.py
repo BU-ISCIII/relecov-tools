@@ -1,4 +1,3 @@
-import logging
 import rich.console
 import json
 import pandas as pd
@@ -9,6 +8,7 @@ import time
 import relecov_tools.utils
 from datetime import datetime
 from relecov_tools.config_json import ConfigJson
+from relecov_tools.base_module import BaseModule
 
 from ena_upload.ena_upload import extract_targets
 from ena_upload.ena_upload import run_construct
@@ -20,7 +20,6 @@ from ena_upload.ena_upload import update_table_simple
 
 pd.options.mode.chained_assignment = None
 
-log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -29,7 +28,7 @@ stderr = rich.console.Console(
 )
 
 
-class EnaUpload:
+class EnaUpload(BaseModule):
     def __init__(
         self,
         user=None,
@@ -43,6 +42,7 @@ class EnaUpload:
         upload_fastq=None,
         output_path=None,
     ):
+        super().__init__(output_directory=output_path, called_module="upload-to-ena")
         if user is None:
             self.user = relecov_tools.utils.prompt_text(
                 msg="Enter your username defined in ENA"
@@ -66,7 +66,7 @@ class EnaUpload:
         else:
             self.source_json_file = source_json
         if not os.path.exists(self.source_json_file):
-            log.error("json data file %s does not exist ", self.source_json_file)
+            self.log.error("json data file %s does not exist ", self.source_json_file)
             stderr.print(f"[red]json data file {self.source_json_file} does not exist")
             sys.exit(1)
         if template_path is None:
@@ -115,7 +115,7 @@ class EnaUpload:
                 wrong_types = [
                     xml for xml in self.metadata_types if xml not in all_metadata_types
                 ]
-                log.error("Unsupported metadata xml types: " + str(wrong_types))
+                self.log.error("Unsupported metadata xml types: " + str(wrong_types))
                 stderr.print(f"[red]Unsupported metadata xml types: {wrong_types}")
                 sys.exit(1)
 
@@ -125,6 +125,8 @@ class EnaUpload:
         with open(self.source_json_file, "r") as fh:
             json_data = json.loads(fh.read())
             self.json_data = json_data
+        batch_id = self.get_batch_id_from_data(self.json_data)
+        self.set_batch_id(batch_id)
         if self.dev:
             self.url = "https://wwwdev.ebi.ac.uk/ena/submit/drop-box/submit/?auth=ENA"
         else:
@@ -183,7 +185,9 @@ class EnaUpload:
                     if (source in fd and fd not in samp.keys())
                 ]
                 if missing_accessions:
-                    log.error("Found samples in json without proper ena accessions")
+                    self.log.error(
+                        "Found samples in json without proper ena accessions"
+                    )
                     stderr.print(f"[red]Found samples missing {source} accession ids:")
                 all_missing_accessions.extend(missing_accessions)
             if all_missing_accessions:
@@ -277,7 +281,7 @@ class EnaUpload:
         try:
             schema_update = process_receipt(receipt.encode("utf-8"), self.action)
         except ValueError:
-            log.error("There was an ERROR during submission:")
+            self.log.error("There was an ERROR during submission:")
             sys.exit(receipt)
         if str(self.action) in ["ADD", "MODIFY"]:
             updated_schemas_df = update_table(
