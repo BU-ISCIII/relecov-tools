@@ -45,6 +45,7 @@ def generate_config_yaml(download_option, target_folders):
         },
         "validate": {
             "json_schema_file": "relecov_tools/schema/relecov_schema.json",
+            "default_sample_id_registry": "tests/data/map_validate/unique_sampleid_registry.json",
         },
     }
 
