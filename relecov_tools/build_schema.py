@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import logging
-import relecov_tools.json_validation
 import rich.console
 import pandas as pd
 import os
@@ -15,12 +13,12 @@ import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
 import relecov_tools.assets.schema_utils.metadatalab_template
 from relecov_tools.config_json import ConfigJson
+from relecov_tools.base_module import BaseModule
 from datetime import datetime
 from openpyxl.worksheet.datavalidation import DataValidation
 
 pd.set_option("future.no_silent_downcasting", True)
 
-log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -29,7 +27,7 @@ stderr = rich.console.Console(
 )
 
 
-class SchemaBuilder:
+class SchemaBuilder(BaseModule):
     def __init__(
         self,
         excel_file_path=None,
@@ -45,15 +43,18 @@ class SchemaBuilder:
         Initialize the SchemaBuilder class. This class generates a JSON Schema file based on the provided draft version.
         It reads the database definition from an Excel file and allows customization of the schema generation process.
         """
+        super().__init__(output_directory=out_dir, called_module=__name__)
         self.excel_file_path = excel_file_path
         self.non_interactive = non_interactive
         # Validate input data
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
-            log.error("A valid Excel file path must be provided.")
+            self.log.error("A valid Excel file path must be provided.")
             raise ValueError("A valid Excel file path must be provided.")
         if not self.excel_file_path.endswith(".xlsx"):
-            log.error("The Excel file must have a .xlsx extension.")
+            self.log.error("The Excel file must have a .xlsx extension.")
             raise ValueError("The Excel file must have a .xlsx extension.")
+        # No metadata is being processed so batch_id will be execution date
+        self.set_batch_id(self.basemod_date)
 
         # Validate output folder creation
         if not out_dir:
@@ -98,7 +99,7 @@ class SchemaBuilder:
         if self.project in available_projects:
             self.project_config = config_data.get(self.project, {})
         else:
-            log.error(
+            self.log.error(
                 f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
             )
             stderr.print(
@@ -127,7 +128,7 @@ class SchemaBuilder:
             if relecov_tools.utils.file_exists(base_schema_path):
                 self.base_schema_path = base_schema_path
             else:
-                log.error(
+                self.log.error(
                     f"[Error]Defined base schema file not found: {base_schema_path}."
                 )
                 stderr.print(
@@ -147,23 +148,25 @@ class SchemaBuilder:
                         relecov_schema,
                     )
                     if not relecov_tools.utils.file_exists(self.base_schema_path):
-                        log.error(
+                        self.log.error(
                             "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning."
                         )
                         stderr.print(
                             "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning. Exiting..."
                         )
                         sys.exit(1)
-                    log.info("RELECOV schema successfully found in the configuration.")
+                    self.log.info(
+                        "RELECOV schema successfully found in the configuration."
+                    )
                     stderr.print(
                         "[green]RELECOV schema successfully found in the configuration."
                     )
                 except FileNotFoundError as fnf_error:
-                    log.error(f"Configuration file not found: {fnf_error}")
+                    self.log.error(f"Configuration file not found: {fnf_error}")
                     stderr.print(f"[red]Configuration file not found: {fnf_error}")
                     sys.exit(1)
             except KeyError as key_error:
-                log.error(f"Configuration key error: {key_error}")
+                self.log.error(f"Configuration key error: {key_error}")
                 stderr.print(f"[orange]Configuration key error: {key_error}")
                 sys.exit(1)
 
@@ -323,7 +326,7 @@ class SchemaBuilder:
 
         # Check json is not empty
         if len(json_data) == 0:
-            log.error(f"{caller_method}{sheet_id}) No data found in xlsx database")
+            self.log.error(f"{caller_method}{sheet_id}) No data found in xlsx database")
             stderr.print(
                 f"{caller_method}{sheet_id}) [red]No data found in xlsx database"
             )
@@ -403,7 +406,7 @@ class SchemaBuilder:
         try:
             complex_json_data = self.read_database_definition(sheet_id=property_id)
         except ValueError as e:
-            log.error(f"{e}")
+            self.log.error(f"{e}")
             stderr.print(f"[yellow]{e}")
             return None
 
@@ -489,7 +492,7 @@ class SchemaBuilder:
                     for db_feature_key, schema_feature_key in mapping_features.items():
                         # Verifiy that db_feature_key is present in the database (processed excel (aka 'json_data'))
                         if db_feature_key not in db_features_dic:
-                            log.info(
+                            self.log.info(
                                 f"Feature {db_feature_key} is not present in database ({self.excel_file_path})"
                             )
                             stderr.print(
@@ -564,7 +567,7 @@ class SchemaBuilder:
             return new_schema
 
         except Exception as e:
-            log.error(f"Error building schema: {str(e)}")
+            self.log.error(f"Error building schema: {str(e)}")
             stderr.print(f"[red]Error building schema: {str(e)}")
             raise
 
@@ -608,7 +611,7 @@ class SchemaBuilder:
         )
 
         if not diff_lines:
-            log.info(
+            self.log.info(
                 "No differences were found between already installed and new generated schema. Exiting. No changes made"
             )
             stderr.print(
@@ -616,7 +619,7 @@ class SchemaBuilder:
             )
             return None
         else:
-            log.info(
+            self.log.info(
                 "Differences found between the existing schema and the newly generated schema."
             )
             stderr.print(
@@ -647,7 +650,7 @@ class SchemaBuilder:
             )
             with open(diff_filepath, "w") as diff_file:
                 diff_file.write("\n".join(diff_lines))
-            log.info(f"[green]Schema diff file saved to {diff_filepath}")
+            self.log.info(f"[green]Schema diff file saved to {diff_filepath}")
             stderr.print(f"[green]Schema diff file saved to {diff_filepath}")
             return True
 
@@ -666,17 +669,17 @@ class SchemaBuilder:
             path_to_save = f"{self.output_folder}/relecov_schema.json"
             with open(path_to_save, "w") as schema_file:
                 json.dump(json_data, schema_file, ensure_ascii=False, indent=4)
-            log.info(f"New JSON schema saved to: {path_to_save}")
+            self.log.info(f"New JSON schema saved to: {path_to_save}")
             stderr.print(f"[green]New JSON schema saved to: {path_to_save} ")
             return True
         except PermissionError as perm_error:
-            log.error(f"Permission error: {perm_error}")
+            self.log.error(f"Permission error: {perm_error}")
             stderr.print(f"[red]Permission error: {perm_error}")
         except IOError as io_error:
-            log.error(f"I/O error: {io_error}")
+            self.log.error(f"I/O error: {io_error}")
             stderr.print(f"[red]I/O error: {io_error}")
         except Exception as e:
-            log.error(f"An unexpected error occurred: {str(e)}")
+            self.log.error(f"An unexpected error occurred: {str(e)}")
             stderr.print(f"[red]An unexpected error occurred: {str(e)}")
         return False
 
@@ -734,7 +737,7 @@ class SchemaBuilder:
                             columns = next(data)
                             version_history = pd.DataFrame(data, columns=columns)
                     except Exception as e:
-                        log.warning(f"Error reading previous VERSION sheet: {e}")
+                        self.log.warning(f"Error reading previous VERSION sheet: {e}")
                     next_version = self.version
                 else:
                     next_version = "1.0.0"
@@ -790,7 +793,7 @@ class SchemaBuilder:
                     lambda x: "Y" if x in required_properties else "N"
                 )
             except Exception as e:
-                log.error(f"Error processing schema properties: {e}")
+                self.log.error(f"Error processing schema properties: {e}")
                 stderr.print(f"Error processing schema properties: {e}")
                 return None
 
@@ -799,7 +802,7 @@ class SchemaBuilder:
                 df["header"] = df["header"].astype(str).str.strip()
                 df_filtered = df[df["header"].str.upper() == "Y"]
             else:
-                log.warning(
+                self.log.warning(
                     "No se encontró la columna 'header', usando df sin filtrar."
                 )
                 df_filtered = df
@@ -824,7 +827,7 @@ class SchemaBuilder:
                     lambda x: x[0] if isinstance(x, list) else x
                 )
             except Exception as e:
-                log.error(f"Error creating overview sheet: {e}")
+                self.log.error(f"Error creating overview sheet: {e}")
                 stderr.print(f"Error creating overview sheet: {e}")
                 return None
 
@@ -844,7 +847,7 @@ class SchemaBuilder:
                 df_metadata["CAMPO"] = df_filtered["label"]
                 df_metadata = df_metadata.transpose()
             except Exception as e:
-                log.error(f"Error creating MetadataLab sheet: {e}")
+                self.log.error(f"Error creating MetadataLab sheet: {e}")
                 stderr.print(f"[red]Error creating MetadataLab sheet: {e}")
                 return None
 
@@ -862,7 +865,7 @@ class SchemaBuilder:
                 df_validation["DESCRIPCIÓN"] = df_hasenum["description"]
                 df_validation["CAMPO"] = df_hasenum["label"]
             except Exception as e:
-                log.error(f"Error creating DataValidation sheet: {e}")
+                self.log.error(f"Error creating DataValidation sheet: {e}")
                 stderr.print(f"[red]Error creating DataValidation sheet: {e}")
                 return None
 
@@ -902,7 +905,7 @@ class SchemaBuilder:
                 df_validation = pd.concat(frames)
                 df_validation = df_validation.drop(index=["tmp_property"])
             except Exception as e:
-                log.error(f"Error processing enums and combining data: {e}")
+                self.log.error(f"Error processing enums and combining data: {e}")
                 stderr.print(f"[red]Error processing enums and combining data: {e}")
                 return None
 
@@ -952,12 +955,14 @@ class SchemaBuilder:
                 )
                 version_history.to_excel(writer, sheet_name="VERSION", index=False)
                 writer.close()
-                log.info(f"Metadata lab template successfuly created in: {out_file}")
+                self.log.info(
+                    f"Metadata lab template successfuly created in: {out_file}"
+                )
                 stderr.print(
                     f"[green]Metadata lab template successfuly created in: {out_file}"
                 )
             except Exception as e:
-                log.error(f"Error writing to Excel: {e}")
+                self.log.error(f"Error writing to Excel: {e}")
                 stderr.print(f"[red]Error writing to Excel: {e}")
                 return None
 
@@ -1076,11 +1081,11 @@ class SchemaBuilder:
 
                 wb.save(out_file)
             except Exception as e:
-                log.error(f"Error adding dropdowns: {e}")
+                self.log.error(f"Error adding dropdowns: {e}")
                 stderr.print(f"[red]Error adding dropdowns: {e}")
                 return None
         except Exception as e:
-            log.error(f"Error in create_metadatalab_excel: {e}")
+            self.log.error(f"Error in create_metadatalab_excel: {e}")
             stderr.print(f"[red]Error in create_metadatalab_excel: {e}")
             return None
 
@@ -1179,14 +1184,14 @@ class SchemaBuilder:
 
     def handle_build_schema(self):
         # Load xlsx database and convert into json format
-        log.info("Start reading xlsx database")
+        self.log.info("Start reading xlsx database")
         stderr.print("[white]Start reading xlsx database")
         database_dic = self.read_database_definition()
 
         # Verify current schema used by relecov-tools:
         base_schema_json = relecov_tools.utils.read_json_file(self.base_schema_path)
         if not base_schema_json:
-            log.error("Couldn't find relecov base schema.)")
+            self.log.error("Couldn't find relecov base schema.)")
             stderr.print("[red]Couldn't find relecov base schema. Exiting...)")
             sys.exit(1)
 

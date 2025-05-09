@@ -4,16 +4,14 @@ import os
 import re
 import glob
 import json
-import logging
 import rich.console
 import time
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.rest_api import RestApi
-from relecov_tools.log_summary import LogSum
+from relecov_tools.base_module import BaseModule
 
-log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -22,7 +20,7 @@ stderr = rich.console.Console(
 )
 
 
-class UpdateDatabase:
+class UpdateDatabase(BaseModule):
     def __init__(
         self,
         user=None,
@@ -33,6 +31,12 @@ class UpdateDatabase:
         server_url=None,
         full_update=False,
     ):
+        if json_file is None:
+            json_file = relecov_tools.utils.prompt_path(
+                msg="Select the json file which have the data to map"
+            )
+        json_dir = os.path.dirname(os.path.realpath(self.json_file))
+        super().__init__(output_directory=json_dir, called_module="update-db")
         # Get the user and password for the database
         if user is None:
             user = relecov_tools.utils.prompt_text(
@@ -44,15 +48,14 @@ class UpdateDatabase:
         self.passwd = passwd
         # get the default coonfiguration used the instance
         self.config_json = ConfigJson()
-        if json_file is None:
-            json_file = relecov_tools.utils.prompt_path(
-                msg="Select the json file which have the data to map"
-            )
+
         if not os.path.isfile(json_file):
-            log.error("json data file %s does not exist ", json_file)
+            self.log.error("json data file %s does not exist ", json_file)
             stderr.print(f"[red] json data file {json_file} does not exist")
             sys.exit(1)
         self.json_data = relecov_tools.utils.read_json_file(json_file)
+        batch_id = self.get_batch_id_from_data(self.json_data)
+        self.set_batch_id(batch_id)
         for row in self.json_data:
             for key, value in row.items():
                 if not isinstance(value, str):
@@ -92,12 +95,11 @@ class UpdateDatabase:
         except KeyError as e:
             logtxt = f"Unable to fetch parameters for {platform} {e}"
             stderr.print(f"[red]{logtxt}")
-            log.error(logtxt)
+            self.log.error(logtxt)
             sys.exit(1)
         # create the instance for logging the summary information
-        json_dir = os.path.dirname(os.path.realpath(self.json_file))
         lab_code = json_dir.split("/")[-2]
-        self.logsum = LogSum(
+        self.logsum = self.parent_log_summary(
             output_location=json_dir, unique_key=lab_code, path=json_dir
         )
 
@@ -130,7 +132,7 @@ class UpdateDatabase:
                 if key not in s_project_fields and key not in s_fields:
                     # just for debugging, write the fields that will not
                     # be included in iSkyLIMS request
-                    log.debug("not key %s in iSkyLIMS", key)
+                    self.log.debug("not key %s in iSkyLIMS", key)
             # include the fixed value
             fixed_value = self.config_json.get_topic_data(
                 "upload_database", "iskylims_fixed_values"
@@ -203,7 +205,7 @@ class UpdateDatabase:
             self.logsum.add_error(entry=str(logtxt1 + logtxt2))
             return
         else:
-            log.info("Fetched sample project fields from iSkyLIMS")
+            self.log.info("Fetched sample project fields from iSkyLIMS")
             stderr.print("[blue] Fetched sample project fields from iSkyLIMS")
         for field in s_project_fields_raw["DATA"]:
             s_project_fields.append(field["sample_project_field_name"])
@@ -285,7 +287,7 @@ class UpdateDatabase:
                     self.logsum.add_error(entry=logtxt, sample=req_sample)
                     stderr.print(f"[red]{logtxt}")
                     continue
-            log.info(
+            self.log.info(
                 "stored data in %s iskylims for sample %s",
                 self.platform,
                 req_sample,
@@ -315,10 +317,10 @@ class UpdateDatabase:
 
         if type_of_info == "sample":
             if server_name == "iskylims":
-                log.info("Getting sample fields from %s", server_name)
+                self.log.info("Getting sample fields from %s", server_name)
                 stderr.print(f"[blue] Getting sample fields from {server_name}")
                 sample_fields, s_project_fields = self.get_iskylims_fields_sample()
-                log.info("Selecting sample fields")
+                self.log.info("Selecting sample fields")
                 stderr.print("[blue] Selecting sample fields")
                 map_fields = self.map_iskylims_sample_fields_values(
                     sample_fields, s_project_fields
@@ -370,7 +372,7 @@ class UpdateDatabase:
             self.start_api(self.server_name)
             for datatype in ["sample", "bioinfodata", "variantdata"]:
                 log_text = f"Sending {datatype} data to {self.server_name}"
-                log.info(log_text)
+                self.log.info(log_text)
                 stderr.print(log_text)
                 self.type_of_info = datatype
                 # TODO: Handling for servers with different datatype needs
@@ -383,7 +385,7 @@ class UpdateDatabase:
                         )
                     else:
                         json_file = long_tables[0]
-                    log.info("Selected %s file for variant data", str(json_file))
+                    self.log.info("Selected %s file for variant data", str(json_file))
                     self.json_data = relecov_tools.utils.read_json_file(json_file)
                 self.store_data(datatype, self.server_name)
         else:
