@@ -48,9 +48,10 @@ class ProcessWrapper(BaseModule):
             output_location=os.path.join(self.output_folder)
         )
         self.config_data["download"].update({"output_location": output_folder})
-        self.config_data["download"].setdefault(
-            "subfolder", "RELECOV"
-        )  # Set default subfolder as RELECOV. If neccesary, it can be overwritten with 'subfolder' parameter in config_file.yaml
+        if self.config_data["download"].get("subfolder") is None:
+            self.config_data["download"].update({"subfolder": "RELECOV"}) # If subfolder is not defined or None, it is set automatically as RELECOV
+            self.log.warning("Subfolder is not defined. Setting subfolder as RELECOV by default")
+            stderr.print("[yellow]Subfolder is not defined. Setting subfolder as RELECOV by default")  
         self.download_params = self.clean_module_params(
             "DownloadManager", self.config_data["download"]
         )
