@@ -53,8 +53,7 @@
                 "lineage_algorithm_software_version": "version",
                 "lineage_assignment_scorpio_version": "scorpio_version",
                 "lineage_assignment_constellation_version": "constellation_version",
-                "lineage_assignment_date": "lineage_analysis_date",
-                "lineage_assignment_database_version": "pangolin_database_version"
+                "lineage_assignment_date": "lineage_analysis_date"
             }
         },
         "variants_long_table": {
@@ -145,6 +144,20 @@
                 }
             }
         },
+        "versions":{
+            "fn": "versions.csv",
+            "required": true,
+            "header_row_idx": 1,
+            "function": "get_software_versions",
+            "extract": false,
+            "content": {
+                "software_version": {
+                    "clade_assignment_software_version":"nextclade",
+                    "lineage_assignment_database_version": "pangolin_database_version"
+
+                },
+                "software_name": {
+                    "clade_assignment_software_name":"nextclade"
                 }
             }
         },
