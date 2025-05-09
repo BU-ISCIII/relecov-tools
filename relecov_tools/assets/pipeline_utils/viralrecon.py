@@ -474,7 +474,7 @@ def quality_control_evaluation(data):
         "number_of_sgene_frameshifts": ("==", 0),
         "number_of_unambiguous_bases": (">", 24000),
         "number_of_Ns": ("<", 5000),
-        "qc_filtered": (">", 50000),
+        "pass_reads": (">", 50000),
         "per_reads_host": ("<", 20.0),
     }
 
