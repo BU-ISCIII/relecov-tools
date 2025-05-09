@@ -4,6 +4,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 import sys
 import os
 import openpyxl
+from datetime import datetime
 
 import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
@@ -177,6 +178,10 @@ class SchemaValidation(BaseModule):
         stderr.print("[blue] Start processing the JSON file")
         self.log.info("Start processing the JSON file")
 
+        # Prepare ID registry (validated samples will be asigned with an unique ID)
+        new_ids_to_save = {}
+
+        # Start validation
         for item_row in self.json_data:
             sample_id_value = item_row.get(self.sample_id_field)
 
@@ -188,8 +193,17 @@ class SchemaValidation(BaseModule):
                 self.json_schema, item_row, validation_errors
             )
             if not validation_errors:
+                # If sample has validated, then assign an unique id
                 if "unique_sample_id" not in item_row:
-                    item_row["unique_sample_id"] = self.generate_unique_id()
+                    new_id = self.generate_incremental_unique_id(
+                        {**self.id_registry, **new_ids_to_save}
+                    )
+                    item_row["unique_sample_id"] = new_id
+                    new_ids_to_save[new_id] = {
+                        "sequencing_sample_id": sample_id_value,
+                        "lab_code": self.lab_code,
+                        "generated_at": datetime.now().isoformat(timespec="seconds"),
+                    }
                 validated_json_data.append(item_row)
                 self.logsum.feed_key(sample=sample_id_value)
             else:
@@ -238,6 +252,10 @@ class SchemaValidation(BaseModule):
 
                 # Add the invalid row to the list
                 invalid_json.append(item_row)
+
+        # For samples that are valid, save its new unique ID in the registry
+        if new_ids_to_save:
+            self.save_new_ids(new_ids_to_save)
 
         # Summarize errors
         stderr.print("[blue] --------------------")
@@ -296,9 +314,16 @@ class SchemaValidation(BaseModule):
             self.log.error(logtxt)
             raise
         tag = "Sample ID given for sequencing"
-        seq_id_col = [idx for idx, cell in enumerate(ws_sheet[1]) if tag in cell.value]
-        if seq_id_col:
-            id_col = seq_id_col[0]
+        # Check if mandatory colum ($tag) is defined in metadata. 
+        try:
+            id_col = next(
+                idx for idx, cell in enumerate(ws_sheet[1])
+                if cell.value is not None and tag in str(cell.value)
+            )
+        except StopIteration:
+            self.log.error(f"Column with tag '{tag}' not found in the second row of the Excel sheet.")
+            stderr.print(f"[red] Column with tag '{tag}' not found. Cannot continue.")
+            sys.exit(1)
         row_to_del = []
         row_iterator = ws_sheet.iter_rows(min_row=2, max_row=ws_sheet.max_row)
         consec_empty_rows = 0
@@ -347,10 +372,39 @@ class SchemaValidation(BaseModule):
         relecov_tools.utils.write_json_to_file(valid_json_data, file_path)
         return
 
-    def generate_unique_id(self, prefix="RLCV"):
-        """Generates an unique identifier
+    def generate_incremental_unique_id(self, current_registry, prefix="RLCV"):
+        """Generates an incremental unique ID using as baseline the latest record
+        in a registry. 
+
+        Args:
+            current_registry (dict): dict containing sample's unique IDs
+            prefix (str, optional): String that preceeds the unique ID. Defaults to "RLCV".
+
+        Returns:
+            string: An unique ID 
         """
-        return f"{prefix}-{uuid.uuid4().hex[:12].upper()}"
+        existing_numbers = []
+        for uid in current_registry:
+            if uid.startswith(prefix):
+                try:
+                    number = int(uid.replace(f"{prefix}-", ""))
+                    existing_numbers.append(number)
+                except ValueError:
+                    continue
+        next_number = max(existing_numbers, default=0) + 1
+        return f"{prefix}-{next_number:09d}"
+    
+    def save_new_ids(self, new_ids_dict):
+        """Updates sample id registry by adding sample unique ids of new validated samples.
+
+        Args:
+            new_ids_dict (dict): Dict of new unique sample IDs.
+        """
+        updated_registry = {**self.id_registry, **new_ids_dict}
+        relecov_tools.utils.write_json_to_file(
+            updated_registry, self.registry_path
+        )
+        self.log.info(f"Added {len(new_ids_dict)} new sample IDs to registry")
 
     def validate(self):
         """Validate samples from metadata, create an excel with invalid samples,
