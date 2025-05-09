@@ -5,15 +5,14 @@ import json
 import jsonschema
 from jsonschema import Draft202012Validator
 from relecov_tools.config_json import ConfigJson
-import logging
 import rich.console
 import os
 import sys
 
 # import jsonschema
 import relecov_tools.utils
+from relecov_tools.base_module import BaseModule
 
-log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -22,7 +21,7 @@ stderr = rich.console.Console(
 )
 
 
-class MappingSchema:
+class MappingSchema(BaseModule):
     def __init__(
         self,
         relecov_schema=None,
@@ -31,6 +30,7 @@ class MappingSchema:
         schema_file=None,
         output_folder=None,
     ):
+        super().__init__(output_directory=output_folder, called_module=__name__)
         config_json = ConfigJson()
         self.config_json = config_json
         if relecov_schema is None:
@@ -41,7 +41,7 @@ class MappingSchema:
             )
         else:
             if not os.path.isfile(relecov_schema):
-                log.error("Relecov schema file %s does not exist", relecov_schema)
+                self.log.error("Relecov schema file %s does not exist", relecov_schema)
                 stderr.print(
                     "[red] Relecov schema " + relecov_schema + " does not exist"
                 )
@@ -50,7 +50,7 @@ class MappingSchema:
         try:
             Draft202012Validator.check_schema(rel_schema_json)
         except jsonschema.ValidationError:
-            log.error("Relecov schema does not fulfill Draft 202012 Validation ")
+            self.log.error("Relecov schema does not fulfill Draft 202012 Validation ")
             stderr.print(
                 "[red] Relecov schema does not fulfill Draft 202012 Validation"
             )
@@ -62,11 +62,14 @@ class MappingSchema:
                 msg="Select the json file which have the data to map"
             )
         if not os.path.isfile(json_file):
-            log.error("json data file %s does not exist ", json_file)
+            self.log.error("json data file %s does not exist ", json_file)
             stderr.print(f"[red] json data file {json_file} does not exist")
             sys.exit(1)
         self.json_data = relecov_tools.utils.read_json_file(json_file)
         self.json_file = json_file
+        batch_id = self.get_batch_id_from_data(self.json_data)
+        self.set_batch_id(batch_id)
+
         if destination_schema is None:
             self.destination_schema = relecov_tools.utils.prompt_selection(
                 msg="Select ENA, GISAID for already defined schemas or other for custom",
@@ -82,7 +85,7 @@ class MappingSchema:
             else:
                 self.schema_file = schema_file
             if not os.path.exists(self.schema_file):
-                log.error(
+                self.log.error(
                     "Schema file %s to map your data does not exist ",
                     self.metadata_file,
                 )
@@ -148,7 +151,7 @@ class MappingSchema:
         if len(errors) >= 1:
             output_errs = "\n".join(f"{field}:{info}" for field, info in errors.items())
             invalid_ontologies = str([field for field in errors.keys()]).strip("[]")
-            log.error("Invalid ontology for: " + invalid_ontologies)
+            self.log.error("Invalid ontology for: " + invalid_ontologies)
             stderr.print("[yellow]\nGot unmapped ontologies. Check mapping_errors.log")
             with open("mapping_errors.log", "w") as errs:
                 errs.write("Ontology mapping errors:\n" + output_errs + "\n")
@@ -166,7 +169,7 @@ class MappingSchema:
                         data[value] = data[value].split(" [", 1)[0]
                     map_sample_dict[item] = data[value]
                 except KeyError as e:
-                    log.info("Property %s not set in the source data", e)
+                    self.log.info("Property %s not set in the source data", e)
             mapped_data.append(map_sample_dict)
         return mapped_data
 
@@ -243,10 +246,15 @@ class MappingSchema:
                 f"Sample {key}: {str(val).strip('[]')}"
                 for key, val in not_provided_fields.items()
             )
+            self.log.error(
+                f"Some required fields for {dest_schema} were Not Provided: "
+                "Check mapping_errors.log for more details"
+            )
             stderr.print(
                 f"[yellow]\nSome required fields for {dest_schema} were Not Provided:",
                 "[yellow]\nCheck mapping_errors.log for more details",
             )
+            self.log.error("Required fields Not Provided:\n" + notprov_report)
             with open("mapping_errors.log", "a") as errs:
                 errs.write("Required fields Not Provided:\n" + notprov_report)
         else:

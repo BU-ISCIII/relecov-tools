@@ -458,13 +458,7 @@ class RelecovMetadata(BaseModule):
                 f"Samples file {self.sample_list_file} is empty. All samples will be included"
             )
             s_json["j_data"] = self.get_samples_files_data(metadata)
-        first_sample = s_json["j_data"][list(s_json["j_data"].keys())[0]]
-        batch_id = first_sample.get("batch_id")
-        if not batch_id:
-            # If created with download module, batch_id will be the name of the folder
-            batch_id = first_sample.get("sequence_file_path_R1", self.date).split("/")[
-                -1
-            ]
+        batch_id = self.get_batch_id_from_data(s_json["j_data"])
         # This will declare self.batch_id in BaseModule() which will be used later
         self.set_batch_id(batch_id)
         metadata = self.process_from_json(metadata, s_json)
