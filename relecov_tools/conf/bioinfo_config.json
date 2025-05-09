@@ -9,7 +9,7 @@
             "multiple_samples": true,
             "split_by_batch": true,
             "content": {
-                "analysis_date": "analysis_date",
+                "bioinformatics_analysis_date": "analysis_date",
                 "depth_of_coverage_value": "medianDPcoveragevirus",
                 "number_of_variants_in_consensus": "Variantsinconsensusx10",
                 "number_of_variants_with_effect": "MissenseVariants",
