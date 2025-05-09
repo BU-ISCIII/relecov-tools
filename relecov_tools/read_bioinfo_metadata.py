@@ -833,7 +833,7 @@ class BioinfoMetadata(BaseModule):
         try:
             if re.search(r".*pangolin\.csv$", os.path.basename(file), re.IGNORECASE):
                 df = pd.read_csv(file)
-                df["lineage_analysis_date"] = datetime.now().strftime("%Y%m%d")
+                df["lineage_assignment_date"] = datetime.now().strftime("%Y%m%d")
                 df.to_csv(out_filepath, index=False)
             else:
                 shutil.copy(file, out_filepath)

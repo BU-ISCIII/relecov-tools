@@ -88,7 +88,7 @@ def process_json_files(
                             continue
 
                         #   Format change so that the date of analysis_date and sample_colletion_date have same format
-                        original_date_format = sample.get("analysis_date", "-")
+                        original_date_format = sample.get("bioinformatics_analysis_date", "-")
                         analysis_date = datetime.strptime(
                             original_date_format, "%Y%m%d"
                         ).strftime("%Y-%m-%d")
@@ -102,10 +102,10 @@ def process_json_files(
                                 "PROVINCE": sample.get("geo_loc_region", "-"),
                                 "ANALYSIS_DATE": analysis_date,
                                 "PANGOLIN_SOFTWARE_VERSION": sample.get(
-                                    "lineage_analysis_software_version", "-"
+                                    "lineage_assignment_software_version", "-"
                                 ),
                                 "PANGOLIN_DATABASE_VERSION": sample.get(
-                                    "pangolin_database_version", "-"
+                                    "lineage_assignment_database_version", "-"
                                 ),
                                 "SAMPLE_ID": str(
                                     sample.get("sequencing_sample_id", "-")
@@ -113,7 +113,7 @@ def process_json_files(
                                 "SAMPLE_COLLECTION_DATE": sample.get(
                                     "sample_collection_date", "-"
                                 ),
-                                "LINEAGE": sample.get("lineage_name", "-"),
+                                "LINEAGE": sample.get("lineage_assignment", "-"),
                                 "WEEK": week,
                             }
                         )
