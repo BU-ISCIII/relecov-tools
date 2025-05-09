@@ -96,8 +96,7 @@
                 "consensus_genome_length" : "genome_length",
                 "consensus_sequence_filename" : "sequence_filename",
                 "consensus_sequence_filepath" : "sequence_filepath",
-                "consensus_sequence_md5" : "sequence_md5", 
-                "number_of_base_pairs_sequenced" : "number_of_base_pairs_sequenced"
+                "consensus_sequence_md5" : "sequence_md5"
             }
         },
         "summary_mqc": {
@@ -109,7 +108,8 @@
             "function": null,
             "extract": true,
             "content": {
-                "ns_per_100_kbp": "# Ns per 100kb consensus"
+                "ns_per_100_kbp": "# Ns per 100kb consensus",
+                "number_of_base_pairs_sequenced": "# Input reads"
             }
         },
         "other_files": {
