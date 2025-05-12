@@ -57,6 +57,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed anatomical material collection config file to match new enums in json_Schema [#567](https://github.com/BU-ISCIII/relecov-tools/pull/567)
 - Fix handling of "Not Provided" in configuration.json [#570](https://github.com/BU-ISCIII/relecov-tools/pull/570)
 - Hotfix for folder specific download log_summary filename [#571](https://github.com/BU-ISCIII/relecov-tools/pull/571)
+- Fix return values and configuration handling in upload-results module [#573](https://github.com/BU-ISCIII/relecov-tools/pull/573)
 
 #### Changed
 
