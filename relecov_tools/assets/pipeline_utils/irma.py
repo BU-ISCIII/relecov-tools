@@ -350,7 +350,7 @@ def get_software_versions(files_list, batch_date, output_folder=None):
                 name = row["software_name"]
                 version = row["software_version"]
                 id = row["software_name"].strip().lower()
-                if not "/" in id:
+                if "/" not in id:
                     id = id.split()[0]
                 version_dict[id] = {"software_version": version, "software_name": name}
         else:
