@@ -1301,12 +1301,9 @@ class DownloadManager(BaseModule):
             if self.logsum.logs.get(self.current_folder):
                 self.logsum.logs[self.current_folder].update({"path": local_folder})
                 try:
-                    log_name = "_".join(
-                        [
-                            "download",
-                            self.current_folder,
-                            self.tag_filename("log_summary.json"),
-                        ]
+                    log_name = (
+                        self.tag_filename("download_" + self.current_folder)
+                        + "_log_summary.json"
                     )
                     self.parent_create_error_summary(
                         filepath=os.path.join(local_folder, log_name),
