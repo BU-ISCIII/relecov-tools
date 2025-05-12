@@ -228,92 +228,8 @@ def handle_pangolin_data(files_list, batch_date, output_folder=None):
         pango_data_processed: A dictionary containing pangolin data handled.
     """
 
-    # Handling pangolin data
-    def pango_version_from_sbatch(sbatch_files, analysis_folder):
-        pango_data_v = None
-        for _ in sbatch_files:
-            latest_date = max(
-                [relecov_tools.utils.get_file_date(x) for x in sbatch_files]
-            )
-            latest_sbatch = [
-                x
-                for x in sbatch_files
-                if relecov_tools.utils.get_file_date(x) == latest_date
-            ][0]
-            with open(latest_sbatch, "r") as f:
-                content = f.readlines()
-            nxf_index = [n for n, line in enumerate(content) if "nextflow run" in line]
-            for line in content[nxf_index[0] : -1]:
-                if "-c" in line and ".config" in line:
-                    conf_path = line.split("-c")[1].replace("\\", "").strip()
-                    break
-            else:
-                method_log_report.update_log_report(
-                    method_name,
-                    "warning",
-                    "Missing files to extract pango-data version",
-                )
-                pango_data_v = None
-                break
-            if not os.path.isabs(conf_path):
-                conf_real_path = os.path.join(analysis_folder, conf_path)
-            else:
-                conf_real_path = conf_path
-            # Read nextflow.config and find pango-data folder used in sbatch
-            if os.path.isfile(conf_real_path):
-                with open(conf_real_path, "r") as f:
-                    conf = f.read()
-                for block in conf.split("}"):
-                    if "PANGOLIN" in block:
-                        pango_folder = [
-                            x.split("--datadir")[1]
-                            for x in block.split("'")
-                            if "--datadir" in x
-                        ][0].strip()
-                        break
-                # if pango_data version is outdated just set as not provided
-                if len(os.listdir(pango_folder)) == 0:
-                    pango_data_v = "Not Provided [GENEPIO:0001668]"
-                else:
-                    initfile = pango_folder + "/pangolin_data/__init__.py"
-                    if not os.path.exists(initfile):
-                        break
-                    with open(initfile, "r") as f:
-                        initlines = f.readlines()
-                    pango_raw = [x for x in initlines if "version" in x][0]
-                    pango_data_v = pango_raw.split("=")[1].strip().strip('"')
-        return pango_data_v
-
-    def get_pango_data_version(files_list):
-        """Extract pangolin database version used in the lineage analysis"""
-        single_file = files_list[0]
-        analysis_folder = "".join(
-            re.split(r"(\/\d{8}_ANALYSIS0.*_HUMAN)", single_file)[0:2]
-        )
-        pango_data_v = None
-        if "lablog_viralrecon.log" in os.listdir(os.path.join(analysis_folder, "..")):
-            with open(os.path.join(analysis_folder, "../lablog_viralrecon.log")) as f:
-                content = f.readlines()
-            for line in content:
-                if "pangolin-data" in line:
-                    version_pattern = r"v\d+\.\d+(\.\d+)?"
-                    match = re.search(version_pattern, line, re.IGNORECASE)
-                    if match:
-                        pango_data_v = match.group()
-                    else:
-                        pango_data_v = None
-        if not pango_data_v:
-            sbatch_files = [x for x in os.listdir(analysis_folder) if "sbatch" in x]
-            sbatch_files = [os.path.join(analysis_folder, x) for x in sbatch_files]
-            pango_data_v = pango_version_from_sbatch(sbatch_files, analysis_folder)
-        if not pango_data_v:
-            pango_data_v = "Not Provided [GENEPIO:0001668]"
-        pango_data_v = pango_data_v.replace("v", "")
-        return pango_data_v
-
     method_name = f"{handle_pangolin_data.__name__}"
     method_log_report = BioinfoReportLog()
-    pango_data_v = get_pango_data_version(files_list)
     pango_data_processed = {}
     valid_samples = []
     try:
@@ -325,13 +241,7 @@ def handle_pangolin_data(files_list, batch_date, output_folder=None):
                 pango_data = relecov_tools.utils.read_csv_file_return_dict(
                     pango_file, sep=","
                 )
-                # Add custom content in pangolin
                 pango_data_key = next(iter(pango_data))
-                pango_data[pango_data_key]["lineage_analysis_date"] = (
-                    relecov_tools.utils.get_file_date(pango_file)
-                )
-                pango_data[pango_data_key]["pangolin_database_version"] = pango_data_v
-                # Rename key in f_data
                 pango_data_updated = {
                     key.split()[0]: value for key, value in pango_data.items()
                 }
