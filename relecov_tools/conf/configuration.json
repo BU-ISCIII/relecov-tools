@@ -8,7 +8,7 @@
     "lab_metadata": {
         "fixed_fields": {
             "study_type": "Whole Genome Sequencing",
-            "collector_name": "Not Provided"
+            "collector_name": "Not Provided [SNOMED:434941000124101]"
         },
         "organism_mapping": {
             "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]": {
