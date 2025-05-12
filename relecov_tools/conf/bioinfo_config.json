@@ -46,6 +46,7 @@
             "required": false,
             "function": "handle_pangolin_data",
             "extract": true,
+            "multiple_samples": true,
             "content": {
                 "variant_name": "scorpio_call",
                 "lineage_assignment": "lineage",
@@ -88,6 +89,7 @@
             "fn": ".consensus.fa",
             "required": false,
             "function": "handle_consensus_fasta",
+            "multiple_samples": true,
             "extract": true,
             "content": {
                 "consensus_sequence_name" : "sequence_name",
