@@ -144,23 +144,6 @@
                 }
             }
         },
-        "versions":{
-            "fn": "versions.csv",
-            "required": true,
-            "header_row_idx": 1,
-            "function": "get_software_versions",
-            "extract": false,
-            "content": {
-                "software_version": {
-                    "clade_assignment_software_version":"nextclade",
-                    "lineage_assignment_database_version": "pangolin_database_version"
-
-                },
-                "software_name": {
-                    "clade_assignment_software_name":"nextclade"
-                }
-            }
-        },
         "fixed_values": {
             "assembly": "Not Provided [GENEPIO:0001668]",
             "assembly_version": "Not Provided [GENEPIO:0001668]",
