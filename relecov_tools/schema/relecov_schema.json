@@ -3,7 +3,7 @@
     "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/relecov_schema.json",
     "title": "relecov-tools Schema.",
     "description": "Json Schema that specifies the structure, content, and validation rules for relecov-tools",
-    "version": "3.0.3dev",
+    "version": "3.0.4dev",
     "type": "object",
     "properties": {
         "organism": {
@@ -3428,7 +3428,7 @@
             "fill_mode": "sample",
             "header": "Y"
         },
-        "Vaccinated": {
+        "vaccinated": {
             "enum": [
                 "Yes [SNOMED:373066001]",
                 "No [SNOMED:373067005]",
@@ -3449,7 +3449,7 @@
             "fill_mode": "sample",
             "header": "Y"
         },
-        "Specific medication for treatment or prophylaxis": {
+        "medicated": {
             "enum": [
                 "Yes [SNOMED:373066001]",
                 "No [SNOMED:373067005]",
@@ -3470,7 +3470,7 @@
             "fill_mode": "sample",
             "header": "Y"
         },
-        "Hospitalization": {
+        "hospitalized": {
             "enum": [
                 "Yes [SNOMED:373066001]",
                 "No [SNOMED:373067005]",
@@ -3491,7 +3491,7 @@
             "fill_mode": "sample",
             "header": "Y"
         },
-        "Admission to intensive care unit": {
+        "icu_admission": {
             "enum": [
                 "Yes [SNOMED:373066001]",
                 "No [SNOMED:373067005]",
@@ -3512,7 +3512,7 @@
             "fill_mode": "sample",
             "header": "Y"
         },
-        "Death": {
+        "death": {
             "enum": [
                 "Yes [SNOMED:373066001]",
                 "No [SNOMED:373067005]",
@@ -3533,7 +3533,7 @@
             "fill_mode": "sample",
             "header": "Y"
         },
-        "Immunosuppression": {
+        "immunosuppressed": {
             "enum": [
                 "Yes [SNOMED:373066001]",
                 "No [SNOMED:373067005]",
