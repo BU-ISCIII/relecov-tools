@@ -76,7 +76,7 @@ $ relecov-tools --help
 \    \  /   |__ / |__  |    |___ |    |   |  \    /
 /    /  \   |  \  |    |    |    |    |   |   \  /
 /    |--|   |   \ |___ |___ |___ |___ |___|    \/
-RELECOV-tools version 1.5.0
+RELECOV-tools version 1.5.1
 Usage: relecov-tools [OPTIONS] COMMAND [ARGS]...
 
 Options:
