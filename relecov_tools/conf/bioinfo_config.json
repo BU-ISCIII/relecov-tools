@@ -47,6 +47,7 @@
             "header_row_idx": 1,
             "required": false,
             "function": "handle_pangolin_data",
+            "filepath_name": "lineage_assignment_file",
             "extract": true,
             "multiple_samples": true,
             "content": {
@@ -113,7 +114,7 @@
             "extract": true,
             "content": {
                 "ns_per_100_kbp": "# Ns per 100kb consensus",
-                "number_of_base_pairs_sequenced": "# Input reads"
+                "number_of_reads_sequenced": "# Input reads"
             }
         },
         "vcf_files": {
@@ -179,7 +180,8 @@
             "subtype_assignment_software_name": "Not Applicable [GENEPIO:0001619]",
             "if_subtype_assignment_software_other": "Not Applicable [GENEPIO:0001619]",
             "subtype_assignment_software_version": "Not Applicable [GENEPIO:0001619]",
-            "subtype_assignment_software_database_version": "Not Applicable [GENEPIO:0001619]"
+            "subtype_assignment_software_database_version": "Not Applicable [GENEPIO:0001619]",
+            "variant_designation": "Not Provided [GENEPIO:0001668]"
         }
     },
     "irma": {
