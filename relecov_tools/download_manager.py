@@ -20,7 +20,6 @@ from relecov_tools.base_module import BaseModule
 
 # from relecov_tools.rest_api import RestApi
 
-"""log = logging.getLogger(__name__)"""
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -253,9 +252,8 @@ class DownloadManager(BaseModule):
         samples_to_delete = []
         lab_code = local_folder.split("/")[-2]
         # TODO: Move these prefixes to configuration.json
-        file_tag = self.batch_id + "_" + self.hex
-        new_meta_file = "lab_metadata_" + lab_code + "_" + file_tag + ".xlsx"
-        sample_data_file = "samples_data_" + lab_code + "_" + file_tag + ".json"
+        new_meta_file = self.tag_filename("lab_metadata_" + lab_code + ".xlsx")
+        sample_data_file = self.tag_filename("samples_data_" + lab_code + ".json")
         sample_data_path = os.path.join(local_folder, sample_data_file)
         os.rename(metadata_file, os.path.join(local_folder, new_meta_file))
         error_text = "Sample %s incomplete. Not added to final Json"
@@ -269,12 +267,12 @@ class DownloadManager(BaseModule):
             # TODO: Move these keys to configuration.json
             values["sequence_file_path_R1"] = local_folder
             values["sequence_file_R1_md5"] = md5_dict.get(values["sequence_file_R1"])
-            values["batch_id"] = self.batch_id
             if values.get("sequence_file_R2"):
                 values["sequence_file_path_R2"] = local_folder
                 values["sequence_file_R2_md5"] = md5_dict.get(
                     values["sequence_file_R2"]
                 )
+            values["batch_id"] = self.batch_id
         if samples_to_delete:
             data = {k: v for k, v in data.items() if k not in samples_to_delete}
         with open(sample_data_path, "w", encoding="utf-8") as fh:
@@ -427,11 +425,17 @@ class DownloadManager(BaseModule):
                         stderr.print(log_text)
                         self.include_warning(log_text, sample=s_name)
                         continue
-                if row[index_layout] == "Paired" and row[index_fastq_r2] is None:
+                if (
+                    "paired" in row[index_layout].lower()
+                    and row[index_fastq_r2] is None
+                ):
                     error_text = "Sample %s is paired-end, but no R2 given"
                     self.include_error(error_text % str(row[index_sampleID]), s_name)
                     row_complete = False
-                if row[index_layout] == "Single" and row[index_fastq_r2] is not None:
+                if (
+                    "single" in row[index_layout].lower()
+                    and row[index_fastq_r2] is not None
+                ):
                     error_text = "Sample %s is single-end, but R1 and R2 were given"
                     self.include_error(error_text % str(row[index_sampleID]), s_name)
                     row_complete = False
@@ -643,6 +647,7 @@ class DownloadManager(BaseModule):
                 self.log.info(
                     "Successfully renamed %s to %s" % (remote_folder, new_name)
                 )
+                self.logsum.rename_log_key(remote_folder, new_name)
             except (OSError, PermissionError) as e:
                 log_text = f"Could not rename remote {remote_folder}. Error: {e}"
                 self.log.error(log_text)
@@ -659,9 +664,9 @@ class DownloadManager(BaseModule):
             remote_folder (str): path to folder in remote repository
         """
 
-        def remove_client_dir(remote_folder):
+        def remove_client_dir(remote_folder, top_level):
             # Never remove a folder in the top level
-            if len(remote_folder.replace("./", "").split("/")) >= 2:
+            if len(remote_folder.replace("./", "").split("/")) >= top_level:
                 self.log.info("Trying to remove %s", remote_folder)
                 try:
                     self.relecov_sftp.remove_dir(remote_folder)
@@ -676,10 +681,14 @@ class DownloadManager(BaseModule):
         remote_folder_files = self.relecov_sftp.get_file_list(remote_folder)
         if remote_folder_files:
             self.rename_remote_folder(remote_folder)
-            log_text = f"Remote folder {remote_folder} not empty. Not removed"
+            log_text = f"Remote folder {remote_folder} not empty. Not removed."
             self.log.warning(log_text)
         else:
-            remove_client_dir(remote_folder)
+            if self.subfolder:
+                top_level = 3
+            else:
+                top_level = 2
+            remove_client_dir(remote_folder, top_level)
         return
 
     def move_processing_fastqs(self, folders_with_metadata):
@@ -914,7 +923,6 @@ class DownloadManager(BaseModule):
                 continue
             self.current_folder = folder
             # Include the folder in the final process log summary
-            self.include_new_key()
             downloaded_metadata = pre_validate_folder(folder, target_folders[folder])
             if not downloaded_metadata:
                 continue
@@ -926,7 +934,10 @@ class DownloadManager(BaseModule):
             # Taking the main folder for each lab as reference for merge and logs
             main_folder = folder.split("/")[0]
             self.current_folder = main_folder
-            tmp_folder_parent = os.path.join(main_folder, self.subfolder)
+            if self.subfolder is not None:
+                tmp_folder_parent = os.path.join(main_folder, self.subfolder)
+            else:
+                tmp_folder_parent = main_folder
             temporal_foldername = f"{date_and_time}_tmp_processing"
             temp_folder = os.path.join(tmp_folder_parent, temporal_foldername)
             # Get every file except the excel ones as they are going to be merged
@@ -1005,6 +1016,17 @@ class DownloadManager(BaseModule):
             )
         else:
             target_folders = [tf for tf in self.target_folders if tf in clean_root_list]
+        if self.subfolder is not None:
+            new_target_folders = []
+            for tfolder in target_folders:
+                if self.subfolder in self.relecov_sftp.list_remote_folders(tfolder):
+                    # Lets dive directly into the selected subfolder
+                    new_target_folders.append(os.path.join(tfolder, self.subfolder))
+                else:
+                    self.log.debug(
+                        f"Folder {tfolder} did not have subfolder {self.subfolder}. Skipped"
+                    )
+            target_folders = new_target_folders.copy()
         if not target_folders:
             self.log.error(
                 "No remote folders matching selection %s", self.target_folders
@@ -1026,19 +1048,11 @@ class DownloadManager(BaseModule):
                 )
                 continue
             for folder in subfolders:
-                if folder.startswith(f"{targeted_folder}/{self.subfolder}"):
-                    full_path = os.path.normpath(folder)
-                    try:
-                        list_files = self.relecov_sftp.get_file_list(full_path)
-
-                        if list_files:
-                            folders_to_process[full_path] = list_files
-
-                    except FileNotFoundError:
-                        self.log.error(
-                            f"Subfolder {self.subfolder} not found in {targeted_folder}"
-                        )
-                        continue
+                list_files = self.relecov_sftp.get_file_list(folder)
+                if list_files:
+                    folders_to_process[folder] = list_files
+                else:
+                    self.log.error(f"Subfolder {folder} empty. Skipped")
         if len(folders_to_process) == 0:
             self.log.info("Exiting process, folders were empty.")
             self.log.error("There are no files in the selected folders.")
@@ -1290,8 +1304,10 @@ class DownloadManager(BaseModule):
             if self.logsum.logs.get(self.current_folder):
                 self.logsum.logs[self.current_folder].update({"path": local_folder})
                 try:
-                    folder_basename = os.path.basename(local_folder.rstrip("/"))
-                    log_name = folder_basename + "_download_log_summary.json"
+                    log_name = (
+                        self.tag_filename("download_" + self.current_folder)
+                        + "_log_summary.json"
+                    )
                     self.parent_create_error_summary(
                         filepath=os.path.join(local_folder, log_name),
                         logs={
@@ -1305,6 +1321,7 @@ class DownloadManager(BaseModule):
             self.log.info(f"Finished processing {folder}")
             stderr.print(f"[green]Finished processing {folder}")
             self.finished_folders[folder] = list(files_md5_dict.keys())
+            self.finished_folders[folder].append(meta_file)
         return
 
     def include_new_key(self, sample=None):
@@ -1372,7 +1389,7 @@ class DownloadManager(BaseModule):
         )
         # If download_option is "download_clean", remove
         # sftp folder content after download is finished
-        if self.download_option == "download_clean" and not self.defer_cleanup:
+        if self.download_option == "download_clean":
             normal_folders = {
                 folder
                 for folder in processed_folders
@@ -1384,10 +1401,9 @@ class DownloadManager(BaseModule):
                     self.clean_remote_folder(folder)
             folders_to_clean = copy.deepcopy(self.finished_folders)
             for folder, downloaded_files in folders_to_clean.items():
-                if self.relecov_sftp.get_file_list(folder):
-                    self.delete_remote_files(folder, files=downloaded_files)
-                    self.clean_remote_folder(folder)
-                    self.log.info(f"Delete process finished in remote {folder}")
+                self.delete_remote_files(folder, files=downloaded_files)
+                self.clean_remote_folder(folder)
+                self.log.info(f"Delete process finished in remote {folder}")
 
             invalid_folders = [
                 key for key in target_folders if key not in folders_to_clean
@@ -1401,24 +1417,6 @@ class DownloadManager(BaseModule):
                 normalized_folder = os.path.normpath(folder)
                 if normalized_folder not in cleaned_folders:
                     cleaned_folders.append(normalized_folder)
-
-            for folder in cleaned_folders:
-                if self.relecov_sftp.get_file_list(folder):
-                    all_subfolders = self.relecov_sftp.list_remote_folders(
-                        folder, recursive=True
-                    )
-                    all_subfolders.sort(key=lambda x: x.count("/"), reverse=True)
-
-                    for subfolder in all_subfolders:
-                        if not self.relecov_sftp.get_file_list(subfolder):
-                            self.clean_remote_folder(subfolder)
-                            self.log.info(
-                                f"Checked and removed empty subfolder: {subfolder}"
-                            )
-
-                    if not self.relecov_sftp.get_file_list(folder):
-                        self.clean_remote_folder(folder)
-                        self.log.info(f"Checked and removed empty folder: {folder}")
 
         self.log.info("Finished download module execution")
         stderr.print("Finished execution")

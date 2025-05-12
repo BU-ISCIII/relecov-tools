@@ -19,6 +19,7 @@ relecov-tools is a set of helper tools for the assembly of the different element
     - [Modules](#modules)
       - [download](#download)
       - [read-lab-metadata](#read-lab-metadata)
+      - [send-mail](#send-mail)
       - [read-bioinfo-metadata](#read-bioinfo-metadata)
       - [validate](#validate)
       - [map](#map)
@@ -39,7 +40,15 @@ relecov-tools is a set of helper tools for the assembly of the different element
 ## Installation
 
 ### Bioconda
-Soon
+relecov-tools is available in Bioconda and can be installed via conda.
+
+If you already have conda installed. Do the following:
+```
+conda config --add channels bioconda
+conda create --name relecov-tools
+conda activate relecov-tools
+conda install -c bioconda relecov-tools
+```
 
 ### Pip
 relecov-tools is available in Pypi and can be installed via pip:
@@ -67,7 +76,7 @@ $ relecov-tools --help
 \    \  /   |__ / |__  |    |___ |    |   |  \    /
 /    /  \   |  \  |    |    |    |    |   |   \  /
 /    |--|   |   \ |___ |___ |___ |___ |___|    \/
-RELECOV-tools version 1.5.0
+RELECOV-tools version 1.5.1
 Usage: relecov-tools [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -169,6 +178,26 @@ Usage: relecov-tools read-metadata [OPTIONS]
 
 An example for the metadata excel file can be found [here](./relecov_tools/example_data/METADATA_LAB_TEST.xlsx)
 
+#### send-mail
+
+`send-mail` sends a validation summary report by email using predefined Jinja templates. It supports attachments, multiple recipients, and includes the option to add additional notes manually or via a .txt file.
+
+```
+$ relecov-tools send-email --help
+Usage: relecov-tools send-email [OPTIONS]
+
+  Send a sample validation report by mail.
+
+  Options:
+    -v, --validate-file PATH       Path to the validation summary JSON file (e.g., validate_log_summary.json) [required]
+    -r, --receiver-email TEXT      Recipient's e-mail address. If not provided, it will be extracted from the institutions guide
+    -a, --attachments PATH         Path(s) to one or more files to attach
+    -t, --template_path PATH       Path to the folder containing the email templates. If not provided, it will be loaded from the configuration file
+    -p, --email-psswd TEXT         Password for bioinformatica@isciii.es. If not provided, it will be loaded from the credentials YAML file
+    -n, --additional-notes PATH    Optional path to a .txt file with additional notes. If not provided, the user will be prompted to write notes manually or provide a path interactively
+    --help                         Show this message and exit.
+```
+
 #### read-bioinfo-metadata
 `read-bioinfo-metadata` Include the results from the Bioinformatics analysis into the Json previously created with read-lab-metadata module.
 
@@ -224,11 +253,13 @@ Usage: relecov-tools validate [OPTIONS]
   Validate json file against schema.
 
   Options:
-    -j, --json_file TEXT    Json file to validate
-    -s, --json_schema_file TEXT Path to the JSON Schema file used for validation (default: relecov-schema)
-    -m, --metadata PATH     Origin file containing metadata
-    -o, --out_folder TEXT   Path to save validate json file
-    --help                  Show this message and exit.
+    -j, --json_file TEXT            Json file to validate
+    -s, --json_schema_file          TEXT Path to the JSON Schema file used for validation
+    -m, --metadata PATH             Origin file containing metadata
+    -o, --out_folder TEXT           Path to save validate json file
+    -e, --excel_sheet TEXT          Optional: Name of the sheet in excel file to validate.
+    -r, --registry TEXT             Path to registry (JSON file) with validated samples and their unique IDs.   
+    --help                          Show this message and exit.
 
 ```
 
@@ -426,7 +457,7 @@ Use a predefined default location found in configuration.json under `logs_config
 If you want your logs to be sent to custom locations depending on the module executed you can do so by using add-extra-config, providing 
 
 #### Custom logs
-After executing each of these modules, you may find a custom log report in json format named "DATE_EXECUTED-MODULE_log_summary.json. These custom log summaries can be useful to detect errors in metadata in order to fix them and/or notify the users.
+After executing each of these modules, you may find a custom log report in json format named `EXECUTED-MODULE_<date>_hex_log_summary.json`. These custom log summaries can be useful to detect errors in metadata in order to fix them and/or notify the users.
 
 ### Python package mode
 relecov-tools is designed in a way that you can use import the different modules and use them in your own scripts, for example:

@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+from datetime import datetime
 
 import relecov_tools.utils
 from relecov_tools.log_summary import LogSum
@@ -40,7 +41,7 @@ class BaseModule:
             "-", "_"
         )
         self.batch_id = "temp_id"
-
+        self.basemod_date = datetime.today().strftime("%Y%m%d%H%M%S")
         config = ConfigJson(extra_config=True)
         logs_config = config.get_configuration("logs_config")
         if self.called_module in logs_config.get("modules_outpath", {}):
@@ -88,7 +89,11 @@ class BaseModule:
         if only_stream is True:
             log_fh = logging.StreamHandler()
         else:
-            os.makedirs(os.path.dirname(log_filepath), exist_ok=True)
+            # Ensure the parent directory of the log file exists
+            # If log_filepath includes a directory, create it to avoid FileHandler errors.
+            dirpath = os.path.dirname(log_filepath)
+            if dirpath:
+                os.makedirs(dirpath, exist_ok=True)
             log_fh = logging.FileHandler(log_filepath, encoding="utf-8")
         log_fh.setLevel(level)
         log_fh.setFormatter(
@@ -155,7 +160,7 @@ class BaseModule:
             new_log_path, level=self.log.getEffectiveLevel()
         )
         self.log.addHandler(new_handler)
-        self.log.info(f"Redirected logs from {log_file} to {new_log_path}")
+        self.log.debug(f"Redirected logs from {log_file} to {new_log_path}")
         return
 
     def get_log_file(self):
@@ -218,3 +223,28 @@ class BaseModule:
                 base_name = base_name.replace("_" + mark, "")
                 self.log.debug(f"{filename} already includes {name}: {mark}.")
         return str(base_name) + "_" + tag + str(extension)
+
+    def get_batch_id_from_data(self, json_data: list):
+        """Extract batch_id from the first sample in JSON data"""
+        if not json_data:
+            self.log.debug("Provided json data is empty.")
+            self.log.debug(f"Using execution date as batch_id: {self.basemod_date}")
+            return self.basemod_date
+        unique_batchs = {samp["batch_id"] for samp in json_data if "batch_id" in samp}
+        if len(unique_batchs) == 0:
+            filepath = "sequence_file_path_R1"
+            self.log.debug(f"Found no samples with batch_id. Trying with {filepath}...")
+            # If created with download module, batch_id will be the name of the folder
+            unique_batchs = {
+                samp[filepath].split("/")[-1] for samp in json_data if filepath in samp
+            }
+        if len(unique_batchs) == 1:
+            batch_id = list(unique_batchs)[0]
+            return batch_id
+        elif len(unique_batchs) == 0:
+            self.log.debug("Could not extract batch_id from provided json data")
+        else:
+            self.log.debug("More than one batch_id found in data.")
+        self.log.debug(f"Using execution date as batch_id: {self.basemod_date}")
+        batch_id = self.basemod_date
+        return batch_id

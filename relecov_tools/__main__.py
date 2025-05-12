@@ -38,7 +38,7 @@ stderr = rich.console.Console(
     stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
 )
 
-__version__ = "1.5.0"
+__version__ = "1.5.1"
 
 
 def run_relecov_tools():
@@ -159,7 +159,10 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
         relecov_tools.base_module.BaseModule._global_hex_code = str(hex_code)
     # Set up logs to a file if we asked for one
     called_module = str(ctx.invoked_subcommand).replace("-", "_")
-    config = relecov_tools.config_json.ConfigJson(extra_config=True)
+    if os.path.isfile(relecov_tools.config_json.ConfigJson._extra_config_path):
+        config = relecov_tools.config_json.ConfigJson(extra_config=True)
+    else:
+        config = relecov_tools.config_json.ConfigJson()
     logs_config = config.get_configuration("logs_config")
     default_outpath = logs_config.get("default_outpath", "/tmp/relecov_tools")
     if log_path is None:
@@ -228,7 +231,7 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
     is_flag=False,
     flag_value="ALL",
     default=None,
-    help="Flag: Select which folders will be targeted giving [paths] or via prompt",
+    help='Flag: Select which folders will be targeted giving [paths] or via prompt. For multiple folders use ["folder1", "folder2"]',
 )
 @click.option(
     "-s",
@@ -333,12 +336,26 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, metadata_out, files_
     default=None,
     help="Optional: Name of the sheet in excel file to validate.",
 )
+@click.option(
+    "-r",
+    "--registry",
+    required=False,
+    default=None,
+    help="Path to the JSON file containing the registered records of validated samples with their unique sample identifiers.",
+)
 @click.pass_context
-def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet):
+def validate(
+    ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet, registry
+):
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
     validation = relecov_tools.json_validation.SchemaValidation(
-        json_file, json_schema_file, metadata, out_folder, excel_sheet
+        json_file,
+        json_schema_file,
+        metadata,
+        out_folder,
+        excel_sheet,
+        registry,
     )
     try:
         validation.validate()
@@ -376,9 +393,9 @@ def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet
     "-t",
     "--template_path",
     type=click.Path(exists=True),
-    required=True,
+    required=False,
     default=None,
-    help="Path to relecov-tools templates folder",
+    help="Path to relecov-tools templates folder (optional)",
 )
 @click.option(
     "-p",
@@ -387,15 +404,28 @@ def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet
     required=False,
     default=None,
 )
+@click.option(
+    "-n",
+    "--additional-notes",
+    type=click.Path(exists=True),
+    required=False,
+    help="Path to a .txt file with additional notes to include in the email (optional).",
+)
 @click.pass_context
 def send_mail(
-    ctx, validate_file, receiver_email, attachments, template_path, email_psswd
+    ctx,
+    validate_file,
+    receiver_email,
+    attachments,
+    template_path,
+    email_psswd,
+    additional_notes,
 ):
     """
     Send a sample validation report by mail.
     """
     debug = ctx.obj.get("debug", False)
-    config_loader = relecov_tools.config_json.ConfigJson()
+    config_loader = relecov_tools.config_json.ConfigJson(extra_config=True)
     config = config_loader.get_configuration("mail_sender")
     if not config:
         raise ValueError(
@@ -412,6 +442,14 @@ def send_mail(
 
     invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
 
+    if not template_path:
+        template_path = config.get("delivery_template_path_file")
+    if not template_path or not os.path.exists(template_path):
+        raise FileNotFoundError(
+            "The template path could not be determined or does not exist. "
+            "Please provide it via --template_path or define 'delivery_template_path_file' in the configuration."
+        )
+
     email_sender = relecov_tools.mail.EmailSender(config, template_path)
 
     template_choice = click.prompt(
@@ -425,16 +463,28 @@ def send_mail(
 
     # Determinar el template a usar
     if template_choice == 1:
-        template_name = "jinja_template_with_errors.j2"
+        template_name = "template_with_errors_relecov.j2"
     else:
-        template_name = "jinja_template_success.j2"
+        template_name = "template_success_relecov.j2"
 
-    add_info = click.confirm(
-        "Would you like to add additional information in the mail?", default=False
-    )
     additional_info = ""
-    if add_info:
-        additional_info = click.prompt("Enter additional information")
+
+    if additional_notes:
+        with open(additional_notes, "r", encoding="utf-8") as f:
+            additional_info = f.read().strip()
+    else:
+        if click.confirm(
+            "Would you like to add a .txt file with additional notes?", default=False
+        ):
+            notes_path = click.prompt(
+                "Enter the path to the .txt file", type=click.Path(exists=True)
+            )
+            with open(notes_path, "r", encoding="utf-8") as f:
+                additional_info = f.read().strip()
+        elif click.confirm(
+            "Would you like to write additional notes manually?", default=False
+        ):
+            additional_info = click.prompt("Enter additional information").strip()
 
     institution_info = email_sender.get_institution_info(submitting_institution_code)
     if not institution_info:
@@ -444,7 +494,7 @@ def send_mail(
     email_receiver_from_json = institution_info["email_receiver"]
 
     email_body = email_sender.render_email_template(
-        additional_info,
+        additional_info=additional_info,
         invalid_count=invalid_count,
         submitting_institution_code=submitting_institution_code,
         template_name=template_name,
@@ -955,7 +1005,7 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
     try:
         merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
         final_logs = logsum.prepare_final_logs(logs=merged_logs)
-        output_filepath = os.path.join(output_folder, lab_code + "_logs_report")
+        output_filepath = os.path.join(output_folder, lab_code + "_metadata_report")
         excel_outpath = output_filepath + ".xlsx"
         logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
         json_outpath = output_filepath + ".json"
@@ -1005,7 +1055,12 @@ def wrapper(ctx, config_file, output_folder):
 @click.option("-u", "--user", help="User name for login to sftp server")
 @click.option("-p", "--password", help="password for the user to login")
 @click.option("-b", "--batch_id", help="Batch from....")
-@click.option("-t", "--template_path", help="Path to relecov-tools templates folder")
+@click.option(
+    "-t",
+    "--template_path",
+    required=False,
+    help="Path to relecov-tools templates folder",
+)
 @click.option(
     "-r", "--project", default="Relecov", help="Project to which the samples belong"
 )
@@ -1026,7 +1081,7 @@ def upload_results(ctx, user, password, batch_id, template_path, project):
             sys.exit(f"EXCEPTION FOUND: {e}")
 
 
-@relecov_tools_cli.command(help_priority=1)
+@relecov_tools_cli.command(help_priority=18)
 @click.option(
     "-n",
     "--config_name",
@@ -1056,7 +1111,10 @@ def add_extra_config(ctx, config_name, config_file, force, clear_config):
     """Save given file content as additional configuration"""
     debug = ctx.obj.get("debug", False)
     try:
-        config_json = relecov_tools.config_json.ConfigJson(extra_config=True)
+        if os.path.isfile(relecov_tools.config_json.ConfigJson._extra_config_path):
+            config_json = relecov_tools.config_json.ConfigJson(extra_config=True)
+        else:
+            config_json = relecov_tools.config_json.ConfigJson()
         if clear_config:
             config_json.remove_extra_config(config_name)
         else:

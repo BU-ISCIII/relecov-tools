@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.X] - 2025-05-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v.1.5.X
+## [1.X.X] - 2025-XX-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v.X.X.X
 
 ### Credits
 
@@ -13,6 +13,62 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Fixes
 
 #### Changed
+
+#### Removed
+
+### Requirements
+
+## [1.5.1] - 2025-05-12 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.1
+
+### Credits
+
+- [Pablo Mata](https://github.com/shettland)
+- [Alejandro Bernabeu](https://github.com/aberdur)
+- [Jaime Ozáez](https://github.com/jaimeozaez)
+- [Sara Monzon](https://github.com/saramonzon)
+- [Sergio Olmos](https://github.com/OPSergio)
+- [Sarai Varona](https://github.com/svarona)
+- [Daniel Valle-Millares](https://github.com/Daniel-VM)
+
+#### Added enhancements
+
+- Correctly implemented new log handling in read-bioinfo-metadata [#546](https://github.com/BU-ISCIII/relecov-tools/pull/546)
+- Implemented new BaseModule logging functionality in pipeline-manager [#549](https://github.com/BU-ISCIII/relecov-tools/pull/549)
+- Included installation with bioconda in README.md [#549](https://github.com/BU-ISCIII/relecov-tools/pull/549)
+- Added support for additional notes via .txt file or manual input in `send-email` CLI [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
+- Restructured and cleaned Jinja templates and ENA templates; moved to assets/mail_templates/ | assets/ena_templates and renamed for clarity [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
+- Set default folder as RELECOV when running wrapper module [#562](https://github.com/BU-ISCIII/relecov-tools/pull/562)
+- Implement unique sample's ID generation using centralized registry [#565](https://github.com/BU-ISCIII/relecov-tools/pull/565).
+- Created a new method in BaseModule to extract batch_id from metadata json files so modules can use it during processing [#569](https://github.com/BU-ISCIII/relecov-tools/pull/569)
+- Implemented BaseModule standard logging functionality in all the modules that did not have it [#569](https://github.com/BU-ISCIII/relecov-tools/pull/569)
+
+#### Fixes
+
+- Fixed paired and single-end files validation [#537](https://github.com/BU-ISCIII/relecov-tools/pull/537)
+- Suppressed unrelated warning when extra-config is not set [#543](https://github.com/BU-ISCIII/relecov-tools/pull/543)
+- Add identifier fields to relecov_schema.json [#544](https://github.com/BU-ISCIII/relecov-tools/pull/544)
+- Fixed deprecated sequence_file_path_R1 field in read-bioinfo-metadata [#546](https://github.com/BU-ISCIII/relecov-tools/pull/546)
+- Fix warning when perLDM is "Data Not Evaluable" [#550](https://github.com/BU-ISCIII/relecov-tools/pull/550)
+- Fixed unexpected warning message when organism field is empty [#553](https://github.com/BU-ISCIII/relecov-tools/pull/553)
+- Modified warning message when validating invalid date format [#557](https://github.com/BU-ISCIII/relecov-tools/pull/557)
+- Fixed wrapper and download subfolder handling and cleaning in remote sftp. [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
+- Removed noisy temporal remote folders from download_log_summary.json [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
+- Added institutions missing in SRI database to config json [#554](https://github.com/BU-ISCIII/relecov-tools/pull/554)
+- Fixed anatomical material collection config file to match new enums in json_Schema [#567](https://github.com/BU-ISCIII/relecov-tools/pull/567)
+- Fix handling of "Not Provided" in configuration.json [#570](https://github.com/BU-ISCIII/relecov-tools/pull/570)
+- Hotfix for folder specific download log_summary filename [#571](https://github.com/BU-ISCIII/relecov-tools/pull/571)
+- Fix return values and configuration handling in upload-results module [#573](https://github.com/BU-ISCIII/relecov-tools/pull/573)
+
+#### Changed
+
+- Update build-schema "," enums splitting to ";" splitting [#550](https://github.com/BU-ISCIII/relecov-tools/pull/550)
+- Update relecov_schema.json [#550](https://github.com/BU-ISCIII/relecov-tools/pull/550)
+- Improve json to excel generation to admit excels with more than one lab [#552](https://github.com/BU-ISCIII/relecov-tools/pull/552)
+- Made --template_path optional in send-email and upload-results commands, using fallback to config key delivery_template_path_file [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
+- The configuration necessary to use the mail module is incorporated as an extra-config. [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)- Add support for qc_failed logic in viralrecon.py and update PR template [#559](https://github.com/BU-ISCIII/relecov-tools/pull/559)
+- Better handling if new_key already exists in log_summary.py-rename_log_key(). [#561](https://github.com/BU-ISCIII/relecov-tools/pull/561)
+- Update relecov_schema.json and Relecov_template*.xlsx to v3.0.3 [#563](https://github.com/BU-ISCIII/relecov-tools/pull/563)
+- Truncated excessively long error and warning messages in the validation summary output. This affects only the summary section; full messages are still stored in individual sample logs. ([#568](https://github.com/BU-ISCIII/relecov-tools/pull/568))
 
 #### Removed
 
@@ -32,10 +88,13 @@ Code contributions to the release:
 - [Juan Ledesma](https://github.com/juanledesma78)
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Sara Monzon](https://github.com/saramonzon)
+- [Sarai Varona](https://github.com/svarona)
 
 ### Modules
 
+- Introduced BaseModule as parent class for all other classes. Used to to handle logs. [#466](https://github.com/BU-ISCIII/relecov-tools/pull/466)
 - New module add-extra-config for additional custom config [#464](https://github.com/BU-ISCIII/relecov-tools/pull/464)
+- Created new `upload-results` module for uploading analysis_results folder back to every COD folder in sftp. [#433](https://github.com/BU-ISCIII/relecov-tools/pull/433)
 
 #### Added enhancements
 
@@ -64,7 +123,6 @@ Code contributions to the release:
 - Test SFTP Login by Updating Port Assignment in wrapper_manager [#426](https://github.com/BU-ISCIII/relecov-tools/pull/426)
 - Update Test Data for new Schema & Modify JSON Filepaths in read-bioinfo-metadata [#427](https://github.com/BU-ISCIII/relecov-tools/pull/427)
 - Update download Module to Process Data by Laboratory COD and Project Subfolder [#431](https://github.com/BU-ISCIII/relecov-tools/pull/431)
-- Created new `upload-results` for uploading analysis_results folder back to every COD folder in sftp. [#433](https://github.com/BU-ISCIII/relecov-tools/pull/433)
 - Update relecov_schema.json to 3.0.0dev version [#435](https://github.com/BU-ISCIII/relecov-tools/pull/435)
 - Fix viralrecon_filepaths Path in read-bioinfo-metadata Module [#438](https://github.com/BU-ISCIII/relecov-tools/pull/438)
 - Fix adding_ontology_to_enum when enum has no ontology [#439](https://github.com/BU-ISCIII/relecov-tools/pull/439)

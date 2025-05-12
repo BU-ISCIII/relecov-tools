@@ -4,6 +4,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 import sys
 import os
 import openpyxl
+from datetime import datetime
 
 import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
@@ -28,6 +29,7 @@ class SchemaValidation(BaseModule):
         metadata=None,
         out_folder=None,
         excel_sheet=None,
+        registry=None,
     ):
         """Validate json file against the schema"""
         super().__init__(output_directory=out_folder, called_module=__name__)
@@ -77,13 +79,12 @@ class SchemaValidation(BaseModule):
             )
             raise TypeError(f"Invalid json file content in {json_data_file}")
         try:
-            batch_id = self.json_data[0].get("batch_id")
-        except IndexError:
-            raise IndexError(f"Provided json file {json_data_file} is empty")
-        except AttributeError:
-            raise AttributeError(f"Invalid json file content in {json_data_file}")
-        if batch_id is not None:
-            self.set_batch_id(batch_id)
+            batch_id = self.get_batch_id_from_data(self.json_data)
+        except ValueError:
+            raise ValueError(f"Provided json file {json_data_file} is empty")
+        except AttributeError as e:
+            raise ValueError(f"Invalid json file content in {json_data_file}: {e}")
+        self.set_batch_id(batch_id)
 
         self.metadata = metadata
         try:
@@ -100,6 +101,43 @@ class SchemaValidation(BaseModule):
                 raise
         else:
             self.excel_sheet = excel_sheet
+
+        # Parse file containing sample IDs registry
+        if registry is not None and relecov_tools.utils.file_exists(registry):
+            self.registry_path = registry
+        else:
+            config_json = ConfigJson(extra_config=True)
+            try:
+                default_path = config_json.get_topic_data(
+                    "validate_config", "default_sample_id_registry"
+                )
+            except KeyError:
+                default_path = None
+
+            if default_path and relecov_tools.utils.file_exists(default_path):
+                self.registry_path = default_path
+            else:
+                stderr.print(
+                    "[yellow]No valid ID registry found. Please select the file manually."
+                )
+                prompted_path = relecov_tools.utils.prompt_path(
+                    "Select the JSON file with registered unique sample IDs"
+                )
+                if relecov_tools.utils.file_exists(prompted_path):
+                    self.registry_path = prompted_path
+                else:
+                    stderr.print(
+                        "[red]No valid ID registry file could be found or selected."
+                    )
+                    sys.exit(1)
+
+        # Read id registry file
+        try:
+            self.id_registry = relecov_tools.utils.read_json_file(self.registry_path)
+        except Exception as e:
+            stderr.print(f"[red]Failed to read ID registry JSON: {e}")
+            self.log.error(f"Failed to read ID registry JSON: {e}")
+            raise
 
     def validate_schema(self):
         """Validate json schema against draft"""
@@ -144,6 +182,10 @@ class SchemaValidation(BaseModule):
         stderr.print("[blue] Start processing the JSON file")
         self.log.info("Start processing the JSON file")
 
+        # Prepare ID registry (validated samples will be asigned with an unique ID)
+        new_ids_to_save = {}
+
+        # Start validation
         for item_row in self.json_data:
             sample_id_value = item_row.get(self.sample_id_field)
 
@@ -155,6 +197,17 @@ class SchemaValidation(BaseModule):
                 self.json_schema, item_row, validation_errors
             )
             if not validation_errors:
+                # If sample has validated, then assign an unique id
+                if "unique_sample_id" not in item_row:
+                    new_id = self.generate_incremental_unique_id(
+                        {**self.id_registry, **new_ids_to_save}
+                    )
+                    item_row["unique_sample_id"] = new_id
+                    new_ids_to_save[new_id] = {
+                        "sequencing_sample_id": sample_id_value,
+                        "lab_code": self.lab_code,
+                        "generated_at": datetime.now().isoformat(timespec="seconds"),
+                    }
                 validated_json_data.append(item_row)
                 self.logsum.feed_key(sample=sample_id_value)
             else:
@@ -185,10 +238,16 @@ class SchemaValidation(BaseModule):
                     except KeyError:
                         self.log.error(f"Could not extract label for {error_field}")
                         err_field_label = error_field
-
                     # Format the error message
                     error.message = error.message.replace(error_field, err_field_label)
-                    error_text = f"Error in column {err_field_label}: {error.message}"
+                    if (
+                        error.validator == "format" and error.validator_value == "date"
+                    ):  # Modification of default text warning for invalid date format.
+                        error_text = f"Error in column {err_field_label}: '{error.instance}' is not a valid date format. Valid format 'YYYY-MM-DD'"
+                    else:
+                        error_text = (
+                            f"Error in column {err_field_label}: {error.message}"
+                        )
 
                     # Log errors for summary
                     error_keys[error.message] = error_field
@@ -198,16 +257,31 @@ class SchemaValidation(BaseModule):
                 # Add the invalid row to the list
                 invalid_json.append(item_row)
 
+        # For samples that are valid, save its new unique ID in the registry
+        if new_ids_to_save:
+            self.save_new_ids(new_ids_to_save)
+
         # Summarize errors
         stderr.print("[blue] --------------------")
         stderr.print("[blue] VALIDATION SUMMARY")
         stderr.print("[blue] --------------------")
         self.log.info("Validation summary:")
+        max_length = 250
         for error_type, count in errors.items():
             field_with_error = error_keys[error_type]
-            error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type}"
-            self.logsum.add_warning(entry=error_text)
-            stderr.print(f"[red]{error_text}")
+            if (
+                "is not a 'date'" in error_type
+            ):  # Modification of default text warning for invalid date format.
+                error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type.split()[0]} is not a valid date format. Valid format 'YYYY-MM-DD"
+            else:
+                error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type}"
+            truncated_msg = (
+                error_text[:max_length] + "..."
+                if len(error_text) > max_length
+                else error_text
+            )
+            self.logsum.add_warning(entry=truncated_msg)
+            stderr.print(f"[red]{truncated_msg}")
             stderr.print("[red] --------------------")
 
         return validated_json_data, invalid_json
@@ -250,9 +324,19 @@ class SchemaValidation(BaseModule):
             self.log.error(logtxt)
             raise
         tag = "Sample ID given for sequencing"
-        seq_id_col = [idx for idx, cell in enumerate(ws_sheet[1]) if tag in cell.value]
-        if seq_id_col:
-            id_col = seq_id_col[0]
+        # Check if mandatory colum ($tag) is defined in metadata.
+        try:
+            id_col = next(
+                idx
+                for idx, cell in enumerate(ws_sheet[1])
+                if cell.value is not None and tag in str(cell.value)
+            )
+        except StopIteration:
+            self.log.error(
+                f"Column with tag '{tag}' not found in the second row of the Excel sheet."
+            )
+            stderr.print(f"[red] Column with tag '{tag}' not found. Cannot continue.")
+            raise
         row_to_del = []
         row_iterator = ws_sheet.iter_rows(min_row=2, max_row=ws_sheet.max_row)
         consec_empty_rows = 0
@@ -300,6 +384,38 @@ class SchemaValidation(BaseModule):
         self.log.info("Saving Json file with the validated samples in %s", file_path)
         relecov_tools.utils.write_json_to_file(valid_json_data, file_path)
         return
+
+    def generate_incremental_unique_id(self, current_registry, prefix="RLCV"):
+        """Generates an incremental unique ID using as baseline the latest record
+        in a registry.
+
+        Args:
+            current_registry (dict): dict containing sample's unique IDs
+            prefix (str, optional): String that preceeds the unique ID. Defaults to "RLCV".
+
+        Returns:
+            string: An unique ID
+        """
+        existing_numbers = []
+        for uid in current_registry:
+            if uid.startswith(prefix):
+                try:
+                    number = int(uid.replace(f"{prefix}-", ""))
+                    existing_numbers.append(number)
+                except ValueError:
+                    continue
+        next_number = max(existing_numbers, default=0) + 1
+        return f"{prefix}-{next_number:09d}"
+
+    def save_new_ids(self, new_ids_dict):
+        """Updates sample id registry by adding sample unique ids of new validated samples.
+
+        Args:
+            new_ids_dict (dict): Dict of new unique sample IDs.
+        """
+        updated_registry = {**self.id_registry, **new_ids_dict}
+        relecov_tools.utils.write_json_to_file(updated_registry, self.registry_path)
+        self.log.info(f"Added {len(new_ids_dict)} new sample IDs to registry")
 
     def validate(self):
         """Validate samples from metadata, create an excel with invalid samples,
