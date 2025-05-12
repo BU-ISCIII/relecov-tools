@@ -6,6 +6,7 @@ import re
 import logging
 import rich
 import os.path
+import pandas as pd
 
 from pathlib import Path
 
@@ -126,7 +127,6 @@ class LongTableParse:
                     variant_dict_copy["Gene"] = gene
                     samp_dict[sample].append(variant_dict_copy)
             else:
-                variant_dict["Gene"] = line_s[heading_index["GENE"]]
                 samp_dict[sample].append(variant_dict)
         stderr.print("[green]\tSuccessful parsing data")
         log.info("Successful parsing long table data")
@@ -340,7 +340,7 @@ def handle_consensus_fasta(files_list, batch_date, output_folder=None):
             "genome_length": str(len(record_fasta)),
             "sequence_filepath": os.path.dirname(consensus_file),
             "sequence_filename": sample_key,
-            "sequence_md5": relecov_tools.utils.calculate_md5(consensus_file)
+            "sequence_md5": relecov_tools.utils.calculate_md5(consensus_file),
         }
 
     # Report missing consensus
