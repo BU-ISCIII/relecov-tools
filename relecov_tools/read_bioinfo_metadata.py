@@ -255,10 +255,11 @@ class BioinfoMetadata(BaseModule):
                         field_errors[sample_name] = {field: e}
                         row[field] = "Not Provided [GENEPIO:0001668]"
                         continue
-            elif not self.software_config[self.current_config_key].get("multiple_samples"): # When sample ID is not in mapping_fields because is not a multiple_sample table           
+            elif not self.software_config[self.current_config_key].get("multiple_samples"):
+                # When sample ID is not in mapping_fields because is not a multiple_sample table
                 for field, value_dict in mapping_fields.items():
                     for json_field, software_key in value_dict.items():
-                        try:       
+                        try:
                             raw_val = map_data[software_key][field]
                             expected_type = (
                                 self.bioinfo_schema["properties"]
