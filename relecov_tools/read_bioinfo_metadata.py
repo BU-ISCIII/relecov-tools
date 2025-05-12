@@ -227,6 +227,7 @@ class BioinfoMetadata(BaseModule):
         errors = []
         field_errors = {}
         field_valid = {}
+
         for row in j_data:
             # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
             #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
@@ -268,10 +269,10 @@ class BioinfoMetadata(BaseModule):
                                 .get("type", "string")
                             )
 
-                            row[
-                                json_field
-                            ] = relecov_tools.utils.cast_value_to_schema_type(
-                                raw_val, expected_type
+                            row[json_field] = (
+                                relecov_tools.utils.cast_value_to_schema_type(
+                                    raw_val, expected_type
+                                )
                             )
                             field_valid[software_key] = {json_field: field}
                         except KeyError as e:
@@ -416,7 +417,6 @@ class BioinfoMetadata(BaseModule):
                 self.update_all_logs(map_method_name, "warning", msg)
                 self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
-
             data_to_map = self.handling_files(
                 files_dict[key], sufix, output_folder, batch_date
             )
@@ -568,6 +568,7 @@ class BioinfoMetadata(BaseModule):
                         + func_name
                         + "(full_paths, batch_date, output_folder)"
                     )
+
                 except Exception as e:
                     self.update_all_logs(
                         self.save_merged_files.__name__,
@@ -776,9 +777,9 @@ class BioinfoMetadata(BaseModule):
                     path_key = self.software_config[key].get("filepath_name")
                     analysis_results_paths = []
                     for paths in file_path:
-                        if (
-                            file_path != "Not Provided [SNOMED:434941000124101]"
-                            and (self.software_config[key].get("extract") or self.software_config[key].get("function"))
+                        if file_path != "Not Provided [SNOMED:434941000124101]" and (
+                            self.software_config[key].get("extract")
+                            or self.software_config[key].get("function")
                         ):
                             analysis_results_path = os.path.join(
                                 base_cod_path,
