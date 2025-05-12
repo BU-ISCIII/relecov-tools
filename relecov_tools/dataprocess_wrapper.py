@@ -348,14 +348,15 @@ class ProcessWrapper(BaseModule):
             called_module="wrapper",
             to_excel=True,
         )
-
+        
         # Logging wrapper stats
         labs = {folder.split("/")[0] for folder in finished_folders}
         num_labs = len(labs)
         samples_per_lab = defaultdict(int)
         for folder, files in finished_folders.items():
             lab = folder.split("/")[0]
-            samples_per_lab[lab] += len(files)
+            seq_files = [f for f in files if not f.endswith(".xlsx")]
+            samples_per_lab[lab] += len(seq_files)
         total_count = sum(samples_per_lab.values())
 
         stderr.print("[blue] --------------------")
