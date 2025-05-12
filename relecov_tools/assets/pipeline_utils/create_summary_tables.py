@@ -88,7 +88,9 @@ def process_json_files(
                             continue
 
                         #   Format change so that the date of analysis_date and sample_colletion_date have same format
-                        original_date_format = sample.get("bioinformatics_analysis_date", "-")
+                        original_date_format = sample.get(
+                            "bioinformatics_analysis_date", "-"
+                        )
                         analysis_date = datetime.strptime(
                             original_date_format, "%Y%m%d"
                         ).strftime("%Y-%m-%d")
