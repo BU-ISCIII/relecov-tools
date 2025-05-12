@@ -348,7 +348,7 @@ class ProcessWrapper(BaseModule):
             called_module="wrapper",
             to_excel=True,
         )
-        
+
         # Logging wrapper stats
         labs = {folder.split("/")[0] for folder in finished_folders}
         num_labs = len(labs)
