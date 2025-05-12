@@ -855,23 +855,26 @@ class BioinfoMetadata(BaseModule):
         """
         dest_folder = os.path.join(dest_folder, "analysis_results")
         os.makedirs(dest_folder, exist_ok=True)
-        out_filepath = os.path.join(dest_folder, os.path.basename(file))
-        if os.path.isfile(out_filepath):
-            return True
-        if file == "Not Provided [GENEPIO:0001668]":
-            self.update_all_logs(
-                self.extract_file.__name__,
-                "warning",
-                f"File for {path_key} not provided in sample {sample_name}",
-            )
-            return False
-        try:
-            shutil.copy(file, out_filepath)                
-        except (IOError, PermissionError) as e:
-            self.update_all_logs(
-                self.extract_file.__name__, "warning", f"Could not extract {file}: {e}"
-            )
-            return False
+        for filepath in file:
+            out_filepath = os.path.join(dest_folder, os.path.basename(filepath))
+            if os.path.isfile(out_filepath):
+                return True
+            if filepath == "Not Provided [GENEPIO:0001668]":
+                self.update_all_logs(
+                    self.extract_file.__name__,
+                    "warning",
+                    f"File for {path_key} not provided in sample {sample_name}",
+                )
+                return False
+            try:
+                shutil.copy(filepath, out_filepath)
+            except (IOError, PermissionError) as e:
+                self.update_all_logs(
+                    self.extract_file.__name__,
+                    "warning",
+                    f"Could not extract {filepath}: {e}",
+                )
+                return False
         return True
 
     def split_data_by_batch(self, j_data):
