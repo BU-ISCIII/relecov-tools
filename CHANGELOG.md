@@ -4,7 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.1dev] - 2025-05-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v.1.5.X
+## [1.X.X] - 2025-XX-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v.X.X.X
+
+### Credits
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [1.5.1] - 2025-05-12 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v.1.5.1
 
 ### Credits
 
@@ -24,6 +38,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added support for additional notes via .txt file or manual input in `send-email` CLI [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
 - Restructured and cleaned Jinja templates and ENA templates; moved to assets/mail_templates/ | assets/ena_templates and renamed for clarity [#548](https://github.com/BU-ISCIII/relecov-tools/pull/548)
 - Set default folder as RELECOV when running wrapper module [#562](https://github.com/BU-ISCIII/relecov-tools/pull/562)
+- Implement unique sample's ID generation using centralized registry [#565](https://github.com/BU-ISCIII/relecov-tools/pull/565).
+- Created a new method in BaseModule to extract batch_id from metadata json files so modules can use it during processing [#569](https://github.com/BU-ISCIII/relecov-tools/pull/569)
+- Implemented BaseModule standard logging functionality in all the modules that did not have it [#569](https://github.com/BU-ISCIII/relecov-tools/pull/569)
 
 #### Fixes
 
@@ -39,6 +56,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added institutions missing in SRI database to config json [#554](https://github.com/BU-ISCIII/relecov-tools/pull/554)
 - Fixed anatomical material collection config file to match new enums in json_Schema [#567](https://github.com/BU-ISCIII/relecov-tools/pull/567)
 - Fix handling of "Not Provided" in configuration.json [#570](https://github.com/BU-ISCIII/relecov-tools/pull/570)
+- Hotfix for folder specific download log_summary filename [#571](https://github.com/BU-ISCIII/relecov-tools/pull/571)
 
 #### Changed
 
@@ -122,9 +140,6 @@ Code contributions to the release:
 - Added summary stats logging to wrapper module [514#](https://github.com/BU-ISCIII/relecov-tools/pull/514).
 - Updated the create_summary_tables.py script to be able to handle single .json files directly [#526](https://github.com/BU-ISCIII/relecov-tools/pull/526).
 - Updated README.md for new functionalities in v1.5.0 [#527](https://github.com/BU-ISCIII/relecov-tools/pull/527)
-- Implement unique sample's ID generation using centralized registry [#565](https://github.com/BU-ISCIII/relecov-tools/pull/565).
-- Created a new method in BaseModule to extract batch_id from metadata json files so modules can use it during processing [#569](https://github.com/BU-ISCIII/relecov-tools/pull/569)
-- Implemented BaseModule standard logging functionality in all the modules that did not have it [#569](https://github.com/BU-ISCIII/relecov-tools/pull/569)
 
 #### Fixes
 
@@ -150,7 +165,6 @@ Code contributions to the release:
 - Fix *fastq properties in pipeline_manager.py [#509](https://github.com/BU-ISCIII/relecov-tools/pull/509)
 - Fixed overriding and wrong configuration in read-lab-metadata for submitting institution [#521](https://github.com/BU-ISCIII/relecov-tools/pull/521)
 - Fixed unused keys in initial_config.yaml [#522](https://github.com/BU-ISCIII/relecov-tools/pull/522)
-- Hotfix for folder specific download log_summary filename [#571](https://github.com/BU-ISCIII/relecov-tools/pull/571)
 
 #### Changed
 
