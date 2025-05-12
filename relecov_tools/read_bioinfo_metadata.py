@@ -762,25 +762,35 @@ class BioinfoMetadata(BaseModule):
                 )
                 continue
             for key, values in files_found_dict.items():
-                file_path = "Not Provided [SNOMED:434941000124101]"
+                file_path = []
                 if values:  # Check if value is not empty
-                    if key in multiple_sample_files:
-                        file_path = values[0]
-                    else:
-                        for file in values:
+                    for file in values:
+                        if key in multiple_sample_files:
+                            file_path.append(file)
+                        else:
                             if sample_name in file:
-                                file_path = file
-                                break  # Exit loop if match found
-                path_key = f"{self.software_name}_filepath_{key}"
-                if file_path != "Not Provided [SNOMED:434941000124101]":
-                    analysis_results_path = os.path.join(
-                        base_cod_path,
-                        "analysis_results",
-                        os.path.basename(file_path),
-                    )
-                    row[path_key] = analysis_results_path
+                                file_path.append(file)
                 else:
-                    row[path_key] = file_path
+                    file_path.append("Not Provided [SNOMED:434941000124101]")
+                if self.software_config[key].get("filepath_name"):
+                    path_key = self.software_config[key].get("filepath_name")
+                    analysis_results_paths = []
+                    for paths in file_path:
+                        if (
+                            file_path != "Not Provided [SNOMED:434941000124101]"
+                            and (self.software_config[key].get("extract") or self.software_config[key].get("function"))
+                        ):
+                            analysis_results_path = os.path.join(
+                                base_cod_path,
+                                "analysis_results",
+                                os.path.basename(paths),
+                            )
+                            analysis_results_paths.append(analysis_results_path)
+                        else:
+                            analysis_results_paths = file_path
+                    row[path_key] = ", ".join(analysis_results_paths)
+                else:
+                    path_key = key
                 if self.software_config[key].get("extract"):
                     self.extract_file(
                         file=file_path,

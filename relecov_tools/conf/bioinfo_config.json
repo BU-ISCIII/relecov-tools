@@ -64,6 +64,7 @@
             "fn": "variants_long_table.csv",
             "sample_col_idx": 1,
             "header_row_idx": 1,
+            "filepath_name": "long_table_path",
             "required": true,
             "multiple_samples": true,
             "split_by_batch": true,
@@ -115,9 +116,10 @@
                 "number_of_base_pairs_sequenced": "# Input reads"
             }
         },
-        "vcf_filename": {
+        "vcf_files": {
             "fn": "^(?!.*tbi$).*.filtered.vcf.gz",
             "required": false,
+            "filepath_name": "vcf_filename",
             "function": null,
             "extract": true,
             "content": {}
@@ -215,6 +217,7 @@
             "fn": "variants_long_table.csv",
             "sample_col_idx": 1,
             "header_row_idx": 1,
+            "filepath_name": "long_table_path",
             "required": true,
             "multiple_samples": true,
             "split_by_batch": true,
@@ -244,18 +247,19 @@
             "fn": "99-stats/consensus_files/.*consensus\\.fa$",
             "required": false,
             "function": "handle_consensus_fasta",
+            "filepath_name": "consensus_sequence_filepath",
             "extract": true,
             "content": {
                 "consensus_sequence_name" : "sequence_name",
                 "consensus_genome_length" : "genome_length",
                 "consensus_sequence_filename" : "sequence_filename",
-                "consensus_sequence_filepath" : "sequence_filepath",
                 "consensus_sequence_md5" : "sequence_md5"
             }
         },
-        "vcf_filename": {
+        "vcf_files": {
             "fn": "06-variant-calling/vcf_files/.*\\.vcf$",
             "required": false,
+            "filepath_name": "vcf_filename",
             "function": null,
             "extract": true,
             "content": {}
