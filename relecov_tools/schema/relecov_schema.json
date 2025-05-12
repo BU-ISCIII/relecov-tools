@@ -3,7 +3,7 @@
     "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/relecov_schema.json",
     "title": "relecov-tools Schema.",
     "description": "Json Schema that specifies the structure, content, and validation rules for relecov-tools",
-    "version": "3.0.4dev",
+    "version": "3.0.5dev",
     "type": "object",
     "properties": {
         "organism": {
@@ -6105,7 +6105,7 @@
             "ontology": "NCIT:C179767",
             "type": "string",
             "description": "An indication of the taxonomic clade grouping of organisms.",
-            "classification": "Lineage fields",
+            "classification": "Clade fields",
             "label": "Clade Assignment",
             "fill_mode": "batch",
             "header": "N"
@@ -6117,7 +6117,7 @@
             "ontology": "GENEPIO:0001501",
             "type": "string",
             "description": "The name of the software used to determine the clade.",
-            "classification": "Lineage fields",
+            "classification": "Clade fields",
             "label": "Clade Assignment Software Name",
             "fill_mode": "batch",
             "header": "N"
@@ -6129,7 +6129,7 @@
             "ontology": "0",
             "type": "string",
             "description": "Other software used to determine clade.",
-            "classification": "Lineage fields",
+            "classification": "Clade fields",
             "label": "Other Clade Assignment Software",
             "fill_mode": "batch",
             "header": "N"
@@ -6141,7 +6141,7 @@
             "ontology": "GENEPIO:0001502",
             "type": "string",
             "description": "The version of the software used to determine the clade.",
-            "classification": "Lineage fields",
+            "classification": "Clade fields",
             "label": "Clade Assignment Software Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6153,8 +6153,21 @@
             "ontology": "MS:1001016",
             "type": "string",
             "description": "Version of the search database to determine the clade.",
-            "classification": "Lineage fields",
+            "classification": "Clade fields",
             "label": "Clade Assignment Software Database Version",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "clade_assignment_date": {
+            "examples": [
+                "20241204"
+            ],
+            "ontology": "LOINC:40783184",
+            "type": "string",
+            "format": "date",
+            "description": "Date when the clade analysis was performed via Nextclade",
+            "classification": "Clade fields",
+            "label": "Clade Assignment Date",
             "fill_mode": "batch",
             "header": "N"
         },
@@ -6244,7 +6257,7 @@
         },
         "lineage_assignment_date": {
             "examples": [
-                "2024-12-02 00:00:00"
+                "20241204"
             ],
             "ontology": "LOINC:40783184",
             "type": "string",
