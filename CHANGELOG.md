@@ -149,6 +149,7 @@ Code contributions to the release:
 - Fix *fastq properties in pipeline_manager.py [#509](https://github.com/BU-ISCIII/relecov-tools/pull/509)
 - Fixed overriding and wrong configuration in read-lab-metadata for submitting institution [#521](https://github.com/BU-ISCIII/relecov-tools/pull/521)
 - Fixed unused keys in initial_config.yaml [#522](https://github.com/BU-ISCIII/relecov-tools/pull/522)
+- Hotfix for folder specific download log_summary filename [#571](https://github.com/BU-ISCIII/relecov-tools/pull/571)
 
 #### Changed
 
