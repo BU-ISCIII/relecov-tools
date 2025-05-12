@@ -35,7 +35,7 @@ class UploadSftp(BaseModule):
         if not batch_id:
             raise ValueError("Error: You must provide a batch_id as an argument.")
         self.set_batch_id(batch_id)
-        config_json = ConfigJson()
+        config_json = ConfigJson(extra_config=True)
         config = config_json.get_configuration("mail_sender")
         sftp_config = config_json.get_configuration("sftp_handle")
         self.allowed_file_ext = config_json.get_topic_data(
@@ -97,6 +97,8 @@ class UploadSftp(BaseModule):
             raise FileNotFoundError(
                 f"Batch {self.batch_id} was not found in any COD* folder."
             )
+
+        return matching_cod
 
     def compress_results(self, batch_data, cod):
         """Compress the analysis_results folder with a random password"""
