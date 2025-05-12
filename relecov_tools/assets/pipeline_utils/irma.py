@@ -218,6 +218,7 @@ class LongTableParse:
 
 # START util functions
 
+
 def parse_long_table(files_list, batch_date, output_folder=None):
     """File handler to retrieve data from long table files and convert it into a JSON structured format.
     This function utilizes the LongTableParse class to parse the long table data.
@@ -287,7 +288,7 @@ def handle_consensus_fasta(files_list, batch_date, output_folder=None):
         sample_key = os.path.basename(consensus_file).split(".")[0]
         # Update consensus data for the sample key
         consensus_data_processed[sample_key] = {
-            "sequence_name": ', '.join(sequence_names),
+            "sequence_name": ", ".join(sequence_names),
             "genome_length": genome_length,
             "sequence_filepath": os.path.dirname(consensus_file),
             "sequence_filename": sample_key,
@@ -329,6 +330,7 @@ def quality_control_evaluation(data):
             )
     return data
 
+
 def get_software_versions(files_list, batch_date, output_folder=None):
     """File handler to parse software versions from csv.
 
@@ -349,12 +351,9 @@ def get_software_versions(files_list, batch_date, output_folder=None):
                 name = row["software_name"]
                 version = row["software_version"]
                 id = row["software_name"].strip().lower()
-                if not '/' in id:
+                if not "/" in id:
                     id = id.split()[0]
-                version_dict[id] = {
-                    "software_version":version,
-                    "software_name":name
-                }
+                version_dict[id] = {"software_version": version, "software_name": name}
         else:
             method_log_report.update_log_report(
                 method_name,
