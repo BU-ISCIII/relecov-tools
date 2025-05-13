@@ -859,14 +859,15 @@ class BioinfoMetadata(BaseModule):
         for filepath in file:
             out_filepath = os.path.join(dest_folder, os.path.basename(filepath))
             if os.path.isfile(out_filepath):
-                return True
+                self.log.debug(f"{out_filepath} already exists, not extracted")
+                continue
             if filepath == "Not Provided [GENEPIO:0001668]":
                 self.update_all_logs(
                     self.extract_file.__name__,
                     "warning",
                     f"File for {path_key} not provided in sample {sample_name}",
                 )
-                return False
+                continue
             try:
                 shutil.copy(filepath, out_filepath)
             except (IOError, PermissionError) as e:
