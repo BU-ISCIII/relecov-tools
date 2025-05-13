@@ -127,9 +127,7 @@ class UploadSftp(BaseModule):
                         arcname = arcname[1:]  # Remove leading dot if present
                     zipf.write(file_path, arcname)
 
-        self.log.info(
-            f"Compressed file: {zip_path} with password: {password.decode()}"
-        )
+        self.log.info(f"Compressed file: {zip_path} with password: {password.decode()}")
         stderr.print(
             f"[green]Compressed file: {zip_path} with password: {password.decode()}"
         )
