@@ -745,7 +745,6 @@ class BioinfoMetadata(BaseModule):
         sample_name_error = 0
         multiple_sample_files = self.get_multiple_sample_files()
         for row in j_data:
-            row["bioinfo_metadata_file"] = self.out_filename
             if not row.get("sequencing_sample_id"):
                 self.update_all_logs(
                     method_name,
