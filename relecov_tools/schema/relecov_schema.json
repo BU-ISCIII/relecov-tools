@@ -3,7 +3,7 @@
     "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/relecov_schema.json",
     "title": "relecov-tools Schema.",
     "description": "Json Schema that specifies the structure, content, and validation rules for relecov-tools",
-    "version": "3.0.6dev",
+    "version": "3.0.7dev",
     "type": "object",
     "properties": {
         "organism": {
@@ -4319,6 +4319,18 @@
             "fill_mode": "sample",
             "header": "N"
         },
+        "submitting_institution_id": {
+            "examples": [
+                "COD-1111-BU"
+            ],
+            "ontology": "NCIT:C81294",
+            "type": "string",
+            "description": "The Institution identifier that is submitting data or information.",
+            "classification": "Sample collection and processing",
+            "label": "Submitting Institution Identifier",
+            "fill_mode": "batch",
+            "header": "N"
+        },
         "collecting_institution_email": {
             "examples": [
                 "johnnyblogs@lab.ca"
@@ -5426,6 +5438,18 @@
             "fill_mode": "batch",
             "header": "N"
         },
+        "bioinfo_metadata_file": {
+            "examples": [
+                "bioinfo_lab_metadata_COD-1111-BU_20250506140633_3C412C.json"
+            ],
+            "ontology": "CAO:000237",
+            "type": "string",
+            "description": "Bioinfo JSON with metadata information",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Bioinfo JSON",
+            "fill_mode": "batch",
+            "header": "N"
+        },
         "vcf_filename": {
             "examples": [
                 "Ivar"
@@ -5680,11 +5704,11 @@
         },
         "depth_of_coverage_value": {
             "examples": [
-                "400x"
+                "400"
             ],
             "ontology": "GENEPIO:0001474",
             "type": "integer",
-            "description": "The average number of reads representing a given nucleotide in the reconstructed sequence.",
+            "description": "The average number of reads representing each nucleotide in the reconstructed sequence.",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "Depth of coverage Mean value",
             "fill_mode": "batch",
@@ -5843,6 +5867,30 @@
             "description": "Quality control failed fields",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "Quality control failed fields",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "schema_name": {
+            "examples": [
+                "relecov_schema.json"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Name of the JSON Schema",
+            "classification": "Files info",
+            "label": "Schema Name",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "schema_version": {
+            "examples": [
+                "v3.0.0"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Version of the JSON Schema",
+            "classification": "Files info",
+            "label": "Schema Version",
             "fill_mode": "batch",
             "header": "N"
         },
