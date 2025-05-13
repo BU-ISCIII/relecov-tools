@@ -256,6 +256,21 @@
                 "consensus_sequence_md5" : "sequence_md5"
             }
         },
+        "workflow_summary": {
+            "fn": "multiqc/multiqc_report.html",
+            "required": false,
+            "multiple_samples": true,
+            "function": null,
+            "extract": true,
+            "content": {
+                "software_version": {
+                    "dehosting_method_software_version": "kraken2"
+                },
+                "software_name": {
+                    "dehosting_method_software_name": "kraken2"
+                }
+            }
+        },
         "vcf_files": {
             "fn": "06-variant-calling/vcf_files/.*\\.vcf$",
             "required": false,
@@ -274,7 +289,6 @@
                 "software_version": {
                     "bioinformatics_protocol_software_version": "irma",
                     "consensus_sequence_software_version": "irma",
-                    "dehosting_method_software_version": "nf-core/taxprofiler",
                     "mapping_software_version":"irma",
                     "preprocessing_software_version":"fastp",
                     "clade_assignment_software_version":"nextclade",
@@ -284,7 +298,6 @@
                 "software_name": {
                     "bioinformatics_protocol_software_name": "irma",
                     "consensus_sequence_software_name": "irma",
-                    "dehosting_method_software_name": "nf-core/taxprofiler",
                     "mapping_software_name":"irma",
                     "preprocessing_software_name":"fastp",
                     "clade_assignment_software_name":"nextclade",
