@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Changed
 
 - Update relecov_schema.json and metadata template to v3.0.5 [#576](https://github.com/BU-ISCIII/relecov-tools/pull/576)
+- Update relecov_schema.json and metadata templates to v3.0.6 [#579](https://github.com/BU-ISCIII/relecov-tools/pull/579)
 
 #### Removed
 
