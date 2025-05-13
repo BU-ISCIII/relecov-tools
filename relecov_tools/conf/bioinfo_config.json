@@ -93,13 +93,13 @@
             "fn": ".consensus.fa",
             "required": false,
             "function": "handle_consensus_fasta",
+            "filepath_name": "consensus_sequence_filepath",
             "multiple_samples": true,
             "extract": true,
             "content": {
                 "consensus_sequence_name" : "sequence_name",
                 "consensus_genome_length" : "genome_length",
                 "consensus_sequence_filename" : "sequence_filename",
-                "consensus_sequence_filepath" : "sequence_filepath",
                 "consensus_sequence_md5" : "sequence_md5"
             }
         },
