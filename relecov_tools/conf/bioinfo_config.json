@@ -94,7 +94,6 @@
             "required": false,
             "function": "handle_consensus_fasta",
             "filepath_name": "consensus_sequence_filepath",
-            "multiple_samples": true,
             "extract": true,
             "content": {
                 "consensus_sequence_name" : "sequence_name",
