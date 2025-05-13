@@ -876,7 +876,7 @@ class BioinfoMetadata(BaseModule):
                     "warning",
                     f"Could not extract {filepath}: {e}",
                 )
-                return False
+                continue
         return True
 
     def split_data_by_batch(self, j_data):
