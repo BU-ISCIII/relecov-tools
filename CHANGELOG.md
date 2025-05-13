@@ -24,10 +24,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Alejandro Bernabeu](https://github.com/aberdur)
+- [Pablo Mata](https://github.com/shettland)
 
 #### Added enhancements
 
 #### Fixes
+
+- Fixed level being set by default to debug instead of level provided in CLI [#584](https://github.com/BU-ISCIII/relecov-tools/pull/584)
+- Fixed wrong output dir when --log-path was set via CLI in BaseModule [#584](https://github.com/BU-ISCIII/relecov-tools/pull/584)
 
 #### Changed
 
