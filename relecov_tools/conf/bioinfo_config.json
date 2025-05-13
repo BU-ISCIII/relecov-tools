@@ -17,7 +17,7 @@
                 "per_Ns": "%Ns10x",
                 "per_reads_host": "%readshost",
                 "per_reads_virus": "%readsvirus",
-                "per_unmapped": "%unmapedreads",
+                "per_unmapped": "%unmappedreads",
                 "pass_reads": "totalreads",
                 "reference_genome_accession": "Virussequence",
                 "read_length": "read_length",
