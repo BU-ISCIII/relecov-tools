@@ -19,7 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Requirements
 
 
-## [1.5.2] - 2025-05-13 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v.1.5.2
+## [1.5.2] - 2025-05-13 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.2
 
 ### Credits
 
