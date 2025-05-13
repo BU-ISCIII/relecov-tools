@@ -43,13 +43,12 @@
             }
         },
         "mapping_pangolin": {
-            "fn": ".pangolin(?:.*?)?\\.csv$",
+            "fn": ".pangolin(?:.*?)?\\.csv",
             "header_row_idx": 1,
             "required": false,
             "function": "handle_pangolin_data",
             "filepath_name": "lineage_assignment_file",
             "extract": true,
-            "multiple_samples": true,
             "content": {
                 "variant_name": "scorpio_call",
                 "lineage_assignment": "lineage",
