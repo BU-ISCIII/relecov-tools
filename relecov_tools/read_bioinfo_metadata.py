@@ -192,7 +192,7 @@ class BioinfoMetadata(BaseModule):
                 matching_files = [
                     os.path.join(tup[0], file_name)
                     for file_name in tup[1]
-                    if re.search(topic_scope["fn"], file_name)
+                    if re.search(topic_scope["fn"], os.path.join(tup[0], file_name))
                 ]
                 if len(matching_files) >= 1:
                     files_found[topic_key] = matching_files
@@ -227,6 +227,7 @@ class BioinfoMetadata(BaseModule):
         errors = []
         field_errors = {}
         field_valid = {}
+
         for row in j_data:
             # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
             #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
@@ -255,6 +256,28 @@ class BioinfoMetadata(BaseModule):
                         field_errors[sample_name] = {field: e}
                         row[field] = "Not Provided [GENEPIO:0001668]"
                         continue
+            elif not self.software_config[self.current_config_key].get(
+                "multiple_samples"
+            ):  # When sample ID is not in mapping_fields because is not a multiple_sample table
+                for field, value_dict in mapping_fields.items():
+                    for json_field, software_key in value_dict.items():
+                        try:
+                            raw_val = map_data[software_key][field]
+                            expected_type = (
+                                self.bioinfo_schema["properties"]
+                                .get(json_field, {})
+                                .get("type", "string")
+                            )
+
+                            row[json_field] = (
+                                relecov_tools.utils.cast_value_to_schema_type(
+                                    raw_val, expected_type
+                                )
+                            )
+                            field_valid[software_key] = {json_field: field}
+                        except KeyError as e:
+                            field_errors[software_key] = {json_field: str(e)}
+                            row[json_field] = "Not Provided [GENEPIO:0001668]"
             else:
                 errors.append(sample_name)
                 for field in mapping_fields.keys():
@@ -313,6 +336,9 @@ class BioinfoMetadata(BaseModule):
             )
         else:
             print(
+                f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
+            )
+            self.log.info(
                 f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
             )
 
@@ -391,7 +417,6 @@ class BioinfoMetadata(BaseModule):
                 self.update_all_logs(map_method_name, "warning", msg)
                 self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
-
             data_to_map = self.handling_files(
                 files_dict[key], sufix, output_folder, batch_date
             )
@@ -543,9 +568,10 @@ class BioinfoMetadata(BaseModule):
                         + func_name
                         + "(full_paths, batch_date, output_folder)"
                     )
+
                 except Exception as e:
                     self.update_all_logs(
-                        self.save_splitted_files.__name__,
+                        self.save_merged_files.__name__,
                         "error",
                         f"Error occurred while parsing '{func_name}': {e}.",
                     )
@@ -592,7 +618,9 @@ class BioinfoMetadata(BaseModule):
         with open(f_path, "r") as html_file:
             html_content = html_file.read()
         soup = BeautifulSoup(html_content, features="lxml")
-        div_id = "mqc-module-section-software_versions"
+        div_id = re.compile(
+            r"mqc-module-section-(software_versions|multiqc_software_versions)"
+        )
         versions_div = soup.find("div", id=div_id)
         if versions_div:
             table = versions_div.find("table", class_="table")
@@ -719,7 +747,6 @@ class BioinfoMetadata(BaseModule):
         sample_name_error = 0
         multiple_sample_files = self.get_multiple_sample_files()
         for row in j_data:
-            row["bioinfo_metadata_file"] = self.out_filename
             if not row.get("sequencing_sample_id"):
                 self.update_all_logs(
                     method_name,
@@ -737,25 +764,34 @@ class BioinfoMetadata(BaseModule):
                 )
                 continue
             for key, values in files_found_dict.items():
-                file_path = "Not Provided [SNOMED:434941000124101]"
+                file_path = []
                 if values:  # Check if value is not empty
-                    if key in multiple_sample_files:
-                        file_path = values[0]
-                    else:
-                        for file in values:
-                            if sample_name in file:
-                                file_path = file
-                                break  # Exit loop if match found
-                path_key = f"{self.software_name}_filepath_{key}"
-                if file_path != "Not Provided [SNOMED:434941000124101]":
-                    analysis_results_path = os.path.join(
-                        base_cod_path,
-                        "analysis_results",
-                        os.path.basename(file_path),
-                    )
-                    row[path_key] = analysis_results_path
+                    for file in values:
+                        if key in multiple_sample_files:
+                            file_path.append(file)
+                        elif sample_name in file:
+                            file_path.append(file)
                 else:
-                    row[path_key] = file_path
+                    file_path.append("Not Provided [SNOMED:434941000124101]")
+                if self.software_config[key].get("filepath_name"):
+                    path_key = self.software_config[key].get("filepath_name")
+                    analysis_results_paths = []
+                    for paths in file_path:
+                        if file_path != "Not Provided [SNOMED:434941000124101]" and (
+                            self.software_config[key].get("extract")
+                            or self.software_config[key].get("function")
+                        ):
+                            analysis_results_path = os.path.join(
+                                base_cod_path,
+                                "analysis_results",
+                                os.path.basename(paths),
+                            )
+                            analysis_results_paths.append(analysis_results_path)
+                        else:
+                            analysis_results_paths = file_path
+                    row[path_key] = ", ".join(analysis_results_paths)
+                else:
+                    path_key = key
                 if self.software_config[key].get("extract"):
                     self.extract_file(
                         file=file_path,
@@ -820,28 +856,27 @@ class BioinfoMetadata(BaseModule):
         """
         dest_folder = os.path.join(dest_folder, "analysis_results")
         os.makedirs(dest_folder, exist_ok=True)
-        out_filepath = os.path.join(dest_folder, os.path.basename(file))
-        if os.path.isfile(out_filepath):
-            return True
-        if file == "Not Provided [GENEPIO:0001668]":
-            self.update_all_logs(
-                self.extract_file.__name__,
-                "warning",
-                f"File for {path_key} not provided in sample {sample_name}",
-            )
-            return False
-        try:
-            if re.search(r".*pangolin\.csv$", os.path.basename(file), re.IGNORECASE):
-                df = pd.read_csv(file)
-                df["lineage_analysis_date"] = datetime.now().strftime("%Y%m%d")
-                df.to_csv(out_filepath, index=False)
-            else:
-                shutil.copy(file, out_filepath)
-        except (IOError, PermissionError) as e:
-            self.update_all_logs(
-                self.extract_file.__name__, "warning", f"Could not extract {file}: {e}"
-            )
-            return False
+        for filepath in file:
+            out_filepath = os.path.join(dest_folder, os.path.basename(filepath))
+            if os.path.isfile(out_filepath):
+                self.log.debug(f"{out_filepath} already exists, not extracted")
+                continue
+            if filepath == "Not Provided [GENEPIO:0001668]":
+                self.update_all_logs(
+                    self.extract_file.__name__,
+                    "warning",
+                    f"File for {path_key} not provided in sample {sample_name}",
+                )
+                continue
+            try:
+                shutil.copy(filepath, out_filepath)
+            except (IOError, PermissionError) as e:
+                self.update_all_logs(
+                    self.extract_file.__name__,
+                    "warning",
+                    f"Could not extract {filepath}: {e}",
+                )
+                continue
         return True
 
     def split_data_by_batch(self, j_data):
@@ -1076,9 +1111,10 @@ class BioinfoMetadata(BaseModule):
                 files_found_dict, batch_data, sufix, batch_date, batch_dir
             )
             stderr.print("[blue]Adding software versions to read lab metadata...")
-            batch_data = self.get_multiqc_software_versions(
-                files_found_dict["workflow_summary"], batch_data
-            )
+            if "workflow_summary" in files_found_dict:
+                batch_data = self.get_multiqc_software_versions(
+                    files_found_dict["workflow_summary"], batch_data
+                )
             stderr.print("[blue]Adding fixed values")
             batch_data = self.add_fixed_values(batch_data)
             # Adding files path

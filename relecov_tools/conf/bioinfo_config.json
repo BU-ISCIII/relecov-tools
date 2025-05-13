@@ -9,7 +9,7 @@
             "multiple_samples": true,
             "split_by_batch": true,
             "content": {
-                "analysis_date": "analysis_date",
+                "bioinformatics_analysis_date": "analysis_date",
                 "depth_of_coverage_value": "medianDPcoveragevirus",
                 "number_of_variants_in_consensus": "Variantsinconsensusx10",
                 "number_of_variants_with_effect": "MissenseVariants",
@@ -17,11 +17,13 @@
                 "per_Ns": "%Ns10x",
                 "per_reads_host": "%readshost",
                 "per_reads_virus": "%readsvirus",
-                "per_unmapped": "%unmapedreads",
-                "qc_filtered": "totalreads",
+                "per_unmapped": "%unmappedreads",
+                "pass_reads": "totalreads",
                 "reference_genome_accession": "Virussequence",
-                "read_length": "read_length"
-            }
+                "read_length": "read_length",
+                "clade_assignment": "clade_assignment",
+                "clade_assignment_date": "clade_assignment_date",
+                "clade_assignment_software_database_version": "clade_assignment_software_database_version"           }
         },
         "quality_control": {
             "fn": "quality_control_report(?:_\\d{8})?\\.tsv",
@@ -41,63 +43,63 @@
             }
         },
         "mapping_pangolin": {
-            "fn": ".pangolin(?:.*?)?\\.csv$",
+            "fn": ".pangolin(?:.*?)?\\.csv",
             "header_row_idx": 1,
             "required": false,
             "function": "handle_pangolin_data",
+            "filepath_name": "lineage_assignment_file",
             "extract": true,
             "content": {
                 "variant_name": "scorpio_call",
-                "lineage_name": "lineage",
+                "lineage_assignment": "lineage",
+                "lineage_assignment_software_version": "pangolin_version",
                 "lineage_algorithm_software_version": "version",
-                "lineage_analysis_software_version": "pangolin_version",
-                "lineage_analysis_scorpio_version": "scorpio_version",
-                "lineage_analysis_constellation_version": "constellation_version",
-                "lineage_analysis_date": "lineage_analysis_date",
-                "pangolin_database_version": "pangolin_database_version"
+                "lineage_assignment_scorpio_version": "scorpio_version",
+                "lineage_assignment_constellation_version": "constellation_version",
+                "lineage_assignment_date": "lineage_assignment_date",
+                "lineage_assignment_database_version": "lineage_assignment_database_version"
             }
         },
         "variants_long_table": {
             "fn": "variants_long_table.csv",
             "sample_col_idx": 1,
             "header_row_idx": 1,
+            "filepath_name": "long_table_path",
             "required": true,
             "multiple_samples": true,
             "split_by_batch": true,
-            "map": false,
             "function": "parse_long_table",
             "content": {
                 "sample" : "SAMPLE",
                 "chromosome": "CHROM",
                 "pos": "POS", 
-                "alt": "ALT", 
                 "ref": "REF",
+                "alt": "ALT", 
                 "Filter": "FILTER",
                 "dp": "DP",
                 "ref_dp": "REF_DP",
                 "alt_dp": "ALT_DP",
                 "af": "AF",
+                "gene" : "GENE",
                 "effect": "EFFECT",
                 "hgvs_c": "HGVS_C",
                 "hgvs_p": "HGVS_P",
                 "hgvs_p_1_letter": "HGVS_P_1LETTER",
                 "caller" : "CALLER",
-                "lineage" : "LINEAGE",
-                "gene" : "GENE"
+                "lineage" : "LINEAGE"
             }
         },
         "mapping_consensus": {
             "fn": ".consensus.fa",
             "required": false,
             "function": "handle_consensus_fasta",
+            "filepath_name": "consensus_sequence_filepath",
             "extract": true,
             "content": {
                 "consensus_sequence_name" : "sequence_name",
                 "consensus_genome_length" : "genome_length",
                 "consensus_sequence_filename" : "sequence_filename",
-                "consensus_sequence_filepath" : "sequence_filepath",
-                "consensus_sequence_md5" : "sequence_md5", 
-                "number_of_base_pairs_sequenced" : "number_of_base_pairs_sequenced"
+                "consensus_sequence_md5" : "sequence_md5"
             }
         },
         "summary_mqc": {
@@ -109,12 +111,14 @@
             "function": null,
             "extract": true,
             "content": {
-                "ns_per_100_kbp": "# Ns per 100kb consensus"
+                "ns_per_100_kbp": "# Ns per 100kb consensus",
+                "number_of_reads_sequenced": "# Input reads"
             }
         },
-        "other_files": {
+        "vcf_files": {
             "fn": "^(?!.*tbi$).*.filtered.vcf.gz",
             "required": false,
+            "filepath_name": "vcf_filename",
             "function": null,
             "extract": true,
             "content": {}
@@ -132,7 +136,8 @@
                     "dehosting_method_software_version": "kraken2",
                     "mapping_software_version":"bowtie2",
                     "preprocessing_software_version":"fastp",
-                    "variant_calling_software_version":"ivar"
+                    "variant_calling_software_version":"ivar",
+                    "clade_assignment_software_version":"nextclade"
                 },
                 "software_name": {
                     "bioinformatics_protocol_software_name": "nf-core/viralrecon",
@@ -140,12 +145,14 @@
                     "dehosting_method_software_name": "kraken2",
                     "mapping_software_name":"bowtie2",
                     "preprocessing_software_name":"fastp",
-                    "variant_calling_software_name":"ivar"
+                    "variant_calling_software_name":"ivar",
+                    "clade_assignment_software_name":"nextclade"
                 }
             }
         },
         "fixed_values": {
             "assembly": "Not Provided [GENEPIO:0001668]",
+            "assembly_version": "Not Provided [GENEPIO:0001668]",
             "assembly_params": "Not Provided [GENEPIO:0001668]",
             "commercial_open_source_both": "Open Source",
             "consensus_params": "-p vcf -f",
@@ -153,13 +160,195 @@
             "if_assembly_other": "Not Provided [GENEPIO:0001668]",
             "if_bioinformatic_protocol_is_other_specify": "Not Provided [GENEPIO:0001668]",
             "if_consensus_other": "Not Provided [GENEPIO:0001668]",
-            "if_lineage_assignment_other": "Not Provided [GENEPIO:0001668]",
             "if_mapping_other": "Not Provided [GENEPIO:0001668]",
             "if_preprocessing_other": "Not Provided [GENEPIO:0001668]",
-            "lineage_analysis_software_name": "pangolin",
+            "lineage_assignment_software_name": "pangolin",
+            "if_lineage_assignment_other": "Not Provided [GENEPIO:0001668]",
+            "if_variant_calling_other": "Not Provided [GENEPIO:0001668]",
             "mapping_params": "--seed 1",
             "preprocessing_params": "--cut_front --cut_tail --trim_poly_x --cut_mean_quality 30 --qualified_quality_phred   30    --unqualified_percent_limit 10 --length_required 50",
-            "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20   -m10"
+            "variant_calling_params": "--ignore-overlaps --count-orphans --no-BAQ --max-depth 0 --min-BQ 0';-t 0.25 -q 20   -m10",
+            "if_clade_assignment_other": "Not Provided [GENEPIO:0001668]",
+            "type_assignment": "Not Applicable [GENEPIO:0001619]",
+            "type_assignment_software_name": "Not Applicable [GENEPIO:0001619]",
+            "if_type_assignment_software_other": "Not Applicable [GENEPIO:0001619]",
+            "type_assignment_software_version": "Not Applicable [GENEPIO:0001619]",
+            "type_assignment_software_database_version": "Not Applicable [GENEPIO:0001619]",
+            "subtype_assignment": "Not Applicable [GENEPIO:0001619]",
+            "subtype_assignment_software_name": "Not Applicable [GENEPIO:0001619]",
+            "if_subtype_assignment_software_other": "Not Applicable [GENEPIO:0001619]",
+            "subtype_assignment_software_version": "Not Applicable [GENEPIO:0001619]",
+            "subtype_assignment_software_database_version": "Not Applicable [GENEPIO:0001619]",
+            "variant_designation": "Not Provided [GENEPIO:0001668]"
+        }
+    },
+    "irma": {
+        "summary_stats": {
+            "fn": "summary_stats(?:_\\d{8})?\\.tab",
+            "sample_col_idx": 1,
+            "header_row_idx": 1,
+            "required": true,
+            "function": null,
+            "multiple_samples": true,
+            "split_by_batch": true,
+            "content": {
+                "type_assignment": "flu_type",
+                "subtype_assignment": "flu_subtype",
+                "clade_assignment": "clade",
+                "number_of_reads_sequenced": "totalreads",
+                "pass_reads": "qc_filtered_reads",
+                "per_reads_host": "%readshost",
+                "per_reads_virus": "%readsvirus",
+                "per_unmapped": "%unmappedreads",
+                "depth_of_coverage_value": "medianDPcoveragevirus",
+                "per_genome_greater_10x": "Coverage>10x(%)",
+                "per_Ns": "%Ns10x",
+                "number_of_variants_in_consensus": "Variantsinconsensusx10",
+                "number_of_variants_with_effect": "MissenseVariants",
+                "number_of_unambiguous_bases": "Total_Unambiguous_Bases",
+                "number_of_Ns": "Total_Ns_count",
+                "read_length": "read_length",
+                "bioinformatics_analysis_date": "analysis_date",
+                "clade_assignment_date": "clade_assignment_date",
+                "clade_assignment_software_database_version": "clade_assignment_software_database_version"
+            }
+        },
+        "variants_long_table": {
+            "fn": "variants_long_table.csv",
+            "sample_col_idx": 1,
+            "header_row_idx": 1,
+            "filepath_name": "long_table_path",
+            "required": true,
+            "multiple_samples": true,
+            "split_by_batch": true,
+            "function": "parse_long_table",
+            "content": {
+                "sample": "SAMPLE",
+                "subtype": "FLU_SUBTYPE",
+                "chromosome": "CHROM",
+                "pos": "POS", 
+                "ref": "REF",
+                "alt": "ALT", 
+                "Filter": "FILTER",
+                "dp": "DP",
+                "ref_dp": "REF_DP",
+                "alt_dp": "ALT_DP",
+                "af": "AF",
+                "gene": "GENE",
+                "effect": "EFFECT",
+                "hgvs_c": "HGVS_C",
+                "hgvs_p": "HGVS_P",
+                "hgvs_p_1_letter": "HGVS_P_1LETTER",
+                "caller" : "CALLER",
+                "clade": "CLADE"
+            }
+        },
+        "mapping_consensus": {
+            "fn": "99-stats/consensus_files/.*consensus\\.fa$",
+            "required": false,
+            "function": "handle_consensus_fasta",
+            "filepath_name": "consensus_sequence_filepath",
+            "extract": true,
+            "content": {
+                "consensus_sequence_name" : "sequence_name",
+                "consensus_genome_length" : "genome_length",
+                "consensus_sequence_filename" : "sequence_filename",
+                "consensus_sequence_md5" : "sequence_md5"
+            }
+        },
+        "workflow_summary": {
+            "fn": "multiqc/multiqc_report.html",
+            "required": false,
+            "multiple_samples": true,
+            "function": null,
+            "extract": true,
+            "content": {
+                "software_version": {
+                    "dehosting_method_software_version": "kraken2"
+                },
+                "software_name": {
+                    "dehosting_method_software_name": "kraken2"
+                }
+            }
+        },
+        "vcf_files": {
+            "fn": "06-variant-calling/vcf_files/.*\\.vcf$",
+            "required": false,
+            "filepath_name": "vcf_filename",
+            "function": null,
+            "extract": true,
+            "content": {}
+        },
+        "versions":{
+            "fn": "versions.csv",
+            "header_row_idx": 1,
+            "required": true,
+            "function": "get_software_versions",
+            "extract": false,
+            "content": {
+                "software_version": {
+                    "bioinformatics_protocol_software_version": "irma",
+                    "consensus_sequence_software_version": "irma",
+                    "mapping_software_version":"irma",
+                    "preprocessing_software_version":"fastp",
+                    "clade_assignment_software_version":"nextclade",
+                    "type_assignment_software_version": "irma",
+                    "subtype_assignment_software_version": "irma"
+                },
+                "software_name": {
+                    "bioinformatics_protocol_software_name": "irma",
+                    "consensus_sequence_software_name": "irma",
+                    "mapping_software_name":"irma",
+                    "preprocessing_software_name":"fastp",
+                    "clade_assignment_software_name":"nextclade",
+                    "type_assignment_software_name": "irma",
+                    "subtype_assignment_software_name": "irma"
+                }
+            }
+        },
+        "fixed_values": {
+            "assembly": "IRMA (Iterative Refinement Meta-Assembler)",
+            "assembly_version": "IRMA v1.2.0",
+            "assembly_params": "Default [NCIT:C48156]",
+            "commercial_open_source_both": "Open Source",
+            "consensus_params": "MIN_AMBIG=0.75; MIN_CONS_SUPPORT=9",
+            "depth_of_coverage_threshold": ">10x",
+            "if_assembly_other": "Not Provided [GENEPIO:0001668]",
+            "if_bioinformatic_protocol_is_other_specify": "Not Provided [GENEPIO:0001668]",
+            "if_consensus_other": "Not Provided [GENEPIO:0001668]",
+            "if_mapping_other": "Not Provided [GENEPIO:0001668]",
+            "if_preprocessing_other": "Not Provided [GENEPIO:0001668]",
+            "if_variant_calling_other": "Not Provided [GENEPIO:0001668]",
+            "if_subtype_assignment_software_other": "Not Provided [GENEPIO:0001668]",
+            "if_type_assignment_software_other": "Not Provided [GENEPIO:0001668]",
+            "if_clade_assignment_other":"Not Provided [GENEPIO:0001668]",
+            "mapping_params": "Default [NCIT:C48156]",
+            "preprocessing_params": "--cut_front --cut_tail --cut_mean_quality 15 --qualified_quality_phred 15 --trim_poly_x --length_required 50 --detect_adapter_for_pe",
+            "variant_calling_params": "-f 0.25 -d 10",
+            "variant_calling_software_version": "In-House [NCIT:C126386]",
+            "variant_calling_software_name": "In-House [NCIT:C126386]",
+            "per_sgene_ambiguous": "Not Applicable [GENEPIO:0001619]",
+            "per_sgene_coverage": "Not Applicable [GENEPIO:0001619]",
+            "per_ldmutations": "Not Applicable [GENEPIO:0001619]",
+            "number_of_sgene_frameshifts": "Not Applicable [GENEPIO:0001619]",
+            "variant_name": "Not Applicable [GENEPIO:0001619]",
+            "lineage_assignment": "Not Applicable [GENEPIO:0001619]",
+            "lineage_assignment_software_name": "Not Applicable [GENEPIO:0001619]",
+            "if_lineage_assignment_other": "Not Provided [GENEPIO:0001668]",
+            "lineage_assignment_software_version": "Not Applicable [GENEPIO:0001619]",
+            "lineage_algorithm_software_version": "Not Applicable [GENEPIO:0001619]",
+            "lineage_assignment_scorpio_version": "Not Applicable [GENEPIO:0001619]",
+            "lineage_assignment_constellation_version": "Not Applicable [GENEPIO:0001619]",
+            "lineage_assignment_date": "Not Applicable [GENEPIO:0001619]",
+            "lineage_assignment_file": "Not Applicable [GENEPIO:0001619]",
+            "lineage_assignment_database_version": "Not Applicable [GENEPIO:0001619]",
+            "ns_per_100_kbp": "Not Provided [GENEPIO:0001668]",
+            "type_assignment_software_database_version": "Not Applicable [GENEPIO:0001619]",
+            "subtype_assignment_software_database_version": "Not Applicable [GENEPIO:0001619]",
+            "reference_genome_accession": "Not Applicable [GENEPIO:0001619]",
+            "variant_designation": "Not Applicable [GENEPIO:0001619]",
+            "qc_test": "Not Applicable [GENEPIO:0001619]",
+            "qc_failed": "Not Applicable [GENEPIO:0001619]"
         }
     }
 }
