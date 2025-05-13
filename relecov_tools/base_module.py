@@ -69,9 +69,10 @@ class BaseModule:
             self.log.addHandler(handler)
         else:
             # First time this class is initialized, set root handler and move cli-log-file
+            log_level = self.log.root.getEffectiveLevel()
             if not self.log.handlers:
                 handler = BaseModule.set_log_handler(
-                    self.final_log_path, level=logging.DEBUG
+                    self.final_log_path, level=log_level
                 )
                 self.log.addHandler(handler)
             self.redirect_logs(
@@ -138,8 +139,7 @@ class BaseModule:
                 "--log-path activated via CLI. Logs output folder wont change"
             )
             new_log_path = os.path.join(
-                os.path.dirname(BaseModule._cli_log_path_param),
-                os.path.basename(new_log_path),
+                BaseModule._cli_log_path_param, os.path.basename(new_log_path)
             )
         try:
             # Only copy file content, not permissions nor metadata
