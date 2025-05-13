@@ -768,9 +768,8 @@ class BioinfoMetadata(BaseModule):
                     for file in values:
                         if key in multiple_sample_files:
                             file_path.append(file)
-                        else:
-                            if sample_name in file:
-                                file_path.append(file)
+                        elif sample_name in file:
+                            file_path.append(file)
                 else:
                     file_path.append("Not Provided [SNOMED:434941000124101]")
                 if self.software_config[key].get("filepath_name"):
