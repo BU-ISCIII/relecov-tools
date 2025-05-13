@@ -618,8 +618,8 @@ class BioinfoMetadata(BaseModule):
         with open(f_path, "r") as html_file:
             html_content = html_file.read()
         soup = BeautifulSoup(html_content, features="lxml")
-        div_id = "mqc-module-section-software_versions"
-        versions_div = soup.find("div", id=div_id)
+        div_id_pattern = re.compile(r"mqc-module-section-(software_versions|multiqc_software_versions)")
+        versions_div = soup.find("div", id=div_id_pattern)
         if versions_div:
             table = versions_div.find("table", class_="table")
             if table:
