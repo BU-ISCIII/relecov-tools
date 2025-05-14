@@ -254,7 +254,7 @@ class BioinfoMetadata(BaseModule):
                         field_valid[sample_name] = {field: value}
                     except KeyError as e:
                         field_errors[sample_name] = {field: e}
-                        row[field] = "Not Provided [GENEPIO:0001668]"
+                        row[field] = "Not Provided [SNOMED:434941000124101]"
                         continue
             elif not self.software_config[self.current_config_key].get(
                 "multiple_samples"
@@ -277,11 +277,11 @@ class BioinfoMetadata(BaseModule):
                             field_valid[software_key] = {json_field: field}
                         except KeyError as e:
                             field_errors[software_key] = {json_field: str(e)}
-                            row[json_field] = "Not Provided [GENEPIO:0001668]"
+                            row[json_field] = "Not Provided [SNOMED:434941000124101]"
             else:
                 errors.append(sample_name)
                 for field in mapping_fields.keys():
-                    row[field] = "Not Provided [GENEPIO:0001668]"
+                    row[field] = "Not Provided [SNOMED:434941000124101]"
         # work around when map_data comes from several per-sample tables/files instead of single table
         if len(table_name) > 2:
             table_name = os.path.dirname(table_name[0])
@@ -861,7 +861,7 @@ class BioinfoMetadata(BaseModule):
             if os.path.isfile(out_filepath):
                 self.log.debug(f"{out_filepath} already exists, not extracted")
                 continue
-            if filepath == "Not Provided [GENEPIO:0001668]":
+            if filepath == "Not Provided [SNOMED:434941000124101]":
                 self.update_all_logs(
                     self.extract_file.__name__,
                     "warning",

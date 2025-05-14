@@ -92,7 +92,7 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
                 if leave_empty:
                     data_row[heading[idx]] = None
                 else:
-                    data_row[heading[idx]] = "Not Provided [GENEPIO:0001668]"
+                    data_row[heading[idx]] = "Not Provided [SNOMED:434941000124101]"
             else:
                 data_row[heading[idx]] = l_row[idx]
         ws_data.append(data_row)
