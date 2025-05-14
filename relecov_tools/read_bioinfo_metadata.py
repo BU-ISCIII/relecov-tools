@@ -528,7 +528,7 @@ class BioinfoMetadata(BaseModule):
         Args:
             file_list (list): A list of file path/s to be processed.
             output_folder (str): Path to save output files from imported method if necessary
-            file_tag(str): Number of the batch which corresponds with the data download date.
+            file_tag(str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
 
         Returns:
             data: A dictionary containing bioinfo metadata handled for each sample.
@@ -1021,7 +1021,7 @@ class BioinfoMetadata(BaseModule):
 
         Args:
             files_dict (dict): A dictionary containing file paths identified for each configuration item.
-            file_tag (str): Tag to be used in the output file name, should include batch date and hex.
+            file_tag (str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
             output_folder (str): Path to save output files generated during processing.
 
         Returns:
