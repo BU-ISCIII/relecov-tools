@@ -621,33 +621,35 @@ class BioinfoMetadata(BaseModule):
         div_id = re.compile(
             r"mqc-module-section-(software_versions|multiqc_software_versions)"
         )
-        versions_div = soup.find("div", id=div_id)
+        versions_div = soup.find_all("div", id=div_id)
+        program_versions = {}
         if versions_div:
-            table = versions_div.find("table", class_="table")
-            if table:
-                rows = table.find_all("tr")
-                for row in rows[1:]:  # skipping header
-                    columns = row.find_all("td")
-                    if len(columns) == 3:
-                        program_name = columns[1].text.strip()
-                        version = columns[2].text.strip()
-                        program_versions[program_name] = version
-                    else:
-                        self.update_all_logs(
-                            method_name,
-                            "error",
-                            f"HTML entry error in {columns}. HTML table expected format should be \n<th> Process Name\n</th>\n<th> Software </th>\n.",
-                        )
-                        sys.exit(
-                            self.log_report.print_log_report(method_name, ["error"])
-                        )
-            else:
-                self.update_all_logs(
-                    method_name,
-                    "error",
-                    f"Unable to locate the table containing software versions in file {f_path} under div section {div_id}.",
-                )
-                sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+            for div in versions_div:
+                table = div.find("table", class_="table")
+                if table:
+                    rows = table.find_all("tr")
+                    for row in rows[1:]:  # skipping header
+                        columns = row.find_all("td")
+                        if len(columns) == 3:
+                            program_name = columns[1].text.strip()
+                            version = columns[2].text.strip()
+                            program_versions[program_name] = version
+                        else:
+                            self.update_all_logs(
+                                method_name,
+                                "error",
+                                f"HTML entry error in {columns}. HTML table expected format should be \n<th> Process Name\n</th>\n<th> Software </th>\n.",
+                            )
+                            sys.exit(
+                                self.log_report.print_log_report(method_name, ["error"])
+                            )
+                else:
+                    self.update_all_logs(
+                        method_name,
+                        "error",
+                        f"Unable to locate the table containing software versions in file {f_path} under div section {div_id}.",
+                    )
+                    sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         else:
             self.update_all_logs(
                 self.get_multiqc_software_versions.__name__,
