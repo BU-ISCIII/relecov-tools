@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed level being set by default to debug instead of level provided in CLI [#584](https://github.com/BU-ISCIII/relecov-tools/pull/584)
 - Fixed wrong output dir when --log-path was set via CLI in BaseModule [#584](https://github.com/BU-ISCIII/relecov-tools/pull/584)
 - Add irma config and fixed read bioinfo metadata [#578](https://github.com/BU-ISCIII/relecov-tools/pull/578)
+- Fixed multiqc software versions with new pattern [#593](https://github.com/BU-ISCIII/relecov-tools/pull/593)
 
 #### Changed
 
