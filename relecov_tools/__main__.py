@@ -38,7 +38,7 @@ stderr = rich.console.Console(
     stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
 )
 
-__version__ = "1.5.2"
+__version__ = "1.5.3"
 
 
 def run_relecov_tools():
