@@ -154,9 +154,9 @@ class LongTableParse:
             j_list.append(j_dict)
         return j_list
 
-    def save_to_file(self, j_list, batch_date):
+    def save_to_file(self, j_list, file_tag):
         """Transform the parsed data into a json file"""
-        file_name = "long_table_" + batch_date + ".json"
+        file_name = "long_table_" + file_tag + ".json"
         file_path = os.path.join(self.output_directory, file_name)
         if os.path.exists(file_path):
             stderr.print(
@@ -218,7 +218,7 @@ class LongTableParse:
 # START util functions
 
 
-def parse_long_table(files_list, batch_date, output_folder=None):
+def parse_long_table(files_list, file_tag, output_folder=None):
     """File handler to retrieve data from long table files and convert it into a JSON structured format.
     This function utilizes the LongTableParse class to parse the long table data.
     Since this utility handles and maps data using a custom way, it returns None to be avoid being  transferred to method read_bioinfo_metadata.BioinfoMetadata.mapping_over_table().
@@ -247,7 +247,7 @@ def parse_long_table(files_list, batch_date, output_folder=None):
         # Parsing long table data and saving it
         long_table_data = long_table.parsing_csv()
         # Saving long table data into a file
-        long_table.save_to_file(long_table_data, batch_date)
+        long_table.save_to_file(long_table_data, file_tag)
         stderr.print("[green]\tProcess completed")
     elif len(files_list) > 1:
         method_log_report.update_log_report(
@@ -259,7 +259,7 @@ def parse_long_table(files_list, batch_date, output_folder=None):
     return None
 
 
-def handle_consensus_fasta(files_list, batch_date, output_folder=None):
+def handle_consensus_fasta(files_list, file_tag, output_folder=None):
     """File handler to parse consensus data (fasta) into JSON structured format.
 
     Args:
@@ -330,7 +330,7 @@ def quality_control_evaluation(data):
     return data
 
 
-def get_software_versions(files_list, batch_date, output_folder=None):
+def get_software_versions(files_list, file_tag, output_folder=None):
     """File handler to parse software versions from csv.
 
     Args:

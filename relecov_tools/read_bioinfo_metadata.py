@@ -148,7 +148,7 @@ class BioinfoMetadata(BaseModule):
         if self.software_name in available_software:
             self.software_config = bioinfo_config.get_configuration(self.software_name)
         else:
-            self.update_logs(
+            self.update_all_logs(
                 self.__init__.__name__,
                 "error",
                 f"No configuration available for '{self.software_name}'. Currently, the only available software options are:: {', '.join(available_software)}",
@@ -376,7 +376,7 @@ class BioinfoMetadata(BaseModule):
         return
 
     def add_bioinfo_results_metadata(
-        self, files_dict, j_data, sufix, batch_date, output_folder=None
+        self, files_dict, j_data, sufix, file_tag, output_folder=None
     ):
         """Adds metadata from bioinformatics results to j_data.
         It first calls file_handlers and then maps the handled
@@ -387,7 +387,7 @@ class BioinfoMetadata(BaseModule):
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (list item per sample).
             sufix (str): Sufix added to splitted tables file name.
             output_folder (str): Path to save output files generated during handling_files() process.
-            batch_date(str): Number of the batch which corresponds with the data download date.
+            file_tag(str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
 
         Returns:
             j_data_mapped: A list of dictionaries with bioinformatics metadata mapped into j_data.
@@ -418,7 +418,7 @@ class BioinfoMetadata(BaseModule):
                 self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
             data_to_map = self.handling_files(
-                files_dict[key], sufix, output_folder, batch_date
+                files_dict[key], sufix, output_folder, file_tag
             )
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
@@ -501,7 +501,7 @@ class BioinfoMetadata(BaseModule):
             )
             raise ValueError(self.log_report.print_log_report(method_name, ["error"]))
 
-    def handling_files(self, file_list, sufix, output_folder, batch_date):
+    def handling_files(self, file_list, sufix, output_folder, file_tag):
         """Handles different file formats to extract data regardless of their structure.
         The goal is to extract the data contained in files specified in ${file_list},
         using either 'standard' handlers defined in this class or pipeline-specific file handlers.
@@ -528,7 +528,7 @@ class BioinfoMetadata(BaseModule):
         Args:
             file_list (list): A list of file path/s to be processed.
             output_folder (str): Path to save output files from imported method if necessary
-            batch_date(str): Number of the batch which corresponds with the data download date.
+            file_tag(str): Number of the batch which corresponds with the data download date.
 
         Returns:
             data: A dictionary containing bioinfo metadata handled for each sample.
@@ -566,7 +566,7 @@ class BioinfoMetadata(BaseModule):
                         utils_name
                         + "."
                         + func_name
-                        + "(full_paths, batch_date, output_folder)"
+                        + "(full_paths, file_tag, output_folder)"
                     )
 
                 except Exception as e:
@@ -589,7 +589,7 @@ class BioinfoMetadata(BaseModule):
                         utils_name
                         + "."
                         + func_name
-                        + "(file_list, batch_date, output_folder)"
+                        + "(file_list, file_tag, output_folder)"
                     )
                 except Exception as e:
                     self.update_all_logs(
@@ -1015,13 +1015,13 @@ class BioinfoMetadata(BaseModule):
         relecov_tools.utils.write_json_to_file(merged_metadata, batch_filepath)
         return merged_metadata
 
-    def save_merged_files(self, files_dict, batch_date, output_folder=None):
+    def save_merged_files(self, files_dict, file_tag, output_folder=None):
         """
         Process and save files that where split by cod and that have a function to be processed
 
         Args:
             files_dict (dict): A dictionary containing file paths identified for each configuration item.
-            batch_date (str): Date or ID of the batch to be used in the output file name.
+            file_tag (str): Tag to be used in the output file name, should include batch date and hex.
             output_folder (str): Path to save output files generated during processing.
 
         Returns:
@@ -1055,7 +1055,7 @@ class BioinfoMetadata(BaseModule):
                         utils_name
                         + "."
                         + func_name
-                        + "(file_path, batch_date, output_folder)"
+                        + "(file_path, file_tag, output_folder)"
                     )
                 except Exception as e:
                     self.update_all_logs(
@@ -1097,6 +1097,14 @@ class BioinfoMetadata(BaseModule):
         # Add bioinfo metadata to j_data
         for batch_dir, batch_dict in data_by_batch.items():
             batch_data = batch_dict["j_data"]
+            if not batch_data:
+                self.log.warning(f"Data from batch {batch_dir} was completely empty. Skipped.")
+                self.update_all_logs(
+                    self.create_bioinfo_file.__name__,
+                    "warning",
+                    f"Data from batch {batch_dir} was completely empty. Skipped.",
+                )
+                continue
             first_sample = batch_data[0]
             lab_code = first_sample.get(
                 "submitting_institution_id", batch_dir.split("/")[-2]
@@ -1104,11 +1112,12 @@ class BioinfoMetadata(BaseModule):
             batch_date = first_sample.get("batch_id", batch_dir.split("/")[-1])
             self.set_batch_id(batch_date)
             self.logsum.feed_key(batch_dir)
+            file_tag = batch_date + "_" + self.hex
             stderr.print(f"[blue]Processing data from {batch_dir}")
             stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
             self.split_tables_by_batch(files_found_dict, sufix, batch_data, batch_dir)
             batch_data = self.add_bioinfo_results_metadata(
-                files_found_dict, batch_data, sufix, batch_date, batch_dir
+                files_found_dict, batch_data, sufix, file_tag, batch_dir
             )
             stderr.print("[blue]Adding software versions to read lab metadata...")
             if "workflow_summary" in files_found_dict:
@@ -1181,9 +1190,10 @@ class BioinfoMetadata(BaseModule):
             self.log.info(
                 "More than one batch date in the same json data. Using current date as batch date."
             )
-            batch_date = datetime.now().strftime("%Y%m%d%H%M%S")
+            batch_date = self.basemod_date
         self.set_batch_id(batch_date)
-        self.save_merged_files(files_found_dict, batch_date, out_path)
+        file_tag = self.batch_id + "_" + self.hex
+        self.save_merged_files(files_found_dict, file_tag, out_path)
         batch_filename = self.tag_filename("bioinfo_lab_metadata" + ".json")
         stderr.print("[blue]Writting output json file")
         file_path = os.path.join(out_path, batch_filename)
