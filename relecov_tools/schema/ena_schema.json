@@ -379,7 +379,7 @@
         "Zimbabwe [GAZ:00001106]",
         "Not Applicable [GENEPIO:0001619]",
         "Not Collected [GENEPIO:0001620]",
-        "Not Provided [GENEPIO:0001668]",
+        "Not Provided [SNOMED:434941000124101]",
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
@@ -447,7 +447,7 @@
         "Surveillance [GENEPIO:0100004]",
         "Not Applicable [GENEPIO:0001619]",
         "Not Collected [GENEPIO:0001620]",
-        "Not Provided [GENEPIO:0001668]",
+        "Not Provided [SNOMED:434941000124101]",
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
@@ -469,7 +469,7 @@
         "Tissue [UBERON:0000479]",
         "Not Applicable [GENEPIO:0001619]",
         "Not Collected [GENEPIO:0001620]",
-        "Not Provided [GENEPIO:0001668]",
+        "Not Provided [SNOMED:434941000124101]",
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
@@ -519,7 +519,7 @@
         "Wood [ENVO:00002040]",
         "Not Applicable [GENEPIO:0001619]",
         "Not Collected [GENEPIO:0001620]",
-        "Not Provided [GENEPIO:0001668]",
+        "Not Provided [SNOMED:434941000124101]",
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
@@ -549,7 +549,7 @@
         "Tiger [NCBITaxon:9694]",
         "Not Applicable [GENEPIO:0001619]",
         "Not Collected [GENEPIO:0001620]",
-        "Not Provided [GENEPIO:0001668]",
+        "Not Provided [SNOMED:434941000124101]",
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
@@ -583,7 +583,7 @@
         "Viverridae [NCBITaxon:9673]",
         "Not Applicable [GENEPIO:0001619]",
         "Not Collected [GENEPIO:0001620]",
-        "Not Provided [GENEPIO:0001668]",
+        "Not Provided [SNOMED:434941000124101]",
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],
@@ -850,7 +850,7 @@
         "MGI DNBSEQ-G50 [GENEPIO:0100150]",
         "Not Applicable [GENEPIO:0001619]",
         "Not Collected [GENEPIO:0001620]",
-        "Not Provided [GENEPIO:0001668]",
+        "Not Provided [SNOMED:434941000124101]",
         "Missing [GENEPIO:0001618]",
         "Restricted Access [GENEPIO:0001810]"
       ],

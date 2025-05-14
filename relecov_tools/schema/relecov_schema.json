@@ -3,7 +3,7 @@
     "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/relecov_schema.json",
     "title": "relecov-tools Schema.",
     "description": "Json Schema that specifies the structure, content, and validation rules for relecov-tools",
-    "version": "3.0.7dev",
+    "version": "3.0.8",
     "type": "object",
     "properties": {
         "organism": {
@@ -2996,11 +2996,10 @@
                 "Protocol Testing [GENEPIO:0100024]",
                 "Surveillance [GENEPIO:0100004]",
                 "Other [NCIT:C124261]",
-                "Not Applicable [GENEPIO:0001619]",
-                "Not Collected [GENEPIO:0001620]",
-                "Not Provided [GENEPIO:0001668]",
-                "Missing [GENEPIO:0001618]",
-                "Restricted Access [GENEPIO:0001810]"
+                "Not Collected [LOINC:LA4700-6]",
+                "Not Applicable [SNOMED:385432009]",
+                "Missing [LOINC:LA14698-7]",
+                "Not Provided [SNOMED:434941000124101]"
             ],
             "examples": [
                 "Surveillance"

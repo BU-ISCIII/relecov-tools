@@ -18,6 +18,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
+## [1.5.3] - 2025-05-14 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.3
+
+### Credits
+
+- [Alejandro Bernabeu](https://github.com/aberdur)
+- [Pablo Mata](https://github.com/shettland)
+- [Sarai Varona](https://github.com/svarona)
+
+#### Added enhancements
+
+- Included hex code in output filenames pipeline-utils scripts [#591](https://github.com/BU-ISCIII/relecov-tools/pull/591)
+- Included hex code in pipeline-manager merged json filename [#591](https://github.com/BU-ISCIII/relecov-tools/pull/591)
+
+#### Fixes
+
+- Fixed multiqc software versions with new pattern [#593](https://github.com/BU-ISCIII/relecov-tools/pull/593)
+
+#### Changed
+
+- Update Metadata Template and Schema Ontology Mappings [#588](https://github.com/BU-ISCIII/relecov-tools/pull/588)
+- Remove *dev from relecov_schema.json [#596](https://github.com/BU-ISCIII/relecov-tools/pull/596)
+
+#### Removed
+
+### Requirements
 
 ## [1.5.2] - 2025-05-13 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.2
 

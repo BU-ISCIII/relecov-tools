@@ -535,9 +535,8 @@ class PipelineManager(BaseModule):
             relecov_tools.utils.write_json_to_file(fields, group_info)
             self.log.info(f"Group fields info saved in {group_info}")
 
-            json_filename = os.path.join(
-                group_doc_folder, f"{group_tag}_validate_batch.json"
-            )
+            output_filename = self.tag_filename(f"{group_tag}_validate_batch.json")
+            json_filename = os.path.join(group_doc_folder, output_filename)
             relecov_tools.utils.write_json_to_file(final_valid_samples, json_filename)
             self.log.info("Successfully created pipeline folder. Ready to launch")
             stderr.print(f"[blue]Folder {group_outfolder} finished. Ready to launch")

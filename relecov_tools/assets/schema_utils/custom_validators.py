@@ -7,7 +7,7 @@ def validate_with_exceptions(schema, data, errors):
     This function filters out specific validation errors from the provided list
     of errors based on exceptions defined in the schema. It allows:
       - Numeric fields (integer/float) to contain the placeholder
-        'Not Provided [GENEPIO:0001668]'.
+        'Not Provided [SNOMED:434941000124101]'.
       - String fields with format 'date' to contain the same placeholder.
 
     Args:
@@ -27,7 +27,7 @@ def validate_with_exceptions(schema, data, errors):
         # allow not provided for numeric types
         if (
             error.validator == "type"
-            and error.instance == "Not Provided [GENEPIO:0001668]"
+            and error.instance == "Not Provided [SNOMED:434941000124101]"
             and prop_schema.get("type") in ["integer", "number"]
         ):
             continue
@@ -35,7 +35,7 @@ def validate_with_exceptions(schema, data, errors):
         # allow not provided for date format types
         if (
             error.validator == "format"
-            and error.instance == "Not Provided [GENEPIO:0001668]"
+            and error.instance == "Not Provided [SNOMED:434941000124101]"
             and prop_schema.get("type") == "string"
             and prop_schema.get("format") == "date"
         ):
