@@ -1098,7 +1098,9 @@ class BioinfoMetadata(BaseModule):
         for batch_dir, batch_dict in data_by_batch.items():
             batch_data = batch_dict["j_data"]
             if not batch_data:
-                self.log.warning(f"Data from batch {batch_dir} was completely empty. Skipped.")
+                self.log.warning(
+                    f"Data from batch {batch_dir} was completely empty. Skipped."
+                )
                 self.update_all_logs(
                     self.create_bioinfo_file.__name__,
                     "warning",
