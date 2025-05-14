@@ -29,6 +29,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Added enhancements
 
+- Included hex code in output filenames pipeline-utils scripts [#591](https://github.com/BU-ISCIII/relecov-tools/pull/591)
+- Included hex code in pipeline-manager merged json filename [#591](https://github.com/BU-ISCIII/relecov-tools/pull/591)
+
 #### Fixes
 
 - Fixed level being set by default to debug instead of level provided in CLI [#584](https://github.com/BU-ISCIII/relecov-tools/pull/584)
