@@ -46,6 +46,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changed zip passlog from debug to info in upload-results [#581](https://github.com/BU-ISCIII/relecov-tools/pull/581)
 - Update relecov_schema.json to v3.0.7 [#585](https://github.com/BU-ISCIII/relecov-tools/pull/585)
 - Update Metadata Template and Schema Ontology Mappings [#588](https://github.com/BU-ISCIII/relecov-tools/pull/588)
+- Remove *dev from relecov_schema.json [#596](https://github.com/BU-ISCIII/relecov-tools/pull/596)
 
 #### Removed
 
