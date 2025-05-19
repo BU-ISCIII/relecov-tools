@@ -16,6 +16,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed self.json_file call before it was set in update-db [#598](https://github.com/BU-ISCIII/relecov-tools/pull/598)
 - Included missing http in server_url from configuration.json [#598](https://github.com/BU-ISCIII/relecov-tools/pull/598)
+- Enhance Sample Presence Validation for read-bioinfo-metadata Processing [#599](https://github.com/BU-ISCIII/relecov-tools/pull/598)
+- Update relecov schema/template to v3.0.9 [#599](https://github.com/BU-ISCIII/relecov-tools/pull/598)
 
 #### Changed
 
