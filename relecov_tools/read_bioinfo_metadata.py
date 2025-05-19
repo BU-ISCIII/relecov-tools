@@ -228,6 +228,18 @@ class BioinfoMetadata(BaseModule):
         field_errors = {}
         field_valid = {}
 
+        sample_ids = {
+            row.get("sequencing_sample_id")
+            for row in j_data
+            if row.get("sequencing_sample_id")
+        }
+        matched_samples = sample_ids & set(map_data.keys())
+
+        if not matched_samples:
+            no_samples = True
+        else:
+            no_samples = False
+
         for row in j_data:
             # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
             #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
@@ -256,8 +268,11 @@ class BioinfoMetadata(BaseModule):
                         field_errors[sample_name] = {field: e}
                         row[field] = "Not Provided [SNOMED:434941000124101]"
                         continue
-            elif not self.software_config[self.current_config_key].get(
-                "multiple_samples"
+            elif (
+                not self.software_config[self.current_config_key].get(
+                    "multiple_samples"
+                )
+                and no_samples is True
             ):  # When sample ID is not in mapping_fields because is not a multiple_sample table
                 for field, value_dict in mapping_fields.items():
                     for json_field, software_key in value_dict.items():
