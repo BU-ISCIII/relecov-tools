@@ -355,10 +355,12 @@ class RelecovMetadata(BaseModule):
         for idx in range(len(m_data)):
             sample_id = str(m_data[idx].get("sequencing_sample_id"))
             if m_data[idx].get(map_field):
+                # Remove potential ontology tags from value like [SNOMED:258500001]
+                cleaned_key = re.sub(" [\[].*?[\]]", "", m_data[idx][map_field])
                 try:
                     adding_data = {
                         k: v
-                        for k, v in json_data[m_data[idx][map_field]].items()
+                        for k, v in json_data[cleaned_key].items()
                         if k in json_fields["adding_fields"]
                     }
                     m_data[idx].update(adding_data)
