@@ -4,13 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.X.X] - 2025-XX-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v.X.X.X
+## [1.5.4] - 2025-05-19 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.4
 
 ### Credits
+
+- [Pablo Mata](https://github.com/shettland)
+- [Alejandro Bernabeu](https://github.com/aberdur)
 
 #### Added enhancements
 
 #### Fixes
+
+- Fixed self.json_file call before it was set in update-db [#598](https://github.com/BU-ISCIII/relecov-tools/pull/598)
+- Included missing http in server_url from configuration.json [#598](https://github.com/BU-ISCIII/relecov-tools/pull/598)
+- Enhance Sample Presence Validation for read-bioinfo-metadata Processing [#599](https://github.com/BU-ISCIII/relecov-tools/pull/598)
+- Update relecov schema/template to v3.0.9 [#599](https://github.com/BU-ISCIII/relecov-tools/pull/598)
 
 #### Changed
 

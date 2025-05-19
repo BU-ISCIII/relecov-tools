@@ -35,7 +35,7 @@ class UpdateDatabase(BaseModule):
             json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file which have the data to map"
             )
-        json_dir = os.path.dirname(os.path.realpath(self.json_file))
+        json_dir = os.path.dirname(os.path.realpath(json_file))
         super().__init__(output_directory=json_dir, called_module="update-db")
         # Get the user and password for the database
         if user is None:
