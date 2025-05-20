@@ -460,7 +460,7 @@ class RelecovMetadata(BaseModule):
                 f"Samples file {self.sample_list_file} is empty. All samples will be included"
             )
             s_json["j_data"] = self.get_samples_files_data(metadata)
-        batch_id = self.get_batch_id_from_data(s_json["j_data"])
+        batch_id = self.get_batch_id_from_data(list(s_json["j_data"].values()))
         # This will declare self.batch_id in BaseModule() which will be used later
         self.set_batch_id(batch_id)
         metadata = self.process_from_json(metadata, s_json)
