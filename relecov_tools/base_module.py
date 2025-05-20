@@ -52,6 +52,7 @@ class BaseModule:
                     "default_outpath", "/tmp/relecov_tools"
                 )
         output_directory = os.path.realpath(output_directory)
+        self.basemod_outdir = output_directory
         if BaseModule._global_hex_code is None:
             if BaseModule._cli_log_file:
                 hex_folder = os.path.dirname(BaseModule._cli_log_file)
@@ -80,7 +81,6 @@ class BaseModule:
             )
 
         self.base_logsum = None
-        self.basemod_outdir = output_directory
         # Set this after the first module starts in case it calls other modules
         BaseModule._active_process = True
 
