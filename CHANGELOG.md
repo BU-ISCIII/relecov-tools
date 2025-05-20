@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.5dev] - 2025-05-19 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.5dev
+
+### Credits
+
+- [Pablo Mata](https://github.com/shettland)
+
+#### Added enhancements
+
+#### Fixes
+
+- Restricting filehandler search to basemodule outdir to fix logfiles with temp_id in its name [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
+- Create invalid_samples sftp dir only if there are invalid samples in wrapper [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
+- Fixed wrong call to get batch_id from data in read-lab-metadata [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [1.5.4] - 2025-05-19 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.4
 
 ### Credits
