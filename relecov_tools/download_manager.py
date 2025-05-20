@@ -1377,6 +1377,7 @@ class DownloadManager(BaseModule):
 
         self.relecov_sftp.close_connection()
         stderr.print(f"Processed {len(processed_folders)} folders: {processed_folders}")
+        self.log.info(f"Processed {len(processed_folders)} folders:{processed_folders}")
         if self.logsum.logs:
             self.log.info(
                 "Printing process summary to %s", self.platform_storage_folder
