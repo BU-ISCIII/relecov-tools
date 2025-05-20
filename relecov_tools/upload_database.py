@@ -139,21 +139,7 @@ class UpdateDatabase(BaseModule):
             )
             for prop, val in fixed_value.items():
                 s_dict[prop] = val
-            # Adding tha specimen_source field to set sample_type
-            try:
-                s_dict["sample_type"] = row["specimen_source"]
-            except KeyError as e:
-                logtxt = f"Unable to fetch specimen_source from json file {e}"
-                self.logsum.add_warning(entry=logtxt)
-                s_dict["sample_type"] = "Other"
             sample_list.append(s_dict)
-            # if sample_entry_date is not set then, add the current date
-            if "sample_entry_date" not in row:
-                logtxt = "sample_entry_date is not in the sample fields"
-                self.logsum.add_warning(entry=logtxt)
-                stderr.print(f"[yellow]{logtxt}")
-                s_dict["sample_entry_date"] = time.strftime("%Y-%m-%d")
-
         return sample_list
 
     def get_iskylims_fields_sample(self):
