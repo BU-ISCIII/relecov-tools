@@ -145,7 +145,9 @@ class BaseModule:
             # Only copy file content, not permissions nor metadata
             shutil.copyfile(log_file, new_log_path)
             os.remove(log_file)
-            self.log.debug(f"Successful copy and delete of old log-file {log_file}")
+            self.log.debug(
+                f"Successful redirection of old log-file {log_file} to {new_log_path}"
+            )
         except OSError as e:
             self.log.error(f"Could not redirect {log_file} to {new_log_path}: {e}")
             return
@@ -170,7 +172,10 @@ class BaseModule:
             x for x in self.log.handlers if isinstance(x, logging.FileHandler)
         ]
         for handler in file_handlers:
-            if self.called_module in handler.baseFilename:
+            if (
+                self.called_module in handler.baseFilename
+                and self.basemod_outdir in handler.baseFilename
+            ):
                 module_handlers.append(handler)
         if len(module_handlers) == 1:
             return module_handlers[0].baseFilename
