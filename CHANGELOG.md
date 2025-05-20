@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Pablo Mata](https://github.com/shettland)
+- [Sergio Olmos](https://github.com/OPSergio)
 
 #### Added enhancements
 
@@ -21,6 +22,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Changed
 
 #### Removed
+
+- Removed hardcoded `sample_entry_date` and legacy fallback logic from `upload_database` mapping. [#610](https://github.com/BU-ISCIII/relecov-tools/pull/610)
+
 
 ### Requirements
 
