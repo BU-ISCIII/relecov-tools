@@ -79,6 +79,15 @@ jobs:
           -s tests/data/read_lab_metadata/samples_data_test.json \
           -o $OUTPUT_LOCATION
 
+    - name: Run read-bioinfo-metadata module
+      if: matrix.modules == 'read-bioinfo-metadata'
+      run: |
+        relecov-tools read-bioinfo-metadata \
+          --json_file tests/data/read_bioinfo_metadata/validated_samples.json \
+          --input_folder tests/data/read_bioinfo_metadata/analysis_folder/ \
+          --software_name viralrecon \
+          -o $OUTPUT_LOCATION
+
     - name: Run validate module (default)
       if: matrix.modules == 'validate'
       run: |
