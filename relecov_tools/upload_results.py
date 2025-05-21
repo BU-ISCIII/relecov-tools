@@ -188,11 +188,19 @@ class UploadSftp(BaseModule):
                 self.log.warning(f"Tried to delete {zip_path}, but it does not exist")
                 stderr.print(f"[red]Tried to delete {zip_path}, but it does not exist")
             except PermissionError as e:
-                self.log.error(f"Permission denied when trying to delete {zip_path}: {e}")
-                stderr.print(f"[red]Permission denied when trying to delete {zip_path}: {e}")
+                self.log.error(
+                    f"Permission denied when trying to delete {zip_path}: {e}"
+                )
+                stderr.print(
+                    f"[red]Permission denied when trying to delete {zip_path}: {e}"
+                )
             except Exception as e:
-                self.log.error(f"Unexpected error when trying to delete {zip_path}: {e}")
-                stderr.print(f"[red]Unexpected error when trying to delete {zip_path}: {e}")
+                self.log.error(
+                    f"Unexpected error when trying to delete {zip_path}: {e}"
+                )
+                stderr.print(
+                    f"[red]Unexpected error when trying to delete {zip_path}: {e}"
+                )
             self.relecov_sftp.close_connection()
 
     def notify_lab(
