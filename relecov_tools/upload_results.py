@@ -97,7 +97,6 @@ class UploadSftp(BaseModule):
             raise FileNotFoundError(
                 f"Batch {self.batch_id} was not found in any COD* folder."
             )
-
         return matching_cod
 
     def compress_results(self, batch_data, cod):
@@ -182,6 +181,7 @@ class UploadSftp(BaseModule):
             return False
 
         finally:
+            os.remove(zip_path)
             self.relecov_sftp.close_connection()
 
     def notify_lab(
