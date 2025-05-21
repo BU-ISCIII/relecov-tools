@@ -138,51 +138,76 @@ class LogSum:
                         logs[key]["samples"][sample]["valid"] = False
         return logs
 
-    def merge_logs(self, key_name, logs_list):
+    def merge_logs(self, logs_list, key_name=None):
         """Merge a multiple set of logs without losing information
 
         Args:
-            key_name (str): Name of the final key holding the logs
             logs_list (list(dict)): List of logs for different processes,
             logs should only include the actual records,
+            key_name (str, Optional): Name of the final key holding the logs.
+            If None, all the keys found in logs_list will be included.
 
         Returns:
             final_logs (dict): Merged list of logs into a single record
         """
+        def add_new_logs(current_logs, new_logs):
+            """Merge two logs including all its keys"""
+            merged_logs = copy.deepcopy(current_logs)
 
-        def add_new_logs(merged_logs, logs):
-            if "errors" not in logs.keys():
-                logs = logs.get(list(logs.keys())[0])
-            merged_logs["errors"].extend(logs.get("errors"))
-            merged_logs["warnings"].extend(logs.get("warnings"))
-            if logs.get("samples"):
-                for sample, vals in logs["samples"].items():
-                    if sample not in merged_logs["samples"].keys():
-                        merged_logs["samples"][sample] = vals
-                    else:
-                        merged_logs["samples"][sample]["errors"].extend(
-                            logs["samples"][sample]["errors"]
+            for key, values in new_logs.items():
+                if key not in merged_logs:
+                    merged_logs[key] = copy.deepcopy(values)
+                else:
+                    for field in ["errors", "warnings"]:
+                        merged_logs[key].setdefault(field, [])
+                        merged_logs[key][field].extend(values.get(field, []))
+                        # Remove repeated elements
+                        merged_logs[key][field] = list(
+                            dict.fromkeys(merged_logs[key][field])
                         )
-                        merged_logs["samples"][sample]["warnings"].extend(
-                            logs["samples"][sample]["warnings"]
-                        )
+                    merged_logs[key].setdefault("samples", {})
+                    for sample, vals in new_logs[key].get("samples", {}).items():
+                        if sample not in merged_logs[key]["samples"].keys():
+                            merged_logs[key]["samples"][sample] = vals
+                        else:
+                            merged_logs[key]["samples"][sample]["errors"].extend(
+                                logs["samples"][sample]["errors"]
+                            )
+                            merged_logs[key]["samples"][sample]["warnings"].extend(
+                                logs["samples"][sample]["warnings"]
+                            )
+                    merged_logs[key].setdefault("path", self.output_location)
             return merged_logs
 
         if not logs_list:
-            return
-        merged_logs = OrderedDict({"valid": True, "errors": [], "warnings": []})
-        merged_logs["samples"] = {}
-        for idx, logs in enumerate(logs_list):
+            return {}
+        if len(logs_list) == 1:
+            if key_name is None:
+                return logs_list[0]
+            else:
+                if key_name in logs_list[0]:
+                    return logs_list[0]
+                else:
+                    return {}
+        proc_logs_list = []
+        for logs in logs_list:
+            if key_name is None:
+                proc_logs_list.append(logs)
+            else:
+                proc_logs_list.append({key_name: logs.get(key_name, {})})
+        merged_logs = proc_logs_list[0]
+        for idx, logs in enumerate(proc_logs_list[1:]):
             if not logs:
+                err = f"Logs {idx} were empty. Check if key {key_name} is present"
+                log.warning(err)
                 continue
             try:
                 merged_logs = add_new_logs(merged_logs, logs)
             except (TypeError, KeyError) as e:
                 err = f"Could not add logs {idx} in list: {e}"
-                merged_logs["errors"].extend(err)
+                stderr.print(f"[red]{err}")
                 log.error(err)
-        final_logs = {key_name: merged_logs}
-        return final_logs
+        return merged_logs
 
     def create_logs_excel(self, logs, excel_outpath):
         """Create an excel file with logs information
@@ -227,14 +252,15 @@ class LogSum:
 
             for key, logs in logs.items():
                 if not logs.get("samples"):
+                    log.warning(f"No samples found for key {key}")
                     try:
                         samples_logs = logs[key]["samples"]
                     except (KeyError, AttributeError) as e:
-                        stderr.print(
-                            f"[red]Could not convert log summary to excel: {e}"
-                        )
-                        log.error("Could not convert log summary to excel: %s" % str(e))
-                    return
+                        err = f"Could not convert log summary to excel for {key}: {e}"
+                        stderr.print(f"[red]{err}")
+                        log.error(err)
+                        workbook.close()
+                        return
                 else:
                     samples_logs = logs.get("samples")
                 if not samples_logs:
@@ -351,7 +377,6 @@ class LogSum:
                 log.error("Logs input must be a dict. No output file generated.")
                 stderr.print("[red]Logs input must be a dict. No output file.")
                 return
-        final_logs = self.prepare_final_logs(logs)
         if not called_module:
             traceback_functions = [
                 f.function for f in inspect.stack() if "__main__.py" in f.filename
@@ -367,6 +392,24 @@ class LogSum:
             filepath = os.path.join(self.output_location, filename)
         else:
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        if os.path.exists(filepath):
+            log.info(f"{filepath} already exists, merging its content...")
+            with open(filepath, "r", encoding="utf-8") as f:
+                present_logs = json.load(f)
+            if self.unique_key:
+                merge_key = self.unique_key
+            else:
+                merge_key = None
+            try:
+                merged_logs = self.merge_logs(
+                    key_name=merge_key, logs_list=[present_logs, logs]
+                )
+                logs = merged_logs
+            except Exception as e:
+                filepath = filepath.replace(".json", "_2.json")
+                err = f"Could not merge logs: {e}. Saving logs in {filepath} instead"
+                log.error(err)
+        final_logs = self.prepare_final_logs(logs)
         with open(filepath, "w", encoding="utf-8") as f:
             try:
                 f.write(

@@ -951,8 +951,9 @@ def build_schema(
     "-l",
     "--lab_code",
     type=click.Path(),
-    help="Name for target laboratory in log-summary.json files",
-    required=True,
+    default=None,
+    help="Only merge logs from target laboratory in log-summary.json files",
+    required=False,
 )
 @click.option(
     "-o",
@@ -988,9 +989,10 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
         try:
             with open(file, "r") as f:
                 content = json.load(f)
-                if lab_code not in content:
-                    raise KeyError(f"lab_code '{lab_code}' not found in {file}")
-                all_logs.append(content[lab_code])
+                if lab_code is not None and lab_code not in content:
+                    log.warning(f"lab_code '{lab_code}' not found in {file}")
+                    stderr.print(f"[yellow]lab_code '{lab_code}' not found in {file}")
+                all_logs.append(content)
         except Exception as e:
             stderr.print(f"[red]Couldn't extract data from {file}: {e}")
             log.error(f"Couldn't extract data from {file}: {e}")
@@ -1010,7 +1012,6 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
         logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
         json_outpath = output_filepath + ".json"
         relecov_tools.utils.write_json_to_file(final_logs, json_outpath)
-        print(f"[green]Successfully created logs Json in {json_outpath}")
     except Exception as e:
         if debug:
             log.error(f"EXCEPTION FOUND: {e}")
