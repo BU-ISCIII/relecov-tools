@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added zip file removal step in upload_results module [#613](https://github.com/BU-ISCIII/relecov-tools/pull/613)
 - Now all keys in log_summary files can be merged. Not only for a given lab-code [#615](https://github.com/BU-ISCIII/relecov-tools/pull/615)
+- Add GitHub Actions test for read-bioinfo-metadata module [#616](https://github.com/BU-ISCIII/relecov-tools/pull/616)
 
 #### Fixes
 
