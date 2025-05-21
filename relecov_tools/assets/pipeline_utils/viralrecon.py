@@ -8,6 +8,7 @@ import rich
 import os.path
 
 from pathlib import Path
+from datetime import datetime
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
@@ -147,8 +148,12 @@ class LongTableParse:
             sys.exit(1)
         else:
             analysis_date = relecov_tools.utils.get_file_date(self.file_path)
+            if len(analysis_date) == 8:
+                analysis_date = datetime.strptime(analysis_date, "%Y%m%d").strftime(
+                    "%Y-%m-%d"
+                )
         for key, values in samp_dict.items():
-            j_dict = {"sample_name": key, "analysis_date": analysis_date}
+            j_dict = {"sample_name": key, "bioinformatics_analysis_date": analysis_date}
             j_dict["variants"] = values
             j_list.append(j_dict)
         return j_list
