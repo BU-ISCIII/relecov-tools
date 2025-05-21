@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Added enhancements
 
+- Added zip file removal step in upload_results module [#613](https://github.com/BU-ISCIII/relecov-tools/pull/613)
+
 #### Fixes
 
 - Restricting filehandler search to basemodule outdir to fix logfiles with temp_id in its name [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
