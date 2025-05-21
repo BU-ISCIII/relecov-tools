@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Pablo Mata](https://github.com/shettland)
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Jaime Ozáez](https://github.com/jaimeozaez)
+- [Alejandro Bernabeu](https://github.com/aberdur)
 
 #### Added enhancements
 
@@ -21,8 +22,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Restricting filehandler search to basemodule outdir to fix logfiles with temp_id in its name [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 - Create invalid_samples sftp dir only if there are invalid samples in wrapper [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 - Fixed wrong call to get batch_id from data in read-lab-metadata [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
+- Fix incorrect bioinformatics_analysis_date key [#614](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 
 #### Changed
+
+- Update test datasets for GitHub Actions [#614](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 
 #### Removed
 
