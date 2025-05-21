@@ -150,6 +150,7 @@ class LogSum:
         Returns:
             final_logs (dict): Merged list of logs into a single record
         """
+
         def add_new_logs(current_logs, new_logs):
             """Merge two logs including all its keys"""
             merged_logs = copy.deepcopy(current_logs)
