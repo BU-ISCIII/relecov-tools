@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Pablo Mata](https://github.com/shettland)
 - [Sergio Olmos](https://github.com/OPSergio)
+- [Jaime Ozáez](https://github.com/jaimeozaez)
 
 #### Added enhancements
 
