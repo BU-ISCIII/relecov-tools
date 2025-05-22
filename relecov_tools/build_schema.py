@@ -354,7 +354,9 @@ class SchemaBuilder(BaseModule):
         )
         return draft_template
 
-    def standard_jsonschema_object(seschemalf, data_dict, target_key, remove_ontology=False):
+    def standard_jsonschema_object(
+        seschemalf, data_dict, target_key, remove_ontology=False
+    ):
         """
         Create a standard JSON Schema object for a given key in the data dictionary.
 
@@ -792,10 +794,17 @@ class SchemaBuilder(BaseModule):
                 df["required"] = df["property_id"].apply(
                     lambda x: "Y" if x in required_properties else "N"
                 )
+
                 def clean_ontologies(enums):
                     return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
 
-                df["enum"] = df["enum"].apply(lambda enum_list: clean_ontologies(enum_list) if isinstance(enum_list, list) else enum_list)
+                df["enum"] = df["enum"].apply(
+                    lambda enum_list: (
+                        clean_ontologies(enum_list)
+                        if isinstance(enum_list, list)
+                        else enum_list
+                    )
+                )
             except Exception as e:
                 self.log.error(f"Error processing schema properties: {e}")
                 stderr.print(f"Error processing schema properties: {e}")
