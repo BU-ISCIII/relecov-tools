@@ -228,15 +228,22 @@ class UploadSftp(BaseModule):
         )
 
         # Send the email
-        self.email_sender.send_email(
-            receiver_email=receiver_email,
-            subject=f"Batch {batch_name} - Resultados del análisis",
-            body=email_body,
-            attachments=[],
-            email_psswd=email_psswd,
-        )
+        try:
+            self.email_sender.send_email(
+                receiver_email=receiver_email,
+                subject=f"Batch {batch_name} - Resultados del análisis",
+                body=email_body,
+                attachments=[],
+                email_psswd=email_psswd,
+            )
+            self.log.info(f"Notification sent to {receiver_email} for batch {batch_name}.")
+            stderr.print(f"[green]Notification sent to {receiver_email} for batch {batch_name}.")
+        
+        except:
+            self.log.error(f"Error while sending the email to {receiver_email} for batch {batch_name}.")
+            stderr.print(f"[red]Error while sending the email to {receiver_email} for batch {batch_name}.")
 
-        print(f"Notification sent to {receiver_email} for batch {batch_name}.")
+
 
     def execute_process(self):
         """Runs the complete flow: search, compress, upload, logging and sending the email."""
