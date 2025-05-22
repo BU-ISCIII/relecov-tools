@@ -115,16 +115,17 @@ class UploadSftp(BaseModule):
         path_7z = os.path.join(batch_path, filename_7z)
 
         try:
-            subprocess.run([
-                "7z", "a",
-                f"-p{passwd_7z}",
-                "-mhe=on",
-                path_7z,
-                analysis_dir
-            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            subprocess.run(
+                ["7z", "a", f"-p{passwd_7z}", "-mhe=on", path_7z, analysis_dir],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True,
+            )
 
             self.log.info(f"Compressed file: {path_7z} with password: {passwd_7z}")
-            stderr.print(f"[green]Compressed file: {path_7z} with password: {passwd_7z}")
+            stderr.print(
+                f"[green]Compressed file: {path_7z} with password: {passwd_7z}"
+            )
             return path_7z, passwd_7z, filename_7z
 
         except subprocess.CalledProcessError as e:
@@ -196,9 +197,7 @@ class UploadSftp(BaseModule):
                     f"[red]Permission denied when trying to delete {path_7z}: {e}"
                 )
             except Exception as e:
-                self.log.error(
-                    f"Unexpected error when trying to delete {path_7z}: {e}"
-                )
+                self.log.error(f"Unexpected error when trying to delete {path_7z}: {e}")
                 stderr.print(
                     f"[red]Unexpected error when trying to delete {path_7z}: {e}"
                 )
@@ -235,14 +234,20 @@ class UploadSftp(BaseModule):
                 attachments=[],
                 email_psswd=email_psswd,
             )
-            self.log.info(f"Notification sent to {receiver_email} for batch {batch_name}.")
-            stderr.print(f"[green]Notification sent to {receiver_email} for batch {batch_name}.")
-        
+            self.log.info(
+                f"Notification sent to {receiver_email} for batch {batch_name}."
+            )
+            stderr.print(
+                f"[green]Notification sent to {receiver_email} for batch {batch_name}."
+            )
+
         except:
-            self.log.error(f"Error while sending the email to {receiver_email} for batch {batch_name}.")
-            stderr.print(f"[red]Error while sending the email to {receiver_email} for batch {batch_name}.")
-
-
+            self.log.error(
+                f"Error while sending the email to {receiver_email} for batch {batch_name}."
+            )
+            stderr.print(
+                f"[red]Error while sending the email to {receiver_email} for batch {batch_name}."
+            )
 
     def execute_process(self):
         """Runs the complete flow: search, compress, upload, logging and sending the email."""
