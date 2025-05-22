@@ -354,7 +354,7 @@ class SchemaBuilder(BaseModule):
         )
         return draft_template
 
-    def standard_jsonschema_object(seschemalf, data_dict, target_key):
+    def standard_jsonschema_object(seschemalf, data_dict, target_key, remove_ontology=False):
         """
         Create a standard JSON Schema object for a given key in the data dictionary.
 
@@ -378,10 +378,10 @@ class SchemaBuilder(BaseModule):
             value = handle_nan(data_dict.get(target_key, ""))
             # if no value, json key won't be necessary, then avoid adding it
             if len(value) > 0:
-                if target_key == "enum":
-                    json_dict[target_key] = value.split("; ")
-                elif target_key == "examples":
-                    json_dict[target_key] = [value]
+                items = value.split("; ")
+                if remove_ontology and target_key == "enum":
+                    items = [re.sub(r"\s*\[.*?\]", "", item).strip() for item in items]
+                json_dict[target_key] = items if target_key == "enum" else [value]
         elif target_key == "description":
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
         else:
@@ -530,7 +530,7 @@ class SchemaBuilder(BaseModule):
                                 schema_property.update(options_dict)
                         else:
                             std_json_feature = self.standard_jsonschema_object(
-                                db_features_dic, db_feature_key
+                                db_features_dic, db_feature_key, remove_ontology=False
                             )
                             if std_json_feature:
                                 schema_property[schema_feature_key] = std_json_feature[
@@ -792,6 +792,10 @@ class SchemaBuilder(BaseModule):
                 df["required"] = df["property_id"].apply(
                     lambda x: "Y" if x in required_properties else "N"
                 )
+                def clean_ontologies(enums):
+                    return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
+
+                df["enum"] = df["enum"].apply(lambda enum_list: clean_ontologies(enum_list) if isinstance(enum_list, list) else enum_list)
             except Exception as e:
                 self.log.error(f"Error processing schema properties: {e}")
                 stderr.print(f"Error processing schema properties: {e}")
@@ -973,6 +977,9 @@ class SchemaBuilder(BaseModule):
                 ws_metadata.delete_rows(5)
                 relecov_tools.assets.schema_utils.metadatalab_template.create_condition(
                     ws_metadata, self.project_config, df_filtered
+                )
+                relecov_tools.assets.schema_utils.metadatalab_template.add_conditional_format_age_check(
+                    ws_metadata, df_filtered
                 )
                 ws_dropdowns = (
                     wb.create_sheet("DROPDOWNS")
