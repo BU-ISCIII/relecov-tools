@@ -22,28 +22,31 @@
                 "error_title": "Valor no permitido"
             },
             "sample_collection_date": {
-                "header_row_idx": 4,
-                "max_rows": 4,
+                "header_row_idx": 5,
+                "max_rows": 1000,
                 "validation_type": "custom",
-                "formula1": "ISNUMBER(DATEVALUE(TEXT({col_letter}5, \"yyyy-mm-dd\")))",
+                "formula1": "=ISNUMBER({col_letter}5)",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
-                "error_title": "Formato de fecha incorrecto"
+                "error_title": "Formato de fecha incorrecto",
+                "format_cells_as_date": true
             },
             "sample_received_date": {
-                "header_row_idx": 4,
-                "max_rows": 4,
+                "header_row_idx": 5,
+                "max_rows": 1000,
                 "validation_type": "custom",
-                "formula1": "ISNUMBER(DATEVALUE(TEXT({col_letter}5, \"yyyy-mm-dd\")))",
+                "formula1": "=ISNUMBER({col_letter}5)",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
-                "error_title": "Formato de fecha incorrecto"
+                "error_title": "Formato de fecha incorrecto",
+                "format_cells_as_date": true
             },
             "sequencing_date": {
-                "header_row_idx": 4,
-                "max_rows": 4,
+                "header_row_idx": 5,
+                "max_rows": 1000,
                 "validation_type": "custom",
-                "formula1": "ISNUMBER(DATEVALUE(TEXT({col_letter}5, \"yyyy-mm-dd\")))",
+                "formula1": "=ISNUMBER({col_letter}5)",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
-                "error_title": "Formato de fecha incorrecto"
+                "error_title": "Formato de fecha incorrecto",
+                "format_cells_as_date": true
             }
         },
         "mepram": {
