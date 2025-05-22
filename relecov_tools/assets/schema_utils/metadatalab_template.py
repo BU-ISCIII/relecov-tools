@@ -238,12 +238,22 @@ def create_condition(ws_metadata, conditions, df_filtered):
 
             if rules.get("format_cells_as_date", False):
                 col_idx = column_index_from_string(col_letter)
-                for row in ws_metadata.iter_rows(min_row=start_row, max_row=end_row, min_col=col_idx, max_col=col_idx):
+                for row in ws_metadata.iter_rows(
+                    min_row=start_row, max_row=end_row, min_col=col_idx, max_col=col_idx
+                ):
                     for cell in row:
                         cell.number_format = "yyyy-mm-dd"
     return ws_metadata
 
-def add_conditional_format_age_check(ws_metadata, df_filtered, prop1="host_age_years", prop2="host_age_months", start_row=5, end_row=1000):
+
+def add_conditional_format_age_check(
+    ws_metadata,
+    df_filtered,
+    prop1="host_age_years",
+    prop2="host_age_months",
+    start_row=5,
+    end_row=1000,
+):
     """
     Applies a conditional formatting that marks in red if both cells are filled in
     (host_age_years and host_age_months) in the same row.
