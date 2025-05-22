@@ -135,7 +135,7 @@ class UploadSftp(BaseModule):
 
         except Exception as e:
             self.log.error(f"Unexpected error during compression: {e}")
-            stderr.print(f"[red]Unexpected error during compression")
+            stderr.print("[red]Unexpected error during compression")
             raise
 
     def upload_to_sftp(self, path_7z, cod):
@@ -241,7 +241,7 @@ class UploadSftp(BaseModule):
                 f"[green]Notification sent to {receiver_email} for batch {batch_name}."
             )
 
-        except:
+        except Exception:
             self.log.error(
                 f"Error while sending the email to {receiver_email} for batch {batch_name}."
             )
