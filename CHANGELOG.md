@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added zip file removal step in upload_results module [#613](https://github.com/BU-ISCIII/relecov-tools/pull/613)
 - Now all keys in log_summary files can be merged. Not only for a given lab-code [#615](https://github.com/BU-ISCIII/relecov-tools/pull/615)
 - Add GitHub Actions test for read-bioinfo-metadata module [#616](https://github.com/BU-ISCIII/relecov-tools/pull/616)
+- Validate that host_age_years and host_age_months are not both filled [#617](https://github.com/BU-ISCIII/relecov-tools/pull/617)
 - Included alternative ID selectino when no sequencing_sample_id is provided in excel file [#619](https://github.com/BU-ISCIII/relecov-tools/pull/619)
 - Included long_table param for update_db as required for --full_update [#619](https://github.com/BU-ISCIII/relecov-tools/pull/619)
 - Fill missing sample_fields required in iskylims with Not Provided in update-db [#620](https://github.com/BU-ISCIII/relecov-tools/pull/620)
@@ -30,6 +31,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed wrong call to get batch_id from data in read-lab-metadata [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 - Fix incorrect bioinformatics_analysis_date key [#614](https://github.com/BU-ISCIII/relecov-tools/pull/614)
 - Fixed analysis_date format in create_summary_tables.py, apart from the way consensus files are retrieved [#624](https://github.com/BU-ISCIII/relecov-tools/pull/624).
+- Remove ontologies from dropdowns in build-schema template generation [#617](https://github.com/BU-ISCIII/relecov-tools/pull/617)
+- Fix date validators in Excel templates [#617](https://github.com/BU-ISCIII/relecov-tools/pull/617)
 
 #### Changed
 
