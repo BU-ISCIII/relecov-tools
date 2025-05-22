@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import pyzipper
 import json
 import relecov_tools.utils
 import relecov_tools.sftp_client
@@ -10,6 +9,8 @@ from datetime import datetime
 from rich.console import Console
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.base_module import BaseModule
+import subprocess
+import pdb
 
 stderr = Console(
     stderr=True,
@@ -110,33 +111,34 @@ class UploadSftp(BaseModule):
             stderr.print(f"[red]Folder analysis_results not found in {batch_path}")
             return None, None, None
 
-        password = token_hex(8).encode()  # Creates a random password
-        zip_filename = f"{cod}_{batch}_analysis_results_{self.project}_{datetime.now().strftime('%Y%m%d%H%M%S')}.zip"
-        zip_path = os.path.join(batch_path, zip_filename)
+        passwd_7z = token_hex(8)  # Creates a random password
+        filename_7z = f"{cod}_{batch}_analysis_results_{self.project}_{datetime.now().strftime('%Y%m%d%H%M%S')}.7z"
+        path_7z = os.path.join(batch_path, filename_7z)
 
-        with pyzipper.AESZipFile(
-            zip_path, "w", compression=pyzipper.ZIP_DEFLATED, encryption=pyzipper.WZ_AES
-        ) as zipf:
-            zipf.setpassword(password)  # The password is assigned to ZIP file
-            for root, _, files in os.walk(analysis_dir):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    arcname = os.path.relpath(file_path, analysis_dir)
-                    if arcname.startswith("."):
-                        arcname = arcname[1:]  # Remove leading dot if present
-                    zipf.write(file_path, arcname)
+        try:
+            subprocess.run([
+                "7z", "a",
+                f"-p{passwd_7z}",
+                "-mhe=on",
+                path_7z,
+                analysis_dir
+            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
-        self.log.info(f"Compressed file: {zip_path} with password: {password.decode()}")
-        stderr.print(
-            f"[green]Compressed file: {zip_path} with password: {password.decode()}"
-        )
-        return (
-            zip_path,
-            password.decode(),
-            zip_filename,
-        )  # Converts the password to a string before returning it
+            self.log.info(f"Compressed file: {path_7z} with password: {passwd_7z}")
+            stderr.print(f"[green]Compressed file: {path_7z} with password: {passwd_7z}")
+            return path_7z, passwd_7z, filename_7z
 
-    def upload_to_sftp(self, zip_path, cod):
+        except subprocess.CalledProcessError as e:
+            self.log.error(f"Compression failed for {analysis_dir}: {e}")
+            stderr.print(f"[red]Compression failed for {analysis_dir}")
+            raise
+
+        except Exception as e:
+            self.log.error(f"Unexpected error during compression: {e}")
+            stderr.print(f"[red]Unexpected error during compression")
+            raise
+
+    def upload_to_sftp(self, path_7z, cod):
         """Upload the compressed file to the SFTP server in the ANALYSIS_RESULTS folder inside the corresponding COD"""
         if not self.relecov_sftp.open_connection():
             self.log.error("Could not connect to SFTP server")
@@ -147,7 +149,7 @@ class UploadSftp(BaseModule):
 
         # Define the remote path where the file is to be uploaded
         remote_dir = f"/{cod}/{self.analysis_folder}"
-        remote_file_path = f"{remote_dir}/{os.path.basename(zip_path)}"
+        remote_file_path = f"{remote_dir}/{os.path.basename(path_7z)}"
 
         try:
             # Check if the ANALYSIS_RESULTS folder exists inside the COD
@@ -162,17 +164,17 @@ class UploadSftp(BaseModule):
                 return False
 
             # Upload the compressed file
-            self.log.info(f"Uploading {zip_path} to {remote_file_path} in SFTP...")
-            stderr.print(f"[blue]Uploading {zip_path} to {remote_file_path} in SFTP...")
-            success = self.relecov_sftp.upload_file(zip_path, remote_file_path)
+            self.log.info(f"Uploading {path_7z} to {remote_file_path} in SFTP...")
+            stderr.print(f"[blue]Uploading {path_7z} to {remote_file_path} in SFTP...")
+            success = self.relecov_sftp.upload_file(path_7z, remote_file_path)
 
             if success:
                 self.log.info(f"File successfully uploaded to {remote_file_path}")
                 stderr.print(f"[green]File successfully uploaded to {remote_file_path}")
                 return True
             else:
-                self.log.error(f"Error uploading {zip_path} file")
-                stderr.print(f"[red]Error uploading {zip_path} file")
+                self.log.error(f"Error uploading {path_7z} file")
+                stderr.print(f"[red]Error uploading {path_7z} file")
                 return False
 
         except Exception as e:
@@ -182,24 +184,24 @@ class UploadSftp(BaseModule):
 
         finally:
             try:
-                os.remove(zip_path)
-                self.log.info(f"Deleted local file {zip_path}")
+                os.remove(path_7z)
+                self.log.info(f"Deleted local file {path_7z}")
             except FileNotFoundError:
-                self.log.warning(f"Tried to delete {zip_path}, but it does not exist")
-                stderr.print(f"[red]Tried to delete {zip_path}, but it does not exist")
+                self.log.warning(f"Tried to delete {path_7z}, but it does not exist")
+                stderr.print(f"[red]Tried to delete {path_7z}, but it does not exist")
             except PermissionError as e:
                 self.log.error(
-                    f"Permission denied when trying to delete {zip_path}: {e}"
+                    f"Permission denied when trying to delete {path_7z}: {e}"
                 )
                 stderr.print(
-                    f"[red]Permission denied when trying to delete {zip_path}: {e}"
+                    f"[red]Permission denied when trying to delete {path_7z}: {e}"
                 )
             except Exception as e:
                 self.log.error(
-                    f"Unexpected error when trying to delete {zip_path}: {e}"
+                    f"Unexpected error when trying to delete {path_7z}: {e}"
                 )
                 stderr.print(
-                    f"[red]Unexpected error when trying to delete {zip_path}: {e}"
+                    f"[red]Unexpected error when trying to delete {path_7z}: {e}"
                 )
             self.relecov_sftp.close_connection()
 
@@ -209,8 +211,8 @@ class UploadSftp(BaseModule):
         lab_code,
         receiver_email,
         email_psswd=None,
-        zip_passwd=None,
-        zip_filename=None,
+        passwd_7z=None,
+        filename_7z=None,
     ):
         """
         Sends an email notification to the laboratory with results details.
@@ -221,8 +223,8 @@ class UploadSftp(BaseModule):
             submitting_institution_code=lab_code,
             template_name="template_results_relecov.j2",
             batch=batch_name,
-            password=zip_passwd,
-            zip_filename=zip_filename,
+            password=passwd_7z,
+            zip_filename=filename_7z,
         )
 
         # Send the email
@@ -247,9 +249,9 @@ class UploadSftp(BaseModule):
             self.log.info(f"Processing batch {batch_data['batch']} in {cod}")
             stderr.print(f"Processing batch {batch_data['batch']} in {cod}")
 
-            zip_path, password, zip_filename = self.compress_results(batch_data, cod)
-            if zip_path:
-                success = self.upload_to_sftp(zip_path, cod)
+            path_7z, passwd_7z, filename_7z = self.compress_results(batch_data, cod)
+            if path_7z:
+                success = self.upload_to_sftp(path_7z, cod)
                 if success:
                     if cod not in self.processed_batches:
                         self.processed_batches[cod] = []
@@ -257,8 +259,8 @@ class UploadSftp(BaseModule):
                     self.processed_batches[cod].append(
                         {
                             "batch": batch_data["batch"],
-                            "archivo": zip_filename,
-                            "contraseña": password,
+                            "archivo": filename_7z,
+                            "contraseña": passwd_7z,
                             "fecha": datetime.now().isoformat(),
                         }
                     )
@@ -276,6 +278,6 @@ class UploadSftp(BaseModule):
                             batch_data["batch"],
                             lab_code,
                             receiver_email,
-                            zip_passwd=password,
-                            zip_filename=zip_filename,
+                            passwd_7z=passwd_7z,
+                            filename_7z=filename_7z,
                         )
