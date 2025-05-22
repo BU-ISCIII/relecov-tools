@@ -6,6 +6,9 @@ import pandas as pd
 
 import relecov_tools.utils
 from openpyxl.worksheet.datavalidation import DataValidation
+from openpyxl.utils import column_index_from_string
+from openpyxl.formatting.rule import FormulaRule
+from openpyxl.styles import PatternFill
 
 
 log = logging.getLogger(__name__)
@@ -232,4 +235,37 @@ def create_condition(ws_metadata, conditions, df_filtered):
                 validation.errorTitle = error_title
                 ws_metadata.add_data_validation(validation)
                 validation.add(cell_range)
+
+            if rules.get("format_cells_as_date", False):
+                col_idx = column_index_from_string(col_letter)
+                for row in ws_metadata.iter_rows(min_row=start_row, max_row=end_row, min_col=col_idx, max_col=col_idx):
+                    for cell in row:
+                        cell.number_format = "yyyy-mm-dd"
     return ws_metadata
+
+def add_conditional_format_age_check(ws_metadata, df_filtered, prop1="host_age_years", prop2="host_age_months", start_row=5, end_row=1000):
+    """
+    Applies a conditional formatting that marks in red if both cells are filled in
+    (host_age_years and host_age_months) in the same row.
+    """
+
+    label_to_property = dict(zip(df_filtered["label"], df_filtered["property_id"]))
+
+    column_map = {}
+    for cell in ws_metadata[4]:
+        property_id = label_to_property.get(cell.value)
+        if property_id:
+            column_map[property_id] = cell.column_letter
+
+    col1_letter = column_map.get(prop1)
+    col2_letter = column_map.get(prop2)
+    if not col1_letter or not col2_letter:
+        return
+
+    red_fill = PatternFill(start_color="F54627", end_color="F54627", fill_type="solid")
+    for row in range(start_row, end_row + 1):
+        formula = f"=AND(NOT(ISBLANK(${col1_letter}{row})), NOT(ISBLANK(${col2_letter}{row})))"
+        rule = FormulaRule(formula=[formula], fill=red_fill)
+
+        for col in [col1_letter, col2_letter]:
+            ws_metadata.conditional_formatting.add(f"{col}{row}", rule)
