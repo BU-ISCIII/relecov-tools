@@ -10,7 +10,6 @@ from rich.console import Console
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.base_module import BaseModule
 import subprocess
-import pdb
 
 stderr = Console(
     stderr=True,
