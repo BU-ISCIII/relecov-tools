@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added zip file removal step in upload_results module [#613](https://github.com/BU-ISCIII/relecov-tools/pull/613)
 - Now all keys in log_summary files can be merged. Not only for a given lab-code [#615](https://github.com/BU-ISCIII/relecov-tools/pull/615)
 - Add GitHub Actions test for read-bioinfo-metadata module [#616](https://github.com/BU-ISCIII/relecov-tools/pull/616)
+- Validate that host_age_years and host_age_months are not both filled [#617](https://github.com/BU-ISCIII/relecov-tools/pull/617)
 
 #### Fixes
 
@@ -25,6 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Create invalid_samples sftp dir only if there are invalid samples in wrapper [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 - Fixed wrong call to get batch_id from data in read-lab-metadata [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 - Fix incorrect bioinformatics_analysis_date key [#614](https://github.com/BU-ISCIII/relecov-tools/pull/607)
+- Remove ontologies from dropdowns in build-schema template generation [#617](https://github.com/BU-ISCIII/relecov-tools/pull/617)
+- Fix date validators in Excel templates [#617](https://github.com/BU-ISCIII/relecov-tools/pull/617)
 
 #### Changed
 
