@@ -26,7 +26,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Create invalid_samples sftp dir only if there are invalid samples in wrapper [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 - Fixed wrong call to get batch_id from data in read-lab-metadata [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 - Fix incorrect bioinformatics_analysis_date key [#614](https://github.com/BU-ISCIII/relecov-tools/pull/607)
-- Remove ontologies from dropdowns in build-schema template generation [#617](https://github.com/BU-ISCIII/relecov-tools/pull/617)
 - Fix date validators in Excel templates [#617](https://github.com/BU-ISCIII/relecov-tools/pull/617)
 
 #### Changed
