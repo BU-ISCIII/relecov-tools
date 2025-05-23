@@ -172,10 +172,10 @@ class LogSum:
                             merged_logs[key]["samples"][sample] = vals
                         else:
                             merged_logs[key]["samples"][sample]["errors"].extend(
-                                logs["samples"][sample]["errors"]
+                                new_logs[key]["samples"][sample]["errors"]
                             )
                             merged_logs[key]["samples"][sample]["warnings"].extend(
-                                logs["samples"][sample]["warnings"]
+                                new_logs[key]["samples"][sample]["warnings"]
                             )
                     merged_logs[key].setdefault("path", self.output_location)
             return merged_logs
