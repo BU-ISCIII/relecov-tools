@@ -30,6 +30,7 @@ class UpdateDatabase(BaseModule):
         platform=None,
         server_url=None,
         full_update=False,
+        long_table=None,
     ):
         if json_file is None:
             json_file = relecov_tools.utils.prompt_path(
@@ -68,8 +69,13 @@ class UpdateDatabase(BaseModule):
         )
         self.schema = relecov_tools.utils.read_json_file(schema)
         if full_update is True:
+            if not os.path.isfile(long_table):
+                raise ValueError(
+                    f"Provided long_table file does not exist {long_table_file}"
+                )
             self.full_update = True
             self.server_url = None
+            self.long_table_file = os.path.realpath(long_table)
         else:
             self.full_update = False
             if type_of_info is None:
@@ -364,13 +370,7 @@ class UpdateDatabase(BaseModule):
                 # TODO: Handling for servers with different datatype needs
                 if datatype == "variantdata":
                     json_dir = os.path.dirname(os.path.realpath(self.json_file))
-                    long_tables = glob.glob(os.path.join(json_dir, "*long_table*.json"))
-                    if not long_tables:
-                        json_file = relecov_tools.utils.prompt_path(
-                            msg="Select long_table json file for variant data"
-                        )
-                    else:
-                        json_file = long_tables[0]
+                    json_file = self.long_table_file
                     self.log.info("Selected %s file for variant data", str(json_file))
                     self.json_data = relecov_tools.utils.read_json_file(json_file)
                 self.store_data(datatype, self.server_name)
