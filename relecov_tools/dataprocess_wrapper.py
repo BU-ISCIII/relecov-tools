@@ -211,7 +211,7 @@ class ProcessWrapper(BaseModule):
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
 
         # As all folders are merged into one during download, there should only be 1 folder
-        if not valid_dirs or len(valid_dirs) >= 2 and invalid_json:
+        if (not valid_dirs or len(valid_dirs) >= 2) and invalid_json:
             # If all samples were valid during download and download_clean is used, the original folder might have been deleted
             self.log.warning(
                 "Couldnt find %s folder in remote sftp. Creating new one", main_folder
