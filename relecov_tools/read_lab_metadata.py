@@ -159,7 +159,7 @@ class RelecovMetadata(BaseModule):
         no_fastq_error = "No R1 fastq file was given for sample %s in metadata"
         n = 0
         for sample in clean_metadata_rows:
-            n+=1
+            n += 1
             sample_id = str(sample.get(self.unique_sample_id))
             if not sample_id:
                 if sample.get("collecting_lab_sample_id"):
@@ -541,13 +541,16 @@ class RelecovMetadata(BaseModule):
                 else:
                     sample_id = row.get("sequence_file_R1", "").split(".")[0]
                 if not sample_id:
-                    log_text = f"{sample_id_col} not provided in row {row_number}. Skipped"
+                    log_text = (
+                        f"{sample_id_col} not provided in row {row_number}. Skipped"
+                    )
                     self.logsum.add_error(entry=log_text)
+                    stderr.print(f"[red]{log_text}")
                     continue
                 else:
-                    log_text = f"{sample_id_col} not provided for {sample_id}
-                    self.logsum.add_error(entry=log_text, sample_id)
-                stderr.print(f"[red]{log_text}")
+                    log_text = f"{sample_id_col} not provided for {sample_id}"
+                    self.logsum.add_error(entry=log_text, sample=sample_id)
+                    stderr.print(f"[red]{log_text}")
             included_sample_ids.append(sample_id)
             for key in row.keys():
                 if header_flag in key:
