@@ -2,7 +2,6 @@
 import sys
 import os
 import re
-import glob
 import json
 import rich.console
 import time
@@ -71,7 +70,7 @@ class UpdateDatabase(BaseModule):
         if full_update is True:
             if not os.path.isfile(long_table):
                 raise ValueError(
-                    f"Provided long_table file does not exist {long_table_file}"
+                    f"Provided long_table file does not exist {long_table}"
                 )
             self.full_update = True
             self.server_url = None
@@ -369,7 +368,6 @@ class UpdateDatabase(BaseModule):
                 self.type_of_info = datatype
                 # TODO: Handling for servers with different datatype needs
                 if datatype == "variantdata":
-                    json_dir = os.path.dirname(os.path.realpath(self.json_file))
                     json_file = self.long_table_file
                     self.log.info("Selected %s file for variant data", str(json_file))
                     self.json_data = relecov_tools.utils.read_json_file(json_file)
