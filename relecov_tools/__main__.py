@@ -728,12 +728,20 @@ def upload_to_gisaid(
     default=False,
     help="Sequentially run every update option",
 )
+@click.option(
+    "-l",
+    "--long_table",
+    default=None,
+    help="Long_table.json file from read-bioinfo-metadata + viralrecon",
+)
 @click.pass_context
-def update_db(ctx, user, password, json, type, platform, server_url, full_update):
+def update_db(
+    ctx, user, password, json, type, platform, server_url, full_update, long_table
+):
     """upload the information included in json file to the database"""
     debug = ctx.obj.get("debug", False)
     update_database_obj = relecov_tools.upload_database.UpdateDatabase(
-        user, password, json, type, platform, server_url, full_update
+        user, password, json, type, platform, server_url, full_update, long_table
     )
     try:
         update_database_obj.update_db()
