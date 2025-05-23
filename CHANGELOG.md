@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Now all keys in log_summary files can be merged. Not only for a given lab-code [#615](https://github.com/BU-ISCIII/relecov-tools/pull/615)
 - Add GitHub Actions test for read-bioinfo-metadata module [#616](https://github.com/BU-ISCIII/relecov-tools/pull/616)
 - Included alternative ID selectino when no sequencing_sample_id is provided in excel file [#619](https://github.com/BU-ISCIII/relecov-tools/pull/619)
+- Included long_table param for update_db as required for --full_update [#619](https://github.com/BU-ISCIII/relecov-tools/pull/619)
 
 #### Fixes
 
