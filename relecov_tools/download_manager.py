@@ -390,6 +390,7 @@ class DownloadManager(BaseModule):
                         "sequence_file_R2": "sample1_R2.fastq.gz"},
              sample2:{...} }
         """
+
         def set_nones_to_str(row, req_vals):
             row = list(row)
             for index in req_vals:
@@ -445,16 +446,10 @@ class DownloadManager(BaseModule):
                     log_text = "Sequence File R1 not defined in Metadata for sample %s"
                     stderr.print(f"[red]{str(log_text % s_name)}")
                     self.include_error(entry=str(log_text % s_name), sample=s_name)
-                if (
-                    "paired" in row[index_layout].lower()
-                    and not row[index_fastq_r2]
-                ):
+                if "paired" in row[index_layout].lower() and not row[index_fastq_r2]:
                     error_text = "Sample %s is paired-end, but no R2 given"
                     self.include_error(error_text % str(sample_id), s_name)
-                if (
-                    "single" in row[index_layout].lower()
-                    and not row[index_fastq_r2]
-                ):
+                if "single" in row[index_layout].lower() and not row[index_fastq_r2]:
                     error_text = "Sample %s is single-end, but R1 and R2 were given"
                     self.include_error(error_text % str(sample_id), s_name)
                 sample_file_dict[s_name] = {}
