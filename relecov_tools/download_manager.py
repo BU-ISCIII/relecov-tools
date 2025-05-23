@@ -390,6 +390,13 @@ class DownloadManager(BaseModule):
                         "sequence_file_R2": "sample1_R2.fastq.gz"},
              sample2:{...} }
         """
+        def set_nones_to_str(row, req_vals):
+            row = list(row)
+            for index in req_vals:
+                if not row[index]:
+                    row[index] = ""
+            return row
+
         if not os.path.isfile(meta_f_path):
             self.log.error("Metadata file does not exist on %s", local_folder)
             stderr.print("[red] METADATA_LAB.xlsx do not exist in" + local_folder)
@@ -398,16 +405,25 @@ class DownloadManager(BaseModule):
         metadata_ws, meta_header, header_row = self.read_metadata_file(meta_f_path)
         # TODO Include these columns in config
         index_sampleID = meta_header.index("Sample ID given for sequencing")
+        index_altID = meta_header.index("Sample ID given by originating laboratory")
         index_layout = meta_header.index("Library Layout")
         index_fastq_r1 = meta_header.index("Sequence file R1")
         index_fastq_r2 = meta_header.index("Sequence file R2")
+        req_vals = [index_layout, index_fastq_r1, index_fastq_r2]
         counter = header_row
         for row in islice(metadata_ws.values, header_row, metadata_ws.max_row):
+            row = set_nones_to_str(row, req_vals)
             counter += 1
-            if row[index_sampleID] is not None:
-                row_complete = True
+            if not row[index_sampleID]:
+                if not row[index_altID]:
+                    sample_id = row[index_altID]
+                else:
+                    sample_id = row[index_fastq_r1].split(".")[0]
+            else:
+                sample_id = row[index_sampleID]
+            if sample_id:
                 try:
-                    s_name = str(row[index_sampleID]).strip()
+                    s_name = str(sample_id).strip()
                 except ValueError as e:
                     self.log.error("Unable to convert to string. %s", e)
                     stderr.print("[red]Unable to convert to string. ", e)
@@ -425,37 +441,33 @@ class DownloadManager(BaseModule):
                         stderr.print(log_text)
                         self.include_warning(log_text, sample=s_name)
                         continue
+                if not row[index_fastq_r1]:
+                    log_text = "Sequence File R1 not defined in Metadata for sample %s"
+                    stderr.print(f"[red]{str(log_text % s_name)}")
+                    self.include_error(entry=str(log_text % s_name), sample=s_name)
                 if (
                     "paired" in row[index_layout].lower()
-                    and row[index_fastq_r2] is None
+                    and not row[index_fastq_r2]
                 ):
                     error_text = "Sample %s is paired-end, but no R2 given"
-                    self.include_error(error_text % str(row[index_sampleID]), s_name)
-                    row_complete = False
+                    self.include_error(error_text % str(sample_id), s_name)
                 if (
                     "single" in row[index_layout].lower()
-                    and row[index_fastq_r2] is not None
+                    and not row[index_fastq_r2]
                 ):
                     error_text = "Sample %s is single-end, but R1 and R2 were given"
-                    self.include_error(error_text % str(row[index_sampleID]), s_name)
-                    row_complete = False
-                if row_complete:
-                    if row[index_fastq_r1] is not None:
-                        sample_file_dict[s_name] = {}
-                        # TODO: move these keys to configuration.json
-                        sample_file_dict[s_name]["sequence_file_R1"] = row[
-                            index_fastq_r1
-                        ].strip()
-                        if row[index_fastq_r2] is not None:
-                            sample_file_dict[s_name]["sequence_file_R2"] = row[
-                                index_fastq_r2
-                            ].strip()
-                    else:
-                        log_text = "Fastq_R1 not defined in Metadata for sample %s"
-                        stderr.print(f"[red]{str(log_text % s_name)}")
-                        self.include_error(entry=str(log_text % s_name), sample=s_name)
+                    self.include_error(error_text % str(sample_id), s_name)
+                sample_file_dict[s_name] = {}
+                # TODO: move these keys to configuration.json
+                sample_file_dict[s_name]["sequence_file_R1"] = row[
+                    index_fastq_r1
+                ].strip()
+                if row[index_fastq_r2]:
+                    sample_file_dict[s_name]["sequence_file_R2"] = row[
+                        index_fastq_r2
+                    ].strip()
             else:
-                txt = f"Row {counter} in metadata skipped.No sequencing sample ID given"
+                txt = f"Sample for row {counter} in metadata skipped. No sample ID nor file provided"
                 self.include_warning(entry=txt)
         # Remove duplicated files
         clean_sample_dict = self.remove_duplicated_values(sample_file_dict)
