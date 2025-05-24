@@ -124,26 +124,36 @@ class UpdateDatabase(BaseModule):
         s_fields = list(sample_fields.keys())
         for row in self.json_data:
             s_dict = {}
-            for key, value in row.items():
-                if isinstance(value, str):
-                    found_ontology = re.search(r"(.+) \[\w+:.*", value)
-                    if found_ontology:
-                        # remove the ontology data from item value
-                        value = found_ontology.group(1)
-                if key in s_project_fields:
-                    s_dict[key] = value
-                if key in s_fields:
-                    s_dict[sample_fields[key]] = value
-                if key not in s_project_fields and key not in s_fields:
-                    # just for debugging, write the fields that will not
-                    # be included in iSkyLIMS request
-                    self.log.debug("not key %s in iSkyLIMS", key)
+            for sfield in s_fields:
+                if sfield not in row.keys():
+                    s_dict[sample_fields[sfield]] = "Not Provided"
+                else:
+                    value = row[sfield]
+                    if isinstance(value, str):
+                        found_ontology = re.search(r"(.+) \[\w+:.*", value)
+                        if found_ontology:
+                            # remove the ontology data from item value
+                            value = found_ontology.group(1)
+                    s_dict[sample_fields[sfield]] = value
+            for pfield in s_project_fields:
+                if pfield in row.keys():
+                    value = row[pfield]
+                    if isinstance(value, str):
+                        found_ontology = re.search(r"(.+) \[\w+:.*", value)
+                        if found_ontology:
+                            # remove the ontology data from item value
+                            value = found_ontology.group(1)
+                        s_dict[pfield] = value
             # include the fixed value
             fixed_value = self.config_json.get_topic_data(
                 "upload_database", "iskylims_fixed_values"
             )
             for prop, val in fixed_value.items():
                 s_dict[prop] = val
+            all_iskylims_fields = s_project_fields + s_fields
+            sid = row.get("sequencing_sample_id", row.get("sequence_file_R1"))
+            for missing in list(set(list(row.keys())) - set(all_iskylims_fields)):
+                self.log.debug(f"Field {missing} not found in Iskylims in sample {sid}")
             sample_list.append(s_dict)
         return sample_list
 
