@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add GitHub Actions test for read-bioinfo-metadata module [#616](https://github.com/BU-ISCIII/relecov-tools/pull/616)
 - Included alternative ID selectino when no sequencing_sample_id is provided in excel file [#619](https://github.com/BU-ISCIII/relecov-tools/pull/619)
 - Included long_table param for update_db as required for --full_update [#619](https://github.com/BU-ISCIII/relecov-tools/pull/619)
+- Fill missing sample_fields required in iskylims with Not Provided in update-db [#620](https://github.com/BU-ISCIII/relecov-tools/pull/620)
 
 #### Fixes
 
