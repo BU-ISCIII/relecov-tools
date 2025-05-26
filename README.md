@@ -12,6 +12,7 @@ relecov-tools is a set of helper tools for the assembly of the different element
     - [Bioconda](#bioconda)
     - [Pip](#pip)
     - [Development version](#development-version)
+    - [Required software](#required-software)
   - [Usage](#usage)
     - [Command-line](#command-line)
     - [Modules](#modules)
@@ -61,6 +62,27 @@ If you want to install the latest code in the repository:
 conda create -n relecov_dev pip
 pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/relecov-tools.git@develop
 ```
+
+### Required software
+
+These tools require [7-Zip](https://www.7-zip.org/) (via the `p7zip` package) to handle compressed files. Please make sure it is installed before running the code.
+
+#### Install 7-Zip on Linux
+
+On **Debian/Ubuntu-based systems**:
+
+```bash
+sudo apt update
+sudo apt install p7zip-full
+```
+
+On **Red Hat/Fedora-based systems**:
+
+```bash
+sudo dnf install p7zip p7zip-plugins
+```
+> **Note:** For other distributions, please use your distribution's package manager to install `p7zip`.
+
 
 ## Usage
 
