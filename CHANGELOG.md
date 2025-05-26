@@ -43,6 +43,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
+- A new dependency has been added to `relecov-tools`: the 7-Zip software is now required. [#622](https://github.com/BU-ISCIII/relecov-tools/pull/622)
+
 ## [1.5.4] - 2025-05-19 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.4
 
 ### Credits
