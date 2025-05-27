@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Jaime Ozáez](https://github.com/jaimeozaez)
 - [Alejandro Bernabeu](https://github.com/aberdur)
+- [Victor Lopez](https://github.com/victor5lm)
 
 #### Added enhancements
 
@@ -28,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Create invalid_samples sftp dir only if there are invalid samples in wrapper [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 - Fixed wrong call to get batch_id from data in read-lab-metadata [#607](https://github.com/BU-ISCIII/relecov-tools/pull/607)
 - Fix incorrect bioinformatics_analysis_date key [#614](https://github.com/BU-ISCIII/relecov-tools/pull/614)
+- Fixed analysis_date format in create_summary_tables.py, apart from the way consensus files are retrieved [#624](https://github.com/BU-ISCIII/relecov-tools/pull/624).
 
 #### Changed
 
