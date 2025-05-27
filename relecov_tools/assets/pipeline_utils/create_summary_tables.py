@@ -87,13 +87,9 @@ def process_json_files(
                         if specified_week and week != specified_week:
                             continue
 
-                        #   Format change so that the date of analysis_date and sample_colletion_date have same format
-                        original_date_format = sample.get(
+                        analysis_date = sample.get(
                             "bioinformatics_analysis_date", "-"
                         )
-                        analysis_date = datetime.strptime(
-                            original_date_format, "%Y%m%d"
-                        ).strftime("%Y-%m-%d")
 
                         all_data.append(
                             {
@@ -121,7 +117,7 @@ def process_json_files(
                         )
 
                         # Search of consensus.fa files.
-                        fa_path = sample.get("viralrecon_filepath_mapping_consensus")
+                        fa_path = sample.get("consensus_sequence_filepath")
                         if copy_fasta and fa_path and os.path.exists(fa_path):
                             fa_files.append((fa_path, week))
 
