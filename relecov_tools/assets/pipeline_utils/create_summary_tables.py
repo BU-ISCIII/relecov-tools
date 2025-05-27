@@ -87,9 +87,7 @@ def process_json_files(
                         if specified_week and week != specified_week:
                             continue
 
-                        analysis_date = sample.get(
-                            "bioinformatics_analysis_date", "-"
-                        )
+                        analysis_date = sample.get("bioinformatics_analysis_date", "-")
 
                         all_data.append(
                             {
