@@ -20,3 +20,121 @@ mail_sender:
     email_use_tls: True
     yaml_cred_path: /path/credentials.yml
     institutions_guide_path: /path/contacts.json
+
+download:
+    user: ''
+    password: ''
+    conf_file: ''
+    download_option: ''
+    output_location: ''
+    target_folders: []
+    subfolder: RELECOV
+
+read_lab_metadata:
+    metadata_file: ''
+    sample_list_file: ''
+    metadata_out: ''
+    files_folder: ''
+
+validate:
+    json_file: ''
+    json_schema_file: ''
+    metadata: ''
+    out_folder: ''
+    excel_sheet: ''
+    registry: ''
+
+send_mail:
+    validate_file: ''
+    receiver_email: ''
+    attachments: []
+    template_path: ''
+    email_psswd: ''
+    additional_notes: ''
+
+map:
+    origin_schema: ''
+    json_data: ''
+    destination_schema: ''
+    schema_file: ''
+    output: ''
+
+upload_to_ena:
+    user: ''
+    password: ''
+    center: ''
+    ena_json: ''
+    template_path: ''
+    action: ADD
+    dev: false
+    upload_fastq: false
+    metadata_types: []
+    output_path: ''
+
+upload_to_gisaid:
+    user: ''
+    password: ''
+    client_id: ''
+    token: ''
+    gisaid_json: ''
+    input_path: ''
+    output_path: ''
+    frameshift: ''
+    proxy_config: ''
+    single: false
+    gzip: false
+
+update_db:
+    user: ''
+    password: ''
+    json: ''
+    type: ''
+    platform: ''
+    server_url: ''
+    full_update: false
+    long_table: ''
+
+read_bioinfo_metadata:
+    json_file: ''
+    input_folder: ''
+    out_dir: ''
+    software_name: ''
+    update: false
+
+metadata_homogeneizer:
+    institution: ''
+    directory: ''
+    output: ''
+
+pipeline_manager:
+    input: ''
+    templates_root: ''
+    config: ''
+    output: ''
+    folder_names: []
+
+build_schema:
+    input_file: ''
+    schema_base: ''
+    draft_version: ''
+    diff: false
+    version: ''
+    project: ''
+    non_interactive: false
+    out_dir: ''
+
+logs_to_excel:
+    lab_code: ''
+    output_folder: ''
+    files: []
+
+wrapper:
+    config_file: ''
+    output_folder: ''
+
+upload_results:
+    user: ''
+    password: ''
+    batch_id: ''
+    template_path: ''
+    project: Relecov
