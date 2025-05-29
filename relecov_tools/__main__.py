@@ -41,6 +41,7 @@ stderr = rich.console.Console(
 
 __version__ = "1.5.5dev"
 
+
 # Set up  merge config with extra plus CLI
 def merge_with_extra_config(ctx, func, **cli_kwargs):
     """
@@ -69,6 +70,7 @@ def merge_with_extra_config(ctx, func, **cli_kwargs):
 
     filtered = {k: v for k, v in merged.items() if k in param_names}
     return filtered
+
 
 def run_relecov_tools():
     # Set up the rich traceback

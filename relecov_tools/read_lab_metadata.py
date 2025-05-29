@@ -55,11 +55,15 @@ class RelecovMetadata(BaseModule):
                 )
             self.files_folder = os.path.abspath(self.files_folder)
 
-        if self.sample_list_file is not None and not os.path.exists(self.sample_list_file):
+        if self.sample_list_file is not None and not os.path.exists(
+            self.sample_list_file
+        ):
             self.log.error(
                 "Sample information file %s does not exist ", self.sample_list_file
             )
-            stderr.print("[red] Samples file " + self.sample_list_file + " does not exist")
+            stderr.print(
+                "[red] Samples file " + self.sample_list_file + " does not exist"
+            )
             raise FileNotFoundError(
                 "Sample information file %s does not exist ", self.sample_list_file
             )
