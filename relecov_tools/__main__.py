@@ -4,6 +4,7 @@ import os
 import json
 import sys
 from datetime import datetime
+import inspect
 
 # from rich.prompt import Confirm
 import click
@@ -40,6 +41,34 @@ stderr = rich.console.Console(
 
 __version__ = "1.5.5dev"
 
+# Set up  merge config with extra plus CLI
+def merge_with_extra_config(ctx, func, **cli_kwargs):
+    """
+    Merge CLI arguments with those defined in extra_config.
+    CLI has a higher priority than extra_config, which has a higher priority than default (None).
+    """
+    config = ctx.obj.get("extra_config", None)
+    if config is None:
+        config = relecov_tools.config_json.ConfigJson(extra_config=True)
+        ctx.obj["extra_config"] = config.json_data
+
+    command_name = func.name.strip().replace("-", "_")
+    extra_args = config.json_data.get(command_name, {})
+
+    # Update config and extra_config parameters with CLI: CLI > extra_config > default(None)
+    merged = dict(extra_args)
+    for k, v in cli_kwargs.items():
+        if v is not None:
+            merged[k] = v
+    # Select function parameters only
+    if hasattr(func, "params"):
+        param_names = [param.name for param in func.params]
+    else:
+        sig = inspect.signature(func)
+        param_names = list(sig.parameters.keys())
+
+    filtered = {k: v for k, v in merged.items() if k in param_names}
+    return filtered
 
 def run_relecov_tools():
     # Set up the rich traceback
@@ -302,10 +331,18 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, metadata_out, files_
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
-    debug = ctx.obj.get("debug", False)
-    new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(
-        metadata_file, sample_list_file, metadata_out, files_folder
+    # Merge arguments
+    args = merge_with_extra_config(
+        ctx,
+        read_lab_metadata,
+        metadata_file=metadata_file,
+        sample_list_file=sample_list_file,
+        metadata_out=metadata_out,
+        files_folder=files_folder,
     )
+    debug = ctx.obj.get("debug", False)
+    new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(**args)
+
     try:
         new_metadata.create_metadata_json()
     except Exception as e:
