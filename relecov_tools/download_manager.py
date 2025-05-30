@@ -38,7 +38,7 @@ class DownloadManager(BaseModule):
     def __init__(
         self,
         user=None,
-        passwd=None,
+        password=None,
         conf_file=None,
         download_option=None,
         output_location=None,
@@ -53,7 +53,7 @@ class DownloadManager(BaseModule):
             "sftp_handle", "allowed_file_extensions"
         )
         sftp_user = user
-        sftp_passwd = passwd
+        sftp_passwd = password
         self.target_folders = target_folders
         self.subfolder = subfolder
         self.allowed_download_options = config_json.get_topic_data(

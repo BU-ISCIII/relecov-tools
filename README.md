@@ -148,17 +148,22 @@ Usage: relecov-tools download [OPTIONS]
 
   Download files located in sftp server.
 
-  Options:
-    -u, --user            User name for login to sftp server
-    -p, --password        Password for the user to login
-    -d, --download_option Select the download option: [download_only, download_clean, delete_only].
-        download_only will only download the files
-        download_clean will remove files from sftp after download
-        delete_only will only delete the files
-    -o, --output_location Flag: Select location for downloaded files, overrides config file location
-    -t, --target_folders  Flag: Select which sftp folders will be targeted giving [paths] or via prompt
-    -f, --conf_file       Configuration file in yaml format (no params file)
-    --help                Show this message and exit.
+Options:
+  -u, --user TEXT             User name for login to sftp server
+  -p, --password TEXT         password for the user to login
+  -f, --conf_file TEXT        Configuration file (not params file)
+  -d, --download_option TEXT  Select the download option: [download_only,download_clean, delete_only].
+    download_only will only download the files.
+    download_clean will remove files from sftp after download.
+    delete_only will only delete the files.
+  -o, --output_location TEXT  Flag: Select location for downloaded files,
+                              overrides config file location
+  -t, --target_folders TEXT   Flag: Select which folders will be targeted
+                              giving [paths] or via prompt. For multiple
+                              folders use ["folder1", "folder2"]
+  -s, --subfolder TEXT        Flag: Specify which subfolder to process
+                              (default: RELECOV)
+  --help                      Show this message and exit.
 ```
 
 Configuration can be passed in several formats:
