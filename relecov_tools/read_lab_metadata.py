@@ -21,15 +21,15 @@ class RelecovMetadata(BaseModule):
         self,
         metadata_file=None,
         sample_list_file=None,
-        metadata_out=None,
+        output_folder=None,
         files_folder=None,
         **kwargs,
     ):
-        super().__init__(output_directory=metadata_out, called_module=__name__)
+        super().__init__(output_directory=output_folder, called_module=__name__)
         self.log.info("Initiating read-lab-metadata process")
         self.metadata_file = metadata_file
         self.sample_list_file = sample_list_file
-        self.metadata_out = metadata_out
+        self.output_folder = output_folder
         self.files_folder = files_folder
 
         if self.metadata_file is None:
@@ -67,9 +67,8 @@ class RelecovMetadata(BaseModule):
             raise FileNotFoundError(
                 "Sample information file %s does not exist ", self.sample_list_file
             )
-
-        if self.metadata_out is None:
-            self.metadata_out = relecov_tools.utils.prompt_path(
+        if self.output_folder is None:
+            self.output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
 
@@ -83,10 +82,10 @@ class RelecovMetadata(BaseModule):
         self.configuration = config_json
         self.institution_config = config_json.get_configuration("institutions_config")
 
-        out_path = os.path.realpath(self.metadata_out)
+        out_path = os.path.realpath(self.output_folder)
         self.lab_code = out_path.split("/")[-2]
         self.logsum = self.parent_log_summary(
-            output_location=self.metadata_out, unique_key=self.lab_code, path=out_path
+            output_location=self.output_folder, unique_key=self.lab_code, path=out_path
         )
 
         with open(relecov_sch_path, "r") as fh:
@@ -229,7 +228,7 @@ class RelecovMetadata(BaseModule):
         try:
             samples_filename = "_".join(["samples_data", self.lab_code + ".json"])
             samples_filename = self.tag_filename(filename=samples_filename)
-            file_path = os.path.join(self.metadata_out, samples_filename)
+            file_path = os.path.join(self.output_folder, samples_filename)
             relecov_tools.utils.write_json_to_file(j_data, file_path)
         except Exception:
             self.log.error("Could not output samples_data.json file to output folder")
@@ -647,10 +646,10 @@ class RelecovMetadata(BaseModule):
         file_code = "_".join(["lab_metadata", self.lab_code]) + ".json"
         file_name = self.tag_filename(filename=file_code)
         stderr.print("[blue]Writting output json file")
-        os.makedirs(self.metadata_out, exist_ok=True)
+        os.makedirs(self.output_folder, exist_ok=True)
         # Creating log summary
         self.parent_create_error_summary()
-        file_path = os.path.join(self.metadata_out, file_name)
+        file_path = os.path.join(self.output_folder, file_name)
         self.log.info("Writting output json file %s", file_path)
         relecov_tools.utils.write_json_to_file(completed_metadata, file_path)
         return True
