@@ -71,11 +71,12 @@ class BioinfoReportLog:
 class BioinfoMetadata(BaseModule):
     def __init__(
         self,
-        readlabmeta_json_file=None,
+        json_file=None,
         input_folder=None,
         output_folder=None,
-        software=None,
+        software_name=None,
         update=False,
+        **kwargs,
     ):
         super().__init__(output_directory=output_folder, called_module=__name__)
         self.log.info("Initiating read-bioinfo-metadata process")
@@ -90,20 +91,23 @@ class BioinfoMetadata(BaseModule):
         self.log_report = BioinfoReportLog(output_folder=output_folder)
 
         # Parse read-lab-meta-data
-        if readlabmeta_json_file is None:
-            readlabmeta_json_file = relecov_tools.utils.prompt_path(
+        if json_file is None:
+            json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file that was created by the read-lab-metadata"
             )
-        if not os.path.isfile(readlabmeta_json_file):
+        if not os.path.isfile(json_file):
             self.update_all_logs(
                 self.__init__.__name__,
                 "error",
-                f"file {readlabmeta_json_file} does not exist",
+                f"file {json_file} does not exist",
             )
             sys.exit(
                 self.log_report.print_log_report(self.__init__.__name__, ["error"])
             )
-        self.readlabmeta_json_file = readlabmeta_json_file
+        
+        #  Assign a new name for better readability
+        self.readlabmeta_json_file = json_file
+
         # Initialize j_data object
         stderr.print("[blue]Reading lab metadata json")
         self.j_data = self.collect_info_from_lab_json()
@@ -130,11 +134,11 @@ class BioinfoMetadata(BaseModule):
         self.bioinfo_json_file = os.path.join(
             os.path.dirname(__file__), "conf", "bioinfo_config.json"
         )
-        if software is None:
-            software = relecov_tools.utils.prompt_path(
+        if software_name is None:
+            software_name = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
             )
-        self.software_name = software
+        self.software_name = software_name
         available_software = relecov_tools.utils.get_available_software(
             self.bioinfo_json_file
         )

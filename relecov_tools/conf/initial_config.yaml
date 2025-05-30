@@ -97,7 +97,7 @@ update_db:
 read_bioinfo_metadata:
     json_file: ''
     input_folder: ''
-    out_dir: ''
+    output_folder: ''
     software_name: ''
     update: false
 

@@ -43,13 +43,13 @@ __version__ = "1.5.5dev"
 
 
 # Set up  merge config with extra plus CLI
-def merge_with_extra_config(ctx, allow_extra_conf=False):
+def merge_with_extra_config(ctx, add_extra_config=False):
     """
     Merge CLI arguments with those defined in extra_config.
     CLI has a higher priority than extra_config, which has a higher priority than default (None).
     """
     # Set which configuration is going to be used
-    if allow_extra_conf:
+    if add_extra_config:
         config = relecov_tools.config_json.ConfigJson(extra_config=True)
     else:
         config = relecov_tools.config_json.ConfigJson()
@@ -799,7 +799,7 @@ def update_db(
     help="json file containing lab metadata",
 )
 @click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
-@click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file")
+@click.option("-o", "--output_folder", type=click.Path(), help="Path to save output file")
 @click.option("-s", "--software_name", help="Name of the software/pipeline used.")
 @click.option(
     "--update",
@@ -808,18 +808,17 @@ def update_db(
     help="If the output file already exists, ask if you want to update it.",
 )
 @click.pass_context
-def read_bioinfo_metadata(ctx, json_file, input_folder, out_dir, software_name, update):
+def read_bioinfo_metadata(ctx, json_file, input_folder, output_folder, software_name, update):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
-    debug = ctx.obj.get("debug", False)
-    new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        json_file,
-        input_folder,
-        out_dir,
-        software_name,
-        update,
+    # Merge arguments
+    args_merged = merge_with_extra_config(
+        ctx=ctx,
+        add_extra_config=True,
     )
+    debug = ctx.obj.get("debug", False)
+    new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(**args_merged)
     try:
         new_bioinfo_metadata.create_bioinfo_file()
     except Exception as e:
