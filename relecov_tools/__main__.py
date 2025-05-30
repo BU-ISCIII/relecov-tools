@@ -390,14 +390,14 @@ def validate(ctx):
 @relecov_tools_cli.command(help_priority=4)
 @click.option(
     "-v",
-    "--validate-file",
+    "--validate_file",
     required=True,
     type=click.Path(exists=True),
     help="Path to the validation summary json file (validate_log_summary.json)",
 )
 @click.option(
     "-r",
-    "--receiver-email",
+    "--receiver_email",
     required=False,
     help="Recipient's e-mail address (optional). If not provided, it will be extracted from the institutions guide.",
 )
@@ -418,32 +418,34 @@ def validate(ctx):
 )
 @click.option(
     "-p",
-    "--email-psswd",
+    "--email_psswd",
     help="Password for bioinformatica@isciii.es",
     required=False,
     default=None,
 )
 @click.option(
     "-n",
-    "--additional-notes",
+    "--additional_notes",
     type=click.Path(exists=True),
     required=False,
     help="Path to a .txt file with additional notes to include in the email (optional).",
 )
 @click.pass_context
-def send_mail(
-    ctx,
-    validate_file,
-    receiver_email,
-    attachments,
-    template_path,
-    email_psswd,
-    additional_notes,
-):
+def send_mail(ctx):
     """
     Send a sample validation report by mail.
     """
     debug = ctx.obj.get("debug", False)
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
+
+    # Get arguments to use them here
+    validate_file = args_merged.get("validate_file")
+    receiver_email = args_merged.get("receiver_email")
+    attachments = args_merged.get("attachments")
+    template_path = args_merged.get("template_path")
+    email_psswd = args_merged.get("email_psswd")
+    additional_notes = args_merged.get("additional_notes")
+
     config_loader = relecov_tools.config_json.ConfigJson(extra_config=True)
     config = config_loader.get_configuration("mail_sender")
     if not config:
@@ -458,7 +460,6 @@ def send_mail(
         raise ValueError("Error: Validation data could not be loaded.")
 
     submitting_institution_code = list(validate_data.keys())[0]
-
     invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
 
     if not template_path:
