@@ -41,6 +41,7 @@ stderr = rich.console.Console(
 
 __version__ = "1.5.5dev"
 
+# INFO: All @click.option parameters live in ctx.params; merge_with_extra_config keeps the CLI > extra_config > default hierarchy, so the modules function only needs ctx in its signature.
 
 # Set up  merge config with extra plus CLI
 def merge_with_extra_config(ctx, add_extra_config=False):
