@@ -45,7 +45,7 @@ __version__ = "1.5.5dev"
 # Set up  merge config with extra plus CLI
 def merge_with_extra_config(ctx, add_extra_config=False):
     """
-    Merge CLI arguments with those defined in extra_config.
+    Merge CLI arguments with those defined in conig or extra_config.
     CLI has a higher priority than extra_config, which has a higher priority than default (None).
     """
     # Set which configuration is going to be used
@@ -275,27 +275,16 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
     help="Flag: Specify which subfolder to process (default: RELECOV)",
 )
 @click.pass_context
-def download(
-    ctx,
-    user,
-    password,
-    conf_file,
-    download_option,
-    output_location,
-    target_folders,
-    subfolder,
-):
+def download(ctx):
     """Download files located in sftp server."""
     debug = ctx.obj.get("debug", False)
+    args_merged = merge_with_extra_config(
+        ctx=ctx,
+        add_extra_config=True,
+    )
     try:
         download_manager = relecov_tools.download_manager.DownloadManager(
-            user,
-            password,
-            conf_file,
-            download_option,
-            output_location,
-            target_folders,
-            subfolder,
+            **args_merged
         )
         download_manager.execute_process()
     except Exception as e:
@@ -331,7 +320,7 @@ def download(
     help="Path to folder where samples files are located",
 )
 @click.pass_context
-def read_lab_metadata(ctx, metadata_file, sample_list_file, output_folder, files_folder):
+def read_lab_metadata(ctx):
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
@@ -808,7 +797,7 @@ def update_db(
     help="If the output file already exists, ask if you want to update it.",
 )
 @click.pass_context
-def read_bioinfo_metadata(ctx, json_file, input_folder, output_folder, software_name, update):
+def read_bioinfo_metadata(ctx):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
