@@ -43,30 +43,32 @@ __version__ = "1.5.5dev"
 
 
 # Set up  merge config with extra plus CLI
-def merge_with_extra_config(ctx, func, **cli_kwargs):
+def merge_with_extra_config(ctx, allow_extra_conf=False):
     """
     Merge CLI arguments with those defined in extra_config.
     CLI has a higher priority than extra_config, which has a higher priority than default (None).
     """
-    config = ctx.obj.get("extra_config", None)
-    if config is None:
+    # Set which configuration is going to be used
+    if allow_extra_conf:
         config = relecov_tools.config_json.ConfigJson(extra_config=True)
-        ctx.obj["extra_config"] = config.json_data
+    else:
+        config = relecov_tools.config_json.ConfigJson()
+    ctx.obj["config"] = config.json_data
 
-    command_name = func.name.strip().replace("-", "_")
+    command_name = ctx.command.name.replace('-','_')
+    command_params = ctx.params
     extra_args = config.json_data.get(command_name, {})
 
-    # Update config and extra_config parameters with CLI: CLI > extra_config > default(None)
+    # Merge: CLI > extra_config > default
     merged = dict(extra_args)
-    for k, v in cli_kwargs.items():
+    for k, v in command_params.items():
         if v is not None:
             merged[k] = v
-    # Select function parameters only
-    if hasattr(func, "params"):
-        param_names = [param.name for param in func.params]
-    else:
-        sig = inspect.signature(func)
-        param_names = list(sig.parameters.keys())
+
+    # Get function signature to filter only valid params
+    func = ctx.command.callback
+    sig = inspect.signature(func)
+    param_names = list(sig.parameters.keys())
 
     filtered = {k: v for k, v in merged.items() if k in param_names}
     return filtered
@@ -319,7 +321,7 @@ def download(
     help="Json with the additional metadata to add to the received user metadata",
 )
 @click.option(
-    "-o", "--metadata-out", type=click.Path(), help="Path to save output metadata file"
+    "-o", "--output_folder", type=click.Path(), help="Path to save output metadata file"
 )
 @click.option(
     "-f",
@@ -329,21 +331,17 @@ def download(
     help="Path to folder where samples files are located",
 )
 @click.pass_context
-def read_lab_metadata(ctx, metadata_file, sample_list_file, metadata_out, files_folder):
+def read_lab_metadata(ctx, metadata_file, sample_list_file, output_folder, files_folder):
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
     # Merge arguments
-    args = merge_with_extra_config(
-        ctx,
-        read_lab_metadata,
-        metadata_file=metadata_file,
-        sample_list_file=sample_list_file,
-        metadata_out=metadata_out,
-        files_folder=files_folder,
+    args_merged = merge_with_extra_config(
+        ctx=ctx,
+        allow_extra_conf=True
     )
     debug = ctx.obj.get("debug", False)
-    new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(**args)
+    new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(**args_merged)
 
     try:
         new_metadata.create_metadata_json()

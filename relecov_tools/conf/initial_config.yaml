@@ -33,7 +33,7 @@ download:
 read_lab_metadata:
     metadata_file: ''
     sample_list_file: ''
-    metadata_out: ''
+    output_folder: ''
     files_folder: ''
 
 validate:
