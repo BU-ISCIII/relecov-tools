@@ -24,7 +24,7 @@ stderr = rich.console.Console(
 class SchemaValidation(BaseModule):
     def __init__(
         self,
-        json_data_file=None,
+        json_file=None,
         json_schema_file=None,
         metadata=None,
         out_folder=None,
@@ -43,8 +43,8 @@ class SchemaValidation(BaseModule):
 
         self.json_schema = relecov_tools.utils.read_json_file(json_schema_file)
 
-        if json_data_file is None:
-            json_data_file = relecov_tools.utils.prompt_path(
+        if json_file is None:
+            json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file to be validated"
             )
 
@@ -56,11 +56,11 @@ class SchemaValidation(BaseModule):
             self.out_folder = out_folder
 
         # Read and check json to validate file
-        if not os.path.isfile(json_data_file):
+        if not os.path.isfile(json_file):
             stderr.print("[red] Json file does not exist")
             self.log.error("Json file does not exist")
             sys.exit(1)
-        self.json_data_file = json_data_file
+        self.json_data_file = json_file
         out_path = os.path.dirname(os.path.realpath(self.json_data_file))
         self.lab_code = out_path.split("/")[-2]
         self.logsum = self.parent_log_summary(
@@ -69,21 +69,21 @@ class SchemaValidation(BaseModule):
 
         stderr.print("[blue] Reading the json file")
         self.log.info("Reading the json file")
-        self.json_data = relecov_tools.utils.read_json_file(json_data_file)
+        self.json_data = relecov_tools.utils.read_json_file(json_file)
         if not isinstance(self.json_data, list):
-            stderr.print(f"[red]Invalid json file content in {json_data_file}.")
+            stderr.print(f"[red]Invalid json file content in {json_file}.")
             stderr.print("Should be a list of dicts. Create it with read-lab-metadata")
-            self.log.error(f"[red]Invalid json file content in {json_data_file}.")
+            self.log.error(f"[red]Invalid json file content in {json_file}.")
             self.log.error(
                 "Should be a list of dicts. Create it with read-lab-metadata"
             )
-            raise TypeError(f"Invalid json file content in {json_data_file}")
+            raise TypeError(f"Invalid json file content in {json_file}")
         try:
             batch_id = self.get_batch_id_from_data(self.json_data)
         except ValueError:
-            raise ValueError(f"Provided json file {json_data_file} is empty")
+            raise ValueError(f"Provided json file {json_file} is empty")
         except AttributeError as e:
-            raise ValueError(f"Invalid json file content in {json_data_file}: {e}")
+            raise ValueError(f"Invalid json file content in {json_file}: {e}")
         self.set_batch_id(batch_id)
 
         self.metadata = metadata
