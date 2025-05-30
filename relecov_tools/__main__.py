@@ -370,19 +370,11 @@ def read_lab_metadata(ctx):
     help="Path to the JSON file containing the registered records of validated samples with their unique sample identifiers.",
 )
 @click.pass_context
-def validate(
-    ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet, registry
-):
+def validate(ctx):
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
-    validation = relecov_tools.json_validation.SchemaValidation(
-        json_file,
-        json_schema_file,
-        metadata,
-        out_folder,
-        excel_sheet,
-        registry,
-    )
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
+    validation = relecov_tools.json_validation.SchemaValidation(**args_merged)
     try:
         validation.validate()
     except Exception as e:
