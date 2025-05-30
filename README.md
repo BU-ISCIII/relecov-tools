@@ -187,12 +187,12 @@ Usage: relecov-tools read-metadata [OPTIONS]
 
   Create the json compliant to the relecov schema from the Metadata file.
 
-  Options:
-    -m, --metadata_file PATH     file containing metadata in xlsx format.
-    -s, --sample_list_file PATH  Json with the additional metadata to add to the
-    received user metadata.
-    -o, --metadata-out PATH      Path to save output  metadata file in json format.
-    --help                       Show this message and exit.
+Options:
+  -m, --metadata_file PATH     file containing metadata
+  -s, --sample_list_file PATH  Json with the additional metadata to add to the received user metadata
+  -o, --output_folder PATH     Path to save output metadata file
+  -f, --files-folder PATH      Path to folder where samples files are located
+  --help                       Show this message and exit.
 ```
 
 
@@ -227,11 +227,14 @@ Usage: relecov-tools read-bioinfo-metadata [OPTIONS]
 
    Create the json compliant to the relecov schema with Bioinfo Metadata.
 
-   Options:
-      -j, --json_file       Json file containing lab metadata
-      -i, --input_folder    Path to folder containing analysis results
-      -s, --software_name   Name of the software employed in the bioinformatics analysis (default: viralrecon).
-      -o, --out_dir         Path to save output file"
+Options:
+  -j, --json_file PATH      json file containing lab metadata
+  -i, --input_folder PATH   Path to input files
+  -o, --output_folder PATH  Path to save output file
+  -s, --software_name TEXT  Name of the software/pipeline used.
+  --update                  If the output file already exists, ask if you want
+                            to update it.
+  --help                    Show this message and exit.
 ```
 - Note: Software-specific configurations are available in [bioinfo_config.json](./relecov_tools/conf/bioinfo_config.json).
 
