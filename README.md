@@ -213,14 +213,19 @@ Usage: relecov-tools send-email [OPTIONS]
 
   Send a sample validation report by mail.
 
-  Options:
-    -v, --validate-file PATH       Path to the validation summary JSON file (e.g., validate_log_summary.json) [required]
-    -r, --receiver-email TEXT      Recipient's e-mail address. If not provided, it will be extracted from the institutions guide
-    -a, --attachments PATH         Path(s) to one or more files to attach
-    -t, --template_path PATH       Path to the folder containing the email templates. If not provided, it will be loaded from the configuration file
-    -p, --email-psswd TEXT         Password for bioinformatica@isciii.es. If not provided, it will be loaded from the credentials YAML file
-    -n, --additional-notes PATH    Optional path to a .txt file with additional notes. If not provided, the user will be prompted to write notes manually or provide a path interactively
-    --help                         Show this message and exit.
+Options:
+  -v, --validate_file PATH     Path to the validation summary json file
+                               (validate_log_summary.json)  [required]
+  -r, --receiver_email TEXT    Recipient's e-mail address (optional). If not
+                               provided, it will be extracted from the
+                               institutions guide.
+  -a, --attachments PATH       Path to file
+  -t, --template_path PATH     Path to relecov-tools templates folder
+                               (optional)
+  -p, --email_psswd TEXT       Password for bioinformatica@isciii.es
+  -n, --additional_notes PATH  Path to a .txt file with additional notes to
+                               include in the email (optional).
+  --help                       Show this message and exit.
 ```
 
 #### read-bioinfo-metadata
