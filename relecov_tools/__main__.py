@@ -41,7 +41,14 @@ stderr = rich.console.Console(
 
 __version__ = "1.5.5dev"
 
-# INFO: All @click.option parameters live in ctx.params; merge_with_extra_config keeps the CLI > extra_config > default hierarchy, so the modules function only needs ctx in its signature.
+# IMPORTANT: When defining a Click command function in this script, 
+# you MUST include both 'ctx' (for @click.pass_context) and ALL the parameters 
+# defined by @click.option decorators in the function signature.
+# Example:
+# @click.pass_context
+# def my_command(ctx, param1, param2, ...):
+#     ...
+# This is required for correct argument passing and to avoid runtime errors.
 
 # Set up  merge config with extra plus CLI
 def merge_with_extra_config(ctx, add_extra_config=False):
@@ -276,7 +283,7 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
     help="Flag: Specify which subfolder to process (default: RELECOV)",
 )
 @click.pass_context
-def download(ctx):
+def download(ctx, user, password, conf_file, download_option, output_location, target_folders, subfolder):
     """Download files located in sftp server."""
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(
@@ -321,14 +328,14 @@ def download(ctx):
     help="Path to folder where samples files are located",
 )
 @click.pass_context
-def read_lab_metadata(ctx):
+def read_lab_metadata(ctx, metadata_file, sample_list_file, output_folder, files_folder):
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
     # Merge arguments
     args_merged = merge_with_extra_config(
         ctx=ctx,
-        allow_extra_conf=True
+        add_extra_config=True
     )
     debug = ctx.obj.get("debug", False)
     new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(**args_merged)
@@ -371,7 +378,7 @@ def read_lab_metadata(ctx):
     help="Path to the JSON file containing the registered records of validated samples with their unique sample identifiers.",
 )
 @click.pass_context
-def validate(ctx):
+def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet, registry):
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
@@ -431,7 +438,7 @@ def validate(ctx):
     help="Path to a .txt file with additional notes to include in the email (optional).",
 )
 @click.pass_context
-def send_mail(ctx):
+def send_mail(ctx, validate_file, receiver_email, attachments, template_path, email_psswd, additional_notes):
     """
     Send a sample validation report by mail.
     """
@@ -570,10 +577,9 @@ def send_mail(ctx):
 def map(ctx, origin_schema, json_data, destination_schema, schema_file, output):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
     debug = ctx.obj.get("debug", False)
-    new_schema = relecov_tools.map_schema.MappingSchema(
-        origin_schema, json_data, destination_schema, schema_file, output
-    )
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
+        new_schema = relecov_tools.map_schema.MappingSchema(**args_merged)
         new_schema.map_to_data_to_new_schema()
     except Exception as e:
         if debug:
