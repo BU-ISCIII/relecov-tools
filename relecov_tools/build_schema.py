@@ -795,6 +795,7 @@ class SchemaBuilder(BaseModule):
                     lambda x: "Y" if x in required_properties else "N"
                 )
 
+                # TODO: Define enums without ontologies for release 1.6.0
                 # def clean_ontologies(enums):
                 #     return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
 
