@@ -305,14 +305,14 @@ Usage: relecov-tools map [OPTIONS]
 
   Convert data between phage plus schema to ENA, GISAID, or any other schema
 
-  Options:
-    -p, --origin_schema TEXT        File with the origin (relecov) schema
-    -j, --json_data TEXT            File with the json data to convert
-    -d, --destination_schema [ENA|GSAID|other]
-    schema to be mapped
-    -f, --schema_file TEXT          file with the custom schema
-    -o, --output TEXT               File name and path to store the mapped json
-    --help                          Show this message and exit.
+Options:
+  -p, --origin_schema TEXT        File with the origin (relecov) schema
+  -j, --json_data TEXT            File with the json data to convert
+  -d, --destination_schema [ENA|GISAID|other]
+                                  schema to be mapped
+  -f, --schema_file TEXT          file with the custom schema
+  -o, --output_folder TEXT        File name and path to store the mapped json
+  --help                          Show this message and exit.
 ```
 
 #### upload-to-ena
