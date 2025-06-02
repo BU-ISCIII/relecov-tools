@@ -586,6 +586,7 @@ class RelecovMetadata(BaseModule):
                     elif re.match(pattern, str(row[key])):
                         row[key] = str(row[key]).replace("/", "-").replace(".", "-")
                         row[key] = re.match(pattern, row[key]).group(0)
+                        value = row[key]
                     else:
                         try:
                             row[key] = str(int(float(str(row[key]))))
