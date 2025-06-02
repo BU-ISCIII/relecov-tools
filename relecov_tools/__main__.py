@@ -53,8 +53,9 @@ __version__ = "1.5.5dev"
 # Set up  merge config with extra plus CLI
 def merge_with_extra_config(ctx, add_extra_config=False):
     """
-    Merge CLI arguments with those defined in conig or extra_config.
+    Merge CLI arguments with those defined in config or extra_config.
     CLI has a higher priority than extra_config, which has a higher priority than default (None).
+    Additionally, convert any empty string values ('') to None.
     """
     # Set which configuration is going to be used
     if add_extra_config:
@@ -63,7 +64,7 @@ def merge_with_extra_config(ctx, add_extra_config=False):
         config = relecov_tools.config_json.ConfigJson()
     ctx.obj["config"] = config.json_data
 
-    command_name = ctx.command.name.replace('-','_')
+    command_name = ctx.command.name.replace('-', '_')
     command_params = ctx.params
     extra_args = config.json_data.get(command_name, {})
 
@@ -72,6 +73,11 @@ def merge_with_extra_config(ctx, add_extra_config=False):
     for k, v in command_params.items():
         if v is not None:
             merged[k] = v
+
+    # Convert empty strings to None
+    for k, v in merged.items():
+        if v == '':
+            merged[k] = None
 
     # Get function signature to filter only valid params
     func = ctx.command.callback
