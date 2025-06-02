@@ -578,9 +578,9 @@ def send_mail(ctx, validate_file, receiver_email, attachments, template_path, em
     help="schema to be mapped",
 )
 @click.option("-f", "--schema_file", help="file with the custom schema")
-@click.option("-o", "--output", help="File name and path to store the mapped json")
+@click.option("-o", "--output_folder", help="File name and path to store the mapped json")
 @click.pass_context
-def map(ctx, origin_schema, json_data, destination_schema, schema_file, output):
+def map(ctx, origin_schema, json_data, destination_schema, schema_file, output_folder):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)

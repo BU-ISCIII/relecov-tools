@@ -53,11 +53,11 @@ send_mail:
     additional_notes: ''
 
 map:
-    origin_schema: ''
-    json_data: ''
     destination_schema: ''
+    json_data: ''
+    origin_schema: ''
+    output_folder: ''
     schema_file: ''
-    output: ''
 
 upload_to_ena:
     user: ''

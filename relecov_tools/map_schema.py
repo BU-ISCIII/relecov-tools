@@ -24,8 +24,8 @@ stderr = rich.console.Console(
 class MappingSchema(BaseModule):
     def __init__(
         self,
-        relecov_schema=None,
-        json_file=None,
+        origin_schema=None,
+        json_data=None,
         destination_schema=None,
         schema_file=None,
         output_folder=None,
@@ -33,7 +33,7 @@ class MappingSchema(BaseModule):
         super().__init__(output_directory=output_folder, called_module=__name__)
         config_json = ConfigJson()
         self.config_json = config_json
-        if relecov_schema is None:
+        if origin_schema is None:
             relecov_schema = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "schema",
@@ -57,7 +57,7 @@ class MappingSchema(BaseModule):
             sys.exit(1)
         self.relecov_schema = rel_schema_json
 
-        if json_file is None:
+        if json_data is None:
             json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file which have the data to map"
             )
