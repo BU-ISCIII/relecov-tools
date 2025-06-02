@@ -628,19 +628,9 @@ def upload_to_ena(
 ):
     """parse data to create xml files to upload to ena"""
     debug = ctx.obj.get("debug", False)
-    upload_ena = relecov_tools.upload_ena_protocol.EnaUpload(
-        user=user,
-        passwd=password,
-        center=center,
-        source_json=ena_json,
-        template_path=template_path,
-        dev=dev,
-        action=action,
-        metadata_types=metadata_types,
-        upload_fastq=upload_fastq,
-        output_path=output_path,
-    )
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
+        upload_ena = relecov_tools.upload_ena_protocol.EnaUpload(**args_merged)
         upload_ena.upload()
     except Exception as e:
         if debug:
