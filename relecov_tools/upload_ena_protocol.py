@@ -32,9 +32,9 @@ class EnaUpload(BaseModule):
     def __init__(
         self,
         user=None,
-        passwd=None,
+        password=None,
         center=None,
-        source_json=None,
+        ena_json=None,
         template_path=None,
         dev=None,
         action=None,
@@ -49,22 +49,22 @@ class EnaUpload(BaseModule):
             )
         else:
             self.user = user
-        if passwd is None:
+        if password is None:
             self.passwd = relecov_tools.utils.prompt_password(
                 msg="Enter your password to ENA"
             )
         else:
-            self.passwd = passwd
+            self.passwd = password
         if center is None:
             self.center = relecov_tools.utils.prompt_text(msg="Enter your center name")
         else:
             self.center = center
-        if source_json is None:
+        if ena_json is None:
             self.source_json_file = relecov_tools.utils.prompt_path(
                 msg="Select the ENA json file to upload"
             )
         else:
-            self.source_json_file = source_json
+            self.source_json_file = ena_json
         if not os.path.exists(self.source_json_file):
             self.log.error("json data file %s does not exist ", self.source_json_file)
             stderr.print(f"[red]json data file {self.source_json_file} does not exist")
