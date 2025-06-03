@@ -4,6 +4,7 @@ import sys
 import rich.console
 import re
 import shutil
+import numpy as np
 from bs4 import BeautifulSoup
 from datetime import datetime
 from rich.prompt import Prompt
@@ -255,6 +256,8 @@ class BioinfoMetadata(BaseModule):
                 for field, value in mapping_fields.items():
                     try:
                         raw_val = map_data[sample_name][value]
+                        # import pdb; pdb.set_trace()
+                        raw_val = self.replace_na_value_if_needed(field, raw_val)
                         expected_type = (
                             self.bioinfo_schema["properties"]
                             .get(field, {})
@@ -745,6 +748,21 @@ class BioinfoMetadata(BaseModule):
             pass
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
+
+    def replace_na_value_if_needed(self, field, raw_val):
+        """
+        Replace 'NA', None or NaN with 'Not Provided [SNOMED:434941000124101]'
+        if the field is not required in the schema.
+        """
+        required_fields = self.bioinfo_schema.get("required", [])
+        is_na = (
+            raw_val is None
+            or (isinstance(raw_val, str) and raw_val.strip().upper() in ["NA", "NONE"])
+            or (isinstance(raw_val, float) and np.isnan(raw_val))
+        )
+        if is_na and field not in required_fields:
+            return "Not Provided [SNOMED:434941000124101]"
+        return raw_val
 
     def add_bioinfo_files_path(self, files_found_dict, j_data):
         """Adds file paths essential for handling and mapping bioinformatics metadata to the j_data.
