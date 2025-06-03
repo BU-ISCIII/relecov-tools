@@ -23,7 +23,7 @@ class UploadSftp(BaseModule):
     def __init__(
         self,
         user=None,
-        passwd=None,
+        password=None,
         batch_id=None,
         template_path=None,
         project="Relecov",
@@ -57,7 +57,7 @@ class UploadSftp(BaseModule):
         self.sftp_user = user or relecov_tools.utils.prompt_text(
             msg="Enter the user id:"
         )
-        self.sftp_passwd = passwd or relecov_tools.utils.prompt_password(
+        self.sftp_passwd = password or relecov_tools.utils.prompt_password(
             msg="Enter your password:"
         )
 

@@ -1058,7 +1058,7 @@ def wrapper(ctx, config_file, output_folder):
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
 
-
+# upload_results
 @relecov_tools_cli.command(help_priority=17)
 @click.option("-u", "--user", help="User name for login to sftp server")
 @click.option("-p", "--password", help="password for the user to login")
@@ -1075,10 +1075,9 @@ def wrapper(ctx, config_file, output_folder):
 @click.pass_context
 def upload_results(ctx, user, password, batch_id, template_path, project):
     """Upload batch results to sftp server."""
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    upload_sftp = relecov_tools.upload_results.UploadSftp(
-        user, password, batch_id, template_path, project
-    )
+    upload_sftp = relecov_tools.upload_results.UploadSftp(**args_merged)
     try:
         upload_sftp.execute_process()
     except Exception as e:
