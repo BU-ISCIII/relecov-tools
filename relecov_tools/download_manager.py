@@ -446,12 +446,22 @@ class DownloadManager(BaseModule):
                     log_text = "Sequence File R1 not defined in Metadata for sample %s"
                     stderr.print(f"[red]{str(log_text % s_name)}")
                     self.include_error(entry=str(log_text % s_name), sample=s_name)
-                if "paired" in row[index_layout].lower() and not row[index_fastq_r2]:
-                    error_text = "Sample %s is paired-end, but no R2 given"
-                    self.include_error(error_text % str(sample_id), s_name)
-                if "single" in row[index_layout].lower() and not row[index_fastq_r2]:
-                    error_text = "Sample %s is single-end, but R1 and R2 were given"
-                    self.include_error(error_text % str(sample_id), s_name)
+                try:
+                    if "paired" in row[index_layout].lower() and not row[index_fastq_r2]:
+                        error_text = "Sample %s is paired-end, but no R2 given"
+                        self.include_error(error_text % str(sample_id), s_name)
+                    if "single" in row[index_layout].lower() and not row[index_fastq_r2]:
+                        error_text = "Sample %s is single-end, but R1 and R2 were given"
+                        self.include_error(error_text % str(sample_id), s_name)
+                except AttributeError:
+                    error_text = (
+                        f"Missing or invalid 'Library Layout' value for sample {s_name}. "
+                        f"Please check the metadata file and provide a value (single/paired)."
+                    )
+                    self.include_error(error_text, sample=s_name)
+                    stderr.print(f"[red]{error_text}")
+                    raise MetadataError(error_text)
+
                 sample_file_dict[s_name] = {}
                 # TODO: move these keys to configuration.json
                 sample_file_dict[s_name]["sequence_file_R1"] = row[
