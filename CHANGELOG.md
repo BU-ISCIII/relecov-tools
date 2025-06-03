@@ -38,7 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Update test datasets for GitHub Actions [#614](https://github.com/BU-ISCIII/relecov-tools/pull/614)
 - Modified compression function in upload_results module to use 7z instead of AES-ZIP [#618](https://github.com/BU-ISCIII/relecov-tools/pull/618)
-- Update Enrichment panel/assay version enum in relecov_schema [#632](https://github.com/BU-ISCIII/relecov-tools/pull/632)
+- Update relecov_schema to v3.1.0 [#632](https://github.com/BU-ISCIII/relecov-tools/pull/632)
 
 #### Removed
 
