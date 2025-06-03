@@ -379,11 +379,16 @@ Usage: relecov-tools pipeline-manager [OPTIONS]
   bioinformatics pipeline execution.
 
 Options:
-  -i, --input PATH          Path to the input folder where sample files are located
-  -t, --template PATH       Path to the pipeline template folder to be copied in the                       output folder
-  -c, --config PATH         Path to the the template config file
-  -o, --out_dir PATH        Path to output folder
-  --help                    Show this message and exit.
+  -i, --input PATH           select input folder where are located the sample
+                             files
+  -t, --templates_root PATH  Path to folder containing the pipeline templates
+                             from buisciii-tools
+  -c, --config PATH          select the template config file
+  -o, --output PATH          select output folder
+  -f, --folder_names TEXT    Folder basenames to process. Target folders names
+                             should match the given dates. E.g. ... -f folder1
+                             -f folder2 -f folder3
+  --help                     Show this message and exit.
 ```
 
 #### wrapper
