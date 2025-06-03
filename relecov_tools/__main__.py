@@ -782,7 +782,7 @@ def update_db(
     help="If the output file already exists, ask if you want to update it.",
 )
 @click.pass_context
-def read_bioinfo_metadata(ctx):
+def read_bioinfo_metadata(ctx, json_file, input_folder, output_folder, software_name, update):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
@@ -803,7 +803,7 @@ def read_bioinfo_metadata(ctx):
             sys.exit(f"EXCEPTION FOUND: {e}")
 
 
-# read metadata bioinformatics
+# metadata homogeneizer
 @relecov_tools_cli.command(help_priority=12)
 @click.option(
     "-i",
@@ -821,10 +821,9 @@ def read_bioinfo_metadata(ctx):
 @click.pass_context
 def metadata_homogeneizer(ctx, institution, directory, output):
     """Parse institution metadata lab to the one used in relecov"""
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
-        institution, directory, output
-    )
+    new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(**args_merged)
     try:
         new_parse.converting_metadata()
     except Exception as e:
@@ -833,7 +832,6 @@ def metadata_homogeneizer(ctx, institution, directory, output):
             raise
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
-
 
 # creating symbolic links
 @relecov_tools_cli.command(help_priority=13)

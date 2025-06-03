@@ -19,7 +19,7 @@ stderr = rich.console.Console(
 class MetadataHomogeneizer:
     """MetadataHomogeneizer object"""
 
-    def __init__(self, institution=None, directory=None, output_folder=None):
+    def __init__(self, institution=None, directory=None, output=None):
         # open config
         self.config_json = ConfigJson()
         # read heading from config
@@ -110,12 +110,12 @@ class MetadataHomogeneizer:
                     + " does not exist"
                 )
                 sys.exit(1)
-        if output_folder is None:
+        if output is None:
             self.output_folder = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
-            self.output_folder = output_folder
+            self.output_folder = output
         self.processed_metadata = False
 
     def mapping_metadata(self, ws_data):
