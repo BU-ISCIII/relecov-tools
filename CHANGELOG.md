@@ -34,7 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix date validators in Excel templates [#617](https://github.com/BU-ISCIII/relecov-tools/pull/617)
 - Fix date formatting in read-lab-metadata [#632](https://github.com/BU-ISCIII/relecov-tools/pull/632)
 - Map `"NA"` to `"Not Provided [SNOMED:434941000124101]"` in non-required fields of `read-bioinfo-metadata` [#633](https://github.com/BU-ISCIII/relecov-tools/pull/633)
-- Fill `None` or `"NA"` values in non-required fields with `"Not Provided [SNOMED:434941000124101]"` in `upload_results` module [#633](https://github.com/BU-ISCIII/relecov-tools/pull/633)
+- Fill `None` or `"NA"` values in non-required fields with `"Not Provided [SNOMED:434941000124101]"` in `upload_db` module [#633](https://github.com/BU-ISCIII/relecov-tools/pull/633)
 - Improve error handling when `"Library Layout"` field is null in the `download` module [#633](https://github.com/BU-ISCIII/relecov-tools/pull/633)
 
 #### Changed
