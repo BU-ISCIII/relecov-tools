@@ -228,6 +228,16 @@ class UpdateDatabase(BaseModule):
                     s_dict[r_field] = None
             field_values.append(s_dict)
         return field_values
+    
+    def clean_ambiguous_value(self, value):
+        """Replace ambiguous values by default if value is not required."""
+        if isinstance(value, str):
+            if value.strip() in {"", "NA", "None"}:
+                return "Not Provided"
+        elif value is None:
+            return "Not Provided"
+        return value
+
 
     def update_database(self, field_values, post_url):
         """Send the request to update database"""
@@ -333,7 +343,10 @@ class UpdateDatabase(BaseModule):
 
         elif type_of_info == "bioinfodata":
             post_url = "bioinfodata"
-            map_fields = self.json_data
+            map_fields = [
+                {k: self.clean_ambiguous_value(v) for k, v in row.items()}
+                for row in self.json_data
+            ]
 
         elif type_of_info == "variantdata":
             post_url = "variantdata"
