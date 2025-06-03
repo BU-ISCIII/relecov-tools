@@ -346,17 +346,22 @@ Usage: relecov-tools upload-to-gisaid [OPTIONS]
 
   parsed data to create xml files to upload to ena
 
-  Options:
-    -u, --user            user name for login
-    -p, --password        password for the user to login
-    -c, --client_id       client-ID provided by clisupport@gisaid.org
-    -t, --token           path to athentication token
-    -e, --gisaid_json     path to validated json mapped to GISAID
-    -i, --input_path      path to fastas folder or multifasta file
-    -f, --frameshift      frameshift notification: ["catch_all", "catch_none", "catch_novel"]
-    -x, --proxy_config    introduce your proxy credentials as: username:password@proxy:port
-    --single              Flag: input is a folder with several fasta files.
-    --gzip                Flag: input fasta is gziped.
+Options:
+  -u, --user TEXT                 user name for login
+  -p, --password TEXT             password for the user to login
+  -c, --client_id TEXT            client-ID provided by clisupport@gisaid.org
+  -t, --token TEXT                path to athentication token
+  -e, --gisaid_json TEXT          path to validated json mapped to GISAID
+  -i, --input_path TEXT           path to fastas folder or multifasta file
+  -o, --output_path TEXT          output folder for log
+  -f, --frameshift [catch_all|catch_none|catch_novel]
+                                  frameshift notification
+  -x, --proxy_config TEXT         introduce your proxy credentials as:
+                                  username:password@proxy:port
+  --single                        input is a folder with several fasta files.
+                                  Default: False
+  --gzip                          input fasta is gziped. Default: False
+  --help                          Show this message and exit.
 ```
 
 #### update-db
