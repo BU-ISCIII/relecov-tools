@@ -195,9 +195,10 @@ class BioinfoMetadata(BaseModule):
                     for file_name in tup[1]
                     if re.search(topic_scope["fn"], os.path.join(tup[0], file_name))
                 ]
-                if len(matching_files) >= 1:
-                    files_found[topic_key] = matching_files
-                    break
+                if matching_files:
+                    if topic_key not in files_found:
+                        files_found[topic_key] = []
+                    files_found[topic_key].extend(matching_files)
         if len(files_found) < 1:
             self.update_all_logs(
                 method_name,
