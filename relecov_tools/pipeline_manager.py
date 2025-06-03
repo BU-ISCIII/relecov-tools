@@ -59,12 +59,8 @@ class PipelineManager(BaseModule):
                 "configuration.json",
             )
         if not os.path.exists(config):
-            self.log.error(
-                "Pipeline config file %s does not exist ", config
-            )
-            stderr.print(
-                "[red] Pipeline config file " + config + " does not exist"
-            )
+            self.log.error("Pipeline config file %s does not exist ", config)
+            stderr.print("[red] Pipeline config file " + config + " does not exist")
             sys.exit(1)
         conf_settings = relecov_tools.utils.read_json_file(config)
         try:
@@ -92,7 +88,7 @@ class PipelineManager(BaseModule):
             )
         else:
             output_folder = output
-            
+
         # Create the output folder if not exists
         try:
             os.makedirs(output_folder, exist_ok=True)

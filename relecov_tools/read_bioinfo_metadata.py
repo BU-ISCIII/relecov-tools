@@ -104,7 +104,7 @@ class BioinfoMetadata(BaseModule):
             sys.exit(
                 self.log_report.print_log_report(self.__init__.__name__, ["error"])
             )
-        
+
         #  Assign a new name for better readability
         self.readlabmeta_json_file = json_file
 
