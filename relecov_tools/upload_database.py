@@ -228,7 +228,7 @@ class UpdateDatabase(BaseModule):
                     s_dict[r_field] = None
             field_values.append(s_dict)
         return field_values
-    
+
     def clean_ambiguous_value(self, value):
         """Replace ambiguous values by default if value is not required."""
         if isinstance(value, str):
@@ -237,7 +237,6 @@ class UpdateDatabase(BaseModule):
         elif value is None:
             return "Not Provided"
         return value
-
 
     def update_database(self, field_values, post_url):
         """Send the request to update database"""

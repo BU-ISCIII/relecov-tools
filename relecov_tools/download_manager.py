@@ -447,10 +447,16 @@ class DownloadManager(BaseModule):
                     stderr.print(f"[red]{str(log_text % s_name)}")
                     self.include_error(entry=str(log_text % s_name), sample=s_name)
                 try:
-                    if "paired" in row[index_layout].lower() and not row[index_fastq_r2]:
+                    if (
+                        "paired" in row[index_layout].lower()
+                        and not row[index_fastq_r2]
+                    ):
                         error_text = "Sample %s is paired-end, but no R2 given"
                         self.include_error(error_text % str(sample_id), s_name)
-                    if "single" in row[index_layout].lower() and not row[index_fastq_r2]:
+                    if (
+                        "single" in row[index_layout].lower()
+                        and not row[index_fastq_r2]
+                    ):
                         error_text = "Sample %s is single-end, but R1 and R2 were given"
                         self.include_error(error_text % str(sample_id), s_name)
                 except AttributeError:
