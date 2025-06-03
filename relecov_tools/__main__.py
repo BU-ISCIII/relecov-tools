@@ -867,10 +867,9 @@ def pipeline_manager(ctx, input, templates_root, output, config, folder_names):
     Create the symbolic links for the samples which are validated to prepare for
     bioinformatics pipeline execution.
     """
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    new_launch = relecov_tools.pipeline_manager.PipelineManager(
-        input, templates_root, output, config, folder_names
-    )
+    new_launch = relecov_tools.pipeline_manager.PipelineManager(**args_merged)
     try:
         new_launch.pipeline_exc()
     except Exception as e:
@@ -879,7 +878,6 @@ def pipeline_manager(ctx, input, templates_root, output, config, folder_names):
             raise
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
-
 
 # schema builder
 @relecov_tools_cli.command(help_priority=14)
