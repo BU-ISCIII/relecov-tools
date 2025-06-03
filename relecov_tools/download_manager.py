@@ -455,7 +455,7 @@ class DownloadManager(BaseModule):
                         self.include_error(error_text % str(sample_id), s_name)
                     if (
                         "single" in row[index_layout].lower()
-                        and not row[index_fastq_r2]
+                        and row[index_fastq_r2]
                     ):
                         error_text = "Sample %s is single-end, but R1 and R2 were given"
                         self.include_error(error_text % str(sample_id), s_name)
