@@ -272,7 +272,7 @@
             }
         },
         "vcf_files": {
-            "fn": "06-variant-calling/vcf_files/.*\\.vcf$",
+            "fn": "06-variant-calling/vcf_files/.*/.*\\.vcf$",
             "required": false,
             "filepath_name": "vcf_filename",
             "function": null,
