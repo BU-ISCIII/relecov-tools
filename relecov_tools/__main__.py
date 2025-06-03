@@ -706,6 +706,7 @@ def upload_to_gisaid(
             sys.exit(f"EXCEPTION FOUND: {e}")
 
 
+# update_db
 @relecov_tools_cli.command(help_priority=9)
 @click.option("-j", "--json", help="data in json format")
 @click.option(
@@ -751,10 +752,9 @@ def update_db(
 ):
     """upload the information included in json file to the database"""
     debug = ctx.obj.get("debug", False)
-    update_database_obj = relecov_tools.upload_database.UpdateDatabase(
-        user, password, json, type, platform, server_url, full_update, long_table
-    )
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
+        update_database_obj = relecov_tools.upload_database.UpdateDatabase(**args_merged)
         update_database_obj.update_db()
     except Exception as e:
         if debug:
