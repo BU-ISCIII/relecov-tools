@@ -946,7 +946,7 @@ def build_schema(
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
 
-
+# logs to excel
 @relecov_tools_cli.command(help_priority=15)
 @click.option(
     "-l",
@@ -974,6 +974,13 @@ def build_schema(
 def logs_to_excel(ctx, lab_code, output_folder, files):
     """Creates a merged xlsx and Json report from all the log summary jsons given as input"""
     debug = ctx.obj.get("debug", False)
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
+
+    # Get arguments from merged config
+    lab_code = args_merged.get("lab_code")
+    output_folder = args_merged.get("output_folder")
+    files = args_merged.get("files")
+
     all_logs = []
     full_paths = [os.path.realpath(f) for f in files]
     for file in full_paths:
@@ -1004,7 +1011,7 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
         log.error(msg)
         raise ValueError(msg)
 
-    logsum = relecov_tools.log_summary.LogSum(output_location=output_folder)
+    logsum = relecov_tools.log_summary.LogSum(output_folder=output_folder)
     try:
         merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
         final_logs = logsum.prepare_final_logs(logs=merged_logs)

@@ -27,10 +27,13 @@ stderr = Console(
 class LogSum:
     def __init__(
         self,
-        output_location: str = None,
-        unique_key: str = None,
-        path: str = None,
+        output_folder: str = None,
+        lab_code: str = None,
+        files: list = None,
     ):
+        # Use output_folder as output_location internally for compatibility
+        output_location = output_folder
+
         if output_location is not None:
             if not os.path.isdir(str(output_location)):
                 try:
@@ -45,16 +48,14 @@ class LogSum:
 
         log.info(f"Log summary outpath set to {output_location}")
         self.output_location = output_location
-        # if unique_key is given, all entries will be saved inside that key by default
-        if unique_key:
-            self.unique_key = unique_key
-        else:
-            self.unique_key = None
-        # if path is given, all keys will include a field "path" with this value
-        if path:
-            self.path = path
-        else:
-            self.path = None
+
+        # Store new arguments for possible future use
+        self.lab_code = lab_code
+        self.files = files
+
+        # Map legacy attributes to new arguments for compatibility
+        self.unique_key = lab_code if lab_code else None
+        self.path = files if files else None
         self.logs = {}
         return
 
