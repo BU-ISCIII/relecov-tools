@@ -1033,7 +1033,7 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
 
-
+# wrapper
 @relecov_tools_cli.command(help_priority=16)
 @click.option(
     "-c",
@@ -1052,10 +1052,9 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
 @click.pass_context
 def wrapper(ctx, config_file, output_folder):
     """Executes the modules in config file sequentially"""
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(
-        config_file=config_file, output_folder=output_folder
-    )
+    process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(**args_merged)
     try:
         process_wrapper.run_wrapper()
     except Exception as e:
