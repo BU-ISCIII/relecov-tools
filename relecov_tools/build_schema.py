@@ -30,8 +30,8 @@ stderr = rich.console.Console(
 class SchemaBuilder(BaseModule):
     def __init__(
         self,
-        excel_file_path=None,
-        base_schema_path=None,
+        input_file=None,
+        schema_base=None,
         draft_version=None,
         show_diff=None,
         out_dir=None,
@@ -44,7 +44,7 @@ class SchemaBuilder(BaseModule):
         It reads the database definition from an Excel file and allows customization of the schema generation process.
         """
         super().__init__(output_directory=out_dir, called_module=__name__)
-        self.excel_file_path = excel_file_path
+        self.excel_file_path = input_file
         self.non_interactive = non_interactive
         # Validate input data
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
@@ -124,15 +124,15 @@ class SchemaBuilder(BaseModule):
             )
 
         # Validate base schema
-        if base_schema_path is not None:
-            if relecov_tools.utils.file_exists(base_schema_path):
-                self.base_schema_path = base_schema_path
+        if schema_base is not None:
+            if relecov_tools.utils.file_exists(schema_base):
+                self.base_schema_path = schema_base
             else:
                 self.log.error(
-                    f"[Error]Defined base schema file not found: {base_schema_path}."
+                    f"[Error]Defined base schema file not found: {schema_base}."
                 )
                 stderr.print(
-                    f"[Error]Defined base schema file not found: {base_schema_path}. Exiting..."
+                    f"[Error]Defined base schema file not found: {schema_base}. Exiting..."
                 )
                 sys.exit(1)
         else:

@@ -930,27 +930,14 @@ def build_schema(
     non_interactive,
 ):
     """Generates and updates JSON Schema files from Excel-based database definitions."""
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    # Build new schema
     try:
-        schema_update = relecov_tools.build_schema.SchemaBuilder(
-            input_file,
-            schema_base,
-            draft_version,
-            diff,
-            out_dir,
-            version,
-            project,
-            non_interactive,
-        )
-
-        # Build new schema
+        schema_update = relecov_tools.build_schema.SchemaBuilder(**args_merged)
         new_schema = schema_update.handle_build_schema()
         if not new_schema:
             log.error("Schema build returned None. Skipping schema summary.")
             return
-
-        # Generate schema summary
         schema_update.summarize_schema(new_schema)
     except Exception as e:
         if debug:
