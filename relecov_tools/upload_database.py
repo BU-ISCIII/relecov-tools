@@ -23,15 +23,15 @@ class UpdateDatabase(BaseModule):
     def __init__(
         self,
         user=None,
-        passwd=None,
-        json_file=None,
-        type_of_info=None,
+        password=None,
+        json=None,
+        type=None,
         platform=None,
         server_url=None,
         full_update=False,
         long_table=None,
     ):
-        if json_file is None:
+        if json is None:
             json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file which have the data to map"
             )
@@ -43,9 +43,9 @@ class UpdateDatabase(BaseModule):
                 msg="Enter username for upload data to server"
             )
         self.user = user
-        if passwd is None:
-            passwd = relecov_tools.utils.prompt_text(msg="Enter credential password")
-        self.passwd = passwd
+        if password is None:
+            password = relecov_tools.utils.prompt_text(msg="Enter credential password")
+        self.passwd = password
         # get the default coonfiguration used the instance
         self.config_json = ConfigJson()
 
@@ -77,12 +77,12 @@ class UpdateDatabase(BaseModule):
             self.long_table_file = os.path.realpath(long_table)
         else:
             self.full_update = False
-            if type_of_info is None:
-                type_of_info = relecov_tools.utils.prompt_selection(
+            if type is None:
+                type = relecov_tools.utils.prompt_selection(
                     "Select:",
                     ["sample", "bioinfodata", "variantdata"],
                 )
-            self.type_of_info = type_of_info
+            self.type_of_info = type
             # collect data for plarform to upload data
             if platform is None:
                 platform = relecov_tools.utils.prompt_selection(
