@@ -41,14 +41,15 @@ stderr = rich.console.Console(
 
 __version__ = "1.5.5dev"
 
-# IMPORTANT: When defining a Click command function in this script, 
-# you MUST include both 'ctx' (for @click.pass_context) and ALL the parameters 
+# IMPORTANT: When defining a Click command function in this script,
+# you MUST include both 'ctx' (for @click.pass_context) and ALL the parameters
 # defined by @click.option decorators in the function signature.
 # Example:
 # @click.pass_context
 # def my_command(ctx, param1, param2, ...):
 #     ...
 # This is required for correct argument passing and to avoid runtime errors.
+
 
 # Set up  merge config with extra plus CLI
 def merge_with_extra_config(ctx, add_extra_config=False):
@@ -64,7 +65,7 @@ def merge_with_extra_config(ctx, add_extra_config=False):
         config = relecov_tools.config_json.ConfigJson()
     ctx.obj["config"] = config.json_data
 
-    command_name = ctx.command.name.replace('-', '_')
+    command_name = ctx.command.name.replace("-", "_")
     command_params = ctx.params
     extra_args = config.json_data.get(command_name, {})
 
@@ -76,7 +77,7 @@ def merge_with_extra_config(ctx, add_extra_config=False):
 
     # Convert empty strings to None
     for k, v in merged.items():
-        if v == '':
+        if v == "":
             merged[k] = None
 
     # Get function signature to filter only valid params
@@ -289,7 +290,16 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
     help="Flag: Specify which subfolder to process (default: RELECOV)",
 )
 @click.pass_context
-def download(ctx, user, password, conf_file, download_option, output_location, target_folders, subfolder):
+def download(
+    ctx,
+    user,
+    password,
+    conf_file,
+    download_option,
+    output_location,
+    target_folders,
+    subfolder,
+):
     """Download files located in sftp server."""
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(
@@ -297,9 +307,7 @@ def download(ctx, user, password, conf_file, download_option, output_location, t
         add_extra_config=True,
     )
     try:
-        download_manager = relecov_tools.download_manager.DownloadManager(
-            **args_merged
-        )
+        download_manager = relecov_tools.download_manager.DownloadManager(**args_merged)
         download_manager.execute_process()
     except Exception as e:
         if debug:
@@ -334,15 +342,14 @@ def download(ctx, user, password, conf_file, download_option, output_location, t
     help="Path to folder where samples files are located",
 )
 @click.pass_context
-def read_lab_metadata(ctx, metadata_file, sample_list_file, output_folder, files_folder):
+def read_lab_metadata(
+    ctx, metadata_file, sample_list_file, output_folder, files_folder
+):
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
     # Merge arguments
-    args_merged = merge_with_extra_config(
-        ctx=ctx,
-        add_extra_config=True
-    )
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
     new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(**args_merged)
 
@@ -384,7 +391,9 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_folder, files
     help="Path to the JSON file containing the registered records of validated samples with their unique sample identifiers.",
 )
 @click.pass_context
-def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet, registry):
+def validate(
+    ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet, registry
+):
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
@@ -444,7 +453,15 @@ def validate(ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet
     help="Path to a .txt file with additional notes to include in the email (optional).",
 )
 @click.pass_context
-def send_mail(ctx, validate_file, receiver_email, attachments, template_path, email_psswd, additional_notes):
+def send_mail(
+    ctx,
+    validate_file,
+    receiver_email,
+    attachments,
+    template_path,
+    email_psswd,
+    additional_notes,
+):
     """
     Send a sample validation report by mail.
     """
@@ -578,7 +595,9 @@ def send_mail(ctx, validate_file, receiver_email, attachments, template_path, em
     help="schema to be mapped",
 )
 @click.option("-f", "--schema_file", help="file with the custom schema")
-@click.option("-o", "--output_folder", help="File name and path to store the mapped json")
+@click.option(
+    "-o", "--output_folder", help="File name and path to store the mapped json"
+)
 @click.pass_context
 def map(ctx, origin_schema, json_data, destination_schema, schema_file, output_folder):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
@@ -754,7 +773,9 @@ def update_db(
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
-        update_database_obj = relecov_tools.upload_database.UpdateDatabase(**args_merged)
+        update_database_obj = relecov_tools.upload_database.UpdateDatabase(
+            **args_merged
+        )
         update_database_obj.update_db()
     except Exception as e:
         if debug:
@@ -773,7 +794,9 @@ def update_db(
     help="json file containing lab metadata",
 )
 @click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
-@click.option("-o", "--output_folder", type=click.Path(), help="Path to save output file")
+@click.option(
+    "-o", "--output_folder", type=click.Path(), help="Path to save output file"
+)
 @click.option("-s", "--software_name", help="Name of the software/pipeline used.")
 @click.option(
     "--update",
@@ -782,7 +805,9 @@ def update_db(
     help="If the output file already exists, ask if you want to update it.",
 )
 @click.pass_context
-def read_bioinfo_metadata(ctx, json_file, input_folder, output_folder, software_name, update):
+def read_bioinfo_metadata(
+    ctx, json_file, input_folder, output_folder, software_name, update
+):
     """
     Create the json compliant  from the Bioinfo Metadata.
     """
@@ -792,7 +817,9 @@ def read_bioinfo_metadata(ctx, json_file, input_folder, output_folder, software_
         add_extra_config=True,
     )
     debug = ctx.obj.get("debug", False)
-    new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(**args_merged)
+    new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
+        **args_merged
+    )
     try:
         new_bioinfo_metadata.create_bioinfo_file()
     except Exception as e:
@@ -832,6 +859,7 @@ def metadata_homogeneizer(ctx, institution, directory, output):
             raise
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
+
 
 # creating symbolic links
 @relecov_tools_cli.command(help_priority=13)
@@ -878,6 +906,7 @@ def pipeline_manager(ctx, input, templates_root, output, config, folder_names):
             raise
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
+
 
 # schema builder
 @relecov_tools_cli.command(help_priority=14)
@@ -945,6 +974,7 @@ def build_schema(
             raise
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
+
 
 # logs to excel
 @relecov_tools_cli.command(help_priority=15)
@@ -1027,6 +1057,7 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
 
+
 # wrapper
 @relecov_tools_cli.command(help_priority=16)
 @click.option(
@@ -1057,6 +1088,7 @@ def wrapper(ctx, config_file, output_folder):
             raise
         else:
             sys.exit(f"EXCEPTION FOUND: {e}")
+
 
 # upload_results
 @relecov_tools_cli.command(help_priority=17)
