@@ -27,11 +27,11 @@ class GisaidUpload:
     def __init__(
         self,
         user=None,
-        passwd=None,
+        password=None,
         client_id=None,
         token=None,
         gisaid_json=None,
-        fasta_path=None,
+        input_path=None,
         output_path=None,
         frameshift=None,
         proxy_config=None,
@@ -49,12 +49,12 @@ class GisaidUpload:
                 )
             else:
                 self.user = user
-            if passwd is None:
+            if password is None:
                 self.passwd = relecov_tools.utils.prompt_password(
                     msg="Enter your password to GISAID"
                 )
             else:
-                self.passwd = passwd
+                self.passwd = password
             if client_id is None:
                 self.client_id = relecov_tools.utils.prompt_password(
                     msg="Enter your client-ID to GISAID. Email clisupport@gisaid.org to request client-ID"
@@ -75,12 +75,12 @@ class GisaidUpload:
             )
         else:
             self.output_path = output_path
-        if fasta_path is None:
+        if input_path is None:
             self.fasta_path = relecov_tools.utils.prompt_path(
                 msg="Select path to fasta file/s"
             )
         else:
-            self.fasta_path = fasta_path
+            self.fasta_path = input_path
         if frameshift is None:
             self.frameshift = relecov_tools.utils.prompt_selection(
                 msg="Select frameshift notification",

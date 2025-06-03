@@ -694,20 +694,9 @@ def upload_to_gisaid(
 ):
     """parsed data to create files to upload to gisaid"""
     debug = ctx.obj.get("debug", False)
-    upload_gisaid = relecov_tools.gisaid_upload.GisaidUpload(
-        user,
-        password,
-        client_id,
-        token,
-        gisaid_json,
-        input_path,
-        output_path,
-        frameshift,
-        proxy_config,
-        single,
-        gzip,
-    )
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
+        upload_gisaid = relecov_tools.gisaid_upload.GisaidUpload(**args_merged)
         upload_gisaid.gisaid_upload()
     except Exception as e:
         if debug:
