@@ -256,7 +256,6 @@ class BioinfoMetadata(BaseModule):
                 for field, value in mapping_fields.items():
                     try:
                         raw_val = map_data[sample_name][value]
-                        # import pdb; pdb.set_trace()
                         raw_val = self.replace_na_value_if_needed(field, raw_val)
                         expected_type = (
                             self.bioinfo_schema["properties"]
