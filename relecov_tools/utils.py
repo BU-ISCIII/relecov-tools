@@ -68,36 +68,60 @@ def read_json_file(j_file):
 
 
 def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
-    """Read the input excel file and give the information in a list
-    of dictionaries
+    """Read the input excel file and return the data as a list of dictionaries.
+    If openpyxl fails, fall back to pandas but return in the same format.
     """
-    wb_file = openpyxl.load_workbook(f_name, data_only=True)
-    ws_metadata_lab = wb_file[sheet_name]
     try:
-        heading_row = [
-            idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
-        ][0]
-    except IndexError:
-        raise KeyError(f"Header flag '{header_flag}' could not be found in {f_name}")
-    heading = [str(i.value).strip() for i in ws_metadata_lab[heading_row] if i.value]
-    ws_data = []
-    for row in islice(ws_metadata_lab.values, heading_row, ws_metadata_lab.max_row):
-        l_row = list(row)
-        # Ignore the empty rows
-        if all(cell is None for cell in l_row):
-            continue
-        data_row = {}
-        for idx in range(0, len(heading)):
-            if l_row[idx] is None:
-                if leave_empty:
-                    data_row[heading[idx]] = None
+        wb_file = openpyxl.load_workbook(f_name, data_only=True)
+        ws_metadata_lab = wb_file[sheet_name]
+        try:
+            heading_row = [
+                idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
+            ][0]
+        except IndexError:
+            raise KeyError(f"Header flag '{header_flag}' could not be found in {f_name}")
+        heading = [str(i.value).strip() for i in ws_metadata_lab[heading_row] if i.value]
+        ws_data = []
+        for row in islice(ws_metadata_lab.values, heading_row, ws_metadata_lab.max_row):
+            l_row = list(row)
+            if all(cell is None for cell in l_row):
+                continue
+            data_row = {}
+            for idx in range(0, len(heading)):
+                if l_row[idx] is None:
+                    data_row[heading[idx]] = None if leave_empty else "Not Provided [SNOMED:434941000124101]"
                 else:
-                    data_row[heading[idx]] = "Not Provided [SNOMED:434941000124101]"
-            else:
-                data_row[heading[idx]] = l_row[idx]
-        ws_data.append(data_row)
+                    data_row[heading[idx]] = l_row[idx]
+            ws_data.append(data_row)
+        return ws_data, heading_row
 
-    return ws_data, heading_row
+    except Exception as e:
+        try:
+            df = pd.read_excel(f_name, sheet_name=sheet_name, header=None)
+
+            heading_row_idx = df.apply(lambda row: header_flag in row.values, axis=1)
+            if not heading_row_idx.any():
+                raise KeyError(f"Header flag '{header_flag}' could not be found in {f_name}")
+            heading_row = heading_row_idx.idxmax()
+            heading = [str(h).strip() for h in df.iloc[heading_row] if pd.notna(h)]
+
+            ws_data = []
+            for _, row in df.iloc[heading_row+1:].iterrows():
+                if row.isna().all():
+                    continue
+                data_row = {}
+                for idx in range(len(heading)):
+                    val = row.iloc[idx] if idx < len(row) else None
+                    if pd.isna(val):
+                        data_row[heading[idx]] = None if leave_empty else "Not Provided [SNOMED:434941000124101]"
+                    else:
+                        data_row[heading[idx]] = val
+                ws_data.append(data_row)
+            return ws_data, heading_row + 1  # +1 to maintain consistency with openpyxl (1-based)
+
+        except Exception as fallback_e:
+            raise RuntimeError(f"Failed to read file with both openpyxl and pandas:\n- openpyxl error: {e}\n- pandas error: {fallback_e}")
+
 
 
 def string_to_date(string):
