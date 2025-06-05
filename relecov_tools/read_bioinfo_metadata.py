@@ -73,22 +73,22 @@ class BioinfoMetadata(BaseModule):
         self,
         json_file=None,
         input_folder=None,
-        output_folder=None,
+        output_dir=None,
         software_name=None,
         update=False,
         **kwargs,
     ):
-        super().__init__(output_directory=output_folder, called_module=__name__)
+        super().__init__(output_dir=output_dir, called_module=__name__)
         self.log.info("Initiating read-bioinfo-metadata process")
         # Init process log
-        if output_folder is None:
-            self.output_folder = relecov_tools.utils.prompt_path(
+        if output_dir is None:
+            self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
-            self.output_folder = os.path.realpath(output_folder)
-        self.logsum = self.parent_log_summary(output_location=output_folder)
-        self.log_report = BioinfoReportLog(output_folder=output_folder)
+            self.output_dir = os.path.realpath(output_dir)
+        self.logsum = self.parent_log_summary(output_dir=output_dir)
+        self.log_report = BioinfoReportLog(output_folder=output_dir)
 
         # Parse read-lab-meta-data
         if json_file is None:
@@ -1123,7 +1123,7 @@ class BioinfoMetadata(BaseModule):
             stderr.print(f"[green]Created batch json file: {batch_filepath}")
 
         year = str(datetime.now().year)
-        out_path = os.path.join(self.output_folder, year)
+        out_path = os.path.join(self.output_dir, year)
         os.makedirs(out_path, exist_ok=True)
 
         stderr.print("[blue]Saving previously splitted files to output directory")

@@ -27,50 +27,47 @@ stderr = Console(
 class LogSum:
     def __init__(
         self,
-        output_folder: str = None,
+        output_dir: str = None,
         lab_code: str = None,
-        files: list = None,
+        path: list = None,
     ):
-        # Use output_folder as output_location internally for compatibility
-        output_location = output_folder
-
-        if output_location is not None:
-            if not os.path.isdir(str(output_location)):
+        if output_dir is not None:
+            if not os.path.isdir(str(output_dir)):
                 try:
-                    os.makedirs(output_location, exist_ok=True)
+                    os.makedirs(output_dir, exist_ok=True)
                 except IOError:
-                    raise IOError(f"Logs output folder {output_location} doesnt exist")
+                    raise IOError(f"Logs output folder {output_dir} doesnt exist")
         else:
-            log.info("No output_location provided, selecting it from config...")
+            log.info("No output_dir provided, selecting it from config...")
             config_json = ConfigJson(extra_config=True)
             logs_config = config_json.get_configuration("logs_config")
-            output_location = logs_config.get("default_outpath", "/tmp")
+            output_dir = logs_config.get("default_outpath", "/tmp")
 
-        log.info(f"Log summary outpath set to {output_location}")
-        self.output_location = output_location
+        log.info(f"Log summary outpath set to {output_dir}")
+        self.output_dir = output_dir
 
         # Store new arguments for possible future use
         self.lab_code = lab_code
-        self.files = files
+        self.path = path
 
         # Map legacy attributes to new arguments for compatibility
-        self.unique_key = lab_code if lab_code else None
-        self.path = files if files else None
+        self.lab_code = lab_code if lab_code else None
+        self.path = path if path else None
         self.logs = {}
         return
 
     def feed_key(self, key=None, sample=None, path=None):
         """Run update_summary() with no entry nor log_type. Add a new empty key"""
-        if self.unique_key:
-            key = self.unique_key
+        if self.lab_code:
+            key = self.lab_code
         self.update_summary(
             log_type=None, key=key, entry=None, sample=sample, path=path
         )
 
     def add_error(self, entry, key=None, sample=None, path=None):
         """Run update_summary() with log_type as errors"""
-        if self.unique_key:
-            key = self.unique_key
+        if self.lab_code:
+            key = self.lab_code
         log.error(entry)
         self.update_summary(
             log_type="errors", key=key, entry=entry, sample=sample, path=path
@@ -79,8 +76,8 @@ class LogSum:
 
     def add_warning(self, entry, key=None, sample=None, path=None):
         """Run update_summary() with log_type as warnings"""
-        if self.unique_key:
-            key = self.unique_key
+        if self.lab_code:
+            key = self.lab_code
         log.warning(entry)
         self.update_summary(
             log_type="warnings", key=key, entry=entry, sample=sample, path=path
@@ -178,7 +175,7 @@ class LogSum:
                             merged_logs[key]["samples"][sample]["warnings"].extend(
                                 new_logs[key]["samples"][sample]["warnings"]
                             )
-                    merged_logs[key].setdefault("path", self.output_location)
+                    merged_logs[key].setdefault("path", self.output_dir)
             return merged_logs
 
         if not logs_list:
@@ -390,16 +387,16 @@ class LogSum:
         if not filepath:
             date = datetime.today().strftime("%Y%m%d%-H%M%S")
             filename = "_".join([date, called_module, "log_summary.json"])
-            os.makedirs(self.output_location, exist_ok=True)
-            filepath = os.path.join(self.output_location, filename)
+            os.makedirs(self.output_dir, exist_ok=True)
+            filepath = os.path.join(self.output_dir, filename)
         else:
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
         if os.path.exists(filepath):
             log.info(f"{filepath} already exists, merging its content...")
             with open(filepath, "r", encoding="utf-8") as f:
                 present_logs = json.load(f)
-            if self.unique_key:
-                merge_key = self.unique_key
+            if self.lab_code:
+                merge_key = self.lab_code
             else:
                 merge_key = None
             try:

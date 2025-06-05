@@ -36,7 +36,7 @@ class UpdateDatabase(BaseModule):
                 msg="Select the json file which have the data to map"
             )
         json_dir = os.path.dirname(os.path.realpath(json_file))
-        super().__init__(output_directory=json_dir, called_module="update-db")
+        super().__init__(output_dir=json_dir, called_module="update-db")
         # Get the user and password for the database
         if user is None:
             user = relecov_tools.utils.prompt_text(
@@ -105,7 +105,7 @@ class UpdateDatabase(BaseModule):
         # create the instance for logging the summary information
         lab_code = json_dir.split("/")[-2]
         self.logsum = self.parent_log_summary(
-            output_location=json_dir, unique_key=lab_code, path=json_dir
+            output_dir=json_dir, lab_code=lab_code, path=json_dir
         )
 
     def get_schema_ontology_values(self):

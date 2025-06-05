@@ -41,12 +41,12 @@ class DownloadManager(BaseModule):
         password=None,
         conf_file=None,
         download_option=None,
-        output_location=None,
+        output_dir=None,
         target_folders=None,
         subfolder=None,
     ):
         """Initializes the sftp object"""
-        super().__init__(output_directory=output_location, called_module="download")
+        super().__init__(output_dir=output_dir, called_module="download")
         self.log.info("Initiating download process")
         config_json = ConfigJson(extra_config=True)
         self.allowed_file_ext = config_json.get_topic_data(
@@ -102,19 +102,19 @@ class DownloadManager(BaseModule):
                 self.log.error("Invalid configuration file. Missing %s", e)
                 stderr.print(f"[red] Invalid configuration file. Missing {e} !")
                 raise ValueError(f"Invalid configuration file. Missing {e}")
-        if output_location is not None:
-            if os.path.isdir(output_location):
-                self.platform_storage_folder = os.path.realpath(output_location)
+        if output_dir is not None:
+            if os.path.isdir(output_dir):
+                self.platform_storage_folder = os.path.realpath(output_dir)
             else:
                 self.log.error("Output location does not exist, aborting")
                 stderr.print("[red] Output location does not exist, aborting")
-                raise FileNotFoundError(f"Output dir does not exist {output_location}")
+                raise FileNotFoundError(f"Output dir does not exist {output_dir}")
         if sftp_user is None:
             sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
             self.target_folders = self.target_folders.split(",")
         self.logsum = self.parent_log_summary(
-            output_location=self.platform_storage_folder
+            output_dir=self.platform_storage_folder
         )
         if sftp_passwd is None:
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
@@ -816,7 +816,7 @@ class DownloadManager(BaseModule):
         Returns:
             folders_with_metadata: Same dict updated with the merged md5sum file
         """
-        output_location = self.platform_storage_folder
+        output_dir = self.platform_storage_folder
 
         # TODO: Include this function in relecov_tools.utils
         def md5_merger(md5_filelist, avoid_chars=None):
@@ -832,13 +832,13 @@ class DownloadManager(BaseModule):
             }
             return merged_md5
 
-        def md5_handler(md5sumlist, output_location):
+        def md5_handler(md5sumlist, output_dir):
             """Download all the remote md5sum files in a list, merge them
             into a single md5checksum and upload it back to sftp"""
             downloaded_md5files = []
             for md5sum in md5sumlist:
                 md5_name = "_".join([token_hex(nbytes=12), "md5_temp.md5"])
-                fetched_md5 = os.path.join(output_location, md5_name)
+                fetched_md5 = os.path.join(output_dir, md5_name)
                 if self.relecov_sftp.get_from_sftp(
                     file=md5sum, destination=fetched_md5
                 ):
@@ -846,7 +846,7 @@ class DownloadManager(BaseModule):
             merged_md5 = md5_merger(downloaded_md5files, self.avoidable_characters)
             if merged_md5:
                 merged_name = "_".join([folder.split("/")[0], "md5sum.md5"])
-                merged_md5_path = os.path.join(output_location, merged_name)
+                merged_md5_path = os.path.join(output_dir, merged_name)
                 with open(merged_md5_path, "w") as md5out:
                     write_md5 = csv_writer(md5out, delimiter="\t")
                     write_md5.writerows(merged_md5.items())
@@ -873,7 +873,7 @@ class DownloadManager(BaseModule):
                 continue
             folders_with_metadata[folder] = [fi for fi in files if fi not in md5sumlist]
             try:
-                uploaded_md5 = md5_handler(md5sumlist, output_location)
+                uploaded_md5 = md5_handler(md5sumlist, output_dir)
             except (FileNotFoundError, OSError, PermissionError, CsvError) as e:
                 error_text = "Could not merge md5files for %s. Reason: %s"
                 stderr.print(f"[yellow]{error_text % (self.current_folder, str(e))}")
@@ -953,7 +953,7 @@ class DownloadManager(BaseModule):
         """
         metadata_ws = self.metadata_processing.get("excel_sheet")
         header_flag = self.metadata_processing.get("header_flag")
-        output_location = self.platform_storage_folder
+        output_dir = self.platform_storage_folder
         date_and_time = self.batch_id
         exts = self.allowed_file_ext
 
@@ -978,7 +978,7 @@ class DownloadManager(BaseModule):
                 self.include_error(error_text % folder)
                 return
             try:
-                downloaded_metadata = self.get_metadata_file(folder, output_location)
+                downloaded_metadata = self.get_metadata_file(folder, output_dir)
             except (FileNotFoundError, OSError, PermissionError, MetadataError) as err:
                 error_text = "Remote folder %s skipped. Reason: %s"
                 self.include_error(error_text % (folder, err))
@@ -1008,7 +1008,7 @@ class DownloadManager(BaseModule):
                 continue
             # Create a temporal name to avoid duplicated filenames
             meta_filename = "_".join([folder.split("/")[-1], "metadata_temp.xlsx"])
-            local_meta = os.path.join(output_location, meta_filename)
+            local_meta = os.path.join(output_dir, meta_filename)
             os.rename(downloaded_metadata, local_meta)
 
             # Taking the main folder for each lab as reference for merge and logs
@@ -1047,7 +1047,7 @@ class DownloadManager(BaseModule):
                 folders_with_metadata[temp_folder].extend(filelist)
                 # rename metadata file to avoid filename duplications
                 excel_name = "_".join([folder.split("/")[0], "merged_metadata.xlsx"])
-                merged_excel_path = os.path.join(output_location, excel_name)
+                merged_excel_path = os.path.join(output_dir, excel_name)
                 os.rename(local_meta, merged_excel_path)
                 # Keep a track of the main_folder for next iteration
                 last_main_folder = temp_folder

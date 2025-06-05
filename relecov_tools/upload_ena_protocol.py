@@ -40,9 +40,9 @@ class EnaUpload(BaseModule):
         action=None,
         metadata_types=None,
         upload_fastq=None,
-        output_path=None,
+        output_dir=None,
     ):
-        super().__init__(output_directory=output_path, called_module="upload-to-ena")
+        super().__init__(output_dir=output_dir, called_module="upload-to-ena")
         if user is None:
             self.user = relecov_tools.utils.prompt_text(
                 msg="Enter your username defined in ENA"
@@ -96,12 +96,12 @@ class EnaUpload(BaseModule):
         else:
             self.action = action.upper()
 
-        if output_path is None:
-            self.output_path = relecov_tools.utils.prompt_path(
+        if output_dir is None:
+            self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the folder to store the xml files"
             )
         else:
-            self.output_path = output_path
+            self.output_dir = output_dir
 
         self.upload_fastq_files = upload_fastq
 
@@ -214,9 +214,9 @@ class EnaUpload(BaseModule):
 
     def save_tables(self, schemas_dataframe, date):
         """Save the dataframes into csv files"""
-        stderr.print(f"Saving dataframes in {self.output_path}")
+        stderr.print(f"Saving dataframes in {self.output_dir}")
         for source, table in schemas_dataframe.items():
-            table_name = str(self.output_path + source + date + "_table.csv")
+            table_name = str(self.output_dir + source + date + "_table.csv")
             table.to_csv(table_name, sep=",")
 
     def update_json(self, updated_schemas_df, json_data):
@@ -269,11 +269,11 @@ class EnaUpload(BaseModule):
         stderr.print(f"\nProcessing submission to ENA server: {self.url}")
 
         receipt = send_schemas(schema_xmls, self.url, self.user, self.passwd).text
-        if not os.path.exists(self.output_path):
-            os.mkdir(self.output_path)
+        if not os.path.exists(self.output_dir):
+            os.mkdir(self.output_dir)
         date = str(datetime.now().strftime("%Y%m%d-%H%M%S"))
         receipt_name = "receipt_" + date + ".xml"
-        receipt_dir = os.path.join(self.output_path, receipt_name)
+        receipt_dir = os.path.join(self.output_dir, receipt_name)
         stderr.print(f"Printing receipt to {receipt_dir}")
 
         with open(f"{receipt_dir}", "w") as fw:

@@ -28,9 +28,9 @@ class MappingSchema(BaseModule):
         json_data=None,
         destination_schema=None,
         schema_file=None,
-        output_folder=None,
+        output_dir=None,
     ):
-        super().__init__(output_directory=output_folder, called_module=__name__)
+        super().__init__(output_dir=output_dir, called_module=__name__)
         config_json = ConfigJson()
         self.config_json = config_json
         if origin_schema is None:
@@ -122,10 +122,10 @@ class MappingSchema(BaseModule):
             if values["ontology"] == "0":
                 continue
             self.ontology[values["ontology"]] = key
-        self.output_folder = output_folder
+        self.output_dir = output_dir
 
-        if os.path.exists(os.path.join(output_folder, "mapping_errors.log")):
-            os.remove(os.path.join(output_folder, "mapping_errors.log"))
+        if os.path.exists(os.path.join(output_dir, "mapping_errors.log")):
+            os.remove(os.path.join(output_dir, "mapping_errors.log"))
 
     def maping_schemas_based_on_geontology(self):
         """Return a dictionary with the properties of the mapped_to_schema as key and
@@ -264,12 +264,12 @@ class MappingSchema(BaseModule):
 
     def write_json_fo_file(self, mapped_json_data):
         """Write metadata to json file"""
-        os.makedirs(self.output_folder, exist_ok=True)
+        os.makedirs(self.output_dir, exist_ok=True)
         time = datetime.now().strftime("%Y_%m_%d")
         file_name = (
             "mapped_metadata" + "_" + self.destination_schema + "_" + time + ".json"
         )
-        json_file = os.path.join(self.output_folder, file_name)
+        json_file = os.path.join(self.output_dir, file_name)
         stderr.print("Writting mapped data to json file:", json_file)
         with open(json_file, "w", encoding="utf-8") as fh:
             fh.write(

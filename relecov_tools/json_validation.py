@@ -27,12 +27,12 @@ class SchemaValidation(BaseModule):
         json_file=None,
         json_schema_file=None,
         metadata=None,
-        out_folder=None,
+        output_dir=None,
         excel_sheet=None,
         registry=None,
     ):
         """Validate json file against the schema"""
-        super().__init__(output_directory=out_folder, called_module=__name__)
+        super().__init__(output_dir=output_dir, called_module=__name__)
         config_json = ConfigJson()
         self.log.info("Initiating validation process")
         if json_schema_file is None:
@@ -48,12 +48,12 @@ class SchemaValidation(BaseModule):
                 msg="Select the json file to be validated"
             )
 
-        if out_folder is None:
+        if output_dir is None:
             self.out_folder = relecov_tools.utils.prompt_path(
                 msg="Select the folder where excel file with invalid data will be saved"
             )
         else:
-            self.out_folder = out_folder
+            self.out_folder = output_dir
 
         # Read and check json to validate file
         if not os.path.isfile(json_file):
@@ -64,7 +64,7 @@ class SchemaValidation(BaseModule):
         out_path = os.path.dirname(os.path.realpath(self.json_data_file))
         self.lab_code = out_path.split("/")[-2]
         self.logsum = self.parent_log_summary(
-            output_location=self.out_folder, unique_key=self.lab_code, path=out_path
+            output_dir=self.out_folder, lab_code=self.lab_code, path=out_path
         )
 
         stderr.print("[blue] Reading the json file")
