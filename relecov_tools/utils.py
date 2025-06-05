@@ -76,11 +76,17 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
         ws_metadata_lab = wb_file[sheet_name]
         try:
             heading_row = [
-                idx + 1 for idx, x in enumerate(ws_metadata_lab.values) if header_flag in x
+                idx + 1
+                for idx, x in enumerate(ws_metadata_lab.values)
+                if header_flag in x
             ][0]
         except IndexError:
-            raise KeyError(f"Header flag '{header_flag}' could not be found in {f_name}")
-        heading = [str(i.value).strip() for i in ws_metadata_lab[heading_row] if i.value]
+            raise KeyError(
+                f"Header flag '{header_flag}' could not be found in {f_name}"
+            )
+        heading = [
+            str(i.value).strip() for i in ws_metadata_lab[heading_row] if i.value
+        ]
         ws_data = []
         for row in islice(ws_metadata_lab.values, heading_row, ws_metadata_lab.max_row):
             l_row = list(row)
@@ -89,7 +95,9 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
             data_row = {}
             for idx in range(0, len(heading)):
                 if l_row[idx] is None:
-                    data_row[heading[idx]] = None if leave_empty else "Not Provided [SNOMED:434941000124101]"
+                    data_row[heading[idx]] = (
+                        None if leave_empty else "Not Provided [SNOMED:434941000124101]"
+                    )
                 else:
                     data_row[heading[idx]] = l_row[idx]
             ws_data.append(data_row)
@@ -101,27 +109,37 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
 
             heading_row_idx = df.apply(lambda row: header_flag in row.values, axis=1)
             if not heading_row_idx.any():
-                raise KeyError(f"Header flag '{header_flag}' could not be found in {f_name}")
+                raise KeyError(
+                    f"Header flag '{header_flag}' could not be found in {f_name}"
+                )
             heading_row = heading_row_idx.idxmax()
             heading = [str(h).strip() for h in df.iloc[heading_row] if pd.notna(h)]
 
             ws_data = []
-            for _, row in df.iloc[heading_row+1:].iterrows():
+            for _, row in df.iloc[heading_row + 1 :].iterrows():
                 if row.isna().all():
                     continue
                 data_row = {}
                 for idx in range(len(heading)):
                     val = row.iloc[idx] if idx < len(row) else None
                     if pd.isna(val):
-                        data_row[heading[idx]] = None if leave_empty else "Not Provided [SNOMED:434941000124101]"
+                        data_row[heading[idx]] = (
+                            None
+                            if leave_empty
+                            else "Not Provided [SNOMED:434941000124101]"
+                        )
                     else:
                         data_row[heading[idx]] = val
                 ws_data.append(data_row)
-            return ws_data, heading_row + 1  # +1 to maintain consistency with openpyxl (1-based)
+            return (
+                ws_data,
+                heading_row + 1,
+            )  # +1 to maintain consistency with openpyxl (1-based)
 
         except Exception as fallback_e:
-            raise RuntimeError(f"Failed to read file with both openpyxl and pandas:\n- openpyxl error: {e}\n- pandas error: {fallback_e}")
-
+            raise RuntimeError(
+                f"Failed to read file with both openpyxl and pandas:\n- openpyxl error: {e}\n- pandas error: {fallback_e}"
+            )
 
 
 def string_to_date(string):
