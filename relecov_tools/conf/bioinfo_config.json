@@ -92,7 +92,7 @@
         "mapping_consensus": {
             "fn": ".consensus.fa",
             "required": false,
-            "function": "handle_consensus_fasta",
+            "function": "utils/extract_consensus_stats",
             "filepath_name": "consensus_sequence_filepath",
             "extract": true,
             "content": {
@@ -254,7 +254,7 @@
         "mapping_consensus": {
             "fn": "99-stats/consensus_files/.*consensus\\.fa$",
             "required": false,
-            "function": "handle_consensus_fasta",
+            "function": "utils/extract_consensus_stats",
             "filepath_name": "consensus_sequence_filepath",
             "extract": true,
             "content": {

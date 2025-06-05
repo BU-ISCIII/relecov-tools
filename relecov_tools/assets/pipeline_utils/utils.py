@@ -12,6 +12,7 @@ import json
 
 from pathlib import Path
 from datetime import datetime
+from Bio import SeqIO
 
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.read_bioinfo_metadata import BioinfoReportLog
@@ -263,6 +264,52 @@ def parse_long_table(files_list, file_tag, pipeline_name, output_folder=None):
         )
     # This needs to return none to avoid being parsed by method mapping-over-table
     return None
+
+
+def extract_consensus_stats(files_list, file_tag, pipeline_name, output_folder=None):
+    """File handler to parse consensus data (fasta) into JSON structured format.
+
+    Args:
+        files_list (list): A list with paths to condensus files.
+
+    Returns:
+        consensus_data_processed: A dictionary containing consensus data handled.
+    """
+    method_name = f"{extract_consensus_stats.__name__}"
+    method_log_report = BioinfoReportLog()
+
+    consensus_data_processed = {}
+    missing_consens = []
+    for consensus_file in files_list:
+        sequence_names = []
+        genome_length = 0
+        try:
+            record_fasta = SeqIO.parse(consensus_file, "fasta")
+            for record in record_fasta:
+                sequence_names.append(record.description)
+                genome_length += len(record.seq)
+        except FileNotFoundError as e:
+            missing_consens.append(e.filename)
+            continue
+        sample_key = os.path.basename(consensus_file).split(".")[0]
+        # Update consensus data for the sample key
+        consensus_data_processed[sample_key] = {
+            "sequence_name": ", ".join(sequence_names),
+            "genome_length": genome_length,
+            "sequence_filepath": os.path.dirname(consensus_file),
+            "sequence_filename": sample_key,
+            "sequence_md5": relecov_tools.utils.calculate_md5(consensus_file),
+        }
+    # Report missing consensus
+    conserrs = len(missing_consens)
+    if conserrs >= 1:
+        method_log_report.update_log_report(
+            method_name,
+            "warning",
+            f"{conserrs} samples missing in consensus file: {missing_consens}",
+        )
+        method_log_report.print_log_report(method_name, ["valid", "warning"])
+    return consensus_data_processed
 
 
 def get_software_versions_yml(files_list, file_tag, pipeline_name, output_folder=None):
