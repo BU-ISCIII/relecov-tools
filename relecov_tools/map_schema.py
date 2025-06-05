@@ -34,19 +34,19 @@ class MappingSchema(BaseModule):
         config_json = ConfigJson()
         self.config_json = config_json
         if origin_schema is None:
-            relecov_schema = os.path.join(
+            origin_schema = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "schema",
                 config_json.get_topic_data("json_schemas", "relecov_schema"),
             )
         else:
-            if not os.path.isfile(relecov_schema):
-                self.log.error("Relecov schema file %s does not exist", relecov_schema)
+            if not os.path.isfile(origin_schema):
+                self.log.error("Relecov schema file %s does not exist", origin_schema)
                 stderr.print(
-                    "[red] Relecov schema " + relecov_schema + " does not exist"
+                    "[red] Relecov schema " + origin_schema + " does not exist"
                 )
                 exit(1)
-        rel_schema_json = relecov_tools.utils.read_json_file(relecov_schema)
+        rel_schema_json = relecov_tools.utils.read_json_file(origin_schema)
         try:
             Draft202012Validator.check_schema(rel_schema_json)
         except jsonschema.ValidationError:

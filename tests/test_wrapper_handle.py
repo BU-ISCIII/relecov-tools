@@ -34,7 +34,7 @@ def generate_config_yaml(download_option, target_folders):
     config_data = {
         "download": {
             "user": "",
-            "passwd": "",
+            "password": "",
             "download_option": download_option,
             "target_folders": target_folders,
             "subfolder": "RELECOV",
@@ -61,7 +61,7 @@ def prepare_remote_test(**kwargs):
 
     download_manager = DownloadManager(
         user=kwargs["user"],
-        passwd=kwargs["password"],
+        password=kwargs["password"],
         conf_file=None,
         download_option=kwargs["download_option"],
         output_dir=kwargs["output_dir"],
@@ -130,13 +130,13 @@ def prepare_remote_test(**kwargs):
     print("Initiating ProcessWrapper")
     wrapper_manager = ProcessWrapper(  # Initialize ProcessWrapper with the config file
         config_file=conf_file,
-        output_folder=kwargs["output_dir"],
+        output_dir=kwargs["output_dir"],
     )
 
     print("Update Wrapper params")
     wrapper_manager.download_params = {  # Set download parameters
         "user": os.environ["TEST_USER"],
-        "passwd": os.environ["TEST_PASSWORD"],
+        "password": os.environ["TEST_PASSWORD"],
         "download_option": kwargs["download_option"],
         "output_dir": kwargs["output_dir"],
         "target_folders": kwargs["target_folders"],
