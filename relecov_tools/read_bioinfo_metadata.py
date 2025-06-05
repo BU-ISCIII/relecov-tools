@@ -287,10 +287,10 @@ class BioinfoMetadata(BaseModule):
                                 .get("type", "string")
                             )
 
-                            row[json_field] = (
-                                relecov_tools.utils.cast_value_to_schema_type(
-                                    raw_val, expected_type
-                                )
+                            row[
+                                json_field
+                            ] = relecov_tools.utils.cast_value_to_schema_type(
+                                raw_val, expected_type
                             )
                             field_valid[software_key] = {json_field: field}
                         except KeyError as e:
@@ -577,7 +577,9 @@ class BioinfoMetadata(BaseModule):
                         utils_name = "relecov_tools.assets.pipeline_utils.utils"
                         func_name = func_name.split("/", 1)[1]
                     else:
-                        utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                        utils_name = (
+                            f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                        )
 
                     # Dynamically import the function from the specified module
                     import_statement = f"import {utils_name}"
@@ -606,7 +608,9 @@ class BioinfoMetadata(BaseModule):
                         utils_name = "relecov_tools.assets.pipeline_utils.utils"
                         func_name = func_name.split("/", 1)[1]
                     else:
-                        utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                        utils_name = (
+                            f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                        )
 
                     # Dynamically import the function from the specified module
                     import_statement = f"import {utils_name}"
@@ -989,7 +993,9 @@ class BioinfoMetadata(BaseModule):
                         utils_name = "relecov_tools.assets.pipeline_utils.utils"
                         func_name = func_name.split("/", 1)[1]
                     else:
-                        utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                        utils_name = (
+                            f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                        )
 
                     import_statement = f"import {utils_name}"
                     exec(import_statement)
