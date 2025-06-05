@@ -30,7 +30,7 @@ def prepare_remote_test(**kwargs):
     print("Initiating sftp module")
     download_manager = DownloadManager(
         user=kwargs["user"],
-        passwd=kwargs["password"],
+        password=kwargs["password"],
         conf_file=None,
         download_option=kwargs["download_option"],
         output_dir=kwargs["output_dir"],
