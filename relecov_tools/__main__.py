@@ -268,10 +268,14 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
         delete_only will only delete the files",
 )
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -335,10 +339,14 @@ def download(
     help="Json with the additional metadata to add to the received user metadata",
 )
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -351,9 +359,7 @@ def download(
     help="Path to folder where samples files are located",
 )
 @click.pass_context
-def read_lab_metadata(
-    ctx, metadata_file, sample_list_file, output_dir, files_folder
-):
+def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_folder):
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
@@ -385,10 +391,14 @@ def read_lab_metadata(
     help="Origin file containing metadata",
 )
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -613,10 +623,14 @@ def send_mail(
 )
 @click.option("-f", "--schema_file", help="file with the custom schema")
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -654,10 +668,14 @@ def map(ctx, origin_schema, json_data, destination_schema, schema_file, output_d
 @click.option("--upload_fastq", is_flag=True, default=False, help="Upload fastq files")
 @click.option("-m", "--metadata_types", help="List of metadata xml types to submit")
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -703,10 +721,14 @@ def upload_to_ena(
     help="path to fastas folder or multifasta file",
 )
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -834,10 +856,14 @@ def update_db(
 )
 @click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -890,10 +916,14 @@ def read_bioinfo_metadata(
     help="Folder where are located the additional files",
 )
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -935,10 +965,14 @@ def metadata_homogeneizer(ctx, institution, directory, output_dir):
     help="select the template config file",
 )
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -1007,10 +1041,14 @@ def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_name
     help="Run the script without user interaction, using default values.",
 )
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -1056,10 +1094,14 @@ def build_schema(
     required=False,
 )
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
@@ -1139,10 +1181,14 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
     required=True,
 )
 @click.option(
-    "-o", "--output-dir",
-    "--output_folder", "--out-folder",
-    "--output_location", "--output_path",
-    "--out_dir", "--output",
+    "-o",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",

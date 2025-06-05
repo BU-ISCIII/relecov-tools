@@ -222,8 +222,7 @@ class GisaidUpload:
         else:
             if self.gzip:
                 os.system(
-                    "zcat %s > %s/multifasta.fasta"
-                    % (self.fasta_path, self.output_dir)
+                    "zcat %s > %s/multifasta.fasta" % (self.fasta_path, self.output_dir)
                 )
                 multifasta = "%s/multifasta.fasta" % self.output_dir
             else:
