@@ -5,7 +5,6 @@ import rich.console
 import re
 import shutil
 import numpy as np
-from bs4 import BeautifulSoup
 from datetime import datetime
 from rich.prompt import Prompt
 
@@ -287,10 +286,10 @@ class BioinfoMetadata(BaseModule):
                                 .get("type", "string")
                             )
 
-                            row[
-                                json_field
-                            ] = relecov_tools.utils.cast_value_to_schema_type(
-                                raw_val, expected_type
+                            row[json_field] = (
+                                relecov_tools.utils.cast_value_to_schema_type(
+                                    raw_val, expected_type
+                                )
                             )
                             field_valid[software_key] = {json_field: field}
                         except KeyError as e:
