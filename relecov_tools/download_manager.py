@@ -6,6 +6,7 @@ import yaml
 import warnings
 import rich.console
 import paramiko
+import pandas as pd
 import relecov_tools.utils
 import relecov_tools.sftp_client
 from datetime import datetime
@@ -326,56 +327,92 @@ class DownloadManager(BaseModule):
         return clean_sample_dict
 
     def read_metadata_file(self, meta_f_path, return_data=True):
-        """Read excel file, check if the header matches with the one defined in config
+        """Read Excel file, check if the header matches with the one defined in config.
 
         Args:
-            meta_f_path (str): Path to the excel_file
+            meta_f_path (str): Path to the Excel file.
 
         Raises:
-            MetadataError: If the header in the excel is different from config
+            MetadataError: If the header in the Excel is different from config.
 
         Returns:
-            ws_metadata_lab: openpyxl's workbook metadata sheet of the excel file
+            ws_metadata_lab: worksheet (openpyxl or simulated from pandas)
             metadata_header: column names of the header
-            header_row: row where the header is located in the sheet
+            header_row: row where the header is located in the sheet (1-based)
         """
+
+
         warnings.simplefilter(action="ignore", category=UserWarning)
-        wb_file = openpyxl_load_workbook(meta_f_path, data_only=True)
-        ws_metadata_lab = wb_file[self.metadata_processing.get("excel_sheet")]
-        # find out the index for file names
         header_flag = self.metadata_processing.get("header_flag")
-        try:
-            header_row = [
-                i + 1 for i, x in enumerate(ws_metadata_lab.values) if header_flag in x
-            ][0]
-        except IndexError:
-            error_text = "Header could not be found for excel file %s"
-            raise MetadataError(str(error_text % os.path.basename(meta_f_path)))
-        for cell in ws_metadata_lab[header_row]:
-            if cell.value is not None:
-                cell.value = cell.value.strip()
-        metadata_header = [
-            x.value for x in ws_metadata_lab[header_row] if x.value is not None
-        ]
+        sheet_name = self.metadata_processing.get("excel_sheet")
         meta_column_list = self.metadata_lab_heading
-        if meta_column_list != metadata_header[1:]:
-            diffs = [
-                x
-                for x in set(metadata_header[1:] + meta_column_list)
-                if x not in meta_column_list or x not in metadata_header
+
+        try:
+            wb_file = openpyxl_load_workbook(meta_f_path, data_only=True)
+            ws_metadata_lab = wb_file[sheet_name]
+            try:
+                header_row = [
+                    i + 1 for i, x in enumerate(ws_metadata_lab.values) if header_flag in x
+                ][0]
+            except IndexError:
+                error_text = "Header could not be found for excel file %s"
+                raise MetadataError(str(error_text % os.path.basename(meta_f_path)))
+            for cell in ws_metadata_lab[header_row]:
+                if cell.value is not None:
+                    cell.value = cell.value.strip()
+            metadata_header = [
+                x.value for x in ws_metadata_lab[header_row] if x.value is not None
             ]
-            self.log.error(
-                "Config field metadata_lab_heading is different from .xlsx header"
-            )
-            stderr.print(
-                "[red]Header in metadata file is different from config file, aborting"
-            )
-            stderr.print("[red]Differences: ", diffs)
-            raise MetadataError(f"Metadata header different from config: {diffs}")
-        if return_data:
-            return ws_metadata_lab, metadata_header, header_row
-        else:
-            return True
+            if meta_column_list != metadata_header[1:]:
+                diffs = [
+                    x for x in set(metadata_header[1:] + meta_column_list)
+                    if x not in meta_column_list or x not in metadata_header
+                ]
+                self.log.error("Config field metadata_lab_heading is different from .xlsx header")
+                stderr.print("[red]Header in metadata file is different from config file, aborting")
+                stderr.print("[red]Differences: ", diffs)
+                raise MetadataError(f"Metadata header different from config: {diffs}")
+            if return_data:
+                return ws_metadata_lab, metadata_header, header_row
+            else:
+                return True
+
+        except Exception as openpyxl_error:
+            self.log.warning(f"openpyxl failed to read the Excel file: {openpyxl_error}")
+            self.log.warning("Attempting to read using pandas fallback")
+
+            try:
+                df = pd.read_excel(meta_f_path, sheet_name=sheet_name, header=None)
+                header_row_mask = df.apply(lambda row: header_flag in row.values, axis=1)
+                if not header_row_mask.any():
+                    raise MetadataError(f"Header flag '{header_flag}' not found in {meta_f_path}")
+                header_row = header_row_mask.idxmax()
+                metadata_header = [
+                    str(h).strip() for h in df.iloc[header_row] if pd.notna(h)
+                ]
+
+                if meta_column_list != metadata_header[1:]:
+                    diffs = [
+                        x for x in set(metadata_header[1:] + meta_column_list)
+                        if x not in meta_column_list or x not in metadata_header
+                    ]
+                    self.log.error("Config field metadata_lab_heading is different from .xlsx header")
+                    stderr.print("[red]Header in metadata file is different from config file, aborting")
+                    stderr.print("[red]Differences: ", diffs)
+                    raise MetadataError(f"Metadata header different from config: {diffs}")
+
+                if return_data:
+                    ws_metadata_lab = df.iloc[header_row + 1:].values.tolist()
+                    return ws_metadata_lab, metadata_header, header_row + 1 # +1 to be consistent with openpyxl
+                else:
+                    return True
+
+            except Exception as pandas_error:
+                raise MetadataError(
+                    f"Failed to read metadata Excel file with both openpyxl and pandas:\n"
+                    f"- openpyxl error: {openpyxl_error}\n"
+                    f"- pandas error: {pandas_error}"
+                )
 
     def get_sample_fastq_file_names(self, local_folder, meta_f_path):
         """Read excel metadata template and create dictionary with files for each sample
