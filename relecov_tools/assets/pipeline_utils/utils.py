@@ -221,6 +221,7 @@ class LongTableParse:
         j_list = self.convert_to_json(parsed_data)
         return j_list
 
+
 # END of Class
 
 
@@ -248,7 +249,9 @@ def parse_long_table(files_list, file_tag, pipeline_name, output_folder=None):
             sys.exit(method_log_report.print_log_report(method_name, ["error"]))
 
         long_table = LongTableParse(
-            file_path=files_list_processed, pipeline_name=pipeline_name, output_folder=output_folder
+            file_path=files_list_processed,
+            pipeline_name=pipeline_name,
+            output_folder=output_folder,
         )
         # Parsing long table data and saving it
         long_table_data = long_table.parsing_csv()
@@ -349,13 +352,15 @@ def get_software_versions_yml(files_list, file_tag, pipeline_name, output_folder
         for section in yml_data.values():
             for name, version in section.items():
                 software_name = name.strip()
-                software_version = version.strip() if isinstance(version, str) else str(version)
+                software_version = (
+                    version.strip() if isinstance(version, str) else str(version)
+                )
                 software_id = software_name.lower()
                 if "/" not in software_id:
                     software_id = software_id.split()[0]
                 version_dict[software_id] = {
                     "software_version": software_version,
-                    "software_name": software_name
+                    "software_name": software_name,
                 }
 
     return version_dict
