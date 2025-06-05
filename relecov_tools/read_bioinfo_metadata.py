@@ -573,10 +573,13 @@ class BioinfoMetadata(BaseModule):
                     os.path.join(splitted_path, f) for f in matching_files
                 ]
                 try:
+                    if func_name.startswith("utils/"):
+                        utils_name = "relecov_tools.assets.pipeline_utils.utils"
+                        func_name = func_name.split("/", 1)[1]
+                    else:
+                        utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+
                     # Dynamically import the function from the specified module
-                    utils_name = (
-                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
-                    )
                     import_statement = f"import {utils_name}"
                     exec(import_statement)
                     # Get method name and execute it.
@@ -584,7 +587,9 @@ class BioinfoMetadata(BaseModule):
                         utils_name
                         + "."
                         + func_name
-                        + "(full_paths, file_tag, output_folder)"
+                        + "(full_paths, file_tag, '"
+                        + self.software_name
+                        + "', output_folder)"
                     )
 
                 except Exception as e:
@@ -597,9 +602,13 @@ class BioinfoMetadata(BaseModule):
             else:
                 try:
                     # Dynamically import the function from the specified module
-                    utils_name = (
-                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
-                    )
+                    if func_name.startswith("utils/"):
+                        utils_name = "relecov_tools.assets.pipeline_utils.utils"
+                        func_name = func_name.split("/", 1)[1]
+                    else:
+                        utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+
+                    # Dynamically import the function from the specified module
                     import_statement = f"import {utils_name}"
                     exec(import_statement)
                     # Get method name and execute it.
@@ -607,7 +616,9 @@ class BioinfoMetadata(BaseModule):
                         utils_name
                         + "."
                         + func_name
-                        + "(file_list, file_tag, output_folder)"
+                        + "(file_list, file_tag, '"
+                        + self.software_name
+                        + "', output_folder)"
                     )
                 except Exception as e:
                     self.update_all_logs(
@@ -974,9 +985,12 @@ class BioinfoMetadata(BaseModule):
                     continue
                 try:
                     # Dynamically import the function from the specified module
-                    utils_name = (
-                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
-                    )
+                    if func_name.startswith("utils/"):
+                        utils_name = "relecov_tools.assets.pipeline_utils.utils"
+                        func_name = func_name.split("/", 1)[1]
+                    else:
+                        utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+
                     import_statement = f"import {utils_name}"
                     exec(import_statement)
                     # Get method name and execute it.
@@ -984,7 +998,9 @@ class BioinfoMetadata(BaseModule):
                         utils_name
                         + "."
                         + func_name
-                        + "(file_path, file_tag, output_folder)"
+                        + "(file_path, file_tag, '"
+                        + self.software_name
+                        + "', output_folder)"
                     )
                 except Exception as e:
                     self.update_all_logs(
