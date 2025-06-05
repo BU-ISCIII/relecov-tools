@@ -68,7 +68,7 @@
             "required": true,
             "multiple_samples": true,
             "split_by_batch": true,
-            "function": "parse_long_table",
+            "function": "utils/parse_long_table",
             "content": {
                 "sample" : "SAMPLE",
                 "chromosome": "CHROM",
@@ -229,7 +229,7 @@
             "required": true,
             "multiple_samples": true,
             "split_by_batch": true,
-            "function": "parse_long_table",
+            "function": "utils/parse_long_table",
             "content": {
                 "sample": "SAMPLE",
                 "subtype": "FLU_SUBTYPE",
