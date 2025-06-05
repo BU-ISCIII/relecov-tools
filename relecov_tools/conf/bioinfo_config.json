@@ -129,6 +129,14 @@
             "multiple_samples": true,
             "function": null,
             "extract": true,
+            "content": {}
+        },
+        "versions":{
+            "fn": "software_versions.yml",
+            "header_row_idx": 1,
+            "required": true,
+            "function": "utils/get_software_versions_yml",
+            "extract": false,
             "content": {
                 "software_version": {
                     "bioinformatics_protocol_software_version": "nf-core/viralrecon",
@@ -262,14 +270,7 @@
             "multiple_samples": true,
             "function": null,
             "extract": true,
-            "content": {
-                "software_version": {
-                    "dehosting_method_software_version": "kraken2"
-                },
-                "software_name": {
-                    "dehosting_method_software_name": "kraken2"
-                }
-            }
+            "content": {}
         },
         "vcf_files": {
             "fn": "06-variant-calling/vcf_files/.*/.*\\.vcf$",
@@ -303,6 +304,21 @@
                     "clade_assignment_software_name":"nextclade",
                     "type_assignment_software_name": "irma",
                     "subtype_assignment_software_name": "irma"
+                }
+            }
+        },
+        "versions_yaml": {
+            "fn": "nf_core_pipeline_software_mqc_versions.yml",
+            "header_row_idx": 1,
+            "required": true,
+            "function": "utils/get_software_versions_yml",
+            "extract": false,
+            "content": {
+                "software_version": {
+                    "dehosting_method_software_version": "kraken2"
+                },
+                "software_name": {
+                    "dehosting_method_software_name": "kraken2"
                 }
             }
         },
