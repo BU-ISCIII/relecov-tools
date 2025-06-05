@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 import os
-import sys
 import logging
 import rich
 import os.path
 import pandas as pd
-from Bio import SeqIO
-
 
 import relecov_tools.utils
 from relecov_tools.read_bioinfo_metadata import BioinfoReportLog
@@ -18,53 +15,6 @@ stderr = rich.console.Console(
     highlight=False,
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
-
-
-# START util functions
-def handle_consensus_fasta(files_list, file_tag, pipeline_name, output_folder=None):
-    """File handler to parse consensus data (fasta) into JSON structured format.
-
-    Args:
-        files_list (list): A list with paths to condensus files.
-
-    Returns:
-        consensus_data_processed: A dictionary containing consensus data handled.
-    """
-    method_name = f"{handle_consensus_fasta.__name__}"
-    method_log_report = BioinfoReportLog()
-
-    consensus_data_processed = {}
-    missing_consens = []
-    for consensus_file in files_list:
-        sequence_names = []
-        genome_length = 0
-        try:
-            record_fasta = SeqIO.parse(consensus_file, "fasta")
-            for record in record_fasta:
-                sequence_names.append(record.description)
-                genome_length += len(record.seq)
-        except FileNotFoundError as e:
-            missing_consens.append(e.filename)
-            continue
-        sample_key = os.path.basename(consensus_file).split(".")[0]
-        # Update consensus data for the sample key
-        consensus_data_processed[sample_key] = {
-            "sequence_name": ", ".join(sequence_names),
-            "genome_length": genome_length,
-            "sequence_filepath": os.path.dirname(consensus_file),
-            "sequence_filename": sample_key,
-            "sequence_md5": relecov_tools.utils.calculate_md5(consensus_file),
-        }
-    # Report missing consensus
-    conserrs = len(missing_consens)
-    if conserrs >= 1:
-        method_log_report.update_log_report(
-            method_name,
-            "warning",
-            f"{conserrs} samples missing in consensus file: {missing_consens}",
-        )
-        method_log_report.print_log_report(method_name, ["valid", "warning"])
-    return consensus_data_processed
 
 
 def quality_control_evaluation(data):
