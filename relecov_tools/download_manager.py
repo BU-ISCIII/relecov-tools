@@ -113,9 +113,7 @@ class DownloadManager(BaseModule):
             sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
             self.target_folders = self.target_folders.split(",")
-        self.logsum = self.parent_log_summary(
-            output_dir=self.platform_storage_folder
-        )
+        self.logsum = self.parent_log_summary(output_dir=self.platform_storage_folder)
         if sftp_passwd is None:
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
         self.metadata_lab_heading = config_json.get_topic_data(

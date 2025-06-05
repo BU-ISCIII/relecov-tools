@@ -153,11 +153,10 @@ Options:
   -p, --password TEXT         password for the user to login
   -f, --conf_file TEXT        Configuration file (not params file)
   -d, --download_option TEXT  Select the download option: [download_only,download_clean, delete_only].
-    download_only will only download the files.
-    download_clean will remove files from sftp after download.
-    delete_only will only delete the files.
-  -o, --output-dir, --output_folder, --out-folder, --output_location, --output_path, --out_dir, --output DIRECTORY
-                                  Directory where the generated output will be
+                              download_only will only download the files.
+                              download_clean will remove files from sftp after download.
+                              delete_only will only delete the files.
+  -o, --output-dir            Directory where the generated output will be saved.
   -t, --target_folders TEXT   Flag: Select which folders will be targeted
                               giving [paths] or via prompt. For multiple
                               folders use ["folder1", "folder2"]
@@ -195,7 +194,7 @@ Usage: relecov-tools read-metadata [OPTIONS]
 Options:
   -m, --metadata_file PATH     file containing metadata
   -s, --sample_list_file PATH  Json with the additional metadata to add to the received user metadata
-  -o, --output_folder PATH     Path to save output metadata file
+  -o, --output-dir,            Directory where the generated output will be saved.
   -f, --files-folder PATH      Path to folder where samples files are located
   --help                       Show this message and exit.
 ```
@@ -240,7 +239,7 @@ Usage: relecov-tools read-bioinfo-metadata [OPTIONS]
 Options:
   -j, --json_file PATH      json file containing lab metadata
   -i, --input_folder PATH   Path to input files
-  -o, --output_folder PATH  Path to save output file
+  -o, --output-dir,            Directory where the generated output will be saved.
   -s, --software_name TEXT  Name of the software/pipeline used.
   --update                  If the output file already exists, ask if you want
                             to update it.
@@ -289,7 +288,7 @@ Usage: relecov-tools validate [OPTIONS]
     -j, --json_file TEXT            Json file to validate
     -s, --json_schema_file          TEXT Path to the JSON Schema file used for validation
     -m, --metadata PATH             Origin file containing metadata
-    -o, --out_folder TEXT           Path to save validate json file
+    -o, --output-dir,               Directory where the generated output will be saved.
     -e, --excel_sheet TEXT          Optional: Name of the sheet in excel file to validate.
     -r, --registry TEXT             Path to registry (JSON file) with validated samples and their unique IDs.   
     --help                          Show this message and exit.
@@ -311,7 +310,7 @@ Options:
   -d, --destination_schema [ENA|GISAID|other]
                                   schema to be mapped
   -f, --schema_file TEXT          file with the custom schema
-  -o, --output_folder TEXT        File name and path to store the mapped json
+  -o, --output-dir,            Directory where the generated output will be saved.
   --help                          Show this message and exit.
 ```
 
@@ -333,7 +332,7 @@ Usage: relecov-tools upload-to-ena [OPTIONS]
     --dev                                    Flag: Test submission
     --upload_fastq                           Flag: Upload fastq files. Mandatory for "add" action
     -m", --metadata_types                    List of metadata xml types to submit [study,experiment,run,sample]
-    -o, --output_path TEXT                   output folder for the xml generated files
+    -o, --output-dir                         Directory where the generated output will be saved.
     --help                                   Show this message and exit.
 
 ```
@@ -353,7 +352,7 @@ Options:
   -t, --token TEXT                path to athentication token
   -e, --gisaid_json TEXT          path to validated json mapped to GISAID
   -i, --input_path TEXT           path to fastas folder or multifasta file
-  -o, --output_path TEXT          output folder for log
+  -o, --output-dir,               Directory where the generated output will be saved.
   -f, --frameshift [catch_all|catch_none|catch_novel]
                                   frameshift notification
   -x, --proxy_config TEXT         introduce your proxy credentials as:
@@ -384,7 +383,7 @@ Options:
   -t, --templates_root PATH  Path to folder containing the pipeline templates
                              from buisciii-tools
   -c, --config PATH          select the template config file
-  -o, --output PATH          select output folder
+  -o, --output-dir,          Directory where the generated output will be saved.
   -f, --folder_names TEXT    Folder basenames to process. Target folders names
                              should match the given dates. E.g. ... -f folder1
                              -f folder2 -f folder3
@@ -400,7 +399,7 @@ Usage: relecov-tools wrapper [OPTIONS]
 
 Options:
   -c, --config_file PATH    Path to config file in yaml format  [required]
-  -o, --output_folder PATH  Path to folder where global results are saved [required]
+  -o, --output-dir,         Directory where the generated output will be saved [required].
   --help                    Show this message and exit.
 ```
 
@@ -412,9 +411,9 @@ Usage: relecov-tools logs-to-excel [OPTIONS]
   Creates a merged xlsx report from all the log summary jsons given as input
 
 Options:
-    -l, --lab_name                         Name for target laboratory in log-summary.json files
-    -o, --output_folder                    Path to output folder where xlsx file is saved
-    -f, --files                            Paths to log_summary.json files to merge into xlsx file, called once per file
+    -l, --lab_name          Name for target laboratory in log-summary.json files
+    -o, --output-dir,       Directory where the generated output will be saved [required]. 
+    -f, --files             Paths to log_summary.json files to merge into xlsx file, called once per file
 ```
 
 #### add-extra-config
@@ -465,7 +464,7 @@ Options:
   -d, --diff        BOOLEAN Prints a changelog/diff between the base and
                             incoming versions of the schema. Required for the generation 
                             of the JSON schema.
-  -o, --out_dir PATH        Path to save output file/s
+  -o, --output-dir,         Directory where the generated output will be saved [required].
   --help                    Show this message and exit.
 ```
 #### Mandatory Files

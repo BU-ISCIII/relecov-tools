@@ -48,9 +48,7 @@ class BaseModule:
             output_dir = logs_config["modules_outpath"][self.called_module]
         else:
             if output_dir is None:
-                output_dir = logs_config.get(
-                    "default_outpath", "/tmp/relecov_tools"
-                )
+                output_dir = logs_config.get("default_outpath", "/tmp/relecov_tools")
         output_dir = os.path.realpath(output_dir)
         self.basemod_outdir = output_dir
         if BaseModule._global_hex_code is None:

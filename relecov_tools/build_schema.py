@@ -33,7 +33,7 @@ class SchemaBuilder(BaseModule):
         input_file=None,
         schema_base=None,
         draft_version=None,
-        show_diff=None,
+        diff=False,
         output_dir=None,
         version=None,
         project=None,
@@ -108,7 +108,7 @@ class SchemaBuilder(BaseModule):
             sys.exit(1)
 
         # Validate show diff option
-        if not show_diff:
+        if diff is False:
             self.show_diff = None
         else:
             self.show_diff = True
