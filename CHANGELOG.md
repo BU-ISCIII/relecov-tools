@@ -38,6 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fill `None` or `"NA"` values in non-required fields with `"Not Provided [SNOMED:434941000124101]"` in `upload_db` module [#633](https://github.com/BU-ISCIII/relecov-tools/pull/633)
 - Improve error handling when `"Library Layout"` field is null in the `download` module [#633](https://github.com/BU-ISCIII/relecov-tools/pull/633)
 - Fixed irma config to propperly find vcf files [#635](https://github.com/BU-ISCIII/relecov-tools/pull/635)
+- Fixed bug when reading old excel files with openpyxl. Added pandas as fallback reader [#637](https://github.com/BU-ISCIII/relecov-tools/pull/637)
 
 #### Changed
 
