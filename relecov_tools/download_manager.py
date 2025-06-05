@@ -341,7 +341,6 @@ class DownloadManager(BaseModule):
             header_row: row where the header is located in the sheet (1-based)
         """
 
-
         warnings.simplefilter(action="ignore", category=UserWarning)
         header_flag = self.metadata_processing.get("header_flag")
         sheet_name = self.metadata_processing.get("excel_sheet")
@@ -352,7 +351,9 @@ class DownloadManager(BaseModule):
             ws_metadata_lab = wb_file[sheet_name]
             try:
                 header_row = [
-                    i + 1 for i, x in enumerate(ws_metadata_lab.values) if header_flag in x
+                    i + 1
+                    for i, x in enumerate(ws_metadata_lab.values)
+                    if header_flag in x
                 ][0]
             except IndexError:
                 error_text = "Header could not be found for excel file %s"
@@ -365,11 +366,16 @@ class DownloadManager(BaseModule):
             ]
             if meta_column_list != metadata_header[1:]:
                 diffs = [
-                    x for x in set(metadata_header[1:] + meta_column_list)
+                    x
+                    for x in set(metadata_header[1:] + meta_column_list)
                     if x not in meta_column_list or x not in metadata_header
                 ]
-                self.log.error("Config field metadata_lab_heading is different from .xlsx header")
-                stderr.print("[red]Header in metadata file is different from config file, aborting")
+                self.log.error(
+                    "Config field metadata_lab_heading is different from .xlsx header"
+                )
+                stderr.print(
+                    "[red]Header in metadata file is different from config file, aborting"
+                )
                 stderr.print("[red]Differences: ", diffs)
                 raise MetadataError(f"Metadata header different from config: {diffs}")
             if return_data:
@@ -378,14 +384,20 @@ class DownloadManager(BaseModule):
                 return True
 
         except Exception as openpyxl_error:
-            self.log.warning(f"openpyxl failed to read the Excel file: {openpyxl_error}")
+            self.log.warning(
+                f"openpyxl failed to read the Excel file: {openpyxl_error}"
+            )
             self.log.warning("Attempting to read using pandas fallback")
 
             try:
                 df = pd.read_excel(meta_f_path, sheet_name=sheet_name, header=None)
-                header_row_mask = df.apply(lambda row: header_flag in row.values, axis=1)
+                header_row_mask = df.apply(
+                    lambda row: header_flag in row.values, axis=1
+                )
                 if not header_row_mask.any():
-                    raise MetadataError(f"Header flag '{header_flag}' not found in {meta_f_path}")
+                    raise MetadataError(
+                        f"Header flag '{header_flag}' not found in {meta_f_path}"
+                    )
                 header_row = header_row_mask.idxmax()
                 metadata_header = [
                     str(h).strip() for h in df.iloc[header_row] if pd.notna(h)
@@ -393,17 +405,28 @@ class DownloadManager(BaseModule):
 
                 if meta_column_list != metadata_header[1:]:
                     diffs = [
-                        x for x in set(metadata_header[1:] + meta_column_list)
+                        x
+                        for x in set(metadata_header[1:] + meta_column_list)
                         if x not in meta_column_list or x not in metadata_header
                     ]
-                    self.log.error("Config field metadata_lab_heading is different from .xlsx header")
-                    stderr.print("[red]Header in metadata file is different from config file, aborting")
+                    self.log.error(
+                        "Config field metadata_lab_heading is different from .xlsx header"
+                    )
+                    stderr.print(
+                        "[red]Header in metadata file is different from config file, aborting"
+                    )
                     stderr.print("[red]Differences: ", diffs)
-                    raise MetadataError(f"Metadata header different from config: {diffs}")
+                    raise MetadataError(
+                        f"Metadata header different from config: {diffs}"
+                    )
 
                 if return_data:
-                    ws_metadata_lab = df.iloc[header_row + 1:].values.tolist()
-                    return ws_metadata_lab, metadata_header, header_row + 1 # +1 to be consistent with openpyxl
+                    ws_metadata_lab = df.iloc[header_row + 1 :].values.tolist()
+                    return (
+                        ws_metadata_lab,
+                        metadata_header,
+                        header_row + 1,
+                    )  # +1 to be consistent with openpyxl
                 else:
                     return True
 
