@@ -268,10 +268,13 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
         delete_only will only delete the files",
 )
 @click.option(
-    "-o",
-    "--output_location",
-    default=None,
-    help="Flag: Select location for downloaded files, overrides config file location",
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
 )
 @click.option(
     "-t",
@@ -296,7 +299,7 @@ def download(
     password,
     conf_file,
     download_option,
-    output_location,
+    output_dir,
     target_folders,
     subfolder,
 ):
@@ -332,7 +335,13 @@ def download(
     help="Json with the additional metadata to add to the received user metadata",
 )
 @click.option(
-    "-o", "--output_folder", type=click.Path(), help="Path to save output metadata file"
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
 )
 @click.option(
     "-f",
@@ -343,7 +352,7 @@ def download(
 )
 @click.pass_context
 def read_lab_metadata(
-    ctx, metadata_file, sample_list_file, output_folder, files_folder
+    ctx, metadata_file, sample_list_file, output_dir, files_folder
 ):
     """
     Create the json compliant to the relecov schema from the Metadata file.
@@ -375,7 +384,15 @@ def read_lab_metadata(
     type=click.Path(),
     help="Origin file containing metadata",
 )
-@click.option("-o", "--out_folder", help="Path to save validate json file")
+@click.option(
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
+)
 @click.option(
     "-e",
     "--excel_sheet",
@@ -392,7 +409,7 @@ def read_lab_metadata(
 )
 @click.pass_context
 def validate(
-    ctx, json_file, json_schema_file, metadata, out_folder, excel_sheet, registry
+    ctx, json_file, json_schema_file, metadata, output_dir, excel_sheet, registry
 ):
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
@@ -596,10 +613,16 @@ def send_mail(
 )
 @click.option("-f", "--schema_file", help="file with the custom schema")
 @click.option(
-    "-o", "--output_folder", help="File name and path to store the mapped json"
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
 )
 @click.pass_context
-def map(ctx, origin_schema, json_data, destination_schema, schema_file, output_folder):
+def map(ctx, origin_schema, json_data, destination_schema, schema_file, output_dir):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
@@ -630,7 +653,15 @@ def map(ctx, origin_schema, json_data, destination_schema, schema_file, output_f
 @click.option("--dev", is_flag=True, default=False, help="Test submission")
 @click.option("--upload_fastq", is_flag=True, default=False, help="Upload fastq files")
 @click.option("-m", "--metadata_types", help="List of metadata xml types to submit")
-@click.option("-o", "--output_path", help="output folder for the xml generated files")
+@click.option(
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
+)
 @click.pass_context
 def upload_to_ena(
     ctx,
@@ -643,7 +674,7 @@ def upload_to_ena(
     action,
     metadata_types,
     upload_fastq,
-    output_path,
+    output_dir,
 ):
     """parse data to create xml files to upload to ena"""
     debug = ctx.obj.get("debug", False)
@@ -671,7 +702,15 @@ def upload_to_ena(
     "--input_path",
     help="path to fastas folder or multifasta file",
 )
-@click.option("-o", "--output_path", help="output folder for log")
+@click.option(
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
+)
 @click.option(
     "-f",
     "--frameshift",
@@ -705,7 +744,7 @@ def upload_to_gisaid(
     token,
     gisaid_json,
     input_path,
-    output_path,
+    output_dir,
     frameshift,
     proxy_config,
     single,
@@ -795,7 +834,13 @@ def update_db(
 )
 @click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
 @click.option(
-    "-o", "--output_folder", type=click.Path(), help="Path to save output file"
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
 )
 @click.option("-s", "--software_name", help="Name of the software/pipeline used.")
 @click.option(
@@ -806,7 +851,7 @@ def update_db(
 )
 @click.pass_context
 def read_bioinfo_metadata(
-    ctx, json_file, input_folder, output_folder, software_name, update
+    ctx, json_file, input_folder, output_dir, software_name, update
 ):
     """
     Create the json compliant  from the Bioinfo Metadata.
@@ -844,9 +889,17 @@ def read_bioinfo_metadata(
     type=click.Path(),
     help="Folder where are located the additional files",
 )
-@click.option("-o", "--output", type=click.Path(), help="Path to save json output")
+@click.option(
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
+)
 @click.pass_context
-def metadata_homogeneizer(ctx, institution, directory, output):
+def metadata_homogeneizer(ctx, institution, directory, output_dir):
     """Parse institution metadata lab to the one used in relecov"""
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
@@ -881,7 +934,15 @@ def metadata_homogeneizer(ctx, institution, directory, output):
     type=click.Path(),
     help="select the template config file",
 )
-@click.option("-o", "--output", type=click.Path(), help="select output folder")
+@click.option(
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
+)
 @click.option(
     "-f",
     "--folder_names",
@@ -890,7 +951,7 @@ def metadata_homogeneizer(ctx, institution, directory, output):
     help="Folder basenames to process. Target folders names should match the given dates. E.g. ... -f folder1 -f folder2 -f folder3",
 )
 @click.pass_context
-def pipeline_manager(ctx, input, templates_root, output, config, folder_names):
+def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_names):
     """
     Create the symbolic links for the samples which are validated to prepare for
     bioinformatics pipeline execution.
@@ -945,7 +1006,15 @@ def pipeline_manager(ctx, input, templates_root, output, config, folder_names):
     is_flag=True,
     help="Run the script without user interaction, using default values.",
 )
-@click.option("-o", "--out_dir", type=click.Path(), help="Path to save output file/s")
+@click.option(
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
+)
 @click.pass_context
 def build_schema(
     ctx,
@@ -953,7 +1022,7 @@ def build_schema(
     schema_base,
     draft_version,
     diff,
-    out_dir,
+    output_dir,
     version,
     project,
     non_interactive,
@@ -987,11 +1056,13 @@ def build_schema(
     required=False,
 )
 @click.option(
-    "-o",
-    "--output_folder",
-    type=click.Path(),
-    help="Path to output folder where xlsx file is saved",
-    required=False,
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
 )
 @click.option(
     "-f",
@@ -1001,7 +1072,7 @@ def build_schema(
     multiple=True,
 )
 @click.pass_context
-def logs_to_excel(ctx, lab_code, output_folder, files):
+def logs_to_excel(ctx, lab_code, output_dir, files):
     """Creates a merged xlsx and Json report from all the log summary jsons given as input"""
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
@@ -1041,7 +1112,7 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
         log.error(msg)
         raise ValueError(msg)
 
-    logsum = relecov_tools.log_summary.LogSum(output_folder=output_folder)
+    logsum = relecov_tools.log_summary.LogSum(output_dir=output_dir)
     try:
         merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
         final_logs = logsum.prepare_final_logs(logs=merged_logs)
@@ -1068,14 +1139,16 @@ def logs_to_excel(ctx, lab_code, output_folder, files):
     required=True,
 )
 @click.option(
-    "-o",
-    "--output_folder",
-    type=click.Path(),
-    help="Path to folder where global results are saved [required]",
-    required=False,
+    "-o", "--output-dir",
+    "--output_folder", "--out-folder",
+    "--output_location", "--output_path",
+    "--out_dir", "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output will be saved",
 )
 @click.pass_context
-def wrapper(ctx, config_file, output_folder):
+def wrapper(ctx, config_file, output_dir):
     """Executes the modules in config file sequentially"""
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)

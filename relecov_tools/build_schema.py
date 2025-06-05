@@ -34,7 +34,7 @@ class SchemaBuilder(BaseModule):
         schema_base=None,
         draft_version=None,
         show_diff=None,
-        out_dir=None,
+        output_dir=None,
         version=None,
         project=None,
         non_interactive=False,
@@ -43,7 +43,7 @@ class SchemaBuilder(BaseModule):
         Initialize the SchemaBuilder class. This class generates a JSON Schema file based on the provided draft version.
         It reads the database definition from an Excel file and allows customization of the schema generation process.
         """
-        super().__init__(output_directory=out_dir, called_module=__name__)
+        super().__init__(output_dir=output_dir, called_module=__name__)
         self.excel_file_path = input_file
         self.non_interactive = non_interactive
         # Validate input data
@@ -57,15 +57,15 @@ class SchemaBuilder(BaseModule):
         self.set_batch_id(self.basemod_date)
 
         # Validate output folder creation
-        if not out_dir:
-            self.output_folder = relecov_tools.utils.prompt_create_outdir(
+        if not output_dir:
+            self.output_dir = relecov_tools.utils.prompt_create_outdir(
                 path=None, out_dir=None
             )
         else:
-            self.output_folder = os.path.abspath(out_dir)
-            if not os.path.exists(self.output_folder):
-                self.output_folder = relecov_tools.utils.prompt_create_outdir(
-                    path=None, out_dir=out_dir
+            self.output_dir = os.path.abspath(output_dir)
+            if not os.path.exists(self.output_dir):
+                self.output_dir = relecov_tools.utils.prompt_create_outdir(
+                    path=None, out_dir=output_dir
                 )
 
         # Get version option
@@ -265,7 +265,7 @@ class SchemaBuilder(BaseModule):
             )
 
             # Save errors to file
-            error_file_path = f"{self.output_folder}/schema_validation_errors.csv"
+            error_file_path = f"{self.output_dir}/schema_validation_errors.csv"
             df_errors.to_csv(error_file_path, index=False, encoding="utf-8")
 
             # Provide errors to user in rich table format:
@@ -648,7 +648,7 @@ class SchemaBuilder(BaseModule):
             return True
         if diff_output_choice in ["Save to file", "Both"]:
             diff_filepath = os.path.join(
-                os.path.realpath(self.output_folder) + "/build_schema_diff.txt"
+                os.path.realpath(self.output_dir) + "/build_schema_diff.txt"
             )
             with open(diff_filepath, "w") as diff_file:
                 diff_file.write("\n".join(diff_lines))
@@ -668,7 +668,7 @@ class SchemaBuilder(BaseModule):
             bool: True if the schema was successfully saved, False otherwise.
         """
         try:
-            path_to_save = f"{self.output_folder}/relecov_schema.json"
+            path_to_save = f"{self.output_dir}/relecov_schema.json"
             with open(path_to_save, "w") as schema_file:
                 json.dump(json_data, schema_file, ensure_ascii=False, indent=4)
             self.log.info(f"New JSON schema saved to: {path_to_save}")
@@ -701,7 +701,7 @@ class SchemaBuilder(BaseModule):
         """
         try:
             # Retrieve existing files in the output directory
-            output_files = os.listdir(self.output_folder)
+            output_files = os.listdir(self.output_dir)
             notes_control_input = (
                 "Auto-generated update"
                 if self.non_interactive
@@ -726,7 +726,7 @@ class SchemaBuilder(BaseModule):
                 match = re.search(r"v(\d+\.\d+\.\d+)", latest_file)
                 if match:
                     # Load the latest template file and attempt to read version history
-                    out_file = os.path.join(self.output_folder, latest_file)
+                    out_file = os.path.join(self.output_dir, latest_file)
                     version_history = pd.DataFrame(
                         columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
                     )
@@ -744,13 +744,13 @@ class SchemaBuilder(BaseModule):
                 else:
                     next_version = "1.0.0"
                     out_file = os.path.join(
-                        self.output_folder,
+                        self.output_dir,
                         f"Relecov_metadata_template_v{next_version}.xlsx",
                     )
             else:
                 next_version = "1.0.0"
                 out_file = os.path.join(
-                    self.output_folder,
+                    self.output_dir,
                     f"Relecov_metadata_template_v{next_version}.xlsx",
                 )
             # Store versioning information
@@ -764,7 +764,7 @@ class SchemaBuilder(BaseModule):
                 [version_history, pd.DataFrame([version_info])], ignore_index=True
             )
             out_file = os.path.join(
-                self.output_folder, f"Relecov_metadata_template_v{next_version}.xlsx"
+                self.output_dir, f"Relecov_metadata_template_v{next_version}.xlsx"
             )
 
             # Define required metadata classifications
@@ -1180,11 +1180,11 @@ class SchemaBuilder(BaseModule):
                 "Metadata Template File",
             ],
             "Path": [
-                shorten_path(self.output_folder),
-                shorten_path(f"{self.output_folder}/relecov_schema.json"),
+                shorten_path(self.output_dir),
+                shorten_path(f"{self.output_dir}/relecov_schema.json"),
                 shorten_path(self.base_schema_path),
-                shorten_path(f"{self.output_folder}/build_schema_diff.txt"),
-                shorten_path(f"{self.output_folder}/Relecov_metadata_template_v*.xlsx"),
+                shorten_path(f"{self.output_dir}/build_schema_diff.txt"),
+                shorten_path(f"{self.output_dir}/Relecov_metadata_template_v*.xlsx"),
             ],
         }
 

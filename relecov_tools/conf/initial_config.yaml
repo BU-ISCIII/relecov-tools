@@ -26,14 +26,14 @@ download:
     password: ''
     conf_file: ''
     download_option: ''
-    output_location: ''
+    output_dir: ''
     target_folders: []
     subfolder: RELECOV
 
 read_lab_metadata:
     metadata_file: ''
     sample_list_file: ''
-    output_folder: ''
+    output_dir: ''
     files_folder: ''
 
 validate:

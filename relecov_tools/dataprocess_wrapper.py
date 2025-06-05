@@ -25,12 +25,12 @@ class ProcessWrapper(BaseModule):
     if you dont want to use that argument e.g.(target_folders:  ) -> (target_folders = None)
     """
 
-    def __init__(self, config_file: str = None, output_folder: str = None):
-        super().__init__(output_directory=output_folder, called_module="wrapper")
-        if not os.path.isdir(str(output_folder)):
-            raise FileNotFoundError(f"Output folder {output_folder} is not valid")
+    def __init__(self, config_file: str = None, output_dir: str = None):
+        super().__init__(output_dir=output_dir, called_module="wrapper")
+        if not os.path.isdir(str(output_dir)):
+            raise FileNotFoundError(f"Output folder {output_dir} is not valid")
         else:
-            self.output_folder = output_folder
+            self.output_dir = output_dir
         if not os.path.isfile(str(config_file)):
             raise FileNotFoundError(f"Config file {config_file} is not a file")
         else:
@@ -39,15 +39,15 @@ class ProcessWrapper(BaseModule):
                 # Config file should include a key
             except yaml.YAMLError as e:
                 raise yaml.YAMLError(f"Invalid config file: {e}")
-        output_regex = ("out_folder", "output_folder", "output_location")
+        output_regex = ("out_folder", "output_dir", "output_location")
         for key, val in self.config_data.items():
             for arg in output_regex:
                 if val == arg:
-                    self.config_data[key] = self.output_folder
+                    self.config_data[key] = self.output_dir
         self.wrapper_logsum = self.parent_log_summary(
-            output_location=os.path.join(self.output_folder)
+            output_dir=os.path.join(self.output_dir)
         )
-        self.config_data["download"].update({"output_location": output_folder})
+        self.config_data["download"].update({"output_dir": output_dir})
         if "subfolder" not in self.config_data["download"]:
             self.config_data["download"].update(
                 {"subfolder": "RELECOV"}

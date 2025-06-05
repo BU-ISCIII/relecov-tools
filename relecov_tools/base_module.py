@@ -21,11 +21,11 @@ class BaseModule:
     _current_version = None
     _cli_command = None
 
-    def __init__(self, output_directory: str = None, called_module: str = None):
+    def __init__(self, output_dir: str = None, called_module: str = None):
         """Set logs output path based on the module being executed
 
         Args:
-            output_directory (str, optional): Output folder to save called module logs. Defaults to None.
+            output_dir (str, optional): Output folder to save called module logs. Defaults to None.
             called_module (str, optional): Name of the module being executed. Defaults to None.
         """
         if BaseModule._active_process:
@@ -45,25 +45,25 @@ class BaseModule:
         config = ConfigJson(extra_config=True)
         logs_config = config.get_configuration("logs_config")
         if self.called_module in logs_config.get("modules_outpath", {}):
-            output_directory = logs_config["modules_outpath"][self.called_module]
+            output_dir = logs_config["modules_outpath"][self.called_module]
         else:
-            if output_directory is None:
-                output_directory = logs_config.get(
+            if output_dir is None:
+                output_dir = logs_config.get(
                     "default_outpath", "/tmp/relecov_tools"
                 )
-        output_directory = os.path.realpath(output_directory)
-        self.basemod_outdir = output_directory
+        output_dir = os.path.realpath(output_dir)
+        self.basemod_outdir = output_dir
         if BaseModule._global_hex_code is None:
             if BaseModule._cli_log_file:
                 hex_folder = os.path.dirname(BaseModule._cli_log_file)
             else:
-                hex_folder = output_directory
+                hex_folder = output_dir
             self.hex = relecov_tools.utils.get_safe_hex(hex_folder)
             BaseModule._global_hex_code = self.hex
         else:
             self.hex = BaseModule._global_hex_code
         new_logname = self.tag_filename(self.called_module + ".log")
-        self.final_log_path = os.path.join(output_directory, new_logname)
+        self.final_log_path = os.path.join(output_dir, new_logname)
         if BaseModule._active_process is True:
             log_level = self.log.getEffectiveLevel()
             handler = BaseModule.set_log_handler(self.final_log_path, level=log_level)
@@ -119,7 +119,7 @@ class BaseModule:
             log_file = old_log_path
         if new_log_path is None:
             if self.base_logsum is not None:
-                outdir = self.base_logsum.output_location
+                outdir = self.base_logsum.output_dir
                 new_log_path = os.path.join(
                     outdir, self.tag_filename(self.called_module + ".log")
                 )
@@ -195,8 +195,8 @@ class BaseModule:
 
     def parent_log_summary(self, *args, **kwargs):
         """Initiate relecov_tools.LogSum class with given parameters"""
-        if "output_location" not in kwargs:
-            kwargs["output_location"] = self.basemod_outdir
+        if "output_dir" not in kwargs:
+            kwargs["output_dir"] = self.basemod_outdir
         self.base_logsum = LogSum(**kwargs)
         return self.base_logsum
 

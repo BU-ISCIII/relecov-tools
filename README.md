@@ -156,8 +156,8 @@ Options:
     download_only will only download the files.
     download_clean will remove files from sftp after download.
     delete_only will only delete the files.
-  -o, --output_location TEXT  Flag: Select location for downloaded files,
-                              overrides config file location
+  -o, --output-dir, --output_folder, --out-folder, --output_location, --output_path, --out_dir, --output DIRECTORY
+                                  Directory where the generated output will be
   -t, --target_folders TEXT   Flag: Select which folders will be targeted
                               giving [paths] or via prompt. For multiple
                               folders use ["folder1", "folder2"]
