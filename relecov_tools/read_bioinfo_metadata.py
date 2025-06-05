@@ -618,112 +618,6 @@ class BioinfoMetadata(BaseModule):
                     sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
 
-    def get_multiqc_software_versions(self, file_list, j_data):
-        """Reads multiqc html file, finds table containing software version info, and map it to j_data
-
-        Args:
-            file_list (list): A list containing the path to file multiqc_report.html.
-            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
-
-        Returns:
-            j_data: updated j_data with software details mapped in it.
-        """
-        method_name = f"{self.get_multiqc_software_versions.__name__}"
-        # Handle multiqc_report.html
-        f_path = file_list[0]
-        program_versions = {}
-
-        with open(f_path, "r") as html_file:
-            html_content = html_file.read()
-        soup = BeautifulSoup(html_content, features="lxml")
-        div_id = re.compile(
-            r"mqc-module-section-(software_versions|multiqc_software_versions)"
-        )
-        versions_div = soup.find_all("div", id=div_id)
-        program_versions = {}
-        if versions_div:
-            for div in versions_div:
-                table = div.find("table", class_="table")
-                if table:
-                    rows = table.find_all("tr")
-                    for row in rows[1:]:  # skipping header
-                        columns = row.find_all("td")
-                        if len(columns) == 3:
-                            program_name = columns[1].text.strip()
-                            version = columns[2].text.strip()
-                            program_versions[program_name] = version
-                        else:
-                            self.update_all_logs(
-                                method_name,
-                                "error",
-                                f"HTML entry error in {columns}. HTML table expected format should be \n<th> Process Name\n</th>\n<th> Software </th>\n.",
-                            )
-                            sys.exit(
-                                self.log_report.print_log_report(method_name, ["error"])
-                            )
-                else:
-                    self.update_all_logs(
-                        method_name,
-                        "error",
-                        f"Unable to locate the table containing software versions in file {f_path} under div section {div_id}.",
-                    )
-                    sys.exit(self.log_report.print_log_report(method_name, ["error"]))
-        else:
-            self.update_all_logs(
-                self.get_multiqc_software_versions.__name__,
-                "error",
-                f"Failed to locate the required '{div_id}' div section in the '{f_path}' file.",
-            )
-            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
-        # Mapping multiqc sofware versions to j_data
-        field_errors = {}
-        for row in j_data:
-            # Get sample name to track whether version assignment was successful or not.
-            if not row.get("sequencing_sample_id"):
-                self.update_all_logs(
-                    method_name,
-                    "warning",
-                    f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
-                )
-                continue
-            sample_name = row["sequencing_sample_id"]
-            # Append software version and name
-            software_content_details = self.software_config["workflow_summary"].get(
-                "content"
-            )
-            for content_key, content_value in software_content_details.items():
-                for key, value in content_value.items():
-                    # Add software versions
-                    if "software_version" in content_key:
-                        try:
-                            row[key] = program_versions[value]
-                        except KeyError as e:
-                            field_errors[sample_name] = {value: e}
-                            row[key] = "Not Provided [SNOMED:434941000124101]"
-                        continue
-                    # Add software name
-                    elif "software_name" in content_key:
-                        try:
-                            row[key] = value
-                        except KeyError as e:
-                            field_errors[sample_name] = {value: e}
-                            row[key] = "Not Provided [SNOMED:434941000124101]"
-                        continue
-
-        # update progress log
-        if len(field_errors) > 0:
-            self.update_all_logs(
-                method_name,
-                "warning",
-                f"Encountered field errors while mapping data: {field_errors}",
-            )
-        else:
-            self.update_all_logs(
-                method_name, "valid", "Successfully field mapped data."
-            )
-        self.log_report.print_log_report(method_name, ["valid", "warning"])
-        return j_data
-
     def add_fixed_values(self, j_data):
         """Add fixed values to j_data as defined in the bioinformatics configuration (definition: "fixed values")
 
@@ -1157,10 +1051,6 @@ class BioinfoMetadata(BaseModule):
                 files_found_dict, batch_data, sufix, file_tag, batch_dir
             )
             stderr.print("[blue]Adding software versions to read lab metadata...")
-            if "workflow_summary" in files_found_dict:
-                batch_data = self.get_multiqc_software_versions(
-                    files_found_dict["workflow_summary"], batch_data
-                )
             stderr.print("[blue]Adding fixed values")
             batch_data = self.add_fixed_values(batch_data)
             # Adding files path
