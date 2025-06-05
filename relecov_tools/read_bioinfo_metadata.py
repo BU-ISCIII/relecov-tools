@@ -1085,8 +1085,9 @@ class BioinfoMetadata(BaseModule):
             batch_filename = tag + lab_code + ".json"
             batch_filename = self.tag_filename(batch_filename)
             batch_filepath = os.path.join(batch_dir, batch_filename)
-            if self.software_name == "viralrecon":
-                try:
+            module = eval(f"relecov_tools.assets.pipeline_utils.{self.software_name}")
+            try:
+                if hasattr(module, "quality_control_evaluation"):
                     qc_func = eval(
                         f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation"
                     )
@@ -1095,15 +1096,15 @@ class BioinfoMetadata(BaseModule):
                         sample_id = sample.get("sequencing_sample_id")
                         if sample_id in qc_data:
                             sample.update(qc_data[sample_id])
-                except (AttributeError, NameError, TypeError, ValueError) as e:
-                    self.update_all_logs(
-                        self.create_bioinfo_file.__name__,
-                        "warning",
-                        f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}",
-                    )
-                    stderr.print(
-                        f"[orange]Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
-                    )
+            except (AttributeError, NameError, TypeError, ValueError) as e:
+                self.update_all_logs(
+                    self.create_bioinfo_file.__name__,
+                    "warning",
+                    f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}",
+                )
+                stderr.print(
+                    f"[orange]Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
+                )
             if os.path.exists(batch_filepath):
                 stderr.print(
                     f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
