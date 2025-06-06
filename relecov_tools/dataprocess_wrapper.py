@@ -174,7 +174,7 @@ class ProcessWrapper(BaseModule):
             {
                 "metadata_file": metadata_file,
                 "sample_list_file": samples_file,
-                "output_folder": local_folder,
+                "output_dir": local_folder,
             }
         )
         read_meta_logs = self.exec_read_metadata(self.readmeta_params)

@@ -22,7 +22,7 @@ stderr = rich.console.Console(
 
 
 class BioinfoReportLog:
-    def __init__(self, log_report=None, output_folder="/tmp/"):
+    def __init__(self, log_report=None, output_dir="/tmp/"):
         if not log_report:
             self.report = {"error": {}, "valid": {}, "warning": {}}
         else:
@@ -88,7 +88,7 @@ class BioinfoMetadata(BaseModule):
         else:
             self.output_dir = os.path.realpath(output_dir)
         self.logsum = self.parent_log_summary(output_dir=output_dir)
-        self.log_report = BioinfoReportLog(output_folder=output_dir)
+        self.log_report = BioinfoReportLog(output_dir=output_dir)
 
         # Parse read-lab-meta-data
         if json_file is None:
@@ -397,7 +397,7 @@ class BioinfoMetadata(BaseModule):
         return
 
     def add_bioinfo_results_metadata(
-        self, files_dict, j_data, sufix, file_tag, output_folder=None
+        self, files_dict, j_data, sufix, file_tag, output_dir=None
     ):
         """Adds metadata from bioinformatics results to j_data.
         It first calls file_handlers and then maps the handled
@@ -407,7 +407,7 @@ class BioinfoMetadata(BaseModule):
             files_dict (dict{str:str}): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (list item per sample).
             sufix (str): Sufix added to splitted tables file name.
-            output_folder (str): Path to save output files generated during handling_files() process.
+            output_dir (str): Path to save output files generated during handling_files() process.
             file_tag(str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
 
         Returns:
@@ -439,7 +439,7 @@ class BioinfoMetadata(BaseModule):
                 self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
             data_to_map = self.handling_files(
-                files_dict[key], sufix, output_folder, file_tag
+                files_dict[key], sufix, output_dir, file_tag
             )
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
@@ -522,7 +522,7 @@ class BioinfoMetadata(BaseModule):
             )
             raise ValueError(self.log_report.print_log_report(method_name, ["error"]))
 
-    def handling_files(self, file_list, sufix, output_folder, file_tag):
+    def handling_files(self, file_list, sufix, output_dir, file_tag):
         """Handles different file formats to extract data regardless of their structure.
         The goal is to extract the data contained in files specified in ${file_list},
         using either 'standard' handlers defined in this class or pipeline-specific file handlers.
@@ -548,14 +548,14 @@ class BioinfoMetadata(BaseModule):
 
         Args:
             file_list (list): A list of file path/s to be processed.
-            output_folder (str): Path to save output files from imported method if necessary
+            output_dir (str): Path to save output files from imported method if necessary
             file_tag(str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
 
         Returns:
             data: A dictionary containing bioinfo metadata handled for each sample.
         """
         method_name = f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_files.__name__}"
-        splitted_path = os.path.join(output_folder, "analysis_results")
+        splitted_path = os.path.join(output_dir, "analysis_results")
         file_name = self.software_config[self.current_config_key].get("fn")
         # Parsing files
         current_config = self.software_config[self.current_config_key]
@@ -594,7 +594,7 @@ class BioinfoMetadata(BaseModule):
                         + func_name
                         + "(full_paths, file_tag, '"
                         + self.software_name
-                        + "', output_folder)"
+                        + "', output_dir)"
                     )
 
                 except Exception as e:
@@ -625,7 +625,7 @@ class BioinfoMetadata(BaseModule):
                         + func_name
                         + "(file_list, file_tag, '"
                         + self.software_name
-                        + "', output_folder)"
+                        + "', output_dir)"
                     )
                 except Exception as e:
                     self.update_all_logs(
@@ -962,14 +962,14 @@ class BioinfoMetadata(BaseModule):
         relecov_tools.utils.write_json_to_file(merged_metadata, batch_filepath)
         return merged_metadata
 
-    def save_merged_files(self, files_dict, file_tag, output_folder=None):
+    def save_merged_files(self, files_dict, file_tag, output_dir=None):
         """
         Process and save files that where split by cod and that have a function to be processed
 
         Args:
             files_dict (dict): A dictionary containing file paths identified for each configuration item.
             file_tag (str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
-            output_folder (str): Path to save output files generated during processing.
+            output_dir (str): Path to save output files generated during processing.
 
         Returns:
             None
@@ -1009,7 +1009,7 @@ class BioinfoMetadata(BaseModule):
                         + func_name
                         + "(file_path, file_tag, '"
                         + self.software_name
-                        + "', output_folder)"
+                        + "', output_dir)"
                     )
                 except Exception as e:
                     self.update_all_logs(

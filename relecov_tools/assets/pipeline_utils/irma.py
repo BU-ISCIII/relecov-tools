@@ -42,7 +42,7 @@ def quality_control_evaluation(data):
     return data
 
 
-def get_software_versions(files_list, file_tag, pipeline_name, output_folder=None):
+def get_software_versions(files_list, file_tag, pipeline_name, output_dir=None):
     """File handler to parse software versions from csv.
 
     Args:

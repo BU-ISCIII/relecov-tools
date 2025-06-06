@@ -27,15 +27,15 @@ class RelecovMetadata(BaseModule):
     ):
         super().__init__(output_dir=output_dir, called_module=__name__)
         self.log.info("Initiating read-lab-metadata process")
-        self.metadata_file = metadata_file
         self.sample_list_file = sample_list_file
-        self.output_dir = output_dir
         self.files_folder = files_folder
 
-        if self.metadata_file is None:
+        if metadata_file is None:
             self.metadata_file = relecov_tools.utils.prompt_path(
                 msg="Select the excel file which contains metadata"
             )
+        else:
+            self.metadata_file = metadata_file
 
         if not os.path.exists(self.metadata_file):
             self.log.error("Metadata file %s does not exist ", self.metadata_file)
@@ -44,33 +44,38 @@ class RelecovMetadata(BaseModule):
             )
             raise FileNotFoundError(f"Metadata file {self.metadata_file} not found")
 
-        if self.sample_list_file is None:
+        if sample_list_file is None:
             stderr.print("[yellow]No samples_data.json file provided")
             self.log.warning("No samples_data.json file provided")
-            if not os.path.isdir(str(self.files_folder)):
+            if not os.path.isdir(str(files_folder)):
                 stderr.print("[red]No samples file nor valid files folder provided")
                 self.log.error("No samples file nor valid files folder provided")
                 raise FileNotFoundError(
                     "No samples file nor valid files folder provided"
                 )
-            self.files_folder = os.path.abspath(self.files_folder)
+            self.files_folder = os.path.abspath(files_folder)
 
-        if self.sample_list_file is not None and not os.path.exists(
-            self.sample_list_file
+        if sample_list_file is not None and not os.path.exists(
+            sample_list_file
         ):
             self.log.error(
-                "Sample information file %s does not exist ", self.sample_list_file
+                "Sample information file %s does not exist ", sample_list_file
             )
             stderr.print(
-                "[red] Samples file " + self.sample_list_file + " does not exist"
+                "[red] Samples file " + sample_list_file + " does not exist"
             )
             raise FileNotFoundError(
-                "Sample information file %s does not exist ", self.sample_list_file
+                "Sample information file %s does not exist ", sample_list_file
             )
-        if self.output_dir is None:
+        else:
+            self.sample_list_file = sample_list_file
+
+        if output_dir is None:
             self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
+        else:
+            self.output_dir = output_dir
 
         config_json = ConfigJson(extra_config=True)
 
