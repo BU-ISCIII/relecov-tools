@@ -54,7 +54,7 @@ send_mail:
 
 map:
     destination_schema: ''
-    json_data: ''
+    json_file: ''
     origin_schema: ''
     output_folder: ''
     schema_file: ''

@@ -25,7 +25,7 @@ class MappingSchema(BaseModule):
     def __init__(
         self,
         origin_schema=None,
-        json_data=None,
+        json_file=None,
         destination_schema=None,
         schema_file=None,
         output_dir=None,
@@ -57,7 +57,7 @@ class MappingSchema(BaseModule):
             sys.exit(1)
         self.relecov_schema = rel_schema_json
 
-        if json_data is None:
+        if json_file is None:
             json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file which have the data to map"
             )
