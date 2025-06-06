@@ -614,7 +614,9 @@ def send_mail(
 # mapping to ENA schema
 @relecov_tools_cli.command(help_priority=5)
 @click.option("-p", "--origin_schema", help="File with the origin (relecov) schema")
-@click.option("-j", "--json_data", help="File with the json data to convert")
+@click.option(
+    "-j", "--json_data", "json_file", help="File with the json data to convert"
+)
 @click.option(
     "-d",
     "--destination_schema",
@@ -636,7 +638,7 @@ def send_mail(
     help="Directory where the generated output will be saved",
 )
 @click.pass_context
-def map(ctx, origin_schema, json_data, destination_schema, schema_file, output_dir):
+def map(ctx, origin_schema, json_file, destination_schema, schema_file, output_dir):
     """Convert data between phage plus schema to ENA, GISAID, or any other schema"""
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
