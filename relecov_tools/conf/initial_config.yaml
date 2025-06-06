@@ -40,7 +40,7 @@ validate:
     json_file: ''
     json_schema_file: ''
     metadata: ''
-    out_folder: ''
+    output_dir: ''
     excel_sheet: ''
     registry: ''
 
@@ -56,7 +56,7 @@ map:
     destination_schema: ''
     json_file: ''
     origin_schema: ''
-    output_folder: ''
+    output_dir: ''
     schema_file: ''
 
 upload_to_ena:
@@ -69,7 +69,7 @@ upload_to_ena:
     dev: false
     upload_fastq: false
     metadata_types: []
-    output_path: ''
+    output_dir: ''
 
 upload_to_gisaid:
     user: ''
@@ -78,7 +78,7 @@ upload_to_gisaid:
     token: ''
     gisaid_json: ''
     input_path: ''
-    output_path: ''
+    output_dir: ''
     frameshift: ''
     proxy_config: ''
     single: false
@@ -97,20 +97,20 @@ update_db:
 read_bioinfo_metadata:
     json_file: ''
     input_folder: ''
-    output_folder: ''
+    output_dir: ''
     software_name: ''
     update: false
 
 metadata_homogeneizer:
     institution: ''
     directory: ''
-    output: ''
+    output_dir: ''
 
 pipeline_manager:
     input: ''
     templates_root: ''
     config: ''
-    output: ''
+    output_dir: ''
     folder_names: []
 
 build_schema:
@@ -121,16 +121,16 @@ build_schema:
     version: ''
     project: ''
     non_interactive: false
-    out_dir: ''
+    output_dir: ''
 
 logs_to_excel:
     lab_code: ''
-    output_folder: ''
+    output_dir: ''
     files: []
 
 wrapper:
     config_file: ''
-    output_folder: ''
+    output_dir: ''
 
 upload_results:
     user: ''
