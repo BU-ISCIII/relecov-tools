@@ -18,6 +18,7 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
+
 class ProcessWrapper(BaseModule):
     """
     Always fill all the arguments for the class in the config file, leave its value

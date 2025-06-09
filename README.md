@@ -306,7 +306,7 @@ Usage: relecov-tools map [OPTIONS]
 
 Options:
   -p, --origin_schema TEXT          File with the origin (relecov) schema
-  -j, --json_data, --json_file TEXT File with the json data to convert
+  -j, --json_file TEXT              File with the json data to convert
   -d, --destination_schema [ENA|GISAID|other]
                                     schema to be mapped
   -f, --schema_file TEXT            file with the custom schema
@@ -364,10 +364,29 @@ Options:
 ```
 
 #### update-db
-    -u, --user                         user name for login
-    -p, --password                     password for the user to login
-    -t, --type                         Select the type of information to upload to database [sample,bioinfodata,variantdata]
-    -d, --databaseServer               Name of the database server receiving the data [iskylims,relecov]
+
+Upload the information included in json file to the database
+
+```
+Usage: relecov-tools update-db [OPTIONS]
+
+  upload the information included in json file to the database
+
+Options:
+  -j, --json TEXT                 data in json format
+  -t, --type [sample|bioinfodata|variantdata]
+                                  Select the type of information to upload to
+                                  database
+  -plat, --platform [iskylims|relecov]
+                                  name of the platform where data is uploaded
+  -u, --user TEXT                 user name for login
+  -p, --password TEXT             password for the user to login
+  -s, --server_url TEXT           url of the platform server
+  -f, --full_update               Sequentially run every update option
+  -l, --long_table TEXT           Long_table.json file from read-bioinfo-
+                                  metadata + viralrecon
+  --help                          Show this message and exit.
+```
 
 #### pipeline-manager
 Create the folder structure to execute the given pipeline for the latest sample batches after executing download, read-lab-metadata and validate modules. This module will create symbolic links for each sample and generate the necessary files for pipeline execution using the information from validated_BATCH-NAME_DATE.json.
