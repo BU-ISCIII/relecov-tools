@@ -18,7 +18,6 @@ stderr = rich.console.Console(
     force_terminal=relecov_tools.utils.rich_force_colors(),
 )
 
-
 class ProcessWrapper(BaseModule):
     """
     Always fill all the arguments for the class in the config file, leave its value
@@ -188,9 +187,9 @@ class ProcessWrapper(BaseModule):
             raise ValueError("No metadata json found after read-lab-metadata")
         self.validate_params.update(
             {
-                "json_data_file": os.path.join(local_folder, metadata_json[0]),
+                "json_file": os.path.join(local_folder, metadata_json[0]),
                 "metadata": metadata_file,
-                "out_folder": local_folder,
+                "output_dir": local_folder,
             }
         )
         valid_json_data, invalid_json, validate_logs = self.exec_validation(
