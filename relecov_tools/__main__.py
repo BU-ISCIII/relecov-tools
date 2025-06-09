@@ -269,6 +269,7 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
 )
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -340,6 +341,7 @@ def download(
 )
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -392,6 +394,7 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
 )
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -626,6 +629,7 @@ def send_mail(
 @click.option("-f", "--schema_file", help="file with the custom schema")
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -671,6 +675,7 @@ def map(ctx, origin_schema, json_file, destination_schema, schema_file, output_d
 @click.option("-m", "--metadata_types", help="List of metadata xml types to submit")
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -724,6 +729,7 @@ def upload_to_ena(
 )
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -859,6 +865,7 @@ def update_db(
 @click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -919,6 +926,7 @@ def read_bioinfo_metadata(
 )
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -968,6 +976,7 @@ def metadata_homogeneizer(ctx, institution, directory, output_dir):
 )
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -1044,6 +1053,7 @@ def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_name
 )
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -1097,6 +1107,7 @@ def build_schema(
 )
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",
@@ -1184,6 +1195,7 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
 )
 @click.option(
     "-o",
+    "--output_dir",
     "--output-dir",
     "--output_folder",
     "--out-folder",

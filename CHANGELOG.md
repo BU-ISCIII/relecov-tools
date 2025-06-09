@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Alejandro Bernabeu](https://github.com/aberdur)
 - [Victor Lopez](https://github.com/victor5lm)
 - [Sarai Varona](https://github.com/svarona)
+- [Daniel Valle](https://github.com/Daniel-VM)
 
 #### Added enhancements
 
