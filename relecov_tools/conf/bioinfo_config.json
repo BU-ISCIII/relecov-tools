@@ -218,7 +218,9 @@
                 "read_length": "read_length",
                 "bioinformatics_analysis_date": "analysis_date",
                 "clade_assignment_date": "clade_assignment_date",
-                "clade_assignment_software_database_version": "clade_assignment_software_database_version"
+                "clade_assignment_software_database_version": "clade_assignment_software_database_version",
+                "per_hagene_coverage": "10xcov_HA(%)",
+                "per_nagene_coverage": "10xcov_NA(%)"
             }
         },
         "variants_long_table": {
@@ -362,9 +364,7 @@
             "type_assignment_software_database_version": "Not Applicable [GENEPIO:0001619]",
             "subtype_assignment_software_database_version": "Not Applicable [GENEPIO:0001619]",
             "reference_genome_accession": "Not Applicable [GENEPIO:0001619]",
-            "variant_designation": "Not Applicable [GENEPIO:0001619]",
-            "qc_test": "Not Applicable [GENEPIO:0001619]",
-            "qc_failed": "Not Applicable [GENEPIO:0001619]"
+            "variant_designation": "Not Applicable [GENEPIO:0001619]"
         }
     }
 }
