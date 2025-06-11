@@ -319,10 +319,11 @@ def download(
         download_manager.execute_process()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # metadata
@@ -374,10 +375,11 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
         new_metadata.create_metadata_json()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # validation
@@ -432,10 +434,11 @@ def validate(
         validation.validate()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # send-email
@@ -608,10 +611,11 @@ def send_mail(
         )
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # mapping to ENA schema
@@ -651,10 +655,11 @@ def map(ctx, origin_schema, json_file, destination_schema, schema_file, output_d
         new_schema.map_to_data_to_new_schema()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # upload to ENA
@@ -709,10 +714,11 @@ def upload_to_ena(
         upload_ena.upload()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # upload to GISAID
@@ -788,10 +794,11 @@ def upload_to_gisaid(
         upload_gisaid.gisaid_upload()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # update_db
@@ -848,10 +855,11 @@ def update_db(
         update_database_obj.update_db()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # read metadata bioinformatics
@@ -904,10 +912,11 @@ def read_bioinfo_metadata(
         new_bioinfo_metadata.create_bioinfo_file()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # metadata homogeneizer
@@ -948,10 +957,11 @@ def metadata_homogeneizer(ctx, institution, directory, output_dir):
         new_parse.converting_metadata()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # creating symbolic links
@@ -1008,10 +1018,11 @@ def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_name
         new_launch.pipeline_exc()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # schema builder
@@ -1089,10 +1100,11 @@ def build_schema(
         schema_update.summarize_schema(new_schema)
     except Exception as e:
         if debug:
-            log.error(f"Error while building schema: {e}")
+            log.exception(f"Error while building schema: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # logs to excel
@@ -1178,10 +1190,11 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
         relecov_tools.utils.write_json_to_file(final_logs, json_outpath)
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # wrapper
@@ -1217,10 +1230,11 @@ def wrapper(ctx, config_file, output_dir):
         process_wrapper.run_wrapper()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # upload_results
@@ -1247,10 +1261,11 @@ def upload_results(ctx, user, password, batch_id, template_path, project):
         upload_sftp.execute_process()
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 @relecov_tools_cli.command(help_priority=18)
@@ -1295,10 +1310,11 @@ def add_extra_config(ctx, config_name, config_file, force, clear_config):
             )
     except Exception as e:
         if debug:
-            log.error(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
-            sys.exit(f"EXCEPTION FOUND: {e}")
+            log.exception(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 if __name__ == "__main__":
