@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Included long_table param for update_db as required for --full_update [#619](https://github.com/BU-ISCIII/relecov-tools/pull/619)
 - Fill missing sample_fields required in iskylims with Not Provided in update-db [#620](https://github.com/BU-ISCIII/relecov-tools/pull/620)
 - Add support for central CLI and extra_config parameter configuration [#629](https://github.com/BU-ISCIII/relecov-tools/pull/629)
+- Include traceback from unexpected errors in logfile [#648](https://github.com/BU-ISCIII/relecov-tools/pull/648)
 
 #### Fixes
 
