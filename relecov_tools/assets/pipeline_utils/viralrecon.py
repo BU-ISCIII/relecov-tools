@@ -120,54 +120,18 @@ def quality_control_evaluation(data):
         for k, (op, th) in thresholds.items()
     }
 
-    for sample in data:
-        try:
-            qc_status = "pass"
-            failed_reasons = []
+    data, warnings = relecov_tools.assets.pipeline_utils.utils.evaluate_qc_samples(
+        data,
+        thresholds,
+        conditions,
+        invert_operator,
+        is_not_evaluable,
+    )
 
-            for param, condition in conditions.items():
-                value = sample.get(param)
-                try:
-                    if value is None or not condition(value):
-                        if is_not_evaluable(value):
-                            log.info(
-                                "%s is not evaluable for %s in sample %s",
-                                value,
-                                param,
-                                sample["sequencing_sample_id"],
-                            )
-                            continue
-                        qc_status = "fail"
-                        op, th = thresholds[param]
-                        inverted_op = invert_operator(op)
-                        failed_reasons.append(f"({param} {inverted_op} {th})")
-                except (TypeError, ValueError):
-                    if is_not_evaluable(value):
-                        continue
-                    qc_status = "fail"
-                    failed_reasons.append(f"({param} = {value} invalid)")
-                    log_report.update_log_report(
-                        method_name,
-                        "warning",
-                        f"Sample {sample['sequencing_sample_id']} has unevaluable value for {param}: {value}",
-                    )
-
-            sample["qc_test"] = qc_status
-            if qc_status == "fail" and failed_reasons:
-                sample["qc_failed"] = " -- ".join(failed_reasons)
-
-            log_report.update_log_report(
-                method_name,
-                "valid",
-                f"{sample['sequencing_sample_id']} evaluated: {qc_status}",
-            )
-
-        except (TypeError, ValueError, AttributeError) as e:
-            sample["qc_test"] = "fail"
-            sample["qc_failed"] = f"(evaluation_error = {str(e)})"
-            sample_id = sample.get("sequencing_sample_id", "unknown")
-            log_report.update_log_report(
-                method_name, "warning", f"Error evaluating sample {sample_id}: {e}"
-            )
+    for warn in warnings:
+        log_report.update_log_report(
+            method_name,
+            warn
+        )
 
     return data

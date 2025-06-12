@@ -364,3 +364,87 @@ def get_software_versions_yml(files_list, file_tag, pipeline_name, output_folder
                 }
 
     return version_dict
+
+
+def evaluate_qc_samples(data, thresholds, conditions, invert_operator, is_not_evaluable):
+    """
+    Perform QC evaluation on a list of sample data dictionaries using provided threshold logic.
+
+    Parameters:
+    -----------
+    data : list of dict
+        Each dict represents a sample and contains metrics to be evaluated.
+    thresholds : dict
+        A dictionary where keys are metric names and values are tuples (operator, threshold).
+    conditions : dict
+        A dictionary where keys are metric names and values are condition functions.
+    invert_operator : function
+        Function that returns the inverse of a comparison operator.
+    is_not_evaluable : function
+        Function to detect if a metric value should be skipped.
+    log_report : BioinfoReportLog
+        Logger to record validation and warning messages.
+    log : Logger
+        Standard Python logger for logging events.
+    method_name : str
+        Name of the method for logging purposes.
+
+    Returns:
+    --------
+    Tuple of:
+    - data : List[Dict[str, Any]]
+        The input list with added 'qc_test' and optional 'qc_failed' keys.
+    - warning_messages : List[str]
+        List of warning messages that occurred during evaluation.
+    """
+    warning_messages = []
+
+    for sample in data:
+        try:
+            qc_status = "pass"
+            failed_reasons = []
+
+            for param, condition in conditions.items():
+                value = sample.get(param)
+                try:
+                    if value is None or not condition(value):
+                        if is_not_evaluable(value):
+                            log.info(
+                                "%s is not evaluable for %s in sample %s",
+                                value,
+                                param,
+                                sample.get("sequencing_sample_id", "unknown"),
+                            )
+                            continue
+                        qc_status = "fail"
+                        op, th = thresholds[param]
+                        inverted_op = invert_operator(op)
+                        failed_reasons.append(f"({param} {inverted_op} {th})")
+                except (TypeError, ValueError):
+                    if is_not_evaluable(value):
+                        continue
+                    qc_status = "fail"
+                    failed_reasons.append(f"({param} = {value} invalid)")
+                    msg = (
+                        f"Sample {sample.get('sequencing_sample_id', 'unknown')} "
+                        f"has unevaluable value for {param}: {value}"
+                    )
+                    warning_messages.append(msg)
+
+            sample["qc_test"] = qc_status
+            if qc_status == "fail" and failed_reasons:
+                sample["qc_failed"] = " -- ".join(failed_reasons)
+
+            msg = (
+                "valid",
+                f"{sample.get('sequencing_sample_id', 'unknown')} evaluated: {qc_status}",
+            )
+
+        except (TypeError, ValueError, AttributeError) as e:
+            sample["qc_test"] = "fail"
+            sample["qc_failed"] = f"(evaluation_error = {str(e)})"
+            sample_id = sample.get("sequencing_sample_id", "unknown")
+            msg = f"Error evaluating sample {sample_id}: {e}"
+            warning_messages.append(msg)
+
+    return data, warning_messages
