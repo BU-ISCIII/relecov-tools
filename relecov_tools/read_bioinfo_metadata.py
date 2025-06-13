@@ -72,6 +72,7 @@ class BioinfoMetadata(BaseModule):
     def __init__(
         self,
         json_file=None,
+        json_schema_file=None,
         input_folder=None,
         output_dir=None,
         software_name=None,
@@ -79,8 +80,18 @@ class BioinfoMetadata(BaseModule):
         **kwargs,
     ):
         super().__init__(output_dir=output_dir, called_module=__name__)
+        config_json = ConfigJson()
         self.log.info("Initiating read-bioinfo-metadata process")
         # Init process log
+
+        if json_schema_file is None:
+            schema_name = config_json.get_topic_data("json_schemas", "relecov_schema")
+            json_schema_file = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
+            )
+
+        self.json_schema = relecov_tools.utils.read_json_file(json_schema_file)
+
         if output_dir is None:
             self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
@@ -1027,6 +1038,31 @@ class BioinfoMetadata(BaseModule):
                 multiple_sample_files.append(key)
         return multiple_sample_files
 
+    def filter_properties(self, data):
+        """
+        Remove properties from bioinfo_metadata that are not in the schema properties.
+
+        Parameters
+        ----------
+        data : list[dict]
+            Dictionary with the bioinfo metadata
+
+        Returns
+        -------
+        filtered_data: list[dict]
+            Bioinfo metadata json filtered
+        """
+        valid_keys = set(self.json_schema.get("properties", {}).keys())
+
+        filtered_data = []
+
+        for sample in data:
+            for k in list(sample.keys()):
+                if k not in valid_keys:
+                    sample.pop(k)
+            filtered_data.append(sample)
+        return filtered_data
+
     def create_bioinfo_file(self):
         """Create the bioinfodata json with collecting information from lab
         metadata json, mapping_stats, and more information from the files
@@ -1105,6 +1141,10 @@ class BioinfoMetadata(BaseModule):
                 stderr.print(
                     f"[orange]Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
                 )
+
+            # Filter properties from batch_data that are not included in the schema
+            batch_data = self.filter_properties(batch_data)
+
             if os.path.exists(batch_filepath):
                 stderr.print(
                     f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."

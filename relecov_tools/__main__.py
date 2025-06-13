@@ -870,6 +870,9 @@ def update_db(
     type=click.Path(),
     help="json file containing lab metadata",
 )
+@click.option(
+    "-s", "--json_schema_file", help="Path to the JSON Schema file used for validation"
+)
 @click.option("-i", "--input_folder", type=click.Path(), help="Path to input files")
 @click.option(
     "-o",
@@ -894,7 +897,7 @@ def update_db(
 )
 @click.pass_context
 def read_bioinfo_metadata(
-    ctx, json_file, input_folder, output_dir, software_name, update
+    ctx, json_file, json_schema_file, input_folder, output_dir, software_name, update
 ):
     """
     Create the json compliant  from the Bioinfo Metadata.
