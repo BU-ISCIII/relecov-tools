@@ -400,14 +400,22 @@ class UpdateDatabase(BaseModule):
                 self.type_of_info = datatype
                 # TODO: Handling for servers with different datatype needs
                 if datatype == "variantdata":
-                    self.log.info("Selected %s file for variant data", str(self.long_table_file))
-                    self.json_data = relecov_tools.utils.read_json_file(self.long_table_file)
+                    self.log.info(
+                        "Selected %s file for variant data", str(self.long_table_file)
+                    )
+                    self.json_data = relecov_tools.utils.read_json_file(
+                        self.long_table_file
+                    )
                 self.store_data(datatype, self.server_name)
         else:
             self.start_api(self.platform)
             if self.type_of_info == "variantdata":
-                self.log.info("Selected %s file for variant data", str(self.long_table_file))
-                self.json_data = relecov_tools.utils.read_json_file(self.long_table_file)
+                self.log.info(
+                    "Selected %s file for variant data", str(self.long_table_file)
+                )
+                self.json_data = relecov_tools.utils.read_json_file(
+                    self.long_table_file
+                )
             self.store_data(self.type_of_info, self.platform)
         self.parent_create_error_summary(called_module="update-db")
         return
