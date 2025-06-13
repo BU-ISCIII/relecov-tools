@@ -366,7 +366,9 @@ def get_software_versions_yml(files_list, file_tag, pipeline_name, output_folder
     return version_dict
 
 
-def evaluate_qc_samples(data, thresholds, conditions, invert_operator, is_not_evaluable):
+def evaluate_qc_samples(
+    data, thresholds, conditions, invert_operator, is_not_evaluable
+):
     """
     Perform QC evaluation on a list of sample data dictionaries using provided threshold logic.
 

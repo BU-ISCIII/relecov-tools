@@ -129,9 +129,6 @@ def quality_control_evaluation(data):
     )
 
     for warn in warnings:
-        log_report.update_log_report(
-            method_name,
-            warn
-        )
+        log_report.update_log_report(method_name, warn)
 
     return data
