@@ -83,6 +83,16 @@ class UpdateDatabase(BaseModule):
                     ["sample", "bioinfodata", "variantdata"],
                 )
             self.type_of_info = type
+            if self.type_of_info == "variantdata":
+                if long_table is None:
+                    json = relecov_tools.utils.prompt_path(
+                        msg="Select the json file which have the data to map"
+                    )
+                    if not os.path.isfile(long_table):
+                        raise ValueError(
+                            f"Provided long_table file does not exist {long_table}"
+                        )
+                self.long_table_file = os.path.realpath(long_table)
             # collect data for plarform to upload data
             if platform is None:
                 platform = relecov_tools.utils.prompt_selection(
@@ -390,12 +400,14 @@ class UpdateDatabase(BaseModule):
                 self.type_of_info = datatype
                 # TODO: Handling for servers with different datatype needs
                 if datatype == "variantdata":
-                    json_file = self.long_table_file
-                    self.log.info("Selected %s file for variant data", str(json_file))
-                    self.json_data = relecov_tools.utils.read_json_file(json_file)
+                    self.log.info("Selected %s file for variant data", str(self.long_table_file))
+                    self.json_data = relecov_tools.utils.read_json_file(self.long_table_file)
                 self.store_data(datatype, self.server_name)
         else:
             self.start_api(self.platform)
+            if self.type_of_info == "variantdata":
+                self.log.info("Selected %s file for variant data", str(self.long_table_file))
+                self.json_data = relecov_tools.utils.read_json_file(self.long_table_file)
             self.store_data(self.type_of_info, self.platform)
         self.parent_create_error_summary(called_module="update-db")
         return
