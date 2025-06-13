@@ -1049,19 +1049,16 @@ class BioinfoMetadata(BaseModule):
 
         Returns
         -------
-        filtered_data: list[dict]
+        data: list[dict]
             Bioinfo metadata json filtered
         """
         valid_keys = set(self.json_schema.get("properties", {}).keys())
-
-        filtered_data = []
 
         for sample in data:
             for k in list(sample.keys()):
                 if k not in valid_keys:
                     sample.pop(k)
-            filtered_data.append(sample)
-        return filtered_data
+        return data
 
     def create_bioinfo_file(self):
         """Create the bioinfodata json with collecting information from lab
