@@ -44,7 +44,7 @@ def quality_control_evaluation(data):
         "pass_reads": (">", 23000),
         "per_reads_host": ("<", 20.0),
         "per_hagene_coverage": (">", 98.0),
-        "per_nagene_coverage": (">", 98.0)
+        "per_nagene_coverage": (">", 98.0),
     }
 
     def is_not_evaluable(value):
@@ -56,7 +56,11 @@ def quality_control_evaluation(data):
         )
 
     conditions = {
-        k: (lambda x, op=op, th=th: eval(f"{float(x)} {op} {th}") if isinstance(x, (int, float)) else False)
+        k: (
+            lambda x, op=op, th=th: (
+                eval(f"{float(x)} {op} {th}") if isinstance(x, (int, float)) else False
+            )
+        )
         for k, (op, th) in thresholds.items()
     }
 
@@ -69,10 +73,7 @@ def quality_control_evaluation(data):
     )
 
     for warn in warnings:
-        log_report.update_log_report(
-            method_name,
-            warn
-        )
+        log_report.update_log_report(method_name, warn)
 
     return data
 
