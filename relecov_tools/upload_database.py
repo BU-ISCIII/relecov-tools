@@ -32,10 +32,10 @@ class UpdateDatabase(BaseModule):
         long_table=None,
     ):
         if json is None:
-            json_file = relecov_tools.utils.prompt_path(
+            json = relecov_tools.utils.prompt_path(
                 msg="Select the json file which have the data to map"
             )
-        json_dir = os.path.dirname(os.path.realpath(json_file))
+        json_dir = os.path.dirname(os.path.realpath(json))
         super().__init__(output_dir=json_dir, called_module="update-db")
         # Get the user and password for the database
         if user is None:
@@ -49,18 +49,18 @@ class UpdateDatabase(BaseModule):
         # get the default coonfiguration used the instance
         self.config_json = ConfigJson()
 
-        if not os.path.isfile(json_file):
-            self.log.error("json data file %s does not exist ", json_file)
-            stderr.print(f"[red] json data file {json_file} does not exist")
+        if not os.path.isfile(json):
+            self.log.error("json data file %s does not exist ", json)
+            stderr.print(f"[red] json data file {json} does not exist")
             sys.exit(1)
-        self.json_data = relecov_tools.utils.read_json_file(json_file)
+        self.json_data = relecov_tools.utils.read_json_file(json)
         batch_id = self.get_batch_id_from_data(self.json_data)
         self.set_batch_id(batch_id)
         for row in self.json_data:
             for key, value in row.items():
                 if not isinstance(value, str):
                     row[key] = str(value)
-        self.json_file = json_file
+        self.json_file = json
         schema = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "schema",
