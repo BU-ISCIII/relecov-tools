@@ -488,11 +488,10 @@ class DownloadManager(BaseModule):
                     stderr.print("[red]Unable to convert to string. ", e)
                     continue
                 if s_name in sample_file_dict:
-                    if (
-                        row[index_fastq_r1]
-                        == sample_file_dict[s_name].get("sequence_file_R1", "")
-                        or row[index_fastq_r2]
-                        == sample_file_dict[s_name].get("sequence_file_R2", "")
+                    if row[index_fastq_r1] == sample_file_dict[s_name].get(
+                        "sequence_file_R1", ""
+                    ) or row[index_fastq_r2] == sample_file_dict[s_name].get(
+                        "sequence_file_R2", ""
                     ):
                         s_name = s_name + "_remove_" + str(counter)
                     else:
