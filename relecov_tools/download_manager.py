@@ -452,7 +452,7 @@ class DownloadManager(BaseModule):
         def set_nones_to_str(row, req_vals):
             row = list(row)
             for index in req_vals:
-                if not row[index]:
+                if row[index] is None:
                     row[index] = ""
             return row
 
@@ -490,9 +490,9 @@ class DownloadManager(BaseModule):
                 if s_name in sample_file_dict:
                     if (
                         row[index_fastq_r1]
-                        == sample_file_dict[s_name]["sequence_file_R1"]
+                        == sample_file_dict[s_name].get("sequence_file_R1", "")
                         or row[index_fastq_r2]
-                        == sample_file_dict[s_name]["sequence_file_R2"]
+                        == sample_file_dict[s_name].get("sequence_file_R2", "")
                     ):
                         s_name = s_name + "_remove_" + str(counter)
                     else:
