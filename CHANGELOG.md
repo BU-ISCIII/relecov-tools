@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.5dev] - 2025-05-19 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.5dev
+## [1.5.5] - 2025-05-19 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.5
 
 ### Credits
 
@@ -48,6 +48,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed behaviour of upload_database module [#650](https://github.com/BU-ISCIII/relecov-tools/pull/650)
 - Hotfix to solve crash when no latest_template file was found in build-schema [#651](https://github.com/BU-ISCIII/relecov-tools/pull/651)
 - Fixed error when header was not in row 2 along with custom msg for dates out of range [#651](https://github.com/BU-ISCIII/relecov-tools/pull/651)
+- Fixed possible error when no R1 or no R2 files were provided in excel file for download [#651](https://github.com/BU-ISCIII/relecov-tools/pull/651)
 
 #### Changed
 
