@@ -723,14 +723,13 @@ class SchemaBuilder(BaseModule):
                         else "0"
                     ),
                 )
+                version_history = pd.DataFrame(
+                    columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
+                )
                 match = re.search(r"v(\d+\.\d+\.\d+)", latest_file)
                 if match:
                     # Load the latest template file and attempt to read version history
                     out_file = os.path.join(self.output_dir, latest_file)
-                    version_history = pd.DataFrame(
-                        columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
-                    )
-
                     try:
                         wb = openpyxl.load_workbook(out_file)
                         if "VERSION" in wb.sheetnames:
