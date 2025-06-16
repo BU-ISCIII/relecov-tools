@@ -328,11 +328,9 @@ class SchemaValidation(BaseModule):
         tag = "Sample ID given for sequencing"
         # Check if mandatory colum ($tag) is defined in metadata.
         try:
-            header_row = [
-                idx + 1
-                for idx, x in enumerate(ws_sheet.values)
-                if tag in x
-            ][0]
+            header_row = [idx + 1 for idx, x in enumerate(ws_sheet.values) if tag in x][
+                0
+            ]
         except IndexError:
             self.log.error(
                 f"Column with tag '{tag}' not found in any row of the Excel sheet."
