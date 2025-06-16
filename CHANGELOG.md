@@ -28,7 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add support for central CLI and extra_config parameter configuration [#629](https://github.com/BU-ISCIII/relecov-tools/pull/629)
 - Include traceback from unexpected errors in logfile [#648](https://github.com/BU-ISCIII/relecov-tools/pull/648)
 - Added IRMA quality control and filtering of read-bioinfo-metadata properties based on schema [#649](https://github.com/BU-ISCIII/relecov-tools/pull/649)
-- Updated schema version to 3.1.1 [#651](https://github.com/BU-ISCIII/relecov-tools/pull/651)
+- Updated schema version to 3.1.1 with limits for pcr_ct values and dates [#651](https://github.com/BU-ISCIII/relecov-tools/pull/651)
 
 #### Fixes
 
@@ -46,6 +46,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed bug when reading old excel files with openpyxl. Added pandas as fallback reader [#637](https://github.com/BU-ISCIII/relecov-tools/pull/637)
 - Created pipeline utils and added function for versions yaml [#638](https://github.com/BU-ISCIII/relecov-tools/pull/638)
 - Fixed behaviour of upload_database module [#650](https://github.com/BU-ISCIII/relecov-tools/pull/650)
+- Hotfix to solve crash when no latest_template file was found in build-schema [#651](https://github.com/BU-ISCIII/relecov-tools/pull/651)
+- Fixed error when header was not in row 2 along with custom msg for dates out of range [#651](https://github.com/BU-ISCIII/relecov-tools/pull/651)
 
 #### Changed
 
