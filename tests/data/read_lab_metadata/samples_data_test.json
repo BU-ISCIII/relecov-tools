@@ -1,79 +1,119 @@
 {
+    "111111": {
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE1_R1.fastq.gz",
+        "sequence_file_R1_md5": "c7e94849f9a8b0c15eb1cc720295ee80",
+        "sequence_file_R2": "SAMPLE1_R2.fastq.gz",
+        "sequence_file_R2_md5": "04c5bfb372dc7c5f181a5fbd53c1a1f2",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
+    },
+    "249": {
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE4_R1.fastq.gz",
+        "sequence_file_R1_md5": "b98f8c2e48b3c349679002d2a07b2593",
+        "sequence_file_R2": "SAMPLE4_R2.fastq.gz",
+        "sequence_file_R2_md5": "5f1d47c4a6f5a21d47fef4a28cc2f734",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
+    },
     "33500056": {
-        "fastq_r1_md5": "69854e93a48df2e0bd77ab065518f284",
-        "fastq_r2_md5": "e723a5c4fefd200fb5cdef50fe93c02a",
-        "r1_fastq_filepath": "tests/20240320",
-        "r2_fastq_filepath": "tests/20240320",
-        "sequence_file_R1_fastq": "SAMPLE20_TEST2_R1.fastq.gz",
-        "sequence_file_R2_fastq": "SAMPLE20_TEST2_R2.fastq.gz"
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE20_TEST2_R1.fastq.gz",
+        "sequence_file_R1_md5": "53f15bbec7c5fc30ed97e498b1f7a59a",
+        "sequence_file_R2": "SAMPLE20_TEST2_R2.fastq.gz",
+        "sequence_file_R2_md5": "57b71bd083b0d71ae2680532c0ecfa86",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
     },
     "33597813": {
-        "fastq_r1_md5": "18fbfc8a0da49d63cfb43c8ea1fb63a5",
-        "fastq_r2_md5": "1bac23a364f256ee89583088547cd2d0",
-        "r1_fastq_filepath": "tests/20240320",
-        "r2_fastq_filepath": "tests/20240320",
-        "sequence_file_R1_fastq": "SAMPLE21_TEST2_R1.fastq.gz",
-        "sequence_file_R2_fastq": "SAMPLE21_TEST2_R2.fastq.gz"
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE21_TEST2_R1.fastq.gz",
+        "sequence_file_R1_md5": "cda67107301a2a5c7eea3a93ef9861cb",
+        "sequence_file_R2": "SAMPLE21_TEST2_R2.fastq.gz",
+        "sequence_file_R2_md5": "6ec1e7cb5a7b52e02fdf8c4f8407ec8a",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
     },
     "35184262": {
-        "fastq_r1_md5": "99ab59db60c96551ecd9067000cdbb2a",
-        "fastq_r2_md5": "c58920e0893dd51c25ab4ea0a1aee5c5",
-        "r1_fastq_filepath": "tests/20240320",
-        "r2_fastq_filepath": "tests/20240320",
-        "sequence_file_R1_fastq": "SAMPLE22_TEST2_R1.fastq.gz",
-        "sequence_file_R2_fastq": "SAMPLE22_TEST2_R2.fastq.gz"
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE22_TEST2_R1.fastq.gz",
+        "sequence_file_R1_md5": "e339263aa4423b26b6f84b2a9c2a7a2e",
+        "sequence_file_R2": "SAMPLE22_TEST2_R2.fastq.gz",
+        "sequence_file_R2_md5": "77ce9838611e33ff01d71d5828944f29",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
     },
     "37145959EXT": {
-        "fastq_r1_md5": "dc340063a9f08257157ef4ead6c5b34c",
-        "fastq_r2_md5": "9a6eaf7e8f93963510cf756ba90ce524",
-        "r1_fastq_filepath": "tests/20240320",
-        "r2_fastq_filepath": "tests/20240320",
-        "sequence_file_R1_fastq": "SAMPLE23_TEST2_R1.fastq.gz",
-        "sequence_file_R2_fastq": "SAMPLE23_TEST2_R2.fastq.gz"
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE23_TEST2_R1",
+        "sequence_file_R1_md5": "5a9649f7dcfe5936e160d689c6165b5d",
+        "sequence_file_R2": "SAMPLE23_TEST2_R2",
+        "sequence_file_R2_md5": "ae1dd2295ef313d67823807b9926f0db",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
     },
     "39156982": {
-        "fastq_r1_md5": "81b05b2b94880749efc19af6ffeac7a6",
-        "fastq_r2_md5": "b2dcec994291f6b507ec06afe646069d",
-        "r1_fastq_filepath": "tests/20240320",
-        "r2_fastq_filepath": "tests/20240320",
-        "sequence_file_R1_fastq": "SAMPLE24_TEST2_R1.fastq.gz",
-        "sequence_file_R2_fastq": "SAMPLE24_TEST2_R2.fastq.gz"
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE24_TEST2_R1.fastq.gz",
+        "sequence_file_R1_md5": "ca32bb3e8053fdd96d6c140f7b7b20d6",
+        "sequence_file_R2": "SAMPLE24_TEST2_R2.fastq.gz",
+        "sequence_file_R2_md5": "c05d4f0ff5f11ea81aa387d25dcffecf",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
     },
-    "SINGLEID": {
-        "fastq_r1_md5": "112d5d2ff3845236576732f7c7dc8b06",
-        "r1_fastq_filepath": "tests/20240320",
-        "sequence_file_R1_fastq": "Singlesamp.fastq.gz"
+    "39158531BAD": {
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE25_TEST2_R1.fastq.gz",
+        "sequence_file_R1_md5": "4a6eae2bcac64e2d3b3e6045746f5043",
+        "sequence_file_R2": "SAMPLE25_TEST2_R2.fastq.gz",
+        "sequence_file_R2_md5": "a05e49378b4aa45f3172f39732be1d6a",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
     },
-    "id1000": {
-        "fastq_r1_md5": "c1551cdf3d5e9849b80a082051907a72",
-        "fastq_r2_md5": "449407f85d7ed4388b7d8a51e28d97a8",
-        "r1_fastq_filepath": "tests/20240320",
-        "r2_fastq_filepath": "tests/20240320",
-        "sequence_file_R1_fastq": "SAMPLE1_R1.fastq.gz",
-        "sequence_file_R2_fastq": "SAMPLE1_R2.fastq.gz"
+    "39159223BAD": {
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE26_TEST2_R1.fastq.gz",
+        "sequence_file_R1_md5": "b6e0eaa44f19012935edb8b0989e8f6c",
+        "sequence_file_R2": "SAMPLE26_TEST2_R2.fastq.gz",
+        "sequence_file_R2_md5": "59a3b9d9a183f824db1a9d5d9f0ef761",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
     },
-    "id4000_BAD": {
-        "fastq_r1_md5": "5d838ce4a93bcf12d3031a5f9ffd4acf",
-        "fastq_r2_md5": "0a9b0a590b4773e5e4c90c391979a685",
-        "r1_fastq_filepath": "tests/20240320",
-        "r2_fastq_filepath": "tests/20240320",
-        "sequence_file_R1_fastq": "SAMPLE4_R1.fastq.gz",
-        "sequence_file_R2_fastq": "SAMPLE4_R2.fastq.gz"
+    "9783": {
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE3_R1.fastq",
+        "sequence_file_R1_md5": "bc97c8c5ef420bb92f5c12e0f14350a2",
+        "sequence_file_R2": "SAMPLE3_R2.fastq",
+        "sequence_file_R2_md5": "99a3294b3839c6e21b362c1e7bfe75f2",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
     },
-    "id5000GOOD": {
-        "fastq_r1_md5": "d04d32f14ca56f968d07f61d68598639",
-        "fastq_r2_md5": "66a057995ac925e3203ff1afdd5770ec",
-        "r1_fastq_filepath": "tests/20240320",
-        "r2_fastq_filepath": "tests/20240320",
-        "sequence_file_R1_fastq": "SAMPLE5_R1.fastq.gz",
-        "sequence_file_R2_fastq": "SAMPLE5_R2.fastq.gz"
+    "983PAI": {
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE2_R1",
+        "sequence_file_R1_md5": "409dfd41728cc3ad7f6ccf70e6cbf8ce",
+        "sequence_file_R2": "SAMPLE2_R2",
+        "sequence_file_R2_md5": "cfeb9c3f750dfbdeca6b47ec3df0bc7d",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
     },
-    "id6000GOOD": {
-        "fastq_r1_md5": "0d55b49614d1c38582b69ccded1b22c4",
-        "fastq_r2_md5": "50afab6751cce654b973bb336cf3b3eb",
-        "r1_fastq_filepath": "tests/20240320",
-        "r2_fastq_filepath": "tests/20240320",
-        "sequence_file_R1_fastq": "SAMPLE6_R1.fastq.gz",
-        "sequence_file_R2_fastq": "SAMPLE6_R2.fastq.gz"
+    "PAIRED4397": {
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE5_R1.fastq.gz",
+        "sequence_file_R1_md5": "1908a221309d6c738781c7e6c1ed8ff0",
+        "sequence_file_R2": "SAMPLE5_R2.fastq.gz",
+        "sequence_file_R2_md5": "b4d528c1e98a101705cc9b92c7d857d2",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
+    },
+    "PAIRED6666": {
+        "batch_id": "426346721",
+        "sequence_file_R1": "SAMPLE6_R1.fastq.gz",
+        "sequence_file_R1_md5": "2b68d9798a4a9c4b3a43b3b98ae51469",
+        "sequence_file_R2": "SAMPLE6_R2.fastq.gz",
+        "sequence_file_R2_md5": "a8c26d80b9dfc5044d529c58a2ae7333",
+        "sequence_file_path_R1": "tests/20240320",
+        "sequence_file_path_R2": "tests/20240320"
     }
 }

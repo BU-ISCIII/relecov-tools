@@ -20,7 +20,7 @@ def main():
         "user": os.environ["TEST_USER"],
         "password": os.environ["TEST_PASSWORD"],
         "download_option": args.download_option,
-        "output_location": os.environ["OUTPUT_LOCATION"],
+        "output_dir": os.environ["OUTPUT_LOCATION"],
         "target_folders": args.target_folders,
     }
     prepare_remote_test(**val_dict)
@@ -30,10 +30,10 @@ def prepare_remote_test(**kwargs):
     print("Initiating sftp module")
     download_manager = DownloadManager(
         user=kwargs["user"],
-        passwd=kwargs["password"],
+        password=kwargs["password"],
         conf_file=None,
         download_option=kwargs["download_option"],
-        output_location=kwargs["output_location"],
+        output_dir=kwargs["output_dir"],
         target_folders=kwargs["target_folders"],
         subfolder="RELECOV",
     )

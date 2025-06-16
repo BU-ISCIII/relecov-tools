@@ -25,12 +25,12 @@ class ProcessWrapper(BaseModule):
     if you dont want to use that argument e.g.(target_folders:  ) -> (target_folders = None)
     """
 
-    def __init__(self, config_file: str = None, output_folder: str = None):
-        super().__init__(output_directory=output_folder, called_module="wrapper")
-        if not os.path.isdir(str(output_folder)):
-            raise FileNotFoundError(f"Output folder {output_folder} is not valid")
+    def __init__(self, config_file: str = None, output_dir: str = None):
+        super().__init__(output_dir=output_dir, called_module="wrapper")
+        if not os.path.isdir(str(output_dir)):
+            raise FileNotFoundError(f"Output folder {output_dir} is not valid")
         else:
-            self.output_folder = output_folder
+            self.output_dir = output_dir
         if not os.path.isfile(str(config_file)):
             raise FileNotFoundError(f"Config file {config_file} is not a file")
         else:
@@ -39,15 +39,15 @@ class ProcessWrapper(BaseModule):
                 # Config file should include a key
             except yaml.YAMLError as e:
                 raise yaml.YAMLError(f"Invalid config file: {e}")
-        output_regex = ("out_folder", "output_folder", "output_location")
+        output_regex = ("out_folder", "output_dir", "output_location")
         for key, val in self.config_data.items():
             for arg in output_regex:
                 if val == arg:
-                    self.config_data[key] = self.output_folder
+                    self.config_data[key] = self.output_dir
         self.wrapper_logsum = self.parent_log_summary(
-            output_location=os.path.join(self.output_folder)
+            output_dir=os.path.join(self.output_dir)
         )
-        self.config_data["download"].update({"output_location": output_folder})
+        self.config_data["download"].update({"output_dir": output_dir})
         if "subfolder" not in self.config_data["download"]:
             self.config_data["download"].update(
                 {"subfolder": "RELECOV"}
@@ -174,7 +174,7 @@ class ProcessWrapper(BaseModule):
             {
                 "metadata_file": metadata_file,
                 "sample_list_file": samples_file,
-                "output_folder": local_folder,
+                "output_dir": local_folder,
             }
         )
         read_meta_logs = self.exec_read_metadata(self.readmeta_params)
@@ -188,9 +188,9 @@ class ProcessWrapper(BaseModule):
             raise ValueError("No metadata json found after read-lab-metadata")
         self.validate_params.update(
             {
-                "json_data_file": os.path.join(local_folder, metadata_json[0]),
+                "json_file": os.path.join(local_folder, metadata_json[0]),
                 "metadata": metadata_file,
-                "out_folder": local_folder,
+                "output_dir": local_folder,
             }
         )
         valid_json_data, invalid_json, validate_logs = self.exec_validation(
@@ -211,7 +211,7 @@ class ProcessWrapper(BaseModule):
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
 
         # As all folders are merged into one during download, there should only be 1 folder
-        if not valid_dirs or len(valid_dirs) >= 2:
+        if (not valid_dirs or len(valid_dirs) >= 2) and invalid_json:
             # If all samples were valid during download and download_clean is used, the original folder might have been deleted
             self.log.warning(
                 "Couldnt find %s folder in remote sftp. Creating new one", main_folder
@@ -272,7 +272,6 @@ class ProcessWrapper(BaseModule):
         else:
             self.log.info("No invalid samples in %s", key)
             stderr.print(f"[green]No invalid samples were found for {key} !!!")
-            self.download_manager.clean_remote_folder(remote_dir)
         log_filepath = os.path.join(local_folder, str(key) + "_metadata_report.json")
         self.wrapper_logsum.create_error_summary(
             called_module="metadata",

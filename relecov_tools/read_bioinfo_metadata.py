@@ -4,7 +4,7 @@ import sys
 import rich.console
 import re
 import shutil
-from bs4 import BeautifulSoup
+import numpy as np
 from datetime import datetime
 from rich.prompt import Prompt
 
@@ -22,7 +22,7 @@ stderr = rich.console.Console(
 
 
 class BioinfoReportLog:
-    def __init__(self, log_report=None, output_folder="/tmp/"):
+    def __init__(self, log_report=None, output_dir="/tmp/"):
         if not log_report:
             self.report = {"error": {}, "valid": {}, "warning": {}}
         else:
@@ -71,39 +71,54 @@ class BioinfoReportLog:
 class BioinfoMetadata(BaseModule):
     def __init__(
         self,
-        readlabmeta_json_file=None,
+        json_file=None,
+        json_schema_file=None,
         input_folder=None,
-        output_folder=None,
-        software=None,
+        output_dir=None,
+        software_name=None,
         update=False,
+        **kwargs,
     ):
-        super().__init__(output_directory=output_folder, called_module=__name__)
+        super().__init__(output_dir=output_dir, called_module=__name__)
+        config_json = ConfigJson()
         self.log.info("Initiating read-bioinfo-metadata process")
         # Init process log
-        if output_folder is None:
-            self.output_folder = relecov_tools.utils.prompt_path(
+
+        if json_schema_file is None:
+            schema_name = config_json.get_topic_data("json_schemas", "relecov_schema")
+            json_schema_file = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
+            )
+
+        self.json_schema = relecov_tools.utils.read_json_file(json_schema_file)
+
+        if output_dir is None:
+            self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
-            self.output_folder = os.path.realpath(output_folder)
-        self.logsum = self.parent_log_summary(output_location=output_folder)
-        self.log_report = BioinfoReportLog(output_folder=output_folder)
+            self.output_dir = os.path.realpath(output_dir)
+        self.logsum = self.parent_log_summary(output_dir=output_dir)
+        self.log_report = BioinfoReportLog(output_dir=output_dir)
 
         # Parse read-lab-meta-data
-        if readlabmeta_json_file is None:
-            readlabmeta_json_file = relecov_tools.utils.prompt_path(
+        if json_file is None:
+            json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file that was created by the read-lab-metadata"
             )
-        if not os.path.isfile(readlabmeta_json_file):
+        if not os.path.isfile(json_file):
             self.update_all_logs(
                 self.__init__.__name__,
                 "error",
-                f"file {readlabmeta_json_file} does not exist",
+                f"file {json_file} does not exist",
             )
             sys.exit(
                 self.log_report.print_log_report(self.__init__.__name__, ["error"])
             )
-        self.readlabmeta_json_file = readlabmeta_json_file
+
+        #  Assign a new name for better readability
+        self.readlabmeta_json_file = json_file
+
         # Initialize j_data object
         stderr.print("[blue]Reading lab metadata json")
         self.j_data = self.collect_info_from_lab_json()
@@ -130,11 +145,11 @@ class BioinfoMetadata(BaseModule):
         self.bioinfo_json_file = os.path.join(
             os.path.dirname(__file__), "conf", "bioinfo_config.json"
         )
-        if software is None:
-            software = relecov_tools.utils.prompt_path(
+        if software_name is None:
+            software_name = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
             )
-        self.software_name = software
+        self.software_name = software_name
         available_software = relecov_tools.utils.get_available_software(
             self.bioinfo_json_file
         )
@@ -194,9 +209,10 @@ class BioinfoMetadata(BaseModule):
                     for file_name in tup[1]
                     if re.search(topic_scope["fn"], os.path.join(tup[0], file_name))
                 ]
-                if len(matching_files) >= 1:
-                    files_found[topic_key] = matching_files
-                    break
+                if matching_files:
+                    if topic_key not in files_found:
+                        files_found[topic_key] = []
+                    files_found[topic_key].extend(matching_files)
         if len(files_found) < 1:
             self.update_all_logs(
                 method_name,
@@ -255,6 +271,7 @@ class BioinfoMetadata(BaseModule):
                 for field, value in mapping_fields.items():
                     try:
                         raw_val = map_data[sample_name][value]
+                        raw_val = self.replace_na_value_if_needed(field, raw_val)
                         expected_type = (
                             self.bioinfo_schema["properties"]
                             .get(field, {})
@@ -391,7 +408,7 @@ class BioinfoMetadata(BaseModule):
         return
 
     def add_bioinfo_results_metadata(
-        self, files_dict, j_data, sufix, file_tag, output_folder=None
+        self, files_dict, j_data, sufix, file_tag, output_dir=None
     ):
         """Adds metadata from bioinformatics results to j_data.
         It first calls file_handlers and then maps the handled
@@ -401,7 +418,7 @@ class BioinfoMetadata(BaseModule):
             files_dict (dict{str:str}): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (list item per sample).
             sufix (str): Sufix added to splitted tables file name.
-            output_folder (str): Path to save output files generated during handling_files() process.
+            output_dir (str): Path to save output files generated during handling_files() process.
             file_tag(str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
 
         Returns:
@@ -433,7 +450,7 @@ class BioinfoMetadata(BaseModule):
                 self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
             data_to_map = self.handling_files(
-                files_dict[key], sufix, output_folder, file_tag
+                files_dict[key], sufix, output_dir, file_tag
             )
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
@@ -516,7 +533,7 @@ class BioinfoMetadata(BaseModule):
             )
             raise ValueError(self.log_report.print_log_report(method_name, ["error"]))
 
-    def handling_files(self, file_list, sufix, output_folder, file_tag):
+    def handling_files(self, file_list, sufix, output_dir, file_tag):
         """Handles different file formats to extract data regardless of their structure.
         The goal is to extract the data contained in files specified in ${file_list},
         using either 'standard' handlers defined in this class or pipeline-specific file handlers.
@@ -542,14 +559,14 @@ class BioinfoMetadata(BaseModule):
 
         Args:
             file_list (list): A list of file path/s to be processed.
-            output_folder (str): Path to save output files from imported method if necessary
+            output_dir (str): Path to save output files from imported method if necessary
             file_tag(str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
 
         Returns:
             data: A dictionary containing bioinfo metadata handled for each sample.
         """
         method_name = f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_files.__name__}"
-        splitted_path = os.path.join(output_folder, "analysis_results")
+        splitted_path = os.path.join(output_dir, "analysis_results")
         file_name = self.software_config[self.current_config_key].get("fn")
         # Parsing files
         current_config = self.software_config[self.current_config_key]
@@ -570,10 +587,15 @@ class BioinfoMetadata(BaseModule):
                     os.path.join(splitted_path, f) for f in matching_files
                 ]
                 try:
+                    if func_name.startswith("utils/"):
+                        utils_name = "relecov_tools.assets.pipeline_utils.utils"
+                        func_name = func_name.split("/", 1)[1]
+                    else:
+                        utils_name = (
+                            f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                        )
+
                     # Dynamically import the function from the specified module
-                    utils_name = (
-                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
-                    )
                     import_statement = f"import {utils_name}"
                     exec(import_statement)
                     # Get method name and execute it.
@@ -581,7 +603,9 @@ class BioinfoMetadata(BaseModule):
                         utils_name
                         + "."
                         + func_name
-                        + "(full_paths, file_tag, output_folder)"
+                        + "(full_paths, file_tag, '"
+                        + self.software_name
+                        + "', output_dir)"
                     )
 
                 except Exception as e:
@@ -594,9 +618,15 @@ class BioinfoMetadata(BaseModule):
             else:
                 try:
                     # Dynamically import the function from the specified module
-                    utils_name = (
-                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
-                    )
+                    if func_name.startswith("utils/"):
+                        utils_name = "relecov_tools.assets.pipeline_utils.utils"
+                        func_name = func_name.split("/", 1)[1]
+                    else:
+                        utils_name = (
+                            f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                        )
+
+                    # Dynamically import the function from the specified module
                     import_statement = f"import {utils_name}"
                     exec(import_statement)
                     # Get method name and execute it.
@@ -604,7 +634,9 @@ class BioinfoMetadata(BaseModule):
                         utils_name
                         + "."
                         + func_name
-                        + "(file_list, file_tag, output_folder)"
+                        + "(file_list, file_tag, '"
+                        + self.software_name
+                        + "', output_dir)"
                     )
                 except Exception as e:
                     self.update_all_logs(
@@ -614,112 +646,6 @@ class BioinfoMetadata(BaseModule):
                     )
                     sys.exit(self.log_report.print_log_report(method_name, ["error"]))
         return data
-
-    def get_multiqc_software_versions(self, file_list, j_data):
-        """Reads multiqc html file, finds table containing software version info, and map it to j_data
-
-        Args:
-            file_list (list): A list containing the path to file multiqc_report.html.
-            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
-
-        Returns:
-            j_data: updated j_data with software details mapped in it.
-        """
-        method_name = f"{self.get_multiqc_software_versions.__name__}"
-        # Handle multiqc_report.html
-        f_path = file_list[0]
-        program_versions = {}
-
-        with open(f_path, "r") as html_file:
-            html_content = html_file.read()
-        soup = BeautifulSoup(html_content, features="lxml")
-        div_id = re.compile(
-            r"mqc-module-section-(software_versions|multiqc_software_versions)"
-        )
-        versions_div = soup.find_all("div", id=div_id)
-        program_versions = {}
-        if versions_div:
-            for div in versions_div:
-                table = div.find("table", class_="table")
-                if table:
-                    rows = table.find_all("tr")
-                    for row in rows[1:]:  # skipping header
-                        columns = row.find_all("td")
-                        if len(columns) == 3:
-                            program_name = columns[1].text.strip()
-                            version = columns[2].text.strip()
-                            program_versions[program_name] = version
-                        else:
-                            self.update_all_logs(
-                                method_name,
-                                "error",
-                                f"HTML entry error in {columns}. HTML table expected format should be \n<th> Process Name\n</th>\n<th> Software </th>\n.",
-                            )
-                            sys.exit(
-                                self.log_report.print_log_report(method_name, ["error"])
-                            )
-                else:
-                    self.update_all_logs(
-                        method_name,
-                        "error",
-                        f"Unable to locate the table containing software versions in file {f_path} under div section {div_id}.",
-                    )
-                    sys.exit(self.log_report.print_log_report(method_name, ["error"]))
-        else:
-            self.update_all_logs(
-                self.get_multiqc_software_versions.__name__,
-                "error",
-                f"Failed to locate the required '{div_id}' div section in the '{f_path}' file.",
-            )
-            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
-        # Mapping multiqc sofware versions to j_data
-        field_errors = {}
-        for row in j_data:
-            # Get sample name to track whether version assignment was successful or not.
-            if not row.get("sequencing_sample_id"):
-                self.update_all_logs(
-                    method_name,
-                    "warning",
-                    f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
-                )
-                continue
-            sample_name = row["sequencing_sample_id"]
-            # Append software version and name
-            software_content_details = self.software_config["workflow_summary"].get(
-                "content"
-            )
-            for content_key, content_value in software_content_details.items():
-                for key, value in content_value.items():
-                    # Add software versions
-                    if "software_version" in content_key:
-                        try:
-                            row[key] = program_versions[value]
-                        except KeyError as e:
-                            field_errors[sample_name] = {value: e}
-                            row[key] = "Not Provided [SNOMED:434941000124101]"
-                        continue
-                    # Add software name
-                    elif "software_name" in content_key:
-                        try:
-                            row[key] = value
-                        except KeyError as e:
-                            field_errors[sample_name] = {value: e}
-                            row[key] = "Not Provided [SNOMED:434941000124101]"
-                        continue
-
-        # update progress log
-        if len(field_errors) > 0:
-            self.update_all_logs(
-                method_name,
-                "warning",
-                f"Encountered field errors while mapping data: {field_errors}",
-            )
-        else:
-            self.update_all_logs(
-                method_name, "valid", "Successfully field mapped data."
-            )
-        self.log_report.print_log_report(method_name, ["valid", "warning"])
-        return j_data
 
     def add_fixed_values(self, j_data):
         """Add fixed values to j_data as defined in the bioinformatics configuration (definition: "fixed values")
@@ -745,6 +671,21 @@ class BioinfoMetadata(BaseModule):
             pass
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
+
+    def replace_na_value_if_needed(self, field, raw_val):
+        """
+        Replace 'NA', None or NaN with 'Not Provided [SNOMED:434941000124101]'
+        if the field is not required in the schema.
+        """
+        required_fields = self.bioinfo_schema.get("required", [])
+        is_na = (
+            raw_val is None
+            or (isinstance(raw_val, str) and raw_val.strip().upper() in ["NA", "NONE"])
+            or (isinstance(raw_val, float) and np.isnan(raw_val))
+        )
+        if is_na and field not in required_fields:
+            return "Not Provided [SNOMED:434941000124101]"
+        return raw_val
 
     def add_bioinfo_files_path(self, files_found_dict, j_data):
         """Adds file paths essential for handling and mapping bioinformatics metadata to the j_data.
@@ -1032,14 +973,14 @@ class BioinfoMetadata(BaseModule):
         relecov_tools.utils.write_json_to_file(merged_metadata, batch_filepath)
         return merged_metadata
 
-    def save_merged_files(self, files_dict, file_tag, output_folder=None):
+    def save_merged_files(self, files_dict, file_tag, output_dir=None):
         """
         Process and save files that where split by cod and that have a function to be processed
 
         Args:
             files_dict (dict): A dictionary containing file paths identified for each configuration item.
             file_tag (str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
-            output_folder (str): Path to save output files generated during processing.
+            output_dir (str): Path to save output files generated during processing.
 
         Returns:
             None
@@ -1062,9 +1003,14 @@ class BioinfoMetadata(BaseModule):
                     continue
                 try:
                     # Dynamically import the function from the specified module
-                    utils_name = (
-                        f"relecov_tools.assets.pipeline_utils.{self.software_name}"
-                    )
+                    if func_name.startswith("utils/"):
+                        utils_name = "relecov_tools.assets.pipeline_utils.utils"
+                        func_name = func_name.split("/", 1)[1]
+                    else:
+                        utils_name = (
+                            f"relecov_tools.assets.pipeline_utils.{self.software_name}"
+                        )
+
                     import_statement = f"import {utils_name}"
                     exec(import_statement)
                     # Get method name and execute it.
@@ -1072,7 +1018,9 @@ class BioinfoMetadata(BaseModule):
                         utils_name
                         + "."
                         + func_name
-                        + "(file_path, file_tag, output_folder)"
+                        + "(file_path, file_tag, '"
+                        + self.software_name
+                        + "', output_dir)"
                     )
                 except Exception as e:
                     self.update_all_logs(
@@ -1089,6 +1037,28 @@ class BioinfoMetadata(BaseModule):
             if self.software_config[key].get("multiple_samples"):
                 multiple_sample_files.append(key)
         return multiple_sample_files
+
+    def filter_properties(self, data):
+        """
+        Remove properties from bioinfo_metadata that are not in the schema properties.
+
+        Parameters
+        ----------
+        data : list[dict]
+            Dictionary with the bioinfo metadata
+
+        Returns
+        -------
+        data: list[dict]
+            Bioinfo metadata json filtered
+        """
+        valid_keys = set(self.json_schema.get("properties", {}).keys())
+
+        for sample in data:
+            for k in list(sample.keys()):
+                if k not in valid_keys:
+                    sample.pop(k)
+        return data
 
     def create_bioinfo_file(self):
         """Create the bioinfodata json with collecting information from lab
@@ -1139,10 +1109,6 @@ class BioinfoMetadata(BaseModule):
                 files_found_dict, batch_data, sufix, file_tag, batch_dir
             )
             stderr.print("[blue]Adding software versions to read lab metadata...")
-            if "workflow_summary" in files_found_dict:
-                batch_data = self.get_multiqc_software_versions(
-                    files_found_dict["workflow_summary"], batch_data
-                )
             stderr.print("[blue]Adding fixed values")
             batch_data = self.add_fixed_values(batch_data)
             # Adding files path
@@ -1152,8 +1118,9 @@ class BioinfoMetadata(BaseModule):
             batch_filename = tag + lab_code + ".json"
             batch_filename = self.tag_filename(batch_filename)
             batch_filepath = os.path.join(batch_dir, batch_filename)
-            if self.software_name == "viralrecon":
-                try:
+            module = eval(f"relecov_tools.assets.pipeline_utils.{self.software_name}")
+            try:
+                if hasattr(module, "quality_control_evaluation"):
                     qc_func = eval(
                         f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation"
                     )
@@ -1162,15 +1129,19 @@ class BioinfoMetadata(BaseModule):
                         sample_id = sample.get("sequencing_sample_id")
                         if sample_id in qc_data:
                             sample.update(qc_data[sample_id])
-                except (AttributeError, NameError, TypeError, ValueError) as e:
-                    self.update_all_logs(
-                        self.create_bioinfo_file.__name__,
-                        "warning",
-                        f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}",
-                    )
-                    stderr.print(
-                        f"[orange]Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
-                    )
+            except (AttributeError, NameError, TypeError, ValueError) as e:
+                self.update_all_logs(
+                    self.create_bioinfo_file.__name__,
+                    "warning",
+                    f"Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}",
+                )
+                stderr.print(
+                    f"[orange]Could not evaluate quality_control_evaluation for batch {batch_dir}: {e}"
+                )
+
+            # Filter properties from batch_data that are not included in the schema
+            batch_data = self.filter_properties(batch_data)
+
             if os.path.exists(batch_filepath):
                 stderr.print(
                     f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
@@ -1190,7 +1161,7 @@ class BioinfoMetadata(BaseModule):
             stderr.print(f"[green]Created batch json file: {batch_filepath}")
 
         year = str(datetime.now().year)
-        out_path = os.path.join(self.output_folder, year)
+        out_path = os.path.join(self.output_dir, year)
         os.makedirs(out_path, exist_ok=True)
 
         stderr.print("[blue]Saving previously splitted files to output directory")

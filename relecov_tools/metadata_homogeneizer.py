@@ -19,7 +19,7 @@ stderr = rich.console.Console(
 class MetadataHomogeneizer:
     """MetadataHomogeneizer object"""
 
-    def __init__(self, institution=None, directory=None, output_folder=None):
+    def __init__(self, institution=None, directory=None, output_dir=None):
         # open config
         self.config_json = ConfigJson()
         # read heading from config
@@ -110,12 +110,12 @@ class MetadataHomogeneizer:
                     + " does not exist"
                 )
                 sys.exit(1)
-        if output_folder is None:
-            self.output_folder = relecov_tools.utils.prompt_path(
+        if output_dir is None:
+            self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
-            self.output_folder = output_folder
+            self.output_dir = output_dir
         self.processed_metadata = False
 
     def mapping_metadata(self, ws_data):
@@ -245,7 +245,7 @@ class MetadataHomogeneizer:
             additional_data = self.handling_files(additional_file, additional_data)
 
         # write to excel mapped data
-        f_name = os.path.join(self.output_folder, "converted_metadata_lab.xlsx")
+        f_name = os.path.join(self.output_dir, "converted_metadata_lab.xlsx")
         stderr.print("[blue] Dumping information to excel")
         post_process = {"insert_rows": 3, "insert_cols": 1}
         relecov_tools.utils.write_to_excel_file(

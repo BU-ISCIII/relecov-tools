@@ -2,8 +2,6 @@
 [![python_lint](https://github.com/BU-ISCIII/relecov-tools/actions/workflows/python_lint.yml/badge.svg)](https://github.com/BU-ISCIII/relecov-tools/actions/workflows/python_lint.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-> THIS REPO IS UNDER ACTIVE DEVELOPMENT.
-
 relecov-tools is a set of helper tools for the assembly of the different elements in the RELECOV platform (Spanish Network for genomic surveillance of SARS-Cov-2) as data download, processing, validation and upload to public databases, as well as analysis runs and database storage.
 
 ## Table of contents
@@ -14,6 +12,7 @@ relecov-tools is a set of helper tools for the assembly of the different element
     - [Bioconda](#bioconda)
     - [Pip](#pip)
     - [Development version](#development-version)
+    - [Required software](#required-software)
   - [Usage](#usage)
     - [Command-line](#command-line)
     - [Modules](#modules)
@@ -64,6 +63,27 @@ conda create -n relecov_dev pip
 pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/relecov-tools.git@develop
 ```
 
+### Required software
+
+These tools require [7-Zip](https://www.7-zip.org/) (via the `p7zip` package) to handle compressed files. Please make sure it is installed before running the code.
+
+#### Install 7-Zip on Linux
+
+On **Debian/Ubuntu-based systems**:
+
+```bash
+sudo apt update
+sudo apt install p7zip-full
+```
+
+On **Red Hat/Fedora-based systems**:
+
+```bash
+sudo dnf install p7zip p7zip-plugins
+```
+> **Note:** For other distributions, please use your distribution's package manager to install `p7zip`.
+
+
 ## Usage
 
 ### Command-line
@@ -76,7 +96,7 @@ $ relecov-tools --help
 \    \  /   |__ / |__  |    |___ |    |   |  \    /
 /    /  \   |  \  |    |    |    |    |   |   \  /
 /    |--|   |   \ |___ |___ |___ |___ |___|    \/
-RELECOV-tools version 1.5.4
+RELECOV-tools version 1.5.5
 Usage: relecov-tools [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -128,17 +148,21 @@ Usage: relecov-tools download [OPTIONS]
 
   Download files located in sftp server.
 
-  Options:
-    -u, --user            User name for login to sftp server
-    -p, --password        Password for the user to login
-    -d, --download_option Select the download option: [download_only, download_clean, delete_only].
-        download_only will only download the files
-        download_clean will remove files from sftp after download
-        delete_only will only delete the files
-    -o, --output_location Flag: Select location for downloaded files, overrides config file location
-    -t, --target_folders  Flag: Select which sftp folders will be targeted giving [paths] or via prompt
-    -f, --conf_file       Configuration file in yaml format (no params file)
-    --help                Show this message and exit.
+Options:
+  -u, --user TEXT             User name for login to sftp server
+  -p, --password TEXT         password for the user to login
+  -f, --conf_file TEXT        Configuration file (not params file)
+  -d, --download_option TEXT  Select the download option: [download_only,download_clean, delete_only].
+                              download_only will only download the files.
+                              download_clean will remove files from sftp after download.
+                              delete_only will only delete the files.
+  -o, --output_dir, TEXT      Directory where the generated output will be saved
+  -t, --target_folders TEXT   Flag: Select which folders will be targeted
+                              giving [paths] or via prompt. For multiple
+                              folders use ["folder1", "folder2"]
+  -s, --subfolder TEXT        Flag: Specify which subfolder to process
+                              (default: RELECOV)
+  --help                      Show this message and exit.
 ```
 
 Configuration can be passed in several formats:
@@ -159,20 +183,21 @@ allowed_sample_extensions:
 ```
 
 #### read-lab-metadata
+
 `read-lab-metadata` command reads the excel file with laboratory metadata and processes it adding additional needed fields.
 
 ```
 $ relecov-tools read-lab-metadata --help
-Usage: relecov-tools read-metadata [OPTIONS]
+Usage: relecov-tools read-lab-metadata [OPTIONS]
 
   Create the json compliant to the relecov schema from the Metadata file.
 
-  Options:
-    -m, --metadata_file PATH     file containing metadata in xlsx format.
-    -s, --sample_list_file PATH  Json with the additional metadata to add to the
-    received user metadata.
-    -o, --metadata-out PATH      Path to save output  metadata file in json format.
-    --help                       Show this message and exit.
+Options:
+  -m, --metadata_file PATH     file containing metadata
+  -s, --sample_list_file PATH  Json with the additional metadata to add to the received user metadata
+  -o, --output_dir, TEXT       Directory where the generated output will be saved
+  -f, --files_folder PATH      Path to folder where samples files are located
+  --help                       Show this message and exit.
 ```
 
 
@@ -188,14 +213,19 @@ Usage: relecov-tools send-email [OPTIONS]
 
   Send a sample validation report by mail.
 
-  Options:
-    -v, --validate-file PATH       Path to the validation summary JSON file (e.g., validate_log_summary.json) [required]
-    -r, --receiver-email TEXT      Recipient's e-mail address. If not provided, it will be extracted from the institutions guide
-    -a, --attachments PATH         Path(s) to one or more files to attach
-    -t, --template_path PATH       Path to the folder containing the email templates. If not provided, it will be loaded from the configuration file
-    -p, --email-psswd TEXT         Password for bioinformatica@isciii.es. If not provided, it will be loaded from the credentials YAML file
-    -n, --additional-notes PATH    Optional path to a .txt file with additional notes. If not provided, the user will be prompted to write notes manually or provide a path interactively
-    --help                         Show this message and exit.
+Options:
+  -v, --validate_file PATH     Path to the validation summary json file
+                               (validate_log_summary.json)  [required]
+  -r, --receiver_email TEXT    Recipient's e-mail address (optional). If not
+                               provided, it will be extracted from the
+                               institutions guide.
+  -a, --attachments PATH       Path to file
+  -t, --template_path PATH     Path to relecov-tools templates folder
+                               (optional)
+  -p, --email_psswd TEXT       Password for bioinformatica@isciii.es
+  -n, --additional_notes PATH  Path to a .txt file with additional notes to
+                               include in the email (optional).
+  --help                       Show this message and exit.
 ```
 
 #### read-bioinfo-metadata
@@ -207,11 +237,14 @@ Usage: relecov-tools read-bioinfo-metadata [OPTIONS]
 
    Create the json compliant to the relecov schema with Bioinfo Metadata.
 
-   Options:
-      -j, --json_file       Json file containing lab metadata
-      -i, --input_folder    Path to folder containing analysis results
-      -s, --software_name   Name of the software employed in the bioinformatics analysis (default: viralrecon).
-      -o, --out_dir         Path to save output file"
+Options:
+  -j, --json_file PATH      json file containing lab metadata
+  -i, --input_folder PATH   Path to input files
+  -o, --output_dir, TEXT    Directory where the generated output will be saved
+  -s, --software_name TEXT  Name of the software/pipeline used.
+  --update                  If the output file already exists, ask if you want
+                            to update it.
+  --help                    Show this message and exit.
 ```
 - Note: Software-specific configurations are available in [bioinfo_config.json](./relecov_tools/conf/bioinfo_config.json).
 
@@ -256,7 +289,7 @@ Usage: relecov-tools validate [OPTIONS]
     -j, --json_file TEXT            Json file to validate
     -s, --json_schema_file          TEXT Path to the JSON Schema file used for validation
     -m, --metadata PATH             Origin file containing metadata
-    -o, --out_folder TEXT           Path to save validate json file
+    -o, --output_dir,               Directory where the generated output will be saved.
     -e, --excel_sheet TEXT          Optional: Name of the sheet in excel file to validate.
     -r, --registry TEXT             Path to registry (JSON file) with validated samples and their unique IDs.   
     --help                          Show this message and exit.
@@ -272,14 +305,14 @@ Usage: relecov-tools map [OPTIONS]
 
   Convert data between phage plus schema to ENA, GISAID, or any other schema
 
-  Options:
-    -p, --origin_schema TEXT        File with the origin (relecov) schema
-    -j, --json_data TEXT            File with the json data to convert
-    -d, --destination_schema [ENA|GSAID|other]
-    schema to be mapped
-    -f, --schema_file TEXT          file with the custom schema
-    -o, --output TEXT               File name and path to store the mapped json
-    --help                          Show this message and exit.
+Options:
+  -p, --origin_schema TEXT          File with the origin (relecov) schema
+  -j, --json_file TEXT              File with the json data to convert
+  -d, --destination_schema [ENA|GISAID|other]
+                                    schema to be mapped
+  -f, --schema_file TEXT            file with the custom schema
+  -o, --output_dir,                 Directory where the generated output will be saved.
+  --help                            Show this message and exit.
 ```
 
 #### upload-to-ena
@@ -300,7 +333,7 @@ Usage: relecov-tools upload-to-ena [OPTIONS]
     --dev                                    Flag: Test submission
     --upload_fastq                           Flag: Upload fastq files. Mandatory for "add" action
     -m", --metadata_types                    List of metadata xml types to submit [study,experiment,run,sample]
-    -o, --output_path TEXT                   output folder for the xml generated files
+    -o, --output_dir                         Directory where the generated output will be saved.
     --help                                   Show this message and exit.
 
 ```
@@ -313,24 +346,48 @@ Usage: relecov-tools upload-to-gisaid [OPTIONS]
 
   parsed data to create xml files to upload to ena
 
-  Options:
-    -u, --user            user name for login
-    -p, --password        password for the user to login
-    -c, --client_id       client-ID provided by clisupport@gisaid.org
-    -t, --token           path to athentication token
-    -e, --gisaid_json     path to validated json mapped to GISAID
-    -i, --input_path      path to fastas folder or multifasta file
-    -f, --frameshift      frameshift notification: ["catch_all", "catch_none", "catch_novel"]
-    -x, --proxy_config    introduce your proxy credentials as: username:password@proxy:port
-    --single              Flag: input is a folder with several fasta files.
-    --gzip                Flag: input fasta is gziped.
+Options:
+  -u, --user TEXT                 user name for login
+  -p, --password TEXT             password for the user to login
+  -c, --client_id TEXT            client-ID provided by clisupport@gisaid.org
+  -t, --token TEXT                path to athentication token
+  -e, --gisaid_json TEXT          path to validated json mapped to GISAID
+  -i, --input_path TEXT           path to fastas folder or multifasta file
+  -o, --output_dir,               Directory where the generated output will be saved.
+  -f, --frameshift [catch_all|catch_none|catch_novel]
+                                  frameshift notification
+  -x, --proxy_config TEXT         introduce your proxy credentials as:
+                                  username:password@proxy:port
+  --single                        input is a folder with several fasta files.
+                                  Default: False
+  --gzip                          input fasta is gziped. Default: False
+  --help                          Show this message and exit.
 ```
 
 #### update-db
-    -u, --user                         user name for login
-    -p, --password                     password for the user to login
-    -t, --type                         Select the type of information to upload to database [sample,bioinfodata,variantdata]
-    -d, --databaseServer               Name of the database server receiving the data [iskylims,relecov]
+
+Upload the information included in json file to the database
+
+```
+Usage: relecov-tools update-db [OPTIONS]
+
+  upload the information included in json file to the database
+
+Options:
+  -j, --json TEXT                 data in json format
+  -t, --type [sample|bioinfodata|variantdata]
+                                  Select the type of information to upload to
+                                  database
+  -plat, --platform [iskylims|relecov]
+                                  name of the platform where data is uploaded
+  -u, --user TEXT                 user name for login
+  -p, --password TEXT             password for the user to login
+  -s, --server_url TEXT           url of the platform server
+  -f, --full_update               Sequentially run every update option
+  -l, --long_table TEXT           Long_table.json file from read-bioinfo-
+                                  metadata + viralrecon
+  --help                          Show this message and exit.
+```
 
 #### pipeline-manager
 Create the folder structure to execute the given pipeline for the latest sample batches after executing download, read-lab-metadata and validate modules. This module will create symbolic links for each sample and generate the necessary files for pipeline execution using the information from validated_BATCH-NAME_DATE.json.
@@ -341,11 +398,16 @@ Usage: relecov-tools pipeline-manager [OPTIONS]
   bioinformatics pipeline execution.
 
 Options:
-  -i, --input PATH          Path to the input folder where sample files are located
-  -t, --template PATH       Path to the pipeline template folder to be copied in the                       output folder
-  -c, --config PATH         Path to the the template config file
-  -o, --out_dir PATH        Path to output folder
-  --help                    Show this message and exit.
+  -i, --input PATH           select input folder where are located the sample
+                             files
+  -t, --templates_root PATH  Path to folder containing the pipeline templates
+                             from buisciii-tools
+  -c, --config PATH          select the template config file
+  -o, --output_dir,          Directory where the generated output will be saved.
+  -f, --folder_names TEXT    Folder basenames to process. Target folders names
+                             should match the given dates. E.g. ... -f folder1
+                             -f folder2 -f folder3
+  --help                     Show this message and exit.
 ```
 
 #### wrapper
@@ -357,7 +419,7 @@ Usage: relecov-tools wrapper [OPTIONS]
 
 Options:
   -c, --config_file PATH    Path to config file in yaml format  [required]
-  -o, --output_folder PATH  Path to folder where global results are saved [required]
+  -o, --output_dir,         Directory where the generated output will be saved [required].
   --help                    Show this message and exit.
 ```
 
@@ -369,9 +431,9 @@ Usage: relecov-tools logs-to-excel [OPTIONS]
   Creates a merged xlsx report from all the log summary jsons given as input
 
 Options:
-    -l, --lab_name                         Name for target laboratory in log-summary.json files
-    -o, --output_folder                    Path to output folder where xlsx file is saved
-    -f, --files                            Paths to log_summary.json files to merge into xlsx file, called once per file
+    -l, --lab_name          Name for target laboratory in log-summary.json files
+    -o, --output_dir,       Directory where the generated output will be saved [required]. 
+    -f, --files             Paths to log_summary.json files to merge into xlsx file, called once per file
 ```
 
 #### add-extra-config
@@ -422,7 +484,7 @@ Options:
   -d, --diff        BOOLEAN Prints a changelog/diff between the base and
                             incoming versions of the schema. Required for the generation 
                             of the JSON schema.
-  -o, --out_dir PATH        Path to save output file/s
+  -o, --output_dir,         Directory where the generated output will be saved [required].
   --help                    Show this message and exit.
 ```
 #### Mandatory Files

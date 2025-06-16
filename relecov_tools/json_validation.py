@@ -24,15 +24,15 @@ stderr = rich.console.Console(
 class SchemaValidation(BaseModule):
     def __init__(
         self,
-        json_data_file=None,
+        json_file=None,
         json_schema_file=None,
         metadata=None,
-        out_folder=None,
+        output_dir=None,
         excel_sheet=None,
         registry=None,
     ):
         """Validate json file against the schema"""
-        super().__init__(output_directory=out_folder, called_module=__name__)
+        super().__init__(output_dir=output_dir, called_module=__name__)
         config_json = ConfigJson()
         self.log.info("Initiating validation process")
         if json_schema_file is None:
@@ -43,47 +43,47 @@ class SchemaValidation(BaseModule):
 
         self.json_schema = relecov_tools.utils.read_json_file(json_schema_file)
 
-        if json_data_file is None:
-            json_data_file = relecov_tools.utils.prompt_path(
+        if json_file is None:
+            json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file to be validated"
             )
 
-        if out_folder is None:
+        if output_dir is None:
             self.out_folder = relecov_tools.utils.prompt_path(
                 msg="Select the folder where excel file with invalid data will be saved"
             )
         else:
-            self.out_folder = out_folder
+            self.out_folder = output_dir
 
         # Read and check json to validate file
-        if not os.path.isfile(json_data_file):
+        if not os.path.isfile(json_file):
             stderr.print("[red] Json file does not exist")
             self.log.error("Json file does not exist")
             sys.exit(1)
-        self.json_data_file = json_data_file
+        self.json_data_file = json_file
         out_path = os.path.dirname(os.path.realpath(self.json_data_file))
         self.lab_code = out_path.split("/")[-2]
         self.logsum = self.parent_log_summary(
-            output_location=self.out_folder, unique_key=self.lab_code, path=out_path
+            output_dir=self.out_folder, lab_code=self.lab_code, path=out_path
         )
 
         stderr.print("[blue] Reading the json file")
         self.log.info("Reading the json file")
-        self.json_data = relecov_tools.utils.read_json_file(json_data_file)
+        self.json_data = relecov_tools.utils.read_json_file(json_file)
         if not isinstance(self.json_data, list):
-            stderr.print(f"[red]Invalid json file content in {json_data_file}.")
+            stderr.print(f"[red]Invalid json file content in {json_file}.")
             stderr.print("Should be a list of dicts. Create it with read-lab-metadata")
-            self.log.error(f"[red]Invalid json file content in {json_data_file}.")
+            self.log.error(f"[red]Invalid json file content in {json_file}.")
             self.log.error(
                 "Should be a list of dicts. Create it with read-lab-metadata"
             )
-            raise TypeError(f"Invalid json file content in {json_data_file}")
+            raise TypeError(f"Invalid json file content in {json_file}")
         try:
             batch_id = self.get_batch_id_from_data(self.json_data)
         except ValueError:
-            raise ValueError(f"Provided json file {json_data_file} is empty")
+            raise ValueError(f"Provided json file {json_file} is empty")
         except AttributeError as e:
-            raise ValueError(f"Invalid json file content in {json_data_file}: {e}")
+            raise ValueError(f"Invalid json file content in {json_file}: {e}")
         self.set_batch_id(batch_id)
 
         self.metadata = metadata
@@ -240,7 +240,9 @@ class SchemaValidation(BaseModule):
                         err_field_label = error_field
                     # Format the error message
                     error.message = error.message.replace(error_field, err_field_label)
-                    if (
+                    if error.validator == "pattern" and "date" in error_field:
+                        error_text = f"Error in column {err_field_label}. Please provide a date from 2020 to date"
+                    elif (
                         error.validator == "format" and error.validator_value == "date"
                     ):  # Modification of default text warning for invalid date format.
                         error_text = f"Error in column {err_field_label}: '{error.instance}' is not a valid date format. Valid format 'YYYY-MM-DD'"
@@ -326,20 +328,21 @@ class SchemaValidation(BaseModule):
         tag = "Sample ID given for sequencing"
         # Check if mandatory colum ($tag) is defined in metadata.
         try:
-            id_col = next(
-                idx
-                for idx, cell in enumerate(ws_sheet[1])
-                if cell.value is not None and tag in str(cell.value)
-            )
-        except StopIteration:
+            header_row = [idx + 1 for idx, x in enumerate(ws_sheet.values) if tag in x][
+                0
+            ]
+        except IndexError:
             self.log.error(
-                f"Column with tag '{tag}' not found in the second row of the Excel sheet."
+                f"Column with tag '{tag}' not found in any row of the Excel sheet."
             )
-            stderr.print(f"[red] Column with tag '{tag}' not found. Cannot continue.")
+            stderr.print(f"[red]Column with tag '{tag}' not found. Cannot continue.")
             raise
         row_to_del = []
-        row_iterator = ws_sheet.iter_rows(min_row=2, max_row=ws_sheet.max_row)
+        row_iterator = ws_sheet.iter_rows(min_row=header_row, max_row=ws_sheet.max_row)
         consec_empty_rows = 0
+        id_col = [
+            idx for idx, val in enumerate(ws_sheet[header_row]) if val.value == tag
+        ][0]
         for row in row_iterator:
             # if no data in 10 consecutive rows, break loop
             if not any(row[x].value for x in range(10)):

@@ -2,7 +2,6 @@
 import sys
 import os
 import re
-import glob
 import json
 import rich.console
 import time
@@ -24,43 +23,44 @@ class UpdateDatabase(BaseModule):
     def __init__(
         self,
         user=None,
-        passwd=None,
-        json_file=None,
-        type_of_info=None,
+        password=None,
+        json=None,
+        type=None,
         platform=None,
         server_url=None,
         full_update=False,
+        long_table=None,
     ):
-        if json_file is None:
-            json_file = relecov_tools.utils.prompt_path(
+        if json is None:
+            json = relecov_tools.utils.prompt_path(
                 msg="Select the json file which have the data to map"
             )
-        json_dir = os.path.dirname(os.path.realpath(json_file))
-        super().__init__(output_directory=json_dir, called_module="update-db")
+        json_dir = os.path.dirname(os.path.realpath(json))
+        super().__init__(output_dir=json_dir, called_module="update-db")
         # Get the user and password for the database
         if user is None:
             user = relecov_tools.utils.prompt_text(
                 msg="Enter username for upload data to server"
             )
         self.user = user
-        if passwd is None:
-            passwd = relecov_tools.utils.prompt_text(msg="Enter credential password")
-        self.passwd = passwd
+        if password is None:
+            password = relecov_tools.utils.prompt_text(msg="Enter credential password")
+        self.passwd = password
         # get the default coonfiguration used the instance
         self.config_json = ConfigJson()
 
-        if not os.path.isfile(json_file):
-            self.log.error("json data file %s does not exist ", json_file)
-            stderr.print(f"[red] json data file {json_file} does not exist")
+        if not os.path.isfile(json):
+            self.log.error("json data file %s does not exist ", json)
+            stderr.print(f"[red] json data file {json} does not exist")
             sys.exit(1)
-        self.json_data = relecov_tools.utils.read_json_file(json_file)
+        self.json_data = relecov_tools.utils.read_json_file(json)
         batch_id = self.get_batch_id_from_data(self.json_data)
         self.set_batch_id(batch_id)
         for row in self.json_data:
             for key, value in row.items():
                 if not isinstance(value, str):
                     row[key] = str(value)
-        self.json_file = json_file
+        self.json_file = json
         schema = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "schema",
@@ -68,16 +68,31 @@ class UpdateDatabase(BaseModule):
         )
         self.schema = relecov_tools.utils.read_json_file(schema)
         if full_update is True:
+            if not os.path.isfile(long_table):
+                raise ValueError(
+                    f"Provided long_table file does not exist {long_table}"
+                )
             self.full_update = True
             self.server_url = None
+            self.long_table_file = os.path.realpath(long_table)
         else:
             self.full_update = False
-            if type_of_info is None:
-                type_of_info = relecov_tools.utils.prompt_selection(
+            if type is None:
+                type = relecov_tools.utils.prompt_selection(
                     "Select:",
                     ["sample", "bioinfodata", "variantdata"],
                 )
-            self.type_of_info = type_of_info
+            self.type_of_info = type
+            if self.type_of_info == "variantdata":
+                if long_table is None:
+                    json = relecov_tools.utils.prompt_path(
+                        msg="Select the json file which have the data to map"
+                    )
+                    if not os.path.isfile(long_table):
+                        raise ValueError(
+                            f"Provided long_table file does not exist {long_table}"
+                        )
+                self.long_table_file = os.path.realpath(long_table)
             # collect data for plarform to upload data
             if platform is None:
                 platform = relecov_tools.utils.prompt_selection(
@@ -100,7 +115,7 @@ class UpdateDatabase(BaseModule):
         # create the instance for logging the summary information
         lab_code = json_dir.split("/")[-2]
         self.logsum = self.parent_log_summary(
-            output_location=json_dir, unique_key=lab_code, path=json_dir
+            output_dir=json_dir, lab_code=lab_code, path=json_dir
         )
 
     def get_schema_ontology_values(self):
@@ -119,41 +134,37 @@ class UpdateDatabase(BaseModule):
         s_fields = list(sample_fields.keys())
         for row in self.json_data:
             s_dict = {}
-            for key, value in row.items():
-                if isinstance(value, str):
-                    found_ontology = re.search(r"(.+) \[\w+:.*", value)
-                    if found_ontology:
-                        # remove the ontology data from item value
-                        value = found_ontology.group(1)
-                if key in s_project_fields:
-                    s_dict[key] = value
-                if key in s_fields:
-                    s_dict[sample_fields[key]] = value
-                if key not in s_project_fields and key not in s_fields:
-                    # just for debugging, write the fields that will not
-                    # be included in iSkyLIMS request
-                    self.log.debug("not key %s in iSkyLIMS", key)
+            for sfield in s_fields:
+                if sfield not in row.keys():
+                    s_dict[sample_fields[sfield]] = "Not Provided"
+                else:
+                    value = row[sfield]
+                    if isinstance(value, str):
+                        found_ontology = re.search(r"(.+) \[\w+:.*", value)
+                        if found_ontology:
+                            # remove the ontology data from item value
+                            value = found_ontology.group(1)
+                    s_dict[sample_fields[sfield]] = value
+            for pfield in s_project_fields:
+                if pfield in row.keys():
+                    value = row[pfield]
+                    if isinstance(value, str):
+                        found_ontology = re.search(r"(.+) \[\w+:.*", value)
+                        if found_ontology:
+                            # remove the ontology data from item value
+                            value = found_ontology.group(1)
+                        s_dict[pfield] = value
             # include the fixed value
             fixed_value = self.config_json.get_topic_data(
                 "upload_database", "iskylims_fixed_values"
             )
             for prop, val in fixed_value.items():
                 s_dict[prop] = val
-            # Adding tha specimen_source field to set sample_type
-            try:
-                s_dict["sample_type"] = row["specimen_source"]
-            except KeyError as e:
-                logtxt = f"Unable to fetch specimen_source from json file {e}"
-                self.logsum.add_warning(entry=logtxt)
-                s_dict["sample_type"] = "Other"
+            all_iskylims_fields = s_project_fields + s_fields
+            sid = row.get("sequencing_sample_id", row.get("sequence_file_R1"))
+            for missing in list(set(list(row.keys())) - set(all_iskylims_fields)):
+                self.log.debug(f"Field {missing} not found in Iskylims in sample {sid}")
             sample_list.append(s_dict)
-            # if sample_entry_date is not set then, add the current date
-            if "sample_entry_date" not in row:
-                logtxt = "sample_entry_date is not in the sample fields"
-                self.logsum.add_warning(entry=logtxt)
-                stderr.print(f"[yellow]{logtxt}")
-                s_dict["sample_entry_date"] = time.strftime("%Y-%m-%d")
-
         return sample_list
 
     def get_iskylims_fields_sample(self):
@@ -227,6 +238,15 @@ class UpdateDatabase(BaseModule):
                     s_dict[r_field] = None
             field_values.append(s_dict)
         return field_values
+
+    def clean_ambiguous_value(self, value):
+        """Replace ambiguous values by default if value is not required."""
+        if isinstance(value, str):
+            if value.strip() in {"", "NA", "None"}:
+                return "Not Provided"
+        elif value is None:
+            return "Not Provided"
+        return value
 
     def update_database(self, field_values, post_url):
         """Send the request to update database"""
@@ -332,7 +352,10 @@ class UpdateDatabase(BaseModule):
 
         elif type_of_info == "bioinfodata":
             post_url = "bioinfodata"
-            map_fields = self.json_data
+            map_fields = [
+                {k: self.clean_ambiguous_value(v) for k, v in row.items()}
+                for row in self.json_data
+            ]
 
         elif type_of_info == "variantdata":
             post_url = "variantdata"
@@ -377,19 +400,22 @@ class UpdateDatabase(BaseModule):
                 self.type_of_info = datatype
                 # TODO: Handling for servers with different datatype needs
                 if datatype == "variantdata":
-                    json_dir = os.path.dirname(os.path.realpath(self.json_file))
-                    long_tables = glob.glob(os.path.join(json_dir, "*long_table*.json"))
-                    if not long_tables:
-                        json_file = relecov_tools.utils.prompt_path(
-                            msg="Select long_table json file for variant data"
-                        )
-                    else:
-                        json_file = long_tables[0]
-                    self.log.info("Selected %s file for variant data", str(json_file))
-                    self.json_data = relecov_tools.utils.read_json_file(json_file)
+                    self.log.info(
+                        "Selected %s file for variant data", str(self.long_table_file)
+                    )
+                    self.json_data = relecov_tools.utils.read_json_file(
+                        self.long_table_file
+                    )
                 self.store_data(datatype, self.server_name)
         else:
             self.start_api(self.platform)
+            if self.type_of_info == "variantdata":
+                self.log.info(
+                    "Selected %s file for variant data", str(self.long_table_file)
+                )
+                self.json_data = relecov_tools.utils.read_json_file(
+                    self.long_table_file
+                )
             self.store_data(self.type_of_info, self.platform)
         self.parent_create_error_summary(called_module="update-db")
         return

@@ -6,6 +6,7 @@ import yaml
 import warnings
 import rich.console
 import paramiko
+import pandas as pd
 import relecov_tools.utils
 import relecov_tools.sftp_client
 from datetime import datetime
@@ -37,22 +38,22 @@ class DownloadManager(BaseModule):
     def __init__(
         self,
         user=None,
-        passwd=None,
+        password=None,
         conf_file=None,
         download_option=None,
-        output_location=None,
+        output_dir=None,
         target_folders=None,
         subfolder=None,
     ):
         """Initializes the sftp object"""
-        super().__init__(output_directory=output_location, called_module="download")
+        super().__init__(output_dir=output_dir, called_module="download")
         self.log.info("Initiating download process")
         config_json = ConfigJson(extra_config=True)
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
         sftp_user = user
-        sftp_passwd = passwd
+        sftp_passwd = password
         self.target_folders = target_folders
         self.subfolder = subfolder
         self.allowed_download_options = config_json.get_topic_data(
@@ -101,20 +102,18 @@ class DownloadManager(BaseModule):
                 self.log.error("Invalid configuration file. Missing %s", e)
                 stderr.print(f"[red] Invalid configuration file. Missing {e} !")
                 raise ValueError(f"Invalid configuration file. Missing {e}")
-        if output_location is not None:
-            if os.path.isdir(output_location):
-                self.platform_storage_folder = os.path.realpath(output_location)
+        if output_dir is not None:
+            if os.path.isdir(output_dir):
+                self.platform_storage_folder = os.path.realpath(output_dir)
             else:
                 self.log.error("Output location does not exist, aborting")
                 stderr.print("[red] Output location does not exist, aborting")
-                raise FileNotFoundError(f"Output dir does not exist {output_location}")
+                raise FileNotFoundError(f"Output dir does not exist {output_dir}")
         if sftp_user is None:
             sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
             self.target_folders = self.target_folders.split(",")
-        self.logsum = self.parent_log_summary(
-            output_location=self.platform_storage_folder
-        )
+        self.logsum = self.parent_log_summary(output_dir=self.platform_storage_folder)
         if sftp_passwd is None:
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
         self.metadata_lab_heading = config_json.get_topic_data(
@@ -326,56 +325,115 @@ class DownloadManager(BaseModule):
         return clean_sample_dict
 
     def read_metadata_file(self, meta_f_path, return_data=True):
-        """Read excel file, check if the header matches with the one defined in config
+        """Read Excel file, check if the header matches with the one defined in config.
 
         Args:
-            meta_f_path (str): Path to the excel_file
+            meta_f_path (str): Path to the Excel file.
 
         Raises:
-            MetadataError: If the header in the excel is different from config
+            MetadataError: If the header in the Excel is different from config.
 
         Returns:
-            ws_metadata_lab: openpyxl's workbook metadata sheet of the excel file
+            ws_metadata_lab: worksheet (openpyxl or simulated from pandas)
             metadata_header: column names of the header
-            header_row: row where the header is located in the sheet
+            header_row: row where the header is located in the sheet (1-based)
         """
+
         warnings.simplefilter(action="ignore", category=UserWarning)
-        wb_file = openpyxl_load_workbook(meta_f_path, data_only=True)
-        ws_metadata_lab = wb_file[self.metadata_processing.get("excel_sheet")]
-        # find out the index for file names
         header_flag = self.metadata_processing.get("header_flag")
-        try:
-            header_row = [
-                i + 1 for i, x in enumerate(ws_metadata_lab.values) if header_flag in x
-            ][0]
-        except IndexError:
-            error_text = "Header could not be found for excel file %s"
-            raise MetadataError(str(error_text % os.path.basename(meta_f_path)))
-        for cell in ws_metadata_lab[header_row]:
-            if cell.value is not None:
-                cell.value = cell.value.strip()
-        metadata_header = [
-            x.value for x in ws_metadata_lab[header_row] if x.value is not None
-        ]
+        sheet_name = self.metadata_processing.get("excel_sheet")
         meta_column_list = self.metadata_lab_heading
-        if meta_column_list != metadata_header[1:]:
-            diffs = [
-                x
-                for x in set(metadata_header[1:] + meta_column_list)
-                if x not in meta_column_list or x not in metadata_header
+
+        try:
+            wb_file = openpyxl_load_workbook(meta_f_path, data_only=True)
+            ws_metadata_lab = wb_file[sheet_name]
+            try:
+                header_row = [
+                    i + 1
+                    for i, x in enumerate(ws_metadata_lab.values)
+                    if header_flag in x
+                ][0]
+            except IndexError:
+                error_text = "Header could not be found for excel file %s"
+                raise MetadataError(str(error_text % os.path.basename(meta_f_path)))
+            for cell in ws_metadata_lab[header_row]:
+                if cell.value is not None:
+                    cell.value = cell.value.strip()
+            metadata_header = [
+                x.value for x in ws_metadata_lab[header_row] if x.value is not None
             ]
-            self.log.error(
-                "Config field metadata_lab_heading is different from .xlsx header"
+            if meta_column_list != metadata_header[1:]:
+                diffs = [
+                    x
+                    for x in set(metadata_header[1:] + meta_column_list)
+                    if x not in meta_column_list or x not in metadata_header
+                ]
+                self.log.error(
+                    "Config field metadata_lab_heading is different from .xlsx header"
+                )
+                stderr.print(
+                    "[red]Header in metadata file is different from config file, aborting"
+                )
+                stderr.print("[red]Differences: ", diffs)
+                raise MetadataError(f"Metadata header different from config: {diffs}")
+            if return_data:
+                return ws_metadata_lab, metadata_header, header_row
+            else:
+                return True
+
+        except Exception as openpyxl_error:
+            self.log.warning(
+                f"openpyxl failed to read the Excel file: {openpyxl_error}"
             )
-            stderr.print(
-                "[red]Header in metadata file is different from config file, aborting"
-            )
-            stderr.print("[red]Differences: ", diffs)
-            raise MetadataError(f"Metadata header different from config: {diffs}")
-        if return_data:
-            return ws_metadata_lab, metadata_header, header_row
-        else:
-            return True
+            self.log.warning("Attempting to read using pandas fallback")
+
+            try:
+                df = pd.read_excel(meta_f_path, sheet_name=sheet_name, header=None)
+                header_row_mask = df.apply(
+                    lambda row: header_flag in row.values, axis=1
+                )
+                if not header_row_mask.any():
+                    raise MetadataError(
+                        f"Header flag '{header_flag}' not found in {meta_f_path}"
+                    )
+                header_row = header_row_mask.idxmax()
+                metadata_header = [
+                    str(h).strip() for h in df.iloc[header_row] if pd.notna(h)
+                ]
+
+                if meta_column_list != metadata_header[1:]:
+                    diffs = [
+                        x
+                        for x in set(metadata_header[1:] + meta_column_list)
+                        if x not in meta_column_list or x not in metadata_header
+                    ]
+                    self.log.error(
+                        "Config field metadata_lab_heading is different from .xlsx header"
+                    )
+                    stderr.print(
+                        "[red]Header in metadata file is different from config file, aborting"
+                    )
+                    stderr.print("[red]Differences: ", diffs)
+                    raise MetadataError(
+                        f"Metadata header different from config: {diffs}"
+                    )
+
+                if return_data:
+                    ws_metadata_lab = df.iloc[header_row + 1 :].values.tolist()
+                    return (
+                        ws_metadata_lab,
+                        metadata_header,
+                        header_row + 1,
+                    )  # +1 to be consistent with openpyxl
+                else:
+                    return True
+
+            except Exception as pandas_error:
+                raise MetadataError(
+                    f"Failed to read metadata Excel file with both openpyxl and pandas:\n"
+                    f"- openpyxl error: {openpyxl_error}\n"
+                    f"- pandas error: {pandas_error}"
+                )
 
     def get_sample_fastq_file_names(self, local_folder, meta_f_path):
         """Read excel metadata template and create dictionary with files for each sample
@@ -390,6 +448,14 @@ class DownloadManager(BaseModule):
                         "sequence_file_R2": "sample1_R2.fastq.gz"},
              sample2:{...} }
         """
+
+        def set_nones_to_str(row, req_vals):
+            row = list(row)
+            for index in req_vals:
+                if row[index] is None:
+                    row[index] = ""
+            return row
+
         if not os.path.isfile(meta_f_path):
             self.log.error("Metadata file does not exist on %s", local_folder)
             stderr.print("[red] METADATA_LAB.xlsx do not exist in" + local_folder)
@@ -398,26 +464,34 @@ class DownloadManager(BaseModule):
         metadata_ws, meta_header, header_row = self.read_metadata_file(meta_f_path)
         # TODO Include these columns in config
         index_sampleID = meta_header.index("Sample ID given for sequencing")
+        index_altID = meta_header.index("Sample ID given by originating laboratory")
         index_layout = meta_header.index("Library Layout")
         index_fastq_r1 = meta_header.index("Sequence file R1")
         index_fastq_r2 = meta_header.index("Sequence file R2")
+        req_vals = [index_layout, index_fastq_r1, index_fastq_r2]
         counter = header_row
         for row in islice(metadata_ws.values, header_row, metadata_ws.max_row):
+            row = set_nones_to_str(row, req_vals)
             counter += 1
-            if row[index_sampleID] is not None:
-                row_complete = True
+            if not row[index_sampleID]:
+                if not row[index_altID]:
+                    sample_id = row[index_altID]
+                else:
+                    sample_id = row[index_fastq_r1].split(".")[0]
+            else:
+                sample_id = row[index_sampleID]
+            if sample_id:
                 try:
-                    s_name = str(row[index_sampleID]).strip()
+                    s_name = str(sample_id).strip()
                 except ValueError as e:
                     self.log.error("Unable to convert to string. %s", e)
                     stderr.print("[red]Unable to convert to string. ", e)
                     continue
                 if s_name in sample_file_dict:
-                    if (
-                        row[index_fastq_r1]
-                        == sample_file_dict[s_name]["sequence_file_R1"]
-                        or row[index_fastq_r2]
-                        == sample_file_dict[s_name]["sequence_file_R2"]
+                    if row[index_fastq_r1] == sample_file_dict[s_name].get(
+                        "sequence_file_R1", ""
+                    ) or row[index_fastq_r2] == sample_file_dict[s_name].get(
+                        "sequence_file_R2", ""
                     ):
                         s_name = s_name + "_remove_" + str(counter)
                     else:
@@ -425,37 +499,40 @@ class DownloadManager(BaseModule):
                         stderr.print(log_text)
                         self.include_warning(log_text, sample=s_name)
                         continue
-                if (
-                    "paired" in row[index_layout].lower()
-                    and row[index_fastq_r2] is None
-                ):
-                    error_text = "Sample %s is paired-end, but no R2 given"
-                    self.include_error(error_text % str(row[index_sampleID]), s_name)
-                    row_complete = False
-                if (
-                    "single" in row[index_layout].lower()
-                    and row[index_fastq_r2] is not None
-                ):
-                    error_text = "Sample %s is single-end, but R1 and R2 were given"
-                    self.include_error(error_text % str(row[index_sampleID]), s_name)
-                    row_complete = False
-                if row_complete:
-                    if row[index_fastq_r1] is not None:
-                        sample_file_dict[s_name] = {}
-                        # TODO: move these keys to configuration.json
-                        sample_file_dict[s_name]["sequence_file_R1"] = row[
-                            index_fastq_r1
-                        ].strip()
-                        if row[index_fastq_r2] is not None:
-                            sample_file_dict[s_name]["sequence_file_R2"] = row[
-                                index_fastq_r2
-                            ].strip()
-                    else:
-                        log_text = "Fastq_R1 not defined in Metadata for sample %s"
-                        stderr.print(f"[red]{str(log_text % s_name)}")
-                        self.include_error(entry=str(log_text % s_name), sample=s_name)
+                if not row[index_fastq_r1]:
+                    log_text = "Sequence File R1 not defined in Metadata for sample %s"
+                    stderr.print(f"[red]{str(log_text % s_name)}")
+                    self.include_error(entry=str(log_text % s_name), sample=s_name)
+                try:
+                    if (
+                        "paired" in row[index_layout].lower()
+                        and not row[index_fastq_r2]
+                    ):
+                        error_text = "Sample %s is paired-end, but no R2 given"
+                        self.include_error(error_text % str(sample_id), s_name)
+                    if "single" in row[index_layout].lower() and row[index_fastq_r2]:
+                        error_text = "Sample %s is single-end, but R1 and R2 were given"
+                        self.include_error(error_text % str(sample_id), s_name)
+                except AttributeError:
+                    error_text = (
+                        f"Missing or invalid 'Library Layout' value for sample {s_name}. "
+                        f"Please check the metadata file and provide a value (single/paired)."
+                    )
+                    self.include_error(error_text, sample=s_name)
+                    stderr.print(f"[red]{error_text}")
+                    raise MetadataError(error_text)
+
+                sample_file_dict[s_name] = {}
+                # TODO: move these keys to configuration.json
+                sample_file_dict[s_name]["sequence_file_R1"] = row[
+                    index_fastq_r1
+                ].strip()
+                if row[index_fastq_r2]:
+                    sample_file_dict[s_name]["sequence_file_R2"] = row[
+                        index_fastq_r2
+                    ].strip()
             else:
-                txt = f"Row {counter} in metadata skipped.No sequencing sample ID given"
+                txt = f"Sample for row {counter} in metadata skipped. No sample ID nor file provided"
                 self.include_warning(entry=txt)
         # Remove duplicated files
         clean_sample_dict = self.remove_duplicated_values(sample_file_dict)
@@ -736,7 +813,7 @@ class DownloadManager(BaseModule):
         Returns:
             folders_with_metadata: Same dict updated with the merged md5sum file
         """
-        output_location = self.platform_storage_folder
+        output_dir = self.platform_storage_folder
 
         # TODO: Include this function in relecov_tools.utils
         def md5_merger(md5_filelist, avoid_chars=None):
@@ -752,13 +829,13 @@ class DownloadManager(BaseModule):
             }
             return merged_md5
 
-        def md5_handler(md5sumlist, output_location):
+        def md5_handler(md5sumlist, output_dir):
             """Download all the remote md5sum files in a list, merge them
             into a single md5checksum and upload it back to sftp"""
             downloaded_md5files = []
             for md5sum in md5sumlist:
                 md5_name = "_".join([token_hex(nbytes=12), "md5_temp.md5"])
-                fetched_md5 = os.path.join(output_location, md5_name)
+                fetched_md5 = os.path.join(output_dir, md5_name)
                 if self.relecov_sftp.get_from_sftp(
                     file=md5sum, destination=fetched_md5
                 ):
@@ -766,7 +843,7 @@ class DownloadManager(BaseModule):
             merged_md5 = md5_merger(downloaded_md5files, self.avoidable_characters)
             if merged_md5:
                 merged_name = "_".join([folder.split("/")[0], "md5sum.md5"])
-                merged_md5_path = os.path.join(output_location, merged_name)
+                merged_md5_path = os.path.join(output_dir, merged_name)
                 with open(merged_md5_path, "w") as md5out:
                     write_md5 = csv_writer(md5out, delimiter="\t")
                     write_md5.writerows(merged_md5.items())
@@ -793,7 +870,7 @@ class DownloadManager(BaseModule):
                 continue
             folders_with_metadata[folder] = [fi for fi in files if fi not in md5sumlist]
             try:
-                uploaded_md5 = md5_handler(md5sumlist, output_location)
+                uploaded_md5 = md5_handler(md5sumlist, output_dir)
             except (FileNotFoundError, OSError, PermissionError, CsvError) as e:
                 error_text = "Could not merge md5files for %s. Reason: %s"
                 stderr.print(f"[yellow]{error_text % (self.current_folder, str(e))}")
@@ -873,7 +950,7 @@ class DownloadManager(BaseModule):
         """
         metadata_ws = self.metadata_processing.get("excel_sheet")
         header_flag = self.metadata_processing.get("header_flag")
-        output_location = self.platform_storage_folder
+        output_dir = self.platform_storage_folder
         date_and_time = self.batch_id
         exts = self.allowed_file_ext
 
@@ -898,7 +975,7 @@ class DownloadManager(BaseModule):
                 self.include_error(error_text % folder)
                 return
             try:
-                downloaded_metadata = self.get_metadata_file(folder, output_location)
+                downloaded_metadata = self.get_metadata_file(folder, output_dir)
             except (FileNotFoundError, OSError, PermissionError, MetadataError) as err:
                 error_text = "Remote folder %s skipped. Reason: %s"
                 self.include_error(error_text % (folder, err))
@@ -928,7 +1005,7 @@ class DownloadManager(BaseModule):
                 continue
             # Create a temporal name to avoid duplicated filenames
             meta_filename = "_".join([folder.split("/")[-1], "metadata_temp.xlsx"])
-            local_meta = os.path.join(output_location, meta_filename)
+            local_meta = os.path.join(output_dir, meta_filename)
             os.rename(downloaded_metadata, local_meta)
 
             # Taking the main folder for each lab as reference for merge and logs
@@ -967,7 +1044,7 @@ class DownloadManager(BaseModule):
                 folders_with_metadata[temp_folder].extend(filelist)
                 # rename metadata file to avoid filename duplications
                 excel_name = "_".join([folder.split("/")[0], "merged_metadata.xlsx"])
-                merged_excel_path = os.path.join(output_location, excel_name)
+                merged_excel_path = os.path.join(output_dir, excel_name)
                 os.rename(local_meta, merged_excel_path)
                 # Keep a track of the main_folder for next iteration
                 last_main_folder = temp_folder
@@ -1377,6 +1454,7 @@ class DownloadManager(BaseModule):
 
         self.relecov_sftp.close_connection()
         stderr.print(f"Processed {len(processed_folders)} folders: {processed_folders}")
+        self.log.info(f"Processed {len(processed_folders)} folders:{processed_folders}")
         if self.logsum.logs:
             self.log.info(
                 "Printing process summary to %s", self.platform_storage_folder

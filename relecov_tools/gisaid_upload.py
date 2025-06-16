@@ -27,12 +27,12 @@ class GisaidUpload:
     def __init__(
         self,
         user=None,
-        passwd=None,
+        password=None,
         client_id=None,
         token=None,
         gisaid_json=None,
-        fasta_path=None,
-        output_path=None,
+        input_path=None,
+        output_dir=None,
         frameshift=None,
         proxy_config=None,
         single=False,
@@ -49,12 +49,12 @@ class GisaidUpload:
                 )
             else:
                 self.user = user
-            if passwd is None:
+            if password is None:
                 self.passwd = relecov_tools.utils.prompt_password(
                     msg="Enter your password to GISAID"
                 )
             else:
-                self.passwd = passwd
+                self.passwd = password
             if client_id is None:
                 self.client_id = relecov_tools.utils.prompt_password(
                     msg="Enter your client-ID to GISAID. Email clisupport@gisaid.org to request client-ID"
@@ -69,18 +69,18 @@ class GisaidUpload:
             )
         else:
             self.gisaid_json = gisaid_json
-        if output_path is None:
-            self.output_path = relecov_tools.utils.prompt_path(
+        if output_dir is None:
+            self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the folder to store the log files"
             )
         else:
-            self.output_path = output_path
-        if fasta_path is None:
+            self.output_dir = output_dir
+        if input_path is None:
             self.fasta_path = relecov_tools.utils.prompt_path(
                 msg="Select path to fasta file/s"
             )
         else:
-            self.fasta_path = fasta_path
+            self.fasta_path = input_path
         if frameshift is None:
             self.frameshift = relecov_tools.utils.prompt_selection(
                 msg="Select frameshift notification",
@@ -178,9 +178,9 @@ class GisaidUpload:
 
         df_data.replace("not provided", "unknown", inplace=True)
         df_data_comp = self.complete_mand_fields(df_data)
-        df_data_path = os.path.join(self.output_path, "meta_gisaid.csv")
-        if not os.path.exists(self.output_path):
-            os.mkdir(self.output_path)
+        df_data_path = os.path.join(self.output_dir, "meta_gisaid.csv")
+        if not os.path.exists(self.output_dir):
+            os.mkdir(self.output_dir)
         df_data_comp.to_csv(df_data_path, index=False)
         return df_data_path
 
@@ -210,22 +210,21 @@ class GisaidUpload:
             if self.gzip:
                 os.system(
                     "zcat %s > %s/multifasta.fasta"
-                    % (gather_fastas_path, self.output_path)
+                    % (gather_fastas_path, self.output_dir)
                 )
             else:
                 os.system(
                     "cat %s > %s/multifasta.fasta"
-                    % (gather_fastas_path, self.output_path)
+                    % (gather_fastas_path, self.output_dir)
                 )
-            multifasta = "%s/multifasta.fasta" % self.output_path
+            multifasta = "%s/multifasta.fasta" % self.output_dir
 
         else:
             if self.gzip:
                 os.system(
-                    "zcat %s > %s/multifasta.fasta"
-                    % (self.fasta_path, self.output_path)
+                    "zcat %s > %s/multifasta.fasta" % (self.fasta_path, self.output_dir)
                 )
-                multifasta = "%s/multifasta.fasta" % self.output_path
+                multifasta = "%s/multifasta.fasta" % self.output_dir
             else:
                 multifasta = self.fasta_path
         return multifasta
@@ -235,7 +234,7 @@ class GisaidUpload:
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
         virus_name = [name["covv_virus_name"] for name in data]
         multi_gis_path = os.path.join(
-            self.output_path, "processed_multifasta_gisaid.fasta"
+            self.output_dir, "processed_multifasta_gisaid.fasta"
         )
         with open(multifasta) as old_fasta, open(multi_gis_path, "a") as new_fasta:
             records = SeqIO.parse(old_fasta, "fasta")

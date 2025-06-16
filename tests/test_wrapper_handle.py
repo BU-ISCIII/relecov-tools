@@ -22,7 +22,7 @@ def main():
         "user": os.environ["TEST_USER"],
         "password": os.environ["TEST_PASSWORD"],
         "download_option": args.download_option,
-        "output_location": os.environ["OUTPUT_LOCATION"],
+        "output_dir": os.environ["OUTPUT_LOCATION"],
         "target_folders": args.target_folders,
         "sftp_port": os.environ["TEST_PORT"],
     }
@@ -34,7 +34,7 @@ def generate_config_yaml(download_option, target_folders):
     config_data = {
         "download": {
             "user": "",
-            "passwd": "",
+            "password": "",
             "download_option": download_option,
             "target_folders": target_folders,
             "subfolder": "RELECOV",
@@ -61,10 +61,10 @@ def prepare_remote_test(**kwargs):
 
     download_manager = DownloadManager(
         user=kwargs["user"],
-        passwd=kwargs["password"],
+        password=kwargs["password"],
         conf_file=None,
         download_option=kwargs["download_option"],
-        output_location=kwargs["output_location"],
+        output_dir=kwargs["output_dir"],
         target_folders=kwargs["target_folders"],
         subfolder="RELECOV",
     )
@@ -130,15 +130,15 @@ def prepare_remote_test(**kwargs):
     print("Initiating ProcessWrapper")
     wrapper_manager = ProcessWrapper(  # Initialize ProcessWrapper with the config file
         config_file=conf_file,
-        output_folder=kwargs["output_location"],
+        output_dir=kwargs["output_dir"],
     )
 
     print("Update Wrapper params")
     wrapper_manager.download_params = {  # Set download parameters
         "user": os.environ["TEST_USER"],
-        "passwd": os.environ["TEST_PASSWORD"],
+        "password": os.environ["TEST_PASSWORD"],
         "download_option": kwargs["download_option"],
-        "output_location": kwargs["output_location"],
+        "output_dir": kwargs["output_dir"],
         "target_folders": kwargs["target_folders"],
         "sftp_port": kwargs["sftp_port"],
         "subfolder": "RELECOV",

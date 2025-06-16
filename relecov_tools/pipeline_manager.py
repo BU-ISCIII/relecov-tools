@@ -21,21 +21,21 @@ stderr = rich.console.Console(
 class PipelineManager(BaseModule):
     def __init__(
         self,
-        input_folder=None,
+        input=None,
         templates_root=None,
-        output_folder=None,
-        pipeline_conf_file=None,
-        folder_list=None,
+        output_dir=None,
+        config=None,
+        folder_names=None,
     ):
-        super().__init__(output_directory=output_folder, called_module=__name__)
+        super().__init__(output_dir=output_dir, called_module=__name__)
         self.current_date = datetime.date.today().strftime("%Y%m%d")
         self.log.info("Initiating pipeline-manager process")
-        if input_folder is None:
+        if input is None:
             self.input_folder = relecov_tools.utils.prompt_path(
                 msg="Select the folder which contains the fastq file of samples"
             )
         else:
-            self.input_folder = input_folder
+            self.input_folder = input
         if not os.path.exists(self.input_folder):
             self.log.error("Input folder %s does not exist ", self.input_folder)
             stderr.print("[red] Input folder " + self.input_folder + " does not exist")
@@ -52,26 +52,22 @@ class PipelineManager(BaseModule):
                 "[red] Template folder " + self.templates_root + " does not exist"
             )
             sys.exit(1)
-        if pipeline_conf_file is None:
-            pipeline_conf_file = os.path.join(
+        if config is None:
+            config = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "conf",
                 "configuration.json",
             )
-        if not os.path.exists(pipeline_conf_file):
-            self.log.error(
-                "Pipeline config file %s does not exist ", pipeline_conf_file
-            )
-            stderr.print(
-                "[red] Pipeline config file " + pipeline_conf_file + " does not exist"
-            )
+        if not os.path.exists(config):
+            self.log.error("Pipeline config file %s does not exist ", config)
+            stderr.print("[red] Pipeline config file " + config + " does not exist")
             sys.exit(1)
-        conf_settings = relecov_tools.utils.read_json_file(pipeline_conf_file)
+        conf_settings = relecov_tools.utils.read_json_file(config)
         try:
             config_data = conf_settings["pipeline_manager"]
         except KeyError:
-            self.log.error("Invalid pipeline config file %s ", pipeline_conf_file)
-            stderr.print("[red] Invalid pipeline config file " + pipeline_conf_file)
+            self.log.error("Invalid pipeline config file %s ", config)
+            stderr.print("[red] Invalid pipeline config file " + config)
         required_conf = [
             "analysis_user",
             "analysis_group",
@@ -86,20 +82,22 @@ class PipelineManager(BaseModule):
             self.log.error("Invalid pipeline config file. Missing %s", missing_conf)
             stderr.print(f"[red]Invalid pipeline config file. Missing {missing_conf}")
             sys.exit(1)
-        if output_folder is None:
-            output_folder = relecov_tools.utils.prompt_path(
+        if output_dir is None:
+            self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
+        else:
+            self.output_dir = output_dir
+
         # Create the output folder if not exists
         try:
-            os.makedirs(output_folder, exist_ok=True)
+            os.makedirs(self.output_dir, exist_ok=True)
         except OSError or FileExistsError as e:
             self.log.error("Unable to create output folder %s ", e)
             stderr.print("[red] Unable to create output folder ", e)
             sys.exit(1)
-        self.folder_list = folder_list
+        self.folder_list = folder_names
         # Update the output folder with the current date and analysis name
-        self.output_folder = output_folder
         self.out_folder_namevar = f"{self.current_date}_{config_data['analysis_group']}_%s_{config_data['analysis_user']}"
         self.analysis_folder = config_data["analysis_folder"]
         self.copied_sample_folder = config_data["sample_stored_folder"]
@@ -210,14 +208,14 @@ class PipelineManager(BaseModule):
         stderr.print(f"[blue]Found a total of {len(join_validate)} samples")
         return join_validate, latest_date
 
-    def copy_process(self, samples_data, output_folder):
+    def copy_process(self, samples_data, output_dir):
         """Copies all the necessary samples files in the given samples_data list
         to the output folder. Also creates symbolic links into the link folder
         given in config_file.
 
         Args:
             samples_data (list(dict)): samples_data from self.create_samples_data()
-            output_folder (str): Destination folder to copy files
+            output_dir (str): Destination folder to copy files
 
         Returns:
             samp_errors (dict): Dictionary where keys are sequencing_sample_id and values
@@ -225,7 +223,7 @@ class PipelineManager(BaseModule):
         """
         samp_errors = {}
         links_folder = os.path.join(
-            output_folder, self.analysis_folder, self.linked_sample_folder
+            output_dir, self.analysis_folder, self.linked_sample_folder
         )
         os.makedirs(links_folder, exist_ok=True)
         for sample in samples_data:
@@ -240,7 +238,7 @@ class PipelineManager(BaseModule):
             seq_r1_sample_id = sample["sequencing_sample_id"] + "_R1." + ext
             # copy r1 sequencing file into the output folder self.analysis_folder
             sample_raw_r1 = os.path.join(
-                output_folder, self.copied_sample_folder, seq_r1_sample_id
+                output_dir, self.copied_sample_folder, seq_r1_sample_id
             )
             self.log.info("Copying sample %s", sample)
             stderr.print("[blue] Copying sample: ", sample["sequencing_sample_id"])
@@ -261,7 +259,7 @@ class PipelineManager(BaseModule):
             if "sequence_file_path_R2" in sample:
                 seq_r2_sample_id = sample["sequencing_sample_id"] + "_R2." + ext
                 sample_raw_r2 = os.path.join(
-                    output_folder,
+                    output_dir,
                     self.copied_sample_folder,
                     seq_r2_sample_id,
                 )
@@ -400,7 +398,7 @@ class PipelineManager(BaseModule):
                 logtxt = f"[blue]Processing group {group_tag}"
                 stderr.print(logtxt)
             group_outfolder = os.path.join(
-                self.output_folder, self.out_folder_namevar % group_tag
+                self.output_dir, self.out_folder_namevar % group_tag
             )
             if os.path.exists(group_outfolder):
                 msg = f"Analysis folder {group_outfolder} already exists and it will be deleted. Do you want to continue? Y/N"

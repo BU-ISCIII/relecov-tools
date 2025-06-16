@@ -21,11 +21,15 @@ class RelecovMetadata(BaseModule):
         self,
         metadata_file=None,
         sample_list_file=None,
-        output_folder=None,
+        output_dir=None,
         files_folder=None,
+        **kwargs,
     ):
-        super().__init__(output_directory=output_folder, called_module=__name__)
+        super().__init__(output_dir=output_dir, called_module=__name__)
         self.log.info("Initiating read-lab-metadata process")
+        self.sample_list_file = sample_list_file
+        self.files_folder = files_folder
+
         if metadata_file is None:
             self.metadata_file = relecov_tools.utils.prompt_path(
                 msg="Select the excel file which contains metadata"
@@ -51,8 +55,6 @@ class RelecovMetadata(BaseModule):
                 )
             self.files_folder = os.path.abspath(files_folder)
 
-        self.sample_list_file = sample_list_file
-
         if sample_list_file is not None and not os.path.exists(sample_list_file):
             self.log.error(
                 "Sample information file %s does not exist ", sample_list_file
@@ -61,14 +63,18 @@ class RelecovMetadata(BaseModule):
             raise FileNotFoundError(
                 "Sample information file %s does not exist ", sample_list_file
             )
+        else:
+            self.sample_list_file = sample_list_file
 
-        if output_folder is None:
-            self.output_folder = relecov_tools.utils.prompt_path(
+        if output_dir is None:
+            self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
-            self.output_folder = output_folder
+            self.output_dir = output_dir
+
         config_json = ConfigJson(extra_config=True)
+
         # TODO: remove hardcoded schema selection
         relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
         relecov_sch_path = os.path.join(
@@ -77,10 +83,10 @@ class RelecovMetadata(BaseModule):
         self.configuration = config_json
         self.institution_config = config_json.get_configuration("institutions_config")
 
-        out_path = os.path.realpath(self.output_folder)
+        out_path = os.path.realpath(self.output_dir)
         self.lab_code = out_path.split("/")[-2]
         self.logsum = self.parent_log_summary(
-            output_location=self.output_folder, unique_key=self.lab_code, path=out_path
+            output_dir=self.output_dir, lab_code=self.lab_code, path=out_path
         )
 
         with open(relecov_sch_path, "r") as fh:
@@ -118,6 +124,7 @@ class RelecovMetadata(BaseModule):
         self.samples_json_fields = config_json.get_topic_data(
             "lab_metadata", "samples_json_fields"
         )
+        self.unique_sample_id = "sequencing_sample_id"
 
     def get_samples_files_data(self, clean_metadata_rows):
         """Include the fields that would be included in samples_data.json
@@ -156,8 +163,17 @@ class RelecovMetadata(BaseModule):
             self.log.warning("Generating new md5 hashes. This might take a while...")
         j_data = {}
         no_fastq_error = "No R1 fastq file was given for sample %s in metadata"
+        n = 0
         for sample in clean_metadata_rows:
-            sample_id = str(sample.get("sequencing_sample_id"))
+            n += 1
+            sample_id = str(sample.get(self.unique_sample_id))
+            if not sample_id:
+                if sample.get("collecting_lab_sample_id"):
+                    sample_id = sample["collecting_lab_sample_id"]
+                    self.unique_sample_id = "collecting_lab_sample_id"
+                else:
+                    sample_id = sample.get("sequence_file_R1", "").split(".")[0]
+                    self.unique_sample_id = "sequence_file_R1"
             files_dict = {}
             r1_file = sample.get("sequence_file_R1")
             r2_file = sample.get("sequence_file_R2")
@@ -203,13 +219,17 @@ class RelecovMetadata(BaseModule):
                     files_dict["sequence_file_R2_md5"] = safely_calculate_md5(
                         os.path.join(dir_path, r1_file)
                     )
+            if sample_id in j_data:
+                sample_id = "_".join([sample_id, str(n)])
             j_data[sample_id] = files_dict
         if not any(val for val in j_data.values()):
-            raise FileNotFoundError(f"No files found for the samples in {dir_path}")
+            errtxt = f"No files found for the samples in {dir_path}"
+            self.logsum.add_error(entry=errtxt, sample=sample_id)
+            stderr.print(f"[red]{errtxt}")
         try:
             samples_filename = "_".join(["samples_data", self.lab_code + ".json"])
             samples_filename = self.tag_filename(filename=samples_filename)
-            file_path = os.path.join(self.output_folder, samples_filename)
+            file_path = os.path.join(self.output_dir, samples_filename)
             relecov_tools.utils.write_json_to_file(j_data, file_path)
         except Exception:
             self.log.error("Could not output samples_data.json file to output folder")
@@ -234,7 +254,7 @@ class RelecovMetadata(BaseModule):
             samples_json = relecov_tools.utils.read_json_file(self.sample_list_file)
         clean_metadata_rows = []
         for row in valid_metadata_rows:
-            sample_id = str(row["sequencing_sample_id"]).strip()
+            sample_id = str(row[self.unique_sample_id]).strip()
             self.logsum.feed_key(sample=sample_id)
             if sample_id in samples_json.keys():
                 clean_metadata_rows.append(row)
@@ -330,7 +350,7 @@ class RelecovMetadata(BaseModule):
                     if current_value in e_values:
                         m_data[idx][key] = e_values[current_value]
                     else:
-                        sample_id = m_data[idx]["sequencing_sample_id"]
+                        sample_id = m_data[idx][self.unique_sample_id]
                         log_text = f"No ontology found for {current_value} in {key}"
                         self.logsum.add_warning(sample=sample_id, entry=log_text)
                         ontology_errors[key] = ontology_errors.get(key, 0) + 1
@@ -353,12 +373,14 @@ class RelecovMetadata(BaseModule):
         col_name = self.relecov_sch_json["properties"].get(map_field).get("label")
         json_data = json_fields["j_data"]
         for idx in range(len(m_data)):
-            sample_id = str(m_data[idx].get("sequencing_sample_id"))
+            sample_id = str(m_data[idx].get(self.unique_sample_id))
             if m_data[idx].get(map_field):
+                # Remove potential ontology tags from value like [SNOMED:258500001]
+                cleaned_key = re.sub(" [\[].*?[\]]", "", m_data[idx][map_field])
                 try:
                     adding_data = {
                         k: v
-                        for k, v in json_data[m_data[idx][map_field]].items()
+                        for k, v in json_data[cleaned_key].items()
                         if k in json_fields["adding_fields"]
                     }
                     m_data[idx].update(adding_data)
@@ -447,7 +469,7 @@ class RelecovMetadata(BaseModule):
         self.log.info("Processing sample data file")
         s_json = {}
         # TODO: Change sequencing_sample_id for some unique ID used in RELECOV database
-        s_json["map_field"] = "sequencing_sample_id"
+        s_json["map_field"] = self.unique_sample_id
         s_json["adding_fields"] = self.samples_json_fields
         if self.sample_list_file:
             s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
@@ -458,7 +480,7 @@ class RelecovMetadata(BaseModule):
                 f"Samples file {self.sample_list_file} is empty. All samples will be included"
             )
             s_json["j_data"] = self.get_samples_files_data(metadata)
-        batch_id = self.get_batch_id_from_data(s_json["j_data"])
+        batch_id = self.get_batch_id_from_data(list(s_json["j_data"].values()))
         # This will declare self.batch_id in BaseModule() which will be used later
         self.set_batch_id(batch_id)
         metadata = self.process_from_json(metadata, s_json)
@@ -520,17 +542,28 @@ class RelecovMetadata(BaseModule):
                 self.logsum.add_warning(entry=log_text)
                 continue
             if not row[sample_id_col] or "Not Provided" in sample_id:
-                log_text = f"{sample_id_col} not provided in row {row_number}. Skipped"
-                self.logsum.add_warning(entry=log_text)
-                stderr.print(f"[red]{log_text}")
-                continue
+                if row.get("collecting_lab_sample_id"):
+                    sample_id = row["collecting_lab_sample_id"]
+                else:
+                    sample_id = row.get("sequence_file_R1", "").split(".")[0]
+                if not sample_id:
+                    log_text = (
+                        f"{sample_id_col} not provided in row {row_number}. Skipped"
+                    )
+                    self.logsum.add_error(entry=log_text)
+                    stderr.print(f"[red]{log_text}")
+                    continue
+                else:
+                    log_text = f"{sample_id_col} not provided for {sample_id}"
+                    self.logsum.add_error(entry=log_text, sample=sample_id)
+                    stderr.print(f"[red]{log_text}")
             included_sample_ids.append(sample_id)
             for key in row.keys():
                 if header_flag in key:
                     continue
                 value = row[key]
                 # Omitting empty or not provided values
-                if value is None or "not provided" in str(value).lower():
+                if value is None or value == "" or "not provided" in str(value).lower():
                     log_text = f"{key} not provided for sample {sample_id}"
                     self.logsum.add_warning(sample=sample_id, entry=log_text)
                     continue
@@ -559,6 +592,7 @@ class RelecovMetadata(BaseModule):
                     elif re.match(pattern, str(row[key])):
                         row[key] = str(row[key]).replace("/", "-").replace(".", "-")
                         row[key] = re.match(pattern, row[key]).group(0)
+                        value = row[key]
                     else:
                         try:
                             row[key] = str(int(float(str(row[key]))))
@@ -613,10 +647,10 @@ class RelecovMetadata(BaseModule):
         file_code = "_".join(["lab_metadata", self.lab_code]) + ".json"
         file_name = self.tag_filename(filename=file_code)
         stderr.print("[blue]Writting output json file")
-        os.makedirs(self.output_folder, exist_ok=True)
+        os.makedirs(self.output_dir, exist_ok=True)
         # Creating log summary
         self.parent_create_error_summary()
-        file_path = os.path.join(self.output_folder, file_name)
+        file_path = os.path.join(self.output_dir, file_name)
         self.log.info("Writting output json file %s", file_path)
         relecov_tools.utils.write_json_to_file(completed_metadata, file_path)
         return True
