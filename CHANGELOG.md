@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Include traceback from unexpected errors in logfile [#648](https://github.com/BU-ISCIII/relecov-tools/pull/648)
 - Added IRMA quality control and filtering of read-bioinfo-metadata properties based on schema [#649](https://github.com/BU-ISCIII/relecov-tools/pull/649)
 - Updated schema version to 3.1.1 with limits for pcr_ct values and dates [#651](https://github.com/BU-ISCIII/relecov-tools/pull/651)
+- Added enums for autonomous communities and provinces in to 3.1.1 schema version [#655](https://github.com/BU-ISCIII/relecov-tools/pull/655)
 
 #### Fixes
 
