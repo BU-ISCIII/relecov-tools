@@ -23,7 +23,7 @@
         "geo_loc_latitude": "41.6483",
         "geo_loc_longitude": "-0.8830"
     },
-    "Illes Balears": {
+    "Palma De Mallorca": {
         "geo_loc_latitude": "39.5667",
         "geo_loc_longitude": "2.6500"
     },
@@ -39,7 +39,7 @@
         "geo_loc_latitude": "43.3713",
         "geo_loc_longitude": "-8.4188"
     },
-    "Bizkaia": {
+    "Bilbao": {
         "geo_loc_latitude": "43.2569",
         "geo_loc_longitude": "-2.9236"
     },
@@ -67,7 +67,7 @@
         "geo_loc_latitude": "28.4667",
         "geo_loc_longitude": "-16.2500"
     },
-    "Comunidad Foral de Navarra": {
+    "Pamplona": {
         "geo_loc_latitude": "42.8167",
         "geo_loc_longitude": "-1.6500"
     },
@@ -91,7 +91,7 @@
         "geo_loc_latitude": "39.9831",
         "geo_loc_longitude": "-0.0331"
     },
-    "Cantabria": {
+    "Santander": {
         "geo_loc_latitude": "43.4628",
         "geo_loc_longitude": "-3.8050"
     },
