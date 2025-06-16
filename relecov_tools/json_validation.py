@@ -240,7 +240,9 @@ class SchemaValidation(BaseModule):
                         err_field_label = error_field
                     # Format the error message
                     error.message = error.message.replace(error_field, err_field_label)
-                    if (
+                    if error.validator == "pattern" and "date" in error_field:
+                        error_text = f"Error in column {err_field_label}. Please provide a date from 2020 to date"
+                    elif (
                         error.validator == "format" and error.validator_value == "date"
                     ):  # Modification of default text warning for invalid date format.
                         error_text = f"Error in column {err_field_label}: '{error.instance}' is not a valid date format. Valid format 'YYYY-MM-DD'"
@@ -326,20 +328,23 @@ class SchemaValidation(BaseModule):
         tag = "Sample ID given for sequencing"
         # Check if mandatory colum ($tag) is defined in metadata.
         try:
-            id_col = next(
-                idx
-                for idx, cell in enumerate(ws_sheet[1])
-                if cell.value is not None and tag in str(cell.value)
-            )
-        except StopIteration:
+            header_row = [
+                idx + 1
+                for idx, x in enumerate(ws_sheet.values)
+                if tag in x
+            ][0]
+        except IndexError:
             self.log.error(
-                f"Column with tag '{tag}' not found in the second row of the Excel sheet."
+                f"Column with tag '{tag}' not found in any row of the Excel sheet."
             )
-            stderr.print(f"[red] Column with tag '{tag}' not found. Cannot continue.")
+            stderr.print(f"[red]Column with tag '{tag}' not found. Cannot continue.")
             raise
         row_to_del = []
-        row_iterator = ws_sheet.iter_rows(min_row=2, max_row=ws_sheet.max_row)
+        row_iterator = ws_sheet.iter_rows(min_row=header_row, max_row=ws_sheet.max_row)
         consec_empty_rows = 0
+        id_col = [
+            idx for idx, val in enumerate(ws_sheet[header_row]) if val.value == tag
+        ][0]
         for row in row_iterator:
             # if no data in 10 consecutive rows, break loop
             if not any(row[x].value for x in range(10)):
