@@ -1149,7 +1149,7 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
 
     # Get arguments from merged config
     lab_code = args_merged.get("lab_code")
-    output_folder = args_merged.get("output_folder")
+    output_folder = args_merged.get("output_dir")
     files = args_merged.get("files")
 
     all_logs = []
