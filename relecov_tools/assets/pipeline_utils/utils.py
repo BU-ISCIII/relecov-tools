@@ -158,6 +158,7 @@ class LongTableParse:
                 )
         for key, values in samp_dict.items():
             j_dict = {"sample_name": key, "bioinformatics_analysis_date": analysis_date}
+            j_dict["file_name"] = "long_table"
             j_dict["variants"] = values
             j_list.append(j_dict)
         return j_list
@@ -241,32 +242,38 @@ def parse_long_table(files_list, file_tag, pipeline_name, output_folder=None):
 
     # Handling long table data
     if len(files_list) == 1:
-        files_list_processed = files_list[0]
-        if not os.path.isfile(files_list_processed):
+        csv_path = files_list[0]
+        if not os.path.isfile(csv_path):
             method_log_report.update_log_report(
-                method_name, "error", f"{files_list_processed} given file is not a file"
+                method_name, "error", f"{csv_path} is not a valid file"
             )
             sys.exit(method_log_report.print_log_report(method_name, ["error"]))
 
-        long_table = LongTableParse(
-            file_path=files_list_processed,
+        parser = LongTableParse(
+            file_path=csv_path,
             pipeline_name=pipeline_name,
             output_folder=output_folder,
         )
         # Parsing long table data and saving it
-        long_table_data = long_table.parsing_csv()
+        long_table_json = parser.parsing_csv()
+
         # Saving long table data into a file
-        long_table.save_to_file(long_table_data, file_tag)
+        parser.save_to_file(long_table_json, file_tag)
+
         stderr.print("[green]\tProcess completed")
         log.info("Long table process completed")
+
+        return long_table_json
     elif len(files_list) > 1:
         method_log_report.update_log_report(
             method_name,
             "warning",
             f"Found {len(files_list)} variants_long_table files. This version is unable to process more than one variants long table each time.",
         )
-    # This needs to return none to avoid being parsed by method mapping-over-table
-    return None
+    else:
+        method_log_report.update_log_report(
+            method_name, "error", "No valid variants_long_table file found."
+        )
 
 
 def extract_consensus_stats(files_list, file_tag, pipeline_name, output_folder=None):
