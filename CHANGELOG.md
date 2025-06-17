@@ -8,6 +8,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Credits
 
+- [Sara Monzon](https://github.com/saramonzon)
+
+#### Added enhancements
+
+#### Fixes
+
+- Fixed output_folder to output_dif in logs_to_excel params [#658](https://github.com/BU-ISCIII/relecov-tools/pull/658)
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [1.5.5] - 2025-06-16 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.5
+
+### Credits
+
 - [Pablo Mata](https://github.com/shettland)
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Jaime Ozáez](https://github.com/jaimeozaez)
