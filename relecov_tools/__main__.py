@@ -323,6 +323,7 @@ def download(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -379,6 +380,7 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -438,6 +440,7 @@ def validate(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -615,6 +618,7 @@ def send_mail(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -659,6 +663,7 @@ def map(ctx, origin_schema, json_file, destination_schema, schema_file, output_d
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -718,6 +723,7 @@ def upload_to_ena(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -798,6 +804,7 @@ def upload_to_gisaid(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -859,6 +866,7 @@ def update_db(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -919,6 +927,7 @@ def read_bioinfo_metadata(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -964,6 +973,7 @@ def metadata_homogeneizer(ctx, institution, directory, output_dir):
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1025,6 +1035,7 @@ def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_name
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1107,6 +1118,7 @@ def build_schema(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1197,6 +1209,7 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1237,6 +1250,7 @@ def wrapper(ctx, config_file, output_dir):
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1268,6 +1282,7 @@ def upload_results(ctx, user, password, batch_id, template_path, project):
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1317,6 +1332,7 @@ def add_extra_config(ctx, config_name, config_file, force, clear_config):
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
