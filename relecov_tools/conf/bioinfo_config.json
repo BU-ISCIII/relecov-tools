@@ -66,6 +66,7 @@
             "header_row_idx": 1,
             "filepath_name": "long_table_path",
             "required": true,
+            "extra_dict": true,
             "multiple_samples": true,
             "split_by_batch": true,
             "function": "utils/parse_long_table",
@@ -106,10 +107,10 @@
             "fn": "summary_variants_metrics_mqc.csv",
             "sample_col_idx": 1,
             "header_row_idx": 1,
+            "split_by_batch": true,
             "multiple_samples": true,
             "required": true,
             "function": null,
-            "extract": true,
             "content": {
                 "ns_per_100_kbp": "# Ns per 100kb consensus",
                 "number_of_reads_sequenced": "# Input reads"
@@ -229,6 +230,7 @@
             "header_row_idx": 1,
             "filepath_name": "long_table_path",
             "required": true,
+            "extra_dict": true,
             "multiple_samples": true,
             "split_by_batch": true,
             "function": "utils/parse_long_table",
