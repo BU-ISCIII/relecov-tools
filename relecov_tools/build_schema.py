@@ -354,9 +354,7 @@ class SchemaBuilder(BaseModule):
         )
         return draft_template
 
-    def standard_jsonschema_object(
-        self, data_dict, target_key, remove_ontology=False
-    ):
+    def standard_jsonschema_object(self, data_dict, target_key, remove_ontology=False):
         """
         Create a standard JSON Schema object for a given key in the data dictionary.
 
