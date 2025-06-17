@@ -355,7 +355,7 @@ class SchemaBuilder(BaseModule):
         return draft_template
 
     def standard_jsonschema_object(
-        seschemalf, data_dict, target_key, remove_ontology=False
+        self, data_dict, target_key, remove_ontology=False
     ):
         """
         Create a standard JSON Schema object for a given key in the data dictionary.
@@ -379,7 +379,7 @@ class SchemaBuilder(BaseModule):
         if target_key in ["enum", "examples"]:
             value = handle_nan(data_dict.get(target_key, ""))
             # if no value, json key won't be necessary, then avoid adding it
-            if len(value) > 0:
+            if len(value) > 0 or target_key == "examples":
                 items = value.split("; ")
                 if remove_ontology and target_key == "enum":
                     items = [re.sub(r"\s*\[.*?\]", "", item).strip() for item in items]
