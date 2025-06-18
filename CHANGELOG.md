@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Corrected some geo_loc_region names  [#674](https://github.com/BU-ISCIII/relecov-tools/pull/674)
 - Fixed error when subfolder was a part of the main_folder name e.g. FOLDER_RELECOV. Fixes #646 [#679](https://github.com/BU-ISCIII/relecov-tools/pull/679)
 - Fixed wrapper crash when there was no invalid samples for a given folder. Fixes #678 [#679](https://github.com/BU-ISCIII/relecov-tools/pull/679)
+- Added a clear error message when library_layout is missing in the metadata. [#680](https://github.com/BU-ISCIII/relecov-tools/pull/680)
 
 #### Changed
 
