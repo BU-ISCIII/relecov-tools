@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Sara Monzon](https://github.com/saramonzon)
+- [Jaime Ozáez](https://github.com/jaimeozaez)
 
 #### Added enhancements
 
@@ -17,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed output_folder to output_dif in logs_to_excel params [#658](https://github.com/BU-ISCIII/relecov-tools/pull/658)
 - Fixed an issue where no message was printed to stdout/stderr when an exception was raised, making debugging harder [#672](https://github.com/BU-ISCIII/relecov-tools/pull/672)
 - Fixed logic to ensure that example entries are not silently skipped when empty — now they are properly validated or reported [#672](https://github.com/BU-ISCIII/relecov-tools/pull/672)
+- Corrected some geo_loc_region names  [#674](https://github.com/BU-ISCIII/relecov-tools/pull/674)
 
 #### Changed
 
