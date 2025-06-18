@@ -25,6 +25,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Changed
 
+- Forced log-summary and report.xlsx files to be saved in --log-path if given [#681](https://github.com/BU-ISCIII/relecov-tools/pull/681)
+
 #### Removed
 
 ### Requirements
