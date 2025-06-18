@@ -202,7 +202,8 @@ class ProcessWrapper(BaseModule):
         stderr.print(f"[green]Merged logs from all processes in {local_folder}")
         self.log.info(f"Merged logs from all processes in {local_folder}")
         subfolder = getattr(self.download_manager, "subfolder", None)
-        if subfolder and subfolder not in key:
+
+        if subfolder and subfolder not in os.path.split(key):
             main_folder = os.path.join(key, subfolder)
         else:
             main_folder = key
