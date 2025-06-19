@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Added enhancements
 
+- Included sftp files missing in metadata as samples in log_summary so they appear in final report [#685](https://github.com/BU-ISCIII/relecov-tools/pull/685)
+
 #### Fixes
 
 - Fixed output_folder to output_dif in logs_to_excel params [#658](https://github.com/BU-ISCIII/relecov-tools/pull/658)
