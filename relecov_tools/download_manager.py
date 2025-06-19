@@ -665,7 +665,7 @@ class DownloadManager(BaseModule):
                 self.include_warning(error_text1 % str(mismatch_files))
                 miss_text = "This file does not have any associated sample in metadata"
                 for file in mismatch_files:
-                    self.include_warning(sample=file, entry=miss_text)
+                    self.include_error(sample=file, entry=miss_text)
             if mismatch_rev:
                 error_text2 = "Files in metadata missing in folder: %s"
                 self.include_warning(error_text2 % str(mismatch_rev))
