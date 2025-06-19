@@ -5,6 +5,7 @@ import sys
 import os
 import openpyxl
 from datetime import datetime
+from collections import defaultdict
 
 import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
@@ -85,131 +86,114 @@ class SchemaValidation(BaseModule):
         except AttributeError as e:
             raise ValueError(f"Invalid json file content in {json_file}: {e}")
         self.set_batch_id(batch_id)
-
         self.metadata = metadata
+
+        # TODO: Include this field in configuration.json
+        sample_id_ontology = "GENEPIO:0000079"
         try:
-            self.sample_id_field = self.get_sample_id_field()
+            self.sample_id_field = SchemaValidation.get_field_from_schema(
+                sample_id_ontology, self.json_schema
+            )
         except ValueError as e:
             self.sample_id_field = None
-            self.SAMPLE_FIELD_ERROR = str(e)
-        conf_subdata = config_json.get_topic_data("sftp_handle", "metadata_processing")
-        if excel_sheet is None:
-            try:
-                self.excel_sheet = conf_subdata["excel_sheet"]
-            except KeyError:
-                self.log.error("Default metadata sheet name should be in config file")
-                raise
-        else:
-            self.excel_sheet = excel_sheet
-
-        # Parse file containing sample IDs registry
-        if registry is not None and relecov_tools.utils.file_exists(registry):
-            self.registry_path = registry
-        else:
-            config_json = ConfigJson(extra_config=True)
-            try:
-                default_path = config_json.get_topic_data(
-                    "validate_config", "default_sample_id_registry"
-                )
-            except KeyError:
-                default_path = None
-
-            if default_path and relecov_tools.utils.file_exists(default_path):
-                self.registry_path = default_path
-            else:
-                stderr.print(
-                    "[yellow]No valid ID registry found. Please select the file manually."
-                )
-                prompted_path = relecov_tools.utils.prompt_path(
-                    "Select the JSON file with registered unique sample IDs"
-                )
-                if relecov_tools.utils.file_exists(prompted_path):
-                    self.registry_path = prompted_path
-                else:
-                    stderr.print(
-                        "[red]No valid ID registry file could be found or selected."
-                    )
-                    sys.exit(1)
-
-        # Read id registry file
-        try:
-            self.id_registry = relecov_tools.utils.read_json_file(self.registry_path)
-        except Exception as e:
-            stderr.print(f"[red]Failed to read ID registry JSON: {e}")
-            self.log.error(f"Failed to read ID registry JSON: {e}")
-            raise
+            self.log.error(f"Could not extract sample_id_field: {e}. Set to None")
+        self.excel_sheet = excel_sheet
+        self.registry_path = registry
 
     def validate_schema(self):
-        """Validate json schema against draft"""
+        """Validate json schema against draft and check if all properties have label"""
         relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(
             self.json_schema, "2020-12"
         )
+        for prop in self.json_schema["properties"]:
+            if "label" not in prop:
+                self.log.warning(f"Property {prop} is missing 'label'")
+        return
 
-    def get_sample_id_field(self):
-        """Find the name of the field used to track the samples in the given schema"""
-        # TODO: Include this field in configuration.json
-        sample_id_ontology = "GENEPIO:0000079"
+    @staticmethod
+    def get_field_from_schema(ontology, schema_json):
+        """Find the name of the field used to track the samples in the given schema
+        using its ontology value
+
+        Args:
+            field (str): Name of the field
+            schema_json (dict): Loaded json schema as a dictionary
+
+        Returns:
+            sample_id_field (str): Name of the FIRST field that matches the given ontology
+        """
         ontology_match = [
             x
-            for x, y in self.json_schema["properties"].items()
-            if y.get("ontology") == sample_id_ontology
+            for x, y in schema_json["properties"].items()
+            if y.get("ontology") == ontology
         ]
         if ontology_match:
             sample_id_field = ontology_match[0]
         else:
-            error_text = f"No valid sample ID field ({sample_id_ontology}) in schema"
+            error_text = f"No valid sample ID field ({ontology}) in schema"
             raise ValueError(error_text)
         return sample_id_field
 
-    def validate_instances(self):
-        """Validate data instances against a validated JSON schema"""
+    @staticmethod
+    def validate_instances(json_data, json_schema, sample_id_field=None):
+        """Validate data instances against a validated JSON schema
+
+        Args:
+            json_data (list(dict)): List of samples with processed metadata
+            json_schema (dict): Loaded JSON schema as a dictionary
+            sample_id_field (str, optional): Metadata field used as ID to
+            identify the samples associated with each error
+
+        Returns:
+            validated_json_data (list(dict)): List of successfully validated samples
+            errors (dict): Custom dict used to summarize validation errors.
+            '''
+                errors = {
+                    "fields": {
+                        'host_age is a required property': 'host_age'
+                        'Collection_date is not a valid date': 'Collection_date'
+                    },
+                    "samples": {
+                        'host_age is a required property': ["sample_1", "sample_2"]
+                        'Collection_date is not a valid date': ["sample_1"]
+                    }
+                }
+            '''
+        """
+
+        def get_property_label(schema_props, error_field):
+            """Extract the label for the given property given a list of schema properties"""
+            try:
+                err_field_label = schema_props[error_field]["label"]
+            except KeyError:
+                return error_field
+            return err_field_label
 
         # Create validator
-        validator = Draft202012Validator(
-            self.json_schema, format_checker=FormatChecker()
-        )
-        schema_props = self.json_schema["properties"]
+        validator = Draft202012Validator(json_schema, format_checker=FormatChecker())
+        schema_props = json_schema["properties"]
 
         validated_json_data = []
         invalid_json = []
-        errors = {}
-        error_keys = {}
-
-        if self.sample_id_field is None:
-            log_text = f"Logs keys set to None. Reason: {self.SAMPLE_FIELD_ERROR}"
-            self.logsum.add_warning(sample=self.sample_id_field, entry=log_text)
+        errors = defaultdict(dict)
 
         stderr.print("[blue] Start processing the JSON file")
-        self.log.info("Start processing the JSON file")
-
-        # Prepare ID registry (validated samples will be asigned with an unique ID)
-        new_ids_to_save = {}
 
         # Start validation
-        for item_row in self.json_data:
-            sample_id_value = item_row.get(self.sample_id_field)
+        for idx, item_row in enumerate(json_data):
+            sample_id_value = item_row.get(sample_id_field, f"UnknownSample#{idx}")
 
             # Collect all errors (don't raise immediately)
             validation_errors = list(validator.iter_errors(item_row))
 
             # Run the custom validator to check if errors should be ignored
             validation_errors = relecov_tools.assets.schema_utils.custom_validators.validate_with_exceptions(
-                self.json_schema, item_row, validation_errors
+                json_schema, item_row, validation_errors
             )
+
             if not validation_errors:
-                # If sample has validated, then assign an unique id
-                if "unique_sample_id" not in item_row:
-                    new_id = self.generate_incremental_unique_id(
-                        {**self.id_registry, **new_ids_to_save}
-                    )
-                    item_row["unique_sample_id"] = new_id
-                    new_ids_to_save[new_id] = {
-                        "sequencing_sample_id": sample_id_value,
-                        "lab_code": self.lab_code,
-                        "generated_at": datetime.now().isoformat(timespec="seconds"),
-                    }
                 validated_json_data.append(item_row)
-                self.logsum.feed_key(sample=sample_id_value)
+
             else:
                 # Process remaining errors
                 for error in validation_errors:
@@ -258,68 +242,71 @@ class SchemaValidation(BaseModule):
                         elif error.absolute_path:
                             error_field = str(error.absolute_path[0])
                         else:
-                            error_field = error.validator or error.message
+                            error_field = error.validator + " error: " + error.message
                     except Exception as ex:
-                        self.log.warning(
-                            f"Error extracting error_field from: {error}, {ex}"
-                        )
+                        errtxt = f"Error extracting error_field from: {error.validator_value}, {ex}"
                         error_field = str(error)
+                        errors["fields"][errtxt] = error.validator_value
+                        errors["samples"].setdefault(errtxt, []).append(sample_id_value)
+                        continue
 
                     # Try to get the human-readable label from the schema
-                    try:
-                        err_field_label = schema_props[error_field]["label"]
-                    except KeyError:
-                        self.log.error(f"Could not extract label for {error_field}")
-                        err_field_label = error_field
+                    err_field_label = get_property_label(schema_props, error_field)
                     # Format the error message
                     error.message = error.message.replace(error_field, err_field_label)
                     if error.validator == "pattern" and "date" in error_field:
                         error_text = f"Error in column {err_field_label}. Please provide a date from 2020 to date"
+                        error.message = error_text
                     elif (
                         error.validator == "format" and error.validator_value == "date"
                     ):  # Modification of default text warning for invalid date format.
-                        error_text = f"Error in column {err_field_label}: '{error.instance}' is not a valid date format. Valid format 'YYYY-MM-DD'"
+                        error_text = f"Error in column {err_field_label}: '{error.instance}' is not a valid date. Check if it exists or if its format is 'YYYY-MM-DD'"
+                        error.message = error_text
                     else:
                         error_text = (
                             f"Error in column {err_field_label}: {error.message}"
                         )
 
                     # Log errors for summary
-                    error_keys[error.message] = error_field
-                    errors[error.message] = errors.get(error.message, 0) + 1
-                    self.logsum.add_error(sample=sample_id_value, entry=error_text)
+                    errors["fields"][error_text] = error_field
+                    errors["samples"].setdefault(error_text, []).append(sample_id_value)
 
                 # Add the invalid row to the list
                 invalid_json.append(item_row)
+        return validated_json_data, errors
 
-        # For samples that are valid, save its new unique ID in the registry
-        if new_ids_to_save:
-            self.save_new_ids(new_ids_to_save)
+    def summarize_errors(self, errors):
+        """Summarize errors from validation process and add them to log_summary
 
-        # Summarize errors
-        stderr.print("[blue] --------------------")
-        stderr.print("[blue] VALIDATION SUMMARY")
-        stderr.print("[blue] --------------------")
-        self.log.info("Validation summary:")
-        max_length = 250
-        for error_type, count in errors.items():
-            field_with_error = error_keys[error_type]
-            if (
-                "is not a 'date'" in error_type
-            ):  # Modification of default text warning for invalid date format.
-                error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type.split()[0]} is not a valid date format. Valid format 'YYYY-MM-DD"
-            else:
-                error_text = f"{count} samples failed validation for {field_with_error}:\n{error_type}"
+        Args:
+            errors (dict): Error dict from validate_instances()
+        """
+
+        def truncate_error_message(error_text, max_length):
             truncated_msg = (
                 error_text[:max_length] + "..."
                 if len(error_text) > max_length
                 else error_text
             )
+            return truncated_msg
+
+        stderr.print("[blue] --------------------")
+        stderr.print("[blue] VALIDATION SUMMARY")
+        stderr.print("[blue] --------------------")
+        self.log.info("Validation summary:")
+        max_length = 250
+        for error_type, failed_samples in errors["samples"].items():
+            count = len(failed_samples)
+            field_with_error = errors["fields"][error_type]
+            error_text = f"{count} samples failed validation for {field_with_error}: {error_type}"
+            truncated_msg = truncate_error_message(error_text, max_length)
             self.logsum.add_warning(entry=truncated_msg)
+            for failsamp in failed_samples:
+                err_msg = truncate_error_message(error_type, max_length)
+                self.logsum.add_error(sample=failsamp, entry=err_msg)
             stderr.print(f"[red]{truncated_msg}")
             stderr.print("[red] --------------------")
-
-        return validated_json_data, invalid_json
+        return
 
     def create_invalid_metadata(self, invalid_json, metadata, out_folder):
         """Create a new sub excel file having only the samples that were invalid.
@@ -418,8 +405,88 @@ class SchemaValidation(BaseModule):
         file_name = "_".join(["validated", os.path.basename(self.json_data_file)])
         file_path = os.path.join(out_folder, file_name)
         self.log.info("Saving Json file with the validated samples in %s", file_path)
+        stderr.print(f"Saving Json file with the validated samples in {file_path}")
         relecov_tools.utils.write_json_to_file(valid_json_data, file_path)
         return
+
+    def validate_registry_file(self):
+        """Validate specified registry file path. Try to get it from config if invalid."""
+        # Parse file containing sample IDs registry
+        if self.registry_path is not None and relecov_tools.utils.file_exists(
+            os.path.abspath(os.path.expanduser(self.registry_path))
+        ):
+            self.registry_path = os.path.abspath(os.path.expanduser(self.registry_path))
+        else:
+            config_json = ConfigJson(extra_config=True)
+            try:
+                default_path = config_json.get_topic_data(
+                    "validate_config", "default_sample_id_registry"
+                )
+            except KeyError:
+                default_path = None
+
+            if default_path and relecov_tools.utils.file_exists(default_path):
+                self.registry_path = default_path
+            else:
+                stderr.print(
+                    "[yellow]No valid ID registry found. Please select the file manually."
+                )
+                prompted_path = relecov_tools.utils.prompt_path(
+                    "Select the JSON file with registered unique sample IDs"
+                )
+                if relecov_tools.utils.file_exists(prompted_path):
+                    self.registry_path = prompted_path
+                else:
+                    stderr.print(
+                        "[red]No valid ID registry file could be found or selected."
+                    )
+                    raise FileNotFoundError("No valid ID registry file could be found")
+
+        # Read id registry file
+        try:
+            self.id_registry = relecov_tools.utils.read_json_file(self.registry_path)
+        except Exception as e:
+            stderr.print(f"[red]Failed to read ID registry JSON: {e}")
+            self.log.error(f"Failed to read ID registry JSON: {e}")
+            raise
+        return
+
+    def validate_invexcel_args(self):
+        """Validate arguments needed to create invalid_samples.xlsx file"""
+        if self.excel_sheet is None:
+            conf_subdata = ConfigJson().get_topic_data(
+                "sftp_handle", "metadata_processing"
+            )
+            try:
+                self.excel_sheet = conf_subdata["excel_sheet"]
+            except KeyError:
+                self.log.error("Default metadata sheet name should be in config file")
+                raise
+        return
+
+    def update_unique_id_registry(self, valid_json_data):
+        """Prepare ID registry. Validated samples will be asigned with an unique ID"""
+        new_ids_to_save = {}
+        for sample in valid_json_data:
+            # If sample has validated, then assign an unique id
+            if "unique_sample_id" not in sample:
+                new_id = self.generate_incremental_unique_id(
+                    {**self.id_registry, **new_ids_to_save}
+                )
+                sample["unique_sample_id"] = new_id
+            # If sample has validated, then assign an unique id
+            if "unique_sample_id" not in sample:
+                new_id = self.generate_incremental_unique_id(
+                    {**self.id_registry, **new_ids_to_save}
+                )
+                sample["unique_sample_id"] = new_id
+                new_ids_to_save[new_id] = {
+                    "sequencing_sample_id": sample["sequencing_sample_id"],
+                    "lab_code": self.lab_code,
+                    "generated_at": datetime.now().isoformat(timespec="seconds"),
+                }
+        self.save_new_ids(new_ids_to_save)
+        return valid_json_data
 
     def generate_incremental_unique_id(self, current_registry, prefix="RLCV"):
         """Generates an incremental unique ID using as baseline the latest record
@@ -457,18 +524,34 @@ class SchemaValidation(BaseModule):
         """Validate samples from metadata, create an excel with invalid samples,
         and a json file with the validated ones
         """
+        self.log.info("Validate the given schema")
         self.validate_schema()
-        valid_json_data, invalid_json = self.validate_instances()
-        if not invalid_json:
-            stderr.print("[green]Sucessful validation, no invalid file created!!")
-            self.log.info("Sucessful validation, no invalid file created.")
-        else:
+        self.log.info("Starting validation process of JSON file against schema")
+        valid_json_data, errors = SchemaValidation.validate_instances(
+            self.json_data, self.json_schema
+        )
+        for sample in valid_json_data:
+            sample_id_value = sample.get(self.sample_id_field)
+            self.logsum.feed_key(sample=sample_id_value)
+        self.summarize_errors(errors)
+
+        # Add all valid samples to the unique_id registry file
+        self.validate_registry_file()
+        valid_json_data = self.update_unique_id_registry(valid_json_data)
+
+        invalid_json = [x for x in self.json_data if x not in valid_json_data]
+        if invalid_json:
             log_text = "Summary: %s valid and %s invalid samples"
             self.logsum.add_warning(
                 entry=log_text % (len(valid_json_data), len(invalid_json))
             )
+            self.validate_invexcel_args()
             self.create_invalid_metadata(invalid_json, self.metadata, self.out_folder)
+        else:
+            stderr.print("[green]Sucessful validation, no invalid file created!!")
+            self.log.info("Sucessful validation, no invalid file created.")
         if valid_json_data:
+            self.log.info("Creating json_file with validated samples...")
             self.create_validated_json(valid_json_data, self.out_folder)
         else:
             log_text = "All the samples were invalid. No valid file created"
