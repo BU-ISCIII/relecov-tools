@@ -174,7 +174,6 @@ class SchemaValidation(BaseModule):
         schema_props = json_schema["properties"]
 
         validated_json_data = []
-        invalid_json = []
         errors = defaultdict(dict)
 
         stderr.print("[blue] Start processing the JSON file")
@@ -272,7 +271,6 @@ class SchemaValidation(BaseModule):
                     errors["samples"].setdefault(error_text, []).append(sample_id_value)
 
                 # Add the invalid row to the list
-                invalid_json.append(item_row)
         return validated_json_data, errors
 
     def summarize_errors(self, errors):
@@ -533,7 +531,8 @@ class SchemaValidation(BaseModule):
         for sample in valid_json_data:
             sample_id_value = sample.get(self.sample_id_field)
             self.logsum.feed_key(sample=sample_id_value)
-        self.summarize_errors(errors)
+        if errors:
+            self.summarize_errors(errors)
 
         # Add all valid samples to the unique_id registry file
         self.validate_registry_file()
