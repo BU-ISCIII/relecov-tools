@@ -23,10 +23,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed error when subfolder was a part of the main_folder name e.g. FOLDER_RELECOV. Fixes #646 [#679](https://github.com/BU-ISCIII/relecov-tools/pull/679)
 - Fixed wrapper crash when there was no invalid samples for a given folder. Fixes #678 [#679](https://github.com/BU-ISCIII/relecov-tools/pull/679)
 - Added a clear error message when library_layout is missing in the metadata. [#680](https://github.com/BU-ISCIII/relecov-tools/pull/680)
+- AnyOf error messages are now correctly managed in validation process [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
+- Fixed incorrect sample count in validate summary message for date fields [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
 
 #### Changed
 
 - Forced log-summary and report.xlsx files to be saved in --log-path if given [#681](https://github.com/BU-ISCIII/relecov-tools/pull/681)
+- Validate_instances method is now an static method and does not require SchemaValidation initialization [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
+- Summarize_errors is now an independent function instead of being part of validate_instances method [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
+- Unique_id generation is now an independent function instead of being part of validate_instances method [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
+- Param validation to update unique_id_registry has been moved out of class _\_init__ [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
+- Param validation to generate invalid_samples.xlsx file has been moved out of class _\_init__ [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
+- Method get_sample_id_field is now SchemaValidation static method to get a field from a given schema by its ontology [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
+- Method validate_schema now checks if each property has label and gives warning if not present [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
 
 #### Removed
 
