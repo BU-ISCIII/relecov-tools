@@ -217,11 +217,44 @@ class SchemaValidation(BaseModule):
                         if error.validator == "required":
                             error_field = list(error.message.split("'"))[1]
                         elif error.validator == "anyOf":
-                            missing_fields = []
-                            for cond in error.validator_value:
-                                if isinstance(cond, dict) and "required" in cond:
-                                    missing_fields.extend(cond["required"])
-                            error_field = " or ".join(missing_fields)
+                            # AnyOf errors include multiple clauses so they need some processing
+                            multi_errdict = {}
+                            for suberror in error.context:
+                                error_type = suberror.validator
+                                suberr_label = get_property_label(
+                                    schema_props, suberror.validator_value[0]
+                                )
+                                label_message = suberror.message.replace(
+                                    suberror.validator_value[0], suberr_label
+                                )
+                                if suberror.validator in multi_errdict:
+                                    multi_errdict[error_type].append(
+                                        (suberr_label, label_message)
+                                    )
+                                else:
+                                    multi_errdict[error_type] = [
+                                        (suberr_label, label_message)
+                                    ]
+                            error_field = ""
+                            multi_message = {}
+                            # Combine the different error messages from this AnyOf in a single message
+                            for errtype, fieldtups in multi_errdict.items():
+                                failed_fields = " or ".join([t[0] for t in fieldtups])
+                                clean_message = (
+                                    fieldtups[0][1]
+                                    .replace(fieldtups[0][0], "")
+                                    .strip("'")
+                                )
+                                if error_field:
+                                    error_field = error_field + " and"
+                                error_field = error_field + failed_fields
+                                multi_message[errtype] = (
+                                    f"{failed_fields}: {clean_message}"
+                                )
+                            # Override error.message with the combination of the sub-messages
+                            error.message = "Any of the following: " + " --- ".join(
+                                multi_message.values()
+                            )
                         elif error.absolute_path:
                             error_field = str(error.absolute_path[0])
                         else:
