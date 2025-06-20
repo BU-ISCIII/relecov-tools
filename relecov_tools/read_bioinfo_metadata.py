@@ -619,7 +619,7 @@ class BioinfoMetadata(BaseModule):
             return "Not Provided [SNOMED:434941000124101]"
         return raw_val
 
-    def add_bioinfo_files_path(self, files_found_dict, j_data):
+    def add_bioinfo_files_path(self, files_found_dict, hex, j_data):
         """Adds file paths essential for handling and mapping bioinformatics metadata to the j_data.
         For each sample in j_data, the function assigns the corresponding file path based on the identified files in files_found_dict.
 
@@ -671,11 +671,21 @@ class BioinfoMetadata(BaseModule):
                             self.software_config[key].get("extract")
                             or self.software_config[key].get("function")
                         ):
-                            analysis_results_path = os.path.join(
-                                base_cod_path,
-                                "analysis_results",
-                                os.path.basename(paths),
-                            )
+                            if self.software_config[key].get("split_by_batch"):
+                                base, ext = base, ext = os.path.splitext(os.path.basename(paths))
+                                batchid = row["batch_id"]
+                                new_fname = f"{base}_{batchid}_{hex}{ext}"
+                                analysis_results_path = os.path.join(
+                                    base_cod_path,
+                                    "analysis_results",
+                                    new_fname,
+                                )
+                            else:
+                                analysis_results_path = os.path.join(
+                                    base_cod_path,
+                                    "analysis_results",
+                                    os.path.basename(paths),
+                                )
                             analysis_results_paths.append(analysis_results_path)
                         else:
                             analysis_results_paths = file_path
@@ -827,7 +837,13 @@ class BioinfoMetadata(BaseModule):
             sample_colpos = self.get_sample_idx_colpos(key)
             for file in files:
                 try:
-                    extract_batch_rows_to_file(file, lab_code, file_tag)
+                    if self.software_config[key].get("filepath_name"):
+                        filepath_key = self.software_config[key].get("filepath_name")
+                        new_filename = os.path.basename(list({row[filepath_key] for row in batch_data})[0])
+                    else:
+                        base, ext = os.path.splitext(os.path.basename(file))
+                        new_filename = f"{base}_{file_tag}{ext}"
+                    extract_batch_rows_to_file(file, new_filename)
                 except Exception as e:
                     if self.software_config[key].get("required"):
                         log_type = "error"
@@ -990,7 +1006,7 @@ class BioinfoMetadata(BaseModule):
         # Adding files path
         stderr.print("[blue]Adding files path to read lab metadata")
         self.log.info("Adding files path to read lab metadata")
-        self.j_data = self.add_bioinfo_files_path(files_found_dict, self.j_data)
+        self.j_data = self.add_bioinfo_files_path(files_found_dict, self.hex, self.j_data)
 
         module = eval(f"relecov_tools.assets.pipeline_utils.{self.software_name}")
         try:
