@@ -1014,11 +1014,8 @@ class BioinfoMetadata(BaseModule):
                 qc_func = eval(
                     f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation"
                 )
-                qc_data = qc_func(self.j_data)
-                for sample in self.j_data:
-                    sample_id = sample.get("sequencing_sample_id")
-                    if sample_id in qc_data:
-                        sample.update(qc_data[sample_id])
+                self.j_data = qc_func(self.j_data)
+
         except (AttributeError, NameError, TypeError, ValueError) as e:
             self.update_all_logs(
                 self.create_bioinfo_file.__name__,
