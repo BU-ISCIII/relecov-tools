@@ -87,11 +87,11 @@ def quality_control_evaluation(data):
     thresholds = {
         "per_sgene_ambiguous": ("<", 10.0),
         "per_sgene_coverage": (">", 98.0),
-        "per_ldmutations": (">", 60.0),  # except if 'Not Evaluable'
+        "per_ldmutations": (">", 60.0),
         "number_of_sgene_frameshifts": ("==", 0),
         "number_of_unambiguous_bases": (">", 24000),
         "number_of_Ns": ("<", 5000),
-        "pass_reads": (">", 50000),
+        "per_genome_greater_10x": (">", 90.0),
         "per_reads_host": ("<", 20.0),
     }
 
