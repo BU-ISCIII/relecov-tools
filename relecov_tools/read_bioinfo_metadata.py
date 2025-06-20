@@ -809,7 +809,7 @@ class BioinfoMetadata(BaseModule):
             output_dir (str): Output location for the generated tabular file
         """
 
-        def extract_batch_rows_to_file(file, lab_code, file_tag):
+        def extract_batch_rows_to_file(file, new_filename):
             """Create a new table file only with rows matching samples in batch_data"""
             extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
             file_extension = os.path.splitext(file)[1]
@@ -820,8 +820,6 @@ class BioinfoMetadata(BaseModule):
             file_df[sample_col] = file_df[sample_col].astype(str)
             file_df = file_df[file_df[sample_col].isin(batch_samples)]
 
-            base, ext = os.path.splitext(os.path.basename(file))
-            new_filename = f"{base}_{lab_code}_{file_tag}{ext}"
             os.makedirs(os.path.join(output_dir, "analysis_results"), exist_ok=True)
             output_path = os.path.join(output_dir, "analysis_results", new_filename)
             file_df.to_csv(output_path, index=False, sep=extdict.get(file_extension))
