@@ -6458,6 +6458,9 @@
             "header": "N"
         },
         "lineage_assignment_database_version": {
+            "examples": [
+                "2.26.0"
+            ],
             "ontology": "0",
             "type": "string",
             "description": "Version of the lineage assignment database",
