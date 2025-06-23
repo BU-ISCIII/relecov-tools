@@ -43,6 +43,14 @@ def validate_with_exceptions(schema, data, errors):
         ):
             continue
 
+        # allow not evaluable for numeric types
+        if (
+            error.validator == "type"
+            and error.instance == "Data Not Evaluable [NCIT:C186292]"
+            and prop_schema.get("type") in ["integer", "number"]
+        ):
+            continue
+
         # Keep all other errors
         filtered_errors.append(error)
 
