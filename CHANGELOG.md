@@ -15,6 +15,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Added enhancements
 
 - Included sftp files missing in metadata as samples in log_summary so they appear in final report [#685](https://github.com/BU-ISCIII/relecov-tools/pull/685)
+- Added a custom FormatChecker in custom_validators.py to check that date is in the desired range [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687)
+- Included a new field in configuration.json called starting_date to be used by validate custom formatchecker [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687)
+- Now validate_instances() method can also be given a custom validator as input [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687) 
 
 #### Fixes
 
