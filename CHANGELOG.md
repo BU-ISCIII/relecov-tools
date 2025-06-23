@@ -43,12 +43,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Method get_sample_id_field is now SchemaValidation static method to get a field from a given schema by its ontology [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
 - Method validate_schema now checks if each property has label and gives warning if not present [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
 - Updated schema and metadata template version to v3.1.2 removing old date pattern validation [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687)
-- Object init in main has been included in try block [](https://github.com/BU-ISCIII/relecov-tools/pull/687)
-- conf_file param is allowed to be empty besides None in sftp and download module [](https://github.com/BU-ISCIII/relecov-tools/pull/687)
+- Object init in main has been included in try block [#690](https://github.com/BU-ISCIII/relecov-tools/pull/690)
+- conf_file param is allowed to be empty besides None in sftp and download module [#690](https://github.com/BU-ISCIII/relecov-tools/pull/690)
 
 #### Removed
 
-- Removed config_file parameter from wrapper, now download, read_lab_metadata and validate params must be provided via extra config [](https://github.com/BU-ISCIII/relecov-tools/pull/687)
+- Removed config_file parameter from wrapper, now download, read_lab_metadata and validate params must be provided via extra config [#690](https://github.com/BU-ISCIII/relecov-tools/pull/690)
 
 ### Requirements
 
