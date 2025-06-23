@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added a clear error message when library_layout is missing in the metadata. [#680](https://github.com/BU-ISCIII/relecov-tools/pull/680)
 - AnyOf error messages are now correctly managed in validation process [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
 - Fixed incorrect sample count in validate summary message for date fields [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
+- Included a small hotfix in formatchecker to work with non-string fields [#689](https://github.com/BU-ISCIII/relecov-tools/pull/689)
 
 #### Changed
 
