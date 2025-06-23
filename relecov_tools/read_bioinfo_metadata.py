@@ -272,8 +272,10 @@ class BioinfoMetadata(BaseModule):
                             .get(field, {})
                             .get("type", "string")
                         )
-                        row[field] = relecov_tools.utils.cast_value_to_schema_type(
-                            raw_val, expected_type
+                        row[field] = (
+                            relecov_tools.utils.cast_value_to_schema_type(
+                                raw_val, expected_type
+                            )
                         )
                         field_valid[sample_name] = {field: value}
                     except KeyError as e:
