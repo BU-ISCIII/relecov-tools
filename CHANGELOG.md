@@ -41,6 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Param validation to generate invalid_samples.xlsx file has been moved out of class _\_init__ [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
 - Method get_sample_id_field is now SchemaValidation static method to get a field from a given schema by its ontology [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
 - Method validate_schema now checks if each property has label and gives warning if not present [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
+- Updated schema and metadata template version to v3.1.2 removing old date pattern validation [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687)
 
 #### Removed
 
