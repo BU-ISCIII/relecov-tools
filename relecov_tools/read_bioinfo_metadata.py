@@ -77,6 +77,7 @@ class BioinfoMetadata(BaseModule):
         output_dir=None,
         software_name=None,
         update=False,
+        soft_validation=False,
         **kwargs,
     ):
         super().__init__(output_dir=output_dir, called_module=__name__)
@@ -125,6 +126,7 @@ class BioinfoMetadata(BaseModule):
         batch_id = self.get_batch_id_from_data(self.j_data)
         self.set_batch_id(batch_id)
         self.update = update
+        self.soft_validation = soft_validation
 
         # Parse input/output folder
         if input_folder is None:
@@ -294,10 +296,10 @@ class BioinfoMetadata(BaseModule):
                                 .get("type", "string")
                             )
 
-                            row[json_field] = (
-                                relecov_tools.utils.cast_value_to_schema_type(
-                                    raw_val, expected_type
-                                )
+                            row[
+                                json_field
+                            ] = relecov_tools.utils.cast_value_to_schema_type(
+                                raw_val, expected_type
                             )
                             field_valid[software_key] = {json_field: field}
                         except KeyError as e:
@@ -1032,6 +1034,39 @@ class BioinfoMetadata(BaseModule):
 
         # Filter properties from batch_data that are not included in the schema
         self.j_data = self.filter_properties(self.j_data)
+        valid_rows, invalid_rows = relecov_tools.json_validation.SchemaValidation.validate_instances(
+            self.j_data, self.json_schema, "sequencing_sample_id"
+        )
+
+        self.j_data = valid_rows
+
+        if len(invalid_rows) > 0:
+            for error_type, failed_samples in invalid_rows["samples"].items():
+                detail = error_type.split(":", 1)[1].strip()
+                num_samples = len(failed_samples)
+                field_with_error = invalid_rows["fields"][error_type]
+                sample_list = "', '".join(failed_samples)
+
+                error_text = f"Error {detail} in field '{field_with_error}' for {num_samples} sample/s: '{sample_list}'"
+                self.logsum.add_warning(key=out_path, entry=error_text)
+                self.log.info(error_text)
+                stderr.print(f"[red]{error_text}")
+
+                for failsamp in failed_samples:
+                    self.logsum.add_error(key=out_path, sample=failsamp, entry=error_text)
+
+            if not self.soft_validation:
+                self.parent_create_error_summary(
+                    called_module="read-bioinfo-metadata", logs=self.logsum.logs
+                )
+                sys.exit(1)
+        else:
+            stderr.print("[green]Bioinfo json succesfully validated.")
+            self.log.info("Bioinfo json succesfully validated.")
+
+        for sample in self.j_data:
+            self.logsum.feed_key(key=out_path, sample=sample.get("sequencing_sample_id"))
+
         # Split files found based on each batch of samples
         data_by_batch = self.split_data_by_batch(self.j_data)
 
@@ -1065,10 +1100,7 @@ class BioinfoMetadata(BaseModule):
             self.j_data = self.merge_metadata(batch_filepath, self.j_data)
         else:
             relecov_tools.utils.write_json_to_file(self.j_data, batch_filepath)
-        for sample in self.j_data:
-            self.logsum.feed_key(
-                key=out_path, sample=sample.get("sequencing_sample_id")
-            )
+
         self.log.info("Created output json file: %s" % batch_filepath)
         stderr.print(f"[green]Created batch json file: {batch_filepath}")
 
@@ -1093,7 +1125,6 @@ class BioinfoMetadata(BaseModule):
                 "submitting_institution_id", batch_dir.split("/")[-2]
             )
             batch_date = first_sample.get("batch_id", batch_dir.split("/")[-1])
-            self.logsum.feed_key(batch_dir)
             file_tag = batch_date + "_" + self.hex
             stderr.print(f"[blue]Processing data from {batch_dir}")
             self.log.info(f"Processing data from {batch_dir}")
