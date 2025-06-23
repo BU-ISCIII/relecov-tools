@@ -1216,13 +1216,6 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
 # wrapper
 @relecov_tools_cli.command(help_priority=16)
 @click.option(
-    "-c",
-    "--config_file",
-    type=click.Path(),
-    help="Path to config file in yaml format [required]",
-    required=True,
-)
-@click.option(
     "-o",
     "--output_dir",
     "--output-dir",
@@ -1237,7 +1230,7 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
     help="Directory where the generated output will be saved",
 )
 @click.pass_context
-def wrapper(ctx, config_file, output_dir):
+def wrapper(ctx, output_dir):
     """Executes the modules in config file sequentially"""
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)

@@ -25,43 +25,60 @@ class ProcessWrapper(BaseModule):
     if you dont want to use that argument e.g.(target_folders:  ) -> (target_folders = None)
     """
 
-    def __init__(self, config_file: str = None, output_dir: str = None):
+    def __init__(self, output_dir: str = None):
         super().__init__(output_dir=output_dir, called_module="wrapper")
         if not os.path.isdir(str(output_dir)):
             raise FileNotFoundError(f"Output folder {output_dir} is not valid")
         else:
             self.output_dir = output_dir
-        if not os.path.isfile(str(config_file)):
-            raise FileNotFoundError(f"Config file {config_file} is not a file")
-        else:
-            try:
-                self.config_data = relecov_tools.utils.read_yml_file(config_file)
-                # Config file should include a key
-            except yaml.YAMLError as e:
-                raise yaml.YAMLError(f"Invalid config file: {e}")
-        output_regex = ("out_folder", "output_dir", "output_location")
-        for key, val in self.config_data.items():
-            for arg in output_regex:
-                if val == arg:
-                    self.config_data[key] = self.output_dir
-        self.wrapper_logsum = self.parent_log_summary(
-            output_dir=os.path.join(self.output_dir)
+
+        # check extra config params
+        config = ConfigJson(extra_config=True)
+        req_conf = ["download", "read_lab_metadata", "validate"]
+        missing = [conf for conf in req_conf if config.get_configuration(conf) is None]
+        if missing:
+            self.log.error(
+                "Extra config file () is missing required sections: %s"
+                % ", ".join(missing)
+            )
+            self.log.error(
+                "Please use add-extra-config to add them to the config file."
+            )
+            stderr.print(
+                f"[red]Config file is missing required sections: {', '.join(missing)}"
+            )
+            stderr.print(
+                "[red]Please use add-extra-config to add them to the config file."
+            )
+            raise ValueError(
+                f"Config file is missing required sections: {', '.join(missing)}"
+            )
+
+        self.download_params = self.clean_module_params(
+            "DownloadManager", config.get_configuration("download")
         )
-        self.config_data["download"].update({"output_dir": output_dir})
-        if "subfolder" not in self.config_data["download"]:
-            self.config_data["download"].update(
+
+        if (
+            "subfolder" not in self.download_params
+            or self.download_params["subfolder"] is None
+        ):
+            self.download_params["download"].update(
                 {"subfolder": "RELECOV"}
             )  # If subfolder is not defined or None, it is set automatically as RELECOV
             self.log.warning("Subfolder not provided. Set to as RELECOV by default")
             stderr.print("[yellow]Subfolder not provided. Set to RELECOV by default")
-        self.download_params = self.clean_module_params(
-            "DownloadManager", self.config_data["download"]
-        )
+
         self.readmeta_params = self.clean_module_params(
-            "RelecovMetadata", self.config_data["read-lab-metadata"]
+            "RelecovMetadata", config.get_configuration("read_lab_metadata")
         )
+
         self.validate_params = self.clean_module_params(
-            "SchemaValidation", self.config_data["validate"]
+            "SchemaValidation", config.get_configuration("validate")
+        )
+
+        # intialize the log summary wrapper
+        self.wrapper_logsum = self.parent_log_summary(
+            output_dir=os.path.join(self.output_dir)
         )
 
     def clean_module_params(self, module, params):
