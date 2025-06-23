@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from jsonschema import FormatChecker, exceptions
+import datetime
 
 
 def validate_with_exceptions(schema, data, errors):
@@ -45,3 +47,37 @@ def validate_with_exceptions(schema, data, errors):
         filtered_errors.append(error)
 
     return filtered_errors
+
+
+def make_date_checker(start_date, end_date):
+    """Create a format checker to validate dates in the given range only
+
+    Args:
+        start_date(datetime.date()): Starting date to set valid range
+        end_date(datetime.date()): End date for the valid range
+
+    Returns:
+        datechecker (FormatChecker()): Object that will test if properties of
+        given format are within the desired range
+    """
+    checker = FormatChecker()
+
+    @checker.checks("date", raises=exceptions.FormatError)
+    def date_range_checker(date):
+        if isinstance(date, datetime.datetime):
+            date = date.date()
+        elif isinstance(date, str):
+            try:
+                date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+            except ValueError:
+                raise exceptions.FormatError(
+                    f"'{date}' is not a valid date. Check if it exists or if its format is 'YYYY-MM-DD'"
+                )
+        if not (start_date <= date <= end_date):
+            raise exceptions.FormatError(
+                f"Error in date '{date}'. Please provide a date from {start_date} to {end_date}"
+            )
+        else:
+            return True
+
+    return checker
