@@ -73,6 +73,9 @@ def make_date_checker(start_date, end_date):
                 raise exceptions.FormatError(
                     f"'{date}' is not a valid date. Check if it exists or if its format is 'YYYY-MM-DD'"
                 )
+        elif not isinstance(date, datetime.datetime):
+            # Default data type validator will arise this error anyway ('date' is not of type string)
+            return True
         if not (start_date <= date <= end_date):
             raise exceptions.FormatError(
                 f"Error in date '{date}'. Please provide a date from {start_date} to {end_date}"
