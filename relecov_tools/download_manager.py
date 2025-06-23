@@ -65,7 +65,8 @@ class DownloadManager(BaseModule):
             )
         else:
             self.download_option = download_option
-        if conf_file is None:
+
+        if not conf_file:
             # self.sftp_server = config_json.get_topic_data("sftp_handle", "sftp_server")
             # self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
             self.platform_storage_folder = config_json.get_topic_data(
@@ -102,6 +103,7 @@ class DownloadManager(BaseModule):
                 self.log.error("Invalid configuration file. Missing %s", e)
                 stderr.print(f"[red] Invalid configuration file. Missing {e} !")
                 raise ValueError(f"Invalid configuration file. Missing {e}")
+
         if output_dir is not None:
             if os.path.isdir(output_dir):
                 self.platform_storage_folder = os.path.realpath(output_dir)

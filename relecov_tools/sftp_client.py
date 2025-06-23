@@ -32,7 +32,7 @@ class SftpRelecov:
     """
 
     def __init__(self, conf_file=None, username=None, password=None):
-        if conf_file is None:
+        if not conf_file:
             config_json = ConfigJson()
             self.sftp_server = config_json.get_topic_data("sftp_handle", "sftp_server")
             self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
