@@ -904,9 +904,15 @@ def update_db(
     default=False,
     help="If the output file already exists, ask if you want to update it.",
 )
+@click.option(
+    "--soft_validation",
+    is_flag=True,
+    default=False,
+    help="If the module should continue even if any sample does not validate.",
+)
 @click.pass_context
 def read_bioinfo_metadata(
-    ctx, json_file, json_schema_file, input_folder, output_dir, software_name, update
+    ctx, json_file, json_schema_file, input_folder, output_dir, software_name, update, soft_validation
 ):
     """
     Create the json compliant  from the Bioinfo Metadata.
