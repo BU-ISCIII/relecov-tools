@@ -912,7 +912,14 @@ def update_db(
 )
 @click.pass_context
 def read_bioinfo_metadata(
-    ctx, json_file, json_schema_file, input_folder, output_dir, software_name, update, soft_validation
+    ctx,
+    json_file,
+    json_schema_file,
+    input_folder,
+    output_dir,
+    software_name,
+    update,
+    soft_validation,
 ):
     """
     Create the json compliant  from the Bioinfo Metadata.
