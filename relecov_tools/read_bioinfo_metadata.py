@@ -672,7 +672,9 @@ class BioinfoMetadata(BaseModule):
                             or self.software_config[key].get("function")
                         ):
                             if self.software_config[key].get("split_by_batch"):
-                                base, ext = base, ext = os.path.splitext(os.path.basename(paths))
+                                base, ext = base, ext = os.path.splitext(
+                                    os.path.basename(paths)
+                                )
                                 batchid = row["batch_id"]
                                 new_fname = f"{base}_{batchid}_{hex}{ext}"
                                 analysis_results_path = os.path.join(
@@ -837,7 +839,9 @@ class BioinfoMetadata(BaseModule):
                 try:
                     if self.software_config[key].get("filepath_name"):
                         filepath_key = self.software_config[key].get("filepath_name")
-                        new_filename = os.path.basename(list({row[filepath_key] for row in batch_data})[0])
+                        new_filename = os.path.basename(
+                            list({row[filepath_key] for row in batch_data})[0]
+                        )
                     else:
                         base, ext = os.path.splitext(os.path.basename(file))
                         new_filename = f"{base}_{file_tag}{ext}"
@@ -1004,7 +1008,9 @@ class BioinfoMetadata(BaseModule):
         # Adding files path
         stderr.print("[blue]Adding files path to read lab metadata")
         self.log.info("Adding files path to read lab metadata")
-        self.j_data = self.add_bioinfo_files_path(files_found_dict, self.hex, self.j_data)
+        self.j_data = self.add_bioinfo_files_path(
+            files_found_dict, self.hex, self.j_data
+        )
 
         module = eval(f"relecov_tools.assets.pipeline_utils.{self.software_name}")
         try:

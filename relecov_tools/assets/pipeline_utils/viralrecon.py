@@ -39,8 +39,10 @@ def handle_pangolin_data(files_list, file_tag, pipeline_name, output_folder=None
                     pango_file, sep=","
                 )
                 sample_id, metadata = next(iter(pango_data.items()))
-                formatted_date = datetime.strptime(metadata['lineage_assignment_date'], '%Y%m%d').strftime('%Y-%m-%d')
-                pango_data[sample_id]['lineage_assignment_date'] = formatted_date
+                formatted_date = datetime.strptime(
+                    metadata["lineage_assignment_date"], "%Y%m%d"
+                ).strftime("%Y-%m-%d")
+                pango_data[sample_id]["lineage_assignment_date"] = formatted_date
                 pango_data_key = next(iter(pango_data))
                 pango_data_updated = {
                     key.split()[0]: value for key, value in pango_data.items()
