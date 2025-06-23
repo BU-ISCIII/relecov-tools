@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import re
-import yaml
 import os
 import inspect
 import rich.console
 from collections import defaultdict
+
+from relecov_tools.config_json import ConfigJson
 from relecov_tools.download_manager import DownloadManager
 from relecov_tools.read_lab_metadata import RelecovMetadata
 from relecov_tools.json_validation import SchemaValidation
@@ -27,6 +28,8 @@ class ProcessWrapper(BaseModule):
 
     def __init__(self, output_dir: str = None):
         super().__init__(output_dir=output_dir, called_module="wrapper")
+
+        # Check class params
         if not os.path.isdir(str(output_dir)):
             raise FileNotFoundError(f"Output folder {output_dir} is not valid")
         else:
