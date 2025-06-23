@@ -296,10 +296,10 @@ class BioinfoMetadata(BaseModule):
                                 .get("type", "string")
                             )
 
-                            row[
-                                json_field
-                            ] = relecov_tools.utils.cast_value_to_schema_type(
-                                raw_val, expected_type
+                            row[json_field] = (
+                                relecov_tools.utils.cast_value_to_schema_type(
+                                    raw_val, expected_type
+                                )   
                             )
                             field_valid[software_key] = {json_field: field}
                         except KeyError as e:
@@ -1034,12 +1034,19 @@ class BioinfoMetadata(BaseModule):
 
         # Filter properties from batch_data that are not included in the schema
         self.j_data = self.filter_properties(self.j_data)
-        valid_rows, invalid_rows = relecov_tools.json_validation.SchemaValidation.validate_instances(
-            self.j_data, self.json_schema, "sequencing_sample_id"
+        valid_rows, invalid_rows = (
+            relecov_tools.json_validation.SchemaValidation.validate_instances(
+                self.j_data, self.json_schema, "sequencing_sample_id"
+            )
         )
-
         if len(invalid_rows) > 0:
-            unique_failed_samples = list(set(sample for samples in invalid_rows["samples"].values() for sample in samples))
+            unique_failed_samples = list(
+                set(
+                    sample
+                    for samples in invalid_rows["samples"].values()
+                    for sample in samples
+                )
+            )
             for error_type, failed_samples in invalid_rows["samples"].items():
                 detail = error_type.split(":", 1)[1].strip()
                 num_samples = len(failed_samples)
@@ -1054,9 +1061,13 @@ class BioinfoMetadata(BaseModule):
                 stderr.print(f"[red]{error_text}")
 
                 for failsamp in failed_samples:
-                    self.logsum.add_error(key=out_path, sample=failsamp, entry=error_text)
+                    self.logsum.add_error(
+                        key=out_path, sample=failsamp, entry=error_text
+                    )
 
-            if not self.soft_validation or len(unique_failed_samples) == len(self.j_data):
+            if not self.soft_validation or len(unique_failed_samples) == len(
+                self.j_data
+            ):
                 self.parent_create_error_summary(
                     called_module="read-bioinfo-metadata", logs=self.logsum.logs
                 )
@@ -1068,7 +1079,9 @@ class BioinfoMetadata(BaseModule):
         self.j_data = valid_rows
 
         for sample in self.j_data:
-            self.logsum.feed_key(key=out_path, sample=sample.get("sequencing_sample_id"))
+            self.logsum.feed_key(
+                key=out_path, sample=sample.get("sequencing_sample_id")
+            )
 
         # Split files found based on each batch of samples
         data_by_batch = self.split_data_by_batch(self.j_data)
