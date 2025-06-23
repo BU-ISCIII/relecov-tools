@@ -370,9 +370,9 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     # Merge arguments
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(**args_merged)
 
     try:
+        new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(**args_merged)
         new_metadata.create_metadata_json()
     except Exception as e:
         if debug:
@@ -431,8 +431,9 @@ def validate(
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
-    validation = relecov_tools.json_validation.SchemaValidation(**args_merged)
+
     try:
+        validation = relecov_tools.json_validation.SchemaValidation(**args_merged)
         validation.validate()
     except Exception as e:
         if debug:
@@ -916,10 +917,11 @@ def read_bioinfo_metadata(
         add_extra_config=True,
     )
     debug = ctx.obj.get("debug", False)
-    new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        **args_merged
-    )
+
     try:
+        new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
+            **args_merged
+        )
         new_bioinfo_metadata.create_bioinfo_file()
     except Exception as e:
         if debug:
@@ -964,8 +966,11 @@ def metadata_homogeneizer(ctx, institution, directory, output_dir):
     """Parse institution metadata lab to the one used in relecov"""
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(**args_merged)
+
     try:
+        new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
+            **args_merged
+        )
         new_parse.converting_metadata()
     except Exception as e:
         if debug:
@@ -1026,8 +1031,9 @@ def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_name
     """
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    new_launch = relecov_tools.pipeline_manager.PipelineManager(**args_merged)
+
     try:
+        new_launch = relecov_tools.pipeline_manager.PipelineManager(**args_merged)
         new_launch.pipeline_exc()
     except Exception as e:
         if debug:
@@ -1234,8 +1240,11 @@ def wrapper(ctx, output_dir):
     """Executes the modules in config file sequentially"""
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(**args_merged)
+
     try:
+        process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(
+            **args_merged
+        )
         process_wrapper.run_wrapper()
     except Exception as e:
         if debug:
@@ -1266,8 +1275,9 @@ def upload_results(ctx, user, password, batch_id, template_path, project):
     """Upload batch results to sftp server."""
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    upload_sftp = relecov_tools.upload_results.UploadSftp(**args_merged)
+
     try:
+        upload_sftp = relecov_tools.upload_results.UploadSftp(**args_merged)
         upload_sftp.execute_process()
     except Exception as e:
         if debug:
