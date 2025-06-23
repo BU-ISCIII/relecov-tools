@@ -51,6 +51,23 @@ def validate_with_exceptions(schema, data, errors):
         ):
             continue
 
+        # allow not applicable for numeric types
+        if (
+            error.validator == "type"
+            and error.instance == "Not Applicable [GENEPIO:0001619]"
+            and prop_schema.get("type") in ["integer", "number"]
+        ):
+            continue
+
+        # allow not applicable for date format types
+        if (
+            error.validator == "format"
+            and error.instance == "Not Applicable [GENEPIO:0001619]"
+            and prop_schema.get("type") == "string"
+            and prop_schema.get("format") == "date"
+        ):
+            continue
+
         # Keep all other errors
         filtered_errors.append(error)
 
