@@ -11,13 +11,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Sara Monzon](https://github.com/saramonzon)
 - [Jaime Ozáez](https://github.com/jaimeozaez)
 - [Pablo Mata](https://github.com/shettland)
+- [Sarai Varona](https://github.com/svarona)
 
 #### Added enhancements
 
 - Included sftp files missing in metadata as samples in log_summary so they appear in final report [#685](https://github.com/BU-ISCIII/relecov-tools/pull/685)
 - Added a custom FormatChecker in custom_validators.py to check that date is in the desired range [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687)
 - Included a new field in configuration.json called starting_date to be used by validate custom formatchecker [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687)
-- Now validate_instances() method can also be given a custom validator as input [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687) 
+- Now validate_instances() method can also be given a custom validator as input [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687)
+- Added validation for read-bioinfo-metadata [#673](https://github.com/BU-ISCIII/relecov-tools/pull/673)
 
 #### Fixes
 
@@ -31,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - AnyOf error messages are now correctly managed in validation process [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
 - Fixed incorrect sample count in validate summary message for date fields [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
 - Included a small hotfix in formatchecker to work with non-string fields [#689](https://github.com/BU-ISCIII/relecov-tools/pull/689)
+- Fixed filepaths names and split table names [#673](https://github.com/BU-ISCIII/relecov-tools/pull/673)
 
 #### Changed
 
@@ -45,6 +48,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated schema and metadata template version to v3.1.2 removing old date pattern validation [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687)
 - Object init in main has been included in try block [#690](https://github.com/BU-ISCIII/relecov-tools/pull/690)
 - conf_file param is allowed to be empty besides None in sftp and download module [#690](https://github.com/BU-ISCIII/relecov-tools/pull/690)
+- Re-write read-bioinfo-metadata module and long table code [#673](https://github.com/BU-ISCIII/relecov-tools/pull/673)
+- Changed pass reads to genome coverage in quality control check [#673](https://github.com/BU-ISCIII/relecov-tools/pull/673)
 
 #### Removed
 
