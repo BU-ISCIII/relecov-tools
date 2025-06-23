@@ -1038,24 +1038,25 @@ class BioinfoMetadata(BaseModule):
             self.j_data, self.json_schema, "sequencing_sample_id"
         )
 
-        self.j_data = valid_rows
-
         if len(invalid_rows) > 0:
+            unique_failed_samples = list(set(sample for samples in invalid_rows["samples"].values() for sample in samples))
             for error_type, failed_samples in invalid_rows["samples"].items():
                 detail = error_type.split(":", 1)[1].strip()
                 num_samples = len(failed_samples)
                 field_with_error = invalid_rows["fields"][error_type]
                 sample_list = "', '".join(failed_samples)
-
                 error_text = f"Error {detail} in field '{field_with_error}' for {num_samples} sample/s: '{sample_list}'"
-                self.logsum.add_warning(key=out_path, entry=error_text)
+                if len(unique_failed_samples) == len(self.j_data):
+                    self.logsum.add_error(key=out_path, entry=error_text)
+                else:
+                    self.logsum.add_warning(key=out_path, entry=error_text)
                 self.log.info(error_text)
                 stderr.print(f"[red]{error_text}")
 
                 for failsamp in failed_samples:
                     self.logsum.add_error(key=out_path, sample=failsamp, entry=error_text)
 
-            if not self.soft_validation:
+            if not self.soft_validation or len(unique_failed_samples) == len(self.j_data):
                 self.parent_create_error_summary(
                     called_module="read-bioinfo-metadata", logs=self.logsum.logs
                 )
@@ -1063,6 +1064,8 @@ class BioinfoMetadata(BaseModule):
         else:
             stderr.print("[green]Bioinfo json succesfully validated.")
             self.log.info("Bioinfo json succesfully validated.")
+
+        self.j_data = valid_rows
 
         for sample in self.j_data:
             self.logsum.feed_key(key=out_path, sample=sample.get("sequencing_sample_id"))
