@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rich.console
-from jsonschema import Draft202012Validator, FormatChecker, exceptions
+from jsonschema import Draft202012Validator, FormatChecker
 import sys
 import os
 import openpyxl
