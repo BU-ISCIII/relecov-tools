@@ -8,7 +8,7 @@ from collections import defaultdict
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.download import Download
 from relecov_tools.read_lab_metadata import LabMetadata
-from relecov_tools.validate import SchemaValidation
+from relecov_tools.validate import Validate
 from relecov_tools.base_module import BaseModule
 import relecov_tools.utils
 
@@ -120,7 +120,7 @@ class ProcessWrapper(BaseModule):
         return read_meta_logs
 
     def exec_validation(self, validate_params):
-        validate_proccess = SchemaValidation(**validate_params)
+        validate_proccess = Validate(**validate_params)
         valid_json_data, invalid_json = validate_proccess.validate()
         validate_logs = self.wrapper_logsum.prepare_final_logs(
             logs=validate_proccess.logsum.logs

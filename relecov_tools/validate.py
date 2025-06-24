@@ -22,7 +22,7 @@ stderr = rich.console.Console(
 )
 
 
-class SchemaValidation(BaseModule):
+class Validate(BaseModule):
     def __init__(
         self,
         json_file=None,
@@ -91,7 +91,7 @@ class SchemaValidation(BaseModule):
         # TODO: Include this field in configuration.json
         sample_id_ontology = "GENEPIO:0000079"
         try:
-            self.sample_id_field = SchemaValidation.get_field_from_schema(
+            self.sample_id_field = Validate.get_field_from_schema(
                 sample_id_ontology, self.json_schema
             )
         except ValueError as e:
@@ -535,7 +535,7 @@ class SchemaValidation(BaseModule):
         )
         validator = Draft202012Validator(self.json_schema, format_checker=date_checker)
         self.log.info("Starting validation process of JSON file against schema")
-        valid_json_data, errors = SchemaValidation.validate_instances(
+        valid_json_data, errors = Validate.validate_instances(
             self.json_data,
             self.json_schema,
             sample_id_field=self.sample_id_field,

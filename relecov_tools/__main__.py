@@ -433,7 +433,7 @@ def validate(
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
 
     try:
-        validation = relecov_tools.validate.SchemaValidation(**args_merged)
+        validation = relecov_tools.validate.Validate(**args_merged)
         validation.validate()
     except Exception as e:
         if debug:
@@ -1263,7 +1263,7 @@ def wrapper(ctx, output_dir):
     debug = ctx.obj.get("debug", False)
 
     try:
-        process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(
+        process_wrapper = relecov_tools.wrapper.ProcessWrapper(
             **args_merged
         )
         process_wrapper.run_wrapper()
