@@ -357,7 +357,9 @@ class Validate(BaseModule):
             stderr.print(f"[red]Column with tag '{tag}' not found. Cannot continue.")
             raise
         row_to_del = []
-        row_iterator = ws_sheet.iter_rows(min_row=header_row + 1, max_row=ws_sheet.max_row)
+        row_iterator = ws_sheet.iter_rows(
+            min_row=header_row + 1, max_row=ws_sheet.max_row
+        )
         consec_empty_rows = 0
         id_col = [
             idx for idx, val in enumerate(ws_sheet[header_row]) if val.value == tag

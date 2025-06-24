@@ -253,9 +253,7 @@ class Wrapper(BaseModule):
                 valid_sampfiles = [
                     f.get(v) for v in file_fields for f in valid_json_data
                 ]
-                remote_files = self.download.relecov_sftp.get_file_list(
-                    remote_dir
-                )
+                remote_files = self.download.relecov_sftp.get_file_list(remote_dir)
                 valid_files = [f for f in remote_files if f in valid_sampfiles]
                 self.download.delete_remote_files(remote_dir, files=valid_files)
                 self.download.delete_remote_files(remote_dir, skip_seqs=True)
@@ -291,9 +289,7 @@ class Wrapper(BaseModule):
                 stderr.print(
                     f"[blue]Uploading invalid files and metadata to {remote_dir}"
                 )
-                self.download.relecov_sftp.upload_file(
-                    invalid_metadata_path, sftp_path
-                )
+                self.download.relecov_sftp.upload_file(invalid_metadata_path, sftp_path)
             # Upload all the files that failed validation process back to sftp
             upload_files_from_json(invalid_json, remote_dir)
         else:

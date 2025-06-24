@@ -1255,7 +1255,7 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
-)wrapper
+)
 @click.pass_context
 def wrapper(ctx, output_dir):
     """Executes the modules in config file sequentially"""
@@ -1263,9 +1263,7 @@ def wrapper(ctx, output_dir):
     debug = ctx.obj.get("debug", False)
 
     try:
-        process_wrapper = relecov_tools.wrapper.Wrapper(
-            **args_merged
-        )
+        process_wrapper = relecov_tools.wrapper.Wrapper(**args_merged)
         process_wrapper.run_wrapper()
     except Exception as e:
         if debug:
