@@ -742,11 +742,10 @@ class SchemaBuilder(BaseModule):
             # Load excel template file and attempt to read version history
             try:
                 wb = openpyxl.load_workbook(self.excel_template)
-                if "VERSION" in wb.sheetnames:
-                    ws_version = wb["VERSION"]
-                    data = ws_version.values
-                    columns = next(data)
-                    version_history = pd.DataFrame(data, columns=columns)
+                ws_version = wb["VERSION"]
+                data = ws_version.values
+                columns = next(data)
+                version_history = pd.DataFrame(data, columns=columns)
             except Exception as e:
                 self.log.warning(
                     f"Error reading previous VERSION sheet: {e}. Setting 1.0.0 as default."
