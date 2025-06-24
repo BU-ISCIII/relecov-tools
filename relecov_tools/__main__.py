@@ -857,7 +857,7 @@ def update_db(
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
-        update_database_obj = relecov_tools.upload_database.UpdateDatabase(
+        update_database_obj = relecov_tools.upload_database.UploadDatabase(
             **args_merged
         )
         update_database_obj.update_db()
