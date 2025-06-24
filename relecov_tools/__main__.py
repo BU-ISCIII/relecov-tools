@@ -537,7 +537,7 @@ def send_mail(
             "Please provide it via --template_path or define 'delivery_template_path_file' in the configuration."
         )
 
-    email_sender = relecov_tools.mail.EmailSender(config, template_path)
+    email_sender = relecov_tools.mail.Mail(config, template_path)
 
     template_choice = click.prompt(
         "Select the type of template:\n1. Validation with errors\n2. Validation successful",
