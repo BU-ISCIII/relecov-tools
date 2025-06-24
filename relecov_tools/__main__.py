@@ -1075,6 +1075,13 @@ def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_name
     required=False,
 )
 @click.option(
+    "-e",
+    "--excel_template",
+    type=click.Path(),
+    help="Path to the excel template file. This file is used to get version history of the excel template (stored in assets/Relecov_metadata_*.xlsx)",
+    required=False,
+)
+@click.option(
     "-v",
     "--draft_version",
     type=click.STRING,
@@ -1114,6 +1121,7 @@ def build_schema(
     ctx,
     input_file,
     schema_base,
+    excel_template,
     draft_version,
     diff,
     output_dir,
