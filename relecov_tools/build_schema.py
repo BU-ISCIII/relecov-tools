@@ -200,7 +200,7 @@ class SchemaBuilder(BaseModule):
                         )
 
                     self.excel_template = os.path.join(
-                        excel_template_path, excel_template
+                        excel_template_path, excel_template[0]
                     )
 
                 except (FileNotFoundError, IndexError):
