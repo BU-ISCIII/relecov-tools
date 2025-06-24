@@ -10,11 +10,11 @@ relecov-tools is a set of helper tools for the assembly of the different element
 - [relecov-tools](#relecov-tools)
   - [Table of contents](#table-of-contents)
   - [Installation](#installation)
+    - [Requirements prior install](#requirements-prior-install)
+      - [Install 7-Zip on Linux](#install-7-zip-on-linux)
     - [Bioconda](#bioconda)
     - [Pip](#pip)
     - [Development version](#development-version)
-    - [Required software](#required-software)
-      - [Install 7-Zip on Linux](#install-7-zip-on-linux)
   - [Usage](#usage)
     - [Command-line](#command-line)
   - [Modules](#modules)
@@ -41,39 +41,12 @@ relecov-tools is a set of helper tools for the assembly of the different element
 
 ## Installation
 
-### Bioconda
+### Requirements prior install
 
-relecov-tools is available in Bioconda and can be installed via conda.
+These tools require
 
-If you already have conda installed. Do the following:
-
-```
-conda config --add channels bioconda
-conda create --name relecov-tools
-conda activate relecov-tools
-conda install -c bioconda relecov-tools
-```
-
-### Pip
-
-relecov-tools is available in Pypi and can be installed via pip:
-
-```
-pip install relecov-tools
-```
-
-### Development version
-
-If you want to install the latest code in the repository:
-
-```
-conda create -n relecov_dev pip
-pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/relecov-tools.git@develop
-```
-
-### Required software
-
-These tools require [7-Zip](https://www.7-zip.org/) (via the `p7zip` package) to handle compressed files. Please make sure it is installed before running the code.
+- Python > 3.8
+- [7-Zip](https://www.7-zip.org/) (via the `p7zip` package) to handle compressed files. Please make sure it is installed before running the code.
 
 #### Install 7-Zip on Linux
 
@@ -91,6 +64,36 @@ sudo dnf install p7zip p7zip-plugins
 ```
 
 > **Note:** For other distributions, please use your distribution's package manager to install `p7zip`.
+
+### Bioconda
+
+relecov-tools is available in Bioconda and can be installed via conda.
+
+If you already have conda installed. Do the following:
+
+```Bash
+conda config --add channels bioconda
+conda create --name relecov-tools
+conda activate relecov-tools
+conda install -c bioconda relecov-tools
+```
+
+### Pip
+
+relecov-tools is available in Pypi and can be installed via pip:
+
+```Bash
+pip install relecov-tools
+```
+
+### Development version
+
+If you want to install the latest code in the repository:
+
+```
+conda create -n relecov_dev pip
+pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/relecov-tools.git@develop
+```
 
 ## Usage
 
