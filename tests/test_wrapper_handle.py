@@ -3,6 +3,7 @@ import os
 import sys
 import argparse
 import yaml
+from relecov_tools.config_json import ConfigJson
 from relecov_tools.download_manager import DownloadManager
 from relecov_tools.dataprocess_wrapper import ProcessWrapper
 
@@ -35,24 +36,26 @@ def generate_config_yaml(download_option, target_folders):
         "download": {
             "user": "",
             "password": "",
+            "conf_file": "",
+            "output_dir": "",
             "download_option": download_option,
             "target_folders": target_folders,
             "subfolder": "RELECOV",
         },
-        "read-lab-metadata": {
-            "metadata_file": "tests/data/read_lab_metadata/metadata_lab_test.xlsx",
-            "sample_list_file": "tests/data/read_lab_metadata/samples_data_test.json",
-        },
         "validate": {
+            "json_file": "",
+            "metadata": "",
+            "output_dir": "",
+            "excel_sheet": "",
             "json_schema_file": "relecov_tools/schema/relecov_schema.json",
             "registry": "tests/data/map_validate/unique_sampleid_registry.json",
         },
     }
 
-    with open("wrapper_config.yaml", "w") as file:
+    with open("extra_config.yaml", "w") as file:
         yaml.dump(config_data, file, default_flow_style=False)
 
-    return "wrapper_config.yaml"
+    return "extra_config.yaml"
 
 
 def prepare_remote_test(**kwargs):
@@ -128,8 +131,9 @@ def prepare_remote_test(**kwargs):
     )
 
     print("Initiating ProcessWrapper")
+    config_json = ConfigJson()
+    config_json.include_extra_config(conf_file, config_name=None, force=True)
     wrapper_manager = ProcessWrapper(  # Initialize ProcessWrapper with the config file
-        config_file=conf_file,
         output_dir=kwargs["output_dir"],
     )
 
