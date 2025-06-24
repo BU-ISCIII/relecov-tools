@@ -123,8 +123,8 @@ class BioinfoMetadata(BaseModule):
         # Initialize j_data object
         stderr.print("[blue]Reading lab metadata json")
         self.j_data = self.collect_info_from_lab_json()
-        self.batch_id = self.get_batch_id_from_data(self.j_data)
-        self.set_batch_id(self.batch_id)
+        batch_id = self.get_batch_id_from_data(self.j_data)
+        self.set_batch_id(batch_id)
         self.update = update
         self.soft_validation = soft_validation
 
