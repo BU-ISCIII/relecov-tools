@@ -372,7 +372,7 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     debug = ctx.obj.get("debug", False)
 
     try:
-        new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(**args_merged)
+        new_metadata = relecov_tools.read_lab_metadata.LabMetadata(**args_merged)
         new_metadata.create_metadata_json()
     except Exception as e:
         if debug:

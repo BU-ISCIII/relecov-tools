@@ -7,7 +7,7 @@ from collections import defaultdict
 
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.download import Download
-from relecov_tools.read_lab_metadata import RelecovMetadata
+from relecov_tools.read_lab_metadata import LabMetadata
 from relecov_tools.validate import SchemaValidation
 from relecov_tools.base_module import BaseModule
 import relecov_tools.utils
@@ -112,7 +112,7 @@ class ProcessWrapper(BaseModule):
         return finished_folders, download_logs
 
     def exec_read_metadata(self, readmeta_params):
-        read_metadata = RelecovMetadata(**readmeta_params)
+        read_metadata = LabMetadata(**readmeta_params)
         read_metadata.create_metadata_json()
         read_meta_logs = self.wrapper_logsum.prepare_final_logs(
             logs=read_metadata.logsum.logs
