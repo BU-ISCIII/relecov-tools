@@ -37,7 +37,7 @@ class ProcessWrapper(BaseModule):
 
         # check extra config params
         config = ConfigJson(extra_config=True)
-        req_conf = ["download", "read_lab_metadata", "validate"]
+        req_conf = ["download", "validate"]
         missing = [conf for conf in req_conf if config.get_configuration(conf) is None]
         if missing:
             self.log.error(
