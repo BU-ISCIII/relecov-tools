@@ -47,27 +47,24 @@ class SchemaBuilder(BaseModule):
         super().__init__(output_dir=output_dir, called_module=__name__)
         self.excel_file_path = input_file
         self.non_interactive = non_interactive
-        # Validate input data
+        # Validate params
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
             self.log.error("A valid Excel file path must be provided.")
             raise ValueError("A valid Excel file path must be provided.")
         if not self.excel_file_path.endswith(".xlsx"):
             self.log.error("The Excel file must have a .xlsx extension.")
             raise ValueError("The Excel file must have a .xlsx extension.")
+
         # No metadata is being processed so batch_id will be execution date
         self.set_batch_id(self.basemod_date)
 
         # Validate output folder creation
         if not output_dir:
-            self.output_dir = relecov_tools.utils.prompt_create_outdir(
-                path=None, out_dir=None
-            )
+            self.output_dir = relecov_tools.utils.prompt_create_outdir()
         else:
             self.output_dir = os.path.abspath(output_dir)
             if not os.path.exists(self.output_dir):
-                self.output_dir = relecov_tools.utils.prompt_create_outdir(
-                    path=None, out_dir=output_dir
-                )
+                self.output_dir = relecov_tools.utils.prompt_create_outdir()
 
         # Get version option
         if not version:
@@ -75,38 +72,10 @@ class SchemaBuilder(BaseModule):
             self.version = relecov_tools.utils.prompt_text(
                 "Write the desired version using semantic versioning:"
             )
-        self.version = version
+        else:
+            self.version = version
         if not relecov_tools.utils.validate_semantic_version(self.version):
             raise ValueError("[red]Error: Invalid version format")
-
-        # Get version option
-        # Parse build-schema configuration
-        self.build_schema_json_file = os.path.join(
-            os.path.dirname(__file__), "conf", "build_schema_config.json"
-        )
-
-        if project is None:
-            project = relecov_tools.utils.prompt_text("Write the desired project:")
-        self.project = project
-
-        available_projects = self.get_available_projects(self.build_schema_json_file)
-
-        build_schema_config = ConfigJson(self.build_schema_json_file)
-        config_data = build_schema_config.get_configuration(
-            "projects"
-        )  # Obtener solo la sección "projects"
-        self.configurables = config_data.get("configurables", {})
-
-        if self.project in available_projects:
-            self.project_config = config_data.get(self.project, {})
-        else:
-            self.log.error(
-                f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
-            )
-            stderr.print(
-                f"[red]No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
-            )
-            sys.exit(1)
 
         # Validate show diff option
         if diff is False:
@@ -124,6 +93,38 @@ class SchemaBuilder(BaseModule):
                 )
             )
 
+        # Get version option
+        # Parse build-schema configuration
+        self.build_schema_json_file = os.path.join(
+            os.path.dirname(__file__), "conf", "build_schema_config.json"
+        )
+
+        if project is None:
+            project = relecov_tools.utils.prompt_text("Write the desired project:")
+
+        self.project = project
+
+        available_projects = self.get_available_projects(self.build_schema_json_file)
+
+        # Config params
+        config_build_schema = ConfigJson(self.build_schema_json_file)
+        config_data = config_build_schema.get_configuration("projects")
+        self.configurables = config_data.get("configurables", {})
+        config_json = ConfigJson()
+
+        if self.project in available_projects:
+            self.project_config = config_data.get(self.project, {})
+        else:
+            self.log.error(
+                f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
+            )
+            stderr.print(
+                f"[red]No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
+            )
+            raise ValueError(
+                f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
+            )
+
         # Validate base schema
         if schema_base is not None:
             if relecov_tools.utils.file_exists(schema_base):
@@ -135,10 +136,11 @@ class SchemaBuilder(BaseModule):
                 stderr.print(
                     f"[Error]Defined base schema file not found: {schema_base}. Exiting..."
                 )
-                sys.exit(1)
+                raise FileNotFoundError(
+                    f"Defined base schema file not found: {schema_base}."
+                )
         else:
             try:
-                config_json = ConfigJson()
                 relecov_schema = config_json.get_topic_data(
                     "json_schemas", "relecov_schema"
                 )
