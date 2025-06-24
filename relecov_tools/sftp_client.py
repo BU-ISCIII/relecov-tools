@@ -17,7 +17,7 @@ stderr = rich.console.Console(
 )
 
 
-class SftpRelecov:
+class SftpClient:
     """Class to handle SFTP connection with remote server. It uses paramiko library to establish
     the connection. The class can be used to upload and download files from the remote server.
     The class can be initialized with a configuration file and with the username and password.
