@@ -1014,7 +1014,7 @@ class BioinfoMetadata(BaseModule):
         stderr.print("[blue]Adding files path to read lab metadata")
         self.log.info("Adding files path to read lab metadata")
         self.j_data = self.add_bioinfo_files_path(
-            files_found_dict, self.hex, self.j_data
+            files_found_dict, self.j_data
         )
 
         module = eval(f"relecov_tools.assets.pipeline_utils.{self.software_name}")
