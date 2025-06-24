@@ -187,17 +187,28 @@ class SchemaBuilder(BaseModule):
                         f
                         for f in os.listdir(excel_template_path)
                         if f.startswith("Relecov_metadata_template")
-                    ][0]
+                    ]
+                    if len(excel_template) > 1:
+                        self.log.error(
+                            "[Error]Fatal error. More than one excel template was found in current relecov-tools installation (assets)"
+                        )
+                        stderr.print(
+                            "[Error]Fatal error.More than one excel template was found in current relecov-tools installation (assets)..Exiting"
+                        )
+                        raise FileExistsError("Fatal error. More than one excel template was found in current relecov-tools installation (assets)")
+
                     self.excel_template = os.path.join(
                         excel_template_path, excel_template
                     )
-                except FileNotFoundError:
+
+                except (FileNotFoundError, IndexError):
                     self.log.error(
                         "[Error]Fatal error. Excel template was not found in current relecov-tools installation (assets)"
                     )
                     stderr.print(
                         "[Error]Fatal error. Excel template not found in current relecov-tools installation (assets). Exiting..."
                     )
+                    raise
 
     def validate_database_definition(self, json_data):
         """Validate the mandatory features and ensure:
