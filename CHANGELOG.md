@@ -338,7 +338,7 @@ Code contributions to the release:
 - Fix removal of samples with repeated sampleID and .fastq files [#413](https://github.com/BU-ISCIII/relecov-tools/pull/413)
 - Fix renaming of folders withou any valid sample [#413](https://github.com/BU-ISCIII/relecov-tools/pull/413)
 - Fix download module when deleting corrupted pair-end data [#419](https://github.com/BU-ISCIII/relecov-tools/pull/419)
-- Fixed the upload_results module to handle exceptions properly [#441](https://github.com/BU-ISCIII/relecov-tools/pull/441)
+- Fixed the upload_resultwrapperexceptions properly [#441](https://github.com/BU-ISCIII/relecov-tools/pull/441)
 - Update-db now converts data to string prior to API request to avoid crashing [#455](https://github.com/BU-ISCIII/relecov-tools/pull/455)
 - Fixed recursive generation of build/lib/build/lib from pyproject.toml [#455](https://github.com/BU-ISCIII/relecov-tools/pull/455)
 - Make QC evaluation project-dependent + schema upgrade and CI improvements [#467](https://github.com/BU-ISCIII/relecov-tools/pull/467)
