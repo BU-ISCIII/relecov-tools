@@ -20,7 +20,7 @@ import relecov_tools.read_lab_metadata
 import relecov_tools.download
 import relecov_tools.validate
 import relecov_tools.mail
-import relecov_tools.map_schema
+import relecov_tools.map
 import relecov_tools.upload_database
 import relecov_tools.read_bioinfo_metadata
 import relecov_tools.metadata_homogeneizer
@@ -656,7 +656,7 @@ def map(ctx, origin_schema, json_file, destination_schema, schema_file, output_d
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
-        new_schema = relecov_tools.map_schema.MappingSchema(**args_merged)
+        new_schema = relecov_tools.map.MappingSchema(**args_merged)
         new_schema.map_to_data_to_new_schema()
     except Exception as e:
         if debug:
@@ -1133,7 +1133,7 @@ def build_schema(
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
     try:
-        schema_update = relecov_tools.build_schema.SchemaBuilder(**args_merged)
+        schema_update = relecov_tools.build_schema.BuildSchema(**args_merged)
         new_schema = schema_update.handle_build_schema()
         if not new_schema:
             log.error("Schema build returned None. Skipping schema summary.")

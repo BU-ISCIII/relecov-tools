@@ -27,7 +27,7 @@ stderr = rich.console.Console(
 )
 
 
-class SchemaBuilder(BaseModule):
+class BuildSchema(BaseModule):
     def __init__(
         self,
         input_file=None,
