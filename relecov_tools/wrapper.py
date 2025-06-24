@@ -20,7 +20,7 @@ stderr = rich.console.Console(
 )
 
 
-class ProcessWrapper(BaseModule):
+class Wrapper(BaseModule):
     """
     Always fill all the arguments for the class in the config file, leave its value
     if you dont want to use that argument e.g.(target_folders:  ) -> (target_folders = None)
