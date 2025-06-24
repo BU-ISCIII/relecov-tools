@@ -625,7 +625,7 @@ class BioinfoMetadata(BaseModule):
             return "Not Provided [SNOMED:434941000124101]"
         return raw_val
 
-    def add_bioinfo_files_path(self, files_found_dict, hex, j_data):
+    def add_bioinfo_files_path(self, files_found_dict, j_data):
         """Adds file paths essential for handling and mapping bioinformatics metadata to the j_data.
         For each sample in j_data, the function assigns the corresponding file path based on the identified files in files_found_dict.
 
@@ -682,7 +682,7 @@ class BioinfoMetadata(BaseModule):
                                     os.path.basename(paths)
                                 )
                                 batchid = row["batch_id"]
-                                new_fname = f"{base}_{batchid}_{hex}{ext}"
+                                new_fname = f"{base}_{batchid}_{self.hex}{ext}"
                                 analysis_results_path = os.path.join(
                                     base_cod_path,
                                     "analysis_results",
