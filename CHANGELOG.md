@@ -60,6 +60,9 @@ refactor SchemaBuilder initialization and validation logic for clarity and effic
 - refactor versioning logic in save_new_schema method to utilize - excel_template for version history [#693](https://github.com/BU-ISCIII/relecov-tools/pull/693)
 - Improve message when error raises while reading metadata excel [#694](https://github.com/BU-ISCIII/relecov-tools/pull/694)
 - Renamed script files and classes to improve simplicity and clarity [#696](https://github.com/BU-ISCIII/relecov-tools/pull/696)
+- added raw strings to prevent syntax warnings [#696](https://github.com/BU-ISCIII/relecov-tools/pull/696)
+- Set 3.8 python version as min version [#696](https://github.com/BU-ISCIII/relecov-tools/pull/696)
+- fix deprecated warning pkg_resources [#696](https://github.com/BU-ISCIII/relecov-tools/pull/696)
 
 #### Removed
 
