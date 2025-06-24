@@ -195,7 +195,9 @@ class SchemaBuilder(BaseModule):
                         stderr.print(
                             "[Error]Fatal error.More than one excel template was found in current relecov-tools installation (assets)..Exiting"
                         )
-                        raise FileExistsError("Fatal error. More than one excel template was found in current relecov-tools installation (assets)")
+                        raise FileExistsError(
+                            "Fatal error. More than one excel template was found in current relecov-tools installation (assets)"
+                        )
 
                     self.excel_template = os.path.join(
                         excel_template_path, excel_template
