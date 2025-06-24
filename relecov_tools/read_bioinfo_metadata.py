@@ -678,9 +678,7 @@ class BioinfoMetadata(BaseModule):
                             or self.software_config[key].get("function")
                         ):
                             if self.software_config[key].get("split_by_batch"):
-                                base, ext = os.path.splitext(
-                                    os.path.basename(paths)
-                                )
+                                base, ext = os.path.splitext(os.path.basename(paths))
                                 batchid = row["batch_id"]
                                 new_fname = f"{base}_{batchid}_{self.hex}{ext}"
                                 analysis_results_path = os.path.join(
@@ -805,9 +803,7 @@ class BioinfoMetadata(BaseModule):
             ]
         return data_by_batch
 
-    def split_tables_by_batch(
-        self, files_found_dict, file_tag, batch_data, output_dir
-    ):
+    def split_tables_by_batch(self, files_found_dict, file_tag, batch_data, output_dir):
         """Filter table content to output a new table containing only the samples present in given metadata
         Args:
             files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
@@ -1013,9 +1009,7 @@ class BioinfoMetadata(BaseModule):
         # Adding files path
         stderr.print("[blue]Adding files path to read lab metadata")
         self.log.info("Adding files path to read lab metadata")
-        self.j_data = self.add_bioinfo_files_path(
-            files_found_dict, self.j_data
-        )
+        self.j_data = self.add_bioinfo_files_path(files_found_dict, self.j_data)
 
         module = eval(f"relecov_tools.assets.pipeline_utils.{self.software_name}")
         try:
