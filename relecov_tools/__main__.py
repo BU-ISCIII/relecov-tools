@@ -25,7 +25,7 @@ import relecov_tools.upload_database
 import relecov_tools.read_bioinfo_metadata
 import relecov_tools.metadata_homogeneizer
 import relecov_tools.gisaid_upload
-import relecov_tools.upload_ena_protocol
+import relecov_tools.ena_upload
 import relecov_tools.pipeline_manager
 import relecov_tools.build_schema
 import relecov_tools.wrapper
@@ -716,7 +716,7 @@ def upload_to_ena(
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
-        upload_ena = relecov_tools.upload_ena_protocol.EnaUpload(**args_merged)
+        upload_ena = relecov_tools.ena_upload.EnaUpload(**args_merged)
         upload_ena.upload()
     except Exception as e:
         if debug:
@@ -1298,7 +1298,7 @@ def upload_results(ctx, user, password, batch_id, template_path, project):
     debug = ctx.obj.get("debug", False)
 
     try:
-        upload_sftp = relecov_tools.upload_results.UploadSftp(**args_merged)
+        upload_sftp = relecov_tools.upload_results.UploadResults(**args_merged)
         upload_sftp.execute_process()
     except Exception as e:
         if debug:

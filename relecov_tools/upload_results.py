@@ -19,7 +19,7 @@ stderr = Console(
 )
 
 
-class UploadSftp(BaseModule):
+class UploadResults(BaseModule):
     def __init__(
         self,
         user=None,
