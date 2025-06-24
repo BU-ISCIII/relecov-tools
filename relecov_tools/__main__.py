@@ -315,7 +315,7 @@ def download(
         add_extra_config=True,
     )
     try:
-        download = relecov_tools.download.DownloadManager(**args_merged)
+        download = relecov_tools.download.Download(**args_merged)
         download.execute_process()
     except Exception as e:
         if debug:

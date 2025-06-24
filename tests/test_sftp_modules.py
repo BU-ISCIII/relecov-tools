@@ -2,7 +2,7 @@
 import os
 import sys
 import argparse
-from relecov_tools.download import DownloadManager
+from relecov_tools.download import Download
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
 
 def prepare_remote_test(**kwargs):
     print("Initiating sftp module")
-    download = DownloadManager(
+    download = Download(
         user=kwargs["user"],
         password=kwargs["password"],
         conf_file=None,
