@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Jaime Ozáez](https://github.com/jaimeozaez)
 - [Pablo Mata](https://github.com/shettland)
 - [Sarai Varona](https://github.com/svarona)
+- [Victor Lopez](https://github.com/victor5lm)
 
 #### Added enhancements
 
@@ -34,6 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed incorrect sample count in validate summary message for date fields [#684](https://github.com/BU-ISCIII/relecov-tools/pull/684)
 - Included a small hotfix in formatchecker to work with non-string fields [#689](https://github.com/BU-ISCIII/relecov-tools/pull/689)
 - Fixed filepaths names and split table names [#673](https://github.com/BU-ISCIII/relecov-tools/pull/673)
+- Replaced duplicate flag for read-bioinfo-metadata module [#695](https://github.com/BU-ISCIII/relecov-tools/pull/695).
 
 #### Changed
 
