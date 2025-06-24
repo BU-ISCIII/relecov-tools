@@ -5372,9 +5372,12 @@
         },
         "commercial_open_source_both": {
             "enum": [
-                "Commercial",
-                "Open Source",
-                "Both"
+                "Commercial [SWO:1000002]",
+                "Open Source [SWO:1000008]",
+                "Both",
+                "None",
+                "Not Provided [SNOMED:434941000124101",
+                "Not Applicable [GENEPIO:0001619]"
             ],
             "examples": [
                 "Commercial"
@@ -6038,7 +6041,8 @@
                 "Variant of Interest (VOI) [GENEPIO:0100083]",
                 "Variant of Concern (VOC) [GENEPIO:0100082]",
                 "Variant Under Monitoring (VUM) [GENEPIO:0100279]",
-                "Not Provided [SNOMED:434941000124101]"
+                "Not Provided [SNOMED:434941000124101]",
+                "Not Applicable [GENEPIO:0001619]"
             ],
             "examples": [
                 "Variant of Concern (VOC) [GENEPIO:0100083]"
