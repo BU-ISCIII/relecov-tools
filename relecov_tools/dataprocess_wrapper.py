@@ -71,9 +71,7 @@ class ProcessWrapper(BaseModule):
             self.log.warning("Subfolder not provided. Set to as RELECOV by default")
             stderr.print("[yellow]Subfolder not provided. Set to RELECOV by default")
 
-        self.readmeta_params = self.clean_module_params(
-            "RelecovMetadata", config.get_configuration("read_lab_metadata")
-        )
+        self.readmeta_params = dict()
 
         self.validate_params = self.clean_module_params(
             "SchemaValidation", config.get_configuration("validate")
