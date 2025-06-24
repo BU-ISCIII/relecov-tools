@@ -727,8 +727,6 @@ class SchemaBuilder(BaseModule):
             None: If an error occurs during the process.
         """
         try:
-            # Retrieve existing files in the output directory
-            output_files = os.listdir(self.output_dir)
             notes_control_input = (
                 "Auto-generated update"
                 if self.non_interactive
@@ -737,48 +735,26 @@ class SchemaBuilder(BaseModule):
                 )
             )
             # Identify existing template files
-            template_files = [
-                f for f in output_files if f.startswith("Relecov_metadata_template")
-            ]
-            if template_files:
-                # Extract the latest version number from existing files
-                latest_file = max(
-                    template_files,
-                    key=lambda x: (
-                        re.search(r"v(\d+\.\d+\.\d+)", x).group(1)
-                        if re.search(r"v(\d+\.\d+\.\d+)", x)
-                        else "0"
-                    ),
+            version_history = pd.DataFrame(
+                columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
+            )
+
+            # Load excel template file and attempt to read version history
+            try:
+                wb = openpyxl.load_workbook(self.excel_template)
+                if "VERSION" in wb.sheetnames:
+                    ws_version = wb["VERSION"]
+                    data = ws_version.values
+                    columns = next(data)
+                    version_history = pd.DataFrame(data, columns=columns)
+            except Exception as e:
+                self.log.warning(
+                    f"Error reading previous VERSION sheet: {e}. Setting 1.0.0 as default."
                 )
-                version_history = pd.DataFrame(
-                    columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
-                )
-                match = re.search(r"v(\d+\.\d+\.\d+)", latest_file)
-                if match:
-                    # Load the latest template file and attempt to read version history
-                    out_file = os.path.join(self.output_dir, latest_file)
-                    try:
-                        wb = openpyxl.load_workbook(out_file)
-                        if "VERSION" in wb.sheetnames:
-                            ws_version = wb["VERSION"]
-                            data = ws_version.values
-                            columns = next(data)
-                            version_history = pd.DataFrame(data, columns=columns)
-                    except Exception as e:
-                        self.log.warning(f"Error reading previous VERSION sheet: {e}")
-                    next_version = self.version
-                else:
-                    next_version = "1.0.0"
-                    out_file = os.path.join(
-                        self.output_dir,
-                        f"Relecov_metadata_template_v{next_version}.xlsx",
-                    )
-            else:
-                next_version = "1.0.0"
-                out_file = os.path.join(
-                    self.output_dir,
-                    f"Relecov_metadata_template_v{next_version}.xlsx",
-                )
+                version_history = "1.0.0"
+
+            next_version = self.version
+
             # Store versioning information
             version_info = {
                 "FILE_VERSION": f"Relecov_metadata_template_v{next_version}",
