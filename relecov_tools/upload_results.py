@@ -69,7 +69,7 @@ class UploadSftp(BaseModule):
 
         self.processed_batches = {}  # Dictionary to store results
         self.template_path = template_path
-        self.email_sender = relecov_tools.mail.EmailSender(config, template_path)
+        self.email_sender = relecov_tools.mail.Mail(config, template_path)
         self.guide = config.get("institutions_guide_path")
         self.analysis_folder = sftp_config.get("analysis_results_folder")
         self.project = project

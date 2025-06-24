@@ -12,7 +12,7 @@ from jinja2 import Environment, FileSystemLoader
 log = logging.getLogger(__name__)
 
 
-class EmailSender:
+class Mail:
     def __init__(self, config=None, template_path=None):
         self.config = config
         self.template_path = template_path
