@@ -96,29 +96,29 @@ def run_relecov_tools():
     # Print nf-core header
     # stderr.print("\n[green]{},--.[grey39]/[green],-.".format(" " * 42), highlight=False)
     stderr.print(
-        "[blue]                ___   ___       ___  ___  ___                           ",
+        r"[blue]                ___   ___       ___  ___  ___                           ",
         highlight=False,
     )
     stderr.print(
-        "[blue]   \    |-[grey39]-|  [blue] |   \ |    |    |    |    |   | \      /  ",
+        r"[blue]   \    |-[grey39]-|  [blue] |   \ |    |    |    |    |   | \      /  ",
         highlight=False,
     )
     stderr.print(
-        "[blue]    \   \  [grey39]/ [blue]  |__ / |__  |    |___ |    |   |  \    /   ",
+        r"[blue]    \   \  [grey39]/ [blue]  |__ / |__  |    |___ |    |   |  \    /   ",
         highlight=False,
     )
     stderr.print(
-        "[blue]    /  [grey39] / [blue] \   |  \  |    |    |    |    |   |   \  /    ",
+        r"[blue]    /  [grey39] / [blue] \   |  \  |    |    |    |    |   |   \  /    ",
         highlight=False,
     )
     stderr.print(
-        "[blue]   /   [grey39] |-[blue]-|   |   \ |___ |___ |___ |___ |___|    \/     ",
+        r"[blue]   /   [grey39] |-[blue]-|   |   \ |___ |___ |___ |___ |___|    \/     ",
         highlight=False,
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
     stderr.print(
-        "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
+        "\n" r"[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
     )
 
     # Lanch the click cli
