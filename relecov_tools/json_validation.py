@@ -450,7 +450,7 @@ class SchemaValidation(BaseModule):
 
     def validate_invexcel_args(self):
         """Validate arguments needed to create invalid_samples.xlsx file"""
-        if self.excel_sheet is None:
+        if not self.excel_sheet:
             conf_subdata = self.config.get_topic_data(
                 "sftp_handle", "metadata_processing"
             )
