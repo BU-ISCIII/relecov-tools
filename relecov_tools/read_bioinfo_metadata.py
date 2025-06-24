@@ -413,7 +413,7 @@ class BioinfoMetadata(BaseModule):
             files_dict (dict{str:str}): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (list item per sample).
             output_dir (str): Path to save output files generated during handling_files() process.
-            file_tag(str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
+            file_tag (str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
 
         Returns:
             j_data_mapped: A list of dictionaries with bioinformatics metadata mapped into j_data.
@@ -547,6 +547,9 @@ class BioinfoMetadata(BaseModule):
         Args:
             file_list (list): A list of file path/s to be processed.
             func_name (str): The name of the function to execute
+            file_tag (str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
+            out_path (str): Path to save output files generated during handling_files() process.
+
         Returns:
             data: A dictionary containing bioinfo metadata handled for each sample.
         """
@@ -586,6 +589,7 @@ class BioinfoMetadata(BaseModule):
 
         Args:
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
+            out_filename (str): File name of the bioinfo_lab_metadata json
 
         Returns:
             j_data: updated j_data with fixxed values added in it.
@@ -786,7 +790,6 @@ class BioinfoMetadata(BaseModule):
     def split_data_by_batch(self, j_data):
         """Split metadata from json for each batch of samples found according to folder location of the samples.
         Args:
-            files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
             j_data (list(dict)): List of dictionaries, one per sample, including metadata for that sample
         Returns:
             data_by_batch (dict(list(dict))): Dictionary containing parts of j_data corresponding to each
@@ -803,12 +806,12 @@ class BioinfoMetadata(BaseModule):
         return data_by_batch
 
     def split_tables_by_batch(
-        self, files_found_dict, lab_code, file_tag, batch_data, output_dir
+        self, files_found_dict, file_tag, batch_data, output_dir
     ):
         """Filter table content to output a new table containing only the samples present in given metadata
         Args:
             files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
-            sufix (str): Sufix to be added to the new table file name.
+            file_tag (str): File tag to be added to the new table file name.
             batch_data (list(dict)): Metadata corresponding to a single folder with samples (folder)
             output_dir (str): Output location for the generated tabular file
         """
@@ -1146,7 +1149,7 @@ class BioinfoMetadata(BaseModule):
             self.log.info(f"Processing data from {batch_dir}")
 
             self.split_tables_by_batch(
-                files_found_dict, lab_code, file_tag, batch_data, batch_dir
+                files_found_dict, file_tag, batch_data, batch_dir
             )
 
             tag = "bioinfo_lab_metadata_"
