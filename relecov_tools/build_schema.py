@@ -32,6 +32,7 @@ class SchemaBuilder(BaseModule):
         self,
         input_file=None,
         schema_base=None,
+        excel_template=None,
         draft_version=None,
         diff=False,
         output_dir=None,
@@ -141,34 +142,60 @@ class SchemaBuilder(BaseModule):
                 relecov_schema = config_json.get_topic_data(
                     "json_schemas", "relecov_schema"
                 )
-                try:
-                    self.base_schema_path = os.path.join(
-                        os.path.dirname(os.path.realpath(__file__)),
-                        "schema",
-                        relecov_schema,
-                    )
-                    if not relecov_tools.utils.file_exists(self.base_schema_path):
-                        self.log.error(
-                            "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning."
-                        )
-                        stderr.print(
-                            "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning. Exiting..."
-                        )
-                        sys.exit(1)
-                    self.log.info(
-                        "RELECOV schema successfully found in the configuration."
-                    )
-                    stderr.print(
-                        "[green]RELECOV schema successfully found in the configuration."
-                    )
-                except FileNotFoundError as fnf_error:
-                    self.log.error(f"Configuration file not found: {fnf_error}")
-                    stderr.print(f"[red]Configuration file not found: {fnf_error}")
-                    sys.exit(1)
             except KeyError as key_error:
                 self.log.error(f"Configuration key error: {key_error}")
                 stderr.print(f"[orange]Configuration key error: {key_error}")
-                sys.exit(1)
+                raise
+
+            try:
+                self.base_schema_path = os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)),
+                    "schema",
+                    relecov_schema,
+                )
+            except FileNotFoundError as fnf_error:
+                self.log.error(f"Configuration file not found: {fnf_error}")
+                stderr.print(f"[red]Configuration file not found: {fnf_error}")
+                raise
+
+            if not relecov_tools.utils.file_exists(self.base_schema_path):
+                self.log.error(
+                    "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning."
+                )
+                stderr.print(
+                    "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning. Exiting..."
+                )
+                raise FileNotFoundError(
+                    "Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning."
+                )
+
+            self.log.info("RELECOV schema successfully found in the configuration.")
+            stderr.print(
+                "[green]RELECOV schema successfully found in the configuration."
+            )
+
+            if excel_template:
+                self.excel_template = excel_template
+            else:
+                try:
+                    excel_template_path = os.path.join(
+                        os.path.dirname(os.path.realpath(__file__)), "assets"
+                    )
+                    excel_template = [
+                        f
+                        for f in os.listdir(excel_template_path)
+                        if f.startswith("Relecov_metadata_template")
+                    ][0]
+                    self.excel_template = os.path.join(
+                        excel_template_path, excel_template
+                    )
+                except FileNotFoundError:
+                    self.log.error(
+                        "[Error]Fatal error. Excel template was not found in current relecov-tools installation (assets)"
+                    )
+                    stderr.print(
+                        "[Error]Fatal error. Excel template not found in current relecov-tools installation (assets). Exiting..."
+                    )
 
     def validate_database_definition(self, json_data):
         """Validate the mandatory features and ensure:
