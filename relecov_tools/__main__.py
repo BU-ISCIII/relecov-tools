@@ -897,7 +897,7 @@ def update_db(
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
 )
-@click.option("-s", "--software_name", help="Name of the software/pipeline used.")
+@click.option("-p", "--software_name", help="Name of the software/pipeline used.")
 @click.option(
     "--update",
     is_flag=True,
