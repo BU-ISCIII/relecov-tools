@@ -678,7 +678,7 @@ class BioinfoMetadata(BaseModule):
                             or self.software_config[key].get("function")
                         ):
                             if self.software_config[key].get("split_by_batch"):
-                                base, ext = base, ext = os.path.splitext(
+                                base, ext = os.path.splitext(
                                     os.path.basename(paths)
                                 )
                                 batchid = row["batch_id"]
