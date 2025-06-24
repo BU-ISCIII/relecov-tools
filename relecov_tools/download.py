@@ -131,7 +131,7 @@ class Download(BaseModule):
             "lab_metadata", "samples_json_fields"
         )
         # initialize the sftp client
-        self.relecov_sftp = relecov_tools.sftp_client.SftpRelecov(
+        self.relecov_sftp = relecov_tools.sftp_client.SftpClient(
             conf_file, sftp_user, sftp_passwd
         )
         self.finished_folders = {}

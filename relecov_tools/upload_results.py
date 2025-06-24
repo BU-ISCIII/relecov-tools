@@ -61,7 +61,7 @@ class UploadSftp(BaseModule):
             msg="Enter your password:"
         )
 
-        self.relecov_sftp = relecov_tools.sftp_client.SftpRelecov(
+        self.relecov_sftp = relecov_tools.sftp_client.SftpClient(
             username=self.sftp_user, password=self.sftp_passwd
         )
         self.log.info(f"User: {self.sftp_user}, Processing batch: {self.batch_id}")
