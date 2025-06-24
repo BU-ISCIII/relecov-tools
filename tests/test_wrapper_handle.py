@@ -4,7 +4,7 @@ import sys
 import argparse
 import yaml
 from relecov_tools.config_json import ConfigJson
-from relecov_tools.download_manager import DownloadManager
+from relecov_tools.download import DownloadManager
 from relecov_tools.wrapper import ProcessWrapper
 
 
@@ -62,7 +62,7 @@ def prepare_remote_test(**kwargs):
     # First clean the repository.
     print("Initating sftp module")
 
-    download_manager = DownloadManager(
+    download = DownloadManager(
         user=kwargs["user"],
         password=kwargs["password"],
         conf_file=None,
@@ -72,15 +72,15 @@ def prepare_remote_test(**kwargs):
         subfolder="RELECOV",
     )
     print("Openning connection to sftp")
-    download_manager.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
-    if not download_manager.relecov_sftp.open_connection():
+    download.relecov_sftp.sftp_port = os.environ["TEST_PORT"]
+    if not download.relecov_sftp.open_connection():
         print("Could not open connection to remote sftp")
         sys.exit(1)
 
     print("Cleaning folders inside RELECOV")
     base_paths = ["COD-test-1/RELECOV", "COD-test-2/RELECOV"]
     for base_path in base_paths:
-        remote_folders = download_manager.relecov_sftp.list_remote_folders(
+        remote_folders = download.relecov_sftp.list_remote_folders(
             base_path, recursive=True
         )
         remote_folders = sorted(remote_folders, reverse=True)
@@ -89,22 +89,22 @@ def prepare_remote_test(**kwargs):
             if folder == base_path:
                 continue
 
-            filelist = download_manager.relecov_sftp.get_file_list(folder)
+            filelist = download.relecov_sftp.get_file_list(folder)
             for file in filelist:
                 print(f"Removing file {file} in {folder}")
-                download_manager.relecov_sftp.remove_file(file)
+                download.relecov_sftp.remove_file(file)
 
             if "tmp_processing" in folder or "invalid_samples" in folder:
                 try:
                     print(f"Removing special folder {folder}")
-                    download_manager.relecov_sftp.remove_dir(folder)
+                    download.relecov_sftp.remove_dir(folder)
                 except Exception as e:
                     print(f"Could not remove folder {folder}: {e}")
 
-        filelist_base = download_manager.relecov_sftp.get_file_list(base_path)
+        filelist_base = download.relecov_sftp.get_file_list(base_path)
         for file in filelist_base:
             print(f"Removing file {file} in {base_path}")
-            download_manager.relecov_sftp.remove_file(file)
+            download.relecov_sftp.remove_file(file)
 
     data_loc = "tests/data/sftp_handle"
     folder_files_dict = {folder: files for folder, _, files in os.walk(data_loc)}
@@ -120,9 +120,9 @@ def prepare_remote_test(**kwargs):
         for file in files:
             remote_path = os.path.join(remote_dir, file)
             local_path = os.path.join(os.path.abspath(folder), file)
-            download_manager.relecov_sftp.upload_file(local_path, remote_path)
+            download.relecov_sftp.upload_file(local_path, remote_path)
 
-    download_manager.relecov_sftp.close_connection()
+    download.relecov_sftp.close_connection()
 
     print("Create Intermediate YML")
     conf_file = generate_config_yaml(  # Generate the YAML config file

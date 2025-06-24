@@ -9,7 +9,7 @@ import inspect
 # from rich.prompt import Confirm
 import click
 import relecov_tools.config_json
-import relecov_tools.download_manager
+import relecov_tools.download
 import relecov_tools.log_summary
 import rich.console
 import rich.traceback
@@ -17,7 +17,7 @@ import rich.traceback
 import relecov_tools.config_json
 import relecov_tools.utils
 import relecov_tools.read_lab_metadata
-import relecov_tools.download_manager
+import relecov_tools.download
 import relecov_tools.json_validation
 import relecov_tools.mail
 import relecov_tools.map_schema
@@ -315,8 +315,8 @@ def download(
         add_extra_config=True,
     )
     try:
-        download_manager = relecov_tools.download_manager.DownloadManager(**args_merged)
-        download_manager.execute_process()
+        download = relecov_tools.download.DownloadManager(**args_merged)
+        download.execute_process()
     except Exception as e:
         if debug:
             log.exception(f"EXCEPTION FOUND: {e}")

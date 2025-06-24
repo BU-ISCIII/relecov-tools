@@ -6,7 +6,7 @@ import rich.console
 from collections import defaultdict
 
 from relecov_tools.config_json import ConfigJson
-from relecov_tools.download_manager import DownloadManager
+from relecov_tools.download import DownloadManager
 from relecov_tools.read_lab_metadata import RelecovMetadata
 from relecov_tools.json_validation import SchemaValidation
 from relecov_tools.base_module import BaseModule
@@ -98,17 +98,17 @@ class ProcessWrapper(BaseModule):
             sftp_port = download_params.pop("sftp_port", None)
         else:
             sftp_port = None
-        download_manager = DownloadManager(**download_params)
+        download = DownloadManager(**download_params)
         if sftp_port is not None:
-            download_manager.relecov_sftp.sftp_port = int(sftp_port)
-            print(f"SFTP port assigned: {download_manager.relecov_sftp.sftp_port}")
-        download_manager.defer_cleanup = True
-        download_manager.execute_process()
-        finished_folders = download_manager.finished_folders
+            download.relecov_sftp.sftp_port = int(sftp_port)
+            print(f"SFTP port assigned: {download.relecov_sftp.sftp_port}")
+        download.defer_cleanup = True
+        download.execute_process()
+        finished_folders = download.finished_folders
         download_logs = self.wrapper_logsum.prepare_final_logs(
-            logs=download_manager.logsum.logs
+            logs=download.logsum.logs
         )
-        self.download_manager = download_manager
+        self.download = download
         return finished_folders, download_logs
 
     def exec_read_metadata(self, readmeta_params):
@@ -160,7 +160,7 @@ class ProcessWrapper(BaseModule):
                     sample.get("sequence_file_R1"),
                     sample.get("sequence_file_R2"),
                 )
-                ftp_files = self.download_manager.relecov_sftp.get_file_list(remote_dir)
+                ftp_files = self.download.relecov_sftp.get_file_list(remote_dir)
                 uploaded_files = []
                 for file in sample_files:
                     if not file or file in ftp_files:
@@ -168,7 +168,7 @@ class ProcessWrapper(BaseModule):
                     loc_path = os.path.join(local_dir, file)
                     sftp_path = os.path.join(remote_dir, file)
                     self.log.info("Uploading %s to remote %s" % (loc_path, remote_dir))
-                    uploaded = self.download_manager.relecov_sftp.upload_file(
+                    uploaded = self.download.relecov_sftp.upload_file(
                         loc_path, sftp_path
                     )
                     if not uploaded:
@@ -219,13 +219,13 @@ class ProcessWrapper(BaseModule):
         )
         stderr.print(f"[green]Merged logs from all processes in {local_folder}")
         self.log.info(f"Merged logs from all processes in {local_folder}")
-        subfolder = getattr(self.download_manager, "subfolder", None)
+        subfolder = getattr(self.download, "subfolder", None)
 
         if subfolder and subfolder not in os.path.split(key):
             main_folder = os.path.join(key, subfolder)
         else:
             main_folder = key
-        sftp_dirs = self.download_manager.relecov_sftp.list_remote_folders(main_folder)
+        sftp_dirs = self.download.relecov_sftp.list_remote_folders(main_folder)
         sftp_dirs_paths = [os.path.join(main_folder, d) for d in sftp_dirs]
         valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
 
@@ -240,7 +240,7 @@ class ProcessWrapper(BaseModule):
                 remote_dir = os.path.join(
                     main_folder, self.batch_id + "_invalid_samples"
                 )
-                self.download_manager.relecov_sftp.make_dir(remote_dir)
+                self.download.relecov_sftp.make_dir(remote_dir)
             else:
                 remote_dir = valid_dirs[0]
                 stderr.print(
@@ -253,13 +253,13 @@ class ProcessWrapper(BaseModule):
                 valid_sampfiles = [
                     f.get(v) for v in file_fields for f in valid_json_data
                 ]
-                remote_files = self.download_manager.relecov_sftp.get_file_list(
+                remote_files = self.download.relecov_sftp.get_file_list(
                     remote_dir
                 )
                 valid_files = [f for f in remote_files if f in valid_sampfiles]
-                self.download_manager.delete_remote_files(remote_dir, files=valid_files)
-                self.download_manager.delete_remote_files(remote_dir, skip_seqs=True)
-                self.download_manager.clean_remote_folder(remote_dir)
+                self.download.delete_remote_files(remote_dir, files=valid_files)
+                self.download.delete_remote_files(remote_dir, skip_seqs=True)
+                self.download.clean_remote_folder(remote_dir)
 
             logtxt = f"Found {len(invalid_json)} invalid samples in {key}"
             self.wrapper_logsum.add_warning(key=key, entry=logtxt)
@@ -291,7 +291,7 @@ class ProcessWrapper(BaseModule):
                 stderr.print(
                     f"[blue]Uploading invalid files and metadata to {remote_dir}"
                 )
-                self.download_manager.relecov_sftp.upload_file(
+                self.download.relecov_sftp.upload_file(
                     invalid_metadata_path, sftp_path
                 )
             # Upload all the files that failed validation process back to sftp
@@ -313,7 +313,7 @@ class ProcessWrapper(BaseModule):
             self.log.info("Uploading %s xlsx report to remote %s" % (key, remote_dir))
             local_xlsx = os.path.join(local_folder, xlsx_report_files[0])
             remote_xlsx = os.path.join(remote_dir, xlsx_report_files[0])
-            up = self.download_manager.relecov_sftp.upload_file(local_xlsx, remote_xlsx)
+            up = self.download.relecov_sftp.upload_file(local_xlsx, remote_xlsx)
             if not up:
                 self.log.error(
                     "Could not upload %s report to remote %s" % (key, local_folder)
@@ -332,7 +332,7 @@ class ProcessWrapper(BaseModule):
         """
         self.log.info("Starting with wrapper")
         finished_folders, download_logs = self.exec_download(self.download_params)
-        self.set_batch_id(self.download_manager.batch_id)
+        self.set_batch_id(self.download.batch_id)
         if not finished_folders:
             stderr.print("[red]No valid folders found to process")
             self.log.error("No valid folders found to process")
