@@ -347,6 +347,7 @@ class DownloadManager(BaseModule):
         meta_column_list = self.metadata_lab_heading
 
         try:
+            stderr.print(f"Reading metadata file for {self.current_folder}")
             wb_file = openpyxl_load_workbook(meta_f_path, data_only=True)
             ws_metadata_lab = wb_file[sheet_name]
             try:
@@ -371,10 +372,10 @@ class DownloadManager(BaseModule):
                     if x not in meta_column_list or x not in metadata_header
                 ]
                 self.log.error(
-                    "Config field metadata_lab_heading is different from .xlsx header"
+                    f"Config field metadata_lab_heading is different from .xlsx header for {self.current_folder}"
                 )
                 stderr.print(
-                    "[red]Header in metadata file is different from config file, aborting"
+                    f"[red]Header in metadata file is different from config file for {self.current_folder}, aborting"
                 )
                 stderr.print("[red]Differences: ", diffs)
                 raise MetadataError(f"Metadata header different from config: {diffs}")
@@ -388,7 +389,7 @@ class DownloadManager(BaseModule):
                 f"openpyxl failed to read the Excel file: {openpyxl_error}"
             )
             self.log.warning("Attempting to read using pandas fallback")
-
+            stderr.print(f"openpyxl failed to read the Excel file: {openpyxl_error}. Attempting to read using pandas fallback.")
             try:
                 df = pd.read_excel(meta_f_path, sheet_name=sheet_name, header=None)
                 header_row_mask = df.apply(
@@ -410,10 +411,10 @@ class DownloadManager(BaseModule):
                         if x not in meta_column_list or x not in metadata_header
                     ]
                     self.log.error(
-                        "Config field metadata_lab_heading is different from .xlsx header"
+                        f"Config field metadata_lab_heading is different from .xlsx header for {self.current_folder}"
                     )
                     stderr.print(
-                        "[red]Header in metadata file is different from config file, aborting"
+                        f"[red]Header in metadata file is different from config file for {self.current_folder}, aborting"
                     )
                     stderr.print("[red]Differences: ", diffs)
                     raise MetadataError(
