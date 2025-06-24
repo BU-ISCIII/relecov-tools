@@ -21,7 +21,7 @@ stderr = rich.console.Console(
 )
 
 
-class MappingSchema(BaseModule):
+class Map(BaseModule):
     def __init__(
         self,
         origin_schema=None,
