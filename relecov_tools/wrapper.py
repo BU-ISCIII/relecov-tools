@@ -58,7 +58,7 @@ class Wrapper(BaseModule):
             )
 
         self.download_params = self.clean_module_params(
-            "DownloadManager", config.get_configuration("download")
+            "Download", config.get_configuration("download")
         )
 
         if (
