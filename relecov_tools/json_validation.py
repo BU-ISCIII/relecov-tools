@@ -329,7 +329,9 @@ class SchemaValidation(BaseModule):
                 metadata,
                 " does not exist",
             )
-            sys.exit(1)
+            raise FileNotFoundError(
+                f"Unable to create excel file for invalid samples. Metadata file {metadata} does not exist"
+            )
         sample_list = []
         stderr.print("Start preparation of invalid samples")
         self.log.info("Start preparation of invalid samples")
@@ -355,7 +357,7 @@ class SchemaValidation(BaseModule):
             stderr.print(f"[red]Column with tag '{tag}' not found. Cannot continue.")
             raise
         row_to_del = []
-        row_iterator = ws_sheet.iter_rows(min_row=header_row, max_row=ws_sheet.max_row)
+        row_iterator = ws_sheet.iter_rows(min_row=header_row + 1, max_row=ws_sheet.max_row)
         consec_empty_rows = 0
         id_col = [
             idx for idx, val in enumerate(ws_sheet[header_row]) if val.value == tag
@@ -383,7 +385,7 @@ class SchemaValidation(BaseModule):
                         e,
                     )
                     stderr.print(f"[red] Unable to delete row {idx} becuase of {e}")
-                    sys.exit(1)
+                    raise
         os.makedirs(out_folder, exist_ok=True)
         new_name = "invalid_" + os.path.basename(metadata)
         m_file = os.path.join(out_folder, new_name)
