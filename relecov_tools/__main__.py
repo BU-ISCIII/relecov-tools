@@ -656,7 +656,7 @@ def map(ctx, origin_schema, json_file, destination_schema, schema_file, output_d
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
-        new_schema = relecov_tools.map.MappingSchema(**args_merged)
+        new_schema = relecov_tools.map.Map(**args_merged)
         new_schema.map_to_data_to_new_schema()
     except Exception as e:
         if debug:
