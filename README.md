@@ -13,13 +13,15 @@ relecov-tools is a set of helper tools for the assembly of the different element
     - [Pip](#pip)
     - [Development version](#development-version)
     - [Required software](#required-software)
+      - [Install 7-Zip on Linux](#install-7-zip-on-linux)
   - [Usage](#usage)
     - [Command-line](#command-line)
-    - [Modules](#modules)
+  - [Modules](#modules)
       - [download](#download)
       - [read-lab-metadata](#read-lab-metadata)
       - [send-mail](#send-mail)
       - [read-bioinfo-metadata](#read-bioinfo-metadata)
+        - [Configuration of module `read-bioinfo-metadata`](#configuration-of-module-read-bioinfo-metadata)
       - [validate](#validate)
       - [map](#map)
       - [upload-to-ena](#upload-to-ena)
@@ -32,7 +34,8 @@ relecov-tools is a set of helper tools for the assembly of the different element
     - [build-schema](#build-schema)
       - [Mandatory Files](#mandatory-files)
       - [Mandatory Fields](#mandatory-fields)
-    - [Logging functionality](#Logging_functionality)
+      - [Logging\_functionality](#logging_functionality)
+      - [Custom logs](#custom-logs)
     - [Python package mode](#python-package-mode)
   - [Acknowledgements](#acknowledgements)
 
@@ -246,7 +249,7 @@ Options:
   -o, --output_dir, --output-dir, --output_folder, --out-folder, --output_location, --output_path, --out_dir, --output DIRECTORY
                                   Directory where the generated output will be
                                   saved
-  -s, --software_name TEXT        Name of the software/pipeline used.
+  -p, --software_name TEXT        Name of the software/pipeline used.
   --update                        If the output file already exists, ask if
                                   you want to update it.
   --soft_validation               If the module should continue even if any
