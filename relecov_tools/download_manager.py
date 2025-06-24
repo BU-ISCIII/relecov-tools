@@ -389,7 +389,9 @@ class DownloadManager(BaseModule):
                 f"openpyxl failed to read the Excel file: {openpyxl_error}"
             )
             self.log.warning("Attempting to read using pandas fallback")
-            stderr.print(f"openpyxl failed to read the Excel file: {openpyxl_error}. Attempting to read using pandas fallback.")
+            stderr.print(
+                f"openpyxl failed to read the Excel file: {openpyxl_error}. Attempting to read using pandas fallback."
+            )
             try:
                 df = pd.read_excel(meta_f_path, sheet_name=sheet_name, header=None)
                 header_row_mask = df.apply(
