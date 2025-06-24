@@ -6,7 +6,7 @@ import rich.console
 from collections import defaultdict
 
 from relecov_tools.config_json import ConfigJson
-from relecov_tools.download import DownloadManager
+from relecov_tools.download import Download
 from relecov_tools.read_lab_metadata import RelecovMetadata
 from relecov_tools.validate import SchemaValidation
 from relecov_tools.base_module import BaseModule
@@ -98,7 +98,7 @@ class ProcessWrapper(BaseModule):
             sftp_port = download_params.pop("sftp_port", None)
         else:
             sftp_port = None
-        download = DownloadManager(**download_params)
+        download = Download(**download_params)
         if sftp_port is not None:
             download.relecov_sftp.sftp_port = int(sftp_port)
             print(f"SFTP port assigned: {download.relecov_sftp.sftp_port}")

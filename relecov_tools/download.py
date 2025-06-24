@@ -34,7 +34,7 @@ class MetadataError(Exception):
         super().__init__(message)
 
 
-class DownloadManager(BaseModule):
+class Download(BaseModule):
     def __init__(
         self,
         user=None,

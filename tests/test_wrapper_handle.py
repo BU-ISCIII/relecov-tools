@@ -4,7 +4,7 @@ import sys
 import argparse
 import yaml
 from relecov_tools.config_json import ConfigJson
-from relecov_tools.download import DownloadManager
+from relecov_tools.download import Download
 from relecov_tools.wrapper import ProcessWrapper
 
 
@@ -62,7 +62,7 @@ def prepare_remote_test(**kwargs):
     # First clean the repository.
     print("Initating sftp module")
 
-    download = DownloadManager(
+    download = Download(
         user=kwargs["user"],
         password=kwargs["password"],
         conf_file=None,
