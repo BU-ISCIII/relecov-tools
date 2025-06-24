@@ -8,7 +8,7 @@ from collections import defaultdict
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.download import DownloadManager
 from relecov_tools.read_lab_metadata import RelecovMetadata
-from relecov_tools.json_validation import SchemaValidation
+from relecov_tools.validate import SchemaValidation
 from relecov_tools.base_module import BaseModule
 import relecov_tools.utils
 
