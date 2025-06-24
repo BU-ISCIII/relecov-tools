@@ -229,23 +229,31 @@ Options:
 ```
 
 #### read-bioinfo-metadata
+
 `read-bioinfo-metadata` Include the results from the Bioinformatics analysis into the Json previously created with read-lab-metadata module.
 
-```
+```bash
 $ relecov-tools read-bioinfo-metadata --help
 Usage: relecov-tools read-bioinfo-metadata [OPTIONS]
 
-   Create the json compliant to the relecov schema with Bioinfo Metadata.
+  Create the json compliant  from the Bioinfo Metadata.
 
 Options:
-  -j, --json_file PATH      json file containing lab metadata
-  -i, --input_folder PATH   Path to input files
-  -o, --output_dir, TEXT    Directory where the generated output will be saved
-  -s, --software_name TEXT  Name of the software/pipeline used.
-  --update                  If the output file already exists, ask if you want
-                            to update it.
-  --help                    Show this message and exit.
+  -j, --json_file PATH            json file containing lab metadata
+  -s, --json_schema_file TEXT     Path to the JSON Schema file used for
+                                  validation
+  -i, --input_folder PATH         Path to input files
+  -o, --output_dir, --output-dir, --output_folder, --out-folder, --output_location, --output_path, --out_dir, --output DIRECTORY
+                                  Directory where the generated output will be
+                                  saved
+  -s, --software_name TEXT        Name of the software/pipeline used.
+  --update                        If the output file already exists, ask if
+                                  you want to update it.
+  --soft_validation               If the module should continue even if any
+                                  sample does not validate.
+  --help                          Show this message and exit.
 ```
+
 - Note: Software-specific configurations are available in [bioinfo_config.json](./relecov_tools/conf/bioinfo_config.json).
 
 ##### Configuration of module `read-bioinfo-metadata`
