@@ -118,7 +118,8 @@ def run_relecov_tools():
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
     stderr.print(
-        "\n" r"[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
+        "\n" r"[grey39]    RELECOV-tools version {}".format(__version__),
+        highlight=False,
     )
 
     # Lanch the click cli
