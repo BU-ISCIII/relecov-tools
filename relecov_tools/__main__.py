@@ -1263,7 +1263,7 @@ def wrapper(ctx, output_dir):
     debug = ctx.obj.get("debug", False)
 
     try:
-        process_wrapper = relecov_tools.wrapper.ProcessWrapper(
+        process_wrapper = relecov_tools.wrapper.Wrapper(
             **args_merged
         )
         process_wrapper.run_wrapper()

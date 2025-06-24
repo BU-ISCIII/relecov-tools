@@ -5,7 +5,7 @@ import argparse
 import yaml
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.download import Download
-from relecov_tools.wrapper import ProcessWrapper
+from relecov_tools.wrapper import Wrapper
 
 
 def main():
@@ -133,7 +133,7 @@ def prepare_remote_test(**kwargs):
     print("Initiating ProcessWrapper")
     config_json = ConfigJson()
     config_json.include_extra_config(conf_file, config_name=None, force=True)
-    wrapper_manager = ProcessWrapper(  # Initialize ProcessWrapper with the config file
+    wrapper_manager = Wrapper(  # Initialize ProcessWrapper with the config file
         output_dir=kwargs["output_dir"],
     )
 
