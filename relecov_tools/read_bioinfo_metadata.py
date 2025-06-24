@@ -1050,12 +1050,11 @@ class BioinfoMetadata(BaseModule):
                     for sample in samples
                 )
             )
-            for error_type, failed_samples in invalid_rows["samples"].items():
-                detail = error_type.split(":", 1)[1].strip()
+            for error_message, failed_samples in invalid_rows["samples"].items():
                 num_samples = len(failed_samples)
-                field_with_error = invalid_rows["fields"][error_type]
+                field_with_error = invalid_rows["fields"][error_message]
                 sample_list = "', '".join(failed_samples)
-                error_text = f"Error {detail} in field '{field_with_error}' for {num_samples} sample/s: '{sample_list}'"
+                error_text = f"{error_message} in field '{field_with_error}' for {num_samples} sample/s: '{sample_list}'"
                 if len(unique_failed_samples) == len(self.j_data):
                     self.logsum.add_error(key=out_path, entry=error_text)
                 else:
