@@ -123,8 +123,8 @@ class BioinfoMetadata(BaseModule):
         # Initialize j_data object
         stderr.print("[blue]Reading lab metadata json")
         self.j_data = self.collect_info_from_lab_json()
-        batch_id = self.get_batch_id_from_data(self.j_data)
-        self.set_batch_id(batch_id)
+        self.batch_id = self.get_batch_id_from_data(self.j_data)
+        self.set_batch_id(self.batch_id)
         self.update = update
         self.soft_validation = soft_validation
 
@@ -1081,25 +1081,6 @@ class BioinfoMetadata(BaseModule):
 
         # Split files found based on each batch of samples
         data_by_batch = self.split_data_by_batch(self.j_data)
-
-        batch_dates = []
-        # Get batch date for all the samples
-        for batch_dir, batch_dict in data_by_batch.items():
-            if batch_dir.split("/")[-1] not in batch_dates:
-                batch_dates.append(batch_dir.split("/")[-1])
-
-        if len(batch_dates) == 1:
-            batch_date = str(batch_dates[0])
-        else:
-            stderr.print(
-                "[orange]More than one batch date in the same json data. Using current date as batch date."
-            )
-            self.log.info(
-                "More than one batch date in the same json data. Using current date as batch date."
-            )
-            batch_date = self.basemod_date
-
-        self.set_batch_id(batch_date)
 
         if os.path.exists(batch_filepath):
             stderr.print(
