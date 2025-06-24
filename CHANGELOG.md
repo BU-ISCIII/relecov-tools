@@ -50,6 +50,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - conf_file param is allowed to be empty besides None in sftp and download module [#690](https://github.com/BU-ISCIII/relecov-tools/pull/690)
 - Re-write read-bioinfo-metadata module and long table code [#673](https://github.com/BU-ISCIII/relecov-tools/pull/673)
 - Changed pass reads to genome coverage in quality control check [#673](https://github.com/BU-ISCIII/relecov-tools/pull/673)
+- add excel_template option to build-schema and handle its path in SchemaBuilder [#693](https://github.com/BU-ISCIII/relecov-tools/pull/693)
+- make path parameter optional in prompt_create_outdir function
+refactor SchemaBuilder initialization and validation logic for clarity and efficiency [#693](https://github.com/BU-ISCIII/relecov-tools/pull/693)
+- refactor versioning logic in save_new_schema method to utilize - excel_template for version history [#693](https://github.com/BU-ISCIII/relecov-tools/pull/693)
 
 #### Removed
 
