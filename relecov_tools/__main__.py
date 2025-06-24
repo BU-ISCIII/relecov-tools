@@ -28,7 +28,7 @@ import relecov_tools.gisaid_upload
 import relecov_tools.upload_ena_protocol
 import relecov_tools.pipeline_manager
 import relecov_tools.build_schema
-import relecov_tools.dataprocess_wrapper
+import relecov_tools.wrapper
 import relecov_tools.upload_results
 import relecov_tools.base_module
 
@@ -1255,7 +1255,7 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
     "output_dir",
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
-)
+)wrapper
 @click.pass_context
 def wrapper(ctx, output_dir):
     """Executes the modules in config file sequentially"""

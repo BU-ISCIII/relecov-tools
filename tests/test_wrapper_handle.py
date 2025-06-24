@@ -5,7 +5,7 @@ import argparse
 import yaml
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.download_manager import DownloadManager
-from relecov_tools.dataprocess_wrapper import ProcessWrapper
+from relecov_tools.wrapper import ProcessWrapper
 
 
 def main():
