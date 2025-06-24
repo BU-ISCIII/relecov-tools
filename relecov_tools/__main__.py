@@ -18,7 +18,7 @@ import relecov_tools.config_json
 import relecov_tools.utils
 import relecov_tools.read_lab_metadata
 import relecov_tools.download
-import relecov_tools.json_validation
+import relecov_tools.validate
 import relecov_tools.mail
 import relecov_tools.map_schema
 import relecov_tools.upload_database
@@ -433,7 +433,7 @@ def validate(
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
 
     try:
-        validation = relecov_tools.json_validation.SchemaValidation(**args_merged)
+        validation = relecov_tools.validate.SchemaValidation(**args_merged)
         validation.validate()
     except Exception as e:
         if debug:
