@@ -287,10 +287,6 @@
         "geo_loc_latitude": "36.745518",
         "geo_loc_longitude": "-5.163095"
     },
-    "Vélez-Málaga": {
-        "geo_loc_latitude": "36.778904",
-        "geo_loc_longitude": "-4.100808"
-    },
     "Motril": {
         "geo_loc_latitude": "36.746111",
         "geo_loc_longitude": "-3.515"
@@ -443,10 +439,6 @@
         "geo_loc_latitude": "40.4053485",
         "geo_loc_longitude": "-3.8764663"
     },
-    "Alcázar De San Juan": {
-        "geo_loc_latitude": "39.3899806",
-        "geo_loc_longitude": "-3.2101376"
-    },
     "Oliana": {
         "geo_loc_latitude": "42.0671629",
         "geo_loc_longitude": "1.3149416"
@@ -542,10 +534,6 @@
     "Benalmádena": {
         "geo_loc_latitude": "36.594519",
         "geo_loc_longitude": "-4.572284"
-    },
-    "Córdoba": {
-        "geo_loc_latitude": "37.8845813",
-        "geo_loc_longitude": "-4.7760138"
     },
     "Puerto Del Rosario": {
         "geo_loc_latitude": "28.4993424",
@@ -831,10 +819,6 @@
         "geo_loc_latitude": "36.8591822",
         "geo_loc_longitude": "-5.6434544"
     },
-    "Málaga": {
-        "geo_loc_latitude": "36.7213028",
-        "geo_loc_longitude": "-4.4216366"
-    },
     "Villarrobledo": {
         "geo_loc_latitude": "39.2681742",
         "geo_loc_longitude": "-2.6042132"
@@ -991,10 +975,6 @@
         "geo_loc_latitude": "36.7818354",
         "geo_loc_longitude": "-4.0988099"
     },
-    "Jaén": {
-        "geo_loc_latitude": "37.9557275",
-        "geo_loc_longitude": "-3.492055612037218"
-    },
     "Loja": {
         "geo_loc_latitude": "37.1664839",
         "geo_loc_longitude": "-4.1496374"
@@ -1147,10 +1127,6 @@
         "geo_loc_latitude": "36.15829615",
         "geo_loc_longitude": "-5.340474187804688"
     },
-    "Urdúliz": {
-        "geo_loc_latitude": "43.3730856",
-        "geo_loc_longitude": "-2.9483534"
-    },
     "Vitoria-Gasteiz": {
         "geo_loc_latitude": "42.8465088",
         "geo_loc_longitude": "-2.6724025"
@@ -1255,10 +1231,6 @@
         "geo_loc_latitude": "38.0111398",
         "geo_loc_longitude": "-3.3719098"
     },
-    "Ávila": {
-        "geo_loc_latitude": "40.656478",
-        "geo_loc_longitude": "-4.7002172"
-    },
     "Coaña": {
         "geo_loc_latitude": "43.512625799999995",
         "geo_loc_longitude": "-6.761010561610359"
@@ -1286,10 +1258,6 @@
     "Tolosa": {
         "geo_loc_latitude": "43.1386097",
         "geo_loc_longitude": "-2.0723558"
-    },
-    "Cáceres": {
-        "geo_loc_latitude": "39.4745175",
-        "geo_loc_longitude": "-6.3716761"
     },
     "Peñarroya-Pueblonuevo": {
         "geo_loc_latitude": "38.3026178",
@@ -1406,10 +1374,6 @@
     "Carcaixent": {
         "geo_loc_latitude": "39.1209651",
         "geo_loc_longitude": "-0.4472814"
-    },
-    "Cádiz": {
-        "geo_loc_latitude": "36.5297438",
-        "geo_loc_longitude": "-6.2928976"
     },
     "Sagunto": {
         "geo_loc_latitude": "39.6792916",
