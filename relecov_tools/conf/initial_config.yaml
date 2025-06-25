@@ -44,14 +44,6 @@ validate:
     excel_sheet: ''
     registry: ''
 
-send_mail:
-    validate_file: ''
-    receiver_email: ''
-    attachments: []
-    template_path: ''
-    email_psswd: ''
-    additional_notes: ''
-
 map:
     destination_schema: ''
     json_file: ''
