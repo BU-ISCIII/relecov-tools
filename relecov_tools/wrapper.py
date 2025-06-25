@@ -74,7 +74,7 @@ class Wrapper(BaseModule):
         self.readmeta_params = dict()
 
         self.validate_params = self.clean_module_params(
-            "SchemaValidation", config.get_configuration("validate")
+            "Validate", config.get_configuration("validate")
         )
 
         # intialize the log summary wrapper
