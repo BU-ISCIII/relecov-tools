@@ -63,7 +63,8 @@ refactor SchemaBuilder initialization and validation logic for clarity and effic
 
 #### Removed
 
-- Removed config_file parameter from wrapper, now download, read_lab_metadata and validate params must be provided via extra config [#690](https://github.com/BU-ISCIII/relecov-tools/pull/690)
+- Removed config_file parameter from wrapper, now download, read_lab_metadata and validate params must be provided via extra config [#690](https://github.com/BU-ISCIII/relecov-tools/pull/690).
+- Removed duplicate mail-related key in initial_config.yaml [#697](https://github.com/BU-ISCIII/relecov-tools/pull/697).
 
 ### Requirements
 
