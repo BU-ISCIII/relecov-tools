@@ -121,7 +121,6 @@ logs_to_excel:
     files: []
 
 wrapper:
-    config_file: ''
     output_dir: ''
 
 upload_results:
