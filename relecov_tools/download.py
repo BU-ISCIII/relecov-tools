@@ -1476,9 +1476,9 @@ class Download(BaseModule):
         processed_folders = list(
             set(os.path.normpath(folder) for folder in processed_folders)
         )
-        # If download_option is "download_clean", remove
+        # If download_option is "download_only" or "download_clean", remove
         # sftp folder content after download is finished
-        if self.download_option == "download_clean":
+        if self.download_option in ("download_only", "download_clean"):
             normal_folders = {
                 folder
                 for folder in processed_folders
@@ -1490,7 +1490,17 @@ class Download(BaseModule):
                     self.clean_remote_folder(folder)
             folders_to_clean = copy.deepcopy(self.finished_folders)
             for folder, downloaded_files in folders_to_clean.items():
-                self.delete_remote_files(folder, files=downloaded_files)
+                if self.download_option == "download_only":
+                    new_folder = folder.replace("_tmp_processing", "_downloaded")
+                    self.relecov_sftp.rename_file(folder, new_folder)
+                    self.relecov_sftp.make_dir(folder)
+                    invalid_files = [sample for sample in self.relecov_sftp.get_file_list(new_folder) if os.path.basename(sample) not in downloaded_files]
+                    if len(invalid_files) > 1:
+                        for file in invalid_files:
+                            dest_path = file.replace(new_folder, folder)
+                            self.relecov_sftp.copy_within_sftp(file, dest_path)
+                if self.download_option == "download_clean":
+                    self.delete_remote_files(folder, files=downloaded_files)
                 self.clean_remote_folder(folder)
                 self.log.info(f"Delete process finished in remote {folder}")
 
