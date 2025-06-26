@@ -1223,14 +1223,28 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
         raise ValueError(msg)
 
     logsum = relecov_tools.log_summary.LogSum(output_dir=output_dir)
+
     try:
+        logmod = relecov_tools.base_module.BaseModule(output_dir=output_folder, called_module="logs-to-excel")
+
+        # Attempt to extract batch_id from the folder name
+        try:
+            batch_date = datetime.strptime(os.path.basename(output_folder), "%Y%m%d")
+        except Exception:
+            batch_date = logmod.basemod_date
+
+        logmod.set_batch_id(batch_date)
+
         merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
         final_logs = logsum.prepare_final_logs(logs=merged_logs)
-        output_filepath = os.path.join(output_folder, lab_code + "_metadata_report")
-        excel_outpath = output_filepath + ".xlsx"
+
+        output_filename = logmod.tag_filename(f"logs_to_excel_{lab_code}")
+        excel_outpath = os.path.join(output_folder, output_filename + "_metadata_report.xlsx")
         logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
-        json_outpath = output_filepath + ".json"
+
+        json_outpath = excel_outpath.replace(".xlsx", ".json")
         relecov_tools.utils.write_json_to_file(final_logs, json_outpath)
+
     except Exception as e:
         if debug:
             log.exception(f"EXCEPTION FOUND: {e}")
