@@ -297,6 +297,36 @@ class SftpClient:
             log.error("File not found %s", e)
             stderr.print("[red]File not found")
             return False
+        
+    @reconnect_if_fail(n_times=3, sleep_time=30)
+    def copy_within_sftp(self, src_path, dest_path, buffer_size=65536):
+        """
+        Copies a file within the SFTP server by reading and writing in blocks.
+
+        Args:
+            src_path (str): Path to the source file on the SFTP server.
+            dest_path (str): Path where the file should be copied to on the SFTP server.
+            buffer_size (int, optional): Block size for reading/writing in bytes. Default is 64 KB.
+
+        Returns:
+            bool: True if the copy was successful, False if it was not
+        """
+        try:
+            log.info(f"Copying file within SFTP: {src_path} -> {dest_path}")
+            with self.sftp.open(src_path, 'rb') as src_file:
+                with self.sftp.open(dest_path, 'wb') as dest_file:
+                    while True:
+                        data = src_file.read(buffer_size)
+                        if not data:
+                            break
+                        dest_file.write(data)
+            log.info(f"File successfully copied within SFTP to: {dest_path}")
+            return True
+        except FileNotFoundError:
+            log.error(f"Source file not found: {src_path}")
+        except IOError as e:
+            log.error(f"Error during SFTP copy operation: {e}")
+        return False
 
     @reconnect_if_fail(n_times=3, sleep_time=30)
     def close_connection(self):
