@@ -1494,7 +1494,11 @@ class Download(BaseModule):
                     new_folder = folder.replace("_tmp_processing", "_downloaded")
                     self.relecov_sftp.rename_file(folder, new_folder)
                     self.relecov_sftp.make_dir(folder)
-                    invalid_files = [sample for sample in self.relecov_sftp.get_file_list(new_folder) if os.path.basename(sample) not in downloaded_files]
+                    invalid_files = [
+                        sample
+                        for sample in self.relecov_sftp.get_file_list(new_folder)
+                        if os.path.basename(sample) not in downloaded_files
+                    ]
                     if len(invalid_files) > 1:
                         for file in invalid_files:
                             dest_path = file.replace(new_folder, folder)
