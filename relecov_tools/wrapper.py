@@ -308,7 +308,9 @@ class Wrapper(BaseModule):
 
         # Generate standardized filename
         base_filename = f"logs_to_excel_{str(key)}"
-        log_filepath = os.path.join(local_folder, logmod.tag_filename(base_filename) + "_metadata_report.json")
+        log_filepath = os.path.join(
+            local_folder, logmod.tag_filename(base_filename) + "_metadata_report.json"
+        )
         self.wrapper_logsum.create_error_summary(
             called_module="metadata",
             filepath=log_filepath,
