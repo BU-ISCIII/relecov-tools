@@ -1225,7 +1225,9 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
     logsum = relecov_tools.log_summary.LogSum(output_dir=output_dir)
 
     try:
-        logmod = relecov_tools.base_module.BaseModule(output_dir=output_folder, called_module="logs-to-excel")
+        logmod = relecov_tools.base_module.BaseModule(
+            output_dir=output_folder, called_module="logs-to-excel"
+        )
 
         # Set batch ID
         try:
@@ -1238,7 +1240,9 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
         final_logs = logsum.prepare_final_logs(logs=merged_logs)
 
         output_filename = logmod.tag_filename(f"logs_to_excel_{lab_code}")
-        excel_outpath = os.path.join(output_folder, output_filename + "_metadata_report.xlsx")
+        excel_outpath = os.path.join(
+            output_folder, output_filename + "_metadata_report.xlsx"
+        )
         logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
 
         json_outpath = excel_outpath.replace(".xlsx", ".json")
