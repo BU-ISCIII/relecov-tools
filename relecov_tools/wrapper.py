@@ -4,6 +4,7 @@ import os
 import inspect
 import rich.console
 from collections import defaultdict
+from datetime import datetime
 
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.download import Download
@@ -295,7 +296,19 @@ class Wrapper(BaseModule):
         else:
             self.log.info("No invalid samples in %s", key)
             stderr.print(f"[green]No invalid samples were found for {key} !!!")
-        log_filepath = os.path.join(local_folder, str(key) + "_metadata_report.json")
+
+        logmod = BaseModule(output_dir=local_folder, called_module="logs_to_excel")
+
+        # Set batch ID (using folder name or current date as fallback)
+        try:
+            batch_date = datetime.strptime(os.path.basename(local_folder), "%Y%m%d")
+        except Exception:
+            batch_date = logmod.basemod_date
+        logmod.set_batch_id(batch_date)
+
+        # Generate standardized filename
+        base_filename = f"logs_to_excel_{str(key)}"
+        log_filepath = os.path.join(local_folder, logmod.tag_filename(base_filename) + "_metadata_report.json")
         self.wrapper_logsum.create_error_summary(
             called_module="metadata",
             filepath=log_filepath,
