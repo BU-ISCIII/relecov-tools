@@ -299,7 +299,7 @@ class Wrapper(BaseModule):
 
         logmod = BaseModule(output_dir=local_folder, called_module="logs_to_excel")
 
-        # Set batch ID (using folder name or current date as fallback)
+        # Set batch ID
         try:
             batch_date = datetime.strptime(os.path.basename(local_folder), "%Y%m%d")
         except Exception:
