@@ -1227,12 +1227,11 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
     try:
         logmod = relecov_tools.base_module.BaseModule(output_dir=output_folder, called_module="logs-to-excel")
 
-        # Attempt to extract batch_id from the folder name
+        # Set batch ID
         try:
             batch_date = datetime.strptime(os.path.basename(output_folder), "%Y%m%d")
         except Exception:
             batch_date = logmod.basemod_date
-
         logmod.set_batch_id(batch_date)
 
         merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
