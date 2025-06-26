@@ -297,7 +297,7 @@ class SftpClient:
             log.error("File not found %s", e)
             stderr.print("[red]File not found")
             return False
-        
+
     @reconnect_if_fail(n_times=3, sleep_time=30)
     def copy_within_sftp(self, src_path, dest_path, buffer_size=65536):
         """
@@ -313,8 +313,8 @@ class SftpClient:
         """
         try:
             log.info(f"Copying file within SFTP: {src_path} -> {dest_path}")
-            with self.sftp.open(src_path, 'rb') as src_file:
-                with self.sftp.open(dest_path, 'wb') as dest_file:
+            with self.sftp.open(src_path, "rb") as src_file:
+                with self.sftp.open(dest_path, "wb") as dest_file:
                     while True:
                         data = src_file.read(buffer_size)
                         if not data:
