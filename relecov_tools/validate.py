@@ -532,9 +532,219 @@ class Validate(BaseModule):
         relecov_tools.utils.write_json_to_file(updated_registry, self.registry_path)
         self.log.info(f"Added {len(new_ids_dict)} new sample IDs to registry")
 
+    def create_validation_files(self, valid_json_data, invalid_json):
+        """Creates validated and invalid metadata files based on the provided JSON data and
+        adds valid samples to the unique ID registry.
+
+        Args:
+            valid_json_data (list[dict]): List of valid sample metadata dictionaries.
+            invalid_json (list[dict]): List of invalid sample metadata dictionaries.
+
+        Returns:
+            valid_file (str): Path to the created file with valid samples, or None if not created
+            invalid_file (str): Path to the created file with invalid samples, or None if not created
+        """
+        # Add all valid samples to the unique_id registry file
+        self.validate_registry_file()
+        valid_json_data = self.update_unique_id_registry(valid_json_data)
+        valid_file = invalid_file = None
+        if valid_json_data:
+            self.log.info("Creating json_file with validated samples...")
+            valid_file = self.create_validated_json(valid_json_data, self.out_folder)
+        else:
+            log_text = "All the samples were invalid. No valid file created"
+            self.logsum.add_error(entry=log_text)
+            stderr.print(f"[red]{log_text}")
+
+        if invalid_json:
+            log_text = "Summary: %s valid and %s invalid samples"
+            self.logsum.add_warning(
+                entry=log_text % (len(valid_json_data), len(invalid_json))
+            )
+            self.validate_invexcel_args()
+            invalid_file = self.create_invalid_metadata(
+                invalid_json, self.metadata, self.out_folder
+            )
+        else:
+            stderr.print("[green]Sucessful validation, no invalid file created!!")
+            self.log.info("Sucessful validation, no invalid file created.")
+        return valid_file, invalid_file
+
+    def validate_whole_proc_args(self):
+        """Validates that all required arguments for the upload process are present
+        and that the log summary file exists.
+
+        Raises:
+            ValueError: If any required argument is missing or the log summary file does not exist.
+        """
+        required_args = ["user", "password"]
+        self.log.debug(f"Trying to validate args for whole_proc: {required_args}")
+        missing_args = []
+        for arg in required_args:
+            if not self.__dict__.get(arg):
+                missing_args.append(arg)
+        if missing_args:
+            raise ValueError(
+                f"Missing mandatory args to upload validated files: {missing_args}"
+            )
+        if not self.subfolder:
+            self.log.warning("No subfolder provided. Uploading files to main lab folder")
+        if not self.logsum_file or not os.path.isfile(self.logsum_file):
+            raise ValueError(
+                f"Provided log_summary.json from previous processes does not exist: {self.logsum_file}"
+            )
+        return
+
+    def update_invalid_with_logsum(self, invalid_json, previous_logsum):
+        """Adds previously invalid samples from a prior log summary to the current invalid list.
+
+        Args:
+            invalid_json (list[dict]): Current list of invalid sample metadata.
+            previous_logsum (dict): Log summary containing past validation results.
+
+        Returns:
+            list[dict]: Updated list of invalid samples, including any re-detected ones from the log.
+        """
+        log_invalid_samples = []
+        self.log.info("Updating invalid samples with previous log_summary")
+        if self.lab_code in previous_logsum.keys():
+            for samp, logs in previous_logsum[self.lab_code].get("samples", {}).items():
+                self.log.debug(f"Found sample {samp} invalid in previous log_summary")
+                if not logs["valid"]:
+                    log_invalid_samples.append(samp)
+        else:
+            errtxt = f"Lab code {self.lab_code} not found in {self.logsum_file} to update invalid samples"
+            self.log.warning(errtxt)
+            stderr.print(f"[orange]{errtxt}")
+            return invalid_json
+
+        samp_id = "sequencing_sample_id"
+        updated_invalid = [
+            x for x in self.json_data if x.get(samp_id) in log_invalid_samples and x not in invalid_json
+        ]
+        invalid_json.extend([x for x in updated_invalid if x not in invalid_json])
+        return invalid_json
+
+    def upload_validation_results(self, invalid_json, invalid_file):
+        """Uploads invalid sample files and related reports to a remote SFTP server.
+        Checks that required remote directories exist or creates them.
+
+        Args:
+            invalid_json (list[dict]): List of invalid samples containing file paths.
+            invalid_file (str): Path to the Excel metadata report file.
+
+        Raises:
+            FileNotFoundError: If expected files or folders are not found locally or remotely.
+        """
+        def upload_and_clean(local_file, remote_dest):
+            """Upload file to remote sftp and log the process"""
+            self.log.debug(f"Uploading {local_file} to remote sftp: {remote_dest}")
+            if not sftp_client.upload_file(local_file, remote_dest):
+                self.log.error(f"Could not upload {invalid_file} to sftp.")
+                return False
+            else:
+                self.log.debug(f"{remote_dest} uploaded successfully")
+                try:
+                    os.remove(local_file)
+                    return True
+                except OSError as e:
+                    self.log.error(f"Could not remove {local_file}: {e}")
+                    return False
+        stderr.print("[blue]Starting to upload invalid files to remote sftp...")
+        self.log.info("Starting to upload files to remote sftp")
+        sftp_client = relecov_tools.sftp_client.SftpClient(
+            username=self.user, password=self.password
+        )
+        if self.subfolder:
+            remote_labfold = os.path.join(self.lab_code, self.subfolder)
+            flag=True
+        else:
+            remote_labfold = self.lab_code
+            flag=False
+        self.log.info(f"Remote output folder set to {remote_labfold}")
+        remote_labfold = "./" + remote_labfold
+        if remote_labfold not in sftp_client.list_remote_folders(".", recursive=flag):
+            raise FileNotFoundError(f"Couldn't find remote lab folder {remote_labfold}")
+        path_fields = [
+            ("sequence_file_path_R1", "sequence_file_R1"),
+            ("sequence_file_path_R2", "sequence_file_R2"),
+        ]
+        invalid_files = [
+            os.path.join(x[tup[0]], x[tup[1]])
+            for x in invalid_json
+            for tup in path_fields
+            if all(f in x for f in tup)
+        ]
+        if not any(os.path.isfile(f) for f in invalid_files):
+            raise FileNotFoundError(
+                f"No files from metadata found in output_dir {self.out_folder} to upload"
+            )
+        invalid_remote_folder = self.batch_id + "_invalid_samples"
+        remote_outfold = os.path.join(remote_labfold, invalid_remote_folder)
+        failed_uploads = []
+        if invalid_remote_folder not in sftp_client.list_remote_folders(remote_labfold):
+            self.log.info(f"{invalid_remote_folder} not found in sftp, creating it...")
+            sftp_client.make_dir(remote_outfold)
+        for file in invalid_files:
+            remote_dest = os.path.join(remote_outfold, os.path.basename(file))
+            if not upload_and_clean(file, remote_dest):
+                failed_uploads.append(file)
+        remote_dest = os.path.join(remote_outfold, os.path.basename(invalid_file))
+        if not upload_and_clean(invalid_file, remote_dest):
+            failed_uploads.append(invalid_file)
+        report_file = self.lab_code + "_" + self.batch_id + "_metadata_report.xlsx"
+        if report_file in os.listdir(self.out_folder):
+            remote_dest = os.path.join(remote_outfold, os.path.basename(report_file))
+            report_file_path = os.path.join(self.out_folder, report_file)
+            if not upload_and_clean(report_file_path, remote_dest):
+                failed_uploads.append(report_file_path)
+        else:
+            self.log.error(
+                f"Could not upload report file {report_file}. File not in {self.out_folder}"
+            )
+        if failed_uploads:
+            stderr.print(f"[red]Some files could not be uploaded: {failed_uploads}")
+        else:
+            stderr.print("[green]Finished uploading files to remote sftp successfully")
+        return
+
+    def process_validation_upload(self, valid_json_data, invalid_json, previous_logsum):
+        """
+        Coordinates the process of validating and uploading metadata files.
+
+        - Merges current and previous log summaries.
+        - Generates an updated Excel metadata report.
+        - Uploads invalid samples and reports to SFTP if any are found.
+
+        Args:
+            valid_json_data (list[dict]): List of valid sample metadata dictionaries.
+            invalid_json (list[dict]): Current list of invalid sample metadata.
+            previous_logsum (dict): Dictionary containing results from a prior validation run.
+        """
+        invalid_json = self.update_invalid_with_logsum(invalid_json, previous_logsum)
+        merged_logsum = self.logsum.merge_logs(
+            [previous_logsum, self.logsum.logs], key_name=self.lab_code
+        )
+        logsum_basename = self.lab_code + "_" + self.batch_id + "_metadata_report.json"
+        sumfile = os.path.join(self.out_folder, logsum_basename)
+        self.parent_create_error_summary(
+            called_module="metadata",
+            to_excel=True,
+            logs=merged_logsum,
+            filepath=sumfile,
+        )
+        _, invalid_file = self.create_validation_files(valid_json_data, invalid_json)
+        if invalid_file:
+            self.log.info("Starting upload process of invalid_samples...")
+            self.upload_validation_results(invalid_json, invalid_file)
+        else:
+            stderr.print("[green]No invalid samples were found, no upload needed")
+            self.log.info("No invalid samples were found, no upload needed")
+        return
+
     def validate(self):
         """Validate samples from metadata, create an excel with invalid samples,
-        and a json file with the validated ones
+        and a json file with the validated ones.
         """
         self.log.info("Validate the given schema")
         self.validate_schema()
