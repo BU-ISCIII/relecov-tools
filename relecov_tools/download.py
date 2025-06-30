@@ -14,7 +14,6 @@ from itertools import islice
 from secrets import token_hex
 from csv import writer as csv_writer, Error as CsvError
 from openpyxl import load_workbook as openpyxl_load_workbook
-from pandas import read_excel, ExcelWriter, concat
 from pandas.errors import ParserError, EmptyDataError
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.base_module import BaseModule
@@ -609,7 +608,7 @@ class Download(BaseModule):
             folder_name = os.path.dirname(local_meta_file)
             excel_name = str(folder_name.split("/")[-1]) + "merged_metadata.xlsx"
             merged_excel_path = os.path.join(folder_name, excel_name)
-            pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
+            pd_writer = pd.ExcelWriter(merged_excel_path, engine="xlsxwriter")
             for sheet in merged_df.keys():
                 format_sheet = merged_df[sheet].astype(str)
                 format_sheet.replace("nan", None, inplace=True)
@@ -968,7 +967,7 @@ class Download(BaseModule):
         def upload_merged_df(merged_excel_path, last_main_folder, merged_df):
             """Upload metadata dataframe merged from all subfolders back to sftp"""
             self.relecov_sftp.make_dir(last_main_folder)
-            pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
+            pd_writer = pd.ExcelWriter(merged_excel_path, engine="xlsxwriter")
             for sheet in merged_df.keys():
                 format_sheet = merged_df[sheet].astype(str)
                 format_sheet.replace("nan", None, inplace=True)
