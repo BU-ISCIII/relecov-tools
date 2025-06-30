@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import rich.console
 from jsonschema import Draft202012Validator, FormatChecker
-import sys
 import os
 import openpyxl
 from datetime import datetime
@@ -10,6 +9,7 @@ from collections import defaultdict
 import relecov_tools.utils
 import relecov_tools.assets.schema_utils.jsonschema_draft
 import relecov_tools.assets.schema_utils.custom_validators
+import relecov_tools.sftp_client
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.base_module import BaseModule
 
@@ -31,10 +31,12 @@ class Validate(BaseModule):
         output_dir=None,
         excel_sheet=None,
         registry=None,
+        upload_files=False,
+        logsum_file=None,
     ):
         """Validate json file against the schema"""
         super().__init__(output_dir=output_dir, called_module=__name__)
-        self.config = ConfigJson()
+        self.config = ConfigJson(extra_config=True)
         self.log.info("Initiating validation process")
         if json_schema_file is None:
             schema_name = self.config.get_topic_data("json_schemas", "relecov_schema")
@@ -60,7 +62,7 @@ class Validate(BaseModule):
         if not os.path.isfile(json_file):
             stderr.print("[red] Json file does not exist")
             self.log.error("Json file does not exist")
-            sys.exit(1)
+            raise ValueError(f"Json file '{json_file}' does not exist")
         self.json_data_file = json_file
         out_path = os.path.dirname(os.path.realpath(self.json_data_file))
         self.lab_code = out_path.split("/")[-2]
@@ -99,6 +101,14 @@ class Validate(BaseModule):
             self.log.error(f"Could not extract sample_id_field: {e}. Set to None")
         self.excel_sheet = excel_sheet
         self.registry_path = registry
+        self.logsum_file = logsum_file
+        self.upload_files = upload_files
+        validate_extra_config = self.config.get("validate", {})
+        if not self.upload_files:
+            self.upload_files = validate_extra_config.get("upload_files")
+        self.user = validate_extra_config.get("user")
+        self.password = validate_extra_config.get("password")
+        self.subfolder = validate_extra_config.get("subfolder")
 
     def validate_schema(self):
         """Validate json schema against draft and check if all properties have label"""
