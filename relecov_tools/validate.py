@@ -103,11 +103,16 @@ class Validate(BaseModule):
         self.registry_path = registry
         self.logsum_file = logsum_file
         self.upload_files = upload_files
-        upload_config = self.config.get_configuration("download")
-        if upload_config:
-            self.user = upload_config.get("user")
-            self.password = upload_config.get("password")
-            self.subfolder = upload_config.get("subfolder")
+        if upload_files:
+            upload_config = self.config.get_configuration("download")
+            if upload_config:
+                self.user = upload_config.get("user")
+                self.password = upload_config.get("password")
+                self.subfolder = upload_config.get("subfolder")
+            else:
+                self.log.error(
+                    "Could not extract required args to upload from download module"
+                )
 
     def validate_schema(self):
         """Validate json schema against draft and check if all properties have label"""
