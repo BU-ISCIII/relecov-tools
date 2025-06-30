@@ -42,7 +42,9 @@ class Validate(BaseModule):
             req_conf = ["download", "validate"]
         else:
             req_conf = ["validate"]
-        missing = [conf for conf in req_conf if self.config.get_configuration(conf) is None]
+        missing = [
+            conf for conf in req_conf if self.config.get_configuration(conf) is None
+        ]
         if missing:
             self.log.error(
                 "Extra config file () is missing required sections: %s"
