@@ -117,7 +117,7 @@ class Validate(BaseModule):
         )
         for prop in self.json_schema["properties"]:
             if "label" not in prop:
-                self.log.warning(f"Property {prop} is missing 'label'")
+                self.log.debug(f"Property {prop} is missing 'label'")
         return
 
     @staticmethod
@@ -327,7 +327,7 @@ class Validate(BaseModule):
             self.logsum.add_error(entry=log_text)
             return
         self.log.error("Some of the samples in json metadata were not validated")
-        stderr.print("[red] Some of the Samples are not validate")
+        stderr.print("[red] Some of the Samples are not valid")
         if metadata is None:
             metadata = relecov_tools.utils.prompt_path(
                 msg="Select the metadata file to select those not-validated samples."
@@ -401,16 +401,16 @@ class Validate(BaseModule):
         os.makedirs(out_folder, exist_ok=True)
         new_name = "invalid_" + os.path.basename(metadata)
         m_file = os.path.join(out_folder, new_name)
-        self.log.info("Saving excel file with the invalid samples")
-        stderr.print("Saving excel file with the invalid samples")
+        self.log.info(f"Saving excel file with the invalid samples: {m_file}")
         wb.save(m_file)
-        return
+        stderr.print(f"Saved excel file with the invalid samples: {m_file}")
+        return m_file
 
     def create_validated_json(self, valid_json_data, out_folder):
         """Create a copy of the input json file, keeping only the validated samples
 
         Args:
-            valid_json_data (list(dict)): List of samples metadata as dictionaries
+            valid_json_data (list(dict)): List of valid samples metadata as dictionaries
             out_folder (str): path to folder where file will be created
         """
         file_name = "_".join(["validated", os.path.basename(self.json_data_file)])
@@ -418,7 +418,7 @@ class Validate(BaseModule):
         self.log.info("Saving Json file with the validated samples in %s", file_path)
         stderr.print(f"Saving Json file with the validated samples in {file_path}")
         relecov_tools.utils.write_json_to_file(valid_json_data, file_path)
-        return
+        return file_path
 
     def validate_registry_file(self):
         """Validate specified registry file path. Try to get it from config if invalid."""
