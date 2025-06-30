@@ -205,6 +205,7 @@ class SftpClient:
                 try:
                     os.remove(destination)
                 except OSError:
+                    log.error(f"Could not delete {destination} after failed fetch")
                     pass
                 return False
 
