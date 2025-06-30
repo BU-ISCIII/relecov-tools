@@ -1239,7 +1239,7 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
         merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
         final_logs = logsum.prepare_final_logs(logs=merged_logs)
 
-        output_filename = logmod.tag_filename(f"logs_to_excel_{lab_code}")
+        output_filename = logmod.tag_filename(lab_code)
         excel_outpath = os.path.join(
             output_folder, output_filename + "_metadata_report.xlsx"
         )
