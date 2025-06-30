@@ -344,7 +344,7 @@ class Validate(BaseModule):
                 f"Unable to create excel file for invalid samples. Metadata file {metadata} does not exist"
             )
         sample_list = []
-        stderr.print("Start preparation of invalid samples")
+        stderr.print("Start preparation of invalid samples...")
         self.log.info("Start preparation of invalid samples")
         for row in invalid_json:
             sample_list.append(str(row[self.sample_id_field]))
@@ -588,7 +588,9 @@ class Validate(BaseModule):
                 f"Missing mandatory args to upload validated files: {missing_args}"
             )
         if not self.subfolder:
-            self.log.warning("No subfolder provided. Uploading files to main lab folder")
+            self.log.warning(
+                "No subfolder provided. Uploading files to main lab folder"
+            )
         if not self.logsum_file or not os.path.isfile(self.logsum_file):
             raise ValueError(
                 f"Provided log_summary.json from previous processes does not exist: {self.logsum_file}"
@@ -620,7 +622,9 @@ class Validate(BaseModule):
 
         samp_id = "sequencing_sample_id"
         updated_invalid = [
-            x for x in self.json_data if x.get(samp_id) in log_invalid_samples and x not in invalid_json
+            x
+            for x in self.json_data
+            if x.get(samp_id) in log_invalid_samples and x not in invalid_json
         ]
         invalid_json.extend([x for x in updated_invalid if x not in invalid_json])
         return invalid_json
@@ -636,6 +640,7 @@ class Validate(BaseModule):
         Raises:
             FileNotFoundError: If expected files or folders are not found locally or remotely.
         """
+
         def upload_and_clean(local_file, remote_dest):
             """Upload file to remote sftp and log the process"""
             self.log.debug(f"Uploading {local_file} to remote sftp: {remote_dest}")
@@ -650,6 +655,7 @@ class Validate(BaseModule):
                 except OSError as e:
                     self.log.error(f"Could not remove {local_file}: {e}")
                     return False
+
         stderr.print("[blue]Starting to upload invalid files to remote sftp...")
         self.log.info("Starting to upload files to remote sftp")
         sftp_client = relecov_tools.sftp_client.SftpClient(
@@ -657,10 +663,10 @@ class Validate(BaseModule):
         )
         if self.subfolder:
             remote_labfold = os.path.join(self.lab_code, self.subfolder)
-            flag=True
+            flag = True
         else:
             remote_labfold = self.lab_code
-            flag=False
+            flag = False
         self.log.info(f"Remote output folder set to {remote_labfold}")
         remote_labfold = "./" + remote_labfold
         if remote_labfold not in sftp_client.list_remote_folders(".", recursive=flag):
