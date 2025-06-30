@@ -510,10 +510,7 @@ class Download(BaseModule):
                     ):
                         error_text = "Sample %s is paired-end, but no R2 given"
                         self.include_error(error_text % str(sample_id), s_name)
-                    if (
-                        "single" in row[index_layout].lower()
-                        and row[index_fastq_r2]
-                    ):
+                    if "single" in row[index_layout].lower() and row[index_fastq_r2]:
                         error_text = "Sample %s is single-end, but R1 and R2 were given"
                         self.include_error(error_text % str(sample_id), s_name)
                 except AttributeError:
@@ -553,6 +550,7 @@ class Download(BaseModule):
         Returns:
             local_meta_file: Path to downloaded metadata file / merged metadata file.
         """
+
         def download_remote_metafile(target_meta_file):
             local_meta_file = os.path.join(
                 local_folder, os.path.basename(target_meta_file)
@@ -924,12 +922,13 @@ class Download(BaseModule):
             excel_df (dict(str:pandas.DataFrame)): Dict {name_of_excel_sheet:DataFrame}
             containing all sheets in the excel file as pandas dataframes.
         """
+
         def filldf_unique_id_col(meta_df):
             """Fill the unique ID col if missing with other alternative IDs"""
             unique_id_col = "Sample ID given for sequencing"
             alt_id_cols = [
                 "Sample ID given by originating laboratory",
-                "Sequence file R1"
+                "Sequence file R1",
             ]
             if meta_df[unique_id_col].isnull().any():
                 for index, row in meta_df.iterrows():
