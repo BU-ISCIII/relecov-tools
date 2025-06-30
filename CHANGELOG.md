@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Now validate_instances() method can also be given a custom validator as input [#687](https://github.com/BU-ISCIII/relecov-tools/pull/687)
 - Added validation for read-bioinfo-metadata [#673](https://github.com/BU-ISCIII/relecov-tools/pull/673)
 - Remove ontology from metadata excel generated in build-schema [#698](https://github.com/BU-ISCIII/relecov-tools/pull/698)
+- Implemented new workflow in validate module to upload invalid samples and report to sftp [#708](https://github.com/BU-ISCIII/relecov-tools/pull/708)
 
 #### Fixes
 
@@ -65,6 +66,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - added raw strings to prevent syntax warnings [#696](https://github.com/BU-ISCIII/relecov-tools/pull/696)
 - Set 3.8 python version as min version [#696](https://github.com/BU-ISCIII/relecov-tools/pull/696)
 - fix deprecated warning pkg_resources [#696](https://github.com/BU-ISCIII/relecov-tools/pull/696)
+- Included new args in validate module to upload invalid samples and report [#708](https://github.com/BU-ISCIII/relecov-tools/pull/708)
+- Invalid files are not removed from download workflow so now metadata can be validated later [#708](https://github.com/BU-ISCIII/relecov-tools/pull/708)
+- Invalid folders based on log summary are not skipped during wrapper process [#708](https://github.com/BU-ISCIII/relecov-tools/pull/708)
+- Now if sftp_client fetch fails in get_from_sftp method, local temp file is removed [#708](https://github.com/BU-ISCIII/relecov-tools/pull/708)
 
 #### Removed
 
