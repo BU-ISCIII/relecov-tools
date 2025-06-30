@@ -425,9 +425,30 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     default=None,
     help="Path to the JSON file containing the registered records of validated samples with their unique sample identifiers.",
 )
+@click.option(
+    "--upload_files",
+    is_flag=True,
+    default=False,
+    help="Wether to upload the resulting files from validation process or not.",
+)
+@click.option(
+    "-l",
+    "--logsum_file",
+    required=False,
+    default=None,
+    help="Required if --upload_files. Path to the log_summary.json file merged from all previous processes, used to check for invalid samples.",
+)
 @click.pass_context
 def validate(
-    ctx, json_file, json_schema_file, metadata, output_dir, excel_sheet, registry
+    ctx,
+    json_file,
+    json_schema_file,
+    metadata,
+    output_dir,
+    excel_sheet,
+    registry,
+    upload_files,
+    logsum_file,
 ):
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
@@ -435,7 +456,7 @@ def validate(
 
     try:
         validation = relecov_tools.validate.Validate(**args_merged)
-        validation.validate()
+        validation.execute_validation_process()
     except Exception as e:
         if debug:
             log.exception(f"EXCEPTION FOUND: {e}")
