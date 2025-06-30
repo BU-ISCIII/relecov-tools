@@ -103,13 +103,11 @@ class Validate(BaseModule):
         self.registry_path = registry
         self.logsum_file = logsum_file
         self.upload_files = upload_files
-        validate_extra_config = self.config.get_configuration("validate")
-        if validate_extra_config:
-            if not self.upload_files:
-                self.upload_files = validate_extra_config.get("upload_files")
-            self.user = validate_extra_config.get("user")
-            self.password = validate_extra_config.get("password")
-            self.subfolder = validate_extra_config.get("subfolder")
+        upload_config = self.config.get_configuration("download")
+        if upload_config:
+            self.user = upload_config.get("user")
+            self.password = upload_config.get("password")
+            self.subfolder = upload_config.get("subfolder")
 
     def validate_schema(self):
         """Validate json schema against draft and check if all properties have label"""
