@@ -202,6 +202,10 @@ class SftpClient:
                 return True
             except FileNotFoundError as e:
                 log.error("Unable to fetch file %s ", e)
+                try:
+                    os.remove(destination)
+                except OSError:
+                    pass
                 return False
 
     @reconnect_if_fail(n_times=3, sleep_time=30)
