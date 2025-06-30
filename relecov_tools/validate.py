@@ -38,6 +38,28 @@ class Validate(BaseModule):
         super().__init__(output_dir=output_dir, called_module=__name__)
         self.config = ConfigJson(extra_config=True)
         self.log.info("Initiating validation process")
+        if upload_files:
+            req_conf = ["download", "validate"]
+        else:
+            req_conf = ["validate"]
+        missing = [conf for conf in req_conf if self.config.get_configuration(conf) is None]
+        if missing:
+            self.log.error(
+                "Extra config file () is missing required sections: %s"
+                % ", ".join(missing)
+            )
+            self.log.error(
+                "Please use add-extra-config to add them to the config file."
+            )
+            stderr.print(
+                f"[red]Config file is missing required sections: {', '.join(missing)}"
+            )
+            stderr.print(
+                "[red]Please use add-extra-config to add them to the config file."
+            )
+            raise ValueError(
+                f"Config file is missing required sections: {', '.join(missing)}"
+            )
         if json_schema_file is None:
             schema_name = self.config.get_topic_data("json_schemas", "relecov_schema")
             json_schema_file = os.path.join(
@@ -109,10 +131,6 @@ class Validate(BaseModule):
                 self.user = upload_config.get("user")
                 self.password = upload_config.get("password")
                 self.subfolder = upload_config.get("subfolder")
-            else:
-                self.log.error(
-                    "Could not extract required args to upload from download module"
-                )
 
     def validate_schema(self):
         """Validate json schema against draft and check if all properties have label"""
