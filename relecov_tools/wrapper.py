@@ -4,7 +4,6 @@ import os
 import inspect
 import rich.console
 from collections import defaultdict
-from datetime import datetime
 
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.download import Download
