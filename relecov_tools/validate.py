@@ -558,28 +558,25 @@ class Validate(BaseModule):
             self.logsum.feed_key(sample=sample_id_value)
         if errors:
             self.summarize_errors(errors)
-
-        # Add all valid samples to the unique_id registry file
-        self.validate_registry_file()
-        valid_json_data = self.update_unique_id_registry(valid_json_data)
-
         invalid_json = [x for x in self.json_data if x not in valid_json_data]
-        if invalid_json:
-            log_text = "Summary: %s valid and %s invalid samples"
-            self.logsum.add_warning(
-                entry=log_text % (len(valid_json_data), len(invalid_json))
-            )
-            self.validate_invexcel_args()
-            self.create_invalid_metadata(invalid_json, self.metadata, self.out_folder)
-        else:
-            stderr.print("[green]Sucessful validation, no invalid file created!!")
-            self.log.info("Sucessful validation, no invalid file created.")
-        if valid_json_data:
-            self.log.info("Creating json_file with validated samples...")
-            self.create_validated_json(valid_json_data, self.out_folder)
-        else:
-            log_text = "All the samples were invalid. No valid file created"
-            self.logsum.add_error(entry=log_text)
-            stderr.print(f"[red]{log_text}")
-        self.parent_create_error_summary(called_module="validate")
         return valid_json_data, invalid_json
+
+    def execute_validation_process(self):
+        valid_json_data, invalid_json = self.validate()
+        if self.upload_files:
+            stderr.print("Starting uploading process...")
+            self.log.info("Starting uploading process...")
+            try:
+                self.validate_whole_proc_args()
+                previous_logsum = relecov_tools.utils.read_json_file(self.logsum_file)
+                self.process_validation_upload(
+                    valid_json_data, invalid_json, previous_logsum
+                )
+            except (ValueError, FileNotFoundError) as e:
+                stderr.print(f"[red]Could not upload validation files: {e}")
+                self.log.error(f"Could not upload validation files: {e}")
+                self.create_validation_files(valid_json_data, invalid_json)
+        else:
+            self.create_validation_files(valid_json_data, invalid_json)
+            self.parent_create_error_summary(called_module="validate")
+        return
