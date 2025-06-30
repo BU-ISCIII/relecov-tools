@@ -196,17 +196,14 @@ class Wrapper(BaseModule):
             }
         )
         read_meta_logs = self.exec_read_metadata(self.readmeta_params)
-        metadata_json = [
-            x
-            for x in os.listdir(local_folder)
-            if re.search(r"lab_metadata.*\.json$", x)
-            and not x.endswith("_log_summary.json")
-        ]
-        if not metadata_json:
+        # Replicating the way read-lab-metadata output file is named
+        file_code = "_".join(["lab_metadata", key]) + ".json"
+        metadata_json = self.tag_filename(filename=file_code)
+        if metadata_json not in os.listdir(local_folder):
             raise ValueError("No metadata json found after read-lab-metadata")
         self.validate_params.update(
             {
-                "json_file": os.path.join(local_folder, metadata_json[0]),
+                "json_file": os.path.join(local_folder, metadata_json),
                 "metadata": metadata_file,
                 "output_dir": local_folder,
             }
@@ -220,7 +217,15 @@ class Wrapper(BaseModule):
         stderr.print(f"[green]Merged logs from all processes in {local_folder}")
         self.log.info(f"Merged logs from all processes in {local_folder}")
         subfolder = getattr(self.download, "subfolder", None)
-
+        invalid_samples = [
+            samp for samp in merged_logs.get("samples", {}) if not samp["valid"]
+        ]
+        final_json_data = []
+        for sample in valid_json_data:
+            if sample.get("sequencing_sample_id") in invalid_samples:
+                invalid_json.append(sample)
+            else:
+                final_json_data.append(sample)
         if subfolder and subfolder not in os.path.split(key):
             main_folder = os.path.join(key, subfolder)
         else:
@@ -344,9 +349,6 @@ class Wrapper(BaseModule):
             folder = folder_logs.get("path")
             if not folder:
                 self.log.error(f"Skipped folder {key}. Logs do not include path field")
-                continue
-            if not folder_logs.get("valid"):
-                self.log.error(f"Folder {key} is set as invalid in logs. Skipped.")
                 continue
             counter += 1
             logtxt = "Processing folder %s/%s: %s with local path %s"
