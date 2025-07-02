@@ -9,45 +9,51 @@ from relecov_tools.download import Download
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-j", "--json_file",
+        "-j",
+        "--json_file",
         type=str,
         required=True,
-        help="Path to the input JSON file containing processed metadata."
+        help="Path to the input JSON file containing processed metadata.",
     )
     parser.add_argument(
-        "-m", "--metadata",
+        "-m",
+        "--metadata",
         type=str,
         required=True,
-        help="Path to the metadata Excel file."
+        help="Path to the metadata Excel file.",
     )
     parser.add_argument(
         "--upload_files",
         action="store_true",
-        help="If set, upload invalid files to the SFTP server."
+        help="If set, upload invalid files to the SFTP server.",
     )
     parser.add_argument(
-        "-o", "--output_dir",
+        "-o",
+        "--output_dir",
         type=str,
         required=True,
-        help="Directory where output files will be written."
+        help="Directory where output files will be written.",
     )
     parser.add_argument(
-        "-s", "--json_schema_file",
+        "-s",
+        "--json_schema_file",
         type=str,
         required=True,
-        help="Path to the JSON schema file used for validation."
+        help="Path to the JSON schema file used for validation.",
     )
     parser.add_argument(
-        "-r", "--registry",
+        "-r",
+        "--registry",
         type=str,
         required=True,
-        help="Path to the unique sample ID registry JSON file."
+        help="Path to the unique sample ID registry JSON file.",
     )
     parser.add_argument(
-        "-l", "--logsum_file",
+        "-l",
+        "--logsum_file",
         type=str,
         required=True,
-        help="Path to the previous process's log summary JSON file."
+        help="Path to the previous process's log summary JSON file.",
     )
     args = parser.parse_args()
     print("Initiating validate module")
