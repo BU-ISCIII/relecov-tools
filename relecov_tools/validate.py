@@ -718,10 +718,10 @@ class Validate(BaseModule):
             for tup in path_fields
             if all(f in x for f in tup)
         ]
-        """if not any(os.path.isfile(f) for f in invalid_files):
+        if not any(os.path.isfile(f) for f in invalid_files):
             raise FileNotFoundError(
                 f"No files from metadata found to upload: {invalid_files}"
-            )"""
+            )
         invalid_remote_folder = self.batch_id + "_invalid_samples"
         self.remote_outfold = os.path.join(remote_labfold, invalid_remote_folder)
         failed_uploads = []
