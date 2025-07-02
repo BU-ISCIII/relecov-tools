@@ -121,13 +121,13 @@ class Wrapper(BaseModule):
 
     def exec_validation(self, validate_params):
         validate_proccess = Validate(**validate_params)
-        valid_json_data, invalid_json = validate_proccess.validate()
+        validate_proccess.execute_validation_process()
         validate_logs = self.wrapper_logsum.prepare_final_logs(
             logs=validate_proccess.logsum.logs
         )
-        return valid_json_data, invalid_json, validate_logs
+        return validate_logs
 
-    def process_folder(self, finished_folders, key, folder_logs):
+    def process_folder(self, key, folder_logs):
         """Executes read-lab-metadata and validation process for the given downloaded folder.
         Merges all the log summaries generated with the ones from download process, creates
         an excel file with custom format and uploads it back to its remote sftp folder.
@@ -135,8 +135,6 @@ class Wrapper(BaseModule):
         Finally. It cleans all the remote remaining files if the process was successful.
 
         Args:
-            finished_folders (dict(str:list)): Dictionary which includes the names
-            of the remote folders processed during download and the successfull files for each
             key (str): Name of the folder to process in remote sftp, same name as the one
             included in the log_summary from download process.
             folder_logs (dict): Download log_summary corresponding to the processed folder
@@ -150,34 +148,6 @@ class Wrapper(BaseModule):
         Returns:
             merged_logs (dict): Dictionary which includes the logs from all processes
         """
-
-        def upload_files_from_json(invalid_json, remote_dir):
-            """Upload the files in a given json with samples metadata"""
-            for sample in invalid_json:
-                local_dir = sample.get("sequence_file_path_R1")
-                # files_keys = [key for key in sample.keys() if "_file_" in key]
-                sample_files = (
-                    sample.get("sequence_file_R1"),
-                    sample.get("sequence_file_R2"),
-                )
-                ftp_files = self.download.relecov_sftp.get_file_list(remote_dir)
-                uploaded_files = []
-                for file in sample_files:
-                    if not file or file in ftp_files:
-                        continue
-                    loc_path = os.path.join(local_dir, file)
-                    sftp_path = os.path.join(remote_dir, file)
-                    self.log.info("Uploading %s to remote %s" % (loc_path, remote_dir))
-                    uploaded = self.download.relecov_sftp.upload_file(
-                        loc_path, sftp_path
-                    )
-                    if not uploaded:
-                        err = f"Could not upload {loc_path} to {remote_dir}"
-                        self.wrapper_logsum.add_error(sample=sample, entry=err)
-                    else:
-                        uploaded_files.append(file)
-            return uploaded_files
-
         local_folder = folder_logs.get("path")
         self.log.info(f"Working in downloaded local folder {local_folder}")
         if not local_folder:
@@ -201,132 +171,38 @@ class Wrapper(BaseModule):
         metadata_json = self.tag_filename(filename=file_code)
         if metadata_json not in os.listdir(local_folder):
             raise ValueError("No metadata json found after read-lab-metadata")
+        self.log.info("Merging logs from download and read-lab-metadata")
+        previous_logs = self.wrapper_logsum.merge_logs(
+            key_name=key, logs_list=[{key: folder_logs}, read_meta_logs]
+        )
+        temp_logsum = os.path.join(
+            local_folder, self.tag_filename("temp") + "_log_summary.json"
+        )
+        stderr.print(
+            "Creating temporary log_summary file with logs from download and read-lab-metadata..."
+        )
+        self.wrapper_logsum.create_error_summary(
+            filepath=temp_logsum, logs=previous_logs
+        )
         self.validate_params.update(
             {
                 "json_file": os.path.join(local_folder, metadata_json),
                 "metadata": metadata_file,
+                "logsum_file": temp_logsum,
                 "output_dir": local_folder,
+                "upload_files": True,
             }
         )
-        valid_json_data, invalid_json, validate_logs = self.exec_validation(
-            self.validate_params
-        )
+        validate_logs = self.exec_validation(self.validate_params)
+        try:
+            os.remove(temp_logsum)
+        except OSError:
+            self.log.warning(f"Could not remove {temp_logsum}")
         merged_logs = self.wrapper_logsum.merge_logs(
             key_name=key, logs_list=[{key: folder_logs}, read_meta_logs, validate_logs]
         )
         stderr.print(f"[green]Merged logs from all processes in {local_folder}")
         self.log.info(f"Merged logs from all processes in {local_folder}")
-        subfolder = getattr(self.download, "subfolder", None)
-        invalid_samples = [
-            samp for samp in merged_logs.get("samples", {}) if not samp["valid"]
-        ]
-        final_json_data = []
-        for sample in valid_json_data:
-            if sample.get("sequencing_sample_id") in invalid_samples:
-                invalid_json.append(sample)
-            else:
-                final_json_data.append(sample)
-        if subfolder and subfolder not in os.path.split(key):
-            main_folder = os.path.join(key, subfolder)
-        else:
-            main_folder = key
-        sftp_dirs = self.download.relecov_sftp.list_remote_folders(main_folder)
-        sftp_dirs_paths = [os.path.join(main_folder, d) for d in sftp_dirs]
-        valid_dirs = [d for d in sftp_dirs_paths if d in finished_folders.keys()]
-
-        if invalid_json:
-            # As all folders are merged into one during download, there should only be 1 folder
-            if not valid_dirs or len(valid_dirs) >= 2:
-                # If all samples were valid during download and download_clean is used, the original folder might have been deleted
-                self.log.warning(
-                    "Couldnt find %s folder in remote sftp. Creating new one",
-                    main_folder,
-                )
-                remote_dir = os.path.join(
-                    main_folder, self.batch_id + "_invalid_samples"
-                )
-                self.download.relecov_sftp.make_dir(remote_dir)
-            else:
-                remote_dir = valid_dirs[0]
-                stderr.print(
-                    f"[blue]Cleaning successfully validated files from {remote_dir}"
-                )
-                self.log.info(
-                    f"Cleaning successfully validated files from remote dir: {remote_dir}"
-                )
-                file_fields = ("sequence_file_R1", "sequence_file_R2")
-                valid_sampfiles = [
-                    f.get(v) for v in file_fields for f in valid_json_data
-                ]
-                remote_files = self.download.relecov_sftp.get_file_list(remote_dir)
-                valid_files = [f for f in remote_files if f in valid_sampfiles]
-                self.download.delete_remote_files(remote_dir, files=valid_files)
-                self.download.delete_remote_files(remote_dir, skip_seqs=True)
-                self.download.clean_remote_folder(remote_dir)
-
-            logtxt = f"Found {len(invalid_json)} invalid samples in {key}"
-            self.wrapper_logsum.add_warning(key=key, entry=logtxt)
-            if "tmp_processing" in remote_dir:
-                renamed_dir = remote_dir.replace("tmp_processing", "invalid_samples")
-                remote_dir = renamed_dir
-
-            invalid_metadata_files = [
-                x
-                for x in os.listdir(local_folder)
-                if re.search(r"invalid_lab_metadata.*\.xlsx", x)
-            ]
-
-            if not invalid_metadata_files:
-                self.log.warning("No invalid_lab_metadata_*.xlsx file found to upload")
-            else:
-                if len(invalid_metadata_files) > 1:
-                    self.log.warning(
-                        "Multiple invalid_lab_metadata_*.xlsx files found: %s. Uploading the first one.",
-                        invalid_metadata_files,
-                    )
-                invalid_metadata_path = os.path.join(
-                    local_folder, invalid_metadata_files[0]
-                )
-                sftp_path = os.path.join(
-                    remote_dir, os.path.basename(invalid_metadata_path)
-                )
-                self.log.info("Uploading invalid files and metadata to %s", remote_dir)
-                stderr.print(
-                    f"[blue]Uploading invalid files and metadata to {remote_dir}"
-                )
-                self.download.relecov_sftp.upload_file(invalid_metadata_path, sftp_path)
-            # Upload all the files that failed validation process back to sftp
-            upload_files_from_json(invalid_json, remote_dir)
-        else:
-            self.log.info("No invalid samples in %s", key)
-            stderr.print(f"[green]No invalid samples were found for {key} !!!")
-
-        # Generate standardized filename
-        log_filepath = os.path.join(
-            local_folder, self.tag_filename(key) + "_metadata_report.json"
-        )
-        self.wrapper_logsum.create_error_summary(
-            called_module="metadata",
-            filepath=log_filepath,
-            logs=merged_logs,
-            to_excel=True,
-        )
-        xlsx_report_files = [
-            f for f in os.listdir(local_folder) if re.search("metadata_report.xlsx", f)
-        ]
-        if xlsx_report_files and invalid_json:
-            self.log.info("Uploading %s xlsx report to remote %s" % (key, remote_dir))
-            local_xlsx = os.path.join(local_folder, xlsx_report_files[0])
-            remote_xlsx = os.path.join(remote_dir, xlsx_report_files[0])
-            up = self.download.relecov_sftp.upload_file(local_xlsx, remote_xlsx)
-            if not up:
-                self.log.error(
-                    "Could not upload %s report to remote %s" % (key, local_folder)
-                )
-        elif not xlsx_report_files and invalid_json:
-            self.log.error(
-                "Could not find xlsx report for %s in %s" % (key, local_folder)
-            )
         return merged_logs
 
     def run_wrapper(self):
@@ -355,7 +231,7 @@ class Wrapper(BaseModule):
             self.log.info(logtxt % (counter, str(len(finished_folders)), key, folder))
             stderr.print(logtxt % (counter, str(len(finished_folders)), key, folder))
             try:
-                merged_logs = self.process_folder(finished_folders, key, folder_logs)
+                merged_logs = self.process_folder(key, folder_logs)
             except (FileNotFoundError, ValueError) as e:
                 self.log.error(f"Could not process folder {key}: {e}")
                 folder_logs["errors"].append(f"Could not process folder {key}: {e}")
