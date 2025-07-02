@@ -363,8 +363,7 @@ class Validate(BaseModule):
             log_text = f"Invalid excel file won't be created: {self.SAMPLE_FIELD_ERROR}"
             self.logsum.add_error(entry=log_text)
             return
-        self.log.error("Some of the samples in json metadata were not validated")
-        stderr.print("[red] Some of the Samples are not valid")
+        self.log.info("Trying to create invalid metadata excel file...")
         if metadata is None:
             metadata = relecov_tools.utils.prompt_path(
                 msg="Select the metadata file to select those not-validated samples."
@@ -771,7 +770,7 @@ class Validate(BaseModule):
         merged_logsum = self.logsum.merge_logs(
             [previous_logsum, self.logsum.logs], key_name=self.lab_code
         )
-        logsum_basename = self.lab_code + "_" + self.batch_id + "_metadata_report.json"
+        logsum_basename = self.tag_filename(self.lab_code) + "_metadata_report.json"
         sumfile = os.path.join(self.out_folder, logsum_basename)
         self.parent_create_error_summary(
             called_module="metadata",
@@ -815,24 +814,30 @@ class Validate(BaseModule):
             self.logsum.feed_key(sample=sample_id_value)
         if errors:
             self.summarize_errors(errors)
+            stderr.print(
+                f"[red]{len(valid_json_data)}/{len(self.json_data)} samples were valid"
+            )
+        else:
+            stderr.print("[green]No errors found during validation!")
         invalid_json = [x for x in self.json_data if x not in valid_json_data]
         return valid_json_data, invalid_json
 
     def execute_validation_process(self):
         valid_json_data, invalid_json = self.validate()
         if self.upload_files:
-            stderr.print("Starting uploading process...")
-            self.log.info("Starting uploading process...")
+            stderr.print(f"Starting uploading process for {self.lab_code}...")
+            self.log.info(f"Starting uploading process for {self.lab_code}...")
             try:
                 self.validate_whole_proc_args()
-                previous_logsum = relecov_tools.utils.read_json_file(self.logsum_file)
-                self.process_validation_upload(
-                    valid_json_data, invalid_json, previous_logsum
-                )
-            except (ValueError, FileNotFoundError) as e:
+            except ValueError as e:
                 stderr.print(f"[red]Could not upload validation files: {e}")
                 self.log.error(f"Could not upload validation files: {e}")
                 self.create_validation_files(valid_json_data, invalid_json)
+                raise
+            previous_logsum = relecov_tools.utils.read_json_file(self.logsum_file)
+            self.process_validation_upload(
+                valid_json_data, invalid_json, previous_logsum
+            )
         else:
             self.create_validation_files(valid_json_data, invalid_json)
             self.parent_create_error_summary(called_module="validate")
