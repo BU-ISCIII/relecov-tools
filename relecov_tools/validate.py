@@ -145,6 +145,7 @@ class Validate(BaseModule):
                 self.user = upload_config.get("user")
                 self.password = upload_config.get("password")
                 self.subfolder = upload_config.get("subfolder")
+                self.sftp_port = self.config.get_topic_data("sftp_handle", "sftp_port")
 
     def validate_schema(self):
         """Validate json schema against draft and check if all properties have label"""
@@ -664,45 +665,47 @@ class Validate(BaseModule):
         invalid_json.extend([x for x in updated_invalid if x not in invalid_json])
         return invalid_json
 
-    def upload_validation_results(self, invalid_json, invalid_file):
+    def upload_validation_results(self, invalid_json, invalid_excel):
         """Uploads invalid sample files and related reports to a remote SFTP server.
         Checks that required remote directories exist or creates them.
 
         Args:
             invalid_json (list[dict]): List of invalid samples containing file paths.
-            invalid_file (str): Path to the Excel metadata report file.
+            invalid_excel (str): Path to the Excel metadata report file.
 
         Raises:
             FileNotFoundError: If expected files or folders are not found locally or remotely.
         """
 
-        def upload_and_clean(local_file, remote_dest):
+        def upload_and_clean(local_file, remote_dest, clean=True):
             """Upload file to remote sftp and log the process"""
             self.log.debug(f"Uploading {local_file} to remote sftp: {remote_dest}")
             if not sftp_client.upload_file(local_file, remote_dest):
-                self.log.error(f"Could not upload {invalid_file} to sftp.")
+                self.log.error(f"Could not upload {invalid_excel} to sftp.")
                 return False
             else:
                 self.log.debug(f"{remote_dest} uploaded successfully")
-                try:
-                    os.remove(local_file)
-                    return True
-                except OSError as e:
-                    self.log.error(f"Could not remove {local_file}: {e}")
-                    return False
+                if clean:
+                    try:
+                        os.remove(local_file)
+                        return True
+                    except OSError as e:
+                        self.log.error(f"Could not remove {local_file}: {e}")
+                        return False
 
-        stderr.print("[blue]Starting to upload invalid files to remote sftp...")
-        self.log.info("Starting to upload files to remote sftp")
+        self.log.info("Initating sftp client to upload invalid files")
         sftp_client = relecov_tools.sftp_client.SftpClient(
             username=self.user, password=self.password
         )
+        sftp_client.sftp_port = self.sftp_port
         if self.subfolder:
             remote_labfold = os.path.join(self.lab_code, self.subfolder)
             flag = True
         else:
             remote_labfold = self.lab_code
             flag = False
-        self.log.info(f"Remote output folder set to {remote_labfold}")
+        self.log.info(f"Output folder set to {remote_labfold}")
+        stderr.print(f"[blue]Uploading invalid files to remote {remote_labfold}...")
         remote_labfold = "./" + remote_labfold
         if remote_labfold not in sftp_client.list_remote_folders(".", recursive=flag):
             raise FileNotFoundError(f"Couldn't find remote lab folder {remote_labfold}")
@@ -716,28 +719,30 @@ class Validate(BaseModule):
             for tup in path_fields
             if all(f in x for f in tup)
         ]
-        if not any(os.path.isfile(f) for f in invalid_files):
+        """if not any(os.path.isfile(f) for f in invalid_files):
             raise FileNotFoundError(
-                f"No files from metadata found in output_dir {self.out_folder} to upload"
-            )
+                f"No files from metadata found to upload: {invalid_files}"
+            )"""
         invalid_remote_folder = self.batch_id + "_invalid_samples"
-        remote_outfold = os.path.join(remote_labfold, invalid_remote_folder)
+        self.remote_outfold = os.path.join(remote_labfold, invalid_remote_folder)
         failed_uploads = []
         if invalid_remote_folder not in sftp_client.list_remote_folders(remote_labfold):
             self.log.info(f"{invalid_remote_folder} not found in sftp, creating it...")
-            sftp_client.make_dir(remote_outfold)
+            sftp_client.make_dir(self.remote_outfold)
         for file in invalid_files:
-            remote_dest = os.path.join(remote_outfold, os.path.basename(file))
+            remote_dest = os.path.join(self.remote_outfold, os.path.basename(file))
             if not upload_and_clean(file, remote_dest):
                 failed_uploads.append(file)
-        remote_dest = os.path.join(remote_outfold, os.path.basename(invalid_file))
-        if not upload_and_clean(invalid_file, remote_dest):
-            failed_uploads.append(invalid_file)
+        remote_dest = os.path.join(self.remote_outfold, os.path.basename(invalid_excel))
+        if not upload_and_clean(invalid_excel, remote_dest, clean=False):
+            failed_uploads.append(invalid_excel)
         report_file = self.lab_code + "_" + self.batch_id + "_metadata_report.xlsx"
         if report_file in os.listdir(self.out_folder):
-            remote_dest = os.path.join(remote_outfold, os.path.basename(report_file))
+            remote_dest = os.path.join(
+                self.remote_outfold, os.path.basename(report_file)
+            )
             report_file_path = os.path.join(self.out_folder, report_file)
-            if not upload_and_clean(report_file_path, remote_dest):
+            if not upload_and_clean(report_file_path, remote_dest, clean=False):
                 failed_uploads.append(report_file_path)
         else:
             self.log.error(
