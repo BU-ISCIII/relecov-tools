@@ -64,7 +64,7 @@ def main():
     config_json = ConfigJson()
     config_json.include_extra_config(conf_file, config_name=None, force=True)
     print("Fixing filepaths in json file")
-    args
+    update_json_filepaths(args.json_file)
     print("Initiating validate module")
     validation = Validate(**vars(args))
     validation.user = os.environ["TEST_USER"]
