@@ -1220,7 +1220,9 @@ class Download(BaseModule):
                 if not val or not any(val in file for file in clean_fetchlist):
                     err = f"File in metadata {val} does not match any file in sftp"
                     folder_logs = self.logsum.logs.get(self.current_folder, {})
-                    if err not in folder_logs.get("samples", {}).get("errors", ""):
+                    if err not in folder_logs.get("samples", {}).get(sample, {}).get(
+                        "errors", []
+                    ):
                         self.include_error(err, sample)
                     processed_dict[sample][key] = val
                 for file in clean_fetchlist:
