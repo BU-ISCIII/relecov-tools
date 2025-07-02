@@ -1035,11 +1035,12 @@ class BioinfoMetadata(BaseModule):
 
         # Filter properties from batch_data that are not included in the schema
         self.j_data = self.filter_properties(self.j_data)
-        valid_rows, invalid_rows = (
-            relecov_tools.validate.SchemaValidation.validate_instances(
-                self.j_data, self.json_schema, "sequencing_sample_id"
-            )
+        valid_rows, invalid_rows = relecov_tools.validate.Validate.validate_instances(
+            self.j_data, self.json_schema, "sequencing_sample_id"
         )
+        valid_samples = [sample.get("sequencing_sample_id") for sample in valid_rows]
+        for sample in valid_samples:
+            self.logsum.feed_key(key=out_path, sample=sample)
         if len(invalid_rows) > 0:
             unique_failed_samples = list(
                 set(
