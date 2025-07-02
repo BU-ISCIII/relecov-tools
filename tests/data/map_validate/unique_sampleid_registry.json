@@ -1,7 +1,7 @@
 {
     "RLCV-000000001": {
-        "sequencing_sample_id": "sample_for_testing",
+        "generated_at": "2025-05-08T12:35:00",
         "lab_code": "LAB-01",
-        "generated_at": "2025-05-08T12:35:00"
+        "sequencing_sample_id": "sample_for_testing"
     }
 }
