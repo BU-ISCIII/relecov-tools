@@ -3,6 +3,7 @@ import os
 import sys
 import argparse
 import yaml
+import json
 from relecov_tools.validate import Validate
 from relecov_tools.download import Download
 from relecov_tools.config_json import ConfigJson
@@ -62,6 +63,8 @@ def main():
     conf_file = generate_config_yaml()
     config_json = ConfigJson()
     config_json.include_extra_config(conf_file, config_name=None, force=True)
+    print("Fixing filepaths in json file")
+    args
     print("Initiating validate module")
     validation = Validate(**vars(args))
     validation.user = os.environ["TEST_USER"]
@@ -145,6 +148,22 @@ def clean_remote_test(invalid_sftp_folder):
             print(f"Removing file {file} in {base_path}")
             download.relecov_sftp.remove_file(file)
     return
+
+
+def update_json_filepaths(json_file):
+    with open(json_file, "r") as fh:
+        try:
+            json_data = json.load(fh)
+        except (UnicodeDecodeError, ValueError):
+            raise
+    updating_fields = ["sequence_file_path_R1", "sequence_file_path_R2"]
+    for sample in json_data:
+        for field in updating_fields:
+            if field not in sample:
+                continue
+            sample[field] = os.path.join(os.getenv("GITHUB_WORKSPACE"), sample[field])
+    with open(json_file, "w", encoding="utf-8") as fh:
+        fh.write(json.dumps(json_data, indent=4, sort_keys=True, ensure_ascii=False))
 
 
 if __name__ == "__main__":
