@@ -88,15 +88,17 @@ jobs:
           --software_name viralrecon \
           -o $OUTPUT_LOCATION
 
-    - name: Run validate module (default)
+    - name: Run validate module with upload files (default)
       if: matrix.modules == 'validate'
       run: |
-        relecov-tools validate \
+        python3 tests/test_validate.py \
           -j tests/data/map_validate/processed_metadata_lab_test.json \
-          -s relecov_tools/schema/relecov_schema.json \
           -m tests/data/map_validate/metadata_lab_test.xlsx \
+          --upload_files \
+          -o tests/data/map_validate/ \
+          -s relecov_tools/schema/relecov_schema.json \
           -r tests/data/map_validate/unique_sampleid_registry.json \
-          -o $OUTPUT_LOCATION
+          -l tests/data/map_validate/previous_processes_log_summary.json
 
     - name: Run build-schema module
       if: matrix.modules == 'build-schema'
