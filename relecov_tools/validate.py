@@ -89,10 +89,6 @@ class Validate(BaseModule):
             raise ValueError(f"Json file '{json_file}' does not exist")
         self.json_data_file = json_file
         out_path = os.path.dirname(os.path.realpath(self.json_data_file))
-        self.lab_code = out_path.split("/")[-2]
-        self.logsum = self.parent_log_summary(
-            output_dir=self.out_folder, lab_code=self.lab_code, path=out_path
-        )
 
         stderr.print("[blue] Reading the json file")
         self.log.info("Reading the json file")
@@ -111,6 +107,22 @@ class Validate(BaseModule):
             raise ValueError(f"Provided json file {json_file} is empty")
         except AttributeError as e:
             raise ValueError(f"Invalid json file content in {json_file}: {e}")
+        try:
+            unique_institutions = set(
+                [x.get("submitting_institution_id") for x in self.json_data]
+            )
+            if len(unique_institutions) > 1:
+                self.log.warning(
+                    f"All samples in {json_file} should be from the same submitting institution. Found {unique_institutions}"
+                )
+            self.lab_code = self.json_data[0]["submitting_institution_id"]
+            self.log.info(f"Laboratory code set to {self.lab_code}")
+        except Exception as e:
+            self.log.warning(f"Could not extract lab_code from json_data: {e}")
+            self.lab_code = out_path.split("/")[-2]
+        self.logsum = self.parent_log_summary(
+            output_dir=self.out_folder, lab_code=self.lab_code, path=out_path
+        )
         self.set_batch_id(batch_id)
         self.metadata = metadata
 
