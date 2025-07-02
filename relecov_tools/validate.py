@@ -691,6 +691,8 @@ class Validate(BaseModule):
                     except OSError as e:
                         self.log.error(f"Could not remove {local_file}: {e}")
                         return False
+                else:
+                    return True
 
         self.log.info("Initating sftp client to upload invalid files")
         sftp_client = relecov_tools.sftp_client.SftpClient(
