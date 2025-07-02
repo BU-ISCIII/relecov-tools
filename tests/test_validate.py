@@ -161,7 +161,7 @@ def update_json_filepaths(json_file):
         for field in updating_fields:
             if field not in sample:
                 continue
-            sample[field] = os.path.join(os.getenv("GITHUB_WORKSPACE"), sample[field])
+            sample[field] = os.path.join(os.environ["GITHUB_WORKSPACE"], sample[field])
     with open(json_file, "w", encoding="utf-8") as fh:
         fh.write(json.dumps(json_data, indent=4, sort_keys=True, ensure_ascii=False))
 
