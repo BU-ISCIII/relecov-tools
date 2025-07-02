@@ -120,6 +120,7 @@ jobs:
         TEST_USER: ${{ secrets.TEST_USER }}
         TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
         TEST_PORT: ${{ secrets.TEST_PORT }}
+        GITHUB_WORKSPACE: ${{ github.workspace }}
 
     - name: Run build-schema module
       if: matrix.modules == 'build-schema'
