@@ -299,7 +299,7 @@ class SftpClient:
             self.sftp.put(local_path, remote_file)
             return True
         except FileNotFoundError as e:
-            log.error(F"Could not upload file {local_path}: {e}")
+            log.error(f"Could not upload file {local_path}: {e}")
             stderr.print(f"[red]Could not upload file {local_path}: {e}")
             return False
 
