@@ -422,6 +422,8 @@ class BioinfoMetadata(BaseModule):
         method_name = f"{self.add_bioinfo_results_metadata.__name__}"
         extra_json_data = []
         for key in self.software_config.keys():
+            # Reset map_data flag so it only activates when table expects mapping
+            map_data_flag = False
             # Update bioinfo cofiguration key/scope
             self.current_config_key = key
             map_method_name = f"{method_name}:{self.software_name}.{key}"
@@ -455,8 +457,10 @@ class BioinfoMetadata(BaseModule):
                 "extra_dict"
             ):
                 extra_json_data.append(data)
+                map_data_flag = False
             else:
                 data_to_map = data
+                map_data_flag = True
 
             # Mapping data to j_data
             mapping_fields = self.software_config[key].get("content")
@@ -468,7 +472,7 @@ class BioinfoMetadata(BaseModule):
                 )
                 self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
-            if data_to_map:
+            if data_to_map and map_data_flag:
                 j_data_mapped = self.mapping_over_table(
                     j_data=j_data,
                     map_data=data_to_map,
