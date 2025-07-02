@@ -57,7 +57,7 @@ def main():
     )
     args = parser.parse_args()
     print("Initiating validate module")
-    validation = Validate(**args)
+    validation = Validate(**vars(args))
     validation.user = os.environ["TEST_USER"]
     validation.password = os.environ["TEST_PASSWORD"]
     validation.sftp_port = os.environ["TEST_PORT"]
