@@ -1063,15 +1063,15 @@ class BioinfoMetadata(BaseModule):
                         key=out_path, sample=failsamp, entry=error_text
                     )
 
-            if not self.soft_validation or len(unique_failed_samples) == len(
-                self.j_data
-            ):
+            if not self.soft_validation:
                 self.parent_create_error_summary(
                     called_module="read-bioinfo-metadata", logs=self.logsum.logs
                 )
-                raise ValueError(
-                    "Validation of metadata failed, fix the errors or run with --soft_validation"
+                self.log.warning(
+                    "Metadata was not completely validate, fix the errors or run with --soft_validation"
                 )
+                return False
+
         else:
             stderr.print("[green]Bioinfo json succesfully validated.")
             self.log.info("Bioinfo json succesfully validated.")
