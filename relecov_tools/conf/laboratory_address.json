@@ -1,5 +1,6 @@
 {
     "Instituto de Salud Carlos III": {
+        "codcnh": "INST_001",
         "collecting_institution_address": "Crta. Pozuelo Majadahonda S/N",
         "collecting_institution_email": "info@isciii.es",
         "geo_loc_state": "Comunidad de Madrid",
@@ -1259,6 +1260,7 @@
         "submitting_institution_email": "antonio.oliver@ssib.es"
     },
     "Servicio de Microbiologia HU Son Espases": {
+        "codcnh": "SERV_002",
         "collecting_institution_address": "Ctra. Valldemossa 79",
         "collecting_institution_email": "antonio.oliver@ssib.es",
         "geo_loc_state": "Illes Balears",
@@ -1933,6 +1935,7 @@
         "submitting_institution_email": ""
     },
     "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII": {
+        "codcnh": "LAB_003",
         "collecting_institution_address": "c/ Dr. Mallafrè Guasch, 4,",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -1944,6 +1947,7 @@
         "submitting_institution_email": ""
     },
     "LABORATORI DE REFERENCIA DE CATALUNYA": {
+        "codcnh": "LAB_004",
         "collecting_institution_address": "Carrer de la Selva, 10",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -1955,6 +1959,7 @@
         "submitting_institution_email": ""
     },
     "Banc de Sang i Teixits Catalunya": {
+        "codcnh": "BANC_005",
         "collecting_institution_address": "Passeig del Taulat, 116",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -1966,6 +1971,7 @@
         "submitting_institution_email": ""
     },
     "Laboratorio Echevarne, SA Sant Cugat del Vallès": {
+        "codcnh": "LAB_006",
         "collecting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -2029,6 +2035,7 @@
         "submitting_institution_email": ""
     },
     "Fundació Althaia-Manresa": {
+        "codcnh": "FUND_007",
         "collecting_institution_address": "Carrer del Dr. Joan Soler, 1-3",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -2716,6 +2723,7 @@
         "submitting_institution_email": ""
     },
     "CAP La Salut EAP Badalona": {
+        "codcnh": "CAP_008",
         "collecting_institution_address": "Passatge dels Encants, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -2727,6 +2735,7 @@
         "submitting_institution_email": ""
     },
     "CAP Mataró-6 (Gatassa)": {
+        "codcnh": "CAP_009",
         "collecting_institution_address": "Camí del Mig, 36",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -2738,6 +2747,7 @@
         "submitting_institution_email": ""
     },
     "CAP Can Mariner Santa Coloma-1": {
+        "codcnh": "CAP_010",
         "collecting_institution_address": "Carrer de Sant Carles, 79",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -2748,12 +2758,25 @@
         "submitting_institution_address": "Crta del Canyet s/n",
         "submitting_institution_email": ""
     },
-    "CAP Montmeló (Montornès)": {
+    "CAP Montornès": {
+        "codcnh": "CAP_011",
         "collecting_institution_address": "Carrer de Can Parera, 7",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
-        "geo_loc_region": "Tarragona",
+        "geo_loc_region": "Barcelona",
         "geo_loc_city": "Montornès del Vallès",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
+        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution_email": ""
+    },
+    "CAP Montmeló": {
+        "codcnh": "CAP_012",
+        "collecting_institution_address": "Plaza Enerst Lluch 1",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Montmeló",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
         "submitting_institution_address": "Crta del Canyet s/n",
@@ -4983,6 +5006,7 @@
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
     },
     "Microbiología HUC San Cecilio": {
+        "codcnh": "MIC_013",
         "collecting_institution_address": "Av. del Conocimiento S/N",
         "collecting_institution_email": "fegarcia@ugr.es",
         "geo_loc_state": "Andalucía",
@@ -7880,6 +7904,7 @@
         "submitting_institution_email": ""
     },
     "Plataforma de Medicina Computacional, Fundación Progreso y Salud":{
+        "codcnh": "FUND_014",
         "collecting_institution_address": "Avda. Américo Vespucio, 15",
         "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "geo_loc_state": "Andalucía",
@@ -8216,6 +8241,7 @@
         "submitting_institution_email": ""
     },
     "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)": {
+        "codcnh": "CONS_015",
         "collecting_institution_address": "Paseo de Belen 19",
         "collecting_institution_email": "jmeirosbouza@gmail.com",
         "geo_loc_state": "Castilla y León",
@@ -8292,6 +8318,7 @@
         "submitting_institution_email": ""
     },
     "CATLAB": {
+        "codcnh": "LAB_016",
         "collecting_institution_address": "Vial St Jordi, s/n",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
@@ -8667,6 +8694,7 @@
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "Fundació Fisabio": {
+        "codcnh": "FUND_017",
         "collecting_institution_address": "Av. de Catalunya, 21",
         "collecting_institution_email": "",
         "geo_loc_state": "Comunitat Valenciana",
@@ -9224,6 +9252,7 @@
         "submitting_institution_email": ""
     },
     "Gerencia de Atención Primaria Pontevedra Sur": {
+        "codcnh": "GAP_018",
         "collecting_institution_address": "Av. das Camelias, 109, Vigo",
         "collecting_institution_email": "",
         "geo_loc_state": "Galicia",
@@ -9469,6 +9498,7 @@
         "submitting_institution_email": ""
     },
     "Plataforma de Genómica y Bioinformática": {
+        "codcnh": "PLAT_019",
         "collecting_institution_address": "Calle Piqueras, 98",
         "collecting_institution_email": "mthernando@riojasalud.es",
         "geo_loc_state": "La Rioja",
@@ -9570,6 +9600,7 @@
         "submitting_institution_email": ""
     },
     "Instituto Tecnológico y de Energías Renovables, S.A. (ITER, S.A.)": {
+        "codcnh": "INST_020",
         "collecting_institution_address": "Polígono Industrial de Granadilla, s/n",
         "collecting_institution_email": "jlorenzo@iter.es",
         "geo_loc_state": "Canarias",
@@ -10205,6 +10236,7 @@
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es"
     },
     "Microbiología. Hospital Universitario Virgen del Rocio": {
+        "codcnh": "MIC_021",
         "collecting_institution_address": "Avenida Manuel Siurot s/n",
         "collecting_institution_email": "josea.lepe.sspa@juntadeandalucia.es",
         "geo_loc_state": "Andalucía",
@@ -10853,6 +10885,7 @@
         "submitting_institution_email": ""
     },
     "Consejería de Sanidad": {
+        "codcnh": "CONSEJ_022",
         "collecting_institution_address": "Avda. de Francia, 4.",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla - La Mancha",
@@ -11540,6 +11573,7 @@
         "submitting_institution_email": ""
     },
     "Hospital San Eloy": {
+        "codcnh": 480182,
         "collecting_institution_address": "Av. A. Miranda, 5002",
         "collecting_institution_email": "",
         "geo_loc_state": "País Vasco",
@@ -11772,6 +11806,7 @@
         "submitting_institution_email": ""
     },
     "Centro de Investigación Biomédica de Aragón": {
+        "codcnh": "CI_023",
         "collecting_institution_address": "Avenida San Juan Bosco, 13",
         "collecting_institution_email": "mhpstrunk.iacs@aragon.es",
         "geo_loc_state": "Aragón",
@@ -11991,6 +12026,7 @@
         "submitting_institution_email": ""
     },
     "Presidencia del Gobierno": {
+        "codcnh": "PRES_024",
         "collecting_institution_address": "Avenida Puerta de Hierro s/n",
         "collecting_institution_email": "",
         "collecting_institution_finalidad": "Otra Finalidad",
@@ -12003,6 +12039,7 @@
         "submitting_institution_email": "info@isciii.es"
     },
     "Ministerio Sanidad": {
+        "codcnh": "MIN_025",
         "collecting_institution_address": "P.º del Prado, 18, Centro",
         "collecting_institution_email": "",
         "collecting_institution_finalidad": "Otra Finalidad",
