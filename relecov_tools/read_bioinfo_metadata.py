@@ -3,6 +3,7 @@ import os
 import rich.console
 import re
 import shutil
+import importlib
 import numpy as np
 from datetime import datetime
 from rich.prompt import Prompt
@@ -569,17 +570,10 @@ class BioinfoMetadata(BaseModule):
                 utils_name = f"relecov_tools.assets.pipeline_utils.{self.software_name}"
 
             # Dynamically import the function from the specified module
-            import_statement = f"import {utils_name}"
-            exec(import_statement)
-            # Get method name and execute it.
-            data = eval(
-                utils_name
-                + "."
-                + func_name
-                + "(file_list, file_tag, '"
-                + self.software_name
-                + "', out_path)"
-            )
+            module = importlib.import_module(utils_name)
+            # Get method from func_name and execute it.
+            func_obj = getattr(module, func_name)
+            data = func_obj(file_list, file_tag, self.software_name, out_path)
 
         except Exception as e:
             self.update_all_logs(
