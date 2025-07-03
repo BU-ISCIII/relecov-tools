@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import sys
 import rich.console
 import re
 import shutil
@@ -113,9 +112,8 @@ class BioinfoMetadata(BaseModule):
                 "error",
                 f"file {json_file} does not exist",
             )
-            sys.exit(
-                self.log_report.print_log_report(self.__init__.__name__, ["error"])
-            )
+            self.log_report.print_log_report(self.__init__.__name__, ["error"])
+            raise ValueError(f"Json file {json_file} does not exist, cannot continue.")
 
         #  Assign a new name for better readability
         self.readlabmeta_json_file = json_file
@@ -158,14 +156,14 @@ class BioinfoMetadata(BaseModule):
         if self.software_name in available_software:
             self.software_config = bioinfo_config.get_configuration(self.software_name)
         else:
+            errtxt = f"No configuration available for '{self.software_name}'. Currently, the only available software options are:: {', '.join(available_software)}"
             self.update_all_logs(
                 self.__init__.__name__,
                 "error",
-                f"No configuration available for '{self.software_name}'. Currently, the only available software options are:: {', '.join(available_software)}",
+                errtxt,
             )
-            sys.exit(
-                self.log_report.print_log_report(self.__init__.__name__, ["error"])
-            )
+            self.log_report.print_log_report(self.__init__.__name__, ["error"])
+            raise ValueError(errtxt)
 
     def update_all_logs(self, method_name, status, message):
         report = self.log_report.update_log_report(method_name, status, message)
@@ -209,12 +207,14 @@ class BioinfoMetadata(BaseModule):
                         files_found[topic_key] = []
                     files_found[topic_key].extend(matching_files)
         if len(files_found) < 1:
+            errtxt = f"No files found in '{self.input_folder}' according to '{os.path.basename(self.bioinfo_json_file)}' file name patterns."
             self.update_all_logs(
                 method_name,
                 "error",
-                f"No files found in '{self.input_folder}' according to '{os.path.basename(self.bioinfo_json_file)}' file name patterns.",
+                errtxt,
             )
-            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+            self.log_report.print_log_report(method_name, ["error"])
+            raise ValueError(errtxt)
         else:
             self.update_all_logs(
                 self.scann_directory.__name__,
@@ -389,12 +389,14 @@ class BioinfoMetadata(BaseModule):
             else:
                 continue
         if len(missing_required) >= 1:
+            errtxt = f"Missing mandatory files in {self.software_name}:{', '.join(missing_required)}"
             self.update_all_logs(
                 method_name,
                 "error",
-                f"Missing mandatory files in {self.software_name}:{', '.join(missing_required)}",
+                errtxt,
             )
-            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+            self.log_report.print_log_report(method_name, ["error"])
+            raise ValueError(errtxt)
         else:
             self.update_all_logs(
                 method_name, "valid", "Successfull validation of mandatory files."
@@ -585,7 +587,8 @@ class BioinfoMetadata(BaseModule):
                 "error",
                 f"Error occurred while parsing '{func_name}': {e}.",
             )
-            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+            self.log_report.print_log_report(method_name, ["error"])
+            raise ValueError(f"Error occurred while parsing '{func_name}': {e}.")
         return data
 
     def add_fixed_values(self, j_data, out_filename):
@@ -729,12 +732,16 @@ class BioinfoMetadata(BaseModule):
                 self.readlabmeta_json_file
             )
         except ValueError:
+            errtxt = (
+                f"Invalid lab-metadata json file: self.{self.readlabmeta_json_file}"
+            )
             self.update_all_logs(
                 method_name,
                 "error",
-                f"Invalid lab-metadata json file: self.{self.readlabmeta_json_file}",
+                errtxt,
             )
-            sys.exit(self.log_report.print_log_report(method_name, ["error"]))
+            self.log_report.print_log_report(method_name, ["error"])
+            raise ValueError(errtxt)
         return json_lab_data
 
     def get_sample_idx_colpos(self, config_key):
@@ -914,15 +921,10 @@ class BioinfoMetadata(BaseModule):
                             prev_metadata_dict[sample_id] = item
                             stderr.print(f"[green]Sample '{sample_id}' updated (auto).")
                     else:
-                        stderr.print(
-                            f"[red]Sample '{sample_id}' has different data in {batch_filepath} and new metadata. Can't merge."
-                        )
-                        self.log.error(
-                            "Sample %s has different data in %s and new metadata. Can't merge.",
-                            sample_id,
-                            batch_filepath,
-                        )
-                        sys.exit(1)
+                        errtxt = f"Sample '{sample_id}' has different data in {batch_filepath} and new metadata. Can't merge."
+                        stderr.print(f"[red]{errtxt}")
+                        self.log.error(errtxt)
+                        raise ValueError(errtxt)
             else:
                 prev_metadata_dict[sample_id] = item
 
@@ -1072,7 +1074,9 @@ class BioinfoMetadata(BaseModule):
                 self.parent_create_error_summary(
                     called_module="read-bioinfo-metadata", logs=self.logsum.logs
                 )
-                sys.exit(1)
+                raise ValueError(
+                    "Validation of metadata failed, fix the errors or run with --soft_validation"
+                )
         else:
             stderr.print("[green]Bioinfo json succesfully validated.")
             self.log.info("Bioinfo json succesfully validated.")
