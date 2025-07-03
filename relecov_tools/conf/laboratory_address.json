@@ -1,16 +1,4 @@
 {
-    "Instituto de Salud Carlos III": {
-        "codcnh": "INST_001",
-        "collecting_institution_address": "Crta. Pozuelo Majadahonda S/N",
-        "collecting_institution_email": "info@isciii.es",
-        "geo_loc_state": "Comunidad de Madrid",
-        "geo_loc_region": "Madrid",
-        "geo_loc_city": "Madrid",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Instituto de Salud Carlos III",
-        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
-        "submitting_institution_email": "info@isciii.es"
-    },
     "Red De Salud Mental De Araba (Hospital Psiquiátrico De Araba)": {
         "codcnh": 10035,
         "collecting_institution_address": "Álava, 43",
@@ -1922,30 +1910,6 @@
         "submitting_institution_address": "",
         "submitting_institution_email": ""
     },
-    "LABORATORI DE REFERENCIA DE CATALUNYA": {
-        "codcnh": "LAB_004",
-        "collecting_institution_address": "Carrer de la Selva, 10",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Cataluña",
-        "geo_loc_region": "Barcelona",
-        "geo_loc_city": "Barcelona",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
-        "submitting_institution_address": "Carrer de la Selva, 10",
-        "submitting_institution_email": ""
-    },
-    "Laboratorio Echevarne, SA Sant Cugat del Vallès": {
-        "codcnh": "LAB_006",
-        "collecting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Cataluña",
-        "geo_loc_region": "Barcelona",
-        "geo_loc_city": "Sant Cugat del Vallès",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Laboratorio Echevarne, SA Sant Cugat del Vallès",
-        "submitting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
-        "submitting_institution_email": ""
-    },
     "Fundació Sanitària Sant Josep": {
         "codcnh": 80787,
         "collecting_institution_address": "Cr Carme  Verdaguer, 56",
@@ -2672,54 +2636,6 @@
         "geo_loc_country": "Spain",
         "submitting_institution": "",
         "submitting_institution_address": "",
-        "submitting_institution_email": ""
-    },
-    "CAP La Salut EAP Badalona": {
-        "codcnh": "CAP_008",
-        "collecting_institution_address": "Passatge dels Encants, s/n",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Cataluña",
-        "geo_loc_region": "Barcelona",
-        "geo_loc_city": "Badalona",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
-        "submitting_institution_email": ""
-    },
-    "CAP Can Mariner Santa Coloma-1": {
-        "codcnh": "CAP_010",
-        "collecting_institution_address": "Carrer de Sant Carles, 79",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Cataluña",
-        "geo_loc_region": "Tarragona",
-        "geo_loc_city": "Santa Coloma de Gramenet",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
-        "submitting_institution_email": ""
-    },
-    "CAP Montornès": {
-        "codcnh": "CAP_011",
-        "collecting_institution_address": "Carrer de Can Parera, 7",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Cataluña",
-        "geo_loc_region": "Barcelona",
-        "geo_loc_city": "Montornès del Vallès",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
-        "submitting_institution_email": ""
-    },
-    "CAP Montmeló": {
-        "codcnh": "CAP_012",
-        "collecting_institution_address": "Plaza Enerst Lluch 1",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Cataluña",
-        "geo_loc_region": "Barcelona",
-        "geo_loc_city": "Montmeló",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
         "submitting_institution_email": ""
     },
     "Centre Collserola Mutual": {
@@ -8221,18 +8137,6 @@
         "submitting_institution_address": "C. de Irunlarrea, 3, Pamplona",
         "submitting_institution_email": ""
     },
-    "CATLAB": {
-        "codcnh": "LAB_016",
-        "collecting_institution_address": "Vial St Jordi, s/n",
-        "collecting_institution_email": "",
-        "geo_loc_state": "Cataluña",
-        "geo_loc_region": "Barcelona",
-        "geo_loc_city": "Viladecavalls",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
-        "submitting_institution_email": ""
-    },
     "Clinica San Miguel": {
         "codcnh": 310076,
         "collecting_institution_address": "Beloso Alto, 32",
@@ -12025,9 +11929,9 @@
         "submitting_institution_address": "Avda. de Francia, 4.",
         "submitting_institution_email": ""
     },
-    "Presidencia del Gobierno": {
-        "codcnh": "PRES_024",
-        "collecting_institution_address": "Avenida Puerta de Hierro s/n",
+    "Ministerio Sanidad": {
+        "codcnh": "MIN_025",
+        "collecting_institution_address": "P.º del Prado, 18, Centro",
         "collecting_institution_email": "",
         "collecting_institution_finalidad": "Otra Finalidad",
         "geo_loc_state": "Comunidad de Madrid",
@@ -12038,9 +11942,105 @@
         "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
         "submitting_institution_email": "info@isciii.es"
     },
-    "Ministerio Sanidad": {
-        "codcnh": "MIN_025",
-        "collecting_institution_address": "P.º del Prado, 18, Centro",
+    "Instituto de Salud Carlos III": {
+        "codcnh": "INST_001",
+        "collecting_institution_address": "Crta. Pozuelo Majadahonda S/N",
+        "collecting_institution_email": "info@isciii.es",
+        "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Instituto de Salud Carlos III",
+        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
+        "submitting_institution_email": "info@isciii.es"
+    },
+    "LABORATORI DE REFERENCIA DE CATALUNYA": {
+        "codcnh": "LAB_004",
+        "collecting_institution_address": "Carrer de la Selva, 10",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Barcelona",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_email": ""
+    },
+    "Laboratorio Echevarne, SA Sant Cugat del Vallès": {
+        "codcnh": "LAB_006",
+        "collecting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Sant Cugat del Vallès",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Laboratorio Echevarne, SA Sant Cugat del Vallès",
+        "submitting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
+        "submitting_institution_email": ""
+    },
+    "CAP La Salut EAP Badalona": {
+        "codcnh": "CAP_008",
+        "collecting_institution_address": "Passatge dels Encants, s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Badalona",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
+        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution_email": ""
+    },
+    "CAP Can Mariner Santa Coloma-1": {
+        "codcnh": "CAP_010",
+        "collecting_institution_address": "Carrer de Sant Carles, 79",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Tarragona",
+        "geo_loc_city": "Santa Coloma de Gramenet",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
+        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution_email": ""
+    },
+    "CAP Montornès": {
+        "codcnh": "CAP_011",
+        "collecting_institution_address": "Carrer de Can Parera, 7",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Montornès del Vallès",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
+        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution_email": ""
+    },
+    "CAP Montmeló": {
+        "codcnh": "CAP_012",
+        "collecting_institution_address": "Plaza Enerst Lluch 1",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Montmeló",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
+        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution_email": ""
+    },
+    "CATLAB": {
+        "codcnh": "LAB_016",
+        "collecting_institution_address": "Vial St Jordi, s/n",
+        "collecting_institution_email": "",
+        "geo_loc_state": "Cataluña",
+        "geo_loc_region": "Barcelona",
+        "geo_loc_city": "Viladecavalls",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
+        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution_email": ""
+    },
+    "Presidencia del Gobierno": {
+        "codcnh": "PRES_024",
+        "collecting_institution_address": "Avenida Puerta de Hierro s/n",
         "collecting_institution_email": "",
         "collecting_institution_finalidad": "Otra Finalidad",
         "geo_loc_state": "Comunidad de Madrid",
