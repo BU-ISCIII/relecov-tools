@@ -1010,13 +1010,13 @@ class BioinfoMetadata(BaseModule):
         stderr.print("[blue]Adding files path to read lab metadata")
         self.log.info("Adding files path to read lab metadata")
         self.j_data = self.add_bioinfo_files_path(files_found_dict, self.j_data)
-
-        module = eval(f"relecov_tools.assets.pipeline_utils.{self.software_name}")
+            
+        # Dynamically import the function from the specified module
+        module = importlib.import_module(
+            f"relecov_tools.assets.pipeline_utils.{self.software_name}")
         try:
             if hasattr(module, "quality_control_evaluation"):
-                qc_func = eval(
-                    f"relecov_tools.assets.pipeline_utils.{self.software_name}.quality_control_evaluation"
-                )
+                qc_func = getattr(module, "quality_control_evaluation")
                 self.j_data = qc_func(self.j_data)
 
         except (AttributeError, NameError, TypeError, ValueError) as e:
