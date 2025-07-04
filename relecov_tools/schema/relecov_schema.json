@@ -4805,6 +4805,18 @@
             "fill_mode": "batch",
             "header": "N"
         },
+        "geo_loc_longitude": {
+            "examples": [
+                "77.11 W"
+            ],
+            "ontology": "OBI:0001621",
+            "type": "string",
+            "description": "The longitude coordinates of the geographical location of sample collection.",
+            "classification": "Sample collection and processing",
+            "label": "Geo Loc Longitude",
+            "fill_mode": "batch",
+            "header": "N"
+        },
         "study_type": {
             "enum": [
                 "Whole Genome Sequencing [SNOMED:51201000000109]",
@@ -4832,18 +4844,6 @@
             "description": "The nature of the investigation or the investigational use for which the study is being done",
             "classification": "Submission ENA",
             "label": "Study type",
-            "fill_mode": "batch",
-            "header": "N"
-        },
-        "geo_loc_longitude": {
-            "examples": [
-                "77.11 W"
-            ],
-            "ontology": "OBI:0001621",
-            "type": "string",
-            "description": "The longitude coordinates of the geographical location of sample collection.",
-            "classification": "Sample collection and processing",
-            "label": "Geo Loc Longitude",
             "fill_mode": "batch",
             "header": "N"
         },
@@ -5857,7 +5857,7 @@
             "ontology": "0",
             "type": "integer",
             "minimum": 0,
-            "maximum": 10000,
+            "maximum": 100000,
             "description": "Number of Ns",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "Number of Ns",
@@ -5871,7 +5871,7 @@
             "ontology": "GENEPIO:0001484",
             "type": "number",
             "minimum": 0,
-            "maximum": 10000,
+            "maximum": 100000,
             "description": "The number of N symbols present in the consensus fasta sequence, per 100kbp of sequence.",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "Ns per 100 kbp",
