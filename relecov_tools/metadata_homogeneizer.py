@@ -206,18 +206,11 @@ class MetadataHomogeneizer(BaseModule):
                 raise ValueError(f"Unknown error during processing of {file_data['file_name']}")
             func_name = file_data["function"]
             stderr.print("[yellow] Start processing function " + func_name)
-            exec(
-                "from relecov_tools.institution_scripts."
-                + self.institution
-                + " import "
-                + func_name
-            )
-            # somehow this overrides additional_data working as a pointer
-            eval(
-                func_name
-                + "(data_to_add, data, file_data['mapped_fields'], self.heading)"
-            )
-        stderr.print("[green] Succesful processing of additional file ")
+            import_statement = f"relecov_tools.institution_scripts.{self.institution}"
+            module = importlib.import_module(import_statement)
+            func_obj = getattr(module, func_name)
+            data = func_obj(data_to_add, data, file_data['mapped_fields'], self.heading)
+        stderr.print("[green]Succesful processing of additional file")
         return data_to_add
 
     def converting_metadata(self):
