@@ -1067,9 +1067,9 @@ class BioinfoMetadata(BaseModule):
                 self.parent_create_error_summary(
                     called_module="read-bioinfo-metadata", logs=self.logsum.logs
                 )
-                self.log.warning(
-                    "Metadata was not completely validate, fix the errors or run with --soft_validation"
-                )
+                errtxt = "Metadata was not completely validate, fix the errors or run with --soft_validation"
+                self.log.warning(errtxt)
+                stderr.print(f"[red]{errtxt}")
                 return False
 
         else:
