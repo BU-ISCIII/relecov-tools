@@ -3,11 +3,28 @@ name: test_modules
 on:
   push:
     branches: "**"
-  pull_request:
+  pull_request_target:
     types: [opened, reopened, synchronize]
     branches: "**"
 
 jobs:
+  security_check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get User Permission
+      id: checkAccess
+      uses: actions-cool/check-user-permission@v2
+      with:
+        require: write
+        username: ${{ github.triggering_actor }}
+    - name: Check User Permission
+      if: steps.checkAccess.outputs.require-result == 'false'
+      run: |
+        echo "${{ github.triggering_actor }} does not have permissions on this repo."
+        echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
+        echo "Job originally triggered by ${{ github.actor }}"
+        exit 1
+
   test_map:
     runs-on: ubuntu-latest
     strategy:
@@ -86,17 +103,25 @@ jobs:
           --json_file tests/data/read_bioinfo_metadata/validated_samples.json \
           --input_folder tests/data/read_bioinfo_metadata/analysis_folder/ \
           --software_name viralrecon \
+          --soft_validation \
           -o $OUTPUT_LOCATION
 
-    - name: Run validate module (default)
+    - name: Run validate module with upload files (default)
       if: matrix.modules == 'validate'
       run: |
-        relecov-tools validate \
+        python3 tests/test_validate.py \
           -j tests/data/map_validate/processed_metadata_lab_test.json \
-          -s relecov_tools/schema/relecov_schema.json \
           -m tests/data/map_validate/metadata_lab_test.xlsx \
+          --upload_files \
+          -o tests/data/map_validate/ \
+          -s relecov_tools/schema/relecov_schema.json \
           -r tests/data/map_validate/unique_sampleid_registry.json \
-          -o $OUTPUT_LOCATION
+          -l tests/data/map_validate/previous_processes_log_summary.json
+      env:
+        TEST_USER: ${{ secrets.TEST_USER }}
+        TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+        TEST_PORT: ${{ secrets.TEST_PORT }}
+        GITHUB_WORKSPACE: ${{ github.workspace }}
 
     - name: Run build-schema module
       if: matrix.modules == 'build-schema'

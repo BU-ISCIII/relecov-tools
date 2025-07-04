@@ -41,7 +41,7 @@ def quality_control_evaluation(data):
     thresholds = {
         "number_of_unambiguous_bases": (">", 11000),
         "number_of_Ns": ("<", 2300),
-        "pass_reads": (">", 23000),
+        "per_genome_greater_10x": (">", 90.0),
         "per_reads_host": ("<", 20.0),
         "per_hagene_coverage": (">", 98.0),
         "per_nagene_coverage": (">", 98.0),

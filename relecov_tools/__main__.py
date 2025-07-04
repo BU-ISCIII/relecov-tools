@@ -9,7 +9,7 @@ import inspect
 # from rich.prompt import Confirm
 import click
 import relecov_tools.config_json
-import relecov_tools.download_manager
+import relecov_tools.download
 import relecov_tools.log_summary
 import rich.console
 import rich.traceback
@@ -17,18 +17,18 @@ import rich.traceback
 import relecov_tools.config_json
 import relecov_tools.utils
 import relecov_tools.read_lab_metadata
-import relecov_tools.download_manager
-import relecov_tools.json_validation
+import relecov_tools.download
+import relecov_tools.validate
 import relecov_tools.mail
-import relecov_tools.map_schema
+import relecov_tools.map
 import relecov_tools.upload_database
 import relecov_tools.read_bioinfo_metadata
 import relecov_tools.metadata_homogeneizer
 import relecov_tools.gisaid_upload
-import relecov_tools.upload_ena_protocol
+import relecov_tools.ena_upload
 import relecov_tools.pipeline_manager
 import relecov_tools.build_schema
-import relecov_tools.dataprocess_wrapper
+import relecov_tools.wrapper
 import relecov_tools.upload_results
 import relecov_tools.base_module
 
@@ -39,7 +39,7 @@ stderr = rich.console.Console(
     stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
 )
 
-__version__ = "1.5.5"
+__version__ = "1.6.0"
 
 # IMPORTANT: When defining a Click command function in this script,
 # you MUST include both 'ctx' (for @click.pass_context) and ALL the parameters
@@ -96,29 +96,30 @@ def run_relecov_tools():
     # Print nf-core header
     # stderr.print("\n[green]{},--.[grey39]/[green],-.".format(" " * 42), highlight=False)
     stderr.print(
-        "[blue]                ___   ___       ___  ___  ___                           ",
+        r"[blue]                ___   ___       ___  ___  ___                           ",
         highlight=False,
     )
     stderr.print(
-        "[blue]   \    |-[grey39]-|  [blue] |   \ |    |    |    |    |   | \      /  ",
+        r"[blue]   \    |-[grey39]-|  [blue] |   \ |    |    |    |    |   | \      /  ",
         highlight=False,
     )
     stderr.print(
-        "[blue]    \   \  [grey39]/ [blue]  |__ / |__  |    |___ |    |   |  \    /   ",
+        r"[blue]    \   \  [grey39]/ [blue]  |__ / |__  |    |___ |    |   |  \    /   ",
         highlight=False,
     )
     stderr.print(
-        "[blue]    /  [grey39] / [blue] \   |  \  |    |    |    |    |   |   \  /    ",
+        r"[blue]    /  [grey39] / [blue] \   |  \  |    |    |    |    |   |   \  /    ",
         highlight=False,
     )
     stderr.print(
-        "[blue]   /   [grey39] |-[blue]-|   |   \ |___ |___ |___ |___ |___|    \/     ",
+        r"[blue]   /   [grey39] |-[blue]-|   |   \ |___ |___ |___ |___ |___|    \/     ",
         highlight=False,
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
     stderr.print(
-        "\n" "[grey39]    RELECOV-tools version {}".format(__version__), highlight=False
+        "\n" r"[grey39]    RELECOV-tools version {}".format(__version__),
+        highlight=False,
     )
 
     # Lanch the click cli
@@ -315,14 +316,15 @@ def download(
         add_extra_config=True,
     )
     try:
-        download_manager = relecov_tools.download_manager.DownloadManager(**args_merged)
-        download_manager.execute_process()
+        download = relecov_tools.download.Download(**args_merged)
+        download.execute_process()
     except Exception as e:
         if debug:
             log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -369,9 +371,9 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     # Merge arguments
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    new_metadata = relecov_tools.read_lab_metadata.RelecovMetadata(**args_merged)
 
     try:
+        new_metadata = relecov_tools.read_lab_metadata.LabMetadata(**args_merged)
         new_metadata.create_metadata_json()
     except Exception as e:
         if debug:
@@ -379,6 +381,7 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -422,22 +425,45 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     default=None,
     help="Path to the JSON file containing the registered records of validated samples with their unique sample identifiers.",
 )
+@click.option(
+    "--upload_files",
+    is_flag=True,
+    default=False,
+    help="Wether to upload the resulting files from validation process or not.",
+)
+@click.option(
+    "-l",
+    "--logsum_file",
+    required=False,
+    default=None,
+    help="Required if --upload_files. Path to the log_summary.json file merged from all previous processes, used to check for invalid samples.",
+)
 @click.pass_context
 def validate(
-    ctx, json_file, json_schema_file, metadata, output_dir, excel_sheet, registry
+    ctx,
+    json_file,
+    json_schema_file,
+    metadata,
+    output_dir,
+    excel_sheet,
+    registry,
+    upload_files,
+    logsum_file,
 ):
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
-    validation = relecov_tools.json_validation.SchemaValidation(**args_merged)
+
     try:
-        validation.validate()
+        validation = relecov_tools.validate.Validate(**args_merged)
+        validation.execute_validation_process()
     except Exception as e:
         if debug:
             log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -533,7 +559,7 @@ def send_mail(
             "Please provide it via --template_path or define 'delivery_template_path_file' in the configuration."
         )
 
-    email_sender = relecov_tools.mail.EmailSender(config, template_path)
+    email_sender = relecov_tools.mail.Mail(config, template_path)
 
     template_choice = click.prompt(
         "Select the type of template:\n1. Validation with errors\n2. Validation successful",
@@ -615,6 +641,7 @@ def send_mail(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -651,7 +678,7 @@ def map(ctx, origin_schema, json_file, destination_schema, schema_file, output_d
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
-        new_schema = relecov_tools.map_schema.MappingSchema(**args_merged)
+        new_schema = relecov_tools.map.Map(**args_merged)
         new_schema.map_to_data_to_new_schema()
     except Exception as e:
         if debug:
@@ -659,6 +686,7 @@ def map(ctx, origin_schema, json_file, destination_schema, schema_file, output_d
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -710,7 +738,7 @@ def upload_to_ena(
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
-        upload_ena = relecov_tools.upload_ena_protocol.EnaUpload(**args_merged)
+        upload_ena = relecov_tools.ena_upload.EnaUpload(**args_merged)
         upload_ena.upload()
     except Exception as e:
         if debug:
@@ -718,6 +746,7 @@ def upload_to_ena(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -798,6 +827,7 @@ def upload_to_gisaid(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -849,7 +879,7 @@ def update_db(
     debug = ctx.obj.get("debug", False)
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     try:
-        update_database_obj = relecov_tools.upload_database.UpdateDatabase(
+        update_database_obj = relecov_tools.upload_database.UploadDatabase(
             **args_merged
         )
         update_database_obj.update_db()
@@ -859,6 +889,7 @@ def update_db(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -888,16 +919,29 @@ def update_db(
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
 )
-@click.option("-s", "--software_name", help="Name of the software/pipeline used.")
+@click.option("-p", "--software_name", help="Name of the software/pipeline used.")
 @click.option(
     "--update",
     is_flag=True,
     default=False,
     help="If the output file already exists, ask if you want to update it.",
 )
+@click.option(
+    "--soft_validation",
+    is_flag=True,
+    default=False,
+    help="If the module should continue even if any sample does not validate.",
+)
 @click.pass_context
 def read_bioinfo_metadata(
-    ctx, json_file, json_schema_file, input_folder, output_dir, software_name, update
+    ctx,
+    json_file,
+    json_schema_file,
+    input_folder,
+    output_dir,
+    software_name,
+    update,
+    soft_validation,
 ):
     """
     Create the json compliant  from the Bioinfo Metadata.
@@ -908,10 +952,11 @@ def read_bioinfo_metadata(
         add_extra_config=True,
     )
     debug = ctx.obj.get("debug", False)
-    new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
-        **args_merged
-    )
+
     try:
+        new_bioinfo_metadata = relecov_tools.read_bioinfo_metadata.BioinfoMetadata(
+            **args_merged
+        )
         new_bioinfo_metadata.create_bioinfo_file()
     except Exception as e:
         if debug:
@@ -919,6 +964,7 @@ def read_bioinfo_metadata(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -955,8 +1001,11 @@ def metadata_homogeneizer(ctx, institution, directory, output_dir):
     """Parse institution metadata lab to the one used in relecov"""
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(**args_merged)
+
     try:
+        new_parse = relecov_tools.metadata_homogeneizer.MetadataHomogeneizer(
+            **args_merged
+        )
         new_parse.converting_metadata()
     except Exception as e:
         if debug:
@@ -964,6 +1013,7 @@ def metadata_homogeneizer(ctx, institution, directory, output_dir):
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1016,8 +1066,9 @@ def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_name
     """
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    new_launch = relecov_tools.pipeline_manager.PipelineManager(**args_merged)
+
     try:
+        new_launch = relecov_tools.pipeline_manager.PipelineManager(**args_merged)
         new_launch.pipeline_exc()
     except Exception as e:
         if debug:
@@ -1025,6 +1076,7 @@ def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_name
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1042,6 +1094,13 @@ def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_name
     "--schema_base",
     type=click.Path(),
     help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module. (Default: installed schema in 'relecov-tools/relecov_tools/schema/relecov_schema.json')",
+    required=False,
+)
+@click.option(
+    "-e",
+    "--excel_template",
+    type=click.Path(),
+    help="Path to the excel template file. This file is used to get version history of the excel template (stored in assets/Relecov_metadata_*.xlsx)",
     required=False,
 )
 @click.option(
@@ -1084,6 +1143,7 @@ def build_schema(
     ctx,
     input_file,
     schema_base,
+    excel_template,
     draft_version,
     diff,
     output_dir,
@@ -1095,7 +1155,7 @@ def build_schema(
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
     try:
-        schema_update = relecov_tools.build_schema.SchemaBuilder(**args_merged)
+        schema_update = relecov_tools.build_schema.BuildSchema(**args_merged)
         new_schema = schema_update.handle_build_schema()
         if not new_schema:
             log.error("Schema build returned None. Skipping schema summary.")
@@ -1107,6 +1167,7 @@ def build_schema(
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1149,7 +1210,7 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
 
     # Get arguments from merged config
     lab_code = args_merged.get("lab_code")
-    output_folder = args_merged.get("output_folder")
+    output_folder = args_merged.get("output_dir")
     files = args_merged.get("files")
 
     all_logs = []
@@ -1183,32 +1244,43 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
         raise ValueError(msg)
 
     logsum = relecov_tools.log_summary.LogSum(output_dir=output_dir)
+
     try:
+        logmod = relecov_tools.base_module.BaseModule(
+            output_dir=output_folder, called_module="logs-to-excel"
+        )
+
+        # Set batch ID
+        try:
+            batch_date = datetime.strptime(os.path.basename(output_folder), "%Y%m%d")
+        except Exception:
+            batch_date = logmod.basemod_date
+        logmod.set_batch_id(batch_date)
+
         merged_logs = logsum.merge_logs(key_name=lab_code, logs_list=all_logs)
         final_logs = logsum.prepare_final_logs(logs=merged_logs)
-        output_filepath = os.path.join(output_folder, lab_code + "_metadata_report")
-        excel_outpath = output_filepath + ".xlsx"
+
+        output_filename = logmod.tag_filename(lab_code)
+        excel_outpath = os.path.join(
+            output_folder, output_filename + "_metadata_report.xlsx"
+        )
         logsum.create_logs_excel(logs=final_logs, excel_outpath=excel_outpath)
-        json_outpath = output_filepath + ".json"
+
+        json_outpath = excel_outpath.replace(".xlsx", ".json")
         relecov_tools.utils.write_json_to_file(final_logs, json_outpath)
+
     except Exception as e:
         if debug:
             log.exception(f"EXCEPTION FOUND: {e}")
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
 # wrapper
 @relecov_tools_cli.command(help_priority=16)
-@click.option(
-    "-c",
-    "--config_file",
-    type=click.Path(),
-    help="Path to config file in yaml format [required]",
-    required=True,
-)
 @click.option(
     "-o",
     "--output_dir",
@@ -1224,12 +1296,13 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
     help="Directory where the generated output will be saved",
 )
 @click.pass_context
-def wrapper(ctx, config_file, output_dir):
+def wrapper(ctx, output_dir):
     """Executes the modules in config file sequentially"""
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    process_wrapper = relecov_tools.dataprocess_wrapper.ProcessWrapper(**args_merged)
+
     try:
+        process_wrapper = relecov_tools.wrapper.Wrapper(**args_merged)
         process_wrapper.run_wrapper()
     except Exception as e:
         if debug:
@@ -1237,6 +1310,7 @@ def wrapper(ctx, config_file, output_dir):
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1259,8 +1333,9 @@ def upload_results(ctx, user, password, batch_id, template_path, project):
     """Upload batch results to sftp server."""
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
-    upload_sftp = relecov_tools.upload_results.UploadSftp(**args_merged)
+
     try:
+        upload_sftp = relecov_tools.upload_results.UploadResults(**args_merged)
         upload_sftp.execute_process()
     except Exception as e:
         if debug:
@@ -1268,6 +1343,7 @@ def upload_results(ctx, user, password, batch_id, template_path, project):
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 
@@ -1317,6 +1393,7 @@ def add_extra_config(ctx, config_name, config_file, force, clear_config):
             raise
         else:
             log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
 
 

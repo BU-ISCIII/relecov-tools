@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import logging
 import rich
+from datetime import datetime
 
 import relecov_tools.utils
 from relecov_tools.read_bioinfo_metadata import BioinfoReportLog
@@ -37,6 +38,11 @@ def handle_pangolin_data(files_list, file_tag, pipeline_name, output_folder=None
                 pango_data = relecov_tools.utils.read_csv_file_return_dict(
                     pango_file, sep=","
                 )
+                sample_id, metadata = next(iter(pango_data.items()))
+                formatted_date = datetime.strptime(
+                    metadata["lineage_assignment_date"], "%Y%m%d"
+                ).strftime("%Y-%m-%d")
+                pango_data[sample_id]["lineage_assignment_date"] = formatted_date
                 pango_data_key = next(iter(pango_data))
                 pango_data_updated = {
                     key.split()[0]: value for key, value in pango_data.items()
@@ -87,11 +93,11 @@ def quality_control_evaluation(data):
     thresholds = {
         "per_sgene_ambiguous": ("<", 10.0),
         "per_sgene_coverage": (">", 98.0),
-        "per_ldmutations": (">", 60.0),  # except if 'Not Evaluable'
+        "per_ldmutations": (">", 60.0),
         "number_of_sgene_frameshifts": ("==", 0),
         "number_of_unambiguous_bases": (">", 24000),
         "number_of_Ns": ("<", 5000),
-        "pass_reads": (">", 50000),
+        "per_genome_greater_10x": (">", 90.0),
         "per_reads_host": ("<", 20.0),
     }
 

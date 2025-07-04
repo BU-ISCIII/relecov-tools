@@ -528,7 +528,7 @@ def print_log_report(
 
 
 def prompt_create_outdir(
-    path, folder_name=None, prompt_message="Define path to store the output:"
+    path=None, folder_name=None, prompt_message="Define path to store the output:"
 ):
     """Ensure the directory exists or prompt the user to define and create it."""
     # Check path

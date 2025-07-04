@@ -3,7 +3,7 @@
     "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/relecov_schema.json",
     "title": "relecov-tools Schema.",
     "description": "Json Schema that specifies the structure, content, and validation rules for relecov-tools",
-    "version": "3.1.1",
+    "version": "3.1.2",
     "type": "object",
     "properties": {
         "organism": {
@@ -2975,7 +2975,6 @@
             "ontology": "SNOMED:399445004",
             "type": "string",
             "format": "date",
-            "pattern": "^202[0-5]",
             "description": "The date on which the sample was collected. YYYY-MM-DD",
             "classification": "Sample collection and processing",
             "label": "Sample Collection Date",
@@ -2989,7 +2988,6 @@
             "ontology": "SNOMED:281271004",
             "type": "string",
             "format": "date",
-            "pattern": "^202[0-5]",
             "description": "The date on which the sample was received. YYYY-MM-DD",
             "classification": "Sample collection and processing",
             "label": "Sample Received Date",
@@ -3568,7 +3566,6 @@
             "ontology": "GENEPIO:0001447",
             "type": "string",
             "format": "date",
-            "pattern": "^202[0-5]",
             "description": "The date the sample was sequenced. YYYY-MM-DD",
             "classification": "Sequencing",
             "label": "Sequencing Date",
@@ -4808,6 +4805,18 @@
             "fill_mode": "batch",
             "header": "N"
         },
+        "geo_loc_longitude": {
+            "examples": [
+                "77.11 W"
+            ],
+            "ontology": "OBI:0001621",
+            "type": "string",
+            "description": "The longitude coordinates of the geographical location of sample collection.",
+            "classification": "Sample collection and processing",
+            "label": "Geo Loc Longitude",
+            "fill_mode": "batch",
+            "header": "N"
+        },
         "study_type": {
             "enum": [
                 "Whole Genome Sequencing [SNOMED:51201000000109]",
@@ -4835,18 +4844,6 @@
             "description": "The nature of the investigation or the investigational use for which the study is being done",
             "classification": "Submission ENA",
             "label": "Study type",
-            "fill_mode": "batch",
-            "header": "N"
-        },
-        "geo_loc_longitude": {
-            "examples": [
-                "77.11 W"
-            ],
-            "ontology": "OBI:0001621",
-            "type": "string",
-            "description": "The longitude coordinates of the geographical location of sample collection.",
-            "classification": "Sample collection and processing",
-            "label": "Geo Loc Longitude",
             "fill_mode": "batch",
             "header": "N"
         },
@@ -5375,9 +5372,12 @@
         },
         "commercial_open_source_both": {
             "enum": [
-                "Commercial",
-                "Open Source",
-                "Both"
+                "Commercial [SWO:1000002]",
+                "Open Source [SWO:1000008]",
+                "Both",
+                "None",
+                "Not Provided [SNOMED:434941000124101",
+                "Not Applicable [GENEPIO:0001619]"
             ],
             "examples": [
                 "Commercial"
@@ -5857,7 +5857,7 @@
             "ontology": "0",
             "type": "integer",
             "minimum": 0,
-            "maximum": 10000,
+            "maximum": 100000,
             "description": "Number of Ns",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "Number of Ns",
@@ -5871,7 +5871,7 @@
             "ontology": "GENEPIO:0001484",
             "type": "number",
             "minimum": 0,
-            "maximum": 10000,
+            "maximum": 100000,
             "description": "The number of N symbols present in the consensus fasta sequence, per 100kbp of sequence.",
             "classification": "Bioinformatics and QC metrics fields",
             "label": "Ns per 100 kbp",
@@ -6041,7 +6041,8 @@
                 "Variant of Interest (VOI) [GENEPIO:0100083]",
                 "Variant of Concern (VOC) [GENEPIO:0100082]",
                 "Variant Under Monitoring (VUM) [GENEPIO:0100279]",
-                "Not Provided [SNOMED:434941000124101]"
+                "Not Provided [SNOMED:434941000124101]",
+                "Not Applicable [GENEPIO:0001619]"
             ],
             "examples": [
                 "Variant of Concern (VOC) [GENEPIO:0100083]"
@@ -6461,6 +6462,9 @@
             "header": "N"
         },
         "lineage_assignment_database_version": {
+            "examples": [
+                "2.26.0"
+            ],
             "ontology": "0",
             "type": "string",
             "description": "Version of the lineage assignment database",

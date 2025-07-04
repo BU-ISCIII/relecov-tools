@@ -49,6 +49,8 @@ class BaseModule:
         else:
             if output_dir is None:
                 output_dir = logs_config.get("default_outpath", "/tmp/relecov_tools")
+        if BaseModule._cli_log_path_param:
+            output_dir = BaseModule._cli_log_path_param
         output_dir = os.path.realpath(output_dir)
         self.basemod_outdir = output_dir
         if BaseModule._global_hex_code is None:
@@ -111,7 +113,7 @@ class BaseModule:
         Move output log file to destination while keeping track of past logs.
         Keep folder destination if self.cli_log_path is activated.
         """
-        if old_log_path is None:
+        if not old_log_path:
             log_file = self.get_log_file()
         else:
             log_file = old_log_path
