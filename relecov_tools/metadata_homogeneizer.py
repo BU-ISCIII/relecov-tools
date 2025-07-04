@@ -186,30 +186,36 @@ class MetadataHomogeneizer(BaseModule):
                 try:
                     item_data = data[s_value]
                 except KeyError:
-                    errtxt = f"Additional file {f_name} does not have the information for {s_value} ",
+                    errtxt = (
+                        f"Additional file {f_name} does not have the information for {s_value} ",
+                    )
                     self.log.info(errtxt)
                     stderr.print(f"[yellow]{errtxt}")
                     continue
-                
+
                 for m_field, f_field in file_data["mapped_fields"].items():
                     try:
                         meta_idx = self.heading.index(m_field)
                     except ValueError as e:
-                        self.log.error("Field %s does not exist in Metadata heading, check config", e)
+                        self.log.error(
+                            "Field %s does not exist in Metadata heading, check config",
+                            e,
+                        )
                         stderr.print(f"[red] Field {e} does not exist")
                         continue
                     row[meta_idx] = item_data[f_field]
 
-
         else:
-            if data == {'ERROR': 'not valid format'}:
-                raise ValueError(f"Unknown error during processing of {file_data['file_name']}")
+            if data == {"ERROR": "not valid format"}:
+                raise ValueError(
+                    f"Unknown error during processing of {file_data['file_name']}"
+                )
             func_name = file_data["function"]
             stderr.print("[yellow] Start processing function " + func_name)
             import_statement = f"relecov_tools.institution_scripts.{self.institution}"
             module = importlib.import_module(import_statement)
             func_obj = getattr(module, func_name)
-            data = func_obj(data_to_add, data, file_data['mapped_fields'], self.heading)
+            data = func_obj(data_to_add, data, file_data["mapped_fields"], self.heading)
         stderr.print("[green]Succesful processing of additional file")
         return data_to_add
 
