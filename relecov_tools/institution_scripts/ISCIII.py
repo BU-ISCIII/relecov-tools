@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import sys
-
 import logging
 import rich.console
 import relecov_tools.utils
