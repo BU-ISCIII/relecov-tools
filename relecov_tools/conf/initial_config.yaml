@@ -43,14 +43,8 @@ validate:
     output_dir: ''
     excel_sheet: ''
     registry: ''
-
-send_mail:
-    validate_file: ''
-    receiver_email: ''
-    attachments: []
-    template_path: ''
-    email_psswd: ''
-    additional_notes: ''
+    upload_files: false
+    logsum_file: ''
 
 map:
     destination_schema: ''
@@ -129,7 +123,6 @@ logs_to_excel:
     files: []
 
 wrapper:
-    config_file: ''
     output_dir: ''
 
 upload_results:

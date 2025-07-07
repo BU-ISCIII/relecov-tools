@@ -19,7 +19,7 @@ stderr = Console(
 )
 
 
-class UploadSftp(BaseModule):
+class UploadResults(BaseModule):
     def __init__(
         self,
         user=None,
@@ -61,7 +61,7 @@ class UploadSftp(BaseModule):
             msg="Enter your password:"
         )
 
-        self.relecov_sftp = relecov_tools.sftp_client.SftpRelecov(
+        self.relecov_sftp = relecov_tools.sftp_client.SftpClient(
             username=self.sftp_user, password=self.sftp_passwd
         )
         self.log.info(f"User: {self.sftp_user}, Processing batch: {self.batch_id}")
@@ -69,7 +69,7 @@ class UploadSftp(BaseModule):
 
         self.processed_batches = {}  # Dictionary to store results
         self.template_path = template_path
-        self.email_sender = relecov_tools.mail.EmailSender(config, template_path)
+        self.email_sender = relecov_tools.mail.Mail(config, template_path)
         self.guide = config.get("institutions_guide_path")
         self.analysis_folder = sftp_config.get("analysis_results_folder")
         self.project = project

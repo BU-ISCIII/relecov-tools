@@ -1,5 +1,5 @@
 """Main relecov package file."""
 
-import pkg_resources
+from importlib.metadata import version
 
-__version__ = pkg_resources.get_distribution("relecov_tools").version
+__version__ = version("relecov_tools")

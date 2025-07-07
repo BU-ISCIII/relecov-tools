@@ -19,7 +19,7 @@ stderr = rich.console.Console(
 )
 
 
-class UpdateDatabase(BaseModule):
+class UploadDatabase(BaseModule):
     def __init__(
         self,
         user=None,

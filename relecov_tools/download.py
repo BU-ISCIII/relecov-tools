@@ -14,7 +14,6 @@ from itertools import islice
 from secrets import token_hex
 from csv import writer as csv_writer, Error as CsvError
 from openpyxl import load_workbook as openpyxl_load_workbook
-from pandas import read_excel, ExcelWriter, concat
 from pandas.errors import ParserError, EmptyDataError
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.base_module import BaseModule
@@ -34,7 +33,7 @@ class MetadataError(Exception):
         super().__init__(message)
 
 
-class DownloadManager(BaseModule):
+class Download(BaseModule):
     def __init__(
         self,
         user=None,
@@ -65,7 +64,8 @@ class DownloadManager(BaseModule):
             )
         else:
             self.download_option = download_option
-        if conf_file is None:
+
+        if not conf_file:
             # self.sftp_server = config_json.get_topic_data("sftp_handle", "sftp_server")
             # self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
             self.platform_storage_folder = config_json.get_topic_data(
@@ -102,6 +102,7 @@ class DownloadManager(BaseModule):
                 self.log.error("Invalid configuration file. Missing %s", e)
                 stderr.print(f"[red] Invalid configuration file. Missing {e} !")
                 raise ValueError(f"Invalid configuration file. Missing {e}")
+
         if output_dir is not None:
             if os.path.isdir(output_dir):
                 self.platform_storage_folder = os.path.realpath(output_dir)
@@ -129,7 +130,7 @@ class DownloadManager(BaseModule):
             "lab_metadata", "samples_json_fields"
         )
         # initialize the sftp client
-        self.relecov_sftp = relecov_tools.sftp_client.SftpRelecov(
+        self.relecov_sftp = relecov_tools.sftp_client.SftpClient(
             conf_file, sftp_user, sftp_passwd
         )
         self.finished_folders = {}
@@ -265,11 +266,13 @@ class DownloadManager(BaseModule):
                 continue
             # TODO: Move these keys to configuration.json
             values["sequence_file_path_R1"] = local_folder
-            values["sequence_file_R1_md5"] = md5_dict.get(values["sequence_file_R1"])
+            values["sequence_file_R1_md5"] = md5_dict.get(
+                values["sequence_file_R1"], ""
+            )
             if values.get("sequence_file_R2"):
                 values["sequence_file_path_R2"] = local_folder
                 values["sequence_file_R2_md5"] = md5_dict.get(
-                    values["sequence_file_R2"]
+                    values["sequence_file_R2"], ""
                 )
             values["batch_id"] = self.batch_id
         if samples_to_delete:
@@ -345,6 +348,7 @@ class DownloadManager(BaseModule):
         meta_column_list = self.metadata_lab_heading
 
         try:
+            stderr.print(f"Reading metadata file for {self.current_folder}")
             wb_file = openpyxl_load_workbook(meta_f_path, data_only=True)
             ws_metadata_lab = wb_file[sheet_name]
             try:
@@ -369,10 +373,10 @@ class DownloadManager(BaseModule):
                     if x not in meta_column_list or x not in metadata_header
                 ]
                 self.log.error(
-                    "Config field metadata_lab_heading is different from .xlsx header"
+                    f"Config field metadata_lab_heading is different from .xlsx header for {self.current_folder}"
                 )
                 stderr.print(
-                    "[red]Header in metadata file is different from config file, aborting"
+                    f"[red]Header in metadata file is different from config file for {self.current_folder}, aborting"
                 )
                 stderr.print("[red]Differences: ", diffs)
                 raise MetadataError(f"Metadata header different from config: {diffs}")
@@ -386,7 +390,9 @@ class DownloadManager(BaseModule):
                 f"openpyxl failed to read the Excel file: {openpyxl_error}"
             )
             self.log.warning("Attempting to read using pandas fallback")
-
+            stderr.print(
+                f"openpyxl failed to read the Excel file: {openpyxl_error}. Attempting to read using pandas fallback."
+            )
             try:
                 df = pd.read_excel(meta_f_path, sheet_name=sheet_name, header=None)
                 header_row_mask = df.apply(
@@ -408,10 +414,10 @@ class DownloadManager(BaseModule):
                         if x not in meta_column_list or x not in metadata_header
                     ]
                     self.log.error(
-                        "Config field metadata_lab_heading is different from .xlsx header"
+                        f"Config field metadata_lab_heading is different from .xlsx header for {self.current_folder}"
                     )
                     stderr.print(
-                        "[red]Header in metadata file is different from config file, aborting"
+                        f"[red]Header in metadata file is different from config file for {self.current_folder}, aborting"
                     )
                     stderr.print("[red]Differences: ", diffs)
                     raise MetadataError(
@@ -464,22 +470,13 @@ class DownloadManager(BaseModule):
         metadata_ws, meta_header, header_row = self.read_metadata_file(meta_f_path)
         # TODO Include these columns in config
         index_sampleID = meta_header.index("Sample ID given for sequencing")
-        index_altID = meta_header.index("Sample ID given by originating laboratory")
         index_layout = meta_header.index("Library Layout")
         index_fastq_r1 = meta_header.index("Sequence file R1")
         index_fastq_r2 = meta_header.index("Sequence file R2")
-        req_vals = [index_layout, index_fastq_r1, index_fastq_r2]
         counter = header_row
         for row in islice(metadata_ws.values, header_row, metadata_ws.max_row):
-            row = set_nones_to_str(row, req_vals)
             counter += 1
-            if not row[index_sampleID]:
-                if not row[index_altID]:
-                    sample_id = row[index_altID]
-                else:
-                    sample_id = row[index_fastq_r1].split(".")[0]
-            else:
-                sample_id = row[index_sampleID]
+            sample_id = row[index_sampleID]
             if sample_id:
                 try:
                     s_name = str(sample_id).strip()
@@ -504,6 +501,9 @@ class DownloadManager(BaseModule):
                     stderr.print(f"[red]{str(log_text % s_name)}")
                     self.include_error(entry=str(log_text % s_name), sample=s_name)
                 try:
+                    if not row[index_layout]:
+                        error_text = "Missing 'Library Layout' value for sample %s."
+                        self.include_error(error_text % str(sample_id), s_name)
                     if (
                         "paired" in row[index_layout].lower()
                         and not row[index_fastq_r2]
@@ -520,7 +520,6 @@ class DownloadManager(BaseModule):
                     )
                     self.include_error(error_text, sample=s_name)
                     stderr.print(f"[red]{error_text}")
-                    raise MetadataError(error_text)
 
                 sample_file_dict[s_name] = {}
                 # TODO: move these keys to configuration.json
@@ -533,7 +532,7 @@ class DownloadManager(BaseModule):
                     ].strip()
             else:
                 txt = f"Sample for row {counter} in metadata skipped. No sample ID nor file provided"
-                self.include_warning(entry=txt)
+                self.log.warning(txt)
         # Remove duplicated files
         clean_sample_dict = self.remove_duplicated_values(sample_file_dict)
         return clean_sample_dict
@@ -551,8 +550,6 @@ class DownloadManager(BaseModule):
         Returns:
             local_meta_file: Path to downloaded metadata file / merged metadata file.
         """
-        remote_files_list = self.relecov_sftp.get_file_list(remote_folder)
-        meta_files = [fi for fi in remote_files_list if fi.endswith(".xlsx")]
 
         def download_remote_metafile(target_meta_file):
             local_meta_file = os.path.join(
@@ -568,6 +565,9 @@ class DownloadManager(BaseModule):
                 remote_folder,
             )
             return local_meta_file
+
+        remote_files_list = self.relecov_sftp.get_file_list(remote_folder)
+        meta_files = [fi for fi in remote_files_list if fi.endswith(".xlsx")]
 
         if not meta_files:
             raise FileNotFoundError(f"Missing metadata file for {remote_folder}")
@@ -601,7 +601,7 @@ class DownloadManager(BaseModule):
             folder_name = os.path.dirname(local_meta_file)
             excel_name = str(folder_name.split("/")[-1]) + "merged_metadata.xlsx"
             merged_excel_path = os.path.join(folder_name, excel_name)
-            pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
+            pd_writer = pd.ExcelWriter(merged_excel_path, engine="xlsxwriter")
             for sheet in merged_df.keys():
                 format_sheet = merged_df[sheet].astype(str)
                 format_sheet.replace("nan", None, inplace=True)
@@ -620,9 +620,6 @@ class DownloadManager(BaseModule):
         Args:
             remote_folder (str): Name of remote folder being validated
             local_folder (str): Name of folder where files are being downloaded
-
-        Raises:
-            FileNotFoundError: If none of the files in remote folder are valid
 
         Returns:
             sample_files_dict (dict): same structure as self.get_sample_fastq_file_names
@@ -660,6 +657,9 @@ class DownloadManager(BaseModule):
             if mismatch_files:
                 error_text1 = "Files in folder missing in metadata: %s"
                 self.include_warning(error_text1 % str(mismatch_files))
+                miss_text = "This file does not have any associated sample in metadata"
+                for file in mismatch_files:
+                    self.include_error(sample=file, entry=miss_text)
             if mismatch_rev:
                 error_text2 = "Files in metadata missing in folder: %s"
                 self.include_warning(error_text2 % str(mismatch_rev))
@@ -669,9 +669,7 @@ class DownloadManager(BaseModule):
                 sample_files_dict, filtered_files_list
             )
         if not any(value for value in sample_files_dict.values()):
-            raise FileNotFoundError(
-                "No files from metadata found in %s" % remote_folder
-            )
+            self.include_error("No files from metadata found in %s" % remote_folder)
         self.log.info("Finished validating files based on metadata")
         stderr.print("[blue]Finished validating files based on metadata")
         return sample_files_dict, local_meta_file
@@ -714,7 +712,7 @@ class DownloadManager(BaseModule):
             new_name = remote_folder.replace("tmp_processing", "invalid_samples")
             if new_name == remote_folder:
                 self.log.warning("Remote folder %s was already renamed", remote_folder)
-                return
+                return remote_folder
             try:
                 self.relecov_sftp.rename_file(remote_folder, new_name)
                 if self.finished_folders.get(remote_folder):
@@ -725,6 +723,7 @@ class DownloadManager(BaseModule):
                     "Successfully renamed %s to %s" % (remote_folder, new_name)
                 )
                 self.logsum.rename_log_key(remote_folder, new_name)
+                return new_name
             except (OSError, PermissionError) as e:
                 log_text = f"Could not rename remote {remote_folder}. Error: {e}"
                 self.log.error(log_text)
@@ -897,18 +896,19 @@ class DownloadManager(BaseModule):
                 merged_df = table
                 continue
             if meta_sheet:
-                merged_df[meta_sheet] = concat(
+                merged_df[meta_sheet] = pd.concat(
                     [merged_df[meta_sheet], table[meta_sheet]], ignore_index=True
                 ).drop_duplicates()
             else:
-                merged_df = concat(
+                merged_df = pd.concat(
                     [merged_df, table], ignore_index=True
                 ).drop_duplicates()
         return merged_df
 
     def excel_to_df(self, excel_file, metadata_sheet, header_flag):
         """Read an excel file, return a dict with a dataframe for each sheet in it.
-        Process the given sheet with metadata, removing all rows until header is found
+        Process the given sheet with metadata, removing all rows until header is found.
+        Also fill the given unique_id col with any other alternative ID cols if possible.
 
         Args:
             excel_file (str): Path to the local excel file with metadata
@@ -922,17 +922,44 @@ class DownloadManager(BaseModule):
             excel_df (dict(str:pandas.DataFrame)): Dict {name_of_excel_sheet:DataFrame}
             containing all sheets in the excel file as pandas dataframes.
         """
+
+        def filldf_unique_id_col(meta_df):
+            """Fill the unique ID col if missing with other alternative IDs"""
+            unique_id_col = "Sample ID given for sequencing"
+            alt_id_cols = [
+                "Sample ID given by originating laboratory",
+                "Sequence file R1",
+            ]
+            if meta_df[unique_id_col].isnull().any():
+                for index, row in meta_df.iterrows():
+                    if pd.isnull(row[unique_id_col]):
+                        if pd.notnull(row[alt_id_cols[0]]):
+                            new_id = row[alt_id_cols[0]]
+                            errtxt = f"Missing value for {unique_id_col}. Replaced by {alt_id_cols[0]}: {new_id}"
+                        elif pd.notnull(row[alt_id_cols[1]]):
+                            new_id = row[alt_id_cols[1]]
+                            errtxt = f"Missing value for {unique_id_col}. Replaced by {alt_id_cols[1]}: {new_id}"
+                        else:
+                            errtxt = f"Sample {index-1} skipped: missing values for {unique_id_col}, {alt_id_cols[0]} and {alt_id_cols[1]}"
+                            self.include_error(entry=errtxt)
+                            continue
+                        meta_df.at[index, unique_id_col] = new_id
+                        self.include_error(entry=errtxt, sample=new_id)
+            return meta_df
+
         # Get every sheet from the first excel file
-        excel_df = read_excel(excel_file, dtype=str, sheet_name=None)
+        excel_df = pd.read_excel(excel_file, dtype=str, sheet_name=None)
         meta_df = excel_df[metadata_sheet]
         if header_flag in meta_df.columns:
+            excel_df[metadata_sheet] = filldf_unique_id_col(meta_df)
             return excel_df
-        header_row = None
         for idx in range(len(meta_df)):
             if any(meta_df.loc[idx, x] == header_flag for x in meta_df.columns):
                 header_row = idx
         meta_df.columns = meta_df.iloc[header_row]
-        excel_df[metadata_sheet] = meta_df.drop(meta_df.index[: (header_row + 1)])
+        meta_df = meta_df.drop(meta_df.index[: (header_row + 1)])
+        meta_df = filldf_unique_id_col(meta_df)
+        excel_df[metadata_sheet] = meta_df
         excel_df[metadata_sheet] = excel_df[metadata_sheet].reset_index(drop=True)
         return excel_df
 
@@ -957,7 +984,7 @@ class DownloadManager(BaseModule):
         def upload_merged_df(merged_excel_path, last_main_folder, merged_df):
             """Upload metadata dataframe merged from all subfolders back to sftp"""
             self.relecov_sftp.make_dir(last_main_folder)
-            pd_writer = ExcelWriter(merged_excel_path, engine="xlsxwriter")
+            pd_writer = pd.ExcelWriter(merged_excel_path, engine="xlsxwriter")
             for sheet in merged_df.keys():
                 format_sheet = merged_df[sheet].astype(str)
                 format_sheet.replace("nan", None, inplace=True)
@@ -1186,20 +1213,21 @@ class DownloadManager(BaseModule):
         for sample, vals in valid_filedict.items():
             processed_dict[sample] = {}
             for key, val in vals.items():
-                processed_dict[sample][key] = None
                 if val in corrupted:
                     self.include_error(error_text % val, sample=sample)
                 if val in md5miss:
                     self.include_warning(warning_text % val, sample=sample)
+                if not val or not any(val in file for file in clean_fetchlist):
+                    err = f"File in metadata {val} does not match any file in sftp"
+                    folder_logs = self.logsum.logs.get(self.current_folder, {})
+                    if err not in folder_logs.get("samples", {}).get(sample, {}).get(
+                        "errors", []
+                    ):
+                        self.include_error(err, sample)
+                    processed_dict[sample][key] = val
                 for file in clean_fetchlist:
-                    if val in file:
+                    if val and val in file:
                         processed_dict[sample][key] = file
-            # remove sample if it has missing files
-            if not all(x in clean_fetchlist for x in processed_dict[sample].values()):
-                if not corrupted:
-                    error_text = "Sample %s skipped: missing files in sftp"
-                    self.include_error(str(error_text % sample), sample=sample)
-                del processed_dict[sample]
         return processed_dict
 
     def download(self, target_folders):
@@ -1241,7 +1269,7 @@ class DownloadManager(BaseModule):
                 continue
             # Get the files in each folder
             files_to_download = [
-                fi for vals in valid_filedict.values() for fi in vals.values()
+                fi for vals in valid_filedict.values() for fi in vals.values() if fi
             ]
             fetched_files = self.get_remote_folder_files(
                 folder, local_folder, files_to_download
@@ -1250,11 +1278,11 @@ class DownloadManager(BaseModule):
                 error_text = "No files could be downloaded in folder %s" % str(folder)
                 stderr.print(f"{error_text}")
                 self.include_error(error_text)
-                continue
             self.log.info("Finished download for folder: %s", folder)
             stderr.print(f"Finished download for folder {folder}")
             remote_md5sum = self.find_remote_md5sum(folder)
-            if remote_md5sum:
+            corrupted = []
+            if remote_md5sum and fetched_files:
                 # Get the md5checksum to validate integrity of files after download
                 fetched_md5 = os.path.join(
                     local_folder, os.path.basename(remote_md5sum)
@@ -1285,16 +1313,16 @@ class DownloadManager(BaseModule):
                             self.include_error(error_text % "folder")
                             relecov_tools.utils.delete_local_folder(local_folder)
                             continue
-                hash_dict = relecov_tools.utils.read_md5_checksum(
-                    fetched_md5, self.avoidable_characters
-                )
+                try:
+                    hash_dict = relecov_tools.utils.read_md5_checksum(
+                        fetched_md5, self.avoidable_characters
+                    )
+                except Exception as e:
+                    self.log.error(f"Error reading md5sum file: {e}")
+                    remote_md5sum = None
+                    hash_dict = {}
                 self.log.info("Finished md5 check for folder: %s", folder)
                 stderr.print(f"[blue]Finished md5 verification for folder {folder}")
-            else:
-                corrupted = []
-                error_text = "No single md5sum file could be found in %s" % folder
-                stderr.print(f"[red]{error_text}")
-                self.include_warning(error_text)
 
             to_remove = set()
             for sample_id, files in list(valid_filedict.items()):
@@ -1465,9 +1493,9 @@ class DownloadManager(BaseModule):
         processed_folders = list(
             set(os.path.normpath(folder) for folder in processed_folders)
         )
-        # If download_option is "download_clean", remove
+        # If download_option is "download_only" or "download_clean", remove
         # sftp folder content after download is finished
-        if self.download_option == "download_clean":
+        if self.download_option in ("download_only", "download_clean"):
             normal_folders = {
                 folder
                 for folder in processed_folders
@@ -1479,7 +1507,21 @@ class DownloadManager(BaseModule):
                     self.clean_remote_folder(folder)
             folders_to_clean = copy.deepcopy(self.finished_folders)
             for folder, downloaded_files in folders_to_clean.items():
-                self.delete_remote_files(folder, files=downloaded_files)
+                if self.download_option == "download_only":
+                    new_folder = folder.replace("_tmp_processing", "_downloaded")
+                    self.relecov_sftp.rename_file(folder, new_folder)
+                    self.relecov_sftp.make_dir(folder)
+                    invalid_files = [
+                        sample
+                        for sample in self.relecov_sftp.get_file_list(new_folder)
+                        if os.path.basename(sample) not in downloaded_files
+                    ]
+                    if len(invalid_files) > 1:
+                        for file in invalid_files:
+                            dest_path = file.replace(new_folder, folder)
+                            self.relecov_sftp.copy_within_sftp(file, dest_path)
+                if self.download_option == "download_clean":
+                    self.delete_remote_files(folder, files=downloaded_files)
                 self.clean_remote_folder(folder)
                 self.log.info(f"Delete process finished in remote {folder}")
 

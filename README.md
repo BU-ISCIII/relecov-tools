@@ -1,4 +1,5 @@
 # relecov-tools
+
 [![python_lint](https://github.com/BU-ISCIII/relecov-tools/actions/workflows/python_lint.yml/badge.svg)](https://github.com/BU-ISCIII/relecov-tools/actions/workflows/python_lint.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -9,17 +10,19 @@ relecov-tools is a set of helper tools for the assembly of the different element
 - [relecov-tools](#relecov-tools)
   - [Table of contents](#table-of-contents)
   - [Installation](#installation)
+    - [Requirements prior install](#requirements-prior-install)
+      - [Install 7-Zip on Linux](#install-7-zip-on-linux)
     - [Bioconda](#bioconda)
     - [Pip](#pip)
     - [Development version](#development-version)
-    - [Required software](#required-software)
   - [Usage](#usage)
     - [Command-line](#command-line)
-    - [Modules](#modules)
+  - [Modules](#modules)
       - [download](#download)
       - [read-lab-metadata](#read-lab-metadata)
       - [send-mail](#send-mail)
       - [read-bioinfo-metadata](#read-bioinfo-metadata)
+        - [Configuration of module `read-bioinfo-metadata`](#configuration-of-module-read-bioinfo-metadata)
       - [validate](#validate)
       - [map](#map)
       - [upload-to-ena](#upload-to-ena)
@@ -30,42 +33,20 @@ relecov-tools is a set of helper tools for the assembly of the different element
       - [logs-to-excel](#logs-to-excel)
       - [add-extra-config](#add-extra-config)
     - [build-schema](#build-schema)
-      - [Mandatory Files](#mandatory-files)
       - [Mandatory Fields](#mandatory-fields)
-    - [Logging functionality](#Logging_functionality)
+      - [Logging\_functionality](#logging_functionality)
+      - [Custom logs](#custom-logs)
     - [Python package mode](#python-package-mode)
   - [Acknowledgements](#acknowledgements)
 
 ## Installation
 
-### Bioconda
-relecov-tools is available in Bioconda and can be installed via conda.
+### Requirements prior install
 
-If you already have conda installed. Do the following:
-```
-conda config --add channels bioconda
-conda create --name relecov-tools
-conda activate relecov-tools
-conda install -c bioconda relecov-tools
-```
+These tools require
 
-### Pip
-relecov-tools is available in Pypi and can be installed via pip:
-```
-pip install relecov-tools
-```
-
-### Development version
-If you want to install the latest code in the repository:
-
-```
-conda create -n relecov_dev pip
-pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/relecov-tools.git@develop
-```
-
-### Required software
-
-These tools require [7-Zip](https://www.7-zip.org/) (via the `p7zip` package) to handle compressed files. Please make sure it is installed before running the code.
+- Python > 3.8
+- [7-Zip](https://www.7-zip.org/) (via the `p7zip` package) to handle compressed files. Please make sure it is installed before running the code.
 
 #### Install 7-Zip on Linux
 
@@ -81,12 +62,43 @@ On **Red Hat/Fedora-based systems**:
 ```bash
 sudo dnf install p7zip p7zip-plugins
 ```
+
 > **Note:** For other distributions, please use your distribution's package manager to install `p7zip`.
 
+### Bioconda
+
+relecov-tools is available in Bioconda and can be installed via conda.
+
+If you already have conda installed. Do the following:
+
+```Bash
+conda config --add channels bioconda
+conda create --name relecov-tools
+conda activate relecov-tools
+conda install -c bioconda relecov-tools
+```
+
+### Pip
+
+relecov-tools is available in Pypi and can be installed via pip:
+
+```Bash
+pip install relecov-tools
+```
+
+### Development version
+
+If you want to install the latest code in the repository:
+
+```
+conda create -n relecov_dev pip
+pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/relecov-tools.git@develop
+```
 
 ## Usage
 
 ### Command-line
+
 relecov-tools provides a command-line version with help descriptions and params prompt if needed.
 
 ```
@@ -96,7 +108,7 @@ $ relecov-tools --help
 \    \  /   |__ / |__  |    |___ |    |   |  \    /
 /    /  \   |  \  |    |    |    |    |   |   \  /
 /    |--|   |   \ |___ |___ |___ |___ |___|    \/
-RELECOV-tools version 1.5.5
+RELECOV-tools version 1.6.0
 Usage: relecov-tools [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -132,14 +144,14 @@ Commands:
 Further explanation for each argument:
 
 - `--verbose`: Prints all logs as standard output, showing them to the user.
-- `--log-path`: Use it to indicate a custom path for all logs to be saved. See [Logging functionality](#Logging_functionality) for more information.
+- `--log-path`: Use it to indicate a custom path for all logs to be saved. See [Logging functionality](#logging_functionality) for more information.
 - `--debug`: Activate DEBUG logs. When not provided, logs will only show the most relevant information.
 - `--hex-code`: By default all files generated will include a date and an unique hexadecimal code which is randomly generated upon execution. Using this argument you can pre-define the resulting hexadecimal code. NOTE: Keep in mind that this could overwrite existing files.
-
 
 ## Modules
 
 #### download
+
 The command `download` connects to a transfer protocol (currently sftp) and downloads all files in the different available folders in the passed credentials. In addition, it checks if the files in the current folder match the files in the metadata file and also checks if there are md5sum for each file. Else, it creates one before storing in the final repository.
 
 ```
@@ -166,10 +178,12 @@ Options:
 ```
 
 Configuration can be passed in several formats:
+
 - if no config_file is passed, default values are fetched from conf/configuration.json, and user and password are asked in prompt.
 - Default values can be overwritten using a yml config file, so you can input user, password, sftp_server, etc.
 
 Config file example with all available options:
+
 ```
 sftp_server: "sftprelecov.isciii.es"
 sftp_port: "22"
@@ -200,7 +214,6 @@ Options:
   --help                       Show this message and exit.
 ```
 
-
 An example for the metadata excel file can be found [here](./relecov_tools/example_data/METADATA_LAB_TEST.xlsx)
 
 #### send-mail
@@ -229,23 +242,31 @@ Options:
 ```
 
 #### read-bioinfo-metadata
+
 `read-bioinfo-metadata` Include the results from the Bioinformatics analysis into the Json previously created with read-lab-metadata module.
 
-```
+```bash
 $ relecov-tools read-bioinfo-metadata --help
 Usage: relecov-tools read-bioinfo-metadata [OPTIONS]
 
-   Create the json compliant to the relecov schema with Bioinfo Metadata.
+  Create the json compliant  from the Bioinfo Metadata.
 
 Options:
-  -j, --json_file PATH      json file containing lab metadata
-  -i, --input_folder PATH   Path to input files
-  -o, --output_dir, TEXT    Directory where the generated output will be saved
-  -s, --software_name TEXT  Name of the software/pipeline used.
-  --update                  If the output file already exists, ask if you want
-                            to update it.
-  --help                    Show this message and exit.
+  -j, --json_file PATH            json file containing lab metadata
+  -s, --json_schema_file TEXT     Path to the JSON Schema file used for
+                                  validation
+  -i, --input_folder PATH         Path to input files
+  -o, --output_dir, --output-dir, --output_folder, --out-folder, --output_location, --output_path, --out_dir, --output DIRECTORY
+                                  Directory where the generated output will be
+                                  saved
+  -p, --software_name TEXT        Name of the software/pipeline used.
+  --update                        If the output file already exists, ask if
+                                  you want to update it.
+  --soft_validation               If the module should continue even if any
+                                  sample does not validate.
+  --help                          Show this message and exit.
 ```
+
 - Note: Software-specific configurations are available in [bioinfo_config.json](./relecov_tools/conf/bioinfo_config.json).
 
 ##### Configuration of module `read-bioinfo-metadata`
@@ -256,7 +277,6 @@ Structure:
 
 > 1. **Top Level**: Bioinformatics Software Name  
   The top-level keys represent the name of the bioinformatics software used in the analysis (e.g., `"viralrecon"`). Each block contains the configuration for extracting data generated by that specific pipeline.
-
 
 > 2. **Second Level:** Analysis Stages or Result Files  
 Within each software block, the keys correspond to different analysis stages or result files. Each section defines how to locate and process specific output files.
@@ -277,6 +297,7 @@ Within each software block, the keys correspond to different analysis stages or 
 | `content`         | Dictionary mapping standardized parameter names to the corresponding columns in the source file.             | Object             |
 
 #### validate
+
 `validate` commands validate the data in json format outputted by `read-metadata` command against a json schema, in this case the relecov [schema specification](./relecov_tools/schema/relecov_schema.json). It also creates a summary of the errors and warnings found in excel format as a report to the users.
 
 ```
@@ -291,12 +312,16 @@ Usage: relecov-tools validate [OPTIONS]
     -m, --metadata PATH             Origin file containing metadata
     -o, --output_dir,               Directory where the generated output will be saved.
     -e, --excel_sheet TEXT          Optional: Name of the sheet in excel file to validate.
-    -r, --registry TEXT             Path to registry (JSON file) with validated samples and their unique IDs.   
+    -r, --registry TEXT             Path to registry (JSON file) with validated samples and their unique IDs.
+    --upload_files                  Wether to upload the resulting files from validation process or not.
+    -l, --logsum_file TEXT          Required if --upload_files. Path to the log_summary.json file merged from all
+                                    previous processes, used to check for invalid samples.  
     --help                          Show this message and exit.
 
 ```
 
 #### map
+
 The command `map` converts a data in json format from relecov data model to ena or gisaid data model using their own schemas acording to their annotated ontology terms.
 
 ```
@@ -316,6 +341,7 @@ Options:
 ```
 
 #### upload-to-ena
+
 `upload-to-ena` command uses json data mapped to ena schema to use the [ena_upload_cli](https://github.com/usegalaxy-eu/ena-upload-cli) package to upload raw data and metadata to ENA db.
 
 ```
@@ -339,6 +365,7 @@ Usage: relecov-tools upload-to-ena [OPTIONS]
 ```
 
 #### upload-to-gisaid
+
 `upload-to-gisaid` uses the json mapped to gisaid schema to upload raw data and metadata to GISAID db
 
 ```
@@ -390,7 +417,9 @@ Options:
 ```
 
 #### pipeline-manager
+
 Create the folder structure to execute the given pipeline for the latest sample batches after executing download, read-lab-metadata and validate modules. This module will create symbolic links for each sample and generate the necessary files for pipeline execution using the information from validated_BATCH-NAME_DATE.json.
+
 ```
 Usage: relecov-tools pipeline-manager [OPTIONS]
 
@@ -411,7 +440,9 @@ Options:
 ```
 
 #### wrapper
+
 Execute download, read-lab-metadata and validate sequentially using a config file to fill the arguments for each one. It also creates a global report with all the logs for the three processes in a user-friendly .xlsx format. The config file should include the name of each module that is executed, along with the necessary parameters in YAML format.
+
 ```
 Usage: relecov-tools wrapper [OPTIONS]
 
@@ -424,7 +455,9 @@ Options:
 ```
 
 #### logs-to-excel
+
 Creates an xlsx file with all the entries found for a specified laboratory in a given set of log_summary.json files (from log-summary module). The laboratory name must match the name of one of the keys in the provided logs to work.
+
 ```
 Usage: relecov-tools logs-to-excel [OPTIONS]
 
@@ -437,7 +470,9 @@ Options:
 ```
 
 #### add-extra-config
+
 This command is used to create an additional config file that will override the configuration in `conf/configuration.json`. You may pass this configuration in a YAML or JSON file. If you want the keys in your additional configuration to be grouped under a certain keyname, use param `-n, --config_name`. Otherwise, the file content will be parsed with no additional processing.
+
 ```
 Usage: relecov-tools add-extra-config [OPTIONS]
 
@@ -454,6 +489,7 @@ Options:
 ```
 
 ### build-schema
+
 The `build-schema` module provides functionality to generate and manage JSON Schema files based on database definitions from Excel spreadsheets. It automates the creation of JSON Schemas, including validation, drafting, and comparison with existing schemas. Uses the generated JSON schema to create a structured Excel template.
 
 ```
@@ -461,39 +497,39 @@ Usage: relecov-tools build-schema [OPTIONS]
 
   Generates and updates JSON Schema files from Excel-based database
   definitions.
-  Uses the generated JSON schema to create a structured Excel template.
 
 Options:
-  -i, --input_file PATH     Path to the Excel document containing the database
-                            definition. This file must have a .xlsx extension.
-                            [required]
-  -s, --schema_base PATH    Path to the base schema file. This file is used as
-                            a reference to compare it with the schema
-                            generated using this module. (Default: installed
-                            schema in 'relecov-
-                            tools/relecov_tools/schema/relecov_schema.json')
-  -v, --draft_version TEXT  Version of the JSON schema specification to be
-                            used. Example: '2020-12'. See: https://json-
-                            schema.org/specification-links
-  --version           TEXT  Specifies the version of the metadata template to 
-                            generate.
-  -p, --project       TEXT  Specify the project you want to generate the schema   
-                            and template for.
-  --non-interactive BOOLEAN executes the module by assigning the default interactive 
-                            parameters
-  -d, --diff        BOOLEAN Prints a changelog/diff between the base and
-                            incoming versions of the schema. Required for the generation 
-                            of the JSON schema.
-  -o, --output_dir,         Directory where the generated output will be saved [required].
-  --help                    Show this message and exit.
+  -i, --input_file PATH           Path to the Excel document containing the
+                                  database definition. This file must have a
+                                  .xlsx extension.  [required]
+  -s, --schema_base PATH          Path to the base schema file. This file is
+                                  used as a reference to compare it with the
+                                  schema generated using this module.
+                                  (Default: installed schema in 'relecov-tools
+                                  /relecov_tools/schema/relecov_schema.json')
+  -e, --excel_template PATH       Path to the excel template file. This file
+                                  is used to get version history of the excel
+                                  template (stored in assets/Relecov_metadata_*.xlsx)
+  -v, --draft_version TEXT        Version of the JSON schema specification to
+                                  be used. Example: '2020-12'. See:
+                                  https://json-schema.org/specification-links
+  -d, --diff                      Prints a changelog/diff between the base and
+                                  incoming versions of the schema.
+  --version TEXT                  Specify the schema version.
+  -p, --project TEXT              Specficy the project to build the metadata
+                                  template.
+  --non-interactive               Run the script without user interaction,
+                                  using default values.
+  -o, --output_dir, --output-dir, --output_folder, --out-folder, --output_location, --output_path, --out_dir, --output DIRECTORY
+                                  Directory where the generated output will be saved
+  --help                          Show this message and exit.
 ```
-#### Mandatory Files
-Prepare in your output folder the latest version of Excel to compile the history of changes. To generate the template and retain the history of modifications or previous versions, the latest template with its change history must be present in the specified output directory (--out_dir).
 
 #### Mandatory Fields
+
 Ensure that the fields below are properly defined as headers in your Excel sheet (database definition):
 
-```
+```Bash
 enum: List of possible values for enumeration.
 examples: Example values for the property.
 ontology_id: Identifier for ontology.
@@ -507,6 +543,7 @@ complex_field (Y/N): Indicates if the property is a complex (nested) field (Y) o
 ```
 
 #### Logging_functionality
+
 relecov-tools generate logs by default for all processes using a standard name: `<module>_<batch-date>_<hexcode>.log`
 
 The *--log-path* given via command-line interface (CLI) is used to specify the destination directory where logs will be saved during execution
@@ -516,15 +553,17 @@ How default Logs are generated (when --log-path is not used):
 Use a predefined default location found in configuration.json under `logs_config` key. If the module executed is found in
 `modules_outpath` subkey, the log will be generated in the specified folder, otherwise it will be generated in `default_outpath/module`
 
-If you want your logs to be sent to custom locations depending on the module executed you can do so by using add-extra-config, providing 
+If you want your logs to be sent to custom locations depending on the module executed you can do so by using add-extra-config, providing
 
 #### Custom logs
+
 After executing each of these modules, you may find a custom log report in json format named `EXECUTED-MODULE_<date>_hex_log_summary.json`. These custom log summaries can be useful to detect errors in metadata in order to fix them and/or notify the users.
 
 ### Python package mode
+
 relecov-tools is designed in a way that you can use import the different modules and use them in your own scripts, for example:
 
-```
+```Python
 import relecov_tools.sftp_handle
 user="admin"
 passwd="1234"
@@ -538,6 +577,6 @@ sftp_connection.download()
 
 DOCs soon!!
 
-
 ## Acknowledgements
+
 Python package idea and design is really inspired in [nf-core/tools](https://github.com/nf-core/tools).

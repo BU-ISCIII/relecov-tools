@@ -3,7 +3,8 @@
         "default_outpath": "/tmp/"
     },
     "validate_config": {
-        "default_sample_id_registry": "/tmp/unique_sampleid_registry.json"
+        "default_sample_id_registry": "/tmp/unique_sampleid_registry.json",
+        "starting_date": "2020-01-01"
     },
     "lab_metadata": {
         "fixed_fields": {

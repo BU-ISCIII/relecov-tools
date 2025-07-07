@@ -16,7 +16,7 @@ stderr = rich.console.Console(
 )
 
 
-class RelecovMetadata(BaseModule):
+class LabMetadata(BaseModule):
     def __init__(
         self,
         metadata_file=None,

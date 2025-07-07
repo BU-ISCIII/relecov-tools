@@ -27,11 +27,12 @@ stderr = rich.console.Console(
 )
 
 
-class SchemaBuilder(BaseModule):
+class BuildSchema(BaseModule):
     def __init__(
         self,
         input_file=None,
         schema_base=None,
+        excel_template=None,
         draft_version=None,
         diff=False,
         output_dir=None,
@@ -46,27 +47,24 @@ class SchemaBuilder(BaseModule):
         super().__init__(output_dir=output_dir, called_module=__name__)
         self.excel_file_path = input_file
         self.non_interactive = non_interactive
-        # Validate input data
+        # Validate params
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
             self.log.error("A valid Excel file path must be provided.")
             raise ValueError("A valid Excel file path must be provided.")
         if not self.excel_file_path.endswith(".xlsx"):
             self.log.error("The Excel file must have a .xlsx extension.")
             raise ValueError("The Excel file must have a .xlsx extension.")
+
         # No metadata is being processed so batch_id will be execution date
         self.set_batch_id(self.basemod_date)
 
         # Validate output folder creation
         if not output_dir:
-            self.output_dir = relecov_tools.utils.prompt_create_outdir(
-                path=None, out_dir=None
-            )
+            self.output_dir = relecov_tools.utils.prompt_create_outdir()
         else:
             self.output_dir = os.path.abspath(output_dir)
             if not os.path.exists(self.output_dir):
-                self.output_dir = relecov_tools.utils.prompt_create_outdir(
-                    path=None, out_dir=output_dir
-                )
+                self.output_dir = relecov_tools.utils.prompt_create_outdir()
 
         # Get version option
         if not version:
@@ -74,38 +72,10 @@ class SchemaBuilder(BaseModule):
             self.version = relecov_tools.utils.prompt_text(
                 "Write the desired version using semantic versioning:"
             )
-        self.version = version
+        else:
+            self.version = version
         if not relecov_tools.utils.validate_semantic_version(self.version):
             raise ValueError("[red]Error: Invalid version format")
-
-        # Get version option
-        # Parse build-schema configuration
-        self.build_schema_json_file = os.path.join(
-            os.path.dirname(__file__), "conf", "build_schema_config.json"
-        )
-
-        if project is None:
-            project = relecov_tools.utils.prompt_text("Write the desired project:")
-        self.project = project
-
-        available_projects = self.get_available_projects(self.build_schema_json_file)
-
-        build_schema_config = ConfigJson(self.build_schema_json_file)
-        config_data = build_schema_config.get_configuration(
-            "projects"
-        )  # Obtener solo la sección "projects"
-        self.configurables = config_data.get("configurables", {})
-
-        if self.project in available_projects:
-            self.project_config = config_data.get(self.project, {})
-        else:
-            self.log.error(
-                f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
-            )
-            stderr.print(
-                f"[red]No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
-            )
-            sys.exit(1)
 
         # Validate show diff option
         if diff is False:
@@ -123,6 +93,38 @@ class SchemaBuilder(BaseModule):
                 )
             )
 
+        # Get version option
+        # Parse build-schema configuration
+        self.build_schema_json_file = os.path.join(
+            os.path.dirname(__file__), "conf", "build_schema_config.json"
+        )
+
+        if project is None:
+            project = relecov_tools.utils.prompt_text("Write the desired project:")
+
+        self.project = project
+
+        available_projects = self.get_available_projects(self.build_schema_json_file)
+
+        # Config params
+        config_build_schema = ConfigJson(self.build_schema_json_file)
+        config_data = config_build_schema.get_configuration("projects")
+        self.configurables = config_data.get("configurables", {})
+        config_json = ConfigJson()
+
+        if self.project in available_projects:
+            self.project_config = config_data.get(self.project, {})
+        else:
+            self.log.error(
+                f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
+            )
+            stderr.print(
+                f"[red]No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
+            )
+            raise ValueError(
+                f"No configuration available for '{self.project}'. Available projects: {', '.join(available_projects)}"
+            )
+
         # Validate base schema
         if schema_base is not None:
             if relecov_tools.utils.file_exists(schema_base):
@@ -134,41 +136,81 @@ class SchemaBuilder(BaseModule):
                 stderr.print(
                     f"[Error]Defined base schema file not found: {schema_base}. Exiting..."
                 )
-                sys.exit(1)
+                raise FileNotFoundError(
+                    f"Defined base schema file not found: {schema_base}."
+                )
         else:
             try:
-                config_json = ConfigJson()
                 relecov_schema = config_json.get_topic_data(
                     "json_schemas", "relecov_schema"
                 )
-                try:
-                    self.base_schema_path = os.path.join(
-                        os.path.dirname(os.path.realpath(__file__)),
-                        "schema",
-                        relecov_schema,
-                    )
-                    if not relecov_tools.utils.file_exists(self.base_schema_path):
-                        self.log.error(
-                            "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning."
-                        )
-                        stderr.print(
-                            "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning. Exiting..."
-                        )
-                        sys.exit(1)
-                    self.log.info(
-                        "RELECOV schema successfully found in the configuration."
-                    )
-                    stderr.print(
-                        "[green]RELECOV schema successfully found in the configuration."
-                    )
-                except FileNotFoundError as fnf_error:
-                    self.log.error(f"Configuration file not found: {fnf_error}")
-                    stderr.print(f"[red]Configuration file not found: {fnf_error}")
-                    sys.exit(1)
             except KeyError as key_error:
                 self.log.error(f"Configuration key error: {key_error}")
                 stderr.print(f"[orange]Configuration key error: {key_error}")
-                sys.exit(1)
+                raise
+
+            try:
+                self.base_schema_path = os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)),
+                    "schema",
+                    relecov_schema,
+                )
+            except FileNotFoundError as fnf_error:
+                self.log.error(f"Configuration file not found: {fnf_error}")
+                stderr.print(f"[red]Configuration file not found: {fnf_error}")
+                raise
+
+            if not relecov_tools.utils.file_exists(self.base_schema_path):
+                self.log.error(
+                    "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning."
+                )
+                stderr.print(
+                    "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning. Exiting..."
+                )
+                raise FileNotFoundError(
+                    "Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning."
+                )
+
+            self.log.info("RELECOV schema successfully found in the configuration.")
+            stderr.print(
+                "[green]RELECOV schema successfully found in the configuration."
+            )
+
+            if excel_template:
+                self.excel_template = excel_template
+            else:
+                try:
+                    excel_template_path = os.path.join(
+                        os.path.dirname(os.path.realpath(__file__)), "assets"
+                    )
+                    excel_template = [
+                        f
+                        for f in os.listdir(excel_template_path)
+                        if f.startswith("Relecov_metadata_template")
+                    ]
+                    if len(excel_template) > 1:
+                        self.log.error(
+                            "[Error]Fatal error. More than one excel template was found in current relecov-tools installation (assets)"
+                        )
+                        stderr.print(
+                            "[Error]Fatal error.More than one excel template was found in current relecov-tools installation (assets)..Exiting"
+                        )
+                        raise FileExistsError(
+                            "Fatal error. More than one excel template was found in current relecov-tools installation (assets)"
+                        )
+
+                    self.excel_template = os.path.join(
+                        excel_template_path, excel_template[0]
+                    )
+
+                except (FileNotFoundError, IndexError):
+                    self.log.error(
+                        "[Error]Fatal error. Excel template was not found in current relecov-tools installation (assets)"
+                    )
+                    stderr.print(
+                        "[Error]Fatal error. Excel template not found in current relecov-tools installation (assets). Exiting..."
+                    )
+                    raise
 
     def validate_database_definition(self, json_data):
         """Validate the mandatory features and ensure:
@@ -354,9 +396,7 @@ class SchemaBuilder(BaseModule):
         )
         return draft_template
 
-    def standard_jsonschema_object(
-        seschemalf, data_dict, target_key, remove_ontology=False
-    ):
+    def standard_jsonschema_object(self, data_dict, target_key, remove_ontology=False):
         """
         Create a standard JSON Schema object for a given key in the data dictionary.
 
@@ -379,7 +419,7 @@ class SchemaBuilder(BaseModule):
         if target_key in ["enum", "examples"]:
             value = handle_nan(data_dict.get(target_key, ""))
             # if no value, json key won't be necessary, then avoid adding it
-            if len(value) > 0:
+            if len(value) > 0 or target_key == "examples":
                 items = value.split("; ")
                 if remove_ontology and target_key == "enum":
                     items = [re.sub(r"\s*\[.*?\]", "", item).strip() for item in items]
@@ -700,8 +740,6 @@ class SchemaBuilder(BaseModule):
             None: If an error occurs during the process.
         """
         try:
-            # Retrieve existing files in the output directory
-            output_files = os.listdir(self.output_dir)
             notes_control_input = (
                 "Auto-generated update"
                 if self.non_interactive
@@ -710,48 +748,25 @@ class SchemaBuilder(BaseModule):
                 )
             )
             # Identify existing template files
-            template_files = [
-                f for f in output_files if f.startswith("Relecov_metadata_template")
-            ]
-            if template_files:
-                # Extract the latest version number from existing files
-                latest_file = max(
-                    template_files,
-                    key=lambda x: (
-                        re.search(r"v(\d+\.\d+\.\d+)", x).group(1)
-                        if re.search(r"v(\d+\.\d+\.\d+)", x)
-                        else "0"
-                    ),
+            version_history = pd.DataFrame(
+                columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
+            )
+
+            # Load excel template file and attempt to read version history
+            try:
+                wb = openpyxl.load_workbook(self.excel_template)
+                ws_version = wb["VERSION"]
+                data = ws_version.values
+                columns = next(data)
+                version_history = pd.DataFrame(data, columns=columns)
+            except Exception as e:
+                self.log.warning(
+                    f"Error reading previous VERSION sheet: {e}. Setting 1.0.0 as default."
                 )
-                version_history = pd.DataFrame(
-                    columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
-                )
-                match = re.search(r"v(\d+\.\d+\.\d+)", latest_file)
-                if match:
-                    # Load the latest template file and attempt to read version history
-                    out_file = os.path.join(self.output_dir, latest_file)
-                    try:
-                        wb = openpyxl.load_workbook(out_file)
-                        if "VERSION" in wb.sheetnames:
-                            ws_version = wb["VERSION"]
-                            data = ws_version.values
-                            columns = next(data)
-                            version_history = pd.DataFrame(data, columns=columns)
-                    except Exception as e:
-                        self.log.warning(f"Error reading previous VERSION sheet: {e}")
-                    next_version = self.version
-                else:
-                    next_version = "1.0.0"
-                    out_file = os.path.join(
-                        self.output_dir,
-                        f"Relecov_metadata_template_v{next_version}.xlsx",
-                    )
-            else:
-                next_version = "1.0.0"
-                out_file = os.path.join(
-                    self.output_dir,
-                    f"Relecov_metadata_template_v{next_version}.xlsx",
-                )
+                version_history = "1.0.0"
+
+            next_version = self.version
+
             # Store versioning information
             version_info = {
                 "FILE_VERSION": f"Relecov_metadata_template_v{next_version}",
@@ -794,17 +809,17 @@ class SchemaBuilder(BaseModule):
                     lambda x: "Y" if x in required_properties else "N"
                 )
 
-                # TODO: Define enums without ontologies for release 1.6.0
-                # def clean_ontologies(enums):
-                #     return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
+                def clean_ontologies(enums):
+                    return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
 
-                # df["enum"] = df["enum"].apply(
-                #     lambda enum_list: (
-                #         clean_ontologies(enum_list)
-                #         if isinstance(enum_list, list)
-                #         else enum_list
-                #     )
-                # )
+                df["enum"] = df["enum"].apply(
+                    lambda enum_list: (
+                        clean_ontologies(enum_list)
+                        if isinstance(enum_list, list)
+                        else enum_list
+                    )
+                )
+
             except Exception as e:
                 self.log.error(f"Error processing schema properties: {e}")
                 stderr.print(f"Error processing schema properties: {e}")
