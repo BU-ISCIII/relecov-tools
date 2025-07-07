@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import logging
 import rich
-from datetime import datetime
 
 import relecov_tools.utils
 from relecov_tools.read_bioinfo_metadata import BioinfoReportLog
