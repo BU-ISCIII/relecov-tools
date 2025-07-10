@@ -426,6 +426,7 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     help="Path to the JSON file containing the registered records of validated samples with their unique sample identifiers.",
 )
 @click.option(
+    "-u",
     "--upload_files",
     is_flag=True,
     default=False,
@@ -438,6 +439,13 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     default=None,
     help="Required if --upload_files. Path to the log_summary.json file merged from all previous processes, used to check for invalid samples.",
 )
+@click.option(
+    "-c",
+    "--check_db",
+    is_flag=True,
+    default=False,
+    help="Check if the processed samples are already uploaded to platform database and make invalid those that are already there",
+)
 @click.pass_context
 def validate(
     ctx,
@@ -449,6 +457,7 @@ def validate(
     registry,
     upload_files,
     logsum_file,
+    check_db,
 ):
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
