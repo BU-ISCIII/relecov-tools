@@ -167,3 +167,28 @@ class RestApi:
             log.error("Unable to open connection towards %s", self.request_url)
             stderr.print("[red] Unable to open connection towards ", self.request_url)
             return {"ERROR": "Server not available"}
+
+    def sample_already_in_db(self, api_func, credentials, sample_data):
+        """Check if sample with data already exists in the target platform
+
+        Args:
+            api_func (str): Api functionality to check if sample is present
+            credentials (dict["user": user, "pass": pass]): Credentials dictionary
+            sample_data (dict): Dictionary with sample metadata to use as input
+
+        Raises:
+            ValueError: if the conection was interrupted unexpectedly.
+
+        Returns:
+            bool: Wether the sample is found in the database or not.
+        """
+        response = self.get_request(
+            api_func, credentials=credentials, params=sample_data, safe=False
+        )
+        log.info(str(response))
+        if response["status_code"] == 404:
+            return False
+        elif response["status_code"] == 200:
+            return True
+        else:
+            raise ValueError(f"Error trying to check for sample: {response}")
