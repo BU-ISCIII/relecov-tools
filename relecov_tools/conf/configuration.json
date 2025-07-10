@@ -297,6 +297,7 @@
             "store_samples": "createSampleData",
             "bioinfodata": "createBioinfoData",
             "variantdata": "createVariantData",
+            "check_sample": "getSampleData",
             "sftp_info": "sftpInfo",
             "token": ""
             }
