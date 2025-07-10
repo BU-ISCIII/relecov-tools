@@ -12,6 +12,7 @@ import relecov_tools.assets.schema_utils.custom_validators
 import relecov_tools.sftp_client
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.base_module import BaseModule
+from relecov_tools.rest_api import RestApi
 
 
 stderr = rich.console.Console(
@@ -33,15 +34,17 @@ class Validate(BaseModule):
         registry=None,
         upload_files=False,
         logsum_file=None,
+        check_db=False,
     ):
         """Validate json file against the schema"""
         super().__init__(output_dir=output_dir, called_module=__name__)
         self.config = ConfigJson(extra_config=True)
         self.log.info("Initiating validation process")
-        if upload_files:
-            req_conf = ["download", "validate"]
-        else:
-            req_conf = ["validate"]
+        req_conf = (
+            ["validate"]
+            + ["download"] * bool(upload_files)
+            + ["update_db"] * bool(check_db)
+        )
         missing = [
             conf for conf in req_conf if self.config.get_configuration(conf) is None
         ]
@@ -139,6 +142,7 @@ class Validate(BaseModule):
         self.registry_path = registry
         self.logsum_file = logsum_file
         self.upload_files = upload_files
+        self.check_db = check_db
         if upload_files:
             upload_config = self.config.get_configuration("download")
             if upload_config:
@@ -146,6 +150,14 @@ class Validate(BaseModule):
                 self.password = upload_config.get("password")
                 self.subfolder = upload_config.get("subfolder")
                 self.sftp_port = self.config.get_topic_data("sftp_handle", "sftp_port")
+            else:
+                raise ValueError("Could not find")
+        if check_db:
+            platform_config = self.config.get_configuration("update_db")
+            if platform_config:
+                self.db_user = platform_config.get("user")
+                self.db_pass = platform_config.get("password")
+                self.db_platform = platform_config.get("platform")
 
     def validate_schema(self):
         """Validate json schema against draft and check if all properties have label"""
