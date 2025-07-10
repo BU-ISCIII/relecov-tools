@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import logging
-import json
 import requests
 import rich.console
 import relecov_tools.utils
+from requests.auth import HTTPBasicAuth
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +20,31 @@ class RestApi:
         self.request_url = server + url
         self.headers = {"content-type": "application/json"}
 
-    def get_request(self, request_info, parameter, value=None, safe=True):
+    def get_request(
+        self,
+        request_info,
+        parameter=None,
+        value=None,
+        safe=True,
+        credentials=None,
+        params={},
+    ):
+        """Send a GET request with optional parameters and authentication.
+
+        Args:
+            request_info (str): Endpoint path appended to the base URL.
+            parameter ([str, dict, None]): Query parameter(s). If a string, used with `value`.
+            If given as a dict, key-value pairs are joined as query string. If empty or None, no parameters.
+            value (Optional[str]): Value for the `parameter` if it is a string.
+            safe (bool): If True, errors are logged and not raised. Defaults to True.
+            credentials ([dict, tuple, list, None]): Basic auth credentials. Can be a dict with
+            'user' and 'pass' as keys, or a tuple/list (user, pass).
+            params (dict): Dictionary of params for the get request
+
+        Returns:
+            dict: On success, returns {'DATA': <parsed JSON response>}.
+                  On failure, returns {'ERROR': <status code or error message>}.
+        """
         if parameter == "" or parameter is None:
             url_http = str(self.request_url + request_info)
         elif isinstance(parameter, dict):
@@ -34,23 +58,40 @@ class RestApi:
             url_http = str(
                 self.request_url + request_info + "?" + parameter + "=" + value
             )
+        if credentials is not None:
+            if isinstance(credentials, dict):
+                credentials = HTTPBasicAuth(credentials["user"], credentials["pass"])
+            elif isinstance(credentials, (list, tuple)):
+                credentials = HTTPBasicAuth(credentials[0], credentials[1])
         try:
-            req = requests.get(url_http, headers=self.headers)
+            req = requests.get(
+                url_http, headers=self.headers, auth=credentials, params=params
+            )
             if req.status_code != 200:
+                response = req.json()
+                message = (
+                    response.get("detail")
+                    or response.get("error")
+                    or response.get("ERROR")
+                    or response.get("message")
+                    or f"Unexpected error with status {req.status_code}"
+                )
                 if safe:
                     log.error(
-                        "Unable to get parameters. Received error code %s",
-                        req.status_code,
+                        f"Unable to get parameters. Received '{message}' error code {req.status_code}"
                     )
                     stderr.print(
-                        "[red] Unable to fetch data. Received error ", req.status_code
+                        f"[red]Unable to fetch data. Received '{message}' with error {req.status_code}"
                     )
-                return {"ERROR": req.status_code}
-            return {"DATA": json.loads(req.text)}
+                return {"ERROR": message, "status_code": req.status_code}
+            return {"DATA": req.json(), "status_code": req.status_code}
         except requests.ConnectionError:
             log.error("Unable to open connection towards %s", self.request_url)
             stderr.print("[red] Unable to open connection towards ", self.request_url)
-            return {"ERROR": "Server not available"}
+            return {
+                "ERROR": "Server not available",
+                "status_code": "503 Service Unavailable",
+            }
 
     def put_request(self, data, credentials, url):
         if isinstance(credentials, dict):
