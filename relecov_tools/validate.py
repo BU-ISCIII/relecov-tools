@@ -898,7 +898,9 @@ class Validate(BaseModule):
         """Execute all the validation process start to end"""
         valid_json_data, invalid_json = self.validate()
         if self.check_db:
-            stderr.print("[blue]Checking if samples are already uploaded to platform...")
+            stderr.print(
+                "[blue]Checking if samples are already uploaded to platform..."
+            )
             try:
                 self.validate_db_args()
                 valid_json_data, invalid_json = self.search_sample_dups_in_db(
