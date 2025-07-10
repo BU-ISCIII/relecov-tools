@@ -94,6 +94,17 @@ class RestApi:
             }
 
     def put_request(self, data, credentials, url):
+        """Send a PUT request to update data on the server.
+
+        Args:
+            data (dict): Data payload for the PUT request.
+            credentials (dict): Basic auth credentials, with 'user' and 'pass' keys.
+            url (str): Endpoint path appended to the base URL.
+
+        Returns:
+            dict: {'Success': <response text>} on success,
+                  {'ERROR': <status code or message>} on failure.
+        """
         if isinstance(credentials, dict):
             auth = (credentials["user"], credentials["pass"])
         url_http = str(self.request_url + url)
@@ -115,6 +126,18 @@ class RestApi:
         return {"Success": req.text}
 
     def post_request(self, data, credentials, url, file=None):
+        """Send a POST request with optional file upload.
+
+        Args:
+            data (dict): Data payload for the POST request.
+            credentials (dict): Basic auth credentials, with 'user' and 'pass' keys.
+            url (str): Endpoint path appended to the base URL.
+            file (Optional[str]): Path to a file to be uploaded (if any).
+
+        Returns:
+            dict: {'Success': <response text>} on success,
+                  {'ERROR': <status code>, 'ERROR_TEST': <error text>} on failure.
+        """
         if isinstance(credentials, dict):
             auth = (credentials["user"], credentials["pass"])
         url_http = str(self.request_url + url)
