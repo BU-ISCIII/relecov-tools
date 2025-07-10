@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.X.X] - 2025-XX-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.X.X
+
+### Credits
+
+- [Pablo Mata](https://github.com/shettland)
+
+#### Added enhancements
+
+- Expanded rest_api.get_request() method to also accept credentials and params [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
+- Included a new validation workflow to discard samples that are already in the platform database [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
+- New flag 'check_db' was introduced in validate to activate checking of samples in platform [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
+- Included docstrings for all methods in rest_api.py [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [1.6.0] - 2025-07-04 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.0
 
 ### Credits
