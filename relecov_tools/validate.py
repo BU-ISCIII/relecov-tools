@@ -617,7 +617,7 @@ class Validate(BaseModule):
             self.log.info("Sucessful validation, no invalid file created.")
         return valid_file, invalid_file
 
-    def validate_whole_proc_args(self):
+    def validate_upload_args(self):
         """Validates that all required arguments for the upload process are present
         and that the log summary file exists.
 
@@ -625,7 +625,7 @@ class Validate(BaseModule):
             ValueError: If any required argument is missing or the log summary file does not exist.
         """
         required_args = ["user", "password"]
-        self.log.debug(f"Trying to validate args for whole_proc: {required_args}")
+        self.log.debug(f"Trying to validate args for upload: {required_args}")
         missing_args = []
         for arg in required_args:
             if not self.__dict__.get(arg):
@@ -658,8 +658,8 @@ class Validate(BaseModule):
         self.log.info("Updating invalid samples with previous log_summary")
         if self.lab_code in previous_logsum.keys():
             for samp, logs in previous_logsum[self.lab_code].get("samples", {}).items():
-                self.log.debug(f"Found sample {samp} invalid in previous log_summary")
                 if not logs["valid"]:
+                    self.log.debug(f"Found sample {samp} invalid in log_summary")
                     log_invalid_samples.append(samp)
         else:
             errtxt = f"Lab code {self.lab_code} not found in {self.logsum_file} to update invalid samples"
@@ -780,7 +780,6 @@ class Validate(BaseModule):
             invalid_json (list[dict]): Current list of invalid sample metadata.
             previous_logsum (dict): Dictionary containing results from a prior validation run.
         """
-        invalid_json = self.update_invalid_with_logsum(invalid_json, previous_logsum)
         merged_logsum = self.logsum.merge_logs(
             [previous_logsum, self.logsum.logs], key_name=self.lab_code
         )
@@ -800,6 +799,65 @@ class Validate(BaseModule):
             stderr.print("[green]No invalid samples were found, no upload needed")
             self.log.info("No invalid samples were found, no upload needed")
         return
+
+    def validate_db_args(self):
+        """Validates that all required arguments to check if samples are
+        already in platform database are present.
+
+        Raises:
+            ValueError: If any required argument or configuration is missing.
+        """
+        required_args = ["db_user", "db_pass", "db_platform"]
+        self.log.debug(f"Trying to validate args to check database: {required_args}")
+        missing_args = []
+        for arg in required_args:
+            if not self.__dict__.get(arg):
+                missing_args.append(arg)
+        if missing_args:
+            raise ValueError(
+                f"Missing mandatory args to check samples in db: {missing_args}"
+            )
+        p_settings = self.config.get_topic_data("upload_database", "platform")
+        if self.db_platform not in p_settings:
+            raise ValueError(f"No configuration found for platform {self.db_platform}")
+        if "server_url" not in p_settings[self.db_platform]:
+            raise ValueError(f"Missing 'server_url' in config for {self.db_platform}")
+        if "api_url" not in p_settings[self.db_platform]:
+            raise ValueError(f"Missing 'api_url' in config for {self.db_platform}")
+        return
+
+    def search_sample_dups_in_db(self, valid_json_data, invalid_json):
+        """Connect to configured platform and turn invalid those samples that are already
+        uploaded to the database from the workflow. Update jsons based on this clause"""
+        p_settings = self.config.get_topic_data("upload_database", "platform")
+        server_url = p_settings[self.db_platform]["server_url"]
+        api_url = p_settings[self.db_platform]["api_url"]
+        credentials = {
+            "user": self.db_user,
+            "pass": self.db_pass,
+        }
+        api_rest = RestApi(server_url, api_url)
+        apifunc = p_settings[self.db_platform]["check_sample"]
+        for sample in self.json_data:
+            sample_seqid = sample.get("sequencing_sample_id")
+            self.log.debug(f"Checking sample {sample_seqid} in {self.db_platform} db")
+            try:
+                samp_in_db = api_rest.sample_already_in_db(apifunc, credentials, sample)
+            except ValueError as e:
+                errtxt = f"Could not check for sample {sample_seqid} in db: {e}"
+                stderr.print(f"[red]{errtxt}")
+                self.log.error(errtxt)
+                self.logsum.add_error(errtxt, sample=sample_seqid)
+                continue
+            if samp_in_db:
+                errtxt = f"Sample {sample_seqid} already defined in db. Skipped"
+                stderr.print(f"[yellow]{errtxt}")
+                self.log.error(errtxt)
+                self.logsum.add_error(errtxt, sample=sample_seqid)
+                if sample in valid_json_data:
+                    valid_json_data.remove(sample)
+                    invalid_json.append(sample)
+        return valid_json_data, invalid_json
 
     def validate(self):
         """Validate samples from metadata, create an excel with invalid samples,
@@ -832,23 +890,44 @@ class Validate(BaseModule):
                 f"[red]{len(valid_json_data)}/{len(self.json_data)} samples were valid"
             )
         else:
-            stderr.print("[green]No errors found during validation!")
+            stderr.print("[green]No errors found during metadata validation!")
         invalid_json = [x for x in self.json_data if x not in valid_json_data]
         return valid_json_data, invalid_json
 
     def execute_validation_process(self):
+        """Execute all the validation process start to end"""
         valid_json_data, invalid_json = self.validate()
+        if self.check_db:
+            stderr.print("[blue]Checking if samples are already uploaded to platform...")
+            try:
+                self.validate_db_args()
+                valid_json_data, invalid_json = self.search_sample_dups_in_db(
+                    valid_json_data, invalid_json
+                )
+            except ValueError as e:
+                stderr.print(f"[red]Could not check if samples are already in db: {e}")
+                self.log.error(f"Could not check if samples are already in db: {e}")
+                self.create_validation_files(valid_json_data, invalid_json)
+                raise
+        if self.logsum_file:
+            previous_logsum = relecov_tools.utils.read_json_file(self.logsum_file)
+            merged_logs = self.logsum.merge_logs([previous_logsum, self.logsum.logs])
+            invalid_json = self.update_invalid_with_logsum(invalid_json, merged_logs)
+        else:
+            invalid_json = self.update_invalid_with_logsum(
+                invalid_json, self.logsum.logs
+            )
+        valid_json_data = [x for x in valid_json_data if x not in invalid_json]
         if self.upload_files:
             stderr.print(f"Starting uploading process for {self.lab_code}...")
             self.log.info(f"Starting uploading process for {self.lab_code}...")
             try:
-                self.validate_whole_proc_args()
+                self.validate_upload_args()
             except ValueError as e:
                 stderr.print(f"[red]Could not upload validation files: {e}")
                 self.log.error(f"Could not upload validation files: {e}")
                 self.create_validation_files(valid_json_data, invalid_json)
                 raise
-            previous_logsum = relecov_tools.utils.read_json_file(self.logsum_file)
             self.process_validation_upload(
                 valid_json_data, invalid_json, previous_logsum
             )
