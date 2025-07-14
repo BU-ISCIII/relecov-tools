@@ -17,6 +17,7 @@ import shutil
 import pandas as pd
 from datetime import datetime
 
+
 # Function to determine the epidemiological week associated to a certain date.
 def get_epi_week(date_str):
     date = datetime.strptime(date_str, "%Y-%m-%d")
