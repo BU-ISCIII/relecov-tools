@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Included a new validation workflow to discard samples that are already in the platform database [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
 - New flag 'check_db' was introduced in validate to activate checking of samples in platform [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
 - Included docstrings for all methods in rest_api.py [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
+- Updated create_summary_tables.py to organize data jointly [#722](https://github.com/BU-ISCIII/relecov-tools/pull/722).
 
 #### Fixes
 
