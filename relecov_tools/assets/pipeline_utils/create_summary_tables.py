@@ -23,6 +23,7 @@ def get_epi_week(date_str):
     year, week, weekday = date.isocalendar()
     return f"{year}-{week:02d}"
 
+
 # Function to search .json files in the paths indicated in the provided .txt files (specifically, bioinfo_lab_metadata and long_table .json files), read them, extract the relevant information and generate tables.
 def process_json_files(
     input_dir=None,
@@ -184,7 +185,9 @@ def process_json_files(
             existing_agg_df = reader.parse("aggregated_data", dtype=str)
 
     # Only add new samples
-    new_samples_df = df[~df["SEQUENCING_SAMPLE_ID"].astype(str).isin(existing_sample_ids)]
+    new_samples_df = df[
+        ~df["SEQUENCING_SAMPLE_ID"].astype(str).isin(existing_sample_ids)
+    ]
 
     if new_samples_df.empty:
         print("No new samples found. Skipping.")
@@ -194,7 +197,9 @@ def process_json_files(
     combined_samples = pd.concat([existing_df, new_samples_df], ignore_index=True)
 
     # Recreate aggregated data from all samples
-    combined_agg = combined_samples.groupby("LINEAGE").size().reset_index(name="NUMBER_SAMPLES")
+    combined_agg = (
+        combined_samples.groupby("LINEAGE").size().reset_index(name="NUMBER_SAMPLES")
+    )
 
     # Write to Excel file
     with pd.ExcelWriter(excel_file) as writer:
