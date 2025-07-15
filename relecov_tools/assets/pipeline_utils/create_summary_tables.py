@@ -25,7 +25,7 @@ def get_epi_week(date_str):
     return f"{year}-{week:02d}"
 
 
-# Function to search .json files in the paths indicated in the provided .txt files (specifically, bioinfo_lab_metadata and long_table .json files), read them, extract the relevant information and generate tables.
+# Function to search .json files, read them, extract the relevant information and generate tables.
 def process_json_files(
     input_dir=None,
     metadata_list=None,
@@ -177,13 +177,11 @@ def process_json_files(
     # Handle Excel file (read existing if present)
     existing_sample_ids = set()
     existing_df = pd.DataFrame()
-    existing_agg_df = pd.DataFrame()
 
     if os.path.exists(excel_file):
         with pd.ExcelFile(excel_file) as reader:
             existing_df = reader.parse("per_sample_data", dtype=str)
             existing_sample_ids = set(existing_df["SEQUENCING_SAMPLE_ID"])
-            existing_agg_df = reader.parse("aggregated_data", dtype=str)
 
     # Only add new samples
     new_samples_df = df[
