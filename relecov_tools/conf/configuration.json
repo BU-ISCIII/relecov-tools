@@ -144,6 +144,7 @@
                 "Illumina": "sequencing_instrument_platform::Illumina",
                 "PacBio": "sequencing_instrument_platform::PacBio",
                 "Ion Torrent": "sequencing_instrument_platform::Ion Torrent",
+                "Ion Gene": "sequencing_instrument_platform::Ion Torrent",
                 "Oxford Nanopore": "sequencing_instrument_platform::Oxford Nanopore"
             }
         },
