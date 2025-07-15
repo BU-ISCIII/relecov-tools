@@ -51,6 +51,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Improved error message in upload_file method from sftp_client [#708](https://github.com/BU-ISCIII/relecov-tools/pull/708)
 - Read-bioinfo-metadata now also includes valid samples in its log_summary, not only invalid [#708](https://github.com/BU-ISCIII/relecov-tools/pull/708)
 - Included software_versions.yml required file for read-bioinfo-metadata tests [#713](https://github.com/BU-ISCIII/relecov-tools/pull/713)
+- Updated schema and configuration for Ion Torrent [#724](https://github.com/BU-ISCIII/relecov-tools/pull/724)
 
 #### Fixes
 
