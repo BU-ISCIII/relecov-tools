@@ -541,7 +541,7 @@
         "geo_loc_city": "Almería",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Torrecardenas"
     },
@@ -583,7 +583,7 @@
         "geo_loc_city": "Huércal-Overa",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital La Inmaculada"
     },
@@ -625,7 +625,7 @@
         "geo_loc_city": "El Ejido",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario De Poniente"
     },
@@ -1338,7 +1338,7 @@
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": "",
         "collecting_institution": "Hospital Del Mar"
@@ -1352,7 +1352,7 @@
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": "",
         "collecting_institution": "Hospital De L'Esperança."
@@ -1814,8 +1814,8 @@
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Badalona",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
+        "submitting_institution_address": "Carretera Canyet, S/N",
         "submitting_institution_email": "",
         "collecting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona"
     },
@@ -1842,7 +1842,7 @@
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Badalona",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": "",
         "collecting_institution": "Centre Sociosanitari El Carme"
@@ -1870,7 +1870,7 @@
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Calella",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": "",
         "collecting_institution": "Hospital Comarcal Sant Jaume De Calella"
@@ -2402,7 +2402,7 @@
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Mataró",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": "",
         "collecting_institution": "Hospital De Mataro"
@@ -2612,7 +2612,7 @@
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": "",
         "collecting_institution": "Hospital Sociosanitari Pere Virgili"
@@ -2808,7 +2808,7 @@
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Barcelona",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": "",
         "collecting_institution": "Centre Forum"
@@ -3369,7 +3369,7 @@
         "geo_loc_city": "Cádiz",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Puerta Del Mar"
     },
@@ -3425,7 +3425,7 @@
         "geo_loc_city": "Jerez De La Frontera",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario De Jerez De La Frontera"
     },
@@ -3467,7 +3467,7 @@
         "geo_loc_city": "Puerto Real",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario De Puerto Real"
     },
@@ -3901,7 +3901,7 @@
         "geo_loc_city": "Cabra",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Infanta Margarita"
     },
@@ -3915,7 +3915,7 @@
         "geo_loc_city": "Pozoblanco",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Valle De Los Pedroches"
     },
@@ -4362,7 +4362,7 @@
         "geo_loc_region": "Girona",
         "geo_loc_city": "Blanes",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": "",
         "collecting_institution": "Hospital Comarcal De Blanes"
@@ -4559,7 +4559,7 @@
         "geo_loc_city": "Motril",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Santa Ana"
     },
@@ -4615,7 +4615,7 @@
         "geo_loc_city": "Granada",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Clinico San Cecilio"
     },
@@ -4951,7 +4951,7 @@
         "geo_loc_city": "Huelva",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Juan Ramón Jiménez"
     },
@@ -4965,7 +4965,7 @@
         "geo_loc_city": "Huelva",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Juan Ramon Jimenez"
     },
@@ -5105,7 +5105,7 @@
         "geo_loc_city": "Jaén",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario De Jaen"
     },
@@ -7065,7 +7065,7 @@
         "geo_loc_city": "Málaga",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Virgen De La Victoria"
     },
@@ -7205,7 +7205,7 @@
         "geo_loc_city": "Antequera",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital De Antequera"
     },
@@ -7233,7 +7233,7 @@
         "geo_loc_city": "Vélez-Málaga",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital De La Axarquia"
     },
@@ -7261,7 +7261,7 @@
         "geo_loc_city": "Málaga",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Regional De Málaga"
     },
@@ -7303,7 +7303,7 @@
         "geo_loc_city": "Marbella",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Costa Del Sol"
     },
@@ -7471,7 +7471,7 @@
         "geo_loc_city": "Ronda",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital De La Serrania"
     },
@@ -8268,7 +8268,7 @@
         "geo_loc_city": "València",
         "geo_loc_country": "Spain",
         "submitting_institution": "Fundació Fisabio",
-        "submitting_institution_address": "Av. de Catalunya, 21",
+        "submitting_institution_address": "Avenida de Catalunya, 21",
         "submitting_institution_email": "santiago.melon@sespa.es",
         "collecting_institution": "Fundació Fisabio"
     },
@@ -9402,7 +9402,7 @@
         "geo_loc_city": "Sevilla",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Virgen Del Rocio"
     },
@@ -9430,7 +9430,7 @@
         "geo_loc_city": "Sevilla",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Virgen Macarena"
     },
@@ -9598,7 +9598,7 @@
         "geo_loc_city": "Osuna",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital La Merced"
     },
@@ -9612,7 +9612,7 @@
         "geo_loc_city": "Sevilla",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Hospital Universitario Virgen Del Rocío"
     },
@@ -9947,7 +9947,7 @@
         "geo_loc_region": "Tarragona",
         "geo_loc_city": "Reus",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": "",
         "collecting_institution": "Hospital Universitari De Sant Joan De Reus"
@@ -10017,7 +10017,7 @@
         "geo_loc_region": "Tarragona",
         "geo_loc_city": "Tortosa",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
         "submitting_institution_address": "Carrer de la Selva, 10",
         "submitting_institution_email": "",
         "collecting_institution": "Clinica Terres De L'Ebre"
@@ -10718,7 +10718,7 @@
         "geo_loc_city": "Valladolid",
         "geo_loc_country": "Spain",
         "submitting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)",
-        "submitting_institution_address": "Paseo de Belen 19",
+        "submitting_institution_address": "Paseo de Belen, 19",
         "submitting_institution_email": "jmeirosbouza@gmail.com",
         "collecting_institution": "Hospital Universitario Rio Hortega"
     },
@@ -10732,7 +10732,7 @@
         "geo_loc_city": "Valladolid",
         "geo_loc_country": "Spain",
         "submitting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)",
-        "submitting_institution_address": "Paseo de Belen 19",
+        "submitting_institution_address": "Paseo de Belen, 19",
         "submitting_institution_email": "jmeirosbouza@gmail.com",
         "collecting_institution": "Hospital Clinico Universitario De Valladolid"
     },
@@ -11192,7 +11192,7 @@
         "geo_loc_city": "Zaragoza",
         "geo_loc_country": "Spain",
         "submitting_institution": "Centro de Investigación Biomédica de Aragón",
-        "submitting_institution_address": "Avenida San Juan Bosco 13",
+        "submitting_institution_address": "Avenida San Juan Bosco, 13",
         "submitting_institution_email": "mhpstrunk.iacs@aragon.es",
         "collecting_institution": "Centro de Investigación Biomédica de Aragón"
     },
@@ -11453,23 +11453,23 @@
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Manresa",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
+        "submitting_institution_address": "Carretera Canyet, S/N",
         "submitting_institution_email": "",
         "collecting_institution": "Fundació Althaia-Manresa"
     },
-    "CAP_009": {
+    "0908002536": {
         "codcnh": "CAP_009",
-        "collecting_institution_address": "Camí del Mig, 36",
+        "collecting_institution_address": "Camino Ral, 208-210",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Mataró",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
+        "submitting_institution_address": "Carretera Canyet, S/N",
         "submitting_institution_email": "",
-        "collecting_institution": "CAP Mataró-6 (Gatassa)"
+        "collecting_institution": "Cap Mataro Centre"
     },
     "MIC_013": {
         "codcnh": "MIC_013",
@@ -11480,33 +11480,33 @@
         "geo_loc_city": "Granada",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Microbiología HUC San Cecilio"
     },
     "FUND_014": {
         "codcnh": "FUND_014",
-        "collecting_institution_address": "Avenida Américo Vespucio, 15",
+        "collecting_institution_address": "Avenida Manuel Siurot, S/N",
         "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "geo_loc_state": "Andalucía",
         "geo_loc_region": "Sevilla",
         "geo_loc_city": "Sevilla",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud"
     },
     "CONS_015": {
         "codcnh": "CONS_015",
-        "collecting_institution_address": "Paseo de Belen 19",
+        "collecting_institution_address": "Paseo de Belen, 19",
         "collecting_institution_email": "jmeirosbouza@gmail.com",
         "geo_loc_state": "Castilla y León",
         "geo_loc_region": "Valladolid",
         "geo_loc_city": "Valladolid",
         "geo_loc_country": "Spain",
         "submitting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)",
-        "submitting_institution_address": "Paseo de Belen 19",
+        "submitting_institution_address": "Paseo de Belen, 19",
         "submitting_institution_email": "jmeirosbouza@gmail.com",
         "collecting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)"
     },
@@ -11558,20 +11558,20 @@
         "geo_loc_city": "Sevilla",
         "geo_loc_country": "Spain",
         "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avda. Américo Vespucio, 15, Sevilla",
+        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
         "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Microbiología. Hospital Universitario Virgen del Rocio"
     },
     "CONSEJ_022": {
         "codcnh": "CONSEJ_022",
-        "collecting_institution_address": "Avenida de Francia, 4.",
+        "collecting_institution_address": "Avenida de Francia, 4",
         "collecting_institution_email": "",
         "geo_loc_state": "Castilla - La Mancha",
         "geo_loc_region": "Toledo",
         "geo_loc_city": "Toledo",
         "geo_loc_country": "Spain",
         "submitting_institution": "Consejería de Sanidad",
-        "submitting_institution_address": "Avda. de Francia, 4.",
+        "submitting_institution_address": "Avenida de Francia, 4",
         "submitting_institution_email": "",
         "collecting_institution": "Consejería de Sanidad"
     },
@@ -11589,7 +11589,7 @@
         "submitting_institution_email": "info@isciii.es",
         "collecting_institution": "Ministerio Sanidad"
     },
-    "INST_001": {
+    "1328021542": {
         "codcnh": "INST_001",
         "collecting_institution_address": "Carretera Pozuelo Majadahonda S/N",
         "collecting_institution_email": "info@isciii.es",
@@ -11602,20 +11602,20 @@
         "submitting_institution_email": "info@isciii.es",
         "collecting_institution": "Instituto de Salud Carlos III"
     },
-    "LAB_004": {
+    "0908000757": {
         "codcnh": "LAB_004",
-        "collecting_institution_address": "Carrer de la Selva, 10",
+        "collecting_institution_address": "Calle Selva, 10",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
-        "geo_loc_city": "Barcelona",
+        "geo_loc_city": "El Prat de Llobregat",
         "geo_loc_country": "Spain",
-        "submitting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution": "Laboratori De Referencia De Catalunya",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": "",
-        "collecting_institution": "LABORATORI DE REFERENCIA DE CATALUNYA"
+        "collecting_institution": "Laboratori De Referencia De Catalunya"
     },
-    "LAB_006": {
+    "0908014627": {
         "codcnh": "LAB_006",
         "collecting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
         "collecting_institution_email": "",
@@ -11623,75 +11623,75 @@
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Sant Cugat del Vallès",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Laboratorio Echevarne, SA Sant Cugat del Vallès",
+        "submitting_institution": "Laboratorio Echevarne, SA",
         "submitting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
         "submitting_institution_email": "",
-        "collecting_institution": "Laboratorio Echevarne, SA Sant Cugat del Vallès"
+        "collecting_institution": "Laboratorio Echevarne, SA"
     },
-    "CAP_008": {
+    "0908000923": {
         "codcnh": "CAP_008",
-        "collecting_institution_address": "Passatge dels Encants, s/n",
+        "collecting_institution_address": "Pasaje Dels Encants, S/N",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Badalona",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
+        "submitting_institution_address": "Carretera Canyet, S/N",
         "submitting_institution_email": "",
-        "collecting_institution": "CAP La Salut EAP Badalona"
+        "collecting_institution": "Cap La Salut"
     },
     "CAP_010": {
         "codcnh": "CAP_010",
-        "collecting_institution_address": "Carrer de Sant Carles, 79",
+        "collecting_institution_address": "Calle Sant Carles, 79",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Tarragona",
         "geo_loc_city": "Santa Coloma de Gramenet",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
+        "submitting_institution_address": "Carretera Canyet, S/N",
         "submitting_institution_email": "",
-        "collecting_institution": "CAP Can Mariner Santa Coloma-1"
+        "collecting_institution": "Centre De Salut Doctor Vilaseca-Can Mariner"
     },
-    "CAP_011": {
+    "0908000151": {
         "codcnh": "CAP_011",
-        "collecting_institution_address": "Carrer de Can Parera, 7",
+        "collecting_institution_address": "Calle De Can Parera, 7",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Montornès del Vallès",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
+        "submitting_institution_address": "Carretera Canyet, S/N",
         "submitting_institution_email": "",
         "collecting_institution": "CAP Montornès"
     },
-    "CAP_012": {
+    "0908000126": {
         "codcnh": "CAP_012",
-        "collecting_institution_address": "Plaza Enerst Lluch 1",
+        "collecting_institution_address": "Plaza Enerst Lluch, 1",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Montmeló",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
+        "submitting_institution_address": "Carretera Canyet, S/N",
         "submitting_institution_email": "",
-        "collecting_institution": "CAP Montmeló"
+        "collecting_institution": "Cap Montmelo"
     },
     "LAB_016": {
         "codcnh": "LAB_016",
-        "collecting_institution_address": "Vial St Jordi, s/n",
+        "collecting_institution_address": "Calle Vial Sant Jordi, S/N",
         "collecting_institution_email": "",
         "geo_loc_state": "Cataluña",
         "geo_loc_region": "Barcelona",
         "geo_loc_city": "Viladecavalls",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias i Pujol (HUGTiP)",
-        "submitting_institution_address": "Crta del Canyet s/n",
+        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
+        "submitting_institution_address": "Carretera Canyet, S/N",
         "submitting_institution_email": "",
-        "collecting_institution": "CATLAB"
+        "collecting_institution": "Catlab-Centre Analitiques Terrassa, AIE"
     },
     "PRES_024": {
         "codcnh": "PRES_024",
