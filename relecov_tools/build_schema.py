@@ -141,9 +141,9 @@ class BuildSchema(BaseModule):
                 )
         else:
             try:
-                relecov_schema = config_json.get_topic_data(
-                    "json_schemas", "relecov_schema"
-                )
+                relecov_schema = config_json.get_topic_data("general", "json_schemas")[
+                    "relecov_schema"
+                ]
             except KeyError as key_error:
                 self.log.error(f"Configuration key error: {key_error}")
                 stderr.print(f"[orange]Configuration key error: {key_error}")
