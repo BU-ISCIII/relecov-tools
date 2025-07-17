@@ -76,7 +76,9 @@ class LabMetadata(BaseModule):
         config_json = ConfigJson(extra_config=True)
 
         # TODO: remove hardcoded schema selection
-        relecov_schema = config_json.get_topic_data("json_schemas", "relecov_schema")
+        relecov_schema = config_json.get_topic_data("general", "json_schemas")[
+            "relecov_schema"
+        ]
         relecov_sch_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
         )
@@ -114,7 +116,7 @@ class LabMetadata(BaseModule):
                 continue
         self.date = dtime.now().strftime("%Y%m%d%H%M%S")
         self.json_req_files = config_json.get_topic_data(
-            "lab_metadata", "lab_metadata_req_json"
+            "read_lab_metadata", "lab_metadata_req_json"
         )
         self.schema_name = self.relecov_sch_json["title"]
         self.schema_version = self.relecov_sch_json["version"]
@@ -122,7 +124,7 @@ class LabMetadata(BaseModule):
             "sftp_handle", "metadata_processing"
         )
         self.samples_json_fields = config_json.get_topic_data(
-            "lab_metadata", "samples_json_fields"
+            "read_lab_metadata", "samples_json_fields"
         )
         self.unique_sample_id = "sequencing_sample_id"
 
@@ -266,9 +268,9 @@ class LabMetadata(BaseModule):
 
     def adding_fixed_fields(self, m_data):
         """Include fixed data that are always the same for every sample"""
-        p_data = self.configuration.get_topic_data("lab_metadata", "fixed_fields")
+        p_data = self.configuration.get_topic_data("read_lab_metadata", "fixed_fields")
         organism_mapping = self.configuration.get_topic_data(
-            "lab_metadata", "organism_mapping"
+            "read_lab_metadata", "organism_mapping"
         )
 
         for idx in range(len(m_data)):
@@ -289,7 +291,7 @@ class LabMetadata(BaseModule):
     def adding_copy_from_other_field(self, m_data):
         """Add a new field with information based in another field."""
         p_data = self.configuration.get_topic_data(
-            "lab_metadata", "required_copy_from_other_field"
+            "read_lab_metadata", "required_copy_from_other_field"
         )
         for idx in range(len(m_data)):
             for key, value in p_data.items():
@@ -299,7 +301,7 @@ class LabMetadata(BaseModule):
     def adding_post_processing(self, m_data):
         """Add fields which values require post processing"""
         p_data = self.configuration.get_topic_data(
-            "lab_metadata", "required_post_processing"
+            "read_lab_metadata", "required_post_processing"
         )
         for idx in range(len(m_data)):
             for key, p_values in p_data.items():
@@ -644,7 +646,7 @@ class LabMetadata(BaseModule):
             self.log.warning("Metadata was completely empty. No output file generated")
             stderr.print("Metadata was completely empty. No output file generated")
             return
-        file_code = "_".join(["lab_metadata", self.lab_code]) + ".json"
+        file_code = "_".join(["read_lab_metadata", self.lab_code]) + ".json"
         file_name = self.tag_filename(filename=file_code)
         stderr.print("[blue]Writting output json file")
         os.makedirs(self.output_dir, exist_ok=True)
