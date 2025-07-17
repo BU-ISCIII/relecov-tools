@@ -37,7 +37,7 @@ class Map(BaseModule):
             origin_schema = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "schema",
-                config_json.get_topic_data("json_schemas", "relecov_schema"),
+                config_json.get_topic_data("general", "json_schemas")["relecov_schema"],
             )
         else:
             if not os.path.isfile(origin_schema):
@@ -103,7 +103,7 @@ class Map(BaseModule):
             self.schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "schema",
-                config_json.get_topic_data("json_schemas", "ena_schema"),
+                config_json.get_topic_data("general", "json_schemas")["ena_schema"],
             )
         elif self.destination_schema == "GISAID":
             self.schema_file = os.path.join(
@@ -178,9 +178,11 @@ class Map(BaseModule):
         word splitting and include fields with fixed values.
         """
         additional_data = self.config_json.get_topic_data(
-            "ENA_fields", "additional_formating"
+            "upload_to_ena", "additional_formating"
         )
-        fixed_fields = self.config_json.get_topic_data("ENA_fields", "ena_fixed_fields")
+        fixed_fields = self.config_json.get_topic_data(
+            "upload_to_ena", "ena_fixed_fields"
+        )
 
         if self.destination_schema == "ENA":
             for idx in range(len(self.json_data)):
