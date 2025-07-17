@@ -51,7 +51,7 @@
         "geo_loc_latitude": "40.3492998",
         "geo_loc_longitude": "-3.8284295"
     },
-    "Alcoy": {
+    "Alcoi/Alcoy": {
         "geo_loc_latitude": "38.6982348",
         "geo_loc_longitude": "-0.4747619"
     },
@@ -87,7 +87,7 @@
         "geo_loc_latitude": "41.6651189",
         "geo_loc_longitude": "0.5560656"
     },
-    "Altsasu": {
+    "Altsasu/Alsasua": {
         "geo_loc_latitude": "42.9104705",
         "geo_loc_longitude": "-2.1791811319274905"
     },
@@ -95,7 +95,7 @@
         "geo_loc_latitude": "39.151212",
         "geo_loc_longitude": "-0.4346556"
     },
-    "Ametlla Del Vallès, L'": {
+    "L' Ametlla Del Vallès'": {
         "geo_loc_latitude": "41.6434428",
         "geo_loc_longitude": "2.268344"
     },
@@ -191,11 +191,11 @@
         "geo_loc_latitude": "41.3825",
         "geo_loc_longitude": "2.1769"
     },
-    "Barco De Valdeorras, O": {
+    "O Barco De Valdeorras": {
         "geo_loc_latitude": "42.418188150000006",
         "geo_loc_longitude": "-6.985079898492007"
     },
-    "Barrios, Los": {
+    "Los Barrios": {
         "geo_loc_latitude": "42.88360955",
         "geo_loc_longitude": "-5.878367617741937"
     },
@@ -327,7 +327,7 @@
         "geo_loc_latitude": "36.7100716",
         "geo_loc_longitude": "-4.631539"
     },
-    "Castellón De La Plana": {
+    "Castelló De La Plana": {
         "geo_loc_latitude": "39.9831",
         "geo_loc_longitude": "-0.0331"
     },
@@ -435,7 +435,7 @@
         "geo_loc_latitude": "36.772153",
         "geo_loc_longitude": "-2.810602"
     },
-    "Elche": {
+    "Elx/Elche": {
         "geo_loc_latitude": "38.2669",
         "geo_loc_longitude": "-0.6983"
     },
@@ -595,7 +595,7 @@
         "geo_loc_latitude": "41.5485218",
         "geo_loc_longitude": "0.8245593"
     },
-    "L'Hospitalet De Llobregat": {
+    "L' Hospitalet De Llobregat": {
         "geo_loc_latitude": "41.4217",
         "geo_loc_longitude": "2.1897"
     },
@@ -639,7 +639,7 @@
         "geo_loc_latitude": "37.2551712",
         "geo_loc_longitude": "-7.201556"
     },
-    "Línea De La Concepción, La": {
+    "La Línea De La Concepción": {
         "geo_loc_latitude": "36.15829615",
         "geo_loc_longitude": "-5.340474187804688"
     },
@@ -687,7 +687,7 @@
         "geo_loc_latitude": "40.4167",
         "geo_loc_longitude": "-3.7167"
     },
-    "Mahón": {
+    "Maó": {
         "geo_loc_latitude": "39.887261",
         "geo_loc_longitude": "4.259530"
     },
@@ -847,7 +847,7 @@
         "geo_loc_latitude": "38.0856891",
         "geo_loc_longitude": "-0.9448805"
     },
-    "Orotava, La": {
+    "La Orotava": {
         "geo_loc_latitude": "28.0115953",
         "geo_loc_longitude": "-16.6672217"
     },
@@ -875,11 +875,11 @@
         "geo_loc_latitude": "42.0167",
         "geo_loc_longitude": "-4.5333"
     },
-    "Palma De Mallorca": {
+    "Palma": {
         "geo_loc_latitude": "39.5667",
         "geo_loc_longitude": "2.6500"
     },
-    "Pamplona": {
+    "Pamplona/Iruña": {
         "geo_loc_latitude": "42.8167",
         "geo_loc_longitude": "-1.6500"
     },
@@ -895,7 +895,7 @@
         "geo_loc_latitude": "38.3026178",
         "geo_loc_longitude": "-5.2714828"
     },
-    "Pino, O": {
+    "O Pino": {
         "geo_loc_latitude": "42.3968391",
         "geo_loc_longitude": "-8.845580663850722"
     },
@@ -939,7 +939,7 @@
         "geo_loc_latitude": "28.4159024",
         "geo_loc_longitude": "-16.5532956"
     },
-    "Puerto De Santa María, El": {
+    "El Puerto De Santa María": {
         "geo_loc_latitude": "38.68881919965739",
         "geo_loc_longitude": "0.14439744875758234"
     },
@@ -991,7 +991,7 @@
         "geo_loc_latitude": "42.2820748",
         "geo_loc_longitude": "-1.2717767"
     },
-    "Sagunto": {
+    "Sagunt/Sagunto": {
         "geo_loc_latitude": "39.6792916",
         "geo_loc_longitude": "-0.2786451"
     },
@@ -1043,7 +1043,7 @@
         "geo_loc_latitude": "40.5473698",
         "geo_loc_longitude": "-3.6260586"
     },
-    "San Vicente Del Raspeig": {
+    "Sant Vicent Del Raspeig/San Vicente Del Raspeig": {
         "geo_loc_latitude": "38.3903357",
         "geo_loc_longitude": "-0.52079"
     },
@@ -1135,7 +1135,7 @@
         "geo_loc_latitude": "39.6851966",
         "geo_loc_longitude": "-0.4281287"
     },
-    "Seu D'Urgell, La": {
+    "La Seu D'Urgell": {
         "geo_loc_latitude": "42.35734445",
         "geo_loc_longitude": "1.462152658645443"
     },
@@ -1259,11 +1259,11 @@
         "geo_loc_latitude": "43.4847858",
         "geo_loc_longitude": "-6.4693693190585435"
     },
-    "Valencia": {
+    "València": {
         "geo_loc_latitude": "39.4700",
         "geo_loc_longitude": "-0.3764"
     },
-    "Vall De Laguar, La": {
+    "La Vall De Laguar": {
         "geo_loc_latitude": "38.76737255",
         "geo_loc_longitude": "-0.1330206353554161"
     },
@@ -1283,7 +1283,7 @@
         "geo_loc_latitude": "36.7818354",
         "geo_loc_longitude": "-4.0988099"
     },
-    "Vendrell, El": {
+    "El Vendrell": {
         "geo_loc_latitude": "41.218778900000004",
         "geo_loc_longitude": "1.5317501324786442"
     },
@@ -1343,7 +1343,7 @@
         "geo_loc_latitude": "42.9388713",
         "geo_loc_longitude": "-6.3183421"
     },
-    "Villajoyosa": {
+    "La Vila Joiosa/Villajoyosa": {
         "geo_loc_latitude": "38.5100778",
         "geo_loc_longitude": "-0.2296202"
     },
