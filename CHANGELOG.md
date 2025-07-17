@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Pablo Mata](https://github.com/shettland)
 - [Victor Lopez](https://github.com/victor5lm)
+- [Alejandro Bernabeu](https://github.com/aberdur)
 
 #### Added enhancements
 
@@ -18,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - New flag 'check_db' was introduced in validate to activate checking of samples in platform [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
 - Included docstrings for all methods in rest_api.py [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
 - Updated create_summary_tables.py to organize data jointly [#722](https://github.com/BU-ISCIII/relecov-tools/pull/722).
+- Refactor configuration.json structure by grouping fields by module usage[#725](https://github.com/BU-ISCIII/relecov-tools/pull/725)
 
 #### Fixes
 
