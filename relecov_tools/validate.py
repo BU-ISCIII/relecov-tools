@@ -66,7 +66,9 @@ class Validate(BaseModule):
                 f"Config file is missing required sections: {', '.join(missing)}"
             )
         if json_schema_file is None:
-            schema_name = self.config.get_topic_data("json_schemas", "relecov_schema")
+            schema_name = self.config.get_topic_data("general", "json_schemas")[
+                "relecov_schema"
+            ]
             json_schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
             )
@@ -478,9 +480,9 @@ class Validate(BaseModule):
         else:
             config_json = ConfigJson(extra_config=True)
             try:
-                default_path = config_json.get_topic_data(
-                    "validate_config", "default_sample_id_registry"
-                )
+                default_path = config_json.get_topic_data("general", "validate_config")[
+                    "default_sample_id_registry"
+                ]
             except KeyError:
                 default_path = None
 
