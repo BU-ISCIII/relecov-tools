@@ -1,775 +1,631 @@
 {
-    "A Coruña": {
-        "geo_loc_latitude": "43.3713",
-        "geo_loc_longitude": "-8.4188"
-    },
-    "Adeje": {
-        "geo_loc_latitude": "28.1219416",
-        "geo_loc_longitude": "-16.7241893"
-    },
-    "Albacete": {
-        "geo_loc_latitude": "38.9956",
-        "geo_loc_longitude": "-1.8558"
-    },
-    "Albelda De Iregua": {
-        "geo_loc_latitude": "42.3560509",
-        "geo_loc_longitude": "-2.4736796"
-    },
-    "Albocàsser": {
-        "geo_loc_latitude": "40.3571915",
-        "geo_loc_longitude": "0.0245058"
-    },
-    "Alcalá De Guadaíra": {
-        "geo_loc_latitude": "37.3397709",
-        "geo_loc_longitude": "-5.8408396"
-    },
-    "Alcalá De Henares": {
-        "geo_loc_latitude": "40.481954",
-        "geo_loc_longitude": "-3.363981"
-    },
-    "Alcalá La Real": {
-        "geo_loc_latitude": "37.4619794",
-        "geo_loc_longitude": "-3.922384"
-    },
-    "Alcañiz": {
-        "geo_loc_latitude": "41.0506674",
-        "geo_loc_longitude": "-0.1299694"
-    },
-    "Alcantarilla": {
-        "geo_loc_latitude": "37.9702391",
-        "geo_loc_longitude": "-1.2155314"
-    },
-    "Alcaudete": {
-        "geo_loc_latitude": "37.5881403",
-        "geo_loc_longitude": "-4.0812937"
-    },
-    "Alcázar De San Juan": {
-        "geo_loc_latitude": "39.4056",
-        "geo_loc_longitude": "-3.2056"
-    },
-    "Alcorcón": {
-        "geo_loc_latitude": "40.3492998",
-        "geo_loc_longitude": "-3.8284295"
-    },
-    "Alcoi/Alcoy": {
-        "geo_loc_latitude": "38.6982348",
-        "geo_loc_longitude": "-0.4747619"
-    },
-    "Alella": {
-        "geo_loc_latitude": "41.4952867",
-        "geo_loc_longitude": "2.2942758"
-    },
-    "Algeciras": {
-        "geo_loc_latitude": "36.1311725",
-        "geo_loc_longitude": "-5.4473991"
-    },
-    "Alicante": {
-        "geo_loc_latitude": "38.3453",
-        "geo_loc_longitude": "-0.4831"
-    },
-    "Almacelles": {
-        "geo_loc_latitude": "41.7294989",
-        "geo_loc_longitude": "0.4404763"
-    },
-    "Almansa": {
-        "geo_loc_latitude": "38.8682065",
-        "geo_loc_longitude": "-1.0978627"
-    },
-    "Almendralejo": {
-        "geo_loc_latitude": "38.6846791",
-        "geo_loc_longitude": "-6.4067802"
-    },
     "Almería": {
-        "geo_loc_latitude": "36.8403",
-        "geo_loc_longitude": "-2.4681"
-    },
-    "Alpicat": {
-        "geo_loc_latitude": "41.6651189",
-        "geo_loc_longitude": "0.5560656"
-    },
-    "Altsasu/Alsasua": {
-        "geo_loc_latitude": "42.9104705",
-        "geo_loc_longitude": "-2.1791811319274905"
-    },
-    "Alzira": {
-        "geo_loc_latitude": "39.151212",
-        "geo_loc_longitude": "-0.4346556"
-    },
-    "L' Ametlla Del Vallès'": {
-        "geo_loc_latitude": "41.6434428",
-        "geo_loc_longitude": "2.268344"
-    },
-    "Amposta": {
-        "geo_loc_latitude": "40.7079905",
-        "geo_loc_longitude": "0.5827636"
-    },
-    "Andújar": {
-        "geo_loc_latitude": "38.0392362",
-        "geo_loc_longitude": "-4.0505603"
-    },
-    "Antequera": {
-        "geo_loc_latitude": "37.030842",
-        "geo_loc_longitude": "-4.528663"
-    },
-    "Aranda De Duero": {
-        "geo_loc_latitude": "41.6715067",
-        "geo_loc_longitude": "-3.6851172"
-    },
-    "Aranjuez": {
-        "geo_loc_latitude": "40.03221",
-        "geo_loc_longitude": "-3.6039604"
-    },
-    "Arenys De Munt": {
-        "geo_loc_latitude": "41.6095429",
-        "geo_loc_longitude": "2.5400513"
-    },
-    "Arévalo": {
-        "geo_loc_latitude": "41.0632758",
-        "geo_loc_longitude": "-4.7198921"
-    },
-    "Arganda Del Rey": {
-        "geo_loc_latitude": "40.3007708",
-        "geo_loc_longitude": "-3.4380688"
-    },
-    "Argentona": {
-        "geo_loc_latitude": "41.5554326",
-        "geo_loc_longitude": "2.4002787"
-    },
-    "Arona": {
-        "geo_loc_latitude": "28.0996248",
-        "geo_loc_longitude": "-16.6809103"
-    },
-    "Arrasate/Mondragón": {
-        "geo_loc_latitude": "43.0656783",
-        "geo_loc_longitude": "-2.4900779"
-    },
-    "Arrecife": {
-        "geo_loc_latitude": "28.9639681",
-        "geo_loc_longitude": "-13.5499014"
-    },
-    "Arriondas": {
-        "geo_loc_latitude": "43.381388",
-        "geo_loc_longitude": "-5.184444"
-    },
-    "Ávila": {
-        "geo_loc_latitude": "40.6500",
-        "geo_loc_longitude": "-4.6833"
-    },
-    "Avilés": {
-        "geo_loc_latitude": "43.551944",
-        "geo_loc_longitude": "-5.936111"
-    },
-    "Badajoz": {
-        "geo_loc_latitude": "38.8803",
-        "geo_loc_longitude": "-6.9753"
-    },
-    "Badalona": {
-        "geo_loc_latitude": "41.4333",
-        "geo_loc_longitude": "2.2333"
-    },
-    "Balaguer": {
-        "geo_loc_latitude": "41.7897204",
-        "geo_loc_longitude": "0.8054914"
-    },
-    "Banyoles": {
-        "geo_loc_latitude": "42.1180477",
-        "geo_loc_longitude": "2.7653607"
-    },
-    "Barakaldo": {
-        "geo_loc_latitude": "43.282025",
-        "geo_loc_longitude": "-2.984338"
-    },
-    "Barbadás": {
-        "geo_loc_latitude": "42.301551",
-        "geo_loc_longitude": "-7.8872314"
-    },
-    "Barbastro": {
-        "geo_loc_latitude": "42.0365679",
-        "geo_loc_longitude": "0.127111"
-    },
-    "Barcelona": {
-        "geo_loc_latitude": "41.3825",
-        "geo_loc_longitude": "2.1769"
-    },
-    "O Barco De Valdeorras": {
-        "geo_loc_latitude": "42.418188150000006",
-        "geo_loc_longitude": "-6.985079898492007"
-    },
-    "Los Barrios": {
-        "geo_loc_latitude": "42.88360955",
-        "geo_loc_longitude": "-5.878367617741937"
-    },
-    "Baza": {
-        "geo_loc_latitude": "37.4888637",
-        "geo_loc_longitude": "-2.7709805"
-    },
-    "Benalmádena": {
-        "geo_loc_latitude": "36.594519",
-        "geo_loc_longitude": "-4.572284"
-    },
-    "Benavente": {
-        "geo_loc_latitude": "42.0032862",
-        "geo_loc_longitude": "-5.6738595"
-    },
-    "Beniarbeig": {
-        "geo_loc_latitude": "38.8221689",
-        "geo_loc_longitude": "-0.0018612"
-    },
-    "Benidorm": {
-        "geo_loc_latitude": "38.5406255",
-        "geo_loc_longitude": "-0.1290929"
-    },
-    "Berga": {
-        "geo_loc_latitude": "42.1011456",
-        "geo_loc_longitude": "1.8454758"
-    },
-    "Bermeo": {
-        "geo_loc_latitude": "43.4194242",
-        "geo_loc_longitude": "-2.7231562"
-    },
-    "Bétera": {
-        "geo_loc_latitude": "39.5917307",
-        "geo_loc_longitude": "-0.4622695"
-    },
-    "Bilbao": {
-        "geo_loc_latitude": "43.2569",
-        "geo_loc_longitude": "-2.9236"
-    },
-    "Blanes": {
-        "geo_loc_latitude": "41.675284",
-        "geo_loc_longitude": "2.789399"
-    },
-    "Boadilla Del Monte": {
-        "geo_loc_latitude": "40.4053485",
-        "geo_loc_longitude": "-3.8764663"
-    },
-    "Bormujos": {
-        "geo_loc_latitude": "37.3715939",
-        "geo_loc_longitude": "-6.07133"
-    },
-    "Breña Alta": {
-        "geo_loc_latitude": "28.6637814",
-        "geo_loc_longitude": "-17.7867588"
-    },
-    "Brunete": {
-        "geo_loc_latitude": "40.4050499",
-        "geo_loc_longitude": "-3.9979912"
-    },
-    "Bunyola": {
-        "geo_loc_latitude": "39.6961887",
-        "geo_loc_longitude": "2.6989574"
-    },
-    "Burela": {
-        "geo_loc_latitude": "43.6606329",
-        "geo_loc_longitude": "-7.3587521"
-    },
-    "Burgos": {
-        "geo_loc_latitude": "42.3500",
-        "geo_loc_longitude": "-3.6822"
-    },
-    "Burjassot": {
-        "geo_loc_latitude": "39.5090599",
-        "geo_loc_longitude": "-0.4108581"
-    },
-    "Cabra": {
-        "geo_loc_latitude": "37.473418",
-        "geo_loc_longitude": "-4.442200"
-    },
-    "Cáceres": {
-        "geo_loc_latitude": "39.4833",
-        "geo_loc_longitude": "-6.3667"
-    },
-    "Cádiz": {
-        "geo_loc_latitude": "36.5350",
-        "geo_loc_longitude": "-6.2975"
-    },
-    "Calahorra": {
-        "geo_loc_latitude": "42.3035212",
-        "geo_loc_longitude": "-1.9648758"
-    },
-    "Calatayud": {
-        "geo_loc_latitude": "41.3527628",
-        "geo_loc_longitude": "-1.6422977"
-    },
-    "Caldes De Montbui": {
-        "geo_loc_latitude": "41.632265",
-        "geo_loc_longitude": "2.1676442"
-    },
-    "Calella": {
-        "geo_loc_latitude": "41.612812",
-        "geo_loc_longitude": "2.653981"
-    },
-    "Campdevànol": {
-        "geo_loc_latitude": "42.2230582",
-        "geo_loc_longitude": "2.1680717"
-    },
-    "Cangas Del Narcea": {
-        "geo_loc_latitude": "43.165833",
-        "geo_loc_longitude": "-6.541666"
-    },
-    "Caravaca De La Cruz": {
-        "geo_loc_latitude": "38.1046979",
-        "geo_loc_longitude": "-1.861118"
-    },
-    "Carcaixent": {
-        "geo_loc_latitude": "39.1209651",
-        "geo_loc_longitude": "-0.4472814"
-    },
-    "Carrascal De Barregas": {
-        "geo_loc_latitude": "40.9785475",
-        "geo_loc_longitude": "-5.761562"
-    },
-    "Cartagena": {
-        "geo_loc_latitude": "37.6000",
-        "geo_loc_longitude": "-0.9819"
-    },
-    "Cártama": {
-        "geo_loc_latitude": "36.7100716",
-        "geo_loc_longitude": "-4.631539"
-    },
-    "Castelló De La Plana": {
-        "geo_loc_latitude": "39.9831",
-        "geo_loc_longitude": "-0.0331"
-    },
-    "Castilleja De La Cuesta": {
-        "geo_loc_latitude": "37.3867839",
-        "geo_loc_longitude": "-6.054127"
-    },
-    "Cee": {
-        "geo_loc_latitude": "42.9555564",
-        "geo_loc_longitude": "-9.1900013"
-    },
-    "Cehegín": {
-        "geo_loc_latitude": "38.0925078",
-        "geo_loc_longitude": "-1.7987525"
-    },
-    "Cercedilla": {
-        "geo_loc_latitude": "40.7412931",
-        "geo_loc_longitude": "-4.0558002"
-    },
-    "Ceuta": {
-        "geo_loc_latitude": "35.8867",
-        "geo_loc_longitude": "-5.3000"
-    },
-    "Chiclana De La Frontera": {
-        "geo_loc_latitude": "36.4191096",
-        "geo_loc_longitude": "-6.1460683"
-    },
-    "Ciempozuelos": {
-        "geo_loc_latitude": "40.1580087",
-        "geo_loc_longitude": "-3.6205514"
-    },
-    "Cieza": {
-        "geo_loc_latitude": "38.2392",
-        "geo_loc_longitude": "-1.4189"
-    },
-    "Ciudad Real": {
-        "geo_loc_latitude": "38.9833",
-        "geo_loc_longitude": "-3.9167"
-    },
-    "Ciutadella De Menorca": {
-        "geo_loc_latitude": "40.00299755",
-        "geo_loc_longitude": "3.8614810595640465"
-    },
-    "Coaña": {
-        "geo_loc_latitude": "43.512625799999995",
-        "geo_loc_longitude": "-6.761010561610359"
-    },
-    "Collado Villalba": {
-        "geo_loc_latitude": "40.6431496",
-        "geo_loc_longitude": "-3.9930128"
-    },
-    "Constantina": {
-        "geo_loc_latitude": "37.87757",
-        "geo_loc_longitude": "-5.62185"
-    },
-    "Córdoba": {
-        "geo_loc_latitude": "37.8845",
-        "geo_loc_longitude": "-4.7796"
-    },
-    "Coria": {
-        "geo_loc_latitude": "39.9831574",
-        "geo_loc_longitude": "-6.5366803"
-    },
-    "Cornellà De Llobregat": {
-        "geo_loc_latitude": "41.355724",
-        "geo_loc_longitude": "2.0706225"
-    },
-    "Coslada": {
-        "geo_loc_latitude": "40.423802",
-        "geo_loc_longitude": "-3.5552882"
-    },
-    "Cuenca": {
-        "geo_loc_latitude": "40.0667",
-        "geo_loc_longitude": "-2.1500"
-    },
-    "Dénia": {
-        "geo_loc_latitude": "38.8408382",
-        "geo_loc_longitude": "0.1061105"
-    },
-    "Don Benito": {
-        "geo_loc_latitude": "38.9540269",
-        "geo_loc_longitude": "-5.8619466"
-    },
-    "Donostia/San Sebastián": {
-        "geo_loc_latitude": "43.3224219",
-        "geo_loc_longitude": "-1.9838889"
-    },
-    "Dos Hermanas": {
-        "geo_loc_latitude": "37.283689",
-        "geo_loc_longitude": "-5.9226718"
-    },
-    "Écija": {
-        "geo_loc_latitude": "37.5406007",
-        "geo_loc_longitude": "-5.079589"
-    },
-    "Eivissa": {
-        "geo_loc_latitude": "38.974390099999994",
-        "geo_loc_longitude": "1.4197463178515335"
-    },
-    "Ejea De Los Caballeros": {
-        "geo_loc_latitude": "42.1264892",
-        "geo_loc_longitude": "-1.1382958"
-    },
-    "El Ejido": {
-        "geo_loc_latitude": "36.772153",
-        "geo_loc_longitude": "-2.810602"
-    },
-    "Elx/Elche": {
-        "geo_loc_latitude": "38.2669",
-        "geo_loc_longitude": "-0.6983"
-    },
-    "Elda": {
-        "geo_loc_latitude": "38.4789671",
-        "geo_loc_longitude": "-0.7956759"
-    },
-    "Erandio": {
-        "geo_loc_latitude": "43.3055981",
-        "geo_loc_longitude": "-2.9729697"
-    },
-    "Esplugues De Llobregat": {
-        "geo_loc_latitude": "41.3776796",
-        "geo_loc_longitude": "2.0899722"
-    },
-    "Estella": {
-        "geo_loc_latitude": "42.672969",
-        "geo_loc_longitude": "-2.032974"
-    },
-    "Estella-Lizarra": {
-        "geo_loc_latitude": "42.672094",
-        "geo_loc_longitude": "-2.0314834"
-    },
-    "Estepona": {
-        "geo_loc_latitude": "36.4268068",
-        "geo_loc_longitude": "-5.1468484"
-    },
-    "Ferrol": {
-        "geo_loc_latitude": "43.4846862",
-        "geo_loc_longitude": "-8.233162"
-    },
-    "Figueres": {
-        "geo_loc_latitude": "42.2666314",
-        "geo_loc_longitude": "2.9638434"
-    },
-    "Formentera": {
-        "geo_loc_latitude": "38.7063909",
-        "geo_loc_longitude": "1.4335265588311943"
-    },
-    "Fraga": {
-        "geo_loc_latitude": "41.5221304",
-        "geo_loc_longitude": "0.3501756"
-    },
-    "Fuenlabrada": {
-        "geo_loc_latitude": "40.282476",
-        "geo_loc_longitude": "-3.7923422"
-    },
-    "Galdakao": {
-        "geo_loc_latitude": "43.2332639",
-        "geo_loc_longitude": "-2.8453385"
-    },
-    "Gandia": {
-        "geo_loc_latitude": "38.9675925",
-        "geo_loc_longitude": "-0.1803423"
-    },
-    "Getafe": {
-        "geo_loc_latitude": "40.3047",
-        "geo_loc_longitude": "-3.7311"
-    },
-    "Gijón": {
-        "geo_loc_latitude": "43.5345709",
-        "geo_loc_longitude": "-5.6675865"
-    },
-    "Girona": {
-        "geo_loc_latitude": "41.9833",
-        "geo_loc_longitude": "2.8167"
-    },
-    "Godella": {
-        "geo_loc_latitude": "39.5184276",
-        "geo_loc_longitude": "-0.4103168"
-    },
-    "Gorliz": {
-        "geo_loc_latitude": "43.416987",
-        "geo_loc_longitude": "-2.9448381"
-    },
-    "Granada": {
-        "geo_loc_latitude": "37.1781",
-        "geo_loc_longitude": "-3.6008"
-    },
-    "Granollers": {
-        "geo_loc_latitude": "41.6079555",
-        "geo_loc_longitude": "2.2876008"
-    },
-    "Guadalajara": {
-        "geo_loc_latitude": "40.6337",
-        "geo_loc_longitude": "-3.1674"
-    },
-    "Guadarrama": {
-        "geo_loc_latitude": "40.6734454",
-        "geo_loc_longitude": "-4.0893911"
-    },
-    "Guadix": {
-        "geo_loc_latitude": "37.3006914",
-        "geo_loc_longitude": "-3.1351956"
-    },
-    "Haro": {
-        "geo_loc_latitude": "42.5768922",
-        "geo_loc_longitude": "-2.8466768"
-    },
-    "Hellín": {
-        "geo_loc_latitude": "38.5106649",
-        "geo_loc_longitude": "-1.6995137"
-    },
-    "Hondarribia": {
-        "geo_loc_latitude": "43.3624468",
-        "geo_loc_longitude": "-1.7914309"
-    },
-    "Huelva": {
-        "geo_loc_latitude": "37.2500",
-        "geo_loc_longitude": "-6.9500"
-    },
-    "Huercal-Overa": {
-        "geo_loc_latitude": "37.395605",
-        "geo_loc_longitude": "-1.942236"
+        "geo_loc_latitude": "36.8414197",
+        "geo_loc_longitude": "-2.4628135"
     },
     "Huércal-Overa": {
         "geo_loc_latitude": "37.3895979",
         "geo_loc_longitude": "-1.9450652"
     },
-    "Huesca": {
-        "geo_loc_latitude": "42.1333",
-        "geo_loc_longitude": "-0.4167"
+    "El Ejido": {
+        "geo_loc_latitude": "36.7743863",
+        "geo_loc_longitude": "-2.8124886"
     },
-    "Ibiza": {
-        "geo_loc_latitude": "38.906921",
-        "geo_loc_longitude": "1.419519"
-    },
-    "Icod De Los Vinos": {
-        "geo_loc_latitude": "28.3680548",
-        "geo_loc_longitude": "-16.7176389"
-    },
-    "Igualada": {
-        "geo_loc_latitude": "41.5790182",
-        "geo_loc_longitude": "1.617346"
-    },
-    "Inca": {
-        "geo_loc_latitude": "39.716349",
-        "geo_loc_longitude": "2.915213"
-    },
-    "Jaca": {
-        "geo_loc_latitude": "42.5692515",
-        "geo_loc_longitude": "-0.549372"
-    },
-    "Jaén": {
-        "geo_loc_latitude": "37.7667",
-        "geo_loc_longitude": "-3.7711"
-    },
-    "Jarrio": {
-        "geo_loc_latitude": "43.54444",
-        "geo_loc_longitude": "-6.74722"
+    "El Puerto De Santa María": {
+        "geo_loc_latitude": "36.6004006",
+        "geo_loc_longitude": "-6.2252702"
     },
     "Jerez De La Frontera": {
-        "geo_loc_latitude": "36.685195",
-        "geo_loc_longitude": "-6.125217"
+        "geo_loc_latitude": "36.6816936",
+        "geo_loc_longitude": "-6.1377402"
     },
-    "Juneda": {
-        "geo_loc_latitude": "41.5485218",
-        "geo_loc_longitude": "0.8245593"
+    "Cádiz": {
+        "geo_loc_latitude": "36.5297438",
+        "geo_loc_longitude": "-6.2928976"
     },
-    "L' Hospitalet De Llobregat": {
-        "geo_loc_latitude": "41.4217",
-        "geo_loc_longitude": "2.1897"
+    "Algeciras": {
+        "geo_loc_latitude": "36.1311725",
+        "geo_loc_longitude": "-5.4473991"
     },
-    "Laguardia": {
-        "geo_loc_latitude": "42.5535011",
-        "geo_loc_longitude": "-2.5850848"
+    "Puerto Real": {
+        "geo_loc_latitude": "36.5286856",
+        "geo_loc_longitude": "-6.1902161"
     },
-    "Langreo": {
-        "geo_loc_latitude": "43.165833",
-        "geo_loc_longitude": "-6.541666"
+    "Villamartín": {
+        "geo_loc_latitude": "36.8591822",
+        "geo_loc_longitude": "-5.6434544"
     },
-    "Lardero": {
-        "geo_loc_latitude": "42.4272883",
-        "geo_loc_longitude": "-2.4624393"
+    "Sanlúcar De Barrameda": {
+        "geo_loc_latitude": "36.7761393",
+        "geo_loc_longitude": "-6.3534794"
     },
-    "Laredo": {
-        "geo_loc_latitude": "43.41063",
-        "geo_loc_longitude": "-3.4173"
+    "Chiclana De La Frontera": {
+        "geo_loc_latitude": "36.4191096",
+        "geo_loc_longitude": "-6.1460683"
     },
-    "Las Palmas": {
-        "geo_loc_latitude": "28.1272",
-        "geo_loc_longitude": "-15.4314"
-    },
-    "Las Palmas De Gran Canaria": {
-        "geo_loc_latitude": "28.1288694",
-        "geo_loc_longitude": "-15.4349015"
-    },
-    "Lebrija": {
-        "geo_loc_latitude": "36.9193102",
-        "geo_loc_longitude": "-6.0764057"
-    },
-    "Leganés": {
-        "geo_loc_latitude": "40.3281",
-        "geo_loc_longitude": "-3.7644"
-    },
-    "León": {
-        "geo_loc_latitude": "42.6056",
-        "geo_loc_longitude": "-5.5700"
-    },
-    "Lepe": {
-        "geo_loc_latitude": "37.2551712",
-        "geo_loc_longitude": "-7.201556"
+    "Los Barrios": {
+        "geo_loc_latitude": "36.1853519",
+        "geo_loc_longitude": "-5.4933701"
     },
     "La Línea De La Concepción": {
-        "geo_loc_latitude": "36.15829615",
-        "geo_loc_longitude": "-5.340474187804688"
+        "geo_loc_latitude": "36.1677899",
+        "geo_loc_longitude": "-5.3482396"
     },
-    "Llanera": {
-        "geo_loc_latitude": "43.4545737",
-        "geo_loc_longitude": "-5.850642615099105"
+    "San Fernando": {
+        "geo_loc_latitude": "36.4646672",
+        "geo_loc_longitude": "-6.1983492"
     },
-    "Lleida": {
-        "geo_loc_latitude": "41.6167",
-        "geo_loc_longitude": "0.6222"
+    "Vejer De La Frontera": {
+        "geo_loc_latitude": "36.251937",
+        "geo_loc_longitude": "-5.9670492"
     },
-    "Llerena": {
-        "geo_loc_latitude": "38.2378976",
-        "geo_loc_longitude": "-6.0149901"
+    "Cabra": {
+        "geo_loc_latitude": "37.4718153",
+        "geo_loc_longitude": "-4.4335616"
     },
-    "Llíria": {
-        "geo_loc_latitude": "39.6251478",
-        "geo_loc_longitude": "-0.5952749"
+    "Córdoba": {
+        "geo_loc_latitude": "37.8845813",
+        "geo_loc_longitude": "-4.7760138"
     },
-    "Lloret De Mar": {
-        "geo_loc_latitude": "41.6973503",
-        "geo_loc_longitude": "2.8392392"
+    "Pozoblanco": {
+        "geo_loc_latitude": "38.3780204",
+        "geo_loc_longitude": "-4.848573"
     },
-    "Llucmajor": {
-        "geo_loc_latitude": "39.4439046",
-        "geo_loc_longitude": "2.840129"
+    "Montilla": {
+        "geo_loc_latitude": "37.5811178",
+        "geo_loc_longitude": "-4.6414726"
     },
-    "Logroño": {
-        "geo_loc_latitude": "42.4650",
-        "geo_loc_longitude": "-2.4456"
+    "Puente Genil": {
+        "geo_loc_latitude": "37.387395",
+        "geo_loc_longitude": "-4.7716241"
+    },
+    "Peñarroya-Pueblonuevo": {
+        "geo_loc_latitude": "38.3026178",
+        "geo_loc_longitude": "-5.2714828"
+    },
+    "Lucena": {
+        "geo_loc_latitude": "37.4091334",
+        "geo_loc_longitude": "-4.4860128"
+    },
+    "Granada": {
+        "geo_loc_latitude": "37.1734995",
+        "geo_loc_longitude": "-3.5995337"
+    },
+    "Baza": {
+        "geo_loc_latitude": "37.4888637",
+        "geo_loc_longitude": "-2.7709805"
+    },
+    "Motril": {
+        "geo_loc_latitude": "36.7450888",
+        "geo_loc_longitude": "-3.5207655"
+    },
+    "Guadix": {
+        "geo_loc_latitude": "37.2991265",
+        "geo_loc_longitude": "-3.1373303"
     },
     "Loja": {
         "geo_loc_latitude": "37.1664839",
         "geo_loc_longitude": "-4.1496374"
     },
-    "Lorca": {
-        "geo_loc_latitude": "37.6798",
-        "geo_loc_longitude": "-1.6944"
+    "Huelva": {
+        "geo_loc_latitude": "37.2575874",
+        "geo_loc_longitude": "-6.9484945"
     },
-    "Lugo": {
-        "geo_loc_latitude": "43.0167",
-        "geo_loc_longitude": "-7.5500"
+    "Minas De Riotinto": {
+        "geo_loc_latitude": "37.6934573",
+        "geo_loc_longitude": "-6.5957844"
     },
-    "Madrid": {
-        "geo_loc_latitude": "40.4167",
-        "geo_loc_longitude": "-3.7167"
+    "Lepe": {
+        "geo_loc_latitude": "37.2551712",
+        "geo_loc_longitude": "-7.201556"
     },
-    "Maó": {
-        "geo_loc_latitude": "39.887261",
-        "geo_loc_longitude": "4.259530"
+    "Jaén": {
+        "geo_loc_latitude": "37.9557275",
+        "geo_loc_longitude": "-3.4920556"
     },
-    "Majadahonda": {
-        "geo_loc_latitude": "40.4728425",
-        "geo_loc_longitude": "-3.8723542"
+    "Linares": {
+        "geo_loc_latitude": "38.0931247",
+        "geo_loc_longitude": "-3.6357207"
+    },
+    "Úbeda": {
+        "geo_loc_latitude": "38.0111398",
+        "geo_loc_longitude": "-3.3719098"
+    },
+    "Andújar": {
+        "geo_loc_latitude": "38.0392362",
+        "geo_loc_longitude": "-4.0505603"
+    },
+    "Puente De Génave": {
+        "geo_loc_latitude": "38.3545624",
+        "geo_loc_longitude": "-2.8031995"
+    },
+    "Alcaudete": {
+        "geo_loc_latitude": "37.5881403",
+        "geo_loc_longitude": "-4.0812937"
+    },
+    "Alcalá La Real": {
+        "geo_loc_latitude": "37.4619794",
+        "geo_loc_longitude": "-3.922384"
+    },
+    "Cazorla": {
+        "geo_loc_latitude": "37.9128927",
+        "geo_loc_longitude": "-3.0038873"
+    },
+    "Marbella": {
+        "geo_loc_latitude": "36.508976",
+        "geo_loc_longitude": "-4.88562"
     },
     "Málaga": {
-        "geo_loc_latitude": "36.7194",
-        "geo_loc_longitude": "-4.4200"
+        "geo_loc_latitude": "36.7213028",
+        "geo_loc_longitude": "-4.4216366"
+    },
+    "Torremolinos": {
+        "geo_loc_latitude": "36.6242841",
+        "geo_loc_longitude": "-4.4995448"
+    },
+    "Vélez-Málaga": {
+        "geo_loc_latitude": "36.7818354",
+        "geo_loc_longitude": "-4.0988099"
+    },
+    "Antequera": {
+        "geo_loc_latitude": "37.0183652",
+        "geo_loc_longitude": "-4.5596649"
+    },
+    "Estepona": {
+        "geo_loc_latitude": "36.4268068",
+        "geo_loc_longitude": "-5.1468484"
+    },
+    "Benalmádena": {
+        "geo_loc_latitude": "36.594519",
+        "geo_loc_longitude": "-4.572284"
+    },
+    "Ronda": {
+        "geo_loc_latitude": "36.7421339",
+        "geo_loc_longitude": "-5.1665916"
+    },
+    "Sevilla": {
+        "geo_loc_latitude": "37.3886303",
+        "geo_loc_longitude": "-5.9953403"
+    },
+    "Osuna": {
+        "geo_loc_latitude": "37.2373532",
+        "geo_loc_longitude": "-5.1033306"
+    },
+    "Alcalá De Guadaíra": {
+        "geo_loc_latitude": "37.3397709",
+        "geo_loc_longitude": "-5.8408396"
+    },
+    "Morón De La Frontera": {
+        "geo_loc_latitude": "37.1215305",
+        "geo_loc_longitude": "-5.4559583"
+    },
+    "Bormujos": {
+        "geo_loc_latitude": "37.3715939",
+        "geo_loc_longitude": "-6.07133"
+    },
+    "Dos Hermanas": {
+        "geo_loc_latitude": "37.283689",
+        "geo_loc_longitude": "-5.9226718"
+    },
+    "Castilleja De La Cuesta": {
+        "geo_loc_latitude": "37.3867839",
+        "geo_loc_longitude": "-6.054127"
+    },
+    "Utrera": {
+        "geo_loc_latitude": "37.1824646",
+        "geo_loc_longitude": "-5.7817506"
+    },
+    "Constantina": {
+        "geo_loc_latitude": "37.87757",
+        "geo_loc_longitude": "-5.62185"
+    },
+    "Lebrija": {
+        "geo_loc_latitude": "36.9193102",
+        "geo_loc_longitude": "-6.0764057"
+    },
+    "Écija": {
+        "geo_loc_latitude": "37.5406007",
+        "geo_loc_longitude": "-5.079589"
+    },
+    "Coria Del Río": {
+        "geo_loc_latitude": "37.2892112",
+        "geo_loc_longitude": "-6.0535287"
+    },
+    "Huesca": {
+        "geo_loc_latitude": "42.1360614",
+        "geo_loc_longitude": "-0.0298027"
+    },
+    "Barbastro": {
+        "geo_loc_latitude": "42.0365679",
+        "geo_loc_longitude": "0.127111"
+    },
+    "Jaca": {
+        "geo_loc_latitude": "42.5692515",
+        "geo_loc_longitude": "-0.549372"
+    },
+    "Fraga": {
+        "geo_loc_latitude": "41.5221304",
+        "geo_loc_longitude": "0.3501756"
+    },
+    "Alcañiz": {
+        "geo_loc_latitude": "41.0506674",
+        "geo_loc_longitude": "-0.1299694"
+    },
+    "Teruel": {
+        "geo_loc_latitude": "40.6005259",
+        "geo_loc_longitude": "-0.9229282"
+    },
+    "Zaragoza": {
+        "geo_loc_latitude": "41.6521342",
+        "geo_loc_longitude": "-0.8809428"
+    },
+    "Calatayud": {
+        "geo_loc_latitude": "41.3527628",
+        "geo_loc_longitude": "-1.6422977"
+    },
+    "Sádaba": {
+        "geo_loc_latitude": "42.2820748",
+        "geo_loc_longitude": "-1.2717767"
+    },
+    "Ejea De Los Caballeros": {
+        "geo_loc_latitude": "42.1264892",
+        "geo_loc_longitude": "-1.1382958"
+    },
+    "Llanera": {
+        "geo_loc_latitude": "43.4545737",
+        "geo_loc_longitude": "-5.8506426"
+    },
+    "Oviedo": {
+        "geo_loc_latitude": "43.3618625",
+        "geo_loc_longitude": "-5.8483581"
+    },
+    "Langreo": {
+        "geo_loc_latitude": "43.2950131",
+        "geo_loc_longitude": "-5.683431"
+    },
+    "Cangas Del Narcea": {
+        "geo_loc_latitude": "43.1774374",
+        "geo_loc_longitude": "-6.5499784"
+    },
+    "Valdés": {
+        "geo_loc_latitude": "43.4847858",
+        "geo_loc_longitude": "-6.4693693"
+    },
+    "Gijón": {
+        "geo_loc_latitude": "43.5449422",
+        "geo_loc_longitude": "-5.66275"
+    },
+    "Parres": {
+        "geo_loc_latitude": "43.3588207",
+        "geo_loc_longitude": "-5.1846557"
+    },
+    "Avilés": {
+        "geo_loc_latitude": "43.5554436",
+        "geo_loc_longitude": "-5.9222466"
+    },
+    "Coaña": {
+        "geo_loc_latitude": "43.5126258",
+        "geo_loc_longitude": "-6.7610106"
+    },
+    "Mieres": {
+        "geo_loc_latitude": "43.2349957",
+        "geo_loc_longitude": "-5.769932"
     },
     "Manacor": {
-        "geo_loc_latitude": "39.569716",
-        "geo_loc_longitude": "3.209629"
+        "geo_loc_latitude": "39.5696458",
+        "geo_loc_longitude": "3.2106461"
     },
-    "Manises": {
-        "geo_loc_latitude": "39.492989",
-        "geo_loc_longitude": "-0.4621429"
+    "Palma": {
+        "geo_loc_latitude": "39.5695818",
+        "geo_loc_longitude": "2.6500745"
+    },
+    "Muro": {
+        "geo_loc_latitude": "39.7370637",
+        "geo_loc_longitude": "3.0567069"
+    },
+    "Maó": {
+        "geo_loc_latitude": "39.8894922",
+        "geo_loc_longitude": "4.2662071"
+    },
+    "Eivissa": {
+        "geo_loc_latitude": "38.9743901",
+        "geo_loc_longitude": "1.4197463"
+    },
+    "Ciutadella De Menorca": {
+        "geo_loc_latitude": "39.9884294",
+        "geo_loc_longitude": "3.8285693"
+    },
+    "Bunyola": {
+        "geo_loc_latitude": "39.6961887",
+        "geo_loc_longitude": "2.6989574"
+    },
+    "Inca": {
+        "geo_loc_latitude": "39.7211448",
+        "geo_loc_longitude": "2.9111493"
+    },
+    "Formentera": {
+        "geo_loc_latitude": "38.7062157",
+        "geo_loc_longitude": "1.4334101"
+    },
+    "Llucmajor": {
+        "geo_loc_latitude": "39.490845",
+        "geo_loc_longitude": "2.8913179"
+    },
+    "Las Palmas De Gran Canaria": {
+        "geo_loc_latitude": "28.1288694",
+        "geo_loc_longitude": "-15.4349015"
+    },
+    "Telde": {
+        "geo_loc_latitude": "27.9984538",
+        "geo_loc_longitude": "-15.4166761"
+    },
+    "San Bartolomé De Tirajana": {
+        "geo_loc_latitude": "27.9252512",
+        "geo_loc_longitude": "-15.5729983"
+    },
+    "Tías": {
+        "geo_loc_latitude": "28.9543147",
+        "geo_loc_longitude": "-13.6529153"
+    },
+    "Santa Brígida": {
+        "geo_loc_latitude": "28.035684",
+        "geo_loc_longitude": "-15.4974676"
+    },
+    "Puerto Del Rosario": {
+        "geo_loc_latitude": "28.4993424",
+        "geo_loc_longitude": "-13.8599051"
+    },
+    "Teguise": {
+        "geo_loc_latitude": "29.0592518",
+        "geo_loc_longitude": "-13.5602184"
+    },
+    "Arrecife": {
+        "geo_loc_latitude": "28.9639681",
+        "geo_loc_longitude": "-13.5499014"
+    },
+    "Santa María De Guía De Gran Canaria": {
+        "geo_loc_latitude": "28.1390522",
+        "geo_loc_longitude": "-15.6318282"
+    },
+    "La Orotava": {
+        "geo_loc_latitude": "28.3898829",
+        "geo_loc_longitude": "-16.5235692"
+    },
+    "Santa Cruz De Tenerife": {
+        "geo_loc_latitude": "28.467178",
+        "geo_loc_longitude": "-16.2507843"
+    },
+    "Tacoronte": {
+        "geo_loc_latitude": "28.4805316",
+        "geo_loc_longitude": "-16.4137605"
+    },
+    "Adeje": {
+        "geo_loc_latitude": "28.1219416",
+        "geo_loc_longitude": "-16.7241893"
+    },
+    "Arona": {
+        "geo_loc_latitude": "28.0996248",
+        "geo_loc_longitude": "-16.6809103"
+    },
+    "Puerto De La Cruz": {
+        "geo_loc_latitude": "28.4159024",
+        "geo_loc_longitude": "-16.5532956"
+    },
+    "San Cristóbal De La Laguna": {
+        "geo_loc_latitude": "28.4857715",
+        "geo_loc_longitude": "-16.3159422"
+    },
+    "Valverde": {
+        "geo_loc_latitude": "27.809685",
+        "geo_loc_longitude": "-17.9151468"
+    },
+    "San Sebastián De La Gomera": {
+        "geo_loc_latitude": "28.0910382",
+        "geo_loc_longitude": "-17.1110077"
+    },
+    "Breña Alta": {
+        "geo_loc_latitude": "28.6637814",
+        "geo_loc_longitude": "-17.7867588"
+    },
+    "Icod De Los Vinos": {
+        "geo_loc_latitude": "28.3680548",
+        "geo_loc_longitude": "-16.7176389"
+    },
+    "Santander": {
+        "geo_loc_latitude": "43.4618932",
+        "geo_loc_longitude": "-3.8100255"
+    },
+    "Santa Cruz De Bezana": {
+        "geo_loc_latitude": "43.4429407",
+        "geo_loc_longitude": "-3.9049243"
+    },
+    "Laredo": {
+        "geo_loc_latitude": "43.41063",
+        "geo_loc_longitude": "-3.4173"
+    },
+    "Torrelavega": {
+        "geo_loc_latitude": "43.3487303",
+        "geo_loc_longitude": "-4.0515082"
+    },
+    "Ávila": {
+        "geo_loc_latitude": "40.656478",
+        "geo_loc_longitude": "-4.7002172"
+    },
+    "Arévalo": {
+        "geo_loc_latitude": "41.0632758",
+        "geo_loc_longitude": "-4.7198921"
+    },
+    "Aranda De Duero": {
+        "geo_loc_latitude": "41.6715067",
+        "geo_loc_longitude": "-3.6851172"
+    },
+    "Miranda De Ebro": {
+        "geo_loc_latitude": "42.6855632",
+        "geo_loc_longitude": "-2.9478451"
+    },
+    "Burgos": {
+        "geo_loc_latitude": "42.343926",
+        "geo_loc_longitude": "-3.696977"
+    },
+    "León": {
+        "geo_loc_latitude": "42.5989995",
+        "geo_loc_longitude": "-5.5682413"
+    },
+    "Ponferrada": {
+        "geo_loc_latitude": "42.5454124",
+        "geo_loc_longitude": "-6.5938719"
+    },
+    "San Andrés Del Rabanedo": {
+        "geo_loc_latitude": "42.6112327",
+        "geo_loc_longitude": "-5.6168662"
+    },
+    "Villablino": {
+        "geo_loc_latitude": "42.9388713",
+        "geo_loc_longitude": "-6.3183421"
+    },
+    "Palencia": {
+        "geo_loc_latitude": "42.4096322",
+        "geo_loc_longitude": "-4.6161004"
+    },
+    "Salamanca": {
+        "geo_loc_latitude": "40.9651572",
+        "geo_loc_longitude": "-5.6640182"
+    },
+    "Carrascal De Barregas": {
+        "geo_loc_latitude": "40.9785475",
+        "geo_loc_longitude": "-5.761562"
+    },
+    "Segovia": {
+        "geo_loc_latitude": "40.9481192",
+        "geo_loc_longitude": "-4.1172101"
+    },
+    "Soria": {
+        "geo_loc_latitude": "41.6012505",
+        "geo_loc_longitude": "-2.721938"
+    },
+    "Valladolid": {
+        "geo_loc_latitude": "41.6521807",
+        "geo_loc_longitude": "-4.728605"
+    },
+    "Medina Del Campo": {
+        "geo_loc_latitude": "41.3085496",
+        "geo_loc_longitude": "-4.9150256"
+    },
+    "Zamora": {
+        "geo_loc_latitude": "41.6857693",
+        "geo_loc_longitude": "-5.942315"
+    },
+    "Benavente": {
+        "geo_loc_latitude": "42.0032862",
+        "geo_loc_longitude": "-5.6738595"
+    },
+    "Hellín": {
+        "geo_loc_latitude": "38.5106649",
+        "geo_loc_longitude": "-1.6995137"
+    },
+    "Albacete": {
+        "geo_loc_latitude": "38.9950921",
+        "geo_loc_longitude": "-1.8559154"
+    },
+    "Almansa": {
+        "geo_loc_latitude": "38.8682065",
+        "geo_loc_longitude": "-1.0978627"
+    },
+    "Villarrobledo": {
+        "geo_loc_latitude": "39.2681742",
+        "geo_loc_longitude": "-2.6042132"
+    },
+    "Ciudad Real": {
+        "geo_loc_latitude": "38.9597347",
+        "geo_loc_longitude": "-3.8828744"
+    },
+    "Alcázar De San Juan": {
+        "geo_loc_latitude": "39.3899806",
+        "geo_loc_longitude": "-3.2101376"
+    },
+    "Manzanares": {
+        "geo_loc_latitude": "38.9962242",
+        "geo_loc_longitude": "-3.3722143"
+    },
+    "Puertollano": {
+        "geo_loc_latitude": "38.6852161",
+        "geo_loc_longitude": "-4.1111749"
+    },
+    "Valdepeñas": {
+        "geo_loc_latitude": "38.7594573",
+        "geo_loc_longitude": "-3.3847392"
+    },
+    "Tomelloso": {
+        "geo_loc_latitude": "39.1585549",
+        "geo_loc_longitude": "-3.0214851"
+    },
+    "Cuenca": {
+        "geo_loc_latitude": "40.0661031",
+        "geo_loc_longitude": "-2.1313528"
+    },
+    "Guadalajara": {
+        "geo_loc_latitude": "40.7399963",
+        "geo_loc_longitude": "-2.50593"
+    },
+    "Yebes": {
+        "geo_loc_latitude": "40.5331907",
+        "geo_loc_longitude": "-3.1107441"
+    },
+    "Toledo": {
+        "geo_loc_latitude": "39.8560679",
+        "geo_loc_longitude": "-4.0239568"
+    },
+    "Talavera De La Reina": {
+        "geo_loc_latitude": "39.9603798",
+        "geo_loc_longitude": "-4.8311717"
+    },
+    "Badalona": {
+        "geo_loc_latitude": "41.4493539",
+        "geo_loc_longitude": "2.248254"
+    },
+    "Barcelona": {
+        "geo_loc_latitude": "41.3825802",
+        "geo_loc_longitude": "2.177073"
+    },
+    "L' Hospitalet De Llobregat": {
+        "geo_loc_latitude": "41.3598601",
+        "geo_loc_longitude": "2.0997927"
+    },
+    "Esplugues De Llobregat": {
+        "geo_loc_latitude": "41.3776796",
+        "geo_loc_longitude": "2.0899722"
+    },
+    "Sant Cugat Del Vallès": {
+        "geo_loc_latitude": "41.4728432",
+        "geo_loc_longitude": "2.0817809"
+    },
+    "Berga": {
+        "geo_loc_latitude": "42.1011456",
+        "geo_loc_longitude": "1.8454758"
+    },
+    "Calella": {
+        "geo_loc_latitude": "41.6132925",
+        "geo_loc_longitude": "2.6576102"
+    },
+    "Granollers": {
+        "geo_loc_latitude": "41.6079555",
+        "geo_loc_longitude": "2.2876008"
+    },
+    "Igualada": {
+        "geo_loc_latitude": "41.5790182",
+        "geo_loc_longitude": "1.617346"
     },
     "Manlleu": {
         "geo_loc_latitude": "41.9999811",
         "geo_loc_longitude": "2.2841159"
     },
     "Manresa": {
-        "geo_loc_latitude": "41.727944",
-        "geo_loc_longitude": "1.823089"
-    },
-    "Manzanares": {
-        "geo_loc_latitude": "38.9964",
-        "geo_loc_longitude": "-3.3731"
-    },
-    "Marbella": {
-        "geo_loc_latitude": "36.51543",
-        "geo_loc_longitude": "-4.88583"
+        "geo_loc_latitude": "41.7288939",
+        "geo_loc_longitude": "1.8286765"
     },
     "Martorell": {
         "geo_loc_latitude": "41.4769177",
         "geo_loc_longitude": "1.9283971"
-    },
-    "Mataró": {
-        "geo_loc_latitude": "41.540444",
-        "geo_loc_longitude": "2.443782"
-    },
-    "Medina Del Campo": {
-        "geo_loc_latitude": "41.3085496",
-        "geo_loc_longitude": "-4.9150256"
-    },
-    "Melilla": {
-        "geo_loc_latitude": "35.2919",
-        "geo_loc_longitude": "-2.93848"
-    },
-    "Mendaro": {
-        "geo_loc_latitude": "43.2525004",
-        "geo_loc_longitude": "-2.3858392"
-    },
-    "Merida": {
-        "geo_loc_latitude": "38.9000",
-        "geo_loc_longitude": "-6.3333"
-    },
-    "Mérida": {
-        "geo_loc_latitude": "38.9174665",
-        "geo_loc_longitude": "-6.3443977"
-    },
-    "Mieres": {
-        "geo_loc_latitude": "43.226388",
-        "geo_loc_longitude": "-5.781388"
-    },
-    "Minas De Riotinto": {
-        "geo_loc_latitude": "37.6934573",
-        "geo_loc_longitude": "-6.5957844"
-    },
-    "Miranda De Ebro": {
-        "geo_loc_latitude": "42.6855632",
-        "geo_loc_longitude": "-2.9478451"
-    },
-    "Mislata": {
-        "geo_loc_latitude": "39.4751444",
-        "geo_loc_longitude": "-0.4179125"
-    },
-    "Molina De Segura": {
-        "geo_loc_latitude": "38.0558899",
-        "geo_loc_longitude": "-1.2075949"
     },
     "Molins De Rei": {
         "geo_loc_latitude": "41.4138087",
@@ -779,282 +635,6 @@
         "geo_loc_latitude": "41.5393484",
         "geo_loc_longitude": "2.2130934"
     },
-    "Monforte De Lemos": {
-        "geo_loc_latitude": "42.5236693",
-        "geo_loc_longitude": "-7.5096951"
-    },
-    "Montilla": {
-        "geo_loc_latitude": "37.5811178",
-        "geo_loc_longitude": "-4.6414726"
-    },
-    "Montornès Del Vallès": {
-        "geo_loc_latitude": "41.546434",
-        "geo_loc_longitude": "2.268351"
-    },
-    "Móra D'Ebre": {
-        "geo_loc_latitude": "41.0893373",
-        "geo_loc_longitude": "0.6412887"
-    },
-    "Morón De La Frontera": {
-        "geo_loc_latitude": "37.1215305",
-        "geo_loc_longitude": "-5.4559583"
-    },
-    "Móstoles": {
-        "geo_loc_latitude": "40.3223",
-        "geo_loc_longitude": "-3.865"
-    },
-    "Motril": {
-        "geo_loc_latitude": "36.746111",
-        "geo_loc_longitude": "-3.515"
-    },
-    "Murcia": {
-        "geo_loc_latitude": "37.9861",
-        "geo_loc_longitude": "-1.1303"
-    },
-    "Muro": {
-        "geo_loc_latitude": "39.7370637",
-        "geo_loc_longitude": "3.0567069"
-    },
-    "Mutxamel": {
-        "geo_loc_latitude": "38.4134445",
-        "geo_loc_longitude": "-0.4451504"
-    },
-    "Navalcarnero": {
-        "geo_loc_latitude": "40.2877169",
-        "geo_loc_longitude": "-4.014299"
-    },
-    "Navalmoral De La Mata": {
-        "geo_loc_latitude": "39.8928306",
-        "geo_loc_longitude": "-5.5401199"
-    },
-    "Nerja": {
-        "geo_loc_latitude": "36.7468565",
-        "geo_loc_longitude": "-3.8790164"
-    },
-    "Oliana": {
-        "geo_loc_latitude": "42.0671629",
-        "geo_loc_longitude": "1.3149416"
-    },
-    "Olot": {
-        "geo_loc_latitude": "42.1822177",
-        "geo_loc_longitude": "2.4890211"
-    },
-    "Ontinyent": {
-        "geo_loc_latitude": "38.8208523",
-        "geo_loc_longitude": "-0.6099929"
-    },
-    "Orihuela": {
-        "geo_loc_latitude": "38.0856891",
-        "geo_loc_longitude": "-0.9448805"
-    },
-    "La Orotava": {
-        "geo_loc_latitude": "28.0115953",
-        "geo_loc_longitude": "-16.6672217"
-    },
-    "Osuna": {
-        "geo_loc_latitude": "37.237347",
-        "geo_loc_longitude": "-5.103482"
-    },
-    "Ourense": {
-        "geo_loc_latitude": "42.3364",
-        "geo_loc_longitude": "-7.8633"
-    },
-    "Oviedo": {
-        "geo_loc_latitude": "43.36316",
-        "geo_loc_longitude": "-5.85352"
-    },
-    "Palamós": {
-        "geo_loc_latitude": "41.8495354",
-        "geo_loc_longitude": "3.1278785"
-    },
-    "Palazuelos De Eresma": {
-        "geo_loc_latitude": "40.9303438",
-        "geo_loc_longitude": "-4.0577733"
-    },
-    "Palencia": {
-        "geo_loc_latitude": "42.0167",
-        "geo_loc_longitude": "-4.5333"
-    },
-    "Palma": {
-        "geo_loc_latitude": "39.5667",
-        "geo_loc_longitude": "2.6500"
-    },
-    "Pamplona/Iruña": {
-        "geo_loc_latitude": "42.8167",
-        "geo_loc_longitude": "-1.6500"
-    },
-    "Parla": {
-        "geo_loc_latitude": "40.2373952",
-        "geo_loc_longitude": "-3.7718902"
-    },
-    "Parres": {
-        "geo_loc_latitude": "43.3588207",
-        "geo_loc_longitude": "-5.184655747613598"
-    },
-    "Peñarroya-Pueblonuevo": {
-        "geo_loc_latitude": "38.3026178",
-        "geo_loc_longitude": "-5.2714828"
-    },
-    "O Pino": {
-        "geo_loc_latitude": "42.3968391",
-        "geo_loc_longitude": "-8.845580663850722"
-    },
-    "Plasencia": {
-        "geo_loc_latitude": "40.029921",
-        "geo_loc_longitude": "-6.090168"
-    },
-    "Poio": {
-        "geo_loc_latitude": "42.4332306",
-        "geo_loc_longitude": "-8.6590994"
-    },
-    "Ponferrada": {
-        "geo_loc_latitude": "42.5454124",
-        "geo_loc_longitude": "-6.5938719"
-    },
-    "Pontevedra": {
-        "geo_loc_latitude": "42.4318876",
-        "geo_loc_longitude": "-8.6431592"
-    },
-    "Pozo Aledo": {
-        "geo_loc_latitude": "37.8167",
-        "geo_loc_longitude": "-0.85"
-    },
-    "Pozoblanco": {
-        "geo_loc_latitude": "38.3780204",
-        "geo_loc_longitude": "-4.848573"
-    },
-    "Pozuelo De Alarcón": {
-        "geo_loc_latitude": "40.4346528",
-        "geo_loc_longitude": "-3.814834"
-    },
-    "Puente De Génave": {
-        "geo_loc_latitude": "38.3545624",
-        "geo_loc_longitude": "-2.8031995"
-    },
-    "Puente Genil": {
-        "geo_loc_latitude": "37.387395",
-        "geo_loc_longitude": "-4.7716241"
-    },
-    "Puerto De La Cruz": {
-        "geo_loc_latitude": "28.4159024",
-        "geo_loc_longitude": "-16.5532956"
-    },
-    "El Puerto De Santa María": {
-        "geo_loc_latitude": "38.68881919965739",
-        "geo_loc_longitude": "0.14439744875758234"
-    },
-    "Puerto Del Rosario": {
-        "geo_loc_latitude": "28.4993424",
-        "geo_loc_longitude": "-13.8599051"
-    },
-    "Puerto Real": {
-        "geo_loc_latitude": "36.531682",
-        "geo_loc_longitude": "-6.183047"
-    },
-    "Puertollano": {
-        "geo_loc_latitude": "38.6833",
-        "geo_loc_longitude": "-4.1167"
-    },
-    "Puig-Reig": {
-        "geo_loc_latitude": "41.9735499",
-        "geo_loc_longitude": "1.8775308"
-    },
-    "Puigcerdà": {
-        "geo_loc_latitude": "42.4317966",
-        "geo_loc_longitude": "1.9278693"
-    },
-    "Requena": {
-        "geo_loc_latitude": "39.4880777",
-        "geo_loc_longitude": "-1.1001643"
-    },
-    "Reus": {
-        "geo_loc_latitude": "41.154857",
-        "geo_loc_longitude": "1.106481"
-    },
-    "Ribeira": {
-        "geo_loc_latitude": "42.5778204",
-        "geo_loc_longitude": "-9.008342633678707"
-    },
-    "Roca Del Vallès, La": {
-        "geo_loc_latitude": "41.5874771",
-        "geo_loc_longitude": "2.3253831"
-    },
-    "Ronda": {
-        "geo_loc_latitude": "36.745518",
-        "geo_loc_longitude": "-5.163095"
-    },
-    "Sabadell": {
-        "geo_loc_latitude": "41.5421013",
-        "geo_loc_longitude": "2.1138977"
-    },
-    "Sádaba": {
-        "geo_loc_latitude": "42.2820748",
-        "geo_loc_longitude": "-1.2717767"
-    },
-    "Sagunt/Sagunto": {
-        "geo_loc_latitude": "39.6792916",
-        "geo_loc_longitude": "-0.2786451"
-    },
-    "Salamanca": {
-        "geo_loc_latitude": "40.9667",
-        "geo_loc_longitude": "-5.6639"
-    },
-    "Salou": {
-        "geo_loc_latitude": "41.0768193",
-        "geo_loc_longitude": "1.1440411"
-    },
-    "Salt": {
-        "geo_loc_latitude": "41.9741672",
-        "geo_loc_longitude": "2.7949886"
-    },
-    "San Antonio De Benagéber": {
-        "geo_loc_latitude": "39.5619478",
-        "geo_loc_longitude": "-0.5001275"
-    },
-    "San Bartolomé De Tirajana": {
-        "geo_loc_latitude": "27.9252512",
-        "geo_loc_longitude": "-15.5729983"
-    },
-    "San Cristóbal De La Laguna": {
-        "geo_loc_latitude": "28.4857715",
-        "geo_loc_longitude": "-16.3159422"
-    },
-    "San Fernando": {
-        "geo_loc_latitude": "36.4646672",
-        "geo_loc_longitude": "-6.1983492"
-    },
-    "San Javier": {
-        "geo_loc_latitude": "37.8096655",
-        "geo_loc_longitude": "-0.8219942"
-    },
-    "San Lorenzo De El Escorial": {
-        "geo_loc_latitude": "40.5926673",
-        "geo_loc_longitude": "-4.1471642"
-    },
-    "San Pedro Del Pinatar": {
-        "geo_loc_latitude": "37.831272",
-        "geo_loc_longitude": "-0.7909452"
-    },
-    "San Sebastián De La Gomera": {
-        "geo_loc_latitude": "28.0910382",
-        "geo_loc_longitude": "-17.1110077"
-    },
-    "San Sebastián De Los Reyes": {
-        "geo_loc_latitude": "40.5473698",
-        "geo_loc_longitude": "-3.6260586"
-    },
-    "Sant Vicent Del Raspeig/San Vicente Del Raspeig": {
-        "geo_loc_latitude": "38.3903357",
-        "geo_loc_longitude": "-0.52079"
-    },
-    "Sanlúcar De Barrameda": {
-        "geo_loc_latitude": "36.7761393",
-        "geo_loc_longitude": "-6.3534794"
-    },
-    "Sant Andreu De Llavaneres": {
-        "geo_loc_latitude": "41.5739524",
-        "geo_loc_longitude": "2.4828158"
-    },
     "Sant Boi De Llobregat": {
         "geo_loc_latitude": "41.3459033",
         "geo_loc_longitude": "2.0413673"
@@ -1063,348 +643,720 @@
         "geo_loc_latitude": "41.6895041",
         "geo_loc_longitude": "2.4914526"
     },
-    "Sant Cugat Del Vallès": {
-        "geo_loc_latitude": "41.4728432",
-        "geo_loc_longitude": "2.0817809"
-    },
-    "Sant Esteve Sesrovires": {
-        "geo_loc_latitude": "41.4932429",
-        "geo_loc_longitude": "1.8747348"
-    },
-    "Sant Joan D'Alacant": {
-        "geo_loc_latitude": "38.4014162",
-        "geo_loc_longitude": "-0.4359957"
-    },
-    "Sant Joan De Vilatorrada": {
-        "geo_loc_latitude": "41.7422073",
-        "geo_loc_longitude": "1.803625"
-    },
-    "Sant Joan Despí": {
-        "geo_loc_latitude": "41.3667951",
-        "geo_loc_longitude": "2.0570346"
+    "Vilassar De Mar": {
+        "geo_loc_latitude": "41.5064041",
+        "geo_loc_longitude": "2.3913883"
     },
     "Sant Pere De Ribes": {
         "geo_loc_latitude": "41.2619218",
         "geo_loc_longitude": "1.7721357"
     },
-    "Santa Brígida": {
-        "geo_loc_latitude": "28.035684",
-        "geo_loc_longitude": "-15.4974676"
-    },
     "Santa Coloma De Gramenet": {
-        "geo_loc_latitude": "41.448215",
-        "geo_loc_longitude": "2.211027"
-    },
-    "Santa Cruz De Bezana": {
-        "geo_loc_latitude": "43.4429266",
-        "geo_loc_longitude": "-3.9048376"
-    },
-    "Santa Cruz De La Palma": {
-        "geo_loc_latitude": "28.6818901",
-        "geo_loc_longitude": "-17.7663354"
-    },
-    "Santa Cruz De Tenerife": {
-        "geo_loc_latitude": "28.4667",
-        "geo_loc_longitude": "-16.2500"
-    },
-    "Santa María De Guía De Gran Canaria": {
-        "geo_loc_latitude": "28.1390522",
-        "geo_loc_longitude": "-15.6318282"
-    },
-    "Santa Oliva": {
-        "geo_loc_latitude": "41.2532889",
-        "geo_loc_longitude": "1.5510139"
-    },
-    "Santander": {
-        "geo_loc_latitude": "43.4628",
-        "geo_loc_longitude": "-3.8050"
-    },
-    "Santiago De Compostela": {
-        "geo_loc_latitude": "42.8833",
-        "geo_loc_longitude": "-8.55"
-    },
-    "Santurtzi": {
-        "geo_loc_latitude": "43.3287527",
-        "geo_loc_longitude": "-3.0318766"
-    },
-    "Segovia": {
-        "geo_loc_latitude": "40.9481",
-        "geo_loc_longitude": "-4.1184"
-    },
-    "Serra": {
-        "geo_loc_latitude": "39.6851966",
-        "geo_loc_longitude": "-0.4281287"
-    },
-    "La Seu D'Urgell": {
-        "geo_loc_latitude": "42.35734445",
-        "geo_loc_longitude": "1.462152658645443"
-    },
-    "Sevilla": {
-        "geo_loc_latitude": "37.3900",
-        "geo_loc_longitude": "-5.9900"
-    },
-    "Solsona": {
-        "geo_loc_latitude": "41.9945762",
-        "geo_loc_longitude": "1.5184038"
-    },
-    "Soria": {
-        "geo_loc_latitude": "41.7667",
-        "geo_loc_longitude": "-2.4667"
-    },
-    "Tacoronte": {
-        "geo_loc_latitude": "28.4805316",
-        "geo_loc_longitude": "-16.4137605"
-    },
-    "Talarrubias": {
-        "geo_loc_latitude": "39.03702",
-        "geo_loc_longitude": "-5.2335687"
-    },
-    "Talavera De La Reina": {
-        "geo_loc_latitude": "39.95",
-        "geo_loc_longitude": "-4.8333"
-    },
-    "Tarragona": {
-        "geo_loc_latitude": "41.1187",
-        "geo_loc_longitude": "1.2453"
-    },
-    "Teguise": {
-        "geo_loc_latitude": "29.0592518",
-        "geo_loc_longitude": "-13.5602184"
-    },
-    "Telde": {
-        "geo_loc_latitude": "27.9984538",
-        "geo_loc_longitude": "-15.4166761"
+        "geo_loc_latitude": "41.4515626",
+        "geo_loc_longitude": "2.2083371"
     },
     "Terrassa": {
         "geo_loc_latitude": "41.5629623",
         "geo_loc_longitude": "2.0100492"
     },
-    "Teruel": {
-        "geo_loc_latitude": "40.3456",
-        "geo_loc_longitude": "-1.1065"
-    },
-    "Tías": {
-        "geo_loc_latitude": "28.9543147",
-        "geo_loc_longitude": "-13.6529153"
-    },
-    "Toledo": {
-        "geo_loc_latitude": "39.8567",
-        "geo_loc_longitude": "-4.0244"
-    },
-    "Tolosa": {
-        "geo_loc_latitude": "43.1386097",
-        "geo_loc_longitude": "-2.0723558"
-    },
-    "Tomelloso": {
-        "geo_loc_latitude": "39.15844",
-        "geo_loc_longitude": "-3.02090"
-    },
-    "Torrejón De Ardoz": {
-        "geo_loc_latitude": "40.4587767",
-        "geo_loc_longitude": "-3.4793343"
-    },
-    "Torrelavega": {
-        "geo_loc_latitude": "43.3487303",
-        "geo_loc_longitude": "-4.0515082"
-    },
-    "Torrelodones": {
-        "geo_loc_latitude": "40.5762809",
-        "geo_loc_longitude": "-3.928603"
-    },
-    "Torremolinos": {
-        "geo_loc_latitude": "36.6242841",
-        "geo_loc_longitude": "-4.4995448"
-    },
-    "Torrevieja": {
-        "geo_loc_latitude": "37.9775416",
-        "geo_loc_longitude": "-0.6828446"
-    },
-    "Tortosa": {
-        "geo_loc_latitude": "40.814140",
-        "geo_loc_longitude": "0.522052"
-    },
-    "Tremp": {
-        "geo_loc_latitude": "42.1669782",
-        "geo_loc_longitude": "0.8950137"
-    },
-    "Tudela": {
-        "geo_loc_latitude": "42.060165",
-        "geo_loc_longitude": "-1.608065"
-    },
-    "Úbeda": {
-        "geo_loc_latitude": "38.0111398",
-        "geo_loc_longitude": "-3.3719098"
-    },
-    "Urdúliz": {
-        "geo_loc_latitude": "43.375278",
-        "geo_loc_longitude": "-2.960000"
-    },
-    "Usurbil": {
-        "geo_loc_latitude": "43.2703088",
-        "geo_loc_longitude": "-2.0502559"
-    },
-    "Utrera": {
-        "geo_loc_latitude": "37.1824646",
-        "geo_loc_longitude": "-5.7817506"
-    },
-    "Valdemoro": {
-        "geo_loc_latitude": "40.1888604",
-        "geo_loc_longitude": "-3.67143"
-    },
-    "Valdepeñas": {
-        "geo_loc_latitude": "38.7667",
-        "geo_loc_longitude": "-3.4000"
-    },
-    "Valdés": {
-        "geo_loc_latitude": "43.4847858",
-        "geo_loc_longitude": "-6.4693693190585435"
-    },
-    "València": {
-        "geo_loc_latitude": "39.4700",
-        "geo_loc_longitude": "-0.3764"
-    },
-    "La Vall De Laguar": {
-        "geo_loc_latitude": "38.76737255",
-        "geo_loc_longitude": "-0.1330206353554161"
-    },
-    "Valladolid": {
-        "geo_loc_latitude": "41.6528",
-        "geo_loc_longitude": "-4.7236"
-    },
-    "Valls": {
-        "geo_loc_latitude": "41.2835355",
-        "geo_loc_longitude": "1.2473637"
-    },
-    "Valverde": {
-        "geo_loc_latitude": "27.809685",
-        "geo_loc_longitude": "-17.9151468"
-    },
-    "Vélez-Málaga": {
-        "geo_loc_latitude": "36.7818354",
-        "geo_loc_longitude": "-4.0988099"
-    },
-    "El Vendrell": {
-        "geo_loc_latitude": "41.218778900000004",
-        "geo_loc_longitude": "1.5317501324786442"
-    },
-    "Verín": {
-        "geo_loc_latitude": "41.9406091",
-        "geo_loc_longitude": "-7.4406032"
-    },
     "Vic": {
         "geo_loc_latitude": "41.9302021",
         "geo_loc_longitude": "2.2545943"
-    },
-    "Vielha E Mijaran": {
-        "geo_loc_latitude": "42.7017572",
-        "geo_loc_longitude": "0.7954744"
-    },
-    "Vigo": {
-        "geo_loc_latitude": "42.2314",
-        "geo_loc_longitude": "-8.7124"
-    },
-    "Vila-Real": {
-        "geo_loc_latitude": "39.9372616",
-        "geo_loc_longitude": "-0.1004465"
-    },
-    "Vila-Seca": {
-        "geo_loc_latitude": "41.1109268",
-        "geo_loc_longitude": "1.144961"
-    },
-    "Viladecans": {
-        "geo_loc_latitude": "41.3163083",
-        "geo_loc_longitude": "2.0156034"
-    },
-    "Viladecavalls": {
-        "geo_loc_latitude": "41.552843",
-        "geo_loc_longitude": "1.952722"
-    },
-    "Vilafranca Del Penedès": {
-        "geo_loc_latitude": "41.3463825",
-        "geo_loc_longitude": "1.6995213"
-    },
-    "Vilagarcía De Arousa": {
-        "geo_loc_latitude": "42.5950502",
-        "geo_loc_longitude": "-8.74305369469426"
     },
     "Vilanova I La Geltrú": {
         "geo_loc_latitude": "41.2241992",
         "geo_loc_longitude": "1.7256327"
     },
-    "Vilassar De Mar": {
-        "geo_loc_latitude": "41.5064041",
-        "geo_loc_longitude": "2.3913883"
+    "Sabadell": {
+        "geo_loc_latitude": "41.5421013",
+        "geo_loc_longitude": "2.1138977"
     },
-    "Villa Del Prado": {
-        "geo_loc_latitude": "40.2764752",
-        "geo_loc_longitude": "-4.3048032"
+    "Viladecans": {
+        "geo_loc_latitude": "41.3163083",
+        "geo_loc_longitude": "2.0156034"
     },
-    "Villablino": {
-        "geo_loc_latitude": "42.9388713",
-        "geo_loc_longitude": "-6.3183421"
+    "Alella": {
+        "geo_loc_latitude": "41.4952867",
+        "geo_loc_longitude": "2.2942758"
+    },
+    "Mataró": {
+        "geo_loc_latitude": "41.5398348",
+        "geo_loc_longitude": "2.4448926"
+    },
+    "Puig-Reig": {
+        "geo_loc_latitude": "41.9735499",
+        "geo_loc_longitude": "1.8775308"
+    },
+    "Sant Andreu De Llavaneres": {
+        "geo_loc_latitude": "41.5739524",
+        "geo_loc_longitude": "2.4828158"
+    },
+    "Caldes De Montbui": {
+        "geo_loc_latitude": "41.632265",
+        "geo_loc_longitude": "2.1676442"
+    },
+    "L' Ametlla Del Vallès": {
+        "geo_loc_latitude": "41.669334",
+        "geo_loc_longitude": "2.2614527"
+    },
+    "Arenys De Munt": {
+        "geo_loc_latitude": "41.6095429",
+        "geo_loc_longitude": "2.5400513"
+    },
+    "Vilafranca Del Penedès": {
+        "geo_loc_latitude": "41.3463825",
+        "geo_loc_longitude": "1.6995213"
+    },
+    "Canet De Mar": {
+        "geo_loc_latitude": "41.5900933",
+        "geo_loc_longitude": "2.5777998"
+    },
+    "Sant Esteve Sesrovires": {
+        "geo_loc_latitude": "41.4932429",
+        "geo_loc_longitude": "1.8747348"
+    },
+    "Cornellà De Llobregat": {
+        "geo_loc_latitude": "41.355724",
+        "geo_loc_longitude": "2.0706225"
+    },
+    "Sant Joan Despí": {
+        "geo_loc_latitude": "41.3667951",
+        "geo_loc_longitude": "2.0570346"
+    },
+    "Argentona": {
+        "geo_loc_latitude": "41.5554326",
+        "geo_loc_longitude": "2.4002787"
+    },
+    "Banyoles": {
+        "geo_loc_latitude": "42.1180477",
+        "geo_loc_longitude": "2.7653607"
+    },
+    "Blanes": {
+        "geo_loc_latitude": "41.6756178",
+        "geo_loc_longitude": "2.7932391"
+    },
+    "Campdevànol": {
+        "geo_loc_latitude": "42.2230582",
+        "geo_loc_longitude": "2.1680717"
+    },
+    "Figueres": {
+        "geo_loc_latitude": "42.2666314",
+        "geo_loc_longitude": "2.9638434"
+    },
+    "Girona": {
+        "geo_loc_latitude": "41.9793006",
+        "geo_loc_longitude": "2.8199439"
+    },
+    "Salt": {
+        "geo_loc_latitude": "41.9741672",
+        "geo_loc_longitude": "2.7949886"
+    },
+    "Lloret De Mar": {
+        "geo_loc_latitude": "41.6973503",
+        "geo_loc_longitude": "2.8392392"
+    },
+    "Olot": {
+        "geo_loc_latitude": "42.1822177",
+        "geo_loc_longitude": "2.4890211"
+    },
+    "Palamós": {
+        "geo_loc_latitude": "41.8495354",
+        "geo_loc_longitude": "3.1278785"
+    },
+    "Puigcerdà": {
+        "geo_loc_latitude": "42.4317966",
+        "geo_loc_longitude": "1.9278693"
+    },
+    "Lleida": {
+        "geo_loc_latitude": "41.6147605",
+        "geo_loc_longitude": "0.6267842"
+    },
+    "La Seu D'Urgell": {
+        "geo_loc_latitude": "42.3575723",
+        "geo_loc_longitude": "1.4560067"
+    },
+    "Tremp": {
+        "geo_loc_latitude": "42.1669782",
+        "geo_loc_longitude": "0.8950137"
+    },
+    "Vielha E Mijaran": {
+        "geo_loc_latitude": "42.7017572",
+        "geo_loc_longitude": "0.7954744"
+    },
+    "Solsona": {
+        "geo_loc_latitude": "41.9945762",
+        "geo_loc_longitude": "1.5184038"
+    },
+    "Balaguer": {
+        "geo_loc_latitude": "41.7897204",
+        "geo_loc_longitude": "0.8054914"
+    },
+    "Alpicat": {
+        "geo_loc_latitude": "41.6651189",
+        "geo_loc_longitude": "0.5560656"
+    },
+    "Oliana": {
+        "geo_loc_latitude": "42.0671629",
+        "geo_loc_longitude": "1.3149416"
+    },
+    "Reus": {
+        "geo_loc_latitude": "41.1555564",
+        "geo_loc_longitude": "1.1076133"
+    },
+    "Tarragona": {
+        "geo_loc_latitude": "41.1172364",
+        "geo_loc_longitude": "1.2546057"
+    },
+    "Tortosa": {
+        "geo_loc_latitude": "40.8110158",
+        "geo_loc_longitude": "0.5209333"
+    },
+    "Móra D'Ebre": {
+        "geo_loc_latitude": "41.0893373",
+        "geo_loc_longitude": "0.6412887"
+    },
+    "Valls": {
+        "geo_loc_latitude": "41.2835355",
+        "geo_loc_longitude": "1.2458562"
+    },
+    "Santa Oliva": {
+        "geo_loc_latitude": "41.2532889",
+        "geo_loc_longitude": "1.5495064"
+    },
+    "Amposta": {
+        "geo_loc_latitude": "40.7079905",
+        "geo_loc_longitude": "0.5812561"
+    },
+    "Vila-Seca": {
+        "geo_loc_latitude": "41.1109268",
+        "geo_loc_longitude": "1.144961"
+    },
+    "El Vendrell": {
+        "geo_loc_latitude": "41.2199677",
+        "geo_loc_longitude": "1.5348566"
+    },
+    "Salou": {
+        "geo_loc_latitude": "41.0768193",
+        "geo_loc_longitude": "1.1440411"
+    },
+    "La Vall De Laguar": {
+        "geo_loc_latitude": "38.7673725",
+        "geo_loc_longitude": "-0.1330206"
+    },
+    "Dénia": {
+        "geo_loc_latitude": "38.8408382",
+        "geo_loc_longitude": "0.1061105"
+    },
+    "Sant Vicent Del Raspeig/San Vicente Del Raspeig": {
+        "geo_loc_latitude": "38.3964248",
+        "geo_loc_longitude": "-0.5250339"
+    },
+    "Alacant/Alicante": {
+        "geo_loc_latitude": "38.3436365",
+        "geo_loc_longitude": "-0.4881708"
+    },
+    "Alcoi/Alcoy": {
+        "geo_loc_latitude": "38.6982348",
+        "geo_loc_longitude": "-0.4747619"
     },
     "La Vila Joiosa/Villajoyosa": {
         "geo_loc_latitude": "38.5100778",
         "geo_loc_longitude": "-0.2296202"
     },
-    "Villamartín": {
-        "geo_loc_latitude": "36.8591822",
-        "geo_loc_longitude": "-5.6434544"
+    "Elx/Elche": {
+        "geo_loc_latitude": "38.2653307",
+        "geo_loc_longitude": "-0.6988391"
     },
-    "Villanueva De La Serena": {
-        "geo_loc_latitude": "38.9736819",
-        "geo_loc_longitude": "-5.8003669"
+    "Benidorm": {
+        "geo_loc_latitude": "38.5406255",
+        "geo_loc_longitude": "-0.1290929"
     },
-    "Villaquilambre": {
-        "geo_loc_latitude": "42.6469775",
-        "geo_loc_longitude": "-5.5596277"
+    "Orihuela": {
+        "geo_loc_latitude": "38.0856891",
+        "geo_loc_longitude": "-0.9448805"
     },
-    "Villarrobledo": {
-        "geo_loc_latitude": "39.2681742",
-        "geo_loc_longitude": "-2.6042132"
+    "Torrevieja": {
+        "geo_loc_latitude": "37.9775416",
+        "geo_loc_longitude": "-0.6828446"
+    },
+    "Elda": {
+        "geo_loc_latitude": "38.4789671",
+        "geo_loc_longitude": "-0.7956759"
+    },
+    "Sant Joan D'Alacant": {
+        "geo_loc_latitude": "38.4014162",
+        "geo_loc_longitude": "-0.4359957"
+    },
+    "Mutxamel": {
+        "geo_loc_latitude": "38.4290499",
+        "geo_loc_longitude": "-0.4643725"
+    },
+    "Vila-Real": {
+        "geo_loc_latitude": "39.9372616",
+        "geo_loc_longitude": "-0.1004465"
+    },
+    "Castelló De La Plana": {
+        "geo_loc_latitude": "39.9860347",
+        "geo_loc_longitude": "-0.0377354"
     },
     "Vinaròs": {
         "geo_loc_latitude": "40.4703992",
         "geo_loc_longitude": "0.4746076"
     },
-    "Vitoria-Gasteiz": {
-        "geo_loc_latitude": "42.8465088",
-        "geo_loc_longitude": "-2.6724025"
+    "València": {
+        "geo_loc_latitude": "39.4697065",
+        "geo_loc_longitude": "-0.3763353"
+    },
+    "Gandia": {
+        "geo_loc_latitude": "38.9675925",
+        "geo_loc_longitude": "-0.1803423"
+    },
+    "Mislata": {
+        "geo_loc_latitude": "39.4751444",
+        "geo_loc_longitude": "-0.4179125"
+    },
+    "Godella": {
+        "geo_loc_latitude": "39.5184276",
+        "geo_loc_longitude": "-0.4103168"
+    },
+    "Requena": {
+        "geo_loc_latitude": "39.4880777",
+        "geo_loc_longitude": "-1.1001643"
     },
     "Xàtiva": {
         "geo_loc_latitude": "38.988085",
         "geo_loc_longitude": "-0.5200428"
     },
-    "Yebes": {
-        "geo_loc_latitude": "40.5331907",
-        "geo_loc_longitude": "-3.1107441"
+    "Sagunt/Sagunto": {
+        "geo_loc_latitude": "39.6792916",
+        "geo_loc_longitude": "-0.2786451"
     },
-    "Yecla": {
-        "geo_loc_latitude": "38.6135956",
-        "geo_loc_longitude": "-1.1157882"
+    "Carcaixent": {
+        "geo_loc_latitude": "39.1209651",
+        "geo_loc_longitude": "-0.4472814"
+    },
+    "San Antonio De Benagéber": {
+        "geo_loc_latitude": "39.5619478",
+        "geo_loc_longitude": "-0.5001275"
+    },
+    "Alzira": {
+        "geo_loc_latitude": "39.151212",
+        "geo_loc_longitude": "-0.4346556"
+    },
+    "Serra": {
+        "geo_loc_latitude": "39.6851966",
+        "geo_loc_longitude": "-0.4281287"
+    },
+    "Ontinyent": {
+        "geo_loc_latitude": "38.8208523",
+        "geo_loc_longitude": "-0.6099929"
+    },
+    "Bétera": {
+        "geo_loc_latitude": "39.5917307",
+        "geo_loc_longitude": "-0.4622695"
+    },
+    "Manises": {
+        "geo_loc_latitude": "39.492989",
+        "geo_loc_longitude": "-0.4621429"
+    },
+    "Llíria": {
+        "geo_loc_latitude": "39.6251478",
+        "geo_loc_longitude": "-0.5952749"
+    },
+    "Burjassot": {
+        "geo_loc_latitude": "39.5090599",
+        "geo_loc_longitude": "-0.4108581"
+    },
+    "Badajoz": {
+        "geo_loc_latitude": "38.878187",
+        "geo_loc_longitude": "-6.9701115"
+    },
+    "Don Benito": {
+        "geo_loc_latitude": "38.9540269",
+        "geo_loc_longitude": "-5.8619466"
+    },
+    "Almendralejo": {
+        "geo_loc_latitude": "38.6846791",
+        "geo_loc_longitude": "-6.4067802"
+    },
+    "Llerena": {
+        "geo_loc_latitude": "38.2378976",
+        "geo_loc_longitude": "-6.0149901"
+    },
+    "Mérida": {
+        "geo_loc_latitude": "38.9174665",
+        "geo_loc_longitude": "-6.3443977"
     },
     "Zafra": {
         "geo_loc_latitude": "38.4253489",
         "geo_loc_longitude": "-6.4193627"
     },
+    "Talarrubias": {
+        "geo_loc_latitude": "39.03702",
+        "geo_loc_longitude": "-5.2335687"
+    },
+    "Cáceres": {
+        "geo_loc_latitude": "39.4020024",
+        "geo_loc_longitude": "-6.4545805"
+    },
+    "Coria": {
+        "geo_loc_latitude": "39.9831574",
+        "geo_loc_longitude": "-6.5366803"
+    },
+    "Navalmoral De La Mata": {
+        "geo_loc_latitude": "39.8928306",
+        "geo_loc_longitude": "-5.5401199"
+    },
+    "Plasencia": {
+        "geo_loc_latitude": "40.029921",
+        "geo_loc_longitude": "-6.090168"
+    },
+    "O Pino": {
+        "geo_loc_latitude": "42.9454899",
+        "geo_loc_longitude": "-8.3502207"
+    },
+    "A Coruña": {
+        "geo_loc_latitude": "43.3709703",
+        "geo_loc_longitude": "-8.3959425"
+    },
+    "Ferrol": {
+        "geo_loc_latitude": "43.4845713",
+        "geo_loc_longitude": "-8.2329968"
+    },
+    "Santiago De Compostela": {
+        "geo_loc_latitude": "42.8804219",
+        "geo_loc_longitude": "-8.5458608"
+    },
+    "Ribeira": {
+        "geo_loc_latitude": "42.5778204",
+        "geo_loc_longitude": "-9.0083426"
+    },
+    "Cee": {
+        "geo_loc_latitude": "42.9575581",
+        "geo_loc_longitude": "-9.1917202"
+    },
+    "Lugo": {
+        "geo_loc_latitude": "43.0396042",
+        "geo_loc_longitude": "-7.4566072"
+    },
+    "Burela": {
+        "geo_loc_latitude": "43.6606329",
+        "geo_loc_longitude": "-7.3587521"
+    },
+    "Monforte De Lemos": {
+        "geo_loc_latitude": "42.5236693",
+        "geo_loc_longitude": "-7.5096951"
+    },
+    "Ourense": {
+        "geo_loc_latitude": "42.1939629",
+        "geo_loc_longitude": "-7.537124"
+    },
+    "O Barco De Valdeorras": {
+        "geo_loc_latitude": "42.4301028",
+        "geo_loc_longitude": "-6.9801028"
+    },
+    "Verín": {
+        "geo_loc_latitude": "41.9406091",
+        "geo_loc_longitude": "-7.4406032"
+    },
+    "Vigo": {
+        "geo_loc_latitude": "42.2376602",
+        "geo_loc_longitude": "-8.7247205"
+    },
+    "Pontevedra": {
+        "geo_loc_latitude": "42.4318876",
+        "geo_loc_longitude": "-8.6431592"
+    },
+    "Vilagarcía De Arousa": {
+        "geo_loc_latitude": "42.5950502",
+        "geo_loc_longitude": "-8.7430537"
+    },
+    "Majadahonda": {
+        "geo_loc_latitude": "40.4728425",
+        "geo_loc_longitude": "-3.8723542"
+    },
+    "Ciempozuelos": {
+        "geo_loc_latitude": "40.1580087",
+        "geo_loc_longitude": "-3.6205514"
+    },
+    "Madrid": {
+        "geo_loc_latitude": "40.4167047",
+        "geo_loc_longitude": "-3.7035825"
+    },
+    "San Lorenzo De El Escorial": {
+        "geo_loc_latitude": "40.5926673",
+        "geo_loc_longitude": "-4.1471642"
+    },
+    "Cercedilla": {
+        "geo_loc_latitude": "40.7412931",
+        "geo_loc_longitude": "-4.0558002"
+    },
+    "Móstoles": {
+        "geo_loc_latitude": "40.3238525",
+        "geo_loc_longitude": "-3.8649214"
+    },
+    "Coslada": {
+        "geo_loc_latitude": "40.423802",
+        "geo_loc_longitude": "-3.5552882"
+    },
+    "Guadarrama": {
+        "geo_loc_latitude": "40.6734454",
+        "geo_loc_longitude": "-4.0893911"
+    },
+    "Alcalá De Henares": {
+        "geo_loc_latitude": "40.481954",
+        "geo_loc_longitude": "-3.363981"
+    },
+    "Leganés": {
+        "geo_loc_latitude": "40.3281942",
+        "geo_loc_longitude": "-3.76527"
+    },
+    "Getafe": {
+        "geo_loc_latitude": "40.3070639",
+        "geo_loc_longitude": "-3.7331808"
+    },
+    "Alcorcón": {
+        "geo_loc_latitude": "40.3492998",
+        "geo_loc_longitude": "-3.8284295"
+    },
+    "Boadilla Del Monte": {
+        "geo_loc_latitude": "40.4053485",
+        "geo_loc_longitude": "-3.8764663"
+    },
+    "Fuenlabrada": {
+        "geo_loc_latitude": "40.282476",
+        "geo_loc_longitude": "-3.7923422"
+    },
+    "Torrelodones": {
+        "geo_loc_latitude": "40.5762809",
+        "geo_loc_longitude": "-3.928603"
+    },
+    "Brunete": {
+        "geo_loc_latitude": "40.4050499",
+        "geo_loc_longitude": "-3.9979912"
+    },
+    "Pozuelo De Alarcón": {
+        "geo_loc_latitude": "40.4346528",
+        "geo_loc_longitude": "-3.814834"
+    },
+    "Valdemoro": {
+        "geo_loc_latitude": "40.1888604",
+        "geo_loc_longitude": "-3.67143"
+    },
+    "San Sebastián De Los Reyes": {
+        "geo_loc_latitude": "40.5473698",
+        "geo_loc_longitude": "-3.6260586"
+    },
+    "Parla": {
+        "geo_loc_latitude": "40.2373952",
+        "geo_loc_longitude": "-3.7718902"
+    },
+    "Aranjuez": {
+        "geo_loc_latitude": "40.03221",
+        "geo_loc_longitude": "-3.6039604"
+    },
+    "Arganda Del Rey": {
+        "geo_loc_latitude": "40.3007708",
+        "geo_loc_longitude": "-3.4380688"
+    },
+    "Torrejón De Ardoz": {
+        "geo_loc_latitude": "40.4587767",
+        "geo_loc_longitude": "-3.4793343"
+    },
+    "Collado Villalba": {
+        "geo_loc_latitude": "40.6483467",
+        "geo_loc_longitude": "-3.9819765"
+    },
+    "Rivas-Vaciamadrid": {
+        "geo_loc_latitude": "40.3536054",
+        "geo_loc_longitude": "-3.5310879"
+    },
+    "Cartagena": {
+        "geo_loc_latitude": "37.6152488",
+        "geo_loc_longitude": "-0.9876857"
+    },
+    "Molina De Segura": {
+        "geo_loc_latitude": "38.0572339",
+        "geo_loc_longitude": "-1.2095298"
+    },
+    "Murcia": {
+        "geo_loc_latitude": "37.9923795",
+        "geo_loc_longitude": "-1.1305431"
+    },
+    "San Pedro Del Pinatar": {
+        "geo_loc_latitude": "37.831272",
+        "geo_loc_longitude": "-0.7909452"
+    },
+    "San Javier": {
+        "geo_loc_latitude": "37.8059567",
+        "geo_loc_longitude": "-0.8345537"
+    },
+    "Cieza": {
+        "geo_loc_latitude": "38.2392273",
+        "geo_loc_longitude": "-1.418875"
+    },
+    "Yecla": {
+        "geo_loc_latitude": "38.6135956",
+        "geo_loc_longitude": "-1.1157882"
+    },
+    "Caravaca De La Cruz": {
+        "geo_loc_latitude": "38.1046979",
+        "geo_loc_longitude": "-1.861118"
+    },
+    "Lorca": {
+        "geo_loc_latitude": "37.6711989",
+        "geo_loc_longitude": "-1.6988592"
+    },
+    "Alcantarilla": {
+        "geo_loc_latitude": "37.9680649",
+        "geo_loc_longitude": "-1.2149543"
+    },
+    "Cehegín": {
+        "geo_loc_latitude": "38.0925078",
+        "geo_loc_longitude": "-1.7987525"
+    },
+    "Tudela": {
+        "geo_loc_latitude": "42.063972",
+        "geo_loc_longitude": "-1.6053391"
+    },
+    "Estella-Lizarra": {
+        "geo_loc_latitude": "42.672094",
+        "geo_loc_longitude": "-2.0314834"
+    },
+    "Pamplona/Iruña": {
+        "geo_loc_latitude": "42.815686",
+        "geo_loc_longitude": "-1.6522353"
+    },
+    "Baztan": {
+        "geo_loc_latitude": "43.1628957",
+        "geo_loc_longitude": "-1.4935352"
+    },
+    "Altsasu/Alsasua": {
+        "geo_loc_latitude": "42.9104705",
+        "geo_loc_longitude": "-2.1791811"
+    },
+    "Vitoria-Gasteiz": {
+        "geo_loc_latitude": "42.8465088",
+        "geo_loc_longitude": "-2.6724025"
+    },
+    "Laguardia": {
+        "geo_loc_latitude": "42.5535011",
+        "geo_loc_longitude": "-2.5850848"
+    },
+    "Donostia/San Sebastián": {
+        "geo_loc_latitude": "43.3224219",
+        "geo_loc_longitude": "-1.9838889"
+    },
+    "Hondarribia": {
+        "geo_loc_latitude": "43.3624468",
+        "geo_loc_longitude": "-1.7914309"
+    },
+    "Mendaro": {
+        "geo_loc_latitude": "43.2525004",
+        "geo_loc_longitude": "-2.3858392"
+    },
+    "Arrasate/Mondragón": {
+        "geo_loc_latitude": "43.0656783",
+        "geo_loc_longitude": "-2.4900779"
+    },
+    "Tolosa": {
+        "geo_loc_latitude": "43.1386097",
+        "geo_loc_longitude": "-2.0723558"
+    },
+    "Zumarraga": {
+        "geo_loc_latitude": "43.0859968",
+        "geo_loc_longitude": "-2.3140925"
+    },
+    "Usurbil": {
+        "geo_loc_latitude": "43.2703088",
+        "geo_loc_longitude": "-2.0502559"
+    },
+    "Bilbao": {
+        "geo_loc_latitude": "43.2630018",
+        "geo_loc_longitude": "-2.9350039"
+    },
+    "Barakaldo": {
+        "geo_loc_latitude": "43.29548",
+        "geo_loc_longitude": "-2.9900933"
+    },
+    "Usansolo": {
+        "geo_loc_latitude": "43.2185696",
+        "geo_loc_longitude": "-2.818861"
+    },
+    "Santurtzi": {
+        "geo_loc_latitude": "43.3287527",
+        "geo_loc_longitude": "-3.0318766"
+    },
+    "Erandio": {
+        "geo_loc_latitude": "43.3055981",
+        "geo_loc_longitude": "-2.9729697"
+    },
+    "Gorliz": {
+        "geo_loc_latitude": "43.4127349",
+        "geo_loc_longitude": "-2.9375015"
+    },
+    "Bermeo": {
+        "geo_loc_latitude": "43.4194242",
+        "geo_loc_longitude": "-2.7231562"
+    },
     "Zaldibar": {
         "geo_loc_latitude": "43.1697719",
         "geo_loc_longitude": "-2.548773"
-    },
-    "Zamora": {
-        "geo_loc_latitude": "41.5033",
-        "geo_loc_longitude": "-5.7556"
     },
     "Zamudio": {
         "geo_loc_latitude": "43.2827605",
         "geo_loc_longitude": "-2.8623645"
     },
-    "Zaragoza": {
-        "geo_loc_latitude": "41.6483",
-        "geo_loc_longitude": "-0.8830"
+    "Urduliz": {
+        "geo_loc_latitude": "43.3730856",
+        "geo_loc_longitude": "-2.9483534"
     },
-    "Zumarraga": {
-        "geo_loc_latitude": "43.0859968",
-        "geo_loc_longitude": "-2.3140925"
+    "Logroño": {
+        "geo_loc_latitude": "42.4661196",
+        "geo_loc_longitude": "-2.4396676"
+    },
+    "Lardero": {
+        "geo_loc_latitude": "42.4272883",
+        "geo_loc_longitude": "-2.4624393"
+    },
+    "Haro": {
+        "geo_loc_latitude": "42.5768922",
+        "geo_loc_longitude": "-2.8466768"
+    },
+    "Calahorra": {
+        "geo_loc_latitude": "42.3035212",
+        "geo_loc_longitude": "-1.9648758"
+    },
+    "Albelda De Iregua": {
+        "geo_loc_latitude": "42.3560509",
+        "geo_loc_longitude": "-2.4736796"
+    },
+    "Ceuta": {
+        "geo_loc_latitude": "35.894422",
+        "geo_loc_longitude": "-5.3558174"
+    },
+    "Melilla": {
+        "geo_loc_latitude": "35.2929114",
+        "geo_loc_longitude": "-2.9507202"
+    },
+    "El Prat De Llobregat": {
+        "geo_loc_latitude": "41.3246333",
+        "geo_loc_longitude": "2.0952568"
+    },
+    "Montornès Del Vallès": {
+        "geo_loc_latitude": "41.542545",
+        "geo_loc_longitude": "2.2670557"
+    },
+    "Montmeló": {
+        "geo_loc_latitude": "41.5515189",
+        "geo_loc_longitude": "2.2480812"
+    },
+    "Viladecavalls": {
+        "geo_loc_latitude": "41.5563969",
+        "geo_loc_longitude": "1.9553173"
+    },
+    "Santa Cruz de Tenerife": {
+        "geo_loc_latitude": "28.467178",
+        "geo_loc_longitude": "-16.2507843"
     }
 }
