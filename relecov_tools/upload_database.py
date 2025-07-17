@@ -64,7 +64,9 @@ class UploadDatabase(BaseModule):
         schema = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "schema",
-            self.config_json.get_topic_data("json_schemas", "relecov_schema"),
+            self.config_json.get_topic_data("general", "json_schemas")[
+                "relecov_schema"
+            ],
         )
         self.schema = relecov_tools.utils.read_json_file(schema)
         if full_update is True:
