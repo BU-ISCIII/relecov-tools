@@ -1,12 +1,96 @@
-{
-    "logs_config": {
-        "default_outpath": "/tmp/"
+{   
+    "general": {
+        "logs_config": {
+            "default_outpath": "/tmp/"
+        },
+        "validate_config": {
+            "default_sample_id_registry": "/tmp/unique_sampleid_registry.json",
+            "starting_date": "2020-01-01"
+        },
+        "json_schemas": {
+            "relecov_schema": "relecov_schema.json",
+            "ena_schema": "ena_schema.json",
+            "gisaid_schema": "gisaid_schema.json"
+        },
+        "institution_mapping_file": {
+            "ISCIII": "ISCIII.json",
+            "HUGTiP": "HUGTiP.json"
+        }
     },
-    "validate_config": {
-        "default_sample_id_registry": "/tmp/unique_sampleid_registry.json",
-        "starting_date": "2020-01-01"
+    "pipeline_manager": {
+        "analysis_group": "RLV",
+        "analysis_user": "icasas_C",
+        "doc_folder": "DOC",
+        "analysis_folder": "ANALYSIS",
+        "sample_stored_folder": "RAW",
+        "sample_link_folder": "00-reads",
+        "organism_config": {
+            "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]": {
+                "pipeline_template": "viralrecon",
+                "service_tag": "SARSCOV2",
+                "group_by_fields": [
+                    "sequencing_instrument_platform",
+                    "enrichment_panel",
+                    "enrichment_panel_version"
+                ]
+            },
+            "Respiratory syncytial virus [SNOMED:6415009]": {
+                "pipeline_template": "IRMA",
+                "service_tag": "GENOMERSV",
+                "group_by_fields": [
+                    "sequencing_instrument_platform",
+                    "enrichment_panel",
+                    "enrichment_panel_version"
+                ]
+            },
+            "Influenza virus [SNOMED:725894000]": {
+                "pipeline_templates": ["IRMA", "taxprofiler"],
+                "service_tag": "GENOMEFLU",
+                "group_by_fields": [
+                    "sequencing_instrument_platform"
+                ]
+            }
+        }
     },
-    "lab_metadata": {
+    "sftp_handle": {
+        "sftp_connection": {
+            "sftp_server": "sftpgenvigies.isciii.es",
+            "sftp_port": "22"
+        },
+        "metadata_processing": {
+            "sample_id_col": "Sample ID given for sequencing",
+            "header_flag": "CAMPO",
+            "excel_sheet": "METADATA_LAB",
+            "alternative_sheet": "5.Viral Characterisation and Se",
+            "alternative_flag": "CAMPO",
+            "alternative_sample_id_col": "Sample ID given for sequencing"
+        },
+        "abort_if_md5_mismatch": "False",
+        "analysis_results_folder": "ANALYSIS_RESULTS",
+        "platform_storage_folder": "/tmp/relecov",
+        "allowed_file_extensions": [
+            ".fastq.gz",
+            ".fastq",
+            ".fq",
+            ".fq.gz",
+            ".fasta",
+            ".fasta.gz",
+            ".fa",
+            ".fa.gz",
+            "bam"
+        ],
+        "allowed_download_options": [
+            "download_only",
+            "download_clean",
+            "delete_only"
+        ],
+        "skip_when_found": [
+            "#",
+            "Hash",
+            "Path"
+        ]
+    },
+    "read_lab_metadata": {
         "fixed_fields": {
             "study_type": "Whole Genome Sequencing",
             "collector_name": "Not Provided [SNOMED:434941000124101]"
@@ -161,178 +245,41 @@
             "batch_id"
         ]
     },
-    "long_table_heading": [
-        "SAMPLE",
-        "CHROM",
-        "POS",
-        "REF",
-        "ALT",
-        "FILTER",
-        "DP",
-        "REF_DP",
-        "ALT_DP",
-        "AF",
-        "GENE",
-        "EFFECT",
-        "HGVS_C",
-        "HGVS_P",
-        "HGVS_P_1LETTER",
-        "CALLER",
-        "LINEAGE"
-    ],
-    "long_table_parse_aux": {
-        "Chromosome": "CHROM",
-        "Variant": {
-            "pos": "POS", 
-            "alt": "ALT", 
-            "ref": "REF"
-        },
-        "Filter": "FILTER",
-        "VariantInSample": {
-            "dp": "DP",
-            "ref_dp": "REF_DP",
-            "alt_dp": "ALT_DP",
-            "af": "AF"
-        },
-        "Effect": "EFFECT",
-        "VariantAnnotation": {
-            "hgvs_c": "HGVS_C",
-            "hgvs_p": "HGVS_P",
-            "hgvs_p_1_letter": "HGVS_P_1LETTER"
+    "upload_to_gisaid": {
+        "gisaid_csv_headers": [
+            "submitter",
+            "covv_virus_name",
+            "covv_type",
+            "covv_passage",
+            "covv_collection_date",
+            "covv_location",
+            "covv_add_location",
+            "covv_host",
+            "covv_add_host_info",
+            "covv_sampling_strategy",
+            "covv_gender",
+            "covv_patient_age",
+            "covv_patient_status",
+            "covv_specimen",
+            "covv_outbreak",
+            "covv_last_vaccinated",
+            "covv_treatment",
+            "covv_seq_technology",
+            "covv_assembly_method",
+            "covv_coverage",
+            "covv_orig_lab",
+            "covv_orig_lab_addr",
+            "covv_provider_sample_id",
+            "covv_subm_lab",
+            "covv_subm_lab_addr",
+            "covv_subm_sample_id",
+            "covv_authors"
+        ],
+        "GISAID_configuration": {
+            "submitter": "GISAID_ID"
         }
     },
-    "gisaid_csv_headers": [
-        "submitter",
-        "covv_virus_name",
-        "covv_type",
-        "covv_passage",
-        "covv_collection_date",
-        "covv_location",
-        "covv_add_location",
-        "covv_host",
-        "covv_add_host_info",
-        "covv_sampling_strategy",
-        "covv_gender",
-        "covv_patient_age",
-        "covv_patient_status",
-        "covv_specimen",
-        "covv_outbreak",
-        "covv_last_vaccinated",
-        "covv_treatment",
-        "covv_seq_technology",
-        "covv_assembly_method",
-        "covv_coverage",
-        "covv_orig_lab",
-        "covv_orig_lab_addr",
-        "covv_provider_sample_id",
-        "covv_subm_lab",
-        "covv_subm_lab_addr",
-        "covv_subm_sample_id",
-        "covv_authors"
-    ],
-    "json_schemas": {
-        "relecov_schema": "relecov_schema.json",
-        "ena_schema": "ena_schema.json",
-        "gisaid_schema": "gisaid_schema.json"
-    },
-    "institution_mapping_file": {
-        "ISCIII": "ISCIII.json",
-        "HUGTiP": "HUGTiP.json"
-    },
-    "sftp_handle": {
-        "sftp_connection": {
-            "sftp_server": "sftpgenvigies.isciii.es",
-            "sftp_port": "22"
-        },
-        "metadata_processing": {
-            "sample_id_col": "Sample ID given for sequencing",
-            "header_flag": "CAMPO",
-            "excel_sheet": "METADATA_LAB",
-            "alternative_sheet": "5.Viral Characterisation and Se",
-            "alternative_flag": "CAMPO",
-            "alternative_sample_id_col": "Sample ID given for sequencing"
-        },
-        "abort_if_md5_mismatch": "False",
-        "analysis_results_folder": "ANALYSIS_RESULTS",
-        "platform_storage_folder": "/tmp/relecov",
-        "allowed_file_extensions": [
-            ".fastq.gz",
-            ".fastq",
-            ".fq",
-            ".fq.gz",
-            ".fasta",
-            ".fasta.gz",
-            ".fa",
-            ".fa.gz",
-            "bam"
-        ],
-        "allowed_download_options": [
-            "download_only",
-            "download_clean",
-            "delete_only"
-        ],
-        "skip_when_found": [
-            "#",
-            "Hash",
-            "Path"
-        ]
-    },
-    "GISAID_configuration": {
-        "submitter": "GISAID_ID"
-    },
-    "upload_database": {
-        "platform":{
-            "iskylims": {
-                "server_url": "http://relecov-iskylims.isciiides.es",
-                "api_url": "/wetlab/api/",
-                "store_samples": "create-sample",
-                "url_project_fields": "projects-fields",
-                "url_sample_fields": "sample-fields",
-                "param_sample_project": "project",
-                "project_name": "relecov",
-                "token": ""
-            },
-            "relecov": {
-            "server_url": "http://relecov-platform.isciiides.es",
-            "api_url": "/api/",
-            "store_samples": "createSampleData",
-            "bioinfodata": "createBioinfoData",
-            "variantdata": "createVariantData",
-            "check_sample": "getSampleData",
-            "sftp_info": "sftpInfo",
-            "token": ""
-            }
-        },
-        "iskylims_fixed_values": {
-            "patient_core": "",
-            "sample_project": "Relecov",
-            "only_recorded": "Yes",
-            "sample_location": "Not defined"
-        },
-        "relecov_sample_metadata": [
-            "authors",
-            "collecting_institution",
-            "collecting_lab_sample_id",
-            "ena_broker_name",
-            "ena_sample_accession",
-            "gisaid_accession_id",
-            "gisaid_virus_name",
-            "microbiology_lab_sample_id",
-            "sequence_file_path_R1",
-            "sequence_file_path_R2",
-            "schema_name",
-            "schema_version",
-            "sequencing_date",
-            "sequence_file_R1_md5",
-            "sequence_file_R2_md5",
-            "sequence_file_R1",
-            "sequence_file_R2",
-            "sequencing_sample_id",
-            "submitting_institution",
-            "submitting_lab_sample_id"
-        ]
-    },
-    "ENA_fields": {
+    "upload_to_ena": {
         "ENA_configuration": {
             "study_alias": "RELECOV",
             "design_description": "Design Description",
@@ -454,39 +401,56 @@
             ]
         }
     },
-    "pipeline_manager": {
-        "analysis_group": "RLV",
-        "analysis_user": "icasas_C",
-        "doc_folder": "DOC",
-        "analysis_folder": "ANALYSIS",
-        "sample_stored_folder": "RAW",
-        "sample_link_folder": "00-reads",
-        "organism_config": {
-            "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]": {
-                "pipeline_template": "viralrecon",
-                "service_tag": "SARSCOV2",
-                "group_by_fields": [
-                    "sequencing_instrument_platform",
-                    "enrichment_panel",
-                    "enrichment_panel_version"
-                ]
+    "upload_database": {
+        "platform":{
+            "iskylims": {
+                "server_url": "http://relecov-iskylims.isciiides.es",
+                "api_url": "/wetlab/api/",
+                "store_samples": "create-sample",
+                "url_project_fields": "projects-fields",
+                "url_sample_fields": "sample-fields",
+                "param_sample_project": "project",
+                "project_name": "relecov",
+                "token": ""
             },
-            "Respiratory syncytial virus [SNOMED:6415009]": {
-                "pipeline_template": "IRMA",
-                "service_tag": "GENOMERSV",
-                "group_by_fields": [
-                    "sequencing_instrument_platform",
-                    "enrichment_panel",
-                    "enrichment_panel_version"
-                ]
-            },
-            "Influenza virus [SNOMED:725894000]": {
-                "pipeline_templates": ["IRMA", "taxprofiler"],
-                "service_tag": "GENOMEFLU",
-                "group_by_fields": [
-                    "sequencing_instrument_platform"
-                ]
+            "relecov": {
+            "server_url": "http://relecov-platform.isciiides.es",
+            "api_url": "/api/",
+            "store_samples": "createSampleData",
+            "bioinfodata": "createBioinfoData",
+            "variantdata": "createVariantData",
+            "check_sample": "getSampleData",
+            "sftp_info": "sftpInfo",
+            "token": ""
             }
-        }
+        },
+        "iskylims_fixed_values": {
+            "patient_core": "",
+            "sample_project": "Relecov",
+            "only_recorded": "Yes",
+            "sample_location": "Not defined"
+        },
+        "relecov_sample_metadata": [
+            "authors",
+            "collecting_institution",
+            "collecting_lab_sample_id",
+            "ena_broker_name",
+            "ena_sample_accession",
+            "gisaid_accession_id",
+            "gisaid_virus_name",
+            "microbiology_lab_sample_id",
+            "sequence_file_path_R1",
+            "sequence_file_path_R2",
+            "schema_name",
+            "schema_version",
+            "sequencing_date",
+            "sequence_file_R1_md5",
+            "sequence_file_R2_md5",
+            "sequence_file_R1",
+            "sequence_file_R2",
+            "sequencing_sample_id",
+            "submitting_institution",
+            "submitting_lab_sample_id"
+        ]
     }
 }
