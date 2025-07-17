@@ -118,7 +118,7 @@ class Download(BaseModule):
         if sftp_passwd is None:
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
         self.metadata_lab_heading = config_json.get_topic_data(
-            "lab_metadata", "metadata_lab_heading"
+            "read_lab_metadata", "metadata_lab_heading"
         )
         self.metadata_processing = config_json.get_topic_data(
             "sftp_handle", "metadata_processing"
@@ -127,7 +127,7 @@ class Download(BaseModule):
             "sftp_handle", "skip_when_found"
         )
         self.samples_json_fields = config_json.get_topic_data(
-            "lab_metadata", "samples_json_fields"
+            "read_lab_metadata", "samples_json_fields"
         )
         # initialize the sftp client
         self.relecov_sftp = relecov_tools.sftp_client.SftpClient(
