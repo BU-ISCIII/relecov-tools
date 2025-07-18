@@ -33,10 +33,7 @@ def parse_args(args=None):
         help="Output excel file path.",
     )
     parser.add_argument(
-        "-p",
-        "--previous_json",
-        help="Previous .json file path",
-        default=False
+        "-p", "--previous_json", help="Previous .json file path", default=False
     )
     parser.add_argument(
         "-a",
@@ -92,7 +89,16 @@ def process_regcess_table(file):
     """
 
     # 1. Load with proper dtypes
-    regcess_db = pd.read_excel(file, sheet_name="Metadatos", dtype={"CCN": str, "Cód. Centro Autonómico": str, "Código Postal": str, "Teléfono Principal": str})
+    regcess_db = pd.read_excel(
+        file,
+        sheet_name="Metadatos",
+        dtype={
+            "CCN": str,
+            "Cód. Centro Autonómico": str,
+            "Código Postal": str,
+            "Teléfono Principal": str,
+        },
+    )
 
     # 2. Ensure missing column
     if "Cód. Clase de Centro" not in regcess_db.columns:
@@ -100,27 +106,43 @@ def process_regcess_table(file):
 
     # 3. Transform case
     regcess_db["Nombre Centro"] = regcess_db["Nombre Centro"].str.title()
-    regcess_db["Dependencia Funcional"] = regcess_db["Dependencia Funcional"].str.title()
+    regcess_db["Dependencia Funcional"] = regcess_db[
+        "Dependencia Funcional"
+    ].str.title()
     regcess_db["Email"] = regcess_db["Email"].str.lower()
     regcess_db["Email"] = regcess_db["Email"].fillna("Desconocido")
 
     # 4. Construct Dirección
     regcess_db["Dirección"] = (
-        regcess_db["Tipo Vía"].str.title().str.strip() + " " +
-        regcess_db["Nombre Vía"].str.title().str.strip() + ", " +
-        regcess_db["Número Vía"].astype(str).str.strip()
+        regcess_db["Tipo Vía"].str.title().str.strip()
+        + " "
+        + regcess_db["Nombre Vía"].str.title().str.strip()
+        + ", "
+        + regcess_db["Número Vía"].astype(str).str.strip()
     )
 
     # 5. Split Latitude and Longitude in two different columns
-    regcess_db['Coordenadas'] = regcess_db['Coordenadas'].astype(str)
-    regcess_db[['Latitud', 'Longitud']] = regcess_db['Coordenadas'].str.split(',', expand=True)
+    regcess_db["Coordenadas"] = regcess_db["Coordenadas"].astype(str)
+    regcess_db[["Latitud", "Longitud"]] = regcess_db["Coordenadas"].str.split(
+        ",", expand=True
+    )
 
     # 6. Clean text columns (remove double witespaces and double commas)
-    regcess_db["Nombre Centro"] = regcess_db["Nombre Centro"].apply(lambda x: re.sub(r'\s+', ' ', x) if isinstance(x, str) else x)
-    regcess_db["Dependencia Funcional"] = regcess_db["Dependencia Funcional"].apply(lambda x: re.sub(r'\s+', ' ', x) if isinstance(x, str) else x)
-    regcess_db["Dirección"] = regcess_db["Dirección"].apply(lambda x: re.sub(r",,+", ",", x) if isinstance(x, str) else x)
-    regcess_db["Dirección"] = regcess_db["Dirección"].apply(lambda x: re.sub(r",\s*,", ",", x) if isinstance(x, str) else x)
-    regcess_db["Dirección"] = regcess_db["Dirección"].apply(lambda x: re.sub(r'\s+', ' ', x) if isinstance(x, str) else x)
+    regcess_db["Nombre Centro"] = regcess_db["Nombre Centro"].apply(
+        lambda x: re.sub(r"\s+", " ", x) if isinstance(x, str) else x
+    )
+    regcess_db["Dependencia Funcional"] = regcess_db["Dependencia Funcional"].apply(
+        lambda x: re.sub(r"\s+", " ", x) if isinstance(x, str) else x
+    )
+    regcess_db["Dirección"] = regcess_db["Dirección"].apply(
+        lambda x: re.sub(r",,+", ",", x) if isinstance(x, str) else x
+    )
+    regcess_db["Dirección"] = regcess_db["Dirección"].apply(
+        lambda x: re.sub(r",\s*,", ",", x) if isinstance(x, str) else x
+    )
+    regcess_db["Dirección"] = regcess_db["Dirección"].apply(
+        lambda x: re.sub(r"\s+", " ", x) if isinstance(x, str) else x
+    )
 
     # 7. Normalize names
     regcess_db["Municipio"] = regcess_db["Municipio"].apply(normalize_names)
@@ -138,7 +160,18 @@ def process_cnh_table(file):
     Returns:
         cnh_ddbb (pd.DataFrame): cleaned CNH DataFrame
     """
-    cnh_ddbb = pd.read_excel(file, sheet_name="DIRECTORIO DE HOSPITALES", dtype={"CCN": str, "CODCNH": str, "CODIDCOM": str, "Cód. Municipio": str, "Cód. Provincia": str, "Cód. CCAA": str})
+    cnh_ddbb = pd.read_excel(
+        file,
+        sheet_name="DIRECTORIO DE HOSPITALES",
+        dtype={
+            "CCN": str,
+            "CODCNH": str,
+            "CODIDCOM": str,
+            "Cód. Municipio": str,
+            "Cód. Provincia": str,
+            "Cód. CCAA": str,
+        },
+    )
     cnh_ddbb["Nombre del Complejo"] = cnh_ddbb["Nombre del Complejo"].str.title()
 
     return cnh_ddbb
@@ -166,27 +199,49 @@ def process_complex(cnh_ddbb, regcess_db):
     Returns:
         complex_hospitals (pd.DataFrame): DataFrame of complex hospitals
     """
-    complex_hospitals = cnh_ddbb[cnh_ddbb['Forma parte Complejo'] == 'S']
-    complex_hospitals = complex_hospitals[["CCN", "CODCNH", "Nombre del Complejo", "CODIDCOM", "Cód. Municipio", "Cód. Provincia", 'Cód. CCAA']]
-    complex_hospitals = pd.merge(complex_hospitals, regcess_db, on=['CCN'], how="inner", suffixes=('_compl', '_regcess'))
+    complex_hospitals = cnh_ddbb[cnh_ddbb["Forma parte Complejo"] == "S"]
+    complex_hospitals = complex_hospitals[
+        [
+            "CCN",
+            "CODCNH",
+            "Nombre del Complejo",
+            "CODIDCOM",
+            "Cód. Municipio",
+            "Cód. Provincia",
+            "Cód. CCAA",
+        ]
+    ]
+    complex_hospitals = pd.merge(
+        complex_hospitals,
+        regcess_db,
+        on=["CCN"],
+        how="inner",
+        suffixes=("_compl", "_regcess"),
+    )
 
     # Remove hospital name from REGCESS
     complex_hospitals.drop(columns=["Nombre Centro"], inplace=True)
     complex_hospitals["CODCNH"] = complex_hospitals["CODIDCOM"]
 
     # keep only last hospital for information (ESRI one of the hospitals, randomly)
-    complex_hospitals = complex_hospitals.drop_duplicates(subset='CODIDCOM', keep='first')
+    complex_hospitals = complex_hospitals.drop_duplicates(
+        subset="CODIDCOM", keep="first"
+    )
 
     # Remove hospital info not aplicable to complex
     # Replace CCN which is assoaciated with hospital and not the complex, with a combination of COMP_ + the complex code CODIDCOM
     complex_hospitals["CCN"] = "COMP_" + complex_hospitals["CODIDCOM"]
     # Remove data from the hospital
-    complex_hospitals[["Cód. Centro Autonómico", "Dependencia Funcional", "Cód. Clase de Centro"]] = "N/A"
+    complex_hospitals[
+        ["Cód. Centro Autonómico", "Dependencia Funcional", "Cód. Clase de Centro"]
+    ] = "N/A"
     # Replaced "Clase de Centro" with "Complejo" instead of the hospital's values.
     complex_hospitals[["Clase de Centro"]] = "Complejo"
 
     # Fix column names and numbers to fit in the hospital table names
-    complex_hospitals = complex_hospitals.drop(columns=["CODIDCOM"]).rename(columns={"Nombre del Complejo": "Nombre Centro"})
+    complex_hospitals = complex_hospitals.drop(columns=["CODIDCOM"]).rename(
+        columns={"Nombre del Complejo": "Nombre Centro"}
+    )
 
     return complex_hospitals
 
@@ -261,7 +316,7 @@ def create_json(hospitals):
             "geo_loc_country": "Spain",
             "submitting_institution": "",
             "submitting_institution_address": "",
-            "submitting_institution_email": ""
+            "submitting_institution_email": "",
         }
 
     return hospitals_json
@@ -332,7 +387,9 @@ def add_hospitals(hospital_ddbb_json, regcess_db, add_json):
                 "collecting_institution": row["Nombre Centro"].strip(),
                 "collecting_institution_address": row["Dirección"],
                 "collecting_institution_email": (
-                    row["Email"].strip() if not pd.isna(row.get("Email")) else "Desconocido"
+                    row["Email"].strip()
+                    if not pd.isna(row.get("Email"))
+                    else "Desconocido"
                 ),
                 "autonom_cod": row["Cód. Centro Autonómico"],
                 "geo_loc_state": row["CCAA"].strip(),
@@ -350,12 +407,20 @@ def add_hospitals(hospital_ddbb_json, regcess_db, add_json):
                 "collecting_institution_phone": row["Teléfono Principal"],
                 "geo_loc_country": "Spain",
                 "submitting_institution": data.get("submitting_institution"),
-                "submitting_institution_address": data.get("submitting_institution_address"),
-                "submitting_institution_email": data.get("submitting_institution_email")
+                "submitting_institution_address": data.get(
+                    "submitting_institution_address"
+                ),
+                "submitting_institution_email": data.get(
+                    "submitting_institution_email"
+                ),
             }
 
             for field, new_val in new_data.items():
-                old_val = data.get(field, "").strip() if isinstance(data.get(field), str) else data.get(field)
+                old_val = (
+                    data.get(field, "").strip()
+                    if isinstance(data.get(field), str)
+                    else data.get(field)
+                )
                 if old_val != new_val:
                     if field not in differences:
                         differences[field] = {}
@@ -391,13 +456,19 @@ def compare_json(prev_json_path, new_hospitals, differences):
         for ccn, data in new_hospitals.items():
             if ccn == prev_ccn:
                 data_found = True
-                for key in ["submitting_institution", "submitting_institution_address", "submitting_institution_email"]:
+                for key in [
+                    "submitting_institution",
+                    "submitting_institution_address",
+                    "submitting_institution_email",
+                ]:
                     if key in prev_data:
                         data[key] = prev_data[key]
 
                 for field in data:
                     if field in prev_data and field not in {
-                        "submitting_institution", "submitting_institution_address", "submitting_institution_email"
+                        "submitting_institution",
+                        "submitting_institution_address",
+                        "submitting_institution_email",
                     }:
                         if data[field] != prev_data[field]:
                             if field not in differences:
@@ -408,6 +479,7 @@ def compare_json(prev_json_path, new_hospitals, differences):
             missing_json[prev_ccn] = prev_data
 
     return missing_json, differences
+
 
 def write_json(output_json, data):
     """Write a dict to a JSON file with pretty formatting and message.
@@ -466,7 +538,7 @@ def create_cities_coord(hospital_json, geo_loc_file):
             if loc:
                 geo_loc_json[data["geo_loc_city"]] = {
                     "geo_loc_latitude": str(loc.latitude),
-                    "geo_loc_longitude": str(loc.longitude)
+                    "geo_loc_longitude": str(loc.longitude),
                 }
             else:
                 print("City with coordenates not found")
@@ -475,10 +547,10 @@ def create_cities_coord(hospital_json, geo_loc_file):
     write_json(geo_loc_file, geo_loc_json)
 
     schema_data_json = {}
-    schema_data_json["cities"] = '; '.join(cities)
-    schema_data_json["states"] = '; '.join(states)
-    schema_data_json["regions"] = '; '.join(regions)
-    schema_data_json["hospitals"] = '; '.join(hospitals)
+    schema_data_json["cities"] = "; ".join(cities)
+    schema_data_json["states"] = "; ".join(states)
+    schema_data_json["regions"] = "; ".join(regions)
+    schema_data_json["hospitals"] = "; ".join(hospitals)
 
     write_json("schema_excel_strings.json", schema_data_json)
 
@@ -495,12 +567,20 @@ def main(args=None):
     cnh_ddbb = process_cnh_table(args.cnh)
 
     # Remove columns that we are not using
-    regcess_db.drop(columns=["Unnamed: 10", "Coordenadas", "Tipo Vía", "Nombre Vía", "Número Vía"], errors='ignore', inplace=True)
+    regcess_db.drop(
+        columns=["Unnamed: 10", "Coordenadas", "Tipo Vía", "Nombre Vía", "Número Vía"],
+        errors="ignore",
+        inplace=True,
+    )
 
-    cod_mapping = cnh_ddbb[["CCN", "CODCNH", "Cód. Municipio", "Cód. Provincia", 'Cód. CCAA']]
+    cod_mapping = cnh_ddbb[
+        ["CCN", "CODCNH", "Cód. Municipio", "Cód. Provincia", "Cód. CCAA"]
+    ]
 
     # Merge both tables
-    hospital_ddbb = pd.merge(regcess_db, cod_mapping, on=['CCN'], how="inner", suffixes=('_regcess', '_cnh'))
+    hospital_ddbb = pd.merge(
+        regcess_db, cod_mapping, on=["CCN"], how="inner", suffixes=("_regcess", "_cnh")
+    )
 
     # Process hospital complex
     complex_table = process_complex(cnh_ddbb, regcess_db)
@@ -512,19 +592,23 @@ def main(args=None):
     if args.additional_json:
         with open(args.additional_json, "r", encoding="utf-8") as json_file:
             add_json = json.load(json_file)
-        hospital_ddbb_json, add_json, differences = add_hospitals(hospital_ddbb_json, regcess_db, add_json)
+        hospital_ddbb_json, add_json, differences = add_hospitals(
+            hospital_ddbb_json, regcess_db, add_json
+        )
 
     write_json(args.additional_json, add_json)
 
-    hospital_ddbb = pd.DataFrame.from_dict(hospital_ddbb_json, orient='index')
+    hospital_ddbb = pd.DataFrame.from_dict(hospital_ddbb_json, orient="index")
     hospital_ddbb.reset_index(inplace=True)
-    hospital_ddbb.rename(columns={'index': 'ccn'}, inplace=True)
+    hospital_ddbb.rename(columns={"index": "ccn"}, inplace=True)
 
     hospital_ddbb.to_excel(args.out_excel, sheet_name="hospitals", index=False)
     print(f"Archivo Excel generado: {args.out_excel}")
 
     if args.previous_json:
-        missing_json, differences = compare_json(args.previous_json, hospital_ddbb_json, differences)
+        missing_json, differences = compare_json(
+            args.previous_json, hospital_ddbb_json, differences
+        )
         if len(missing_json) != 0:
             write_json("missing_hospitals.json", missing_json)
 
@@ -534,6 +618,7 @@ def main(args=None):
         write_json(args.differences_json, differences)
 
     create_cities_coord(hospital_ddbb_json, args.geo_loc_cities)
+
 
 if __name__ == "__main__":
     sys.exit(main())
