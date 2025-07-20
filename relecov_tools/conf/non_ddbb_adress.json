@@ -20,7 +20,7 @@
         "phone": "000000000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Instituto de Salud Carlos III",
-        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
+        "submitting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
         "submitting_institution_email": "info@isciii.es"
     },
     "SERV_002": {
@@ -43,13 +43,13 @@
         "lab_geo_loc_longitude": "2.64469",
         "phone": "N/A",
         "submitting_institution": "Servicio de Microbiologia HU Son Espases",
-        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_address": "Carretera Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es",
         "collecting_institution": "Servicio de Microbiologia HU Son Espases"
     },
     "LAB_003": {
         "codcnh": "LAB_003",
-        "collecting_institution_address": "Calle Dr. Mallafrè Guasch, 4,",
+        "collecting_institution_address": "Calle Dr. Mallafrè Guasch, 4",
         "collecting_institution_email": "",
         "autonom_cod": "N/A",
         "geo_loc_state": "Cataluña",
@@ -67,7 +67,7 @@
         "lab_geo_loc_longitude": "1.23854",
         "phone": "N/A",
         "submitting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII",
-        "submitting_institution_address": "c/ Dr. Mallafrè Guasch, 4,",
+        "submitting_institution_address": "Calle Dr. Mallafrè Guasch, 4",
         "submitting_institution_email": "",
         "collecting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII"
     },
@@ -139,7 +139,7 @@
         "lab_geo_loc_longitude": "2.0653671",
         "phone": "935040149",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Laboratorio Echevarne, SA",
+        "submitting_institution": "Laboratorio Echevarne, Sa",
         "submitting_institution_address": "Avenida Can Bellet, 61-65",
         "submitting_institution_email": ""
     },
@@ -571,7 +571,7 @@
         "lab_geo_loc_longitude": "-3.7340082",
         "phone": "913353535",
         "submitting_institution": "Instituto de Salud Carlos III",
-        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
+        "submitting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
         "submitting_institution_email": "info@isciii.es",
         "collecting_institution": "Presidencia del Gobierno"
     },
@@ -595,7 +595,7 @@
         "lab_geo_loc_longitude": "-3.6940267",
         "phone": "915961089",
         "submitting_institution": "Instituto de Salud Carlos III",
-        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
+        "submitting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
         "submitting_institution_email": "info@isciii.es",
         "collecting_institution": "Ministerio Sanidad"
     }
