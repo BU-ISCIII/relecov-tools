@@ -127,7 +127,7 @@ def process_regcess_table(file):
         ",", expand=True
     )
 
-    # 6. Clean text columns (remove double witespaces and double commas)
+    # 6. Clean text columns (remove double witespaces, double commas and double S/Ns)
     regcess_db["Nombre Centro"] = regcess_db["Nombre Centro"].apply(
         lambda x: re.sub(r"\s+", " ", x) if isinstance(x, str) else x
     )
@@ -142,6 +142,15 @@ def process_regcess_table(file):
     )
     regcess_db["Dirección"] = regcess_db["Dirección"].apply(
         lambda x: re.sub(r"\s+", " ", x) if isinstance(x, str) else x
+    )
+    regcess_db["Dirección"] = regcess_db["Dirección"].apply(
+        lambda x: re.sub(r",\s*S/N(,\s*S/N)+", ", S/N", x) if isinstance(x, str) else x
+    )
+    regcess_db["Dirección"] = regcess_db["Dirección"].apply(
+        lambda x: re.sub(r"\s*S/N(,\s*S/N)+", ", S/N", x) if isinstance(x, str) else x
+    )
+    regcess_db["Dirección"] = regcess_db["Dirección"].apply(
+        lambda x: re.sub(r"\s*Sn(,\s*S/N)+", ", S/N", x) if isinstance(x, str) else x
     )
 
     # 7. Normalize names
