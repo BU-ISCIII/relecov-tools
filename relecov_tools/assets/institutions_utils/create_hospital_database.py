@@ -302,7 +302,7 @@ def create_json(hospitals):
 
         ccn_hospital = row["CCN"]
         hospitals_json[ccn_hospital] = {
-            "codcnh": row["CODCNH"],
+            "collecting_institution_codcnh": row["CODCNH"],
             "collecting_institution": row["Nombre Centro"].strip(),
             "collecting_institution_address": row["Dirección"],
             "collecting_institution_email": (
@@ -318,7 +318,7 @@ def create_json(hospitals):
             "post_code": row["Código Postal"],
             "dep_func": row["Dependencia Funcional"].strip(),
             "center_class_code": center_class_code,
-            "collecting_institution_finalidad": row["Clase de Centro"].strip(),
+            "collecting_institution_function": row["Clase de Centro"].strip(),
             "lab_geo_loc_latitude": row["Latitud"],
             "lab_geo_loc_longitude": row["Longitud"],
             "collecting_institution_phone": row["Teléfono Principal"],
@@ -392,7 +392,7 @@ def add_hospitals(hospital_ddbb_json, regcess_db, add_json):
                 geo_loc_city_cod = "ADD"
 
             new_data = {
-                "codcnh": data.get("codcnh"),
+                "collecting_institution_codcnh": data.get("collecting_institution_codcnh"),
                 "collecting_institution": row["Nombre Centro"].strip(),
                 "collecting_institution_address": row["Dirección"],
                 "collecting_institution_email": (
@@ -410,7 +410,7 @@ def add_hospitals(hospital_ddbb_json, regcess_db, add_json):
                 "post_code": row["Código Postal"],
                 "dep_func": row["Dependencia Funcional"].strip(),
                 "center_class_code": center_class_code,
-                "collecting_institution_finalidad": row["Clase de Centro"].strip(),
+                "collecting_institution_function": row["Clase de Centro"].strip(),
                 "lab_geo_loc_latitude": row["Latitud"],
                 "lab_geo_loc_longitude": row["Longitud"],
                 "collecting_institution_phone": row["Teléfono Principal"],
