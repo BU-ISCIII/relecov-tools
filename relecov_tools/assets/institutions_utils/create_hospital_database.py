@@ -392,7 +392,9 @@ def add_hospitals(hospital_ddbb_json, regcess_db, add_json):
                 geo_loc_city_cod = "ADD"
 
             new_data = {
-                "collecting_institution_codcnh": data.get("collecting_institution_codcnh"),
+                "collecting_institution_codcnh": data.get(
+                    "collecting_institution_codcnh"
+                ),
                 "collecting_institution": row["Nombre Centro"].strip(),
                 "collecting_institution_address": row["Dirección"],
                 "collecting_institution_email": (
