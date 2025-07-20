@@ -386,7 +386,7 @@
     "0111000294": {
         "codcnh": "110223",
         "collecting_institution": "Hospital Virgen Del Camino",
-        "collecting_institution_address": "Carretera Sanlucar-Chipiona, S/N, S/N",
+        "collecting_institution_address": "Carretera Sanlucar-Chipiona, S/N",
         "collecting_institution_email": "sanlucar.secretaria@jmpascual.com",
         "autonom_cod": "16057",
         "geo_loc_state": "Andalucía",
@@ -866,7 +866,7 @@
     "0114003668": {
         "codcnh": "140241",
         "collecting_institution": "Hospital Quironsalud Cordoba",
-        "collecting_institution_address": "Avenida Del Aeropuerto, S/N, S/N",
+        "collecting_institution_address": "Avenida Del Aeropuerto, S/N",
         "collecting_institution_email": "info.cor@quironsalud.es",
         "autonom_cod": "47784",
         "geo_loc_state": "Andalucía",
@@ -1370,7 +1370,7 @@
     "0121001889": {
         "codcnh": "210148",
         "collecting_institution": "Hospital Virgen De La Bella",
-        "collecting_institution_address": "Avenida Las Rosas, S/N, S/N",
+        "collecting_institution_address": "Avenida Las Rosas, S/N",
         "collecting_institution_email": "mmorales@jmpascual.com",
         "autonom_cod": "50094",
         "geo_loc_state": "Andalucía",
@@ -2995,9 +2995,9 @@
         "lab_geo_loc_longitude": "-5.9371066",
         "collecting_institution_phone": "955050570",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario Central de Asturias",
-        "submitting_institution_address": "Av. Roma, s/n",
-        "submitting_institution_email": "santiago.melon@sespa.es"
+        "submitting_institution": "",
+        "submitting_institution_address": "",
+        "submitting_institution_email": ""
     },
     "0141001671": {
         "codcnh": "410375",
@@ -3308,7 +3308,7 @@
         "collecting_institution_phone": "974247000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario San Jorge",
-        "submitting_institution_address": "Av. Martínez de Velasco, 36",
+        "submitting_institution_address": "Avenida Martinez De Velasco, 36",
         "submitting_institution_email": ""
     },
     "0222000003": {
@@ -3668,7 +3668,7 @@
         "collecting_institution_phone": "976765500",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Miguel Servet",
-        "submitting_institution_address": "P.º Isabel la Católica, 1-3",
+        "submitting_institution_address": "Paseo Isabel La Catolica, 1-3",
         "submitting_institution_email": "rbenito@salud.aragon.es"
     },
     "0250000070": {
@@ -3715,8 +3715,8 @@
         "lab_geo_loc_longitude": "-0.9036407",
         "collecting_institution_phone": "976765700",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Clínico Universitario Lozano Blesa",
-        "submitting_institution_address": "S. Juan Bosco, 15",
+        "submitting_institution": "Hospital Clinico Universitario Lozano Blesa",
+        "submitting_institution_address": "Calle San Juan Bosco, 15",
         "submitting_institution_email": "rbenito@salud.aragon.es"
     },
     "0250000082": {
@@ -4052,7 +4052,7 @@
         "collecting_institution_phone": "985812346",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Central de Asturias",
-        "submitting_institution_address": "Av. Roma, s/n",
+        "submitting_institution_address": "Avenida De Roma, S/N",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "0333001052": {
@@ -4076,7 +4076,7 @@
         "collecting_institution_phone": "985652000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Central de Asturias",
-        "submitting_institution_address": "Av. Roma, s/n",
+        "submitting_institution_address": "Avenida De Roma, S/N",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "0333001472": {
@@ -4100,7 +4100,7 @@
         "collecting_institution_phone": "985106900",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Central de Asturias",
-        "submitting_institution_address": "Av. Roma, s/n",
+        "submitting_institution_address": "Avenida De Roma, S/N",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "0333002321": {
@@ -4196,7 +4196,7 @@
         "collecting_institution_phone": "985840032",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Central de Asturias",
-        "submitting_institution_address": "Av. Roma, s/n",
+        "submitting_institution_address": "Avenida De Roma, S/N",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "0333002581": {
@@ -4292,7 +4292,7 @@
         "collecting_institution_phone": "985320050",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Central de Asturias",
-        "submitting_institution_address": "Av. Roma, s/n",
+        "submitting_institution_address": "Avenida De Roma, S/N",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "0333002777": {
@@ -4340,7 +4340,7 @@
         "collecting_institution_phone": "985185000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Central de Asturias",
-        "submitting_institution_address": "Av. Roma, s/n",
+        "submitting_institution_address": "Avenida De Roma, S/N",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "0333002781": {
@@ -4460,7 +4460,7 @@
         "collecting_institution_phone": "985639300",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Central de Asturias",
-        "submitting_institution_address": "Av. Roma, s/n",
+        "submitting_institution_address": "Avenida De Roma, S/N",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "0333005233": {
@@ -4508,7 +4508,7 @@
         "collecting_institution_phone": "985108000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Central de Asturias",
-        "submitting_institution_address": "Av. Roma, s/n",
+        "submitting_institution_address": "Avenida De Roma, S/N",
         "submitting_institution_email": "santiago.melon@sespa.es"
     },
     "0333005582": {
@@ -4604,7 +4604,7 @@
         "collecting_institution_phone": "971847000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Servicio de Microbiologia HU Son Espases",
-        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_address": "Carretera Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es"
     },
     "0407000002": {
@@ -4796,7 +4796,7 @@
         "collecting_institution_phone": "971397000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Servicio de Microbiologia HU Son Espases",
-        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_address": "Carretera Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es"
     },
     "0407000011": {
@@ -4916,7 +4916,7 @@
         "collecting_institution_phone": "971888514",
         "geo_loc_country": "Spain",
         "submitting_institution": "Servicio de Microbiologia HU Son Espases",
-        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_address": "Carretera Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es"
     },
     "0407000423": {
@@ -4940,7 +4940,7 @@
         "collecting_institution_phone": "971487000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Servicio de Microbiologia HU Son Espases",
-        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_address": "Carretera Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es"
     },
     "0407000872": {
@@ -4964,7 +4964,7 @@
         "collecting_institution_phone": "871205000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Servicio de Microbiologia HU Son Espases",
-        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_address": "Carretera Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es"
     },
     "0407001219": {
@@ -5036,7 +5036,7 @@
         "collecting_institution_phone": "871202000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Servicio de Microbiologia HU Son Espases",
-        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_address": "Carretera Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es"
     },
     "0407001618": {
@@ -5516,7 +5516,7 @@
         "collecting_institution_phone": "928450000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Gran Canaria Dr. Negrín",
-        "submitting_institution_address": "C. Pl. Barranco de la Ballena s/n",
+        "submitting_institution_address": "Plaza Barranco De La Ballena, S/N",
         "submitting_institution_email": ""
     },
     "0535001838": {
@@ -5684,7 +5684,7 @@
         "collecting_institution_phone": "928810000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Insular de Lanzarote",
-        "submitting_institution_address": "C. Juan de Quesada, s/n, Arrecife",
+        "submitting_institution_address": "Calle Juan De Quesada, S/N",
         "submitting_institution_email": ""
     },
     "0535004296": {
@@ -5996,7 +5996,7 @@
         "collecting_institution_phone": "922678000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Canarias",
-        "submitting_institution_address": "Carretera Ofra s/n, La Laguna",
+        "submitting_institution_address": "Carretera Cuesta Taco, S/N",
         "submitting_institution_email": ""
     },
     "0538001932": {
@@ -6019,8 +6019,8 @@
         "lab_geo_loc_longitude": "-16.2846109",
         "collecting_institution_phone": "922602000",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario Ntra. Sra de Candelaria (HUNSC)",
-        "submitting_institution_address": "Carretera del Rosario 145",
+        "submitting_institution": "Hospital Universitario Nuestra Señora De Candelaria",
+        "submitting_institution_address": "Carretera Rosario (Del), 145",
         "submitting_institution_email": "jalcflo@gobiernodecanarias.org"
     },
     "0538002288": {
@@ -6211,8 +6211,8 @@
         "lab_geo_loc_longitude": "-3.8279401",
         "collecting_institution_phone": "942202520",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario Marqués de Valdecilla",
-        "submitting_institution_address": "Av. Valdecilla s/n",
+        "submitting_institution": "Hospital Universitario Marques De Valdecilla",
+        "submitting_institution_address": "Avenida Valdecilla, 25",
         "submitting_institution_email": ""
     },
     "0639000455": {
@@ -6332,7 +6332,7 @@
         "collecting_institution_phone": "942847400",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Sierrallana",
-        "submitting_institution_address": "Bo. Ganzo, s/n, Torrelavega",
+        "submitting_institution_address": "Barrio Ganzo, S/N",
         "submitting_institution_email": ""
     },
     "0639001300": {
@@ -6362,7 +6362,7 @@
     "0705000769": {
         "codcnh": "050013",
         "collecting_institution": "Hospital Nuestra Señora De Sonsoles",
-        "collecting_institution_address": "Avenida De Juan Carlos I, S/N, S/N",
+        "collecting_institution_address": "Avenida De Juan Carlos I, S/N",
         "collecting_institution_email": "gerente.hnss@saludcastillayleon.es",
         "autonom_cod": "05-C11-0001",
         "geo_loc_state": "Castilla y León",
@@ -6380,7 +6380,7 @@
         "collecting_institution_phone": "920358000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Nuestra Señora de Sonsoles",
-        "submitting_institution_address": "Av. Juan Carlos I, s/n",
+        "submitting_institution_address": "Avenida De Juan Carlos I, S/N",
         "submitting_institution_email": ""
     },
     "0705000770": {
@@ -6482,7 +6482,7 @@
     "0709001370": {
         "codcnh": "090098",
         "collecting_institution": "Hospital Santiago Apostol",
-        "collecting_institution_address": "Carretera De Oron Sn, S/N",
+        "collecting_institution_address": "Carretera De Oron, S/N",
         "collecting_institution_email": "gerente.hsap@saludcastillayleon.es",
         "autonom_cod": "09-C11-0004",
         "geo_loc_state": "Castilla y León",
@@ -6548,7 +6548,7 @@
         "collecting_institution_phone": "947281810",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Burgos Complejo Asistencial Univer. de Burgos",
-        "submitting_institution_address": "Av. Islas Baleares, 3",
+        "submitting_institution_address": "Avenida Islas Baleares, 3",
         "submitting_institution_email": ""
     },
     "0709001375": {
@@ -6578,7 +6578,7 @@
     "0709001376": {
         "codcnh": "090026",
         "collecting_institution": "Hospital Fuente Bermeja- Complejo Asistencial Universitario De Burgos-",
-        "collecting_institution_address": "Calle Francisco Salinas Sn, S/N",
+        "collecting_institution_address": "Calle Francisco Salinas, S/N",
         "collecting_institution_email": "gerente.cabu@saludcastillayleon.es",
         "autonom_cod": "09-C14-0001",
         "geo_loc_state": "Castilla y León",
@@ -6602,7 +6602,7 @@
     "0724001712": {
         "codcnh": "240016",
         "collecting_institution": "Hospital De Leon Complejo Asistencial Universitario De Leon",
-        "collecting_institution_address": "Calle Altos De Nava Sn, S/N",
+        "collecting_institution_address": "Calle Altos De Nava, S/N",
         "collecting_institution_email": "gerente.hleo@saludcastillayleon.es",
         "autonom_cod": "24-C11-0002",
         "geo_loc_state": "Castilla y León",
@@ -6794,7 +6794,7 @@
     "0724001721": {
         "codcnh": "240220",
         "collecting_institution": "Hospital Valle De Laciana",
-        "collecting_institution_address": "Avenida De Asturias Sn, S/N",
+        "collecting_institution_address": "Avenida De Asturias, S/N",
         "collecting_institution_email": "araceli.frances@ute-orthem.provire.es",
         "autonom_cod": "24-C13-0003",
         "geo_loc_state": "Castilla y León",
@@ -6842,7 +6842,7 @@
     "0734000718": {
         "codcnh": "340014",
         "collecting_institution": "Hospital Rio Carrion Complejo Asistencial Universitario De Palencia",
-        "collecting_institution_address": "Avenida Donantes De Sangre Sn, S/N",
+        "collecting_institution_address": "Avenida Donantes De Sangre, S/N",
         "collecting_institution_email": "gerente.hrcr@saludcastillayleon.es",
         "autonom_cod": "34-C11-0001",
         "geo_loc_state": "Castilla y León",
@@ -6860,7 +6860,7 @@
         "collecting_institution_phone": "979167000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Rio Carrion Complejo Asistencial Universitario de Palencia",
-        "submitting_institution_address": "Av. Donantes de Sangre, s/n",
+        "submitting_institution_address": "Avenida Donantes De Sangre, S/N",
         "submitting_institution_email": ""
     },
     "0734000719": {
@@ -6914,7 +6914,7 @@
     "0734000721": {
         "codcnh": "340035",
         "collecting_institution": "Hospital Psiquiatrico San Luis",
-        "collecting_institution_address": "Carretera De Burgos Sn, S/N",
+        "collecting_institution_address": "Carretera De Burgos, S/N",
         "collecting_institution_email": "ch.palencia@hospitalarias.es",
         "autonom_cod": "34-C14-0001",
         "geo_loc_state": "Castilla y León",
@@ -6986,7 +6986,7 @@
     "0737001404": {
         "codcnh": "370074",
         "collecting_institution": "Hospital Los Montalvos (Complejo Asistencial Universitario De Salamanca)",
-        "collecting_institution_address": "Carretera Ciudad Rodrigo, S/N, S/N",
+        "collecting_institution_address": "Carretera Ciudad Rodrigo, S/N",
         "collecting_institution_email": "gerencia.husa@saludcastillayleon.es",
         "autonom_cod": "37-C11-0002",
         "geo_loc_state": "Castilla y León",
@@ -7004,7 +7004,7 @@
         "collecting_institution_phone": "923330163",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Los Montalvos (Complejo Asistencial Universitario de Salamanca)",
-        "submitting_institution_address": "P.º de San Vicente, 58",
+        "submitting_institution_address": "Carretera Ciudad Rodrigo, S/N",
         "submitting_institution_email": ""
     },
     "0737001405": {
@@ -7034,7 +7034,7 @@
     "0740000778": {
         "codcnh": "400019",
         "collecting_institution": "Hospital General De Segovia Complejo Asistencial De Segovia",
-        "collecting_institution_address": "Calle Luis Erik Claveria Neurologo Sn, S/N",
+        "collecting_institution_address": "Calle Luis Erik Claveria Neurologo, S/N",
         "collecting_institution_email": "gerente.gasse@saludcastillayleon.es",
         "autonom_cod": "40-C11-0001",
         "geo_loc_state": "Castilla y León",
@@ -7082,7 +7082,7 @@
     "0742000617": {
         "codcnh": "420011",
         "collecting_institution": "Hospital Santa Barbara ,Complejo Asistencial De Soria",
-        "collecting_institution_address": "Paseo De Santa Barbara, S/N, S/N",
+        "collecting_institution_address": "Paseo De Santa Barbara, S/N",
         "collecting_institution_email": "gerente.hsor@saludcastillayleon.es",
         "autonom_cod": "42-C11-0001",
         "geo_loc_state": "Castilla y León",
@@ -7100,7 +7100,7 @@
         "collecting_institution_phone": "975234300",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario de Ciudad Real",
-        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
+        "submitting_institution_address": "Calle Obispo Rafael Torija, 35",
         "submitting_institution_email": ""
     },
     "0742000618": {
@@ -7202,7 +7202,7 @@
     "0747001315": {
         "codcnh": "470113",
         "collecting_institution": "Hospital Recoletas Salud Campo Grande",
-        "collecting_institution_address": "Plaza De Colon S/N, S/N",
+        "collecting_institution_address": "Plaza De Colon, S/N",
         "collecting_institution_email": "coordinacion.medica.hcg@gruporecoletas.com",
         "autonom_cod": "47-C11-0004",
         "geo_loc_state": "Castilla y León",
@@ -7532,7 +7532,7 @@
         "collecting_institution_phone": "967597100",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario de Albacete",
-        "submitting_institution_address": "Calle Hermanos Falcó 37",
+        "submitting_institution_address": "Calle Hermanos Falco, 37",
         "submitting_institution_email": ""
     },
     "0802000374": {
@@ -7676,7 +7676,7 @@
         "collecting_institution_phone": "926580500",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario de Ciudad Real",
-        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
+        "submitting_institution_address": "Calle Obispo Rafael Torija, 35",
         "submitting_institution_email": ""
     },
     "0813000577": {
@@ -7700,7 +7700,7 @@
         "collecting_institution_phone": "926646000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario de Ciudad Real",
-        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
+        "submitting_institution_address": "Calle Obispo Rafael Torija, 35",
         "submitting_institution_email": ""
     },
     "0813000578": {
@@ -7772,7 +7772,7 @@
         "collecting_institution_phone": "926320200",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario de Ciudad Real",
-        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
+        "submitting_institution_address": "Calle Obispo Rafael Torija, 35",
         "submitting_institution_email": ""
     },
     "0813000595": {
@@ -7796,7 +7796,7 @@
         "collecting_institution_phone": "926278000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario de Ciudad Real",
-        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
+        "submitting_institution_address": "Calle Obispo Rafael Torija, 35",
         "submitting_institution_email": ""
     },
     "0813000931": {
@@ -7820,7 +7820,7 @@
         "collecting_institution_phone": "926525800",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario de Ciudad Real",
-        "submitting_institution_address": "C. Obispo Rafael Torija, s/n",
+        "submitting_institution_address": "Calle Obispo Rafael Torija, 35",
         "submitting_institution_email": ""
     },
     "0816000170": {
@@ -7844,7 +7844,7 @@
         "collecting_institution_phone": "969179900",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Virgen de la Luz",
-        "submitting_institution_address": "Hermandad de Donantes de Sangre, 1",
+        "submitting_institution_address": "Calle Hermandad Donantes De Sangre, 1",
         "submitting_institution_email": ""
     },
     "0816000342": {
@@ -7892,7 +7892,7 @@
         "collecting_institution_phone": "949209200",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Guadalajara",
-        "submitting_institution_address": "C. Donante de Sangre, S/N",
+        "submitting_institution_address": "Avenida Donantes De Sangre, S/N",
         "submitting_institution_email": ""
     },
     "0819000010": {
@@ -7946,7 +7946,7 @@
     "0819000180": {
         "codcnh": "190061",
         "collecting_institution": "U.R.R. De Enfermos Psiquicos Alcohete",
-        "collecting_institution_address": "Paseo Conde Romanones S/N, S/N",
+        "collecting_institution_address": "Paseo Conde Romanones, S/N",
         "collecting_institution_email": "mvpchaves@jccm.es",
         "autonom_cod": "1901873/0003011",
         "geo_loc_state": "Castilla - La Mancha",
@@ -8156,7 +8156,7 @@
         "collecting_institution_phone": "925803600",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Nuestra Señora del Prado",
-        "submitting_institution_address": "CTRA. MADRID, Av. Extremadura, KM 114",
+        "submitting_institution_address": "Carretera Madrid, KM 114",
         "submitting_institution_email": ""
     },
     "0845000812": {
@@ -8564,7 +8564,7 @@
         "collecting_institution_phone": "932483000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": ""
     },
     "0908005151": {
@@ -8635,8 +8635,8 @@
         "lab_geo_loc_longitude": "2.151762",
         "collecting_institution_phone": "932275400",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Clínic de Barcelona (HCB)",
-        "submitting_institution_address": "C/Villarroel 170",
+        "submitting_institution": "Hospital Clinic De Barcelona",
+        "submitting_institution_address": "Calle Villarroel, 170",
         "submitting_institution_email": ""
     },
     "0908005154": {
@@ -8684,7 +8684,7 @@
         "collecting_institution_phone": "933674100",
         "geo_loc_country": "Spain",
         "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": ""
     },
     "0908005157": {
@@ -9092,7 +9092,7 @@
         "collecting_institution_phone": "937690201",
         "geo_loc_country": "Spain",
         "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": ""
     },
     "0908005177": {
@@ -9211,8 +9211,8 @@
         "lab_geo_loc_longitude": "2.1034957",
         "collecting_institution_phone": "932607510",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Bellvitge",
-        "submitting_institution_address": "Carrer Feixa Llarga s/n",
+        "submitting_institution": "Hospital Universitari De Bellvitge",
+        "submitting_institution_address": "Calle Feixa Llarga, S/N",
         "submitting_institution_email": ""
     },
     "0908005182": {
@@ -9932,7 +9932,7 @@
         "collecting_institution_phone": "935074710",
         "geo_loc_country": "Spain",
         "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": ""
     },
     "0908005215": {
@@ -10340,7 +10340,7 @@
         "collecting_institution_phone": "937417700",
         "geo_loc_country": "Spain",
         "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": ""
     },
     "0908005238": {
@@ -10508,7 +10508,7 @@
         "collecting_institution_phone": "932594000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": ""
     },
     "0908005248": {
@@ -10796,7 +10796,7 @@
         "collecting_institution_phone": "932483000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": ""
     },
     "0908005264": {
@@ -11108,7 +11108,7 @@
         "collecting_institution_phone": "934893000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Vall d'Hebron",
-        "submitting_institution_address": "Passeig de la Vall d'Hebron, 119-129",
+        "submitting_institution_address": "Paseo Vall D'Hebron, 119-129",
         "submitting_institution_email": ""
     },
     "0908005288": {
@@ -11588,7 +11588,7 @@
         "collecting_institution_phone": "972940200",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Vall d'Hebron",
-        "submitting_institution_address": "Passeig de la Vall d'Hebron, 119-129",
+        "submitting_institution_address": "Paseo Vall D'Hebron, 119-129",
         "submitting_institution_email": ""
     },
     "0917000814": {
@@ -11804,7 +11804,7 @@
         "collecting_institution_phone": "972353264",
         "geo_loc_country": "Spain",
         "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": ""
     },
     "0917000824": {
@@ -12044,7 +12044,7 @@
         "collecting_institution_phone": "973248100",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitari Arnau de Vilanova de Lleida",
-        "submitting_institution_address": "Av. Alcalde Rovira Roure, 80",
+        "submitting_institution_address": "Avenida Alcalde Rovira Roure, 80",
         "submitting_institution_email": ""
     },
     "0925000574": {
@@ -12620,7 +12620,7 @@
         "collecting_institution_phone": "977588200",
         "geo_loc_country": "Spain",
         "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": ""
     },
     "0943000760": {
@@ -12956,7 +12956,7 @@
         "collecting_institution_phone": "977310300",
         "geo_loc_country": "Spain",
         "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Carrer de la Selva, 10",
+        "submitting_institution_address": "Calle Selva, 10",
         "submitting_institution_email": ""
     },
     "1003000040": {
@@ -13148,8 +13148,8 @@
         "collecting_institution_phone": "966616211",
         "geo_loc_country": "Spain",
         "submitting_institution": "Fundació Fisabio",
-        "submitting_institution_address": "Av. Roma, s/n",
-        "submitting_institution_email": "santiago.melon@sespa.es"
+        "submitting_institution_address": "Avenida de Catalunya, 21",
+        "submitting_institution_email": ""
     },
     "1003000144": {
         "codcnh": "030092",
@@ -13340,8 +13340,8 @@
         "collecting_institution_phone": "965913496",
         "geo_loc_country": "Spain",
         "submitting_institution": "Fundació Fisabio",
-        "submitting_institution_address": "Av. Roma, s/n",
-        "submitting_institution_email": "santiago.melon@sespa.es"
+        "submitting_institution_address": "Avenida de Catalunya, 21",
+        "submitting_institution_email": ""
     },
     "1003000229": {
         "codcnh": "030089",
@@ -13604,8 +13604,8 @@
         "collecting_institution_phone": "964725000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Fundació Fisabio",
-        "submitting_institution_address": "Av. Roma, s/n",
-        "submitting_institution_email": "santiago.melon@sespa.es"
+        "submitting_institution_address": "Avenida de Catalunya, 21",
+        "submitting_institution_email": ""
     },
     "1012000182": {
         "codcnh": "120038",
@@ -13748,8 +13748,8 @@
         "collecting_institution_phone": "963131800",
         "geo_loc_country": "Spain",
         "submitting_institution": "Fundació Fisabio",
-        "submitting_institution_address": "Av. Roma, s/n",
-        "submitting_institution_email": "santiago.melon@sespa.es"
+        "submitting_institution_address": "Avenida de Catalunya, 21",
+        "submitting_institution_email": ""
     },
     "1046000096": {
         "codcnh": "460291",
@@ -13916,8 +13916,8 @@
         "collecting_institution_phone": "963188906",
         "geo_loc_country": "Spain",
         "submitting_institution": "Fundació Fisabio",
-        "submitting_institution_address": "Av. Roma, s/n",
-        "submitting_institution_email": "santiago.melon@sespa.es"
+        "submitting_institution_address": "Avenida de Catalunya, 21",
+        "submitting_institution_email": ""
     },
     "1046000342": {
         "codcnh": "460044",
@@ -13940,8 +13940,8 @@
         "collecting_institution_phone": "961973500",
         "geo_loc_country": "Spain",
         "submitting_institution": "Fundació Fisabio",
-        "submitting_institution_address": "Av. Roma, s/n",
-        "submitting_institution_email": "santiago.melon@sespa.es"
+        "submitting_institution_address": "Avenida de Catalunya, 21",
+        "submitting_institution_email": ""
     },
     "1046000344": {
         "codcnh": "460116",
@@ -14036,8 +14036,8 @@
         "collecting_institution_phone": "961244000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Fundació Fisabio",
-        "submitting_institution_address": "Av. Roma, s/n",
-        "submitting_institution_email": "santiago.melon@sespa.es"
+        "submitting_institution_address": "Avenida de Catalunya, 21",
+        "submitting_institution_email": ""
     },
     "1046000383": {
         "codcnh": "460266",
@@ -14468,7 +14468,7 @@
         "collecting_institution_phone": "924218100",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Badajoz",
-        "submitting_institution_address": "Av. de Elvas, s/n",
+        "submitting_institution_address": "Avenida Elvas, 0",
         "submitting_institution_email": ""
     },
     "1106000566": {
@@ -14636,7 +14636,7 @@
         "collecting_institution_phone": "924381000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital de Mérida",
-        "submitting_institution_address": "Av. Don Antonio Campos Hoyos, 26",
+        "submitting_institution_address": "Avenida Don Antonio Campos Hoyos, 26",
         "submitting_institution_email": ""
     },
     "1106000796": {
@@ -14660,7 +14660,7 @@
         "collecting_institution_phone": "924388081",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital de Mérida",
-        "submitting_institution_address": "Av. Don Antonio Campos Hoyos, 26",
+        "submitting_institution_address": "Avenida Don Antonio Campos Hoyos, 26",
         "submitting_institution_email": ""
     },
     "1106000798": {
@@ -14852,7 +14852,7 @@
         "collecting_institution_phone": "927256211",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital San Pedro de Alcantara",
-        "submitting_institution_address": "Av. Pablo Naranjo Porras, s/n",
+        "submitting_institution_address": "Avenida Pablo Naranjo Porras, 0",
         "submitting_institution_email": ""
     },
     "1110000563": {
@@ -15092,7 +15092,7 @@
         "collecting_institution_phone": "981178000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Complexo Hospitalario Universitario A Coruña",
-        "submitting_institution_address": "As Xubias, 84",
+        "submitting_institution_address": "Lugar Jubias De Arriba, 84",
         "submitting_institution_email": ""
     },
     "1215000173": {
@@ -15260,7 +15260,7 @@
         "collecting_institution_phone": "981950000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Complexo Hospitalario Universitario Santiago",
-        "submitting_institution_address": "Rúa da Choupana, s/n",
+        "submitting_institution_address": "Calle Choupana (Da), S/N",
         "submitting_institution_email": ""
     },
     "1215000181": {
@@ -15356,7 +15356,7 @@
         "collecting_institution_phone": "982296000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Complexo Hospitalario Universitario de Lugo",
-        "submitting_institution_address": "Rúa Dr. Ulises Romero, 1",
+        "submitting_institution_address": "Calle Ulises Romero, 1",
         "submitting_institution_email": ""
     },
     "1227000094": {
@@ -15836,7 +15836,7 @@
         "collecting_institution_phone": "986811111",
         "geo_loc_country": "Spain",
         "submitting_institution": "Complexo Hospitalario Universitario de Vigo",
-        "submitting_institution_address": "Estrada de Clara Campoamor, 341",
+        "submitting_institution_address": "Carretera Clara Campoamor, 341",
         "submitting_institution_email": "Benito.Jose.Regueiro.Garcia@sergas.es"
     },
     "1328000001": {
@@ -16148,7 +16148,7 @@
         "collecting_institution_phone": "913908000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario 12 de Octubre",
-        "submitting_institution_address": "Av. de Cordoba, s/n",
+        "submitting_institution_address": "Avenida De Cordoba, S/N",
         "submitting_institution_email": "mfolgueira@salud.madrid.org"
     },
     "1328000018": {
@@ -16364,7 +16364,7 @@
         "collecting_institution_phone": "916648600",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Mostoles",
-        "submitting_institution_address": "C. Dr. Luis Montes, S/N",
+        "submitting_institution_address": "Calle Rio Jucar, S/N",
         "submitting_institution_email": ""
     },
     "1328000027": {
@@ -16387,8 +16387,8 @@
         "lab_geo_loc_longitude": "-3.6699309",
         "collecting_institution_phone": "915868000",
         "geo_loc_country": "Spain",
-        "submitting_institution": "HU GREGORIO MARAÑÓN",
-        "submitting_institution_address": "C. del Dr. Esquerdo, 46",
+        "submitting_institution": "Hospital General Universitario Gregorio Marañon",
+        "submitting_institution_address": "Calle Del Doctor Esquerdo, 46",
         "submitting_institution_email": ""
     },
     "1328000028": {
@@ -16651,8 +16651,8 @@
         "lab_geo_loc_longitude": "-3.6968814",
         "collecting_institution_phone": "913368000",
         "geo_loc_country": "Spain",
-        "submitting_institution": "H U RAMÓN Y CAJAL",
-        "submitting_institution_address": "Ctra. Colmenar Viejo, km.9, 100",
+        "submitting_institution": "Hospital Universitario Ramon Y Cajal",
+        "submitting_institution_address": "Carretera De Colmenar Viejo, KM.9,1",
         "submitting_institution_email": ""
     },
     "1328000040": {
@@ -16724,7 +16724,7 @@
         "collecting_institution_phone": "914818000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Severo Ochoa",
-        "submitting_institution_address": "Av. de Orellana, s/n",
+        "submitting_institution_address": "Avenida Orellana, S/N",
         "submitting_institution_email": ""
     },
     "1328000043": {
@@ -16748,7 +16748,7 @@
         "collecting_institution_phone": "913303000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Clinico San Carlos",
-        "submitting_institution_address": "Calle del Prof Martín Lagos",
+        "submitting_institution_address": "Calle Del Profesor Martin Lagos, S/N",
         "submitting_institution_email": ""
     },
     "1328000044": {
@@ -17108,7 +17108,7 @@
         "collecting_institution_phone": "916839360",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Getafe",
-        "submitting_institution_address": "Carr. Madrid - Toledo, Km 12,500, Getafe",
+        "submitting_institution_address": "Carretera De Madrid-Toledo, KM.12,500",
         "submitting_institution_email": ""
     },
     "1328000063": {
@@ -18116,7 +18116,7 @@
         "collecting_institution_phone": "968359000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario Reina Sofia",
-        "submitting_institution_address": "Av. Intendente Jorge Palacios, 1",
+        "submitting_institution_address": "Avenida Intendente Jorge Palacios, 1",
         "submitting_institution_email": ""
     },
     "1430000007": {
@@ -18163,8 +18163,8 @@
         "lab_geo_loc_longitude": "-0.9642549",
         "collecting_institution_phone": "968128600",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital General Universitario Santa Lucía",
-        "submitting_institution_address": "C. Minarete, s/n",
+        "submitting_institution": "Hospital General Universitario Santa Lucia",
+        "submitting_institution_address": "Calle Mezquita (Paraje Los Arcos), S/N",
         "submitting_institution_email": ""
     },
     "1430000047": {
@@ -18188,7 +18188,7 @@
         "collecting_institution_phone": "968565000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario Los Arcos del Mar Menor",
-        "submitting_institution_address": "Paraje Torre Octavio, 54, Pozo Aledo",
+        "submitting_institution_address": "Paraje Torre Octavio, S/N",
         "submitting_institution_email": ""
     },
     "1430000051": {
@@ -18212,7 +18212,7 @@
         "collecting_institution_phone": "968240601",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital G. Universitario J.M. Morales Meseguer",
-        "submitting_institution_address": "Av. Marqués de Los Vélez, s/n",
+        "submitting_institution_address": "Avenida Marques De Los Velez, 0",
         "submitting_institution_email": ""
     },
     "1430000053": {
@@ -18356,7 +18356,7 @@
         "collecting_institution_phone": "968775550",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital de la Vega Lorenzo Guirao",
-        "submitting_institution_address": "Vereda de Morcillo, s/n, Cieza",
+        "submitting_institution_address": "Carretera De Abaran, S/N",
         "submitting_institution_email": ""
     },
     "1430000059": {
@@ -18403,8 +18403,8 @@
         "lab_geo_loc_longitude": "-1.162941",
         "collecting_institution_phone": "968369500",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Clínico Universitario Virgen de la Arrixaca",
-        "submitting_institution_address": "Ctra. Madrid-Cartagena, s/n, El Palmar",
+        "submitting_institution": "Hospital Clinico Universitario Virgen De La Arrixaca",
+        "submitting_institution_address": "Carretera Madrid-Cartagena, S/N",
         "submitting_institution_email": ""
     },
     "1430000061": {
@@ -18476,7 +18476,7 @@
         "collecting_institution_phone": "968445500",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Rafael Mendez",
-        "submitting_institution_address": "Ctra. N-340, Lorca",
+        "submitting_institution_address": "Carretera Nacional 340, Km 589, S/N NACIONAL 340- KM. 589",
         "submitting_institution_email": ""
     },
     "1430000064": {
@@ -18668,7 +18668,7 @@
         "collecting_institution_phone": "848434000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Navarra",
-        "submitting_institution_address": "C. de Irunlarrea, 3, Pamplona",
+        "submitting_institution_address": "Calle Irunlarrea, 3 -",
         "submitting_institution_email": ""
     },
     "1531000730": {
@@ -18692,7 +18692,7 @@
         "collecting_institution_phone": "848435000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Navarra",
-        "submitting_institution_address": "C. de Irunlarrea, 3, Pamplona",
+        "submitting_institution_address": "Calle Irunlarrea, 3 -",
         "submitting_institution_email": ""
     },
     "1531000733": {
@@ -18716,7 +18716,7 @@
         "collecting_institution_phone": "948255400",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Navarra",
-        "submitting_institution_address": "C. de Irunlarrea, 3, Pamplona",
+        "submitting_institution_address": "Calle Irunlarrea, 3 -",
         "submitting_institution_email": ""
     },
     "1531000734": {
@@ -18884,7 +18884,7 @@
         "collecting_institution_phone": "848422222",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Navarra",
-        "submitting_institution_address": "C. de Irunlarrea, 3, Pamplona",
+        "submitting_institution_address": "Calle Irunlarrea, 3 -",
         "submitting_institution_email": ""
     },
     "1601000003": {
@@ -19004,7 +19004,7 @@
         "collecting_institution_phone": "945007007",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Donostia",
-        "submitting_institution_address": "Begiristain Doktorea Pasealekua, s/n",
+        "submitting_institution_address": "Paseo Doctor Begiristain, 109",
         "submitting_institution_email": ""
     },
     "1620000001": {
@@ -19195,8 +19195,8 @@
         "lab_geo_loc_longitude": "-1.9686538",
         "collecting_institution_phone": "943007060",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Univeristario Donostia",
-        "submitting_institution_address": "Begiristain Doktorea Pasealekua, s/n",
+        "submitting_institution": "Hospital Universitario Donostia",
+        "submitting_institution_address": "Paseo Doctor Begiristain, 109",
         "submitting_institution_email": ""
     },
     "1620000012": {
@@ -19340,7 +19340,7 @@
         "collecting_institution_phone": "944006000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Basurto",
-        "submitting_institution_address": "Montevideo Etorb., 18",
+        "submitting_institution_address": "Avenida Montevideo, 16",
         "submitting_institution_email": "MIKELJOSEBA.URRUTICOECHEAGUTIERREZ@osakidetza.eus"
     },
     "1648000006": {
@@ -19484,7 +19484,7 @@
         "collecting_institution_phone": "946006000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Cruces",
-        "submitting_institution_address": "Plaza Cruces, s/n",
+        "submitting_institution_address": "Plaza Cruces, 11",
         "submitting_institution_email": ""
     },
     "1648000014": {
@@ -19508,7 +19508,7 @@
         "collecting_institution_phone": "944006733",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Cruces",
-        "submitting_institution_address": "Plaza Cruces, s/n",
+        "submitting_institution_address": "Plaza Cruces, 11",
         "submitting_institution_email": ""
     },
     "1648000015": {
@@ -19676,7 +19676,7 @@
         "collecting_institution_phone": "944006603",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Cruces",
-        "submitting_institution_address": "Plaza Cruces, s/n",
+        "submitting_institution_address": "Plaza Cruces, 11",
         "submitting_institution_email": ""
     },
     "1648000022": {
@@ -19820,7 +19820,7 @@
         "collecting_institution_phone": "946134800",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario Cruces",
-        "submitting_institution_address": "Plaza Cruces, s/n",
+        "submitting_institution_address": "Plaza Cruces, 11",
         "submitting_institution_email": ""
     },
     "1726000067": {
@@ -19940,7 +19940,7 @@
         "collecting_institution_phone": "941298000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario San Pedro",
-        "submitting_institution_address": "C. Piqueras, 98",
+        "submitting_institution_address": "Calle Piqueras, 98",
         "submitting_institution_email": ""
     },
     "1726000699": {
@@ -20036,7 +20036,7 @@
         "collecting_institution_phone": "856907000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Ceuta",
-        "submitting_institution_address": "Colmenar s/n",
+        "submitting_institution_address": "Calle Loma Colmenar, S/N",
         "submitting_institution_email": ""
     },
     "1952000109": {
@@ -20059,7 +20059,7 @@
         "lab_geo_loc_longitude": "-2.9475224",
         "collecting_institution_phone": "952670000",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Comarcal de Melilla",
+        "submitting_institution": "Hospital Comarcal",
         "submitting_institution_address": "Remonta, 2",
         "submitting_institution_email": ""
     },
@@ -20300,7 +20300,7 @@
         "collecting_institution_phone": "941298000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario San Pedro",
-        "submitting_institution_address": "C. Piqueras, 98",
+        "submitting_institution_address": "Calle Piqueras, 98",
         "submitting_institution_email": ""
     },
     "COMP_281427": {
@@ -20348,7 +20348,7 @@
         "collecting_institution_phone": "917277000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario La Paz",
-        "submitting_institution_address": "P.º de la Castellana, 261",
+        "submitting_institution_address": "Paseo De La Castellana, 261",
         "submitting_institution_email": "fernandoj.lazaro@salud.madrid.org"
     },
     "COMP_280225": {
@@ -20371,8 +20371,8 @@
         "lab_geo_loc_longitude": "-3.6699309",
         "collecting_institution_phone": "915868000",
         "geo_loc_country": "Spain",
-        "submitting_institution": "HU GREGORIO MARAÑÓN",
-        "submitting_institution_address": "C. del Dr. Esquerdo, 46",
+        "submitting_institution": "Hospital General Universitario Gregorio Marañon",
+        "submitting_institution_address": "Calle Del Doctor Esquerdo, 46",
         "submitting_institution_email": ""
     },
     "COMP_281405": {
@@ -20546,7 +20546,7 @@
     "COMP_370016": {
         "codcnh": "370016",
         "collecting_institution": "Complejo Asistencial Universitario De Salamanca",
-        "collecting_institution_address": "Carretera Ciudad Rodrigo, S/N, S/N",
+        "collecting_institution_address": "Carretera Ciudad Rodrigo, S/N",
         "collecting_institution_email": "gerencia.husa@saludcastillayleon.es",
         "autonom_cod": "N/A",
         "geo_loc_state": "Castilla y León",
@@ -20587,8 +20587,8 @@
         "lab_geo_loc_longitude": "-16.6740841",
         "collecting_institution_phone": "922174740",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario Ntra. Sra de Candelaria (HUNSC)",
-        "submitting_institution_address": "Carretera del Rosario 145",
+        "submitting_institution": "Hospital Universitario Nuestra Señora De Candelaria",
+        "submitting_institution_address": "Carretera Rosario (Del), 145",
         "submitting_institution_email": "jalcflo@gobiernodecanarias.org"
     },
     "COMP_380326": {
@@ -20876,7 +20876,7 @@
         "collecting_institution_phone": "967597100",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital General Universitario de Albacete",
-        "submitting_institution_address": "Calle Hermanos Falcó 37",
+        "submitting_institution_address": "Calle Hermanos Falco, 37",
         "submitting_institution_email": ""
     },
     "COMP_040097": {
@@ -20972,7 +20972,7 @@
         "collecting_institution_phone": "924215000",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Badajoz",
-        "submitting_institution_address": "Av. de Elvas, s/n",
+        "submitting_institution_address": "Avenida Elvas, 0",
         "submitting_institution_email": ""
     },
     "COMP_060253": {
@@ -21026,7 +21026,7 @@
     "COMP_090133": {
         "codcnh": "090133",
         "collecting_institution": "Complejo Asistencial Universitario De Burgos",
-        "collecting_institution_address": "Calle Francisco Salinas Sn, S/N",
+        "collecting_institution_address": "Calle Francisco Salinas, S/N",
         "collecting_institution_email": "gerente.cabu@saludcastillayleon.es",
         "autonom_cod": "N/A",
         "geo_loc_state": "Castilla y León",
@@ -21044,7 +21044,7 @@
         "collecting_institution_phone": "947281810",
         "geo_loc_country": "Spain",
         "submitting_institution": "Hospital Universitario de Burgos Complejo Asistencial Univer. de Burgos",
-        "submitting_institution_address": "Av. Islas Baleares, 3",
+        "submitting_institution_address": "Avenida Islas Baleares, 3",
         "submitting_institution_email": ""
     },
     "1328021542": {
@@ -21067,8 +21067,8 @@
         "lab_geo_loc_longitude": "-3.8653296",
         "collecting_institution_phone": "000000000",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Instituto de Salud Carlos III",
-        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
+        "submitting_institution": "Instituto De Salud Carlos Iii - Centro Nacional De Microbiologia",
+        "submitting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
         "submitting_institution_email": "info@isciii.es"
     },
     "SERV_002": {
@@ -21091,13 +21091,13 @@
         "lab_geo_loc_longitude": "2.64469",
         "phone": "N/A",
         "submitting_institution": "Servicio de Microbiologia HU Son Espases",
-        "submitting_institution_address": "Ctra. Valldemossa 79",
+        "submitting_institution_address": "Carretera Valldemossa 79",
         "submitting_institution_email": "antonio.oliver@ssib.es",
         "collecting_institution": "Servicio de Microbiologia HU Son Espases"
     },
     "LAB_003": {
         "codcnh": "LAB_003",
-        "collecting_institution_address": "Calle Dr. Mallafrè Guasch, 4,",
+        "collecting_institution_address": "Calle Dr. Mallafrè Guasch, 4",
         "collecting_institution_email": "",
         "autonom_cod": "N/A",
         "geo_loc_state": "Cataluña",
@@ -21115,7 +21115,7 @@
         "lab_geo_loc_longitude": "1.23854",
         "phone": "N/A",
         "submitting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII",
-        "submitting_institution_address": "c/ Dr. Mallafrè Guasch, 4,",
+        "submitting_institution_address": "Calle Dr. Mallafrè Guasch, 4",
         "submitting_institution_email": "",
         "collecting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII"
     },
@@ -21187,8 +21187,8 @@
         "lab_geo_loc_longitude": "2.0653671",
         "collecting_institution_phone": "935040149",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Laboratorio Echevarne, SA",
-        "submitting_institution_address": "Carrer de Martorell,20 Sant Cugat del Vallès",
+        "submitting_institution": "Laboratorio Echevarne, Sa",
+        "submitting_institution_address": "Avenida Can Bellet, 61-65",
         "submitting_institution_email": ""
     },
     "FUND_007": {
@@ -21452,7 +21452,7 @@
         "phone": "N/A",
         "submitting_institution": "Fundació Fisabio",
         "submitting_institution_address": "Avenida de Catalunya, 21",
-        "submitting_institution_email": "santiago.melon@sespa.es",
+        "submitting_institution_email": "",
         "collecting_institution": "Fundació Fisabio"
     },
     "GAP_018": {
@@ -21475,7 +21475,7 @@
         "lab_geo_loc_longitude": "-8.7284837",
         "phone": "N/A",
         "submitting_institution": "Gerencia de Atención Primaria Pontevedra Sur",
-        "submitting_institution_address": "Av. das Camelias, 109, Vigo",
+        "submitting_institution_address": "Avenida das Camelias, 109",
         "submitting_institution_email": "",
         "collecting_institution": "Gerencia de Atención Primaria Pontevedra Sur"
     },
@@ -21618,8 +21618,8 @@
         "lab_geo_loc_latitude": "40.4451851",
         "lab_geo_loc_longitude": "-3.7340082",
         "phone": "913353535",
-        "submitting_institution": "Instituto de Salud Carlos III",
-        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
+        "submitting_institution": "Instituto De Salud Carlos Iii - Centro Nacional De Microbiologia",
+        "submitting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
         "submitting_institution_email": "info@isciii.es",
         "collecting_institution": "Presidencia del Gobierno"
     },
@@ -21642,8 +21642,8 @@
         "lab_geo_loc_latitude": "40.4134038",
         "lab_geo_loc_longitude": "-3.6940267",
         "phone": "915961089",
-        "submitting_institution": "Instituto de Salud Carlos III",
-        "submitting_institution_address": "Crta. Pozuelo Majadahonda S/N",
+        "submitting_institution": "Instituto De Salud Carlos Iii - Centro Nacional De Microbiologia",
+        "submitting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
         "submitting_institution_email": "info@isciii.es",
         "collecting_institution": "Ministerio Sanidad"
     }
