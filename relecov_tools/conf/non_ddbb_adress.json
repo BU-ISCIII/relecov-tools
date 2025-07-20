@@ -1,6 +1,6 @@
 {
     "1328021542": {
-        "codcnh": "INST_001",
+        "collecting_institution_codcnh": "INST_001",
         "collecting_institution": "Instituto De Salud Carlos Iii - Centro Nacional De Microbiologia",
         "collecting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
         "collecting_institution_email": "Desconocido",
@@ -14,7 +14,7 @@
         "post_code": "28220",
         "dep_func": "Otras Entidades U Organismos Públicos De Dependencia Estatal",
         "center_class_code": "C256",
-        "collecting_institution_finalidad": "Centros de Diagnostico",
+        "collecting_institution_function": "Centros de Diagnostico",
         "lab_geo_loc_latitude": "40.4603614",
         "lab_geo_loc_longitude": "-3.8653296",
         "collecting_institution_phone": "000000000",
@@ -24,7 +24,7 @@
         "submitting_institution_email": "info@isciii.es"
     },
     "SERV_002": {
-        "codcnh": "SERV_002",
+        "collecting_institution_codcnh": "SERV_002",
         "collecting_institution_address": "Carretera Valldemossa 79",
         "collecting_institution_email": "antonio.oliver@ssib.es",
         "autonom_cod": "N/A",
@@ -38,7 +38,7 @@
         "post_code": "07120",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "39.60717",
         "lab_geo_loc_longitude": "2.64469",
         "collecting_institution_phone": "N/A",
@@ -48,7 +48,7 @@
         "collecting_institution": "Servicio de Microbiologia HU Son Espases"
     },
     "LAB_003": {
-        "codcnh": "LAB_003",
+        "collecting_institution_codcnh": "LAB_003",
         "collecting_institution_address": "Calle Dr. Mallafrè Guasch, 4",
         "collecting_institution_email": "",
         "autonom_cod": "N/A",
@@ -62,7 +62,7 @@
         "post_code": "43005",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "41.12429",
         "lab_geo_loc_longitude": "1.23854",
         "collecting_institution_phone": "N/A",
@@ -72,7 +72,7 @@
         "collecting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII"
     },
     "0908000757": {
-        "codcnh": "LAB_004",
+        "collecting_institution_codcnh": "LAB_004",
         "collecting_institution": "Laboratori De Referencia De Catalunya",
         "collecting_institution_address": "Calle Selva, 10",
         "collecting_institution_email": "Desconocido",
@@ -86,7 +86,7 @@
         "post_code": "08820",
         "dep_func": "Privados",
         "center_class_code": "C256",
-        "collecting_institution_finalidad": "Centros de Diagnostico",
+        "collecting_institution_function": "Centros de Diagnostico",
         "lab_geo_loc_latitude": "41.3162898",
         "lab_geo_loc_longitude": "2.0721947",
         "collecting_institution_phone": "933965300",
@@ -96,7 +96,7 @@
         "submitting_institution_email": ""
     },
     "BANC_005": {
-        "codcnh": "BANC_005",
+        "collecting_institution_codcnh": "BANC_005",
         "collecting_institution_address": "Passeig del Taulat, 116",
         "collecting_institution_email": "",
         "autonom_cod": "N/A",
@@ -110,7 +110,7 @@
         "post_code": "08005",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "41.4006968",
         "lab_geo_loc_longitude": "2.2081675",
         "collecting_institution_phone": "935573500",
@@ -120,7 +120,7 @@
         "collecting_institution": "Banc de Sang i Teixits Catalunya"
     },
     "0908014627": {
-        "codcnh": "LAB_006",
+        "collecting_institution_codcnh": "LAB_006",
         "collecting_institution": "Laboratorio Echevarne, Sa",
         "collecting_institution_address": "Avenida Can Bellet, 61-65",
         "collecting_institution_email": "secretariadireccion@echevarne.com",
@@ -134,7 +134,7 @@
         "post_code": "08174",
         "dep_func": "Privados",
         "center_class_code": "C256",
-        "collecting_institution_finalidad": "Centros de Diagnostico",
+        "collecting_institution_function": "Centros de Diagnostico",
         "lab_geo_loc_latitude": "41.4837857",
         "lab_geo_loc_longitude": "2.0653671",
         "collecting_institution_phone": "935040149",
@@ -144,7 +144,7 @@
         "submitting_institution_email": ""
     },
     "FUND_007": {
-        "codcnh": "FUND_007",
+        "collecting_institution_codcnh": "FUND_007",
         "collecting_institution_address": "Carrer del Dr. Joan Soler, 1-3",
         "collecting_institution_email": "",
         "autonom_cod": "N/A",
@@ -158,7 +158,7 @@
         "post_code": "08243",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "41.7210484",
         "lab_geo_loc_longitude": "1.8383049",
         "collecting_institution_phone": "938759300",
@@ -168,7 +168,7 @@
         "collecting_institution": "Fundació Althaia-Manresa"
     },
     "0908000923": {
-        "codcnh": "CAP_008",
+        "collecting_institution_codcnh": "CAP_008",
         "collecting_institution": "Cap La Salut",
         "collecting_institution_address": "Pasaje Dels Encants, S/N",
         "collecting_institution_email": "Desconocido",
@@ -182,7 +182,7 @@
         "post_code": "08914",
         "dep_func": "Servicios O Institutos De Salud De Las Comunidades Autónomas",
         "center_class_code": "C231",
-        "collecting_institution_finalidad": "Centros de salud",
+        "collecting_institution_function": "Centros de salud",
         "lab_geo_loc_latitude": "41.4435836",
         "lab_geo_loc_longitude": "2.2267433",
         "collecting_institution_phone": "934603948",
@@ -192,7 +192,7 @@
         "submitting_institution_email": ""
     },
     "0908002536": {
-        "codcnh": "CAP_009",
+        "collecting_institution_codcnh": "CAP_009",
         "collecting_institution": "Cap Mataro Centre",
         "collecting_institution_address": "Camino Ral, 208-210",
         "collecting_institution_email": "Desconocido",
@@ -206,7 +206,7 @@
         "post_code": "08301",
         "dep_func": "Otras Entidades U Organismos Públicos",
         "center_class_code": "C231",
-        "collecting_institution_finalidad": "Centros de salud",
+        "collecting_institution_function": "Centros de salud",
         "lab_geo_loc_latitude": "41.539476",
         "lab_geo_loc_longitude": "2.4500082",
         "collecting_institution_phone": "937555190",
@@ -216,7 +216,7 @@
         "submitting_institution_email": ""
     },
     "0908003178": {
-        "codcnh": "CAP_010",
+        "collecting_institution_codcnh": "CAP_010",
         "collecting_institution": "Centre De Salut Doctor Vilaseca-Can Mariner",
         "collecting_institution_address": "Calle Sant Carles, 79",
         "collecting_institution_email": "Desconocido",
@@ -230,7 +230,7 @@
         "post_code": "08922",
         "dep_func": "Servicios O Institutos De Salud De Las Comunidades Autónomas",
         "center_class_code": "C231",
-        "collecting_institution_finalidad": "Centros de salud",
+        "collecting_institution_function": "Centros de salud",
         "lab_geo_loc_latitude": "41.4480887",
         "lab_geo_loc_longitude": "2.2097985",
         "collecting_institution_phone": "934666453",
@@ -240,7 +240,7 @@
         "submitting_institution_email": ""
     },
     "0908000151": {
-        "codcnh": "CAP_011",
+        "collecting_institution_codcnh": "CAP_011",
         "collecting_institution": "Cap Montornes",
         "collecting_institution_address": "Calle De Can Parera, 7",
         "collecting_institution_email": "Desconocido",
@@ -254,7 +254,7 @@
         "post_code": "08170",
         "dep_func": "Servicios O Institutos De Salud De Las Comunidades Autónomas",
         "center_class_code": "C231",
-        "collecting_institution_finalidad": "Centros de salud",
+        "collecting_institution_function": "Centros de salud",
         "lab_geo_loc_latitude": "41.5467816",
         "lab_geo_loc_longitude": "2.2689019",
         "collecting_institution_phone": "935720303",
@@ -264,7 +264,7 @@
         "submitting_institution_email": ""
     },
     "0908000126": {
-        "codcnh": "CAP_012",
+        "collecting_institution_codcnh": "CAP_012",
         "collecting_institution": "Cap Montmelo",
         "collecting_institution_address": "Plaza Ernest Lluch, 1",
         "collecting_institution_email": "Desconocido",
@@ -278,7 +278,7 @@
         "post_code": "08160",
         "dep_func": "Servicios O Institutos De Salud De Las Comunidades Autónomas",
         "center_class_code": "C231",
-        "collecting_institution_finalidad": "Centros de salud",
+        "collecting_institution_function": "Centros de salud",
         "lab_geo_loc_latitude": "41.5537599",
         "lab_geo_loc_longitude": "2.2511482",
         "collecting_institution_phone": "935444440",
@@ -288,7 +288,7 @@
         "submitting_institution_email": ""
     },
     "MIC_013": {
-        "codcnh": "MIC_013",
+        "collecting_institution_codcnh": "MIC_013",
         "collecting_institution_address": "Avenida del Conocimiento S/N",
         "collecting_institution_email": "fegarcia@ugr.es",
         "autonom_cod": "N/A",
@@ -302,7 +302,7 @@
         "post_code": "18007",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "37.146143",
         "lab_geo_loc_longitude": "-3.6029887",
         "collecting_institution_phone": "N/A",
@@ -312,7 +312,7 @@
         "collecting_institution": "Microbiología HUC San Cecilio"
     },
     "FUND_014": {
-        "codcnh": "FUND_014",
+        "collecting_institution_codcnh": "FUND_014",
         "collecting_institution_address": "Avenida Manuel Siurot, S/N",
         "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "autonom_cod": "N/A",
@@ -326,7 +326,7 @@
         "post_code": "41013",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "37.3613333",
         "lab_geo_loc_longitude": "-5.9815096",
         "collecting_institution_phone": "N/A",
@@ -336,7 +336,7 @@
         "collecting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud"
     },
     "CONS_015": {
-        "codcnh": "CONS_015",
+        "collecting_institution_codcnh": "CONS_015",
         "collecting_institution_address": "Paseo de Belen, 19",
         "collecting_institution_email": "jmeirosbouza@gmail.com",
         "autonom_cod": "N/A",
@@ -350,7 +350,7 @@
         "post_code": "47011",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "41.6634839",
         "lab_geo_loc_longitude": "-4.7039398",
         "collecting_institution_phone": "983186318",
@@ -360,7 +360,7 @@
         "collecting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)"
     },
     "0908003855": {
-        "codcnh": "LAB_016",
+        "collecting_institution_codcnh": "LAB_016",
         "collecting_institution": "Catlab-Centre Analitiques Terrassa, Aie",
         "collecting_institution_address": "Calle Vial Sant Jordi, S/N",
         "collecting_institution_email": "Desconocido",
@@ -374,7 +374,7 @@
         "post_code": "08232",
         "dep_func": "Privados",
         "center_class_code": "C256",
-        "collecting_institution_finalidad": "Centros de Diagnostico",
+        "collecting_institution_function": "Centros de Diagnostico",
         "lab_geo_loc_latitude": "41.560694",
         "lab_geo_loc_longitude": "1.961816",
         "collecting_institution_phone": "937485600",
@@ -384,7 +384,7 @@
         "submitting_institution_email": ""
     },
     "FUND_017": {
-        "codcnh": "FUND_017",
+        "collecting_institution_codcnh": "FUND_017",
         "collecting_institution_address": "Avenida de Catalunya, 21",
         "collecting_institution_email": "",
         "autonom_cod": "N/A",
@@ -398,7 +398,7 @@
         "post_code": "46021",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "39.4816786",
         "lab_geo_loc_longitude": "-0.35314696",
         "collecting_institution_phone": "N/A",
@@ -408,7 +408,7 @@
         "collecting_institution": "Fundació Fisabio"
     },
     "GAP_018": {
-        "codcnh": "GAP_018",
+        "collecting_institution_codcnh": "GAP_018",
         "collecting_institution_address": "Avenida das Camelias, 109",
         "collecting_institution_email": "",
         "autonom_cod": "N/A",
@@ -422,7 +422,7 @@
         "post_code": "36211",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "42.2252473",
         "lab_geo_loc_longitude": "-8.7284837",
         "collecting_institution_phone": "N/A",
@@ -432,7 +432,7 @@
         "collecting_institution": "Gerencia de Atención Primaria Pontevedra Sur"
     },
     "PLAT_019": {
-        "codcnh": "PLAT_019",
+        "collecting_institution_codcnh": "PLAT_019",
         "collecting_institution_address": "Calle Piqueras, 98",
         "collecting_institution_email": "mthernando@riojasalud.es",
         "autonom_cod": "N/A",
@@ -446,7 +446,7 @@
         "post_code": "26006",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "42.4538677",
         "lab_geo_loc_longitude": "-2.426554",
         "collecting_institution_phone": "N/A",
@@ -456,7 +456,7 @@
         "collecting_institution": "Plataforma de Genómica y Bioinformática"
     },
     "INST_020": {
-        "codcnh": "INST_020",
+        "collecting_institution_codcnh": "INST_020",
         "collecting_institution_address": "Polígono Industrial de Granadilla, s/n",
         "collecting_institution_email": "jlorenzo@iter.es",
         "autonom_cod": "N/A",
@@ -470,7 +470,7 @@
         "post_code": "38600",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "28.0698005",
         "lab_geo_loc_longitude": "-16.5126569",
         "collecting_institution_phone": "922747700",
@@ -480,7 +480,7 @@
         "collecting_institution": "Instituto Tecnológico y de Energías Renovables, S.A. (ITER, S.A.)"
     },
     "MIC_021": {
-        "codcnh": "MIC_021",
+        "collecting_institution_codcnh": "MIC_021",
         "collecting_institution_address": "Avenida Manuel Siurot s/n",
         "collecting_institution_email": "josea.lepe.sspa@juntadeandalucia.es",
         "autonom_cod": "N/A",
@@ -494,7 +494,7 @@
         "post_code": "41013",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "37.3619503",
         "lab_geo_loc_longitude": "-5.9804021",
         "collecting_institution_phone": "N/A",
@@ -504,7 +504,7 @@
         "collecting_institution": "Microbiología. Hospital Universitario Virgen del Rocio"
     },
     "CONSEJ_022": {
-        "codcnh": "CONSEJ_022",
+        "collecting_institution_codcnh": "CONSEJ_022",
         "collecting_institution_address": "Avenida de Francia, 4",
         "collecting_institution_email": "",
         "autonom_cod": "N/A",
@@ -518,7 +518,7 @@
         "post_code": "45005",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "39.8778065",
         "lab_geo_loc_longitude": "-4.0313959",
         "collecting_institution_phone": "925267099",
@@ -528,7 +528,7 @@
         "collecting_institution": "Consejería de Sanidad"
     },
     "CI_023": {
-        "codcnh": "CI_023",
+        "collecting_institution_codcnh": "CI_023",
         "collecting_institution_address": "Avenida San Juan Bosco, 13",
         "collecting_institution_email": "mhpstrunk.iacs@aragon.es",
         "autonom_cod": "N/A",
@@ -542,7 +542,7 @@
         "post_code": "50009",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "41.6437524",
         "lab_geo_loc_longitude": "-0.9023431",
         "collecting_institution_phone": "N/A",
@@ -552,7 +552,7 @@
         "collecting_institution": "Centro de Investigación Biomédica de Aragón"
     },
     "PRES_024": {
-        "codcnh": "PRES_024",
+        "collecting_institution_codcnh": "PRES_024",
         "collecting_institution_address": "Avenida Puerta de Hierro s/n",
         "collecting_institution_email": "",
         "autonom_cod": "N/A",
@@ -566,7 +566,7 @@
         "post_code": "28040",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "40.4451851",
         "lab_geo_loc_longitude": "-3.7340082",
         "collecting_institution_phone": "913353535",
@@ -576,7 +576,7 @@
         "collecting_institution": "Presidencia del Gobierno"
     },
     "MIN_025": {
-        "codcnh": "MIN_025",
+        "collecting_institution_codcnh": "MIN_025",
         "collecting_institution_address": "P.º del Prado, 18, Centro",
         "collecting_institution_email": "",
         "autonom_cod": "N/A",
@@ -590,7 +590,7 @@
         "post_code": "28014",
         "dep_func": "N/A",
         "center_class_code": "N/A",
-        "collecting_institution_finalidad": "N/A",
+        "collecting_institution_function": "N/A",
         "lab_geo_loc_latitude": "40.4134038",
         "lab_geo_loc_longitude": "-3.6940267",
         "collecting_institution_phone": "915961089",
