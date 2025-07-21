@@ -141,7 +141,7 @@ class BuildSchema(BaseModule):
                 )
         else:
             try:
-                relecov_schema = config_json.get_topic_data("general", "json_schemas")[
+                relecov_schema = config_json.get_topic_data("generic", "json_schemas")[
                     "relecov_schema"
                 ]
             except KeyError as key_error:

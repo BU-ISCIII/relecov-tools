@@ -86,7 +86,7 @@ class BioinfoMetadata(BaseModule):
         # Init process log
 
         if json_schema_file is None:
-            schema_name = config_json.get_topic_data("general", "json_schemas")[
+            schema_name = config_json.get_topic_data("generic", "json_schemas")[
                 "relecov_schema"
             ]
             json_schema_file = os.path.join(

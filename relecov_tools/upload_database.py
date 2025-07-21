@@ -64,7 +64,7 @@ class UploadDatabase(BaseModule):
         schema = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "schema",
-            self.config_json.get_topic_data("general", "json_schemas")[
+            self.config_json.get_topic_data("generic", "json_schemas")[
                 "relecov_schema"
             ],
         )
