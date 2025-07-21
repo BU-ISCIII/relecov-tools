@@ -40,7 +40,7 @@ class MetadataHomogeneizer:
             os.path.dirname(__file__),
             "schema",
             "institution_schemas",
-            self.config_json.get_topic_data("general", "institution_mapping_file")[
+            self.config_json.get_topic_data("generic", "institution_mapping_file")[
                 self.institution
             ],
         )

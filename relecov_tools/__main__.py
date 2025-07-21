@@ -212,7 +212,7 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
         config = relecov_tools.config_json.ConfigJson(extra_config=True)
     else:
         config = relecov_tools.config_json.ConfigJson()
-    logs_config = config.get_topic_data("general", "logs_config")
+    logs_config = config.get_topic_data("generic", "logs_config")
     default_outpath = logs_config.get("default_outpath", "/tmp/relecov_tools")
     if log_path is None:
         log_path = logs_config.get("modules_outpath", {}).get(called_module)
