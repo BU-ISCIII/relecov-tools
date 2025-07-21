@@ -868,7 +868,9 @@ class Validate(BaseModule):
         self.log.info("Validate the given schema")
         self.validate_schema()
         self.log.info("Preparing validator based on config")
-        starting_date = self.config.get_topic_data("validate_config", "starting_date")
+        starting_date = self.config.get_topic_data("general", "validate_config")[
+            "starting_date"
+        ]
         date_checker = (
             relecov_tools.assets.schema_utils.custom_validators.make_date_checker(
                 datetime.strptime(starting_date, "%Y-%m-%d").date(),
