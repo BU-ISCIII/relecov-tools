@@ -66,9 +66,7 @@ class Validate(BaseModule):
                 f"Config file is missing required sections: {', '.join(missing)}"
             )
         if json_schema_file is None:
-            schema_name = self.config.get_topic_data("generic", "json_schemas")[
-                "relecov_schema"
-            ]
+            schema_name = self.config.get_topic_data("generic", "relecov_schema")
             json_schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
             )
@@ -480,9 +478,9 @@ class Validate(BaseModule):
         else:
             config_json = ConfigJson(extra_config=True)
             try:
-                default_path = config_json.get_topic_data("generic", "validate_config")[
-                    "default_sample_id_registry"
-                ]
+                default_path = config_json.get_topic_data(
+                    "generic", "default_sample_id_registry"
+                )
             except KeyError:
                 default_path = None
 
@@ -868,9 +866,7 @@ class Validate(BaseModule):
         self.log.info("Validate the given schema")
         self.validate_schema()
         self.log.info("Preparing validator based on config")
-        starting_date = self.config.get_topic_data("generic", "validate_config")[
-            "starting_date"
-        ]
+        starting_date = self.config.get_topic_data("generic", "starting_date")
         date_checker = (
             relecov_tools.assets.schema_utils.custom_validators.make_date_checker(
                 datetime.strptime(starting_date, "%Y-%m-%d").date(),

@@ -37,7 +37,7 @@ class Map(BaseModule):
             origin_schema = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "schema",
-                config_json.get_topic_data("generic", "json_schemas")["relecov_schema"],
+                config_json.get_topic_data("generic", "relecov_schema"),
             )
         else:
             if not os.path.isfile(origin_schema):
@@ -103,13 +103,13 @@ class Map(BaseModule):
             self.schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "schema",
-                config_json.get_topic_data("generic", "json_schemas")["ena_schema"],
+                config_json.get_topic_data("generic", "ena_schema"),
             )
         elif self.destination_schema == "GISAID":
             self.schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
                 "schema",
-                config_json.get_topic_data("generic", "json_schemas")["gisaid_schema"],
+                config_json.get_topic_data("generic", "gisaid_schema"),
             )
         else:
             stderr.print("[red] Invalid option for mapping to schena")
