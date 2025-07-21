@@ -76,9 +76,7 @@ class LabMetadata(BaseModule):
         config_json = ConfigJson(extra_config=True)
 
         # TODO: remove hardcoded schema selection
-        relecov_schema = config_json.get_topic_data("generic", "json_schemas")[
-            "relecov_schema"
-        ]
+        relecov_schema = config_json.get_topic_data("generic", "relecov_schema")
         relecov_sch_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
         )
