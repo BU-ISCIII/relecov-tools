@@ -23,6 +23,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Fixes
 
+- Revert extra-config change: restore logs_config = config.get_configuration("logs_config") [#734](https://github.com/BU-ISCIII/relecov-tools/pull/734)
+
 #### Changed
 
 - Moved sample_id_ontology previously hard-coded in validate.py to configuration.json [#733](https://github.com/BU-ISCIII/relecov-tools/pull/733)
