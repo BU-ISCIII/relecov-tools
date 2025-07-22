@@ -159,6 +159,11 @@ def process_regcess_table(file):
     regcess_db["CCAA"] = regcess_db["CCAA"].apply(normalize_names)
     regcess_db["Provincia"] = regcess_db["Provincia"].apply(normalize_names)
 
+    # 8. Fix some hospital names
+    regcess_db["Nombre Centro"] = regcess_db["Nombre Centro"].apply(
+        lambda x: center_name_map(x) if center_name_map(x) is not None else x
+    )
+
     return regcess_db
 
 
@@ -326,6 +331,22 @@ def create_json(hospitals):
         }
 
     return hospitals_json
+
+
+def center_name_map(center_name):
+    """Map center names with wrong accents ino the propper name.
+    Args:
+        center_name (str): e.g. "GERMÃ?N SÃ?NCHEZ LÃ?PEZ"
+    Returns:
+        center_name_fixed (str): "GERMÁN SÁNCHEZ LÓPEZ"
+    """
+    center_map = {
+        "Hospital FãTima": "Hospital Fatima",
+        "Hospital Mare De Dã?A©U De La Mercã?A?": "Hospital Mare De Deu De La Merce",
+        "Red De Salud Mental De Araba (Hospital PsiquiãTrico De Araba)": "Red De Salud Mental De Araba (Hospital Psiquiatrico De Araba)",
+    }
+    center_name_fixed = center_map.get(center_name)
+    return center_name_fixed
 
 
 def center_class_map(class_name):
