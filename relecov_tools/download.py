@@ -103,7 +103,7 @@ class Download(BaseModule):
         if sftp_user is None:
             sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
-            self.target_folders = self.target_folders.split(",")
+            self.target_folders = self.target_folders.strip("[").strip("]").split(",")
         self.logsum = self.parent_log_summary(output_dir=self.platform_storage_folder)
         if sftp_passwd is None:
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
@@ -1102,14 +1102,19 @@ class Download(BaseModule):
             raise ConnectionError("Error while listing folders in remote")
         if self.target_folders is None:
             target_folders = clean_root_list
+            selected_folders = target_folders.copy()
         elif self.target_folders[0] == "ALL":
             self.log.info("Showing folders from remote SFTP for user selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
                 msg="Select the folders that will be targeted",
                 choices=sorted(clean_root_list),
             )
+            selected_folders = target_folders.copy()
         else:
-            target_folders = [tf for tf in self.target_folders if tf in clean_root_list]
+            target_folders = [
+                f.strip() for f in self.target_folders if f.strip() in clean_root_list
+            ]
+            selected_folders = self.target_folders
         if self.subfolder is not None:
             new_target_folders = []
             for tfolder in target_folders:
@@ -1122,14 +1127,13 @@ class Download(BaseModule):
                     )
             target_folders = new_target_folders.copy()
         if not target_folders:
-            self.log.error(
-                "No remote folders matching selection %s", self.target_folders
-            )
-            stderr.print("Found no remote folders matching selection")
-            stderr.print(f"List of remote folders: {str(clean_root_list)}")
-            raise ValueError(
-                f"Found no remote folders matching selection {self.target_folders}"
-            )
+            errtxt = f"No remote folders matching selection {selected_folders}"
+            if self.subfolder is not None:
+                errtxt += f" Check if subfolder {str(self.subfolder)} is present"
+            self.log.error(errtxt)
+            stderr.print(errtxt)
+            stderr.print(f"List of available remote folders: {str(clean_root_list)}")
+            raise ValueError(errtxt)
         folders_to_process = {}
         for targeted_folder in target_folders:
             try:
