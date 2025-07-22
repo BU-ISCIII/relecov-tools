@@ -5,7 +5,8 @@
         },
         "validate_config": {
             "default_sample_id_registry": "/tmp/unique_sampleid_registry.json",
-            "starting_date": "2020-01-01"
+            "starting_date": "2020-01-01",
+            "sample_id_ontology": "GENEPIO:0000079"
         },
         "json_schemas": {
             "relecov_schema": "relecov_schema.json",
