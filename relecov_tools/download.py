@@ -87,21 +87,11 @@ class Download(BaseModule):
             with open(conf_file, "r") as fh:
                 config = yaml.load(fh, Loader=yaml.FullLoader)
             try:
-                # self.sftp_server = config["sftp_server"]
-                # self.sftp_port = config["sftp_port"]
-                self.target_folders = config["target_folders"]
-                try:
-                    self.platform_storage_folder = config["platform_storage_folder"]
-                except KeyError:
-                    self.platform_storage_folder = config_json.get_topic_data(
-                        "sftp_handle", "platform_storage_folder"
-                    )
-                sftp_user = config["sftp_user"]
-                sftp_passwd = config["sftp_passwd"]
-            except KeyError as e:
-                self.log.error("Invalid configuration file. Missing %s", e)
-                stderr.print(f"[red] Invalid configuration file. Missing {e} !")
-                raise ValueError(f"Invalid configuration file. Missing {e}")
+                self.platform_storage_folder = config["platform_storage_folder"]
+            except KeyError:
+                self.platform_storage_folder = config_json.get_topic_data(
+                    "sftp_handle", "platform_storage_folder"
+                )
 
         if output_dir is not None:
             if os.path.isdir(output_dir):
