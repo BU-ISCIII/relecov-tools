@@ -18,10 +18,7 @@
         "lab_geo_loc_latitude": "40.4603614",
         "lab_geo_loc_longitude": "-3.8653296",
         "collecting_institution_phone": "000000000",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Instituto de Salud Carlos III",
-        "submitting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
-        "submitting_institution_email": "info@isciii.es"
+        "geo_loc_country": "Spain"
     },
     "SERV_002": {
         "collecting_institution_codcnh": "SERV_002",
@@ -42,9 +39,6 @@
         "lab_geo_loc_latitude": "39.60717",
         "lab_geo_loc_longitude": "2.64469",
         "collecting_institution_phone": "N/A",
-        "submitting_institution": "Servicio de Microbiologia HU Son Espases",
-        "submitting_institution_address": "Carretera Valldemossa 79",
-        "submitting_institution_email": "antonio.oliver@ssib.es",
         "collecting_institution": "Servicio de Microbiologia HU Son Espases"
     },
     "LAB_003": {
@@ -66,9 +60,6 @@
         "lab_geo_loc_latitude": "41.12429",
         "lab_geo_loc_longitude": "1.23854",
         "collecting_institution_phone": "N/A",
-        "submitting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII",
-        "submitting_institution_address": "Calle Dr. Mallafrè Guasch, 4",
-        "submitting_institution_email": "",
         "collecting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII"
     },
     "0908000757": {
@@ -90,10 +81,7 @@
         "lab_geo_loc_latitude": "41.3162898",
         "lab_geo_loc_longitude": "2.0721947",
         "collecting_institution_phone": "933965300",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Laboratori De Referencia De Catalunya",
-        "submitting_institution_address": "Calle Selva, 10",
-        "submitting_institution_email": ""
+        "geo_loc_country": "Spain"
     },
     "BANC_005": {
         "collecting_institution_codcnh": "BANC_005",
@@ -114,9 +102,6 @@
         "lab_geo_loc_latitude": "41.4006968",
         "lab_geo_loc_longitude": "2.2081675",
         "collecting_institution_phone": "935573500",
-        "submitting_institution": "Banc de Sang i Teixits Catalunya",
-        "submitting_institution_address": "Passeig del Taulat, 116",
-        "submitting_institution_email": "",
         "collecting_institution": "Banc de Sang i Teixits Catalunya"
     },
     "0908014627": {
@@ -138,10 +123,7 @@
         "lab_geo_loc_latitude": "41.4837857",
         "lab_geo_loc_longitude": "2.0653671",
         "collecting_institution_phone": "935040149",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Laboratorio Echevarne, Sa",
-        "submitting_institution_address": "Avenida Can Bellet, 61-65",
-        "submitting_institution_email": ""
+        "geo_loc_country": "Spain"
     },
     "FUND_007": {
         "collecting_institution_codcnh": "FUND_007",
@@ -162,9 +144,6 @@
         "lab_geo_loc_latitude": "41.7210484",
         "lab_geo_loc_longitude": "1.8383049",
         "collecting_institution_phone": "938759300",
-        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
-        "submitting_institution_address": "Carretera Canyet, S/N",
-        "submitting_institution_email": "",
         "collecting_institution": "Fundació Althaia-Manresa"
     },
     "0908000923": {
@@ -186,10 +165,7 @@
         "lab_geo_loc_latitude": "41.4435836",
         "lab_geo_loc_longitude": "2.2267433",
         "collecting_institution_phone": "934603948",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
-        "submitting_institution_address": "Carretera Canyet, S/N",
-        "submitting_institution_email": ""
+        "geo_loc_country": "Spain"
     },
     "0908002536": {
         "collecting_institution_codcnh": "CAP_009",
@@ -210,10 +186,7 @@
         "lab_geo_loc_latitude": "41.539476",
         "lab_geo_loc_longitude": "2.4500082",
         "collecting_institution_phone": "937555190",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
-        "submitting_institution_address": "Carretera Canyet, S/N",
-        "submitting_institution_email": ""
+        "geo_loc_country": "Spain"
     },
     "0908003178": {
         "collecting_institution_codcnh": "CAP_010",
@@ -234,10 +207,7 @@
         "lab_geo_loc_latitude": "41.4480887",
         "lab_geo_loc_longitude": "2.2097985",
         "collecting_institution_phone": "934666453",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
-        "submitting_institution_address": "Carretera Canyet, S/N",
-        "submitting_institution_email": ""
+        "geo_loc_country": "Spain"
     },
     "0908000151": {
         "collecting_institution_codcnh": "CAP_011",
@@ -258,10 +228,7 @@
         "lab_geo_loc_latitude": "41.5467816",
         "lab_geo_loc_longitude": "2.2689019",
         "collecting_institution_phone": "935720303",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
-        "submitting_institution_address": "Carretera Canyet, S/N",
-        "submitting_institution_email": ""
+        "geo_loc_country": "Spain"
     },
     "0908000126": {
         "collecting_institution_codcnh": "CAP_012",
@@ -282,10 +249,7 @@
         "lab_geo_loc_latitude": "41.5537599",
         "lab_geo_loc_longitude": "2.2511482",
         "collecting_institution_phone": "935444440",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
-        "submitting_institution_address": "Carretera Canyet, S/N",
-        "submitting_institution_email": ""
+        "geo_loc_country": "Spain"
     },
     "MIC_013": {
         "collecting_institution_codcnh": "MIC_013",
@@ -306,9 +270,6 @@
         "lab_geo_loc_latitude": "37.146143",
         "lab_geo_loc_longitude": "-3.6029887",
         "collecting_institution_phone": "N/A",
-        "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
-        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Microbiología HUC San Cecilio"
     },
     "FUND_014": {
@@ -330,9 +291,6 @@
         "lab_geo_loc_latitude": "37.3613333",
         "lab_geo_loc_longitude": "-5.9815096",
         "collecting_institution_phone": "N/A",
-        "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
-        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud"
     },
     "CONS_015": {
@@ -354,9 +312,6 @@
         "lab_geo_loc_latitude": "41.6634839",
         "lab_geo_loc_longitude": "-4.7039398",
         "collecting_institution_phone": "983186318",
-        "submitting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)",
-        "submitting_institution_address": "Paseo de Belen, 19",
-        "submitting_institution_email": "jmeirosbouza@gmail.com",
         "collecting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)"
     },
     "0908003855": {
@@ -378,10 +333,7 @@
         "lab_geo_loc_latitude": "41.560694",
         "lab_geo_loc_longitude": "1.961816",
         "collecting_institution_phone": "937485600",
-        "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitari Germans Trias I Pujol De Badalona",
-        "submitting_institution_address": "Carretera Canyet, S/N",
-        "submitting_institution_email": ""
+        "geo_loc_country": "Spain"
     },
     "FUND_017": {
         "collecting_institution_codcnh": "FUND_017",
@@ -402,9 +354,6 @@
         "lab_geo_loc_latitude": "39.4816786",
         "lab_geo_loc_longitude": "-0.35314696",
         "collecting_institution_phone": "N/A",
-        "submitting_institution": "Fundació Fisabio",
-        "submitting_institution_address": "Avenida de Catalunya, 21",
-        "submitting_institution_email": "santiago.melon@sespa.es",
         "collecting_institution": "Fundació Fisabio"
     },
     "GAP_018": {
@@ -426,9 +375,6 @@
         "lab_geo_loc_latitude": "42.2252473",
         "lab_geo_loc_longitude": "-8.7284837",
         "collecting_institution_phone": "N/A",
-        "submitting_institution": "Gerencia de Atención Primaria Pontevedra Sur",
-        "submitting_institution_address": "Avenida das Camelias, 109",
-        "submitting_institution_email": "",
         "collecting_institution": "Gerencia de Atención Primaria Pontevedra Sur"
     },
     "PLAT_019": {
@@ -450,9 +396,6 @@
         "lab_geo_loc_latitude": "42.4538677",
         "lab_geo_loc_longitude": "-2.426554",
         "collecting_institution_phone": "N/A",
-        "submitting_institution": "Plataforma de Genómica y Bioinformática",
-        "submitting_institution_address": "Calle Piqueras, 98",
-        "submitting_institution_email": "mthernando@riojasalud.es",
         "collecting_institution": "Plataforma de Genómica y Bioinformática"
     },
     "INST_020": {
@@ -474,9 +417,6 @@
         "lab_geo_loc_latitude": "28.0698005",
         "lab_geo_loc_longitude": "-16.5126569",
         "collecting_institution_phone": "922747700",
-        "submitting_institution": "Instituto Tecnológico y de Energías Renovables, S.A. (ITER, S.A.)",
-        "submitting_institution_address": "Polígono Industrial de Granadilla, s/n",
-        "submitting_institution_email": "jlorenzo@iter.es",
         "collecting_institution": "Instituto Tecnológico y de Energías Renovables, S.A. (ITER, S.A.)"
     },
     "MIC_021": {
@@ -498,9 +438,6 @@
         "lab_geo_loc_latitude": "37.3619503",
         "lab_geo_loc_longitude": "-5.9804021",
         "collecting_institution_phone": "N/A",
-        "submitting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud",
-        "submitting_institution_address": "Avenida Manuel Siurot, S/N",
-        "submitting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
         "collecting_institution": "Microbiología. Hospital Universitario Virgen del Rocio"
     },
     "CONSEJ_022": {
@@ -522,9 +459,6 @@
         "lab_geo_loc_latitude": "39.8778065",
         "lab_geo_loc_longitude": "-4.0313959",
         "collecting_institution_phone": "925267099",
-        "submitting_institution": "Consejería de Sanidad",
-        "submitting_institution_address": "Avenida de Francia, 4",
-        "submitting_institution_email": "",
         "collecting_institution": "Consejería de Sanidad"
     },
     "CI_023": {
@@ -546,9 +480,6 @@
         "lab_geo_loc_latitude": "41.6437524",
         "lab_geo_loc_longitude": "-0.9023431",
         "collecting_institution_phone": "N/A",
-        "submitting_institution": "Centro de Investigación Biomédica de Aragón",
-        "submitting_institution_address": "Avenida San Juan Bosco, 13",
-        "submitting_institution_email": "mhpstrunk.iacs@aragon.es",
         "collecting_institution": "Centro de Investigación Biomédica de Aragón"
     },
     "PRES_024": {
@@ -570,9 +501,6 @@
         "lab_geo_loc_latitude": "40.4451851",
         "lab_geo_loc_longitude": "-3.7340082",
         "collecting_institution_phone": "913353535",
-        "submitting_institution": "Instituto de Salud Carlos III",
-        "submitting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
-        "submitting_institution_email": "info@isciii.es",
         "collecting_institution": "Presidencia del Gobierno"
     },
     "MIN_025": {
@@ -594,9 +522,6 @@
         "lab_geo_loc_latitude": "40.4134038",
         "lab_geo_loc_longitude": "-3.6940267",
         "collecting_institution_phone": "915961089",
-        "submitting_institution": "Instituto de Salud Carlos III",
-        "submitting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
-        "submitting_institution_email": "info@isciii.es",
         "collecting_institution": "Ministerio Sanidad"
     }
 }
