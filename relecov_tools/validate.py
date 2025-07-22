@@ -130,7 +130,7 @@ class Validate(BaseModule):
         self.metadata = metadata
 
         # TODO: Include this field in configuration.json
-        sample_id_ontology = "GENEPIO:0000079"
+        sample_id_ontology = self.config.get_topic_data("generic", "sample_id_ontology")
         try:
             self.sample_id_field = Validate.get_field_from_schema(
                 sample_id_ontology, self.json_schema
