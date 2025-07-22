@@ -1333,7 +1333,7 @@ def wrapper(ctx, output_dir):
     help="Path to relecov-tools templates folder",
 )
 @click.option(
-    "-r", "--project", default="Relecov", help="Project to which the samples belong"
+    "-r", "--project", default=None, help="Project to which the samples belong"
 )
 @click.pass_context
 def upload_results(ctx, user, password, batch_id, template_path, project):
