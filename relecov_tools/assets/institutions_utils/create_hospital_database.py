@@ -323,9 +323,6 @@ def create_json(hospitals):
             "lab_geo_loc_longitude": row["Longitud"],
             "collecting_institution_phone": row["Teléfono Principal"],
             "geo_loc_country": "Spain",
-            "submitting_institution": "",
-            "submitting_institution_address": "",
-            "submitting_institution_email": "",
         }
 
     return hospitals_json
@@ -417,13 +414,6 @@ def add_hospitals(hospital_ddbb_json, regcess_db, add_json):
                 "lab_geo_loc_longitude": row["Longitud"],
                 "collecting_institution_phone": row["Teléfono Principal"],
                 "geo_loc_country": "Spain",
-                "submitting_institution": data.get("submitting_institution"),
-                "submitting_institution_address": data.get(
-                    "submitting_institution_address"
-                ),
-                "submitting_institution_email": data.get(
-                    "submitting_institution_email"
-                ),
             }
 
             for field, new_val in new_data.items():
@@ -467,20 +457,8 @@ def compare_json(prev_json_path, new_hospitals, differences):
         for ccn, data in new_hospitals.items():
             if ccn == prev_ccn:
                 data_found = True
-                for key in [
-                    "submitting_institution",
-                    "submitting_institution_address",
-                    "submitting_institution_email",
-                ]:
-                    if key in prev_data:
-                        data[key] = prev_data[key]
-
                 for field in data:
-                    if field in prev_data and field not in {
-                        "submitting_institution",
-                        "submitting_institution_address",
-                        "submitting_institution_email",
-                    }:
+                    if field in prev_data:
                         if data[field] != prev_data[field]:
                             if field not in differences:
                                 differences[field] = {}
@@ -535,10 +513,6 @@ def create_cities_coord(hospital_json, geo_loc_file):
         hospital = data["collecting_institution"]
         if hospital not in hospitals:
             hospitals.append(hospital)
-
-        submitting = data["submitting_institution"]
-        if submitting not in submittings:
-            submittings.append(submitting)
 
         country = data["geo_loc_country"]
         if city not in geo_loc_cities:
