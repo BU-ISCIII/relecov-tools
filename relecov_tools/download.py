@@ -47,7 +47,7 @@ class Download(BaseModule):
         """Initializes the sftp object"""
         super().__init__(output_dir=output_dir, called_module="download")
         self.log.info("Initiating download process")
-        config_json = ConfigJson(extra_config=True)
+        config_json = ConfigJson()
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
