@@ -25,6 +25,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Changed
 
+- Moved sample_id_ontology previously hard-coded in validate.py to configuration.json [#733](https://github.com/BU-ISCIII/relecov-tools/pull/733)
+
 #### Removed
 
 ### Requirements
