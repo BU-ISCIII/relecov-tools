@@ -1,5 +1,6 @@
 {
     "1328021542": {
+        "collecting_institution_ccn": "1328021542",
         "collecting_institution_codcnh": "INST_001",
         "collecting_institution": "Instituto De Salud Carlos Iii - Centro Nacional De Microbiologia",
         "collecting_institution_address": "Carretera Nacional Vi (Madrid-Coruña), KM 2,200",
@@ -21,6 +22,7 @@
         "geo_loc_country": "Spain"
     },
     "SERV_002": {
+        "collecting_institution_ccn": "SERV_002",
         "collecting_institution_codcnh": "SERV_002",
         "collecting_institution_address": "Carretera Valldemossa 79",
         "collecting_institution_email": "antonio.oliver@ssib.es",
@@ -42,6 +44,7 @@
         "collecting_institution": "Servicio de Microbiologia HU Son Espases"
     },
     "LAB_003": {
+        "collecting_institution_ccn": "LAB_003",
         "collecting_institution_codcnh": "LAB_003",
         "collecting_institution_address": "Calle Dr. Mallafrè Guasch, 4",
         "collecting_institution_email": "",
@@ -63,6 +66,7 @@
         "collecting_institution": "Lab Clínic ICS Camp de Tarragona-Terres de l'Ebre. Hospital Joan XXIII"
     },
     "0908000757": {
+        "collecting_institution_ccn": "0908000757",
         "collecting_institution_codcnh": "LAB_004",
         "collecting_institution": "Laboratori De Referencia De Catalunya",
         "collecting_institution_address": "Calle Selva, 10",
@@ -84,6 +88,7 @@
         "geo_loc_country": "Spain"
     },
     "BANC_005": {
+        "collecting_institution_ccn": "BANC_005",
         "collecting_institution_codcnh": "BANC_005",
         "collecting_institution_address": "Passeig del Taulat, 116",
         "collecting_institution_email": "",
@@ -105,6 +110,7 @@
         "collecting_institution": "Banc de Sang i Teixits Catalunya"
     },
     "0908014627": {
+        "collecting_institution_ccn": "0908014627",
         "collecting_institution_codcnh": "LAB_006",
         "collecting_institution": "Laboratorio Echevarne, Sa",
         "collecting_institution_address": "Avenida Can Bellet, 61-65",
@@ -126,6 +132,7 @@
         "geo_loc_country": "Spain"
     },
     "FUND_007": {
+        "collecting_institution_ccn": "FUND_007",
         "collecting_institution_codcnh": "FUND_007",
         "collecting_institution_address": "Carrer del Dr. Joan Soler, 1-3",
         "collecting_institution_email": "",
@@ -147,6 +154,7 @@
         "collecting_institution": "Fundació Althaia-Manresa"
     },
     "0908000923": {
+        "collecting_institution_ccn": "0908000923",
         "collecting_institution_codcnh": "CAP_008",
         "collecting_institution": "Cap La Salut",
         "collecting_institution_address": "Pasaje Dels Encants, S/N",
@@ -168,6 +176,7 @@
         "geo_loc_country": "Spain"
     },
     "0908002536": {
+        "collecting_institution_ccn": "0908002536",
         "collecting_institution_codcnh": "CAP_009",
         "collecting_institution": "Cap Mataro Centre",
         "collecting_institution_address": "Camino Ral, 208-210",
@@ -189,6 +198,7 @@
         "geo_loc_country": "Spain"
     },
     "0908003178": {
+        "collecting_institution_ccn": "0908003178",
         "collecting_institution_codcnh": "CAP_010",
         "collecting_institution": "Centre De Salut Doctor Vilaseca-Can Mariner",
         "collecting_institution_address": "Calle Sant Carles, 79",
@@ -210,6 +220,7 @@
         "geo_loc_country": "Spain"
     },
     "0908000151": {
+        "collecting_institution_ccn": "0908000151",
         "collecting_institution_codcnh": "CAP_011",
         "collecting_institution": "Cap Montornes",
         "collecting_institution_address": "Calle De Can Parera, 7",
@@ -231,6 +242,7 @@
         "geo_loc_country": "Spain"
     },
     "0908000126": {
+        "collecting_institution_ccn": "0908000126",
         "collecting_institution_codcnh": "CAP_012",
         "collecting_institution": "Cap Montmelo",
         "collecting_institution_address": "Plaza Ernest Lluch, 1",
@@ -252,6 +264,7 @@
         "geo_loc_country": "Spain"
     },
     "MIC_013": {
+        "collecting_institution_ccn": "MIC_013",
         "collecting_institution_codcnh": "MIC_013",
         "collecting_institution_address": "Avenida del Conocimiento S/N",
         "collecting_institution_email": "fegarcia@ugr.es",
@@ -273,6 +286,7 @@
         "collecting_institution": "Microbiología HUC San Cecilio"
     },
     "FUND_014": {
+        "collecting_institution_ccn": "FUND_014",
         "collecting_institution_codcnh": "FUND_014",
         "collecting_institution_address": "Avenida Manuel Siurot, S/N",
         "collecting_institution_email": "joaquin.dopazo@juntadeandalucia.es",
@@ -294,6 +308,7 @@
         "collecting_institution": "Plataforma de Medicina Computacional, Fundación Progreso y Salud"
     },
     "CONS_015": {
+        "collecting_institution_ccn": "CONS_015",
         "collecting_institution_codcnh": "CONS_015",
         "collecting_institution_address": "Paseo de Belen, 19",
         "collecting_institution_email": "jmeirosbouza@gmail.com",
@@ -315,6 +330,7 @@
         "collecting_institution": "Consorcio LUCIA (SACYL,ITACYL UBU,UVa)"
     },
     "0908003855": {
+        "collecting_institution_ccn": "0908003855",
         "collecting_institution_codcnh": "LAB_016",
         "collecting_institution": "Catlab-Centre Analitiques Terrassa, Aie",
         "collecting_institution_address": "Calle Vial Sant Jordi, S/N",
@@ -336,6 +352,7 @@
         "geo_loc_country": "Spain"
     },
     "FUND_017": {
+        "collecting_institution_ccn": "FUND_017",
         "collecting_institution_codcnh": "FUND_017",
         "collecting_institution_address": "Avenida de Catalunya, 21",
         "collecting_institution_email": "",
@@ -357,6 +374,7 @@
         "collecting_institution": "Fundació Fisabio"
     },
     "GAP_018": {
+        "collecting_institution_ccn": "GAP_018",
         "collecting_institution_codcnh": "GAP_018",
         "collecting_institution_address": "Avenida das Camelias, 109",
         "collecting_institution_email": "",
@@ -378,6 +396,7 @@
         "collecting_institution": "Gerencia de Atención Primaria Pontevedra Sur"
     },
     "PLAT_019": {
+        "collecting_institution_ccn": "PLAT_019",
         "collecting_institution_codcnh": "PLAT_019",
         "collecting_institution_address": "Calle Piqueras, 98",
         "collecting_institution_email": "mthernando@riojasalud.es",
@@ -399,6 +418,7 @@
         "collecting_institution": "Plataforma de Genómica y Bioinformática"
     },
     "INST_020": {
+        "collecting_institution_ccn": "INST_020",
         "collecting_institution_codcnh": "INST_020",
         "collecting_institution_address": "Polígono Industrial de Granadilla, s/n",
         "collecting_institution_email": "jlorenzo@iter.es",
@@ -420,6 +440,7 @@
         "collecting_institution": "Instituto Tecnológico y de Energías Renovables, S.A. (ITER, S.A.)"
     },
     "MIC_021": {
+        "collecting_institution_ccn": "MIC_021",
         "collecting_institution_codcnh": "MIC_021",
         "collecting_institution_address": "Avenida Manuel Siurot s/n",
         "collecting_institution_email": "josea.lepe.sspa@juntadeandalucia.es",
@@ -441,6 +462,7 @@
         "collecting_institution": "Microbiología. Hospital Universitario Virgen del Rocio"
     },
     "CONSEJ_022": {
+        "collecting_institution_ccn": "CONSEJ_022",
         "collecting_institution_codcnh": "CONSEJ_022",
         "collecting_institution_address": "Avenida de Francia, 4",
         "collecting_institution_email": "",
@@ -462,6 +484,7 @@
         "collecting_institution": "Consejería de Sanidad"
     },
     "CI_023": {
+        "collecting_institution_ccn": "CI_023",
         "collecting_institution_codcnh": "CI_023",
         "collecting_institution_address": "Avenida San Juan Bosco, 13",
         "collecting_institution_email": "mhpstrunk.iacs@aragon.es",
@@ -483,6 +506,7 @@
         "collecting_institution": "Centro de Investigación Biomédica de Aragón"
     },
     "PRES_024": {
+        "collecting_institution_ccn": "PRES_024",
         "collecting_institution_codcnh": "PRES_024",
         "collecting_institution_address": "Avenida Puerta de Hierro s/n",
         "collecting_institution_email": "",
@@ -504,6 +528,7 @@
         "collecting_institution": "Presidencia del Gobierno"
     },
     "MIN_025": {
+        "collecting_institution_ccn": "MIN_025",
         "collecting_institution_codcnh": "MIN_025",
         "collecting_institution_address": "P.º del Prado, 18, Centro",
         "collecting_institution_email": "",
