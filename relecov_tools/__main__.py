@@ -293,10 +293,8 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
 @click.option(
     "-s",
     "--subfolder",
-    is_flag=False,
-    flag_value="ALL",
-    default="RELECOV",
-    help="Flag: Specify which subfolder to process (default: RELECOV)",
+    default=None,
+    help="Flag: Specify which subfolder to process",
 )
 @click.pass_context
 def download(
