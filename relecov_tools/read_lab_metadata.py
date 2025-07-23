@@ -126,6 +126,18 @@ class LabMetadata(BaseModule):
         )
         self.unique_sample_id = "sequencing_sample_id"
 
+    def _split_institution(self, raw: str) -> tuple[str, str]:
+        name = re.split(r"\s*\[", raw, maxsplit=1)[0].strip()
+        brackets = re.findall(r"\[([^\]]+)\]", raw)
+        code = brackets[-1].strip() if len(brackets) >= 2 else ""
+        return name, code
+
+    INSTITUTION_FIELDS = {
+        "collecting_institution",
+        "submitting_institution",
+        "sequencing_institution",
+    }
+
     def get_samples_files_data(self, clean_metadata_rows):
         """Include the fields that would be included in samples_data.json
 
@@ -375,8 +387,12 @@ class LabMetadata(BaseModule):
         for idx in range(len(m_data)):
             sample_id = str(m_data[idx].get(self.unique_sample_id))
             if m_data[idx].get(map_field):
-                # Remove potential ontology tags from value like [SNOMED:258500001]
-                cleaned_key = re.sub(" [\[].*?[\]]", "", m_data[idx][map_field])
+                code = m_data[idx].get(map_field)
+                if not code:
+                    continue
+
+                cleaned_key = str(code).strip()
+
                 try:
                     adding_data = {
                         k: v
@@ -502,14 +518,16 @@ class LabMetadata(BaseModule):
         return c_files
 
     def read_metadata_file(self):
-        """Reads the input metadata file from header row, changes the metadata heading
-        with their property name values defined in schema. Convert the date columns
-        value to the yyyy/mm/dd format. Return list of dicts with data
+        """
+        Reads the input metadata file, converts headings to schema properties
+        and returns a list[dict] with the cleaned rows.
         """
         meta_sheet = self.metadata_processing.get("excel_sheet")
         header_flag = self.metadata_processing.get("header_flag")
         sample_id_col = self.metadata_processing.get("sample_id_col")
         self.alternative_heading = False
+
+        # ────────── 0. Open sheet ──────────
         try:
             ws_metadata_lab, heading_row_number = relecov_tools.utils.read_excel_file(
                 self.metadata_file, meta_sheet, header_flag, leave_empty=False
@@ -521,26 +539,33 @@ class LabMetadata(BaseModule):
             sample_id_col = self.metadata_processing.get("alternative_sample_id_col")
             logtxt = f"No excel sheet named {meta_sheet}. Using {alt_sheet}"
             stderr.print(f"[yellow]{logtxt}")
-            self.log.error(f"{logtxt}")
+            self.log.error(logtxt)
             ws_metadata_lab, heading_row_number = relecov_tools.utils.read_excel_file(
                 self.metadata_file, alt_sheet, header_flag, leave_empty=False
             )
-        valid_metadata_rows = []
-        included_sample_ids = []
+
+        valid_metadata_rows, included_sample_ids = [], []
         row_number = heading_row_number
+
         for row in ws_metadata_lab:
             row_number += 1
             property_row = {}
+
+            # ────────── 1. Validate sample_id ──────────
             try:
                 sample_id = str(row[sample_id_col]).strip()
             except KeyError:
                 self.logsum.add_error(entry=f"No {sample_id_col} found in excel file")
                 continue
-            # Validations on the sample_id
+
             if sample_id in included_sample_ids:
-                log_text = f"Skipped duplicated sample {sample_id} in row {row_number}. Sequencing sample id must be unique"
+                log_text = (
+                    f"Skipped duplicated sample {sample_id} in row {row_number}. "
+                    f"Sequencing sample id must be unique"
+                )
                 self.logsum.add_warning(entry=log_text)
                 continue
+
             if not row[sample_id_col] or "Not Provided" in sample_id:
                 if row.get("collecting_lab_sample_id"):
                     sample_id = row["collecting_lab_sample_id"]
@@ -557,45 +582,62 @@ class LabMetadata(BaseModule):
                     log_text = f"{sample_id_col} not provided for {sample_id}"
                     self.logsum.add_error(entry=log_text, sample=sample_id)
                     stderr.print(f"[red]{log_text}")
+
             included_sample_ids.append(sample_id)
+
+            # ────────── 2. Process columns ──────────
             for key in row.keys():
                 if header_flag in key:
                     continue
+
+                schema_key = self.label_prop_dict.get(key, key)
                 value = row[key]
-                # Omitting empty or not provided values
+
+                # 2.1  Institution fields
+                if schema_key in self.INSTITUTION_FIELDS and value:
+                    name, code = self._split_institution(str(value))
+                    value = name
+                    if schema_key == "collecting_institution":
+                        #  🔧  usa el nombre EXACTO de tu schema/config
+                        property_row["collecting_institution_code_1"] = code
+
+                # 2.2  Omit empty properties
                 if value is None or value == "" or "not provided" in str(value).lower():
                     log_text = f"{key} not provided for sample {sample_id}"
                     self.logsum.add_warning(sample=sample_id, entry=log_text)
                     continue
-                # Get JSON schema type
-                schema_key = self.label_prop_dict.get(key, key)
+
+                # 2.3  Cast to schema type
                 schema_type = (
                     self.relecov_sch_json["properties"]
                     .get(schema_key, {})
                     .get("type", "string")
                 )
-                # Conversion of values according to expected type
                 try:
                     value = relecov_tools.utils.cast_value_to_schema_type(
                         value, schema_type
                     )
                 except (ValueError, TypeError) as e:
-                    log_text = f"Type conversion error for {key} (expected {schema_type}): {value}. {str(e)}"
+                    log_text = (
+                        f"Type conversion error for {key} (expected {schema_type}): "
+                        f"{value}. {e}"
+                    )
                     self.logsum.add_error(sample=sample_id, entry=log_text)
                     stderr.print(f"[red]{log_text}")
                     continue
+
+                # 2.4  Normalise dates and numbers
                 if "date" in key.lower():
-                    # Check if date is a string. Format YYYY/MM/DD to YYYY-MM-DD
                     pattern = r"^\d{4}[-/.]\d{2}[-/.]\d{2}"
                     if isinstance(row[key], dtime):
-                        row[key] = str(row[key].date())
+                        value = str(row[key].date())
                     elif re.match(pattern, str(row[key])):
-                        row[key] = str(row[key]).replace("/", "-").replace(".", "-")
-                        row[key] = re.match(pattern, row[key]).group(0)
-                        value = row[key]
+                        value = re.match(
+                            pattern, str(row[key]).replace("/", "-").replace(".", "-")
+                        ).group(0)
                     else:
                         try:
-                            row[key] = str(int(float(str(row[key]))))
+                            value = str(int(float(str(row[key]))))
                             self.log.info(
                                 "Date given as an integer. Understood as a year"
                             )
@@ -604,18 +646,20 @@ class LabMetadata(BaseModule):
                             self.logsum.add_error(sample=sample_id, entry=log_text)
                             stderr.print(f"[red]{log_text} for sample {sample_id}")
                             continue
-                elif "sample id" in key.lower():
-                    if isinstance(row[key], float) or isinstance(row[key], int):
-                        row[key] = str(int(row[key]))
-                else:
-                    if isinstance(row[key], float) or isinstance(row[key], int):
-                        row[key] = str(row[key])
+                elif "sample id" in key.lower() and isinstance(row[key], (float, int)):
+                    value = str(int(row[key]))
+                elif isinstance(row[key], (float, int)):
+                    value = str(row[key])
+
                 if "date" not in key.lower() and isinstance(row[key], dtime):
                     logtxt = f"Non-date field {key} provided as date. Parsed as int"
                     self.logsum.add_warning(sample=sample_id, entry=logtxt)
-                    row[key] = str(relecov_tools.utils.excel_date_to_num(row[key]))
+                    value = str(relecov_tools.utils.excel_date_to_num(row[key]))
+
                 property_row[schema_key] = value
+
             valid_metadata_rows.append(property_row)
+
         return valid_metadata_rows
 
     def create_metadata_json(self):
