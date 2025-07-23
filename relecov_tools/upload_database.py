@@ -183,12 +183,12 @@ class UploadDatabase(BaseModule):
 
         if "ERROR" in sample_fields_raw:
             logtxt1 = f"Unable to fetch data from {self.platform}."
-            logtxt2 = f" Received error {sample_fields_raw['ERROR']}"
+            logtxt2 = f" Received error {sample_fields_raw["ERROR"]}"
             self.logsum.add_error(entry=str(logtxt1 + logtxt2))
             stderr.print(f"[red]{logtxt1 + logtxt2}")
             sys.exit(1)
 
-        for _, values in sample_fields_raw["DATA"].items():
+        for _, values in sample_fields_raw["data"].items():
             if "ontology" in values:
                 try:
                     property = ontology_dict[values["ontology"]]
@@ -212,13 +212,13 @@ class UploadDatabase(BaseModule):
         )
         if "ERROR" in s_project_fields_raw:
             logtxt1 = f"Unable to fetch data from {self.platform}."
-            logtxt2 = f" Received error {s_project_fields_raw['ERROR']}"
+            logtxt2 = f" Received error {s_project_fields_raw["ERROR"]}"
             self.logsum.add_error(entry=str(logtxt1 + logtxt2))
             return
         else:
             self.log.info("Fetched sample project fields from iSkyLIMS")
             stderr.print("[blue] Fetched sample project fields from iSkyLIMS")
-        for field in s_project_fields_raw["DATA"]:
+        for field in s_project_fields_raw["data"]:
             s_project_fields.append(field["sample_project_field_name"])
         return [sample_fields, s_project_fields]
 
@@ -291,13 +291,13 @@ class UploadDatabase(BaseModule):
                         stderr.print(f"[red]{logtxt}")
                         continue
 
-                elif "is not defined" in result["ERROR_TEST"].lower():
-                    error_txt = result["ERROR_TEST"]
+                elif "is not defined" in result["ERROR"].lower():
+                    error_txt = result["ERROR"]
                     logtxt = f"Sample {req_sample} failed in {post_url}: {error_txt}"
                     self.logsum.add_error(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]Warning: {logtxt}")
                     continue
-                elif "already defined" in result["ERROR_TEST"].lower():
+                elif "already defined" in result["ERROR"].lower():
                     logtxt = f"Request to {post_url} already defined"
                     self.logsum.add_warning(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]{logtxt} for sample {req_sample}")
