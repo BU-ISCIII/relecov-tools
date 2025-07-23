@@ -19,6 +19,11 @@ class RestApi:
     def __init__(self, server, url):
         self.request_url = server + url
         self.headers = {"content-type": "application/json"}
+        self.UNABLE_TO_CONNECT = {
+            "ERROR": "Server not available",
+            "status_code": "503 Service Unavailable",
+            "data": {},
+        }
 
     def get_request(
         self,
@@ -42,8 +47,7 @@ class RestApi:
             params (dict): Dictionary of params for the get request
 
         Returns:
-            dict: On success, returns {'DATA': <parsed JSON response>}.
-                  On failure, returns {'ERROR': <status code or error message>}.
+            dict: Same as RestApi.standardize_response() dict
         """
         if parameter == "" or parameter is None:
             url_http = str(self.request_url + request_info)
@@ -64,34 +68,16 @@ class RestApi:
             elif isinstance(credentials, (list, tuple)):
                 credentials = HTTPBasicAuth(credentials[0], credentials[1])
         try:
-            req = requests.get(
+            response = requests.get(
                 url_http, headers=self.headers, auth=credentials, params=params
             )
-            if req.status_code != 200:
-                response = req.json()
-                message = (
-                    response.get("detail")
-                    or response.get("error")
-                    or response.get("ERROR")
-                    or response.get("message")
-                    or f"Unexpected error with status {req.status_code}"
-                )
-                if safe:
-                    log.error(
-                        f"Unable to get parameters. Received '{message}' error code {req.status_code}"
-                    )
-                    stderr.print(
-                        f"[red]Unable to fetch data. Received '{message}' with error {req.status_code}"
-                    )
-                return {"ERROR": message, "status_code": req.status_code}
-            return {"DATA": req.json(), "status_code": req.status_code}
+            return RestApi.standardize_response(
+                response, success_code=200, method="GET"
+            )
         except requests.ConnectionError:
             log.error("Unable to open connection towards %s", self.request_url)
             stderr.print("[red] Unable to open connection towards ", self.request_url)
-            return {
-                "ERROR": "Server not available",
-                "status_code": "503 Service Unavailable",
-            }
+            return self.UNABLE_TO_CONNECT
 
     def put_request(self, data, credentials, url):
         """Send a PUT request to update data on the server.
@@ -102,28 +88,18 @@ class RestApi:
             url (str): Endpoint path appended to the base URL.
 
         Returns:
-            dict: {'Success': <response text>} on success,
-                  {'ERROR': <status code or message>} on failure.
+            dict: Same as RestApi.standardize_response() dict
         """
         if isinstance(credentials, dict):
             auth = (credentials["user"], credentials["pass"])
         url_http = str(self.request_url + url)
         try:
-            req = requests.put(url_http, data=data, auth=auth)
+            response = requests.put(url_http, data=data, auth=auth)
         except requests.ConnectionError:
             log.error("Unable to open connection towards %s", self.request_url)
             stderr.print("[red] Unable to open connection towards ", self.request_url)
-            return {"ERROR": "Server not available"}
-        if req.status_code != 201:
-            log.error(
-                "Unable to post parameters. Received error code %s",
-                req.status_code,
-            )
-            if req.status_code != 500:
-                stderr.print(f"[red] Unable to put data because  {req.text}")
-            stderr.print(f"[red] Received error {req.status_code}")
-            return {"ERROR": req.status_code}
-        return {"Success": req.text}
+            return self.UNABLE_TO_CONNECT
+        return RestApi.standardize_response(response, success_code=201, method="PUT")
 
     def post_request(self, data, credentials, url, file=None):
         """Send a POST request with optional file upload.
@@ -135,8 +111,7 @@ class RestApi:
             file (Optional[str]): Path to a file to be uploaded (if any).
 
         Returns:
-            dict: {'Success': <response text>} on success,
-                  {'ERROR': <status code>, 'ERROR_TEST': <error text>} on failure.
+            dict: Same as RestApi.standardize_response() dict
         """
         if isinstance(credentials, dict):
             auth = (credentials["user"], credentials["pass"])
@@ -144,29 +119,20 @@ class RestApi:
         try:
             if file:
                 files = {"upload_file": open(file, "rb")}
-                req = requests.post(
+                response = requests.post(
                     url_http, files=files, data=data, headers=self.headers, auth=auth
                 )
             else:
-                req = requests.post(
+                response = requests.post(
                     url_http, data=data, headers=self.headers, auth=auth
                 )
-            if req.status_code != 201:
-                log.error(
-                    "Unable to post parameters. Received error code %s",
-                    req.status_code,
-                )
-                stderr.print(f"[red] Received error {req.status_code}")
-                if req.status_code != 500:
-                    stderr.print(f"[red] Unable to post data because  {req.text}")
-                    return {"ERROR": req.status_code, "ERROR_TEST": req.text}
-                else:
-                    return {"ERROR": req.status_code, "ERROR_TEST": ""}
-            return {"Success": req.text}
+            return RestApi.standardize_response(
+                response, success_code=201, method="POST"
+            )
         except requests.ConnectionError:
             log.error("Unable to open connection towards %s", self.request_url)
             stderr.print("[red] Unable to open connection towards ", self.request_url)
-            return {"ERROR": "Server not available"}
+            return self.UNABLE_TO_CONNECT
 
     def sample_already_in_db(self, api_func, credentials, sample_data):
         """Check if sample with data already exists in the target platform
@@ -192,3 +158,50 @@ class RestApi:
             return True
         else:
             raise ValueError(f"Error trying to check for sample: {response}")
+
+    @staticmethod
+    def standardize_response(response, success_code=200, method=""):
+        """
+        Parses a `requests.Response` object into a standardized dictionary format.
+
+        Args:
+            response (requests.Response): The HTTP response object to parse.
+            success_code (int): Expected HTTP status code indicating success. Default is 200.
+
+        Returns:
+            dict: Standardized dictionary with:
+                - "Success" or "ERROR": response.text
+                - "status_code": HTTP status code
+                - "data": Parsed JSON body if content-type is application/json, else empty dict.
+        """
+        response_header = response.headers.get("Content-Type", "")
+        try:
+            data = response.json() if "application/json" in response_header else {}
+        except ValueError:
+            data = {}
+        if data:
+            message = (
+                data.get("detail")
+                or data.get("error")
+                or data.get("ERROR")
+                or data.get("message")
+                or f"Unexpected error"
+            )
+        else:
+            if response.status_code != success_code:
+                message = "Unexpected error"
+            else:
+                message = "No message"
+        if response.status_code != success_code:
+            logtxt = f"Unable to {method} parameters. Received '{message}' with status code: {response.status_code}"
+            log.error(logtxt)
+            stderr.print(f"[red]{logtxt}")
+            return {"ERROR": message, "status_code": response.status_code, "data": data}
+        else:
+            logtxt = f"Successful {method} response. Received '{message}' with status code: {response.status_code}"
+            log.info(logtxt)
+            return {
+                "Success": message,
+                "status_code": response.status_code,
+                "data": data,
+            }
