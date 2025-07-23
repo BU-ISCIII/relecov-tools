@@ -183,7 +183,7 @@ class UploadDatabase(BaseModule):
 
         if "ERROR" in sample_fields_raw:
             logtxt1 = f"Unable to fetch data from {self.platform}."
-            logtxt2 = f" Received error {sample_fields_raw["ERROR"]}"
+            logtxt2 = f" Received error {sample_fields_raw['ERROR']}"
             self.logsum.add_error(entry=str(logtxt1 + logtxt2))
             stderr.print(f"[red]{logtxt1 + logtxt2}")
             sys.exit(1)
@@ -212,7 +212,7 @@ class UploadDatabase(BaseModule):
         )
         if "ERROR" in s_project_fields_raw:
             logtxt1 = f"Unable to fetch data from {self.platform}."
-            logtxt2 = f" Received error {s_project_fields_raw["ERROR"]}"
+            logtxt2 = f" Received error {s_project_fields_raw['ERROR']}"
             self.logsum.add_error(entry=str(logtxt1 + logtxt2))
             return
         else:
