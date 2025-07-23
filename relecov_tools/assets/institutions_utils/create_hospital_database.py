@@ -307,8 +307,8 @@ def create_json(hospitals):
 
         ccn_hospital = row["CCN"]
         hospitals_json[ccn_hospital] = {
-            "collecting_institution_ccn": ccn_hospital,
-            "collecting_institution_codcnh": row["CODCNH"],
+            "collecting_institution_code_1": ccn_hospital,
+            "collecting_institution_code_2": row["CODCNH"],
             "collecting_institution": row["Nombre Centro"].strip(),
             "collecting_institution_address": row["Dirección"],
             "collecting_institution_email": (
@@ -411,11 +411,11 @@ def add_hospitals(hospital_ddbb_json, regcess_db, add_json):
                 geo_loc_city_cod = "ADD"
 
             new_data = {
-                "collecting_institution_ccn": data.get(
-                    "collecting_institution_ccn"
+                "collecting_institution_code_1": data.get(
+                    "collecting_institution_code_1"
                 ),
-                "collecting_institution_codcnh": data.get(
-                    "collecting_institution_codcnh"
+                "collecting_institution_code_2": data.get(
+                    "collecting_institution_code_2"
                 ),
                 "collecting_institution": row["Nombre Centro"].strip(),
                 "collecting_institution_address": row["Dirección"],

@@ -192,10 +192,10 @@
         "lab_metadata_req_json": {
             "laboratory_data": {
                 "file": "laboratory_address.json",
-                "map_field": "collecting_institution_ccn",
+                "map_field": "collecting_institution_code_1",
                 "adding_fields": [
                   "collecting_institution",
-                  "collecting_institution_codcnh",
+                  "collecting_institution_code_2",
                   "autonom_cod",
                   "collecting_institution_address",
                   "collecting_institution_email",
