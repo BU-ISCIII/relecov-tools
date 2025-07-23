@@ -129,6 +129,18 @@ class LabMetadata(BaseModule):
         self.unique_sample_id = "sequencing_sample_id"
 
     def _split_institution(self, raw: str) -> tuple[str, str]:
+        """
+        Split a free-text institution string into:
+
+            1. **name** – the visible name without any bracketed tags.
+            2. **code** – the last bracketed element, assumed to be the CCN
+            (e.g. `[1328000027]`). If no second bracket exists, returns "".
+
+        Example
+        -------
+        _split_institution("Hospital X [Madrid] [1328000027]")
+        ("Hospital X", "1328000027")
+        """
         name = re.split(r"\s*\[", raw, maxsplit=1)[0].strip()
         brackets = re.findall(r"\[([^\]]+)\]", raw)
         code = brackets[-1].strip() if len(brackets) >= 2 else ""
