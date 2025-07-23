@@ -34,6 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Moved sample_id_ontology previously hard-coded in validate.py to configuration.json [#733](https://github.com/BU-ISCIII/relecov-tools/pull/733)
 - Removed RELECOV as default subfolder for upload-results and download from __main__.py [#736](https://github.com/BU-ISCIII/relecov-tools/pull/736)
 - Adapted upload_database to new standard RestApi responses [#741](https://github.com/BU-ISCIII/relecov-tools/pull/741)
+- RestApi methods now return Response.json.data if possible in data key [#744](https://github.com/BU-ISCIII/relecov-tools/pull/744)
 
 #### Removed
 
