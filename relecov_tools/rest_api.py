@@ -72,7 +72,7 @@ class RestApi:
                 url_http, headers=self.headers, auth=credentials, params=params
             )
             return RestApi.standardize_response(
-                response, success_code=200, method="GET"
+                response, success_codes=[200, 201], method="GET"
             )
         except requests.ConnectionError:
             log.error("Unable to open connection towards %s", self.request_url)
@@ -99,7 +99,7 @@ class RestApi:
             log.error("Unable to open connection towards %s", self.request_url)
             stderr.print("[red] Unable to open connection towards ", self.request_url)
             return self.UNABLE_TO_CONNECT
-        return RestApi.standardize_response(response, success_code=201, method="PUT")
+        return RestApi.standardize_response(response, success_codes=[201], method="PUT")
 
     def post_request(self, data, credentials, url, file=None):
         """Send a POST request with optional file upload.
@@ -127,7 +127,7 @@ class RestApi:
                     url_http, data=data, headers=self.headers, auth=auth
                 )
             return RestApi.standardize_response(
-                response, success_code=201, method="POST"
+                response, success_codes=[201], method="POST"
             )
         except requests.ConnectionError:
             log.error("Unable to open connection towards %s", self.request_url)
@@ -160,13 +160,13 @@ class RestApi:
             raise ValueError(f"Error trying to check for sample: {response}")
 
     @staticmethod
-    def standardize_response(response, success_code=200, method=""):
+    def standardize_response(response, success_codes=[200], method=""):
         """
         Parses a `requests.Response` object into a standardized dictionary format.
 
         Args:
             response (requests.Response): The HTTP response object to parse.
-            success_code (int): Expected HTTP status code indicating success. Default is 200.
+            success_code (list(int)): Expected HTTP status codes indicating success. Default is [200].
 
         Returns:
             dict: Standardized dictionary with:
@@ -179,7 +179,7 @@ class RestApi:
             data = response.json() if "application/json" in response_header else {}
         except ValueError:
             data = {}
-        if data:
+        if data and isinstance(data, dict):
             message = (
                 data.get("detail")
                 or data.get("error")
@@ -188,11 +188,11 @@ class RestApi:
                 or f"Unexpected error"
             )
         else:
-            if response.status_code != success_code:
+            if response.status_code not in success_codes:
                 message = "Unexpected error"
             else:
                 message = "No message"
-        if response.status_code != success_code:
+        if response.status_code not in success_codes:
             logtxt = f"Unable to {method} parameters. Received '{message}' with status code: {response.status_code}"
             log.error(logtxt)
             stderr.print(f"[red]{logtxt}")
