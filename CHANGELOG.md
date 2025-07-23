@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed target_folders selection problems in download module [#736](https://github.com/BU-ISCIII/relecov-tools/pull/736)
 - Removed override of init input params using config in download [#736](https://github.com/BU-ISCIII/relecov-tools/pull/736)
+- Fix detection of missing label in JSON-Schema properties [#743](https://github.com/BU-ISCIII/relecov-tools/pull/743)
 
 #### Changed
 
