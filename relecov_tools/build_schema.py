@@ -106,6 +106,9 @@ class BuildSchema(BaseModule):
 
         available_projects = self.get_available_projects(self.build_schema_json_file)
 
+        # Get collecting institutions and dropdown list
+        self._lab_dropdowns, self._lab_uniques = self._load_laboratory_addresses()
+
         # Config params
         config_build_schema = ConfigJson(self.build_schema_json_file)
         config_data = config_build_schema.get_configuration("projects")
@@ -209,6 +212,41 @@ class BuildSchema(BaseModule):
                         "[Error]Fatal error. Excel template not found in current relecov-tools installation (assets). Exiting..."
                     )
                     raise
+
+    def _load_laboratory_addresses(self):
+        """
+        Returns two dictionaries with key in the three special fields:
+        - dropdowns[field] ........ list ‘<name> [<city>] [<ccn>]’
+        - uniques[field] .......... unique names for schema enum
+        """
+        json_path = os.path.join(
+            os.path.dirname(__file__),
+            "conf",
+            "laboratory_address.json",
+        )
+        with open(json_path, encoding="utf-8") as fh:
+            lab_data = json.load(fh)
+
+        fields = [
+            "collecting_institution",
+            "submitting_institution",
+            "sequencing_institution",
+        ]
+        dropdowns = {f: [] for f in fields}
+        uniques = {f: set() for f in fields}
+
+        for ccn, info in lab_data.items():
+            city = info.get("geo_loc_city", "").strip()
+
+            for f in fields:
+                name = info.get(f, "").strip()
+                if name:
+                    dropdowns[f].append(f"{name} [{city}] [{ccn}]")
+                    uniques[f].add(name)
+
+        dropdowns = {k: sorted(v) for k, v in dropdowns.items()}
+        uniques = {k: sorted(v) for k, v in uniques.items()}
+        return dropdowns, uniques
 
     def validate_database_definition(self, json_data):
         """Validate the mandatory features and ensure:
@@ -507,6 +545,8 @@ class BuildSchema(BaseModule):
             }
             required_property_unique = []
 
+            common_lab_enum = "; ".join(self._lab_uniques["collecting_institution"])
+
             # Read property_ids in the database.
             #   Perform checks and create (for each property) feature object like:
             #       {'example':'A', 'ontology': 'B'...}.
@@ -514,6 +554,13 @@ class BuildSchema(BaseModule):
             for property_id, db_features_dic in json_data.items():
                 schema_property = {}
                 required_property = {}
+
+                if property_id in (
+                    "collecting_institution",
+                    "submitting_institution",
+                    "sequencing_institution",
+                ):
+                    db_features_dic["enum"] = common_lab_enum
 
                 # Parse property_ids that needs to be incorporated as complex fields in json_schema
                 if json_data[property_id].get("complex_field (Y/N)") == "Y":
@@ -745,12 +792,14 @@ class BuildSchema(BaseModule):
                     "\033[93mEnter a note about changes made to the schema: \033[0m"
                 )
             )
-            # Identify existing template files
+
+            # ------------------------------------------------------------------ #
+            # 1.  Versioning & paths
+            # ------------------------------------------------------------------ #
             version_history = pd.DataFrame(
                 columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
             )
 
-            # Load excel template file and attempt to read version history
             try:
                 wb = openpyxl.load_workbook(self.excel_template)
                 ws_version = wb["VERSION"]
@@ -764,8 +813,6 @@ class BuildSchema(BaseModule):
                 version_history = "1.0.0"
 
             next_version = self.version
-
-            # Store versioning information
             version_info = {
                 "FILE_VERSION": f"Relecov_metadata_template_v{next_version}",
                 "CODE": next_version,
@@ -779,7 +826,9 @@ class BuildSchema(BaseModule):
                 self.output_dir, f"Relecov_metadata_template_v{next_version}.xlsx"
             )
 
-            # Define required metadata classifications
+            # ------------------------------------------------------------------ #
+            # 2.  Schema filtering and dataframe preparation
+            # ------------------------------------------------------------------ #
             required_classification = [
                 "Database Identifiers",
                 "Sample collection and processing",
@@ -793,7 +842,6 @@ class BuildSchema(BaseModule):
             required_properties = json_schema.get("required")
             schema_properties = json_schema.get("properties")
 
-            # Read json schema properties and convert it into pandas df
             try:
                 schema_properties_flatten = relecov_tools.assets.schema_utils.metadatalab_template.schema_to_flatten_json(
                     schema_properties
@@ -801,7 +849,7 @@ class BuildSchema(BaseModule):
                 df = relecov_tools.assets.schema_utils.metadatalab_template.schema_properties_to_df(
                     schema_properties_flatten
                 )
-                # Filter metadata fields based on required classifications
+
                 df = df[df["classification"].isin(required_classification)]
                 df["required"] = df["property_id"].apply(
                     lambda x: "Y" if x in required_properties else "N"
@@ -823,7 +871,9 @@ class BuildSchema(BaseModule):
                 stderr.print(f"Error processing schema properties: {e}")
                 return None
 
-            # Ensure 'header' column exists before filtering
+            # ------------------------------------------------------------------ #
+            # 3.  Headers / filtering
+            # ------------------------------------------------------------------ #
             if "header" in df.columns:
                 df["header"] = df["header"].astype(str).str.strip()
                 df_filtered = df[df["header"].str.upper() == "Y"]
@@ -833,7 +883,10 @@ class BuildSchema(BaseModule):
                 )
                 df_filtered = df
 
-            # Overview sheet
+            # ------------------------------------------------------------------ #
+            # 4.  Construction of OVERVIEW, METADATA_LAB and DATA_VALIDATION
+            # ------------------------------------------------------------------ #
+            # -- OVERVIEW
             try:
                 overview_header = [
                     "Label name",
@@ -842,9 +895,7 @@ class BuildSchema(BaseModule):
                     "Mandatory (Y/N)",
                     "Example",
                 ]
-                df_overview = pd.DataFrame(
-                    columns=[col_name for col_name in overview_header]
-                )
+                df_overview = pd.DataFrame(columns=overview_header)
                 df_overview["Label name"] = df_filtered["label"]
                 df_overview["Description"] = df_filtered["description"]
                 df_overview["Group"] = df_filtered["classification"]
@@ -857,12 +908,10 @@ class BuildSchema(BaseModule):
                 stderr.print(f"Error creating overview sheet: {e}")
                 return None
 
-            # Create Metadata LAB sheet
+            # -- METADATA_LAB
             try:
                 metadatalab_header = ["REQUERIDO", "EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
-                df_metadata = pd.DataFrame(
-                    columns=[col_name for col_name in metadatalab_header]
-                )
+                df_metadata = pd.DataFrame(columns=metadatalab_header)
                 df_metadata["REQUERIDO"] = df_filtered["required"].apply(
                     lambda x: "YES" if str(x).upper() in ["Y", "YES"] else ""
                 )
@@ -877,13 +926,11 @@ class BuildSchema(BaseModule):
                 stderr.print(f"[red]Error creating MetadataLab sheet: {e}")
                 return None
 
-            # Create Data Validation sheet
+            # -- DATA_VALIDATION
             try:
                 datavalidation_header = ["EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
-                df_hasenum = df[(pd.notnull(df.enum))]
-                df_validation = pd.DataFrame(
-                    columns=[col_name for col_name in datavalidation_header]
-                )
+                df_hasenum = df[pd.notnull(df.enum)]
+                df_validation = pd.DataFrame(columns=datavalidation_header)
                 df_validation["tmp_property"] = df_hasenum["property_id"]
                 df_validation["EJEMPLOS"] = df_hasenum["examples"].apply(
                     lambda x: x[0] if isinstance(x, list) else x
@@ -895,47 +942,41 @@ class BuildSchema(BaseModule):
                 stderr.print(f"[red]Error creating DataValidation sheet: {e}")
                 return None
 
+            # ------------------------------------------------------------------ #
+            # 5.  Prepare DATA_VALIDATION
+            # ------------------------------------------------------------------ #
             try:
-
-                enum_dict = {property: [] for property in df_hasenum["property_id"]}
+                enum_dict = {prop: [] for prop in df_hasenum["property_id"]}
                 enum_maxitems = 0
-                # Populate the dictionary with flattened lists
                 for key in enum_dict.keys():
                     enum_values = df_hasenum[df_hasenum["property_id"] == key][
                         "enum"
                     ].values
                     if enum_values.size > 0:
-                        enum_list = enum_values[0]  # Extract the list
-                        enum_dict[key] = enum_list  # Assign the list to the dictionary
-                        if enum_maxitems < len(enum_list):
-                            enum_maxitems = len(enum_list)
+                        enum_list = enum_values[0]
+                        enum_dict[key] = enum_list
+                        enum_maxitems = max(enum_maxitems, len(enum_list))
                     else:
                         enum_dict[key] = []
 
-                # Reshape list dimensions based on enum length.
                 for key in enum_dict.keys():
-                    if len(enum_dict[key]) < enum_maxitems:
-                        num_nas = enum_maxitems - len(enum_dict[key])
-                        for _ in range(num_nas):
-                            enum_dict[key].append("")
+                    enum_dict[key].extend([""] * (enum_maxitems - len(enum_dict[key])))
 
                 new_df = pd.DataFrame(enum_dict)
-                new_index = range(len(new_df.columns))
-                new_df.reindex(columns=new_index)
-
                 valid_index = df_validation["tmp_property"].values
                 valid_transposed = df_validation.transpose()
                 valid_transposed.columns = valid_index
-
-                frames = [valid_transposed, new_df]
-                df_validation = pd.concat(frames)
-                df_validation = df_validation.drop(index=["tmp_property"])
+                df_validation = pd.concat([valid_transposed, new_df]).drop(
+                    index=["tmp_property"]
+                )
             except Exception as e:
                 self.log.error(f"Error processing enums and combining data: {e}")
                 stderr.print(f"[red]Error processing enums and combining data: {e}")
                 return None
 
-            #  Replace NaN, Inf values with empty strings
+            # ------------------------------------------------------------------ #
+            # 6.  Cleaning of NaN's
+            # ------------------------------------------------------------------ #
             df_overview = (
                 df_overview.replace([float("inf"), float("-inf")], "")
                 .fillna("")
@@ -952,10 +993,14 @@ class BuildSchema(BaseModule):
                 .infer_objects()
             )
 
-            # WRITE EXCEL
+            # ------------------------------------------------------------------ #
+            # 7.  Initial writing of the XLSX
+            # ------------------------------------------------------------------ #
             try:
                 writer = pd.ExcelWriter(out_file, engine="xlsxwriter")
-                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(
+                mt = relecov_tools.assets.schema_utils.metadatalab_template
+
+                mt.excel_formater(
                     df_overview,
                     writer,
                     "OVERVIEW",
@@ -963,7 +1008,7 @@ class BuildSchema(BaseModule):
                     have_index=False,
                     have_header=False,
                 )
-                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(
+                mt.excel_formater(
                     df_metadata,
                     writer,
                     "METADATA_LAB",
@@ -971,7 +1016,7 @@ class BuildSchema(BaseModule):
                     have_index=True,
                     have_header=False,
                 )
-                relecov_tools.assets.schema_utils.metadatalab_template.excel_formater(
+                mt.excel_formater(
                     df_validation,
                     writer,
                     "DATA_VALIDATION",
@@ -981,6 +1026,7 @@ class BuildSchema(BaseModule):
                 )
                 version_history.to_excel(writer, sheet_name="VERSION", index=False)
                 writer.close()
+
                 self.log.info(
                     f"Metadata lab template successfuly created in: {out_file}"
                 )
@@ -992,127 +1038,106 @@ class BuildSchema(BaseModule):
                 stderr.print(f"[red]Error writing to Excel: {e}")
                 return None
 
+            # ------------------------------------------------------------------ #
+            # 8.  OpenPyXL post-processing (conditions, dropdowns, etc.)
+            # ------------------------------------------------------------------ #
             try:
                 wb = openpyxl.load_workbook(out_file)
                 ws_metadata = wb["METADATA_LAB"]
                 ws_metadata.freeze_panes = self.configurables.get("freeze_panel", "D1")
                 ws_metadata.delete_rows(5)
-                relecov_tools.assets.schema_utils.metadatalab_template.create_condition(
-                    ws_metadata, self.project_config, df_filtered
-                )
-                relecov_tools.assets.schema_utils.metadatalab_template.add_conditional_format_age_check(
-                    ws_metadata, df_filtered
-                )
+                mt.create_condition(ws_metadata, self.project_config, df_filtered)
+                mt.add_conditional_format_age_check(ws_metadata, df_filtered)
+
+                # Hidden sheet for dropdowns
                 ws_dropdowns = (
                     wb.create_sheet("DROPDOWNS")
                     if "DROPDOWNS" not in wb.sheetnames
                     else wb["DROPDOWNS"]
                 )
-
                 for row in ws_dropdowns.iter_rows():
                     for cell in row:
                         cell.value = None
 
-                for col_idx, (property_id, enum_values) in enumerate(
-                    zip(df["property_id"], df["enum"]), start=1
-                ):
-                    if isinstance(enum_values, list) and len(enum_values) > 0:
-                        start_row = 1
-                        col_letter = openpyxl.utils.get_column_letter(col_idx)
-                        for row_offset, value in enumerate(
-                            enum_values, start=start_row
-                        ):
-                            ws_dropdowns[f"{col_letter}{row_offset}"] = value
+                # Dynamic lists for the three special fieldss
+                common_dropdown = self._lab_dropdowns["collecting_institution"]
+                special_dropdowns = {
+                    "collecting_institution": common_dropdown,
+                    "submitting_institution": common_dropdown,
+                    "sequencing_institution": common_dropdown,
+                }
+                # ------------------------------------------------------------------------------
 
-                        dropdown_range_address = f"DROPDOWNS!${col_letter}${start_row}:${col_letter}${start_row + len(enum_values) - 1}"
+                # We scroll through the columns of METADATA_LAB (original order of df)
+                for col_idx, property_id in enumerate(df["property_id"], start=1):
+                    # Select list of values
+                    if property_id in special_dropdowns:
+                        enum_values = special_dropdowns[property_id]
+                    else:
+                        enum_values = df.loc[
+                            df["property_id"] == property_id, "enum"
+                        ].values[0]
 
-                        col_letter_metadata = ws_metadata.cell(
-                            row=4, column=col_idx + 1
-                        ).column_letter
-                        dropdown_range_metadata = (
-                            f"{col_letter_metadata}5:{col_letter_metadata}1000"
-                        )
-                        dropdown = DataValidation(
-                            type="list",
-                            formula1=f"{dropdown_range_address}",
-                            allow_blank=False,
-                            showErrorMessage=True,
-                        )
-                        dropdown.error = "El valor ingresado no es válido. Seleccione un valor de la lista desplegable."
-                        dropdown.errorTitle = "Valor no permitido"
-                        dropdown.prompt = f"Select a value for {property_id}"
-                        dropdown.promptTitle = "Value selection"
+                    if not isinstance(enum_values, list) or len(enum_values) == 0:
+                        continue
 
-                        ws_metadata.add_data_validation(dropdown)
-                        dropdown.add(dropdown_range_metadata)
+                    # Write on sheet DROPDOWNS
+                    col_letter = openpyxl.utils.get_column_letter(col_idx)
+                    for i, val in enumerate(enum_values, start=1):
+                        ws_dropdowns[f"{col_letter}{i}"].value = val
 
+                    # Create validation in METADATA_LAB
+                    dv_range = (
+                        f"DROPDOWNS!${col_letter}$1:${col_letter}${len(enum_values)}"
+                    )
+                    meta_col = ws_metadata.cell(row=4, column=col_idx + 1).column_letter
+                    meta_rng = f"{meta_col}5:{meta_col}1000"
+
+                    dv = DataValidation(
+                        type="list",
+                        formula1=dv_range,
+                        allow_blank=False,
+                        showErrorMessage=True,
+                    )
+                    dv.error = "Valor no permitido. Elija un elemento de la lista."
+                    dv.errorTitle = "Error de validación"
+                    dv.prompt = f"Seleccione un valor para {property_id}"
+                    dv.promptTitle = "Selección de valor"
+
+                    ws_metadata.add_data_validation(dv)
+                    dv.add(meta_rng)
+
+                # ------------------------------------------------------------------ #
+                # 9.  Visual adjustments (widths, text-wrap, hide sheet)
+                # ------------------------------------------------------------------ #
                 if "OVERVIEW" in wb.sheetnames:
                     ws_overview = wb["OVERVIEW"]
                     column_width = 35
                     for col in ws_overview.columns:
-                        max_length = 0
-                        column = col[0].column_letter  # Get the column name
-                        for cell in col:
-                            try:
-                                if len(str(cell.value)) > max_length:
-                                    max_length = len(cell.value)
-                            except Exception:
-                                pass
-                        adjusted_width = max_length + 2
-                        ws_overview.column_dimensions[column].width = min(
-                            adjusted_width, column_width
+                        max_length = max(
+                            len(str(cell.value)) for cell in col if cell.value
                         )
-
-                    # Enable text wrapping for the entire sheet
+                        ws_overview.column_dimensions[col[0].column_letter].width = min(
+                            max_length + 2, column_width
+                        )
                     for row in ws_overview.iter_rows():
                         for cell in row:
                             cell.alignment = openpyxl.styles.Alignment(wrap_text=True)
 
-                    # ws_overview.protection.sheet = True
-                    # ws_overview.protection.password = self.configurables.get(
-                    #     "protection.password", ""
-                    # )
-
-                    # if "DATA_VALIDATION" in wb.sheetnames:
-                    # ws_data_validation = wb["DATA_VALIDATION"]
-                    # ws_data_validation.protection.sheet = True
-                    # ws_data_validation.protection.password = self.configurables.get(
-                    #     "protection.password", ""
-                    # )
-
-                    # if "VERSION" in wb.sheetnames:
-                    # ws_data_validation = wb["VERSION"]
-                    # ws_data_validation.protection.sheet = True
-                    # ws_data_validation.protection.password = self.configurables.get(
-                    #     "protection.password", ""
-                    # )
-
                     ws_version = wb["VERSION"]
-                    column_widths = []
-
-                    for col in ws_version.columns:
-                        max_length = 0
-                        for cell in col:
-                            if len(str(cell.value)) > max_length:
-                                max_length = len(cell.value)
-                        adjusted_width = max_length + 2
-                        column_widths.append(adjusted_width)
-
-                    # Apply the calculated column width
-                    for i, width in enumerate(column_widths):
+                    for i, col in enumerate(ws_version.columns, start=1):
+                        max_len = max(len(str(c.value)) for c in col if c.value)
                         ws_version.column_dimensions[
-                            openpyxl.utils.get_column_letter(i + 1)
-                        ].width = width
+                            openpyxl.utils.get_column_letter(i)
+                        ].width = (max_len + 2)
 
                 ws_dropdowns.sheet_state = "hidden"
-                # ws_dropdowns.protection.sheet = True
-                # ws_dropdowns.protection.password = "password123"
-
                 wb.save(out_file)
             except Exception as e:
                 self.log.error(f"Error adding dropdowns: {e}")
                 stderr.print(f"[red]Error adding dropdowns: {e}")
                 return None
+
         except Exception as e:
             self.log.error(f"Error in create_metadatalab_excel: {e}")
             stderr.print(f"[red]Error in create_metadatalab_excel: {e}")
