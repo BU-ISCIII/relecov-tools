@@ -185,7 +185,7 @@ class RestApi:
                 or data.get("error")
                 or data.get("ERROR")
                 or data.get("message")
-                or f"Unexpected error"
+                or "Unexpected error"
             )
         else:
             if response.status_code not in success_codes:
