@@ -164,9 +164,9 @@ class Validate(BaseModule):
         relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(
             self.json_schema, "2020-12"
         )
-        for prop in self.json_schema["properties"]:
-            if "label" not in prop:
-                self.log.debug(f"Property {prop} is missing 'label'")
+        for prop_name, prop_def in self.json_schema["properties"].items():
+            if "label" not in prop_def:
+                self.log.debug(f"Property {prop_name} is missing 'label'")
         return
 
     @staticmethod
