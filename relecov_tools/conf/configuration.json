@@ -433,7 +433,7 @@
             "store_samples": "createSampleData",
             "bioinfodata": "createBioinfoData",
             "variantdata": "createVariantData",
-            "check_sample": "getSampleData",
+            "check_sample": "checkSampleExists",
             "sftp_info": "sftpInfo",
             "token": ""
             }
