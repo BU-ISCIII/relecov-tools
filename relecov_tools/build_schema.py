@@ -865,6 +865,19 @@ class BuildSchema(BaseModule):
                         else enum_list
                     )
                 )
+                common_dropdown = self._lab_dropdowns["collecting_institution"]
+
+                lab_fields = [
+                    "collecting_institution",
+                    "submitting_institution",
+                    "sequencing_institution",
+                ]
+
+                mask = df["property_id"].isin(lab_fields)
+
+                df.loc[mask, "enum"] = pd.Series(
+                    [common_dropdown] * mask.sum(), index=df.loc[mask].index
+                )
 
             except Exception as e:
                 self.log.error(f"Error processing schema properties: {e}")
