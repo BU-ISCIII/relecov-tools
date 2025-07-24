@@ -33,6 +33,7 @@ class Validate(BaseModule):
         excel_sheet=None,
         registry=None,
         upload_files=False,
+        upload_invalid_fastq=True,
         logsum_file=None,
         check_db=False,
     ):
@@ -142,6 +143,7 @@ class Validate(BaseModule):
         self.registry_path = registry
         self.logsum_file = logsum_file
         self.upload_files = upload_files
+        self.upload_invalid_fastq = upload_invalid_fastq
         self.check_db = check_db
         if upload_files:
             upload_config = self.config.get_configuration("download")
@@ -726,16 +728,24 @@ class Validate(BaseModule):
             ("sequence_file_path_R1", "sequence_file_R1"),
             ("sequence_file_path_R2", "sequence_file_R2"),
         ]
-        invalid_files = [
-            os.path.join(x[tup[0]], x[tup[1]])
-            for x in invalid_json
-            for tup in path_fields
-            if all(f in x for f in tup)
-        ]
-        if not any(os.path.isfile(f) for f in invalid_files):
-            raise FileNotFoundError(
-                f"No files from metadata found to upload: {invalid_files}"
+        if self.upload_invalid_fastq:
+            invalid_files = [
+                os.path.join(row[p], row[f])
+                for row in invalid_json
+                for p, f in path_fields
+                if p in row and f in row
+            ]
+            if not any(os.path.isfile(f) for f in invalid_files):
+                self.log.debug(
+                    "No invalid FASTQ found, only the Excel will be uploaded"
+                )
+                invalid_files = []
+        else:
+            self.log.info(
+                "Flag upload_invalid_fastq=False -> Only the Excel will be uploaded"
             )
+            invalid_files = []
+
         invalid_remote_folder = self.batch_id + "_invalid_samples"
         self.remote_outfold = os.path.join(remote_labfold, invalid_remote_folder)
         failed_uploads = []
