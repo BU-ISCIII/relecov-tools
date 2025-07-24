@@ -253,7 +253,9 @@ def process_complex(cnh_ddbb, regcess_db):
     complex_hospitals[["Clase de Centro"]] = "Complejo"
 
     # Add "Complejo" to the "Nombre del Complejo" if they don't have it
-    sin_complejo = ~complex_hospitals["Nombre del Complejo"].str.contains("Complejo", na=False)
+    sin_complejo = ~complex_hospitals["Nombre del Complejo"].str.contains(
+        "Complejo", na=False
+    )
     complex_hospitals.loc[sin_complejo, "Nombre del Complejo"] = (
         "Complejo " + complex_hospitals.loc[sin_complejo, "Nombre del Complejo"]
     )
