@@ -458,7 +458,7 @@ class LabMetadata(BaseModule):
                 }
                 row.update(adding_data)
 
-            except KeyError as err:
+            except KeyError:
                 # Code present but does not exist in the auxiliary JSON
                 msg = (
                     f"Unknown {col_label} '{code}' in {json_fields['file']} "
