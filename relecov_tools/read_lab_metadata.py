@@ -394,49 +394,105 @@ class LabMetadata(BaseModule):
         return m_data
 
     def process_from_json(self, m_data, json_fields):
-        """Find the labels that are missing in the file to match the given schema."""
+        """
+        Fill in the fields defined in *json_fields* for each sample.
+
+        This is done in two phases:
+
+        1.  **Per-sample
+            - If *map_field* is empty → warning in `log_summary.json`.
+            - If the code exists but is not found in the auxiliary JSON → warning in `log_summary.json`.
+            - If the code exists and is found → add the fields specified in *adding_fields*.
+            - If any of these fields are `Not Provided`, they are filled with `Not Provided [SNOMED:434941000124101]`.
+
+        2.  **console summary** (`stderr`)
+            - On completion, a **single line** per type of problem
+              (empty codes or unknown codes) is displayed indicating how many samples
+              are affected and the affected property.
+            Example:
+                `13 samples without CCN; check log`.
+
+        Parameters
+        ----------
+            m_data : list[dict]
+            Metadata already read from Excel.
+            json_fields : dict
+            Dict taken from *configuration.json* with:
+                        - map_field
+                        - adding_fields
+                        - file
+                        - j_data (previously loaded in adding_fields())
+
+        Returns
+        -------
+            list[dict]
+            Metadata with the new fields added.
+        """
         map_field = json_fields["map_field"]
-        col_name = self.relecov_sch_json["properties"].get(map_field).get("label")
+        col_label = self.relecov_sch_json["properties"][map_field]["label"]
         json_data = json_fields["j_data"]
-        for idx in range(len(m_data)):
-            sample_id = str(m_data[idx].get(self.unique_sample_id))
-            if m_data[idx].get(map_field):
-                code = m_data[idx].get(map_field)
-                if not code:
-                    continue
 
-                cleaned_key = str(code).strip()
+        # ─── counters for the summary ─────────────────────────────────────────
+        empty_codes = []  # samples without value in map_field
+        unknown_codes = []  # value present but not found in auxiliary json
 
-                try:
-                    adding_data = {
-                        k: v
-                        for k, v in json_data[cleaned_key].items()
-                        if k in json_fields["adding_fields"]
-                    }
-                    m_data[idx].update(adding_data)
-                except KeyError as error:
-                    clean_error = re.sub("[\[].*?[\]]", "", str(error.args[0]))
-                    if str(clean_error).lower().strip() == "not provided":
-                        log_text = (
-                            f"Label {col_name} was not provided in sample "
-                            + f"{sample_id}, auto-completing with Not Provided"
-                        )
-                        self.logsum.add_warning(sample=sample_id, entry=log_text)
-                    else:
-                        log_text = (
-                            f"Unknown field value {error} for json data: "
-                            + f"{str(col_name)} in sample {sample_id}. Skipped"
-                        )
-                        self.logsum.add_warning(sample=sample_id, entry=log_text)
-                        continue
-                    # TODO: Include Not Provided as a configuration field
-                    fields_to_add = {
-                        x: self.config_json.get_topic_data(
-                            "generic", "not_provided_field"
-                        )
-                        for x in json_fields["adding_fields"]
-                    }
-                    m_data[idx].update(fields_to_add)
+        for row in m_data:
+            sample_id = str(row.get(self.unique_sample_id))
+            code = (row.get(map_field) or "").strip()
+
+            # ╭─ 1. Empty field ───────────────────────────────────────────────╮
+            if not code:
+                msg = (
+                    f"{col_label} not provided; cannot map "
+                    f"{json_fields['file']} data"
+                )
+                self.logsum.add_warning(sample=sample_id, entry=msg)
+                empty_codes.append(sample_id)
+                continue
+            # ╰────────────────────────────────────────────────────────────────╯
+
+            # ─── 2. Attempt Mapping ────────────────────────────────────────────
+            try:
+                adding_data = {
+                    k: v
+                    for k, v in json_data[code].items()
+                    if k in json_fields["adding_fields"]
+                }
+                row.update(adding_data)
+
+            except KeyError as err:
+                # Code present but does not exist in the auxiliary JSON
+                msg = (
+                    f"Unknown {col_label} '{code}' in {json_fields['file']} "
+                    f"for sample {sample_id}"
+                )
+                self.logsum.add_warning(sample=sample_id, entry=msg)
+                unknown_codes.append(sample_id)
+                continue
+
+            # ─── 3. Fill Not Provided in the added fields ─────────────
+            for field in json_fields["adding_fields"]:
+                if (
+                    field not in row
+                    or not row[field]
+                    or str(row[field]).lower().startswith("not provided")
+                ):
+                    row[field] = self.config_json.get_topic_data(
+                        "generic", "not_provided_field"
+                    )
+
+        # ─── 4. Summary in stderr ──────────────────────────────────────────
+        if empty_codes:
+            stderr.print(
+                f"[yellow]{len(empty_codes)} samples without {col_label}; "
+                " review log"
+            )
+        if unknown_codes:
+            stderr.print(
+                f"[yellow]{len(unknown_codes)} {col_label} values not found "
+                f"in {json_fields['file']}; review log"
+            )
+
         return m_data
 
     def infer_file_format_from_schema(self, metadata):
@@ -616,8 +672,13 @@ class LabMetadata(BaseModule):
                     name, code = self._split_institution(str(value))
                     value = name
                     if schema_key == "collecting_institution":
-                        #  🔧  usa el nombre EXACTO de tu schema/config
-                        property_row["collecting_institution_code_1"] = code
+                        if code:
+                            property_row["collecting_institution_code_1"] = code
+                        else:
+                            self.logsum.add_warning(
+                                sample=sample_id,
+                                entry="CCN not provided for collecting_institution",
+                            )
 
                 # 2.2  Omit empty properties
                 if value is None or value == "" or "not provided" in str(value).lower():
