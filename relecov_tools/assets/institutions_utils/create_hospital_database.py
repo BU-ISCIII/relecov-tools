@@ -252,6 +252,12 @@ def process_complex(cnh_ddbb, regcess_db):
     # Replaced "Clase de Centro" with "Complejo" instead of the hospital's values.
     complex_hospitals[["Clase de Centro"]] = "Complejo"
 
+    # Add "Complejo" to the "Nombre del Complejo" if they don't have it
+    sin_complejo = ~complex_hospitals["Nombre del Complejo"].str.contains("Complejo", na=False)
+    complex_hospitals.loc[sin_complejo, "Nombre del Complejo"] = (
+        "Complejo " + complex_hospitals.loc[sin_complejo, "Nombre del Complejo"]
+    )
+
     # Fix column names and numbers to fit in the hospital table names
     complex_hospitals = complex_hospitals.drop(columns=["CODIDCOM"]).rename(
         columns={"Nombre del Complejo": "Nombre Centro"}
