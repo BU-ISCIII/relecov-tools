@@ -39,6 +39,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated method signatures and added type annotations and docstring for better code clarity [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Enhanced `validate_samplenames` logic to support combined identifier format (`sequencing_sample_id_unique_sample_id`) when present [#738](https://github.com/BU-ISCIII/relecov-tools/issues/738) [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
 - Renamed `add_bioinfo_files_path` to `map_and_extract_bioinfo_paths` in `read_bioinfo_metadata` for clarity and consistency [#777](https://github.com/BU-ISCIII/relecov-tools/pull/777)
+- Updated the hospital database generation to merge REGCESS and CNH data, handle complexes, enrich and normalize metadata, auto-geolocate cities, and generate all related JSON outputs [#726](https://github.com/BU-ISCIII/relecov-tools/pull/726)
+- Added "Complejo" to the "Nombre del Complejo" [#749](https://github.com/BU-ISCIII/relecov-tools/pull/749)
 
 #### Removed
 
@@ -81,6 +83,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Pablo Mata](https://github.com/shettland)
 - [Victor Lopez](https://github.com/victor5lm)
 - [Alejandro Bernabeu](https://github.com/aberdur)
+- [Sarai Varona](https://github.com/svarona)
 
 #### Added enhancements
 
