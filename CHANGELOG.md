@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Pablo Mata](https://github.com/shettland)
 - [Victor Lopez](https://github.com/victor5lm)
 - [Alejandro Bernabeu](https://github.com/aberdur)
+- [Sarai Varona](https://github.com/svarona)
 
 #### Added enhancements
 
@@ -21,7 +22,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated create_summary_tables.py to organize data jointly [#722](https://github.com/BU-ISCIII/relecov-tools/pull/722).
 - Refactor configuration.json structure by grouping fields by module usage[#725](https://github.com/BU-ISCIII/relecov-tools/pull/725)
 - Standardized rest_api responses for all methods with a new static method called standardize_response [#741](https://github.com/BU-ISCIII/relecov-tools/pull/741)
-
+- Updated the hospital database generation to merge REGCESS and CNH data, handle complexes, enrich and normalize metadata, auto-geolocate cities, and generate all related JSON outputs [#726](https://github.com/BU-ISCIII/relecov-tools/pull/726)
+- Added "Complejo" to the "Nombre del Complejo" [#749](https://github.com/BU-ISCIII/relecov-tools/pull/749)
 
 #### Fixes
 
