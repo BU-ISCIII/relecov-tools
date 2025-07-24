@@ -167,7 +167,7 @@ class Wrapper(BaseModule):
         )
         read_meta_logs = self.exec_read_metadata(self.readmeta_params)
         # Replicating the way read-lab-metadata output file is named
-        file_code = "_".join(["lab_metadata", key]) + ".json"
+        file_code = "_".join(["read_lab_metadata", key]) + ".json"
         metadata_json = self.tag_filename(filename=file_code)
         if metadata_json not in os.listdir(local_folder):
             raise ValueError("No metadata json found after read-lab-metadata")
@@ -191,6 +191,7 @@ class Wrapper(BaseModule):
                 "logsum_file": temp_logsum,
                 "output_dir": local_folder,
                 "upload_files": True,
+                "upload_invalid_fastq": False,
             }
         )
         validate_logs = self.exec_validation(self.validate_params)
