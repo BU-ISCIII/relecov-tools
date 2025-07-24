@@ -480,12 +480,13 @@ class LabMetadata(BaseModule):
         # ─── 4. Summary in stderr ──────────────────────────────────────────
         if empty_codes:
             stderr.print(
-                f"[yellow]{len(empty_codes)} muestras sin {col_label}; " "revisa el log"
+                f"[yellow]{len(empty_codes)} samples without {col_label}; "
+                "check the log"
             )
         if unknown_codes:
             stderr.print(
-                f"[yellow]{len(unknown_codes)} valores de {col_label} no localizados "
-                f"en {json_fields['file']}; revisa el log"
+                f"[yellow]{len(unknown_codes)} values of {col_label} not found "
+                f"en {json_fields['file']}; check the log"
             )
 
         return m_data
