@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed target_folders selection problems in download module [#736](https://github.com/BU-ISCIII/relecov-tools/pull/736)
 - Removed override of init input params using config in download [#736](https://github.com/BU-ISCIII/relecov-tools/pull/736)
 - Fix detection of missing label in JSON-Schema properties [#743](https://github.com/BU-ISCIII/relecov-tools/pull/743)
+- Fix wrapper file-name lookup and prevent upload errors of invalid sample uploaded by download module [#748](https://github.com/BU-ISCIII/relecov-tools/pull/748)
 
 #### Changed
 
@@ -86,7 +87,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed error with extra_dict-bioinfo-config files as they were being mapped even though they had custom functions to do so [#708](https://github.com/BU-ISCIII/relecov-tools/pull/708)
 - Substituted multiple missleading sys.exit() for raise ValueError in read-bioinfo-metadata [#713](https://github.com/BU-ISCIII/relecov-tools/pull/713)
 - Remove lineage_assignment_date transformation from handle_pangolin_data [#716](https://github.com/BU-ISCIII/relecov-tools/pull/716)
-- Fix wrapper file-name lookup and prevent duplicate upload of invalid sample [#748](https://github.com/BU-ISCIII/relecov-tools/pull/748)
 
 #### Changed
 
