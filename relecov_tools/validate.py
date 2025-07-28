@@ -690,7 +690,7 @@ class Validate(BaseModule):
         """
 
         def upload_and_clean(local_file, remote_dest, clean=True):
-            """Upload file to remote sftp and opcionalmente borrar el local."""
+            """Upload file to remote sftp and log the process."""
             self.log.debug(f"Uploading {local_file} → {remote_dest}")
             if not sftp_client.upload_file(local_file, remote_dest):
                 self.log.error(f"Could not upload {local_file} to sftp.")
