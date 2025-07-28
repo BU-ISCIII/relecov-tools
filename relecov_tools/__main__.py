@@ -39,7 +39,7 @@ stderr = rich.console.Console(
     stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
 )
 
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 
 # IMPORTANT: When defining a Click command function in this script,
 # you MUST include both 'ctx' (for @click.pass_context) and ALL the parameters
@@ -212,7 +212,7 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
         config = relecov_tools.config_json.ConfigJson(extra_config=True)
     else:
         config = relecov_tools.config_json.ConfigJson()
-    logs_config = config.get_configuration("logs_config")
+    logs_config = config.get_topic_data("generic", "logs_config")
     default_outpath = logs_config.get("default_outpath", "/tmp/relecov_tools")
     if log_path is None:
         log_path = logs_config.get("modules_outpath", {}).get(called_module)
@@ -293,10 +293,8 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
 @click.option(
     "-s",
     "--subfolder",
-    is_flag=False,
-    flag_value="ALL",
-    default="RELECOV",
-    help="Flag: Specify which subfolder to process (default: RELECOV)",
+    default=None,
+    help="Flag: Specify which subfolder to process",
 )
 @click.pass_context
 def download(
@@ -426,6 +424,7 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     help="Path to the JSON file containing the registered records of validated samples with their unique sample identifiers.",
 )
 @click.option(
+    "-u",
     "--upload_files",
     is_flag=True,
     default=False,
@@ -438,6 +437,13 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     default=None,
     help="Required if --upload_files. Path to the log_summary.json file merged from all previous processes, used to check for invalid samples.",
 )
+@click.option(
+    "-c",
+    "--check_db",
+    is_flag=True,
+    default=False,
+    help="Check if the processed samples are already uploaded to platform database and make invalid those that are already there",
+)
 @click.pass_context
 def validate(
     ctx,
@@ -449,6 +455,7 @@ def validate(
     registry,
     upload_files,
     logsum_file,
+    check_db,
 ):
     """Validate json file against schema."""
     debug = ctx.obj.get("debug", False)
@@ -1326,7 +1333,7 @@ def wrapper(ctx, output_dir):
     help="Path to relecov-tools templates folder",
 )
 @click.option(
-    "-r", "--project", default="Relecov", help="Project to which the samples belong"
+    "-r", "--project", default=None, help="Project to which the samples belong"
 )
 @click.pass_context
 def upload_results(ctx, user, password, batch_id, template_path, project):

@@ -47,7 +47,7 @@ class Download(BaseModule):
         """Initializes the sftp object"""
         super().__init__(output_dir=output_dir, called_module="download")
         self.log.info("Initiating download process")
-        config_json = ConfigJson(extra_config=True)
+        config_json = ConfigJson()
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
@@ -87,21 +87,11 @@ class Download(BaseModule):
             with open(conf_file, "r") as fh:
                 config = yaml.load(fh, Loader=yaml.FullLoader)
             try:
-                # self.sftp_server = config["sftp_server"]
-                # self.sftp_port = config["sftp_port"]
-                self.target_folders = config["target_folders"]
-                try:
-                    self.platform_storage_folder = config["platform_storage_folder"]
-                except KeyError:
-                    self.platform_storage_folder = config_json.get_topic_data(
-                        "sftp_handle", "platform_storage_folder"
-                    )
-                sftp_user = config["sftp_user"]
-                sftp_passwd = config["sftp_passwd"]
-            except KeyError as e:
-                self.log.error("Invalid configuration file. Missing %s", e)
-                stderr.print(f"[red] Invalid configuration file. Missing {e} !")
-                raise ValueError(f"Invalid configuration file. Missing {e}")
+                self.platform_storage_folder = config["platform_storage_folder"]
+            except KeyError:
+                self.platform_storage_folder = config_json.get_topic_data(
+                    "sftp_handle", "platform_storage_folder"
+                )
 
         if output_dir is not None:
             if os.path.isdir(output_dir):
@@ -113,12 +103,12 @@ class Download(BaseModule):
         if sftp_user is None:
             sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
-            self.target_folders = self.target_folders.split(",")
+            self.target_folders = self.target_folders.strip("[").strip("]").split(",")
         self.logsum = self.parent_log_summary(output_dir=self.platform_storage_folder)
         if sftp_passwd is None:
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
         self.metadata_lab_heading = config_json.get_topic_data(
-            "lab_metadata", "metadata_lab_heading"
+            "read_lab_metadata", "metadata_lab_heading"
         )
         self.metadata_processing = config_json.get_topic_data(
             "sftp_handle", "metadata_processing"
@@ -127,7 +117,7 @@ class Download(BaseModule):
             "sftp_handle", "skip_when_found"
         )
         self.samples_json_fields = config_json.get_topic_data(
-            "lab_metadata", "samples_json_fields"
+            "read_lab_metadata", "samples_json_fields"
         )
         # initialize the sftp client
         self.relecov_sftp = relecov_tools.sftp_client.SftpClient(
@@ -1112,14 +1102,19 @@ class Download(BaseModule):
             raise ConnectionError("Error while listing folders in remote")
         if self.target_folders is None:
             target_folders = clean_root_list
+            selected_folders = target_folders.copy()
         elif self.target_folders[0] == "ALL":
             self.log.info("Showing folders from remote SFTP for user selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
                 msg="Select the folders that will be targeted",
                 choices=sorted(clean_root_list),
             )
+            selected_folders = target_folders.copy()
         else:
-            target_folders = [tf for tf in self.target_folders if tf in clean_root_list]
+            target_folders = [
+                f.strip() for f in self.target_folders if f.strip() in clean_root_list
+            ]
+            selected_folders = self.target_folders
         if self.subfolder is not None:
             new_target_folders = []
             for tfolder in target_folders:
@@ -1132,14 +1127,13 @@ class Download(BaseModule):
                     )
             target_folders = new_target_folders.copy()
         if not target_folders:
-            self.log.error(
-                "No remote folders matching selection %s", self.target_folders
-            )
-            stderr.print("Found no remote folders matching selection")
-            stderr.print(f"List of remote folders: {str(clean_root_list)}")
-            raise ValueError(
-                f"Found no remote folders matching selection {self.target_folders}"
-            )
+            errtxt = f"No remote folders matching selection {selected_folders}"
+            if self.subfolder is not None:
+                errtxt += f" Check if subfolder {str(self.subfolder)} is present"
+            self.log.error(errtxt)
+            stderr.print(errtxt)
+            stderr.print(f"List of available remote folders: {str(clean_root_list)}")
+            raise ValueError(errtxt)
         folders_to_process = {}
         for targeted_folder in target_folders:
             try:

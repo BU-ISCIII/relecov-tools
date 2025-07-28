@@ -130,7 +130,9 @@ class GisaidUpload:
         dataframe.loc[dataframe["covv_passage"] == "", "covv_passage"] = "Original"
 
         config_json = ConfigJson()
-        gisaid_config = config_json.get_configuration("GISAID_configuration")
+        gisaid_config = config_json.get_configuration("upload_to_gisaid")[
+            "GISAID_configuration"
+        ]
         submitter_id = gisaid_config["submitter"]
         dataframe.loc[dataframe["submitter"] == "", "submitter"] = submitter_id
 
@@ -150,7 +152,8 @@ class GisaidUpload:
         df_data = pd.DataFrame(data)
 
         config_json = ConfigJson()
-        fields = config_json.get_configuration("gisaid_csv_headers")
+        fields = config_json.get_configuration("upload_to_gisaid")["gisaid_csv_headers"]
+
         col_df = list(df_data.columns)
         for field in fields:
             if field not in col_df:
@@ -158,7 +161,7 @@ class GisaidUpload:
 
         config_lab_json = ConfigJson()
         lab_json_conf = config_lab_json.get_topic_data(
-            "lab_metadata", "laboratory_data"
+            "read_lab_metadata", "laboratory_data"
         )
         lab_json_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "conf", lab_json_conf["file"]

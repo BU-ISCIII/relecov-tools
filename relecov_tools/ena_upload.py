@@ -121,7 +121,9 @@ class EnaUpload(BaseModule):
 
         config_json = ConfigJson()
         self.config_json = config_json
-        self.checklist = self.config_json.get_configuration("ENA_fields")["checklist"]
+        self.checklist = self.config_json.get_configuration("upload_to_ena")[
+            "checklist"
+        ]
         with open(self.source_json_file, "r") as fh:
             json_data = json.loads(fh.read())
             self.json_data = json_data
@@ -171,7 +173,9 @@ class EnaUpload(BaseModule):
         source_options = self.metadata_types
         schemas_dataframe = {}
         schemas_dataframe_raw = {}
-        acces_fields = self.config_json.get_topic_data("ENA_fields", "accession_fields")
+        acces_fields = self.config_json.get_topic_data(
+            "upload_to_ena", "accession_fields"
+        )
         filtered_access_fields = [
             fd for fd in acces_fields if any(source in fd for source in source_options)
         ]
@@ -195,7 +199,9 @@ class EnaUpload(BaseModule):
 
         for source in source_options:
             source_topic = "_".join(["df", source, "fields"])
-            source_fields = self.config_json.get_topic_data("ENA_fields", source_topic)
+            source_fields = self.config_json.get_topic_data(
+                "upload_to_ena", source_topic
+            )
             if self.action in ["CANCEL", "MODIFY", "RELEASE"]:
                 source_fields.append(str("ena_" + source + "_accession"))
             source_dict = {
@@ -238,7 +244,7 @@ class EnaUpload(BaseModule):
         """The metadata is submitted in an xml format"""
         schema_targets = extract_targets(self.action, schemas_dataframe)
 
-        tool = self.config_json.get_configuration("ENA_fields")["tool"]
+        tool = self.config_json.get_configuration("upload_to_ena")["tool"]
 
         if self.action in ["ADD", "MODIFY"]:
             schema_xmls = run_construct(

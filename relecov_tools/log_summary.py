@@ -40,7 +40,7 @@ class LogSum:
         else:
             log.info("No output_dir provided, selecting it from config...")
             config_json = ConfigJson(extra_config=True)
-            logs_config = config_json.get_configuration("logs_config")
+            logs_config = config_json.get_topic_data("generic", "logs_config")
             output_dir = logs_config.get("default_outpath", "/tmp")
 
         log.info(f"Log summary outpath set to {output_dir}")
