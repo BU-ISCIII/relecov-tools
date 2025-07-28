@@ -8,6 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Credits
 
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [1.6.1] - 2025-07-28 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.1
+
+### Credits
+
 - [Pablo Mata](https://github.com/shettland)
 - [Victor Lopez](https://github.com/victor5lm)
 - [Alejandro Bernabeu](https://github.com/aberdur)
