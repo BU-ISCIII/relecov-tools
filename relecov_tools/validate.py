@@ -2,6 +2,7 @@
 import rich.console
 from jsonschema import Draft202012Validator, FormatChecker
 import os
+import re
 import openpyxl
 from datetime import datetime
 from collections import defaultdict
@@ -33,7 +34,6 @@ class Validate(BaseModule):
         excel_sheet=None,
         registry=None,
         upload_files=False,
-        upload_invalid_fastq=True,
         logsum_file=None,
         check_db=False,
     ):
@@ -143,7 +143,6 @@ class Validate(BaseModule):
         self.registry_path = registry
         self.logsum_file = logsum_file
         self.upload_files = upload_files
-        self.upload_invalid_fastq = upload_invalid_fastq
         self.check_db = check_db
         if upload_files:
             upload_config = self.config.get_configuration("download")
@@ -691,91 +690,107 @@ class Validate(BaseModule):
         """
 
         def upload_and_clean(local_file, remote_dest, clean=True):
-            """Upload file to remote sftp and log the process"""
-            self.log.debug(f"Uploading {local_file} to remote sftp: {remote_dest}")
+            """Upload file to remote sftp and opcionalmente borrar el local."""
+            self.log.debug(f"Uploading {local_file} → {remote_dest}")
             if not sftp_client.upload_file(local_file, remote_dest):
-                self.log.error(f"Could not upload {invalid_excel} to sftp.")
+                self.log.error(f"Could not upload {local_file} to sftp.")
                 return False
-            else:
-                self.log.debug(f"{remote_dest} uploaded successfully")
-                if clean:
-                    try:
-                        os.remove(local_file)
-                        return True
-                    except OSError as e:
-                        self.log.error(f"Could not remove {local_file}: {e}")
-                        return False
-                else:
-                    return True
+            self.log.debug(f"{remote_dest} uploaded successfully")
+            if clean:
+                try:
+                    os.remove(local_file)
+                except OSError as e:
+                    self.log.error(f"Could not remove {local_file}: {e}")
+                    return False
+            return True
 
-        self.log.info("Initating sftp client to upload invalid files")
+        # ── 1· Connection and remote folders ──────────────────────────
+        self.log.info("Initiating sftp client to upload invalid files")
         sftp_client = relecov_tools.sftp_client.SftpClient(
             username=self.user, password=self.password
         )
         sftp_client.sftp_port = self.sftp_port
-        if self.subfolder:
-            remote_labfold = os.path.join(self.lab_code, self.subfolder)
-            flag = True
-        else:
-            remote_labfold = self.lab_code
-            flag = False
+
+        remote_labfold = (
+            os.path.join(self.lab_code, self.subfolder)
+            if self.subfolder
+            else self.lab_code
+        )
+
         self.log.info(f"Output folder set to {remote_labfold}")
-        stderr.print(f"[blue]Uploading invalid files to remote {remote_labfold}...")
-        remote_labfold = "./" + remote_labfold
-        if remote_labfold not in sftp_client.list_remote_folders(".", recursive=flag):
+        if f"./{remote_labfold}" not in sftp_client.list_remote_folders(
+            ".", recursive=bool(self.subfolder)
+        ):
             raise FileNotFoundError(f"Couldn't find remote lab folder {remote_labfold}")
+
+        invalid_remote_folder = f"{self.batch_id}_invalid_samples"
+        self.remote_outfold = os.path.join(f"./{remote_labfold}", invalid_remote_folder)
+        if invalid_remote_folder not in sftp_client.list_remote_folders(
+            f"./{remote_labfold}"
+        ):
+            self.log.info(f"{invalid_remote_folder} not found, creating it…")
+            sftp_client.make_dir(self.remote_outfold)
+
+        stderr.print(f"[blue]Uploading invalid files to remote {remote_labfold}...")
+
+        # ── 2· Build map path → sample_id  ─────────────────────
         path_fields = [
             ("sequence_file_path_R1", "sequence_file_R1"),
             ("sequence_file_path_R2", "sequence_file_R2"),
         ]
-        if self.upload_invalid_fastq:
-            invalid_files = [
-                os.path.join(row[p], row[f])
-                for row in invalid_json
-                for p, f in path_fields
-                if p in row and f in row
-            ]
-            if not any(os.path.isfile(f) for f in invalid_files):
-                self.log.debug(
-                    "No invalid FASTQ found, only the Excel will be uploaded"
-                )
-                invalid_files = []
-        else:
-            self.log.info(
-                "Flag upload_invalid_fastq=False -> Only the Excel will be uploaded"
-            )
-            invalid_files = []
+        path_to_sample = {}
+        invalid_files = []
+        for row in invalid_json:
+            samp_id = row.get(self.sample_id_field, "UnknownSample")
+            for p, f in path_fields:
+                if p in row and f in row:
+                    file_path = os.path.join(row[p], row[f])
+                    invalid_files.append(file_path)
+                    path_to_sample[file_path] = samp_id
 
-        invalid_remote_folder = self.batch_id + "_invalid_samples"
-        self.remote_outfold = os.path.join(remote_labfold, invalid_remote_folder)
+        # ── 3· Try to upload each FASTQ ────────────────────────────
         failed_uploads = []
-        if invalid_remote_folder not in sftp_client.list_remote_folders(remote_labfold):
-            self.log.info(f"{invalid_remote_folder} not found in sftp, creating it...")
-            sftp_client.make_dir(self.remote_outfold)
         for file in invalid_files:
+            if not os.path.isfile(file):
+                failed_uploads.append(file)
+                self.log.warning(f"Local file not found, skipping upload: {file}")
+                self.logsum.add_error(
+                    sample=path_to_sample[file],
+                    entry="File missing when uploading invalid FastQ",
+                )
+                continue
             remote_dest = os.path.join(self.remote_outfold, os.path.basename(file))
             if not upload_and_clean(file, remote_dest):
                 failed_uploads.append(file)
+                self.logsum.add_error(
+                    sample=path_to_sample[file], entry="Failed to upload invalid FastQ"
+                )
+
+        # ── 4· Upload invalid.xlsx ────────────────────────
         remote_dest = os.path.join(self.remote_outfold, os.path.basename(invalid_excel))
         if not upload_and_clean(invalid_excel, remote_dest, clean=False):
             failed_uploads.append(invalid_excel)
-        report_file = self.lab_code + "_" + self.batch_id + "_metadata_report.xlsx"
-        if report_file in os.listdir(self.out_folder):
-            remote_dest = os.path.join(
-                self.remote_outfold, os.path.basename(report_file)
-            )
-            report_file_path = os.path.join(self.out_folder, report_file)
-            if not upload_and_clean(report_file_path, remote_dest, clean=False):
-                failed_uploads.append(report_file_path)
-        else:
-            self.log.error(
-                f"Could not upload report file {report_file}. File not in {self.out_folder}"
-            )
+
+        # ── 5· Locate & upload the *_metadata_report.xlsx ───────────
+        pattern = re.compile(
+            rf"^{re.escape(self.lab_code)}_{re.escape(self.batch_id)}.*_metadata_report\.xlsx$"
+        )
+        for rpt in (f for f in os.listdir(self.out_folder) if pattern.match(f)):
+            local_path = os.path.join(self.out_folder, rpt)
+            remote_dest = os.path.join(self.remote_outfold, rpt)
+            if not upload_and_clean(local_path, remote_dest, clean=False):
+                failed_uploads.append(local_path)
+
+        # ── 6· Screen summary & log_summary ───────────────────
         if failed_uploads:
-            stderr.print(f"[red]Some files could not be uploaded: {failed_uploads}")
+            preview = ", ".join(os.path.basename(x) for x in failed_uploads[:3])
+            stderr.print(
+                f"[yellow]{len(failed_uploads)} files could not be uploaded "
+                f"(first ones: {preview})"
+            )
+            self.log.warning(f"Files failed to upload: {failed_uploads}")
         else:
             stderr.print("[green]Finished uploading files to remote sftp successfully")
-        return
 
     def process_validation_upload(self, valid_json_data, invalid_json, previous_logsum):
         """
