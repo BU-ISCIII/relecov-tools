@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - New flag 'check_db' was introduced in validate to activate checking of samples in platform [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
 - Included docstrings for all methods in rest_api.py [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
 - Updated create_summary_tables.py to organize data jointly [#722](https://github.com/BU-ISCIII/relecov-tools/pull/722).
+- Updated schema and configuration for Ion Torrent [#724](https://github.com/BU-ISCIII/relecov-tools/pull/724)
 - Refactor configuration.json structure by grouping fields by module usage[#725](https://github.com/BU-ISCIII/relecov-tools/pull/725)
 - Standardized rest_api responses for all methods with a new static method called standardize_response [#741](https://github.com/BU-ISCIII/relecov-tools/pull/741)
 
@@ -79,7 +80,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Improved error message in upload_file method from sftp_client [#708](https://github.com/BU-ISCIII/relecov-tools/pull/708)
 - Read-bioinfo-metadata now also includes valid samples in its log_summary, not only invalid [#708](https://github.com/BU-ISCIII/relecov-tools/pull/708)
 - Included software_versions.yml required file for read-bioinfo-metadata tests [#713](https://github.com/BU-ISCIII/relecov-tools/pull/713)
-- Updated schema and configuration for Ion Torrent [#724](https://github.com/BU-ISCIII/relecov-tools/pull/724)
 
 #### Fixes
 
