@@ -754,7 +754,7 @@ class Validate(BaseModule):
             if not os.path.isfile(file):
                 failed_uploads.append(file)
                 self.log.warning(f"Local file not found, skipping upload: {file}")
-                self.logsum.add_error(
+                self.logsum.add_warning(
                     sample=path_to_sample[file],
                     entry="File missing when uploading invalid FastQ",
                 )
@@ -762,7 +762,7 @@ class Validate(BaseModule):
             remote_dest = os.path.join(self.remote_outfold, os.path.basename(file))
             if not upload_and_clean(file, remote_dest):
                 failed_uploads.append(file)
-                self.logsum.add_error(
+                self.logsum.add_warning(
                     sample=path_to_sample[file], entry="Failed to upload invalid FastQ"
                 )
 
@@ -786,7 +786,10 @@ class Validate(BaseModule):
             preview = ", ".join(os.path.basename(x) for x in failed_uploads[:3])
             stderr.print(
                 f"[yellow]{len(failed_uploads)} files could not be uploaded "
-                f"(first ones: {preview})"
+                f"(first ones: {preview}). "
+                "For the complete list check the validate*.log file."
+                "Note: if the files were corrupted or not referenced in metadata "
+                "they may already have been uploaded during the download step.[/]"
             )
             self.log.warning(f"Files failed to upload: {failed_uploads}")
         else:
