@@ -193,7 +193,7 @@ class PipelineManager(BaseModule):
             validate_files = [
                 os.path.join(folder, f)
                 for f in os.listdir(folder)
-                if f.startswith("validated_lab_metadata") and f.endswith(".json")
+                if f.startswith("validated_read_lab_metadata") and f.endswith(".json")
             ]
             if not validate_files:
                 self.log.error(f"No validated json file found for {folder}. Skipped")
