@@ -103,7 +103,16 @@ class Download(BaseModule):
         if sftp_user is None:
             sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
-            self.target_folders = self.target_folders.strip("[").strip("]").split(",")
+            self.target_folders = [
+                f.strip()
+                for f in self.target_folders.strip("[").strip("]").split(",")
+                if f.strip()
+            ]
+        elif isinstance(self.target_folders, list):
+            self.target_folders = [f.strip() for f in self.target_folders if f.strip()]
+        if not self.target_folders:
+            self.target_folders = None
+
         self.logsum = self.parent_log_summary(output_dir=self.platform_storage_folder)
         if sftp_passwd is None:
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
