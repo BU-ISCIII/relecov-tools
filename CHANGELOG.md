@@ -8,9 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Credits
 
+- [Alejandro Bernabeu](https://github.com/aberdur)
+
 #### Added enhancements
 
 #### Fixes
+
+- Fix "target_folders": "" handling in download module [#760](https://github.com/BU-ISCIII/relecov-tools/pull/760)
 
 #### Changed
 
