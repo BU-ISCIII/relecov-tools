@@ -4,17 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.X.X] - 2025-XX-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.X.X
+## [1.7.0dev] - 2025-XX-XX : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.0dev
 
 ### Credits
 
 - [Alejandro Bernabeu](https://github.com/aberdur)
+- [Sara Monzon](https://github.com/saramonzon)
 
 #### Added enhancements
 
 #### Fixes
 
 - Fix "target_folders": "" handling in download module [#760](https://github.com/BU-ISCIII/relecov-tools/pull/760)
+- minor fix in pipeline_manager so it finds valided json [#764](https://github.com/BU-ISCIII/relecov-tools/pull/764)
 
 #### Changed
 
