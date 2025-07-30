@@ -78,7 +78,7 @@
             ".fasta.gz",
             ".fa",
             ".fa.gz",
-            "bam"
+            ".bam"
         ],
         "allowed_download_options": [
             "download_only",
@@ -89,7 +89,8 @@
             "#",
             "Hash",
             "Path"
-        ]
+        ],
+        "sample_name_regex": "(?P<sample>.+?)(?:[_\\. -]R?[12]|[_\\. -]read[12]|[_\\. -][12])?(?:_L\\d{3})?(?:_\\d{3})?(?:\\.(?:f(?:ast)?q(?:\\.gz)?|bam|cram))$"
     },
     "read_lab_metadata": {
         "fixed_fields": {
