@@ -32,7 +32,6 @@ class Validate(BaseModule):
         metadata=None,
         output_dir=None,
         excel_sheet=None,
-        registry=None,
         upload_files=False,
         logsum_file=None,
         check_db=False,
@@ -140,7 +139,6 @@ class Validate(BaseModule):
             self.sample_id_field = None
             self.log.error(f"Could not extract sample_id_field: {e}. Set to None")
         self.excel_sheet = excel_sheet
-        self.registry_path = registry
         self.logsum_file = logsum_file
         self.upload_files = upload_files
         self.check_db = check_db
@@ -151,8 +149,7 @@ class Validate(BaseModule):
                 self.password = upload_config.get("password")
                 self.subfolder = upload_config.get("subfolder")
                 self.sftp_port = self.config.get_topic_data("sftp_handle", "sftp_port")
-            else:
-                raise ValueError("Could not find")
+
         if check_db:
             platform_config = self.config.get_configuration("update_db")
             if platform_config:
@@ -469,48 +466,6 @@ class Validate(BaseModule):
         relecov_tools.utils.write_json_to_file(valid_json_data, file_path)
         return file_path
 
-    def validate_registry_file(self):
-        """Validate specified registry file path. Try to get it from config if invalid."""
-        # Parse file containing sample IDs registry
-        if self.registry_path is not None and relecov_tools.utils.file_exists(
-            os.path.abspath(os.path.expanduser(self.registry_path))
-        ):
-            self.registry_path = os.path.abspath(os.path.expanduser(self.registry_path))
-        else:
-            config_json = ConfigJson(extra_config=True)
-            try:
-                default_path = config_json.get_topic_data(
-                    "generic", "default_sample_id_registry"
-                )
-            except KeyError:
-                default_path = None
-
-            if default_path and relecov_tools.utils.file_exists(default_path):
-                self.registry_path = default_path
-            else:
-                stderr.print(
-                    "[yellow]No valid ID registry found. Please select the file manually."
-                )
-                prompted_path = relecov_tools.utils.prompt_path(
-                    "Select the JSON file with registered unique sample IDs"
-                )
-                if relecov_tools.utils.file_exists(prompted_path):
-                    self.registry_path = prompted_path
-                else:
-                    stderr.print(
-                        "[red]No valid ID registry file could be found or selected."
-                    )
-                    raise FileNotFoundError("No valid ID registry file could be found")
-
-        # Read id registry file
-        try:
-            self.id_registry = relecov_tools.utils.read_json_file(self.registry_path)
-        except Exception as e:
-            stderr.print(f"[red]Failed to read ID registry JSON: {e}")
-            self.log.error(f"Failed to read ID registry JSON: {e}")
-            raise
-        return
-
     def validate_invexcel_args(self):
         """Validate arguments needed to create invalid_samples.xlsx file"""
         if not self.excel_sheet:
@@ -524,65 +479,8 @@ class Validate(BaseModule):
                 raise
         return
 
-    def update_unique_id_registry(self, valid_json_data):
-        """Prepare ID registry. Validated samples will be asigned with an unique ID"""
-        new_ids_to_save = {}
-        for sample in valid_json_data:
-            # If sample has validated, then assign an unique id
-            if "unique_sample_id" not in sample:
-                new_id = self.generate_incremental_unique_id(
-                    {**self.id_registry, **new_ids_to_save}
-                )
-                sample["unique_sample_id"] = new_id
-            # If sample has validated, then assign an unique id
-            if "unique_sample_id" not in sample:
-                new_id = self.generate_incremental_unique_id(
-                    {**self.id_registry, **new_ids_to_save}
-                )
-                sample["unique_sample_id"] = new_id
-                new_ids_to_save[new_id] = {
-                    "sequencing_sample_id": sample["sequencing_sample_id"],
-                    "lab_code": self.lab_code,
-                    "generated_at": datetime.now().isoformat(timespec="seconds"),
-                }
-        self.save_new_ids(new_ids_to_save)
-        return valid_json_data
-
-    def generate_incremental_unique_id(self, current_registry, prefix="RLCV"):
-        """Generates an incremental unique ID using as baseline the latest record
-        in a registry.
-
-        Args:
-            current_registry (dict): dict containing sample's unique IDs
-            prefix (str, optional): String that preceeds the unique ID. Defaults to "RLCV".
-
-        Returns:
-            string: An unique ID
-        """
-        existing_numbers = []
-        for uid in current_registry:
-            if uid.startswith(prefix):
-                try:
-                    number = int(uid.replace(f"{prefix}-", ""))
-                    existing_numbers.append(number)
-                except ValueError:
-                    continue
-        next_number = max(existing_numbers, default=0) + 1
-        return f"{prefix}-{next_number:09d}"
-
-    def save_new_ids(self, new_ids_dict):
-        """Updates sample id registry by adding sample unique ids of new validated samples.
-
-        Args:
-            new_ids_dict (dict): Dict of new unique sample IDs.
-        """
-        updated_registry = {**self.id_registry, **new_ids_dict}
-        relecov_tools.utils.write_json_to_file(updated_registry, self.registry_path)
-        self.log.info(f"Added {len(new_ids_dict)} new sample IDs to registry")
-
     def create_validation_files(self, valid_json_data, invalid_json):
-        """Creates validated and invalid metadata files based on the provided JSON data and
-        adds valid samples to the unique ID registry.
+        """Creates validated and invalid metadata files based on the provided JSON data.
 
         Args:
             valid_json_data (list[dict]): List of valid sample metadata dictionaries.
@@ -592,9 +490,6 @@ class Validate(BaseModule):
             valid_file (str): Path to the created file with valid samples, or None if not created
             invalid_file (str): Path to the created file with invalid samples, or None if not created
         """
-        # Add all valid samples to the unique_id registry file
-        self.validate_registry_file()
-        valid_json_data = self.update_unique_id_registry(valid_json_data)
         valid_file = invalid_file = None
         if valid_json_data:
             self.log.info("Creating json_file with validated samples...")

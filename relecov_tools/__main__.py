@@ -434,13 +434,6 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     help="Optional: Name of the sheet in excel file to validate.",
 )
 @click.option(
-    "-r",
-    "--registry",
-    required=False,
-    default=None,
-    help="Path to the JSON file containing the registered records of validated samples with their unique sample identifiers.",
-)
-@click.option(
     "-u",
     "--upload_files",
     is_flag=True,
@@ -469,7 +462,6 @@ def validate(
     metadata,
     output_dir,
     excel_sheet,
-    registry,
     upload_files,
     logsum_file,
     check_db,
