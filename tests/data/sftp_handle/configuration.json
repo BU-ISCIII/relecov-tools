@@ -401,7 +401,7 @@
             ]
         }
     },
-    "upload_database": {
+    "update_db": {
         "platform":{
             "iskylims": {
                 "server_url": "http://relecov-iskylims.isciiides.es",
