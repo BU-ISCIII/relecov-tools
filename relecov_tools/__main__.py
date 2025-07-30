@@ -80,7 +80,7 @@ def merge_with_extra_config(ctx, add_extra_config=False):
     if isinstance(topic_block, dict) and (
         "params" in topic_block or "commands" in topic_block
     ):
-        extra_args = dict(topic_block.get("params", {}))  #   defaults
+        extra_args = dict(topic_block.get("params", {}))  # defaults
         extra_args.update(topic_block.get("commands", {}))  # > overrides
     else:
         # Legacy (flat) section – still supported.
