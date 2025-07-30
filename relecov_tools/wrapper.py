@@ -198,6 +198,7 @@ class Wrapper(BaseModule):
                 "logsum_file": temp_logsum,
                 "output_dir": local_folder,
                 "upload_files": True,
+                "check_db": True
             }
         )
         validate_logs = self.exec_validation(self.validate_params)
