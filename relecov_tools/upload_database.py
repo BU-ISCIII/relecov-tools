@@ -105,7 +105,7 @@ class UploadDatabase(BaseModule):
         # Get configuration settings for upload database
         try:
             self.platform_settings = self.config_json.get_topic_data(
-                "upload_database", "platform"
+                "update_db", "platform"
             )
         except KeyError as e:
             logtxt = f"Unable to fetch parameters for {platform} {e}"
@@ -156,7 +156,7 @@ class UploadDatabase(BaseModule):
                         s_dict[pfield] = value
             # include the fixed value
             fixed_value = self.config_json.get_topic_data(
-                "upload_database", "iskylims_fixed_values"
+                "update_db", "iskylims_fixed_values"
             )
             for prop, val in fixed_value.items():
                 s_dict[prop] = val
@@ -226,7 +226,7 @@ class UploadDatabase(BaseModule):
         """Select the values from self.json_data"""
         field_values = []
         r_fields = self.config_json.get_topic_data(
-            "upload_database", "relecov_sample_metadata"
+            "update_db", "relecov_sample_metadata"
         )
 
         for row in self.json_data:

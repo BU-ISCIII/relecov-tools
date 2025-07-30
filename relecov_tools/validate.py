@@ -845,7 +845,7 @@ class Validate(BaseModule):
             raise ValueError(
                 f"Missing mandatory args to check samples in db: {missing_args}"
             )
-        p_settings = self.config.get_topic_data("upload_database", "platform")
+        p_settings = self.config.get_topic_data("update_db", "platform")
         if self.db_platform not in p_settings:
             raise ValueError(f"No configuration found for platform {self.db_platform}")
         if "server_url" not in p_settings[self.db_platform]:
@@ -857,7 +857,7 @@ class Validate(BaseModule):
     def search_sample_dups_in_db(self, valid_json_data, invalid_json):
         """Connect to configured platform and turn invalid those samples that are already
         uploaded to the database from the workflow. Update jsons based on this clause"""
-        p_settings = self.config.get_topic_data("upload_database", "platform")
+        p_settings = self.config.get_topic_data("update_db", "platform")
         server_url = p_settings[self.db_platform]["server_url"]
         api_url = p_settings[self.db_platform]["api_url"]
         credentials = {
