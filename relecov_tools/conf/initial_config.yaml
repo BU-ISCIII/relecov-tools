@@ -42,7 +42,6 @@ validate:
     metadata: ''
     output_dir: ''
     excel_sheet: ''
-    registry: ''
     upload_files: false
     logsum_file: ''
 
