@@ -404,7 +404,7 @@
         }
     },
     "update_db": {
-        "platform":{
+        "platform-params":{
             "iskylims": {
                 "server_url": "http://relecov-iskylims.isciiides.es",
                 "api_url": "/wetlab/api/",
