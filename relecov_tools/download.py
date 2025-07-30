@@ -2,7 +2,9 @@
 import copy
 import json
 import os
+import re
 import yaml
+import collections
 import warnings
 import rich.console
 import paramiko
@@ -97,8 +99,13 @@ class Download(BaseModule):
             if os.path.isdir(output_dir):
                 self.platform_storage_folder = os.path.realpath(output_dir)
             else:
-                self.log.error("Output location does not exist, aborting")
-                stderr.print("[red] Output location does not exist, aborting")
+                msg = (
+                    "Output directory not found or not set.\n"
+                    f"Current value: {repr(output_dir)}\n"
+                    "Please set --output_dir or define download.output_dir in extra_config.json"
+                )
+                self.log.error(msg)
+                stderr.print(f"[red]{msg}")
                 raise FileNotFoundError(f"Output dir does not exist {output_dir}")
         if sftp_user is None:
             sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
@@ -128,6 +135,8 @@ class Download(BaseModule):
         self.samples_json_fields = config_json.get_topic_data(
             "read_lab_metadata", "samples_json_fields"
         )
+        sample_pattern = config_json.get_topic_data("sftp_handle", "sample_name_regex")
+        self.sample_regex = re.compile(sample_pattern, flags=re.IGNORECASE | re.VERBOSE)
         # initialize the sftp client
         self.relecov_sftp = relecov_tools.sftp_client.SftpClient(
             conf_file, sftp_user, sftp_passwd
@@ -656,9 +665,15 @@ class Download(BaseModule):
             if mismatch_files:
                 error_text1 = "Files in folder missing in metadata: %s"
                 self.include_warning(error_text1 % str(mismatch_files))
-                miss_text = "This file does not have any associated sample in metadata"
-                for file in mismatch_files:
-                    self.include_error(sample=file, entry=miss_text)
+                # --- Group R1/R2 or chunks under a single Sample ID ---
+                grouped = collections.defaultdict(list)
+                for f in mismatch_files:
+                    m = self.sample_regex.match(f)
+                    grouped[m.group("sample") if m else f].append(f)
+
+                miss_text = "Sample present in folder but missing in metadata"
+                for sample_id in grouped:
+                    self.include_error(sample=sample_id, entry=miss_text)
             if mismatch_rev:
                 error_text2 = "Files in metadata missing in folder: %s"
                 self.include_warning(error_text2 % str(mismatch_rev))
