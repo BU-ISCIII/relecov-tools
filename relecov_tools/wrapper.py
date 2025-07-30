@@ -4,6 +4,7 @@ import os
 import inspect
 import rich.console
 from collections import defaultdict
+from __future__ import annotations
 
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.download import Download
