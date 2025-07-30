@@ -26,17 +26,27 @@ class Wrapper(BaseModule):
     if you dont want to use that argument e.g.(target_folders:  ) -> (target_folders = None)
     """
 
-    def __init__(self, output_dir: str = None):
-        super().__init__(output_dir=output_dir, called_module="wrapper")
-
-        # Check class params
-        if not os.path.isdir(str(output_dir)):
-            raise FileNotFoundError(f"Output folder {output_dir} is not valid")
-        else:
-            self.output_dir = output_dir
-
-        # check extra config params
+    def __init__(self, output_dir: str | None = None):
         config = ConfigJson(extra_config=True)
+        wrapper_cfg = config.get_configuration("wrapper") or {}
+        download_cfg = config.get_configuration("download") or {}
+
+        final_output_dir = (
+            output_dir
+            or wrapper_cfg.get("output_dir")
+            or download_cfg.get("output_dir")
+        )
+
+        if not final_output_dir:
+            raise ValueError(
+                "Output directory not supplied. "
+                "Use --output_dir or configure it under wrapper/download sections."
+            )
+        if not os.path.isdir(final_output_dir):
+            raise FileNotFoundError(f"Output folder '{final_output_dir}' is not valid")
+
+        super().__init__(output_dir=final_output_dir, called_module="wrapper")
+        self.output_dir = final_output_dir
         req_conf = ["download", "validate"]
         missing = [conf for conf in req_conf if config.get_configuration(conf) is None]
         if missing:
@@ -57,18 +67,15 @@ class Wrapper(BaseModule):
                 f"Config file is missing required sections: {', '.join(missing)}"
             )
 
-        self.download_params = self.clean_module_params(
-            "Download", config.get_configuration("download")
-        )
+        self.download_params = self.clean_module_params("Download", download_cfg)
+        self.download_params["output_dir"] = self.output_dir
 
         if (
             "subfolder" not in self.download_params
             or self.download_params["subfolder"] is None
         ):
-            self.download_params["download"].update(
-                {"subfolder": "RELECOV"}
-            )  # If subfolder is not defined or None, it is set automatically as RELECOV
-            self.log.warning("Subfolder not provided. Set to as RELECOV by default")
+            self.download_params["download"].update({"subfolder": "RELECOV"})
+            self.log.warning("Subfolder not provided. Set to RELECOV by default")
             stderr.print("[yellow]Subfolder not provided. Set to RELECOV by default")
 
         self.readmeta_params = dict()
