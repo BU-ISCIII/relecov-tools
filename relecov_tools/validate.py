@@ -40,11 +40,7 @@ class Validate(BaseModule):
         super().__init__(output_dir=output_dir, called_module=__name__)
         self.config = ConfigJson(extra_config=True)
         self.log.info("Initiating validation process")
-        req_conf = (
-            ["validate"]
-            + ["download"] * bool(upload_files)
-            + ["update_db"] * bool(check_db)
-        )
+        req_conf = ["download"] * bool(upload_files) + ["update_db"] * bool(check_db)
         missing = [
             conf for conf in req_conf if self.config.get_configuration(conf) is None
         ]
@@ -129,7 +125,6 @@ class Validate(BaseModule):
         self.set_batch_id(batch_id)
         self.metadata = metadata
 
-        # TODO: Include this field in configuration.json
         sample_id_ontology = self.config.get_topic_data("generic", "sample_id_ontology")
         try:
             self.sample_id_field = Validate.get_field_from_schema(
@@ -138,10 +133,12 @@ class Validate(BaseModule):
         except ValueError as e:
             self.sample_id_field = None
             self.log.error(f"Could not extract sample_id_field: {e}. Set to None")
+
         self.excel_sheet = excel_sheet
         self.logsum_file = logsum_file
         self.upload_files = upload_files
         self.check_db = check_db
+
         if upload_files:
             upload_config = self.config.get_configuration("download")
             if upload_config:
@@ -740,7 +737,7 @@ class Validate(BaseModule):
             raise ValueError(
                 f"Missing mandatory args to check samples in db: {missing_args}"
             )
-        p_settings = self.config.get_topic_data("update_db", "platform")
+        p_settings = self.config.get_topic_data("update_db", "platform-params")
         if self.db_platform not in p_settings:
             raise ValueError(f"No configuration found for platform {self.db_platform}")
         if "server_url" not in p_settings[self.db_platform]:
@@ -752,7 +749,7 @@ class Validate(BaseModule):
     def search_sample_dups_in_db(self, valid_json_data, invalid_json):
         """Connect to configured platform and turn invalid those samples that are already
         uploaded to the database from the workflow. Update jsons based on this clause"""
-        p_settings = self.config.get_topic_data("update_db", "platform")
+        p_settings = self.config.get_topic_data("update_db", "platform-params")
         server_url = p_settings[self.db_platform]["server_url"]
         api_url = p_settings[self.db_platform]["api_url"]
         credentials = {
@@ -763,7 +760,7 @@ class Validate(BaseModule):
         apifunc = p_settings[self.db_platform]["check_sample"]
         for sample in self.json_data:
             sample_seqid = sample.get("sequencing_sample_id")
-            self.log.debug(f"Checking sample {sample_seqid} in {self.db_platform} db")
+            self.log.info(f"Checking sample {sample_seqid} in {self.db_platform} db")
             try:
                 samp_in_db = api_rest.sample_already_in_db(apifunc, credentials, sample)
             except ValueError as e:
