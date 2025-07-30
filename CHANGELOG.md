@@ -17,10 +17,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fix "target_folders": "" handling in download module [#760](https://github.com/BU-ISCIII/relecov-tools/pull/760)
 - minor fix in pipeline_manager so it finds valided json [#764](https://github.com/BU-ISCIII/relecov-tools/pull/764)
+- Fix triple-counting folder-only samples in log_summary.json [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
 
 #### Changed
 
 - Update __main__ & config_json for new merged-config structure (commands + params) [#765](https://github.com/BU-ISCIII/relecov-tools/pull/765)
+- Propagate wrapper --output_dir down to download [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
+- Update error message when output_dir is missing in extra_config [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
 
 #### Removed
 
