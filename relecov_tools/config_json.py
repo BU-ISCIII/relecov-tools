@@ -25,63 +25,121 @@ class ConfigJson:
             json_file (str, optional): config filepath.
             extra_config (bool, optional): Include content from ~/.relecov_tools/extra_config.json.
         """
+        # ── 1. Load defaults ------------------------------------------------
         with open(json_file, "r", encoding="utf-8") as fh:
-            self.json_data = json.load(fh)
+            base_conf = json.load(fh)
 
-        active_extra_conf = False
-        if extra_config:
-            if os.path.isfile(ConfigJson._extra_config_path):
-                try:
-                    with open(
-                        ConfigJson._extra_config_path, "r", encoding="utf-8"
-                    ) as add_fh:
-                        additional_conf = json.load(add_fh)
-                    self.json_data.update(additional_conf)
-                    active_extra_conf = True
-                except (OSError, json.JSONDecodeError) as e:
-                    log.warning(
-                        f"Could not load extra config: {e}. Using default instead"
-                    )
-            else:
-                log.warning(
-                    f"Could not load extra config: {ConfigJson._extra_config_path} does not exist. Using default instead"
-                )
-                log.warning(
-                    "Run ``relecov-tools add-extra-config`` to include additional configuration"
-                )
-        if not active_extra_conf:
-            log.debug("Running with default configuration.")
-        else:
-            log.debug("Loaded additional configuration.")
+        # ── 2. Optionally load user overrides -------------------------------
+        extra_conf, active_extra = {}, False
+        if extra_config and os.path.isfile(ConfigJson._extra_config_path):
+            try:
+                with open(ConfigJson._extra_config_path, "r", encoding="utf-8") as fh:
+                    extra_conf = json.load(fh)
+                active_extra = True
+            except (OSError, json.JSONDecodeError) as e:
+                log.warning(f"Could not load extra config: {e}. Using default instead")
+        elif extra_config:
+            log.warning(
+                f"Could not load extra config: {ConfigJson._extra_config_path} does not exist. "
+                "Using default instead"
+            )
+            log.warning(
+                "Run `relecov-tools add-extra-config` to include additional configuration"
+            )
+
+        # ── 3. Build an index  <leaf-key → first-level-parent> ---------------
+        #    Needed to relocate overrides that appear outside their branch
+        self._leaf_parent = {}
+
+        def _index_parents(node: dict, top_key: str):
+            if not isinstance(node, dict):
+                return
+            for k, v in node.items():
+                self._leaf_parent.setdefault(k, top_key)
+                _index_parents(v, top_key)
+
+        for first_level_key, subtree in base_conf.items():
+            _index_parents(subtree, first_level_key)
+
+        # ── 4. Merge defaults + overrides into params/commands ---------------
+        self.json_data = self._nested_merge_with_commands(base_conf, extra_conf)
+
+        log.debug(
+            "Loaded additional configuration."
+            if active_extra
+            else "Running with default configuration."
+        )
         self.topic_config = list(self.json_data.keys())
 
-    def get_configuration(self, topic):
+    def get_configuration(self, topic: str, *, raw: bool = False):
         """Obtain the topic configuration from json data"""
-        if topic in self.topic_config:
-            return self.json_data[topic]
-        return None
-
-    def get_topic_data(self, topic, found):
-        """Obtain from topic any forward items from json data"""
-
-        def get_recursive(subtopic, found):
-            if isinstance(subtopic, dict):
-                for key, val in subtopic.items():
-                    if key == found:
-                        return val
-                    elif isinstance(val, dict):
-                        result = get_recursive(val, found)
-                        if result is not None:
-                            return result
-            else:
-                return None
-
-        if topic not in self.json_data.keys():
+        # ── 1. Topic not present ───────────────────────────────────────────
+        if topic not in self.json_data:
             return None
-        if found in self.json_data[topic]:
-            return self.json_data[topic][found]
-        else:
-            return get_recursive(self.json_data[topic], found)
+
+        block = self.json_data[topic]
+
+        # ── 2. Caller wants the nested structure as is ─────────────────────
+        if raw:
+            return block
+
+        # ── 3. Layout: merge params + commands  (commands win) ─────────
+        if isinstance(block, dict) and ("params" in block or "commands" in block):
+            flattened = dict(block.get("params", {}))  # defaults
+            flattened.update(block.get("commands", {}))  # overrides
+            return flattened
+
+        return block
+
+    def get_topic_data(self, topic: str, found: str):
+        """
+        Returns the value of the `found` key within the `topic` block:
+        - First searches in topic[“params”]
+        - Then in topic[“commands”]
+        - Then recursive search (in case it is deeper)
+        - Finally, for compatibility, searches in a flat legacy block
+        """
+
+        # ── Helper: depth-first search in nested dicts ──────────────────────
+        def _recursive_lookup(node, key):
+            """Searches for `key` at any level of nested dictionaries."""
+            if not isinstance(node, dict):
+                return None
+            for k, v in node.items():
+                if k == key:
+                    return v
+                if isinstance(v, dict):
+                    res = _recursive_lookup(v, key)
+                    if res is not None:
+                        return res
+            return None
+
+        # ── 1. Find the topic block ─────────────────────────────────────────
+        topic_block = self.json_data.get(topic)
+        if topic_block is None:
+            return None
+
+        # ── 2. New layout (params / commands) ───────────────────────────────
+        if isinstance(topic_block, dict) and (
+            "params" in topic_block or "commands" in topic_block
+        ):
+            # 2.1  direct hit in commands  (highest priority)
+            if found in topic_block.get("commands", {}):
+                return topic_block["commands"][found]
+            # 2.2  direct hit in params   (defaults)
+            if found in topic_block.get("params", {}):
+                return topic_block["params"][found]
+            # 2.3  recursive search (first commands, then params)
+            return _recursive_lookup(
+                topic_block.get("commands", {}), found
+            ) or _recursive_lookup(topic_block.get("params", {}), found)
+
+        # ── 3. Legacy flat section ──────────────────────────────────────────
+        if found in topic_block:
+            return topic_block[found]
+
+        # ── 4. Legacy with deeper nesting ───────────────────────────────────
+        return _recursive_lookup(topic_block, found)
 
     def include_extra_config(self, config_file, config_name=None, force=False):
         """Include given file content as additional configuration for later usage.
@@ -212,3 +270,26 @@ class ConfigJson:
         else:
             log.warning(f"{submitting_institution} not found in institutions_config")
         return
+
+    def _nested_merge_with_commands(self, base_conf: dict, extra_conf: dict) -> dict:
+        """
+        Create a dict with sublevels ‘params’ (defaults) and ‘commands’
+        (overrides) for *each* top-level key.  If the override
+        appears outside its original branch, it is relocated using self._leaf_parent.
+        """
+        merged = {}
+
+        for key, val in base_conf.items():
+            merged[key] = {"params": val, "commands": {}}
+
+        for key, val in extra_conf.items():
+            if key in merged:
+                merged[key]["commands"] = val
+            elif key in self._leaf_parent:
+                parent = self._leaf_parent[key]
+                merged.setdefault(parent, {"params": {}, "commands": {}})
+                merged[parent]["commands"][key] = val
+            else:
+                merged[key] = {"params": {}, "commands": val}
+
+        return merged
