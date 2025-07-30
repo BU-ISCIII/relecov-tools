@@ -11,6 +11,42 @@ log = logging.getLogger(__name__)
 
 # pass test
 class ConfigJson:
+    """
+    ----------------------------------------------------------------------------
+    Purpose
+    -------
+    Load *configuration.json* (defaults) and, optionally, the user
+    *extra_config.json* (overrides). Internally we normalise everything to the
+    dual-level layout **params / commands**:
+
+        {
+          "download": {
+              "params": {                    # ← defaults (configuration.json)
+                  "threads": 4,
+                  "output_dir": "/default/path"
+              },
+              "commands": {                  # ← overrides (extra_config.json)
+                  "threads": 8
+              }
+          },
+          "generic": {...},
+          ...
+        }
+
+    Helper methods
+    --------------
+    • ``get_configuration(topic, raw=False)``
+        * **raw=False**  → flat dict where *commands overwrite params*
+          (ideal to feed modules directly).
+        * **raw=True**   → the nested block shown above.
+
+    • ``get_topic_data(topic, key)``
+        Returns a *single* value following the priority
+        **commands > params > recursive search** >>> legacy flat section.
+
+    ----------------------------------------------------------------------------
+    """
+
     # TODO: Make this path configurable too
     _extra_config_path = os.path.expanduser("~/.relecov_tools/extra_config.json")
 
@@ -21,9 +57,13 @@ class ConfigJson:
     ):
         """Load config content in configuration.json and additional config if required
 
-        Args:
-            json_file (str, optional): config filepath.
-            extra_config (bool, optional): Include content from ~/.relecov_tools/extra_config.json.
+        Parameters
+        ----------
+        json_file : str
+            Path to the *defaults* file (``configuration.json``).
+        extra_config : bool
+            If *True* merge in the user's overrides located at
+            ``~/.relecov_tools/extra_config.json``.
         """
         # ── 1. Load defaults ------------------------------------------------
         with open(json_file, "r", encoding="utf-8") as fh:
@@ -72,7 +112,19 @@ class ConfigJson:
         self.topic_config = list(self.json_data.keys())
 
     def get_configuration(self, topic: str, *, raw: bool = False):
-        """Obtain the topic configuration from json data"""
+        """
+        Return the configuration block for *topic*.
+
+        Examples
+        --------
+        >>> cfg = ConfigJson(extra_config=True)
+        >>> cfg.get_configuration("download")
+        {'threads': 8, 'output_dir': '/default/path'}          # flat view
+
+        >>> cfg.get_configuration("download", raw=True)
+        {'params': {'threads': 4, 'output_dir': '/default/path'},
+         'commands': {'threads': 8}}                          # nested view
+        """
         # ── 1. Topic not present ───────────────────────────────────────────
         if topic not in self.json_data:
             return None
@@ -93,11 +145,19 @@ class ConfigJson:
 
     def get_topic_data(self, topic: str, found: str):
         """
-        Returns the value of the `found` key within the `topic` block:
-        - First searches in topic[“params”]
-        - Then in topic[“commands”]
-        - Then recursive search (in case it is deeper)
-        - Finally, for compatibility, searches in a flat legacy block
+        Fetch a single value *found* from *topic*.
+
+        Search priority
+        ----------------
+        1. **commands** – overrides
+        2. **params**   – defaults
+        3. Recursive search inside both dicts
+        4. Legacy flat section (back-compat)
+
+        Example
+        -------
+        >>> cfg.get_topic_data("download", "threads")   # → 8
+        >>> cfg.get_topic_data("download", "output_dir")  # → '/default/path'
         """
 
         # ── Helper: depth-first search in nested dicts ──────────────────────
@@ -273,9 +333,11 @@ class ConfigJson:
 
     def _nested_merge_with_commands(self, base_conf: dict, extra_conf: dict) -> dict:
         """
-        Create a dict with sublevels ‘params’ (defaults) and ‘commands’
-        (overrides) for *each* top-level key.  If the override
-        appears outside its original branch, it is relocated using self._leaf_parent.
+        Produce the *params / commands* structure described in the class docstring.
+
+        • Everything from *configuration.json* → **params**
+        • Everything from *extra_config.json* → **commands**
+          (relocating the key to its first-level parent if necessary).
         """
         merged = {}
 
