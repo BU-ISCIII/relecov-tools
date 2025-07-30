@@ -54,38 +54,55 @@ __version__ = "1.7.0dev"
 # Set up  merge config with extra plus CLI
 def merge_with_extra_config(ctx, add_extra_config=False):
     """
-    Merge CLI arguments with those defined in config or extra_config.
-    CLI has a higher priority than extra_config, which has a higher priority than default (None).
-    Additionally, convert any empty string values ('') to None.
+    Build the **final** argument dictionary that will be passed
+    to the Click‐command callback.
+
+    Priority order (highest → lowest):
+        1. CLI arguments
+        2. extra_config.json  →  "commands"  (user overrides)
+        3. configuration.json →  "params"    (defaults)
+
+    Empty strings ('') are normalised to None and any key that is not
+    part of the callback's signature is silently dropped.
     """
-    # Set which configuration is going to be used
-    if add_extra_config:
-        config = relecov_tools.config_json.ConfigJson(extra_config=True)
+
+    # ── 1. Load configuration (with or without extra_config) ────────────
+    config = relecov_tools.config_json.ConfigJson(extra_config=add_extra_config)
+    ctx.obj["config"] = config.json_data  # keep full config for later use
+
+    command_name = ctx.command.name.replace("-", "_")  # e.g. "read-lab-metadata"
+    command_params = ctx.params  # dict with CLI args
+
+    # ── 2. Pull defaults + overrides for this command ───────────────────
+    #     If the block was migrated to the new "params/commands" layout,
+    #     flatten it respecting the priority commands > params.
+    topic_block = config.json_data.get(command_name, {})
+    if isinstance(topic_block, dict) and (
+        "params" in topic_block or "commands" in topic_block
+    ):
+        extra_args = dict(topic_block.get("params", {}))  #   defaults
+        extra_args.update(topic_block.get("commands", {}))  # > overrides
     else:
-        config = relecov_tools.config_json.ConfigJson()
-    ctx.obj["config"] = config.json_data
+        # Legacy (flat) section – still supported.
+        extra_args = topic_block
 
-    command_name = ctx.command.name.replace("-", "_")
-    command_params = ctx.params
-    extra_args = config.json_data.get(command_name, {})
-
-    # Merge: CLI > extra_config > default
+    # ── 3. Merge with CLI  (CLI > all) ──────────────────────────────────
     merged = dict(extra_args)
     for k, v in command_params.items():
-        if v is not None:
+        if v is not None:  # CLI value always wins (except None means “not given”)
             merged[k] = v
 
-    # Convert empty strings to None
+    # ── 4. Normalise empty strings to None ──────────────────────────────
     for k, v in merged.items():
         if v == "":
             merged[k] = None
 
-    # Get function signature to filter only valid params
+    # ── 5. Strip out keys that are not in the callback's signature ─────
     func = ctx.command.callback
     sig = inspect.signature(func)
-    param_names = list(sig.parameters.keys())
+    valid_keys = sig.parameters.keys()
+    filtered = {k: v for k, v in merged.items() if k in valid_keys}
 
-    filtered = {k: v for k, v in merged.items() if k in param_names}
     return filtered
 
 
