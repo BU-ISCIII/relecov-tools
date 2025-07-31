@@ -627,39 +627,3 @@ class PipelineManager(BaseModule):
         stderr.print("Finished execution")
         return
 
-
-class ResultUpload:
-    def __init__(self, input_folder=None, conf_file=None):
-        if input_folder is None:
-            self.input_folder = relecov_tools.utils.prompt_path(
-                msg="Select the folder which contains the results"
-            )
-        else:
-            self.input_folder = input_folder
-        if not os.path.exists(self.input_folder):
-            self.log.error("Input folder %s does not exist ", self.input_folder)
-            stderr.print("[red] Input folder " + self.input_folder + " does not exist")
-            sys.exit(1)
-
-        conf_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            "conf",
-            "configuration.json",
-        )
-        if not os.path.exists(conf_file):
-            self.log.error("Configuration file %s does not exist ", self.conf_file)
-            stderr.print(
-                "[red] Pipeline config file "
-                + self.pipeline_conf_file
-                + " does not exist"
-            )
-            sys.exit(1)
-        conf_settings = relecov_tools.utils.read_json_file(conf_file)
-        try:
-            data = conf_settings["pipelines"]["relecov"]
-        except KeyError:
-            self.log.error("Invalid pipeline config file %s ", self.pipeline_conf_file)
-            stderr.print(
-                "[red] Invalid pipeline config file " + self.pipeline_conf_file
-            )
-        stderr.print(f"[blue] Configuration file loaded  {data}")
