@@ -27,7 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Removed
 
-- Removed registry related functionality []()
+- Removed registry related functionality [#767](https://github.com/BU-ISCIII/relecov-tools/pull/767)
 
 ### Requirements
 
