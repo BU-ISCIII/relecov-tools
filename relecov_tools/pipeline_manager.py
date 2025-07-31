@@ -137,7 +137,9 @@ class PipelineManager(BaseModule):
                 f"Config file is missing required sections: {', '.join(missing)}"
             )
 
-    def get_latest_lab_folders(self, initial_date):
+    def get_latest_lab_folders(
+        self, initial_date: datetime.date
+    ) -> tuple[list[str], datetime.date]:
         """Get latest folder with the newest date
         Args:
             initial_date(datetime.date()): Starting date to search for
@@ -177,12 +179,17 @@ class PipelineManager(BaseModule):
         stderr.print("[blue] Collecting samples from date ", latest_date)
         return lab_latest_folders, latest_date
 
-    def join_valid_items(self, input_folder, folder_list=[], initial_date="20220101"):
+    def join_valid_items(
+        self,
+        input_folder: str | None = None,
+        folder_list: list | None = [],
+        initial_date: datetime.date = datetime.date(2022, 1, 1),
+    ) -> tuple[list[dict], datetime.date]:
         """Join validated metadata for the latest batches downloaded into a single one
 
         Args:
             input_folder (str): Folder to start the searching process.
-            initial_date (str): Only search for folders newer than this date.
+            initial_date (datetime): Only search for folders newer than this date.
             folder_list (list(str)): Only retrieve folders with these basenames. Defaults to list()
 
         Returns:
@@ -240,7 +247,7 @@ class PipelineManager(BaseModule):
         stderr.print(f"[blue]Found a total of {len(join_validate)} samples")
         return join_validate, latest_date
 
-    def copy_process(self, samples_data, output_dir):
+    def copy_process(self, samples_data: list[dict], output_dir: str) -> dict:
         """Copies all the necessary samples files in the given samples_data list
         to the output folder. Also creates symbolic links into the link folder
         given in config_file.
@@ -308,7 +315,7 @@ class PipelineManager(BaseModule):
                     continue
         return samp_errors
 
-    def create_samples_data(self, json_data):
+    def create_samples_data(self, json_data: list[dict]) -> list[dict]:
         """Creates a copy of the json_data but only with relevant keys to copy files.
         Here 'sequence_file_path_R1' is created joining the original 'sequence_file_path_R1'
         and 'sequence_file_R1' fields. The same goes for 'sequence_file_path_R2'
@@ -340,7 +347,9 @@ class PipelineManager(BaseModule):
             samples_data.append(sample)
         return samples_data
 
-    def split_data_by_key(self, json_data, keylist):
+    def split_data_by_key(
+        self, json_data: list[dict], keylist: list[str]
+    ) -> list[list[dict]]:
         """Split a given json data into different lists based on a given list of keys.
         From a single list of samples (dicts), the output will now be a list of lists
         where each new list is a subset of the original samples with the same values
@@ -371,7 +380,7 @@ class PipelineManager(BaseModule):
             list_of_jsons_by_key.extend(self.split_data_by_key(group, next_keys))
         return list_of_jsons_by_key
 
-    def split_samples_by_organism(self, join_validate):
+    def split_samples_by_organism(self, join_validate: list[dict]) -> dict:
         """Split the input JSON into groups for each organism, which will later
         be analysed differently depending on its configuration.
 
@@ -402,15 +411,15 @@ class PipelineManager(BaseModule):
             jsons_by_organism_dict[organism] = splitted_json
         return jsons_by_organism_dict
 
-    def process_samples(self, splitted_json, org_conf, latest_date):
+    def process_samples(self, splitted_json: list[dict], org_conf: dict, latest_date: datetime.date) -> dict:
         """Create the output folder, the required template for the pipeline and
         all the files necessary for each group of samples depending on the organism
         config given. Copy the samples and log the ones that could not be copied.
 
         Args:
-            splitted_json (list(list)): List of jsons, one for each group
+            splitted_json (list(dict)): List of jsons, one for each group
             org_conf (dict): organism params from configuration.json
-            latest_date (str): Latest date found. Used to tag the analysis folder
+            latest_date (datetime): Latest date found. Used to tag the analysis folder
 
         Returns:
             global_samp_errors(dict): Dictionary holding the samples with errors for
@@ -626,4 +635,3 @@ class PipelineManager(BaseModule):
         self.log.info("Finished execution")
         stderr.print("Finished execution")
         return
-
