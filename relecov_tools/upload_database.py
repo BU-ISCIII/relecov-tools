@@ -22,86 +22,93 @@ stderr = rich.console.Console(
 class UploadDatabase(BaseModule):
     def __init__(
         self,
-        user=None,
-        password=None,
-        json=None,
-        type=None,
-        platform=None,
-        server_url=None,
-        full_update=False,
-        long_table=None,
+        user: str | None = None,
+        password: str | None = None,
+        json: list[dict] | str | None = None,
+        type: str | None = None,
+        platform: str | None = None,
+        server_url: str | None = None,
+        full_update: bool = False,
+        long_table: str | None = None,
     ):
-        if json is None:
-            json = relecov_tools.utils.prompt_path(
-                msg="Select the json file which have the data to map"
-            )
-        json_dir = os.path.dirname(os.path.realpath(json))
-        super().__init__(output_dir=json_dir, called_module="update-db")
+
+        super().__init__(called_module="update-db")
+        # create the instance for logging the summary information
+        self.logsum = self.parent_log_summary()
+
+        # Check CLI arguments
+        if isinstance(json, list):
+            self.json_data = json
+        else:
+            if json is None:
+                json = relecov_tools.utils.prompt_path(
+                    msg="Select the json file which has the data to map"
+                )
+            if not (isinstance(json, str) and os.path.isfile(json)):
+                stderr.print(f"[red] JSON data file {json} does not exist")
+                raise FileNotFoundError(f"JSON data file {json} does not exist")
+            self.json_data = relecov_tools.utils.read_json_file(json)
+
+        # Convert all values in json_data to strings
+        # This is to ensure that all values are strings before uploading as they
+        # are expected to be strings in the database
+        for row in self.json_data:
+            for key, value in row.items():
+                if not isinstance(value, str):
+                    row[key] = str(value)
+
         # Get the user and password for the database
         if user is None:
             user = relecov_tools.utils.prompt_text(
                 msg="Enter username for upload data to server"
             )
         self.user = user
+
         if password is None:
             password = relecov_tools.utils.prompt_text(msg="Enter credential password")
         self.passwd = password
-        # get the default coonfiguration used the instance
+
+        # Validate long_table file if provided
+        self.long_table_file = None
+        if full_update or type == "variantdata":
+            if not long_table or not os.path.isfile(long_table):
+                raise ValueError(f"Provided long_table file does not exist: {long_table}")
+            self.long_table_file = os.path.realpath(long_table)
+
+        # Configure full update or specific type and platform
+        self.full_update = bool(full_update)
+        if self.full_update:
+            self.server_url = None
+        else:
+            self.type_of_info = type or relecov_tools.utils.prompt_selection(
+                "Select:",
+                ["sample", "bioinfodata", "variantdata"],
+            )
+
+            self.platform = platform or relecov_tools.utils.prompt_selection(
+                "Select:",
+                ["iskylims", "relecov"],
+            )
+
+            self.server_url = server_url
+
+        # Check and load configuration
         self.config_json = ConfigJson()
 
-        if not os.path.isfile(json):
-            self.log.error("json data file %s does not exist ", json)
-            stderr.print(f"[red] json data file {json} does not exist")
-            sys.exit(1)
-        self.json_data = relecov_tools.utils.read_json_file(json)
         batch_id = self.get_batch_id_from_data(self.json_data)
         self.set_batch_id(batch_id)
-        for row in self.json_data:
-            for key, value in row.items():
-                if not isinstance(value, str):
-                    row[key] = str(value)
+
+        schema_filename = self.config_json.get_topic_data("generic", "relecov_schema")
+        if not isinstance(schema_filename, str) or not schema_filename:
+            stderr.print("[red] Schema filename is not defined in the configuration.")
+            raise ValueError("Schema filename is not defined in the configuration.")
         schema = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "schema",
-            self.config_json.get_topic_data("generic", "relecov_schema"),
+            schema_filename,
         )
         self.schema = relecov_tools.utils.read_json_file(schema)
-        if full_update is True:
-            if not os.path.isfile(long_table):
-                raise ValueError(
-                    f"Provided long_table file does not exist {long_table}"
-                )
-            self.full_update = True
-            self.server_url = None
-            self.long_table_file = os.path.realpath(long_table)
-        else:
-            self.full_update = False
-            if type is None:
-                type = relecov_tools.utils.prompt_selection(
-                    "Select:",
-                    ["sample", "bioinfodata", "variantdata"],
-                )
-            self.type_of_info = type
-            if self.type_of_info == "variantdata":
-                if long_table is None:
-                    json = relecov_tools.utils.prompt_path(
-                        msg="Select the json file which have the data to map"
-                    )
-                    if not os.path.isfile(long_table):
-                        raise ValueError(
-                            f"Provided long_table file does not exist {long_table}"
-                        )
-                self.long_table_file = os.path.realpath(long_table)
-            # collect data for plarform to upload data
-            if platform is None:
-                platform = relecov_tools.utils.prompt_selection(
-                    "Select:",
-                    ["iskylims", "relecov"],
-                )
-            self.platform = platform
-            if server_url is None:
-                self.server_url = server_url
-        # Get configuration settings for upload database
+
         try:
             self.platform_settings = self.config_json.get_topic_data(
                 "update_db", "platform"
@@ -110,12 +117,9 @@ class UploadDatabase(BaseModule):
             logtxt = f"Unable to fetch parameters for {platform} {e}"
             stderr.print(f"[red]{logtxt}")
             self.log.error(logtxt)
-            sys.exit(1)
-        # create the instance for logging the summary information
-        lab_code = json_dir.split("/")[-2]
-        self.logsum = self.parent_log_summary(
-            output_dir=json_dir, lab_code=lab_code, path=json_dir
-        )
+            raise KeyError(
+                f"Unable to fetch parameters for {platform} {e}"
+            )
 
     def get_schema_ontology_values(self):
         """Read the schema and extract the values of ontology with the label"""
