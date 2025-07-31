@@ -1,9 +1,0 @@
-relecov-tools -l /tmp/logs.log  download -u usuario_test -p U[9[Gpyu3.
-relecov-tools -l /tmp/logs.log  download -f relecov_tools/test/sftp_config.yaml
-relecov-tools read-lab-metadata -m relecov_tools/example_data/METADATA_LAB_TEST.xlsx -s relecov_tools/example_data/samples_data_COD_test_01_20220422.json -o /tmp
-relecov-tools validate -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -m relecov_tools/example_data/METADATA_LAB_TEST.xlsx -o /tmp
-relecov-tools map -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -d ENA -o /tmp
-relecov-tools map -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json  -d GISAID -o /tmp
-relecov-tools update-db -j relecov_tools/example_data/processed_METADATA_LAB_TEST.json
-relecov-tools read-bioinfo-metadata -m relecov_tools/example_data/lab_metadata_20220208.xlsx -i /relecov_tools/example_data -o relecov_tools/example_data
-relecov-tools upload-to-ena -e relecov_tools/example_data/to_ena_2.json -o relecov_tools/test -a add -c ISCIII
