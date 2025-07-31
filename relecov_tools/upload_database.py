@@ -60,7 +60,6 @@ class UploadDatabase(BaseModule):
             for key, value in row.items():
                 if not isinstance(value, str):
                     row[key] = str(value)
-        self.json_file = json
         schema = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "schema",
