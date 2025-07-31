@@ -181,6 +181,11 @@ class UploadDatabase(BaseModule):
         s_project_fields = []
         # get the ontology values for mapping values in sample fields
         ontology_dict = self.get_schema_ontology_values()
+        if not self.platform_settings or "iskylims" not in self.platform_settings or self.platform_settings["iskylims"] is None:
+            logtxt = "Platform settings for 'iskylims' are not properly configured in configuration.json."
+            self.logsum.add_error(entry=logtxt)
+            stderr.print(f"[red]{logtxt}")
+            raise ValueError(logtxt)
         sample_url = self.platform_settings["iskylims"]["url_sample_fields"]
         sample_fields_raw = self.platform_rest_api.get_request(sample_url, "", "")
 
@@ -253,6 +258,10 @@ class UploadDatabase(BaseModule):
 
     def update_database(self, field_values, post_url):
         """Send the request to update database"""
+
+        if not self.platform_settings or self.platform not in self.platform_settings:
+            raise ValueError("Platform is not set. Cannot update database.")
+
         post_url = self.platform_settings[self.platform][post_url]
         suces_count = 0
         request_count = 0
@@ -370,13 +379,20 @@ class UploadDatabase(BaseModule):
     def start_api(self, platform):
         """Open connection torwards database server API"""
         # Get database settings
+        if not self.platform_settings or platform not in self.platform_settings:
+            logtxt = f"Platform settings for '{platform}' are not properly configured in configuration.json."
+            stderr.print(f"[red]{logtxt}")
+            self.logsum.add_error(entry=logtxt)
+            raise ValueError(logtxt)
         try:
             p_settings = self.platform_settings[platform]
         except KeyError as e:
             logtxt = f"Unable to fetch parameters for {platform} {e}"
             stderr.print(f"[red]{logtxt}")
             self.logsum.add_error(entry=logtxt)
-            sys.exit(1)
+            raise KeyError(
+                f"Unable to fetch parameters for {platform} {e}"
+            )
         if self.server_url is None:
             server_url = p_settings["server_url"]
         else:
