@@ -153,6 +153,7 @@ class PipelineManager(BaseModule):
         for lab_folder in lab_folders:
             existing_upload_folders = False
             last_folder_date = initial_date
+            latest_folder_name = None
             scan_folder = os.path.join(self.input_folder, lab_folder)
             lab_sub_folders = [f.path for f in os.scandir(scan_folder) if f.is_dir()]
             for lab_sub_folder in lab_sub_folders:
@@ -164,19 +165,29 @@ class PipelineManager(BaseModule):
                     last_folder_date = sub_f_date.date()
                     latest_folder_name = lab_sub_folder
                     existing_upload_folders = True
-            if existing_upload_folders:
+            if existing_upload_folders and latest_folder_name is not None:
                 lab_latest_folders[lab_folder] = {
                     "path": latest_folder_name,
                     "date": last_folder_date,
                 }
                 if last_folder_date > latest_date:
                     latest_date = last_folder_date
+            else:
+                self.log.warning(
+                    "No valid subfolders found in %s. Skipping this lab folder",
+                    lab_folder,
+                )
+                stderr.print(
+                    f"[yellow] No valid subfolders found in {lab_folder}. Skipping this lab folder"
+                )
+
         # keep only folders with the latest date to process
         lab_latest_folders = [
             d["path"] for d in lab_latest_folders.values() if d["date"] == latest_date
         ]
         self.log.info("Latest date to process is %s", latest_date)
         stderr.print("[blue] Collecting samples from date ", latest_date)
+
         return lab_latest_folders, latest_date
 
     def join_valid_items(
