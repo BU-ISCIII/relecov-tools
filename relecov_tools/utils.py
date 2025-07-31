@@ -747,3 +747,8 @@ def get_safe_hex(output_dir, length=3):
 
     hex_id = get_new_hex(token_hex(length).upper(), output_dir)
     return hex_id
+
+
+def generate_fingerprint(sequencing_sample_id, collecting_lab_sample_id, submitting_institution, collecting_institution):
+    combined = f"{sequencing_sample_id}|{collecting_lab_sample_id}|{submitting_institution}|{collecting_institution}".lower()
+    return hashlib.sha256(combined.encode()).hexdigest()[:24]
