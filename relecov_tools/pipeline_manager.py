@@ -202,7 +202,7 @@ class PipelineManager(BaseModule):
             # TODO: Change this for os.walk but with multithreading because its too slow
             lab_folders = [f.path for f in os.scandir(self.input_folder) if f.is_dir()]
             for lab_folder in lab_folders:
-                full_path = os.path.join(input_folder, lab_folder)
+                full_path = os.path.join(input_folder or "", lab_folder)
                 lab_subfolders = [
                     f.path for f in os.scandir(full_path) if f.path if f.is_dir()
                 ]
@@ -213,14 +213,28 @@ class PipelineManager(BaseModule):
                 raise FileNotFoundError("No folders found with the given names")
             last_folder = sorted(folder_list)[-1]
             try:
-                latest_date = relecov_tools.utils.string_to_date(last_folder).date()
+                last_folder_date_obj = relecov_tools.utils.string_to_date(last_folder)
+                if last_folder_date_obj is not None:
+                    latest_date = last_folder_date_obj.date()
+                else:
+                    raise ValueError("Could not parse date from folder name")
             except ValueError:
                 self.log.error(
                     "Failed to get date from folder names. Using last mod date"
                 )
-                latest_date = max(
-                    [relecov_tools.utils.get_file_date(f) for f in folders_to_process]
-                ).date()
+                file_dates = [
+                    relecov_tools.utils.get_file_date(f) for f in folders_to_process
+                ]
+                # Filter out None values
+                file_dates = [d for d in file_dates if d is not None]
+                if not file_dates:
+                    raise ValueError("No valid dates found in folders_to_process")
+                # Ensure file_dates are datetime objects before calling .date()
+                if isinstance(file_dates[0], str):
+                    file_dates = [
+                        datetime.datetime.strptime(d, "%Y%m%d") for d in file_dates
+                    ]
+                latest_date = max(file_dates).date()  # type: ignore
         else:
             folders_to_process, latest_date = self.get_latest_lab_folders(initial_date)
         join_validate = list()
@@ -448,7 +462,7 @@ class PipelineManager(BaseModule):
                     continue
                 shutil.rmtree(group_outfolder)
                 self.log.info(f"Folder {group_outfolder} removed")
-            samples_data = self.create_samples_data(list_of_samples)
+            samples_data = self.create_samples_data(list(list_of_samples))
             # Create a folder for the group of samples and copy the files there
             self.log.info("Creating folder for group %s", group_tag)
             stderr.print(f"[blue]Creating folder for group {group_tag}")
@@ -594,6 +608,7 @@ class PipelineManager(BaseModule):
         """
         # collect json with all validated samples
         init_date = datetime.datetime.strptime("20220101", "%Y%m%d").date()
+
         join_validate, latest_date = self.join_valid_items(
             input_folder=self.input_folder,
             initial_date=init_date,
