@@ -9,6 +9,7 @@ from collections import Counter, defaultdict
 import rich.console
 import relecov_tools.utils
 from relecov_tools.base_module import BaseModule
+from relecov_tools.config_json import ConfigJson
 
 stderr = rich.console.Console(
     stderr=True,
@@ -21,67 +22,48 @@ stderr = rich.console.Console(
 class PipelineManager(BaseModule):
     def __init__(
         self,
-        input=None,
-        templates_root=None,
-        output_dir=None,
-        config=None,
+        input: str | None = None,
+        templates_root: str | None = None,
+        output_dir: str | None = None,
+        skip_db_upload: bool = False,
         folder_names=None,
     ):
         super().__init__(output_dir=output_dir, called_module=__name__)
-        self.current_date = datetime.date.today().strftime("%Y%m%d")
+
+        # Check CLI arguments
+
         self.log.info("Initiating pipeline-manager process")
+        self.current_date = datetime.date.today().strftime("%Y%m%d")
+        self.skip_db_upload = skip_db_upload
+
         if input is None:
             self.input_folder = relecov_tools.utils.prompt_path(
                 msg="Select the folder which contains the fastq file of samples"
             )
         else:
             self.input_folder = input
+
         if not os.path.exists(self.input_folder):
             self.log.error("Input folder %s does not exist ", self.input_folder)
             stderr.print("[red] Input folder " + self.input_folder + " does not exist")
-            sys.exit(1)
+            raise FileNotFoundError(f"Input folder {self.input_folder} does not exist")
+
         if templates_root is None:
             self.templates_root = relecov_tools.utils.prompt_path(
                 msg="Select the folder path which contains the templates"
             )
         else:
             self.templates_root = templates_root
+
         if not os.path.exists(self.templates_root):
             self.log.error("Template folder %s does not exist ", self.templates_root)
             stderr.print(
                 "[red] Template folder " + self.templates_root + " does not exist"
             )
-            sys.exit(1)
-        if config is None:
-            config = os.path.join(
-                os.path.dirname(os.path.realpath(__file__)),
-                "conf",
-                "configuration.json",
+            raise FileNotFoundError(
+                f"Template folder {self.templates_root} does not exist"
             )
-        if not os.path.exists(config):
-            self.log.error("Pipeline config file %s does not exist ", config)
-            stderr.print("[red] Pipeline config file " + config + " does not exist")
-            sys.exit(1)
-        conf_settings = relecov_tools.utils.read_json_file(config)
-        try:
-            config_data = conf_settings["pipeline_manager"]
-        except KeyError:
-            self.log.error("Invalid pipeline config file %s ", config)
-            stderr.print("[red] Invalid pipeline config file " + config)
-        required_conf = [
-            "analysis_user",
-            "analysis_group",
-            "analysis_folder",
-            "sample_stored_folder",
-            "sample_link_folder",
-            "doc_folder",
-            "organism_config",
-        ]
-        missing_conf = [k for k in required_conf if k not in config_data]
-        if missing_conf:
-            self.log.error("Invalid pipeline config file. Missing %s", missing_conf)
-            stderr.print(f"[red]Invalid pipeline config file. Missing {missing_conf}")
-            sys.exit(1)
+
         if output_dir is None:
             self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
@@ -95,8 +77,36 @@ class PipelineManager(BaseModule):
         except OSError or FileExistsError as e:
             self.log.error("Unable to create output folder %s ", e)
             stderr.print("[red] Unable to create output folder ", e)
-            sys.exit(1)
+            raise OSError(f"Unable to create output folder {self.output_dir}: {e}")
+
         self.folder_list = folder_names
+
+        # Check and load config params
+        self.config = ConfigJson(extra_config=True)
+        config_data = self.config.get_configuration("pipeline_manager")
+
+        if not config_data:
+            self.log.error("Invalid pipeline config file")
+            stderr.print("[red] Invalid pipeline config file")
+            raise ValueError("Invalid pipeline config file")
+
+        required_conf = [
+            "analysis_user",
+            "analysis_group",
+            "analysis_folder",
+            "sample_stored_folder",
+            "sample_link_folder",
+            "doc_folder",
+            "organism_config",
+        ]
+
+        missing_conf = [k for k in required_conf if k not in config_data]
+
+        if missing_conf:
+            self.log.error("Invalid pipeline config file. Missing %s", missing_conf)
+            stderr.print(f"[red]Invalid pipeline config file. Missing {missing_conf}")
+            raise ValueError(f"Invalid pipeline config file. Missing {missing_conf}")
+
         # Update the output folder with the current date and analysis name
         self.out_folder_namevar = f"{self.current_date}_{config_data['analysis_group']}_%s_{config_data['analysis_user']}"
         self.analysis_folder = config_data["analysis_folder"]
@@ -104,6 +114,28 @@ class PipelineManager(BaseModule):
         self.linked_sample_folder = config_data["sample_link_folder"]
         self.doc_folder = config_data["doc_folder"]
         self.organism_config = config_data["organism_config"]
+
+        req_conf = ["update_db"] * bool(self.skip_db_upload)
+        missing = [
+            conf for conf in req_conf if self.config.get_configuration(conf) is None
+        ]
+        if missing:
+            self.log.error(
+                "Extra config file () is missing required sections: %s"
+                % ", ".join(missing)
+            )
+            self.log.error(
+                "Please use add-extra-config to add them to the config file."
+            )
+            stderr.print(
+                f"[red]Config file is missing required sections: {', '.join(missing)}"
+            )
+            stderr.print(
+                "[red]Please use add-extra-config to add them to the config file."
+            )
+            raise ValueError(
+                f"Config file is missing required sections: {', '.join(missing)}"
+            )
 
     def get_latest_lab_folders(self, initial_date):
         """Get latest folder with the newest date
