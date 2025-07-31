@@ -263,11 +263,14 @@ class UploadDatabase(BaseModule):
             raise ValueError("Platform is not set. Cannot update database.")
 
         post_url = self.platform_settings[self.platform][post_url]
-        suces_count = 0
+        success_count = 0
         request_count = 0
+        req_sample = None  # Ensure req_sample is always defined
+        result_all = []
         for chunk in field_values:
             req_sample = ""
             request_count += 1
+
             if "sample_name" in chunk:
                 stderr.print(
                     f"[blue] sending request for sample {chunk['sample_name']}"
@@ -278,15 +281,19 @@ class UploadDatabase(BaseModule):
                     f"[blue] sending request for sample {chunk['sequencing_sample_id']}"
                 )
                 req_sample = chunk["sequencing_sample_id"]
+
             self.logsum.feed_key(sample=req_sample)
+
             result = self.platform_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
                 post_url,
             )
+
             if "ERROR" in result:
                 if result["ERROR"] == "Server not available":
                     # retry to connect to server
+                    i = 0
                     for i in range(10):
                         # wait 5 sec before resending the request
                         time.sleep(5)
@@ -320,26 +327,38 @@ class UploadDatabase(BaseModule):
                     stderr.print(f"[red]{logtxt}")
                     continue
             self.log.info(
-                "stored data in %s iskylims for sample %s",
+                "stored data in %s iskylims for sample %s with unique id %s and fingerprint %s",
                 self.platform,
                 req_sample,
+                result["data"]["sample_unique_id"],
+                result["data"]["sample_fingerprint"],
             )
             stderr.print(f"[green] Successful request for {req_sample}")
-            suces_count += 1
-        if request_count == suces_count:
+            result_all.append(result["data"])
+            success_count += 1
+
+        if request_count == success_count:
             stderr.print(
-                f"All {self.type_of_info} data sent sucessfuly to {self.platform}"
+                f"All {self.type_of_info} data sent sucessfully to {self.platform}"
+            )
+            stderr.print(f"[green]Upload process to {self.platform} completed")
+            self.log.info(
+                "%s of the %s requests were sent to %s",
+                success_count,
+                request_count,
+                self.platform,
             )
         else:
             logtxt = "%s of the %s requests were sent to %s"
             self.logsum.add_warning(
-                entry=logtxt % (suces_count, request_count, self.platform),
+                entry=logtxt % (success_count, request_count, self.platform),
                 sample=req_sample,
             )
             stderr.print(
-                f"[yellow]{logtxt % (suces_count, request_count, self.platform)}"
+                f"[yellow]{logtxt % (success_count, request_count, self.platform)}"
             )
-        return
+
+        return result_all
 
     def store_data(self, type_of_info, server_name):
         """Collect data from json file and split them to store data in iSkyLIMS
@@ -347,6 +366,7 @@ class UploadDatabase(BaseModule):
         """
         map_fields = {}
 
+        post_url = "store_samples"
         if type_of_info == "sample":
             if server_name == "iskylims":
                 self.log.info("Getting sample fields from %s", server_name)
@@ -373,8 +393,8 @@ class UploadDatabase(BaseModule):
             post_url = "variantdata"
             map_fields = self.json_data
 
-        self.update_database(map_fields, post_url)
-        stderr.print(f"[green]Upload process to {self.platform} completed")
+        result = self.update_database(map_fields, post_url)
+        return result
 
     def start_api(self, platform):
         """Open connection torwards database server API"""
@@ -436,5 +456,6 @@ class UploadDatabase(BaseModule):
                     self.long_table_file
                 )
             self.store_data(self.type_of_info, self.platform)
+
         self.parent_create_error_summary(called_module="update-db")
         return
