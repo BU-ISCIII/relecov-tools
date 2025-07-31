@@ -111,7 +111,7 @@ class UploadDatabase(BaseModule):
 
         try:
             self.platform_settings = self.config_json.get_topic_data(
-                "update_db", "platform-data"
+                "update_db", "platform-params"
             )
         except KeyError as e:
             logtxt = f"Unable to fetch parameters for {platform} {e}"
