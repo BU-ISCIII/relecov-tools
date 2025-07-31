@@ -7,6 +7,8 @@ import sys
 from collections import Counter, defaultdict
 
 import rich.console
+
+import relecov_tools.upload_database
 import relecov_tools.utils
 from relecov_tools.base_module import BaseModule
 from relecov_tools.config_json import ConfigJson
@@ -436,7 +438,9 @@ class PipelineManager(BaseModule):
             jsons_by_organism_dict[organism] = splitted_json
         return jsons_by_organism_dict
 
-    def process_samples(self, splitted_json: list[dict], org_conf: dict, latest_date: datetime.date) -> dict:
+    def process_samples(
+        self, splitted_json: list[dict], org_conf: dict, latest_date: datetime.date
+    ) -> dict:
         """Create the output folder, the required template for the pipeline and
         all the files necessary for each group of samples depending on the organism
         config given. Copy the samples and log the ones that could not be copied.
@@ -606,6 +610,46 @@ class PipelineManager(BaseModule):
             stderr.print(f"[blue]Folder {group_outfolder} finished. Ready to launch")
         return global_samp_errors
 
+    def update_db_samples(self, json_data: list[dict]) -> dict:
+        """Update the database with the samples data.
+
+        Args:
+            samples_data (list(dict)): List of dictionaries with sample data to update
+
+        Returns:
+            dict
+        """
+        upload_db_conf = self.config.get_configuration("update_db")
+        if not upload_db_conf:
+            self.log.error("No update_db configuration found")
+            stderr.print("[red] No update_db configuration found")
+            raise ValueError("No update_db configuration found")
+        req_conf = [
+            "user",
+            "password",
+            "platform",
+        ]
+        missing_conf = [k for k in req_conf if k not in upload_db_conf]
+        if missing_conf:
+            self.log.error(
+                "Missing required configuration for upload_db: %s", missing_conf
+            )
+            stderr.print(
+                f"[red] Missing required configuration for upload_db: {missing_conf}"
+            )
+            raise ValueError(
+                f"Missing required configuration for upload_db: {missing_conf}"
+            )
+        import pdb; pdb.set_trace()  # noqa: E702
+        upload_db = relecov_tools.upload_database.UploadDatabase(
+            user=upload_db_conf["user"],
+            password=upload_db_conf["password"],
+            json=json_data,
+            type="sample",
+            platform=upload_db_conf["platform"],
+        )
+        upload_db.update_db()
+
     def pipeline_exc(self):
         """Prepare folder for analysis in HPC
         Copies template selected as input
@@ -632,10 +676,23 @@ class PipelineManager(BaseModule):
         batch_id = self.get_batch_id_from_data(join_validate)
         # If more than one batch is included, current date will be set as batch_id
         self.set_batch_id(batch_id)
+        self.log.info("Batch ID set to %s", batch_id)
+        stderr.print(f"[blue]Batch ID set to {batch_id}")
+
+        self.log.info("Updating database with samples data")
+        stderr.print("[blue]Updating database with samples data")
+        # Update the database with the samples data
+        self.update_db_samples(join_validate)
+
+        stderr.print("[blue]Collecting samples by organism")
+        self.log.info("Collecting samples by organism")
+        # Split the samples by organism
         jsons_by_organism_dict = self.split_samples_by_organism(join_validate)
         if not jsons_by_organism_dict:
             self.log.error("No samples found for any of the organisms in config")
             raise ValueError("No samples found for any of the organisms in config")
+
+        # Process each organism's samples
         global_samp_errors = {}
         for organism, splitted_json in jsons_by_organism_dict.items():
             stderr.print(f"[blue]Processing samples for organism: {organism}")
