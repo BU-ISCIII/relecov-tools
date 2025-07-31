@@ -640,7 +640,6 @@ class PipelineManager(BaseModule):
             raise ValueError(
                 f"Missing required configuration for upload_db: {missing_conf}"
             )
-        import pdb; pdb.set_trace()  # noqa: E702
         upload_db = relecov_tools.upload_database.UploadDatabase(
             user=upload_db_conf["user"],
             password=upload_db_conf["password"],
