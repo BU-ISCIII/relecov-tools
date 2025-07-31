@@ -610,14 +610,68 @@ class PipelineManager(BaseModule):
             stderr.print(f"[blue]Folder {group_outfolder} finished. Ready to launch")
         return global_samp_errors
 
-    def update_db_samples(self, json_data: list[dict]) -> dict:
+    def assign_unique_ids_by_fingerprint(self, json_data: list[dict], result: list[dict]) -> list[dict]:
+        """
+        Assigns unique_sample_id to each entry in json_data based on sample_fingerprint,
+        using the data returned in the result list (from DB/API).
+
+        If sample_fingerprint is missing in a sample, it will be generated using a deterministic
+        hash of four key fields.
+
+        Args:
+            json_data (list[dict]): List of sample metadata to be updated
+            result (list[dict]): List of database entries with sample_fingerprint and sample_unique_id
+
+        Returns:
+            list[dict]: Updated list with unique_sample_id set when available
+        """
+
+        # Create lookup table from fingerprint to unique_sample_id
+        fingerprint_to_unique_id = {
+            r["sample_fingerprint"]: r["sample_unique_id"]
+            for r in result
+            if "sample_fingerprint" in r and "sample_unique_id" in r
+        }
+
+        # Update each sample with its unique_sample_id
+        for sample in json_data:
+            fingerprint = sample.get("sample_fingerprint")
+
+            # Generate fingerprint if missing
+            if not fingerprint:
+                try:
+                    fingerprint = relecov_tools.utils.generate_fingerprint(
+                        sample["sequencing_sample_id"],
+                        sample["collecting_lab_sample_id"],
+                        sample["submitting_institution"],
+                        sample["collecting_institution"]
+                    )
+                    sample["sample_fingerprint"] = fingerprint
+                except KeyError as e:
+                    self.log.warning(f"Missing field {e} while generating fingerprint for sample: {sample}")
+                    continue
+
+            # Assign unique_sample_id from lookup table
+            unique_id = fingerprint_to_unique_id.get(fingerprint)
+            if unique_id:
+                sample["unique_sample_id"] = unique_id
+            else:
+                seq_id = sample.get("sequencing_sample_id", "unknown")
+                self.log.warning(
+                    f"Fingerprint '{fingerprint}' not found in DB result "
+                    f"(sequencing_sample_id: '{seq_id}', unique_sample_id: missing)"
+                )
+
+        return json_data
+
+    def update_db_samples(self, json_data: list[dict]) -> list[dict]:
         """Update the database with the samples data.
 
         Args:
-            samples_data (list(dict)): List of dictionaries with sample data to update
+            json_data (list(dict)): List of dictionaries with sample data to update
 
         Returns:
-            dict
+            list(dict): Updated list of dictionaries with unique_sample_id added
         """
         upload_db_conf = self.config.get_configuration("update_db")
         if not upload_db_conf:
@@ -647,7 +701,19 @@ class PipelineManager(BaseModule):
             type="sample",
             platform=upload_db_conf["platform"],
         )
-        upload_db.update_db()
+        upload_db.start_api(upload_db_conf["platform"])
+        result = upload_db.store_data("sample", upload_db_conf["platform"])
+
+        if not result:
+            self.log.error("No data was uploaded to the database")
+            stderr.print("[red] No data was uploaded to the database")
+            raise ValueError("No data was uploaded to the database")
+        self.log.info("Database updated with %s samples", len(json_data))
+        stderr.print(f"[blue] Database updated with {len(json_data)} samples")
+
+        json_data = self.assign_unique_ids_by_fingerprint(json_data, result)
+
+        return json_data
 
     def pipeline_exc(self):
         """Prepare folder for analysis in HPC
@@ -681,7 +747,7 @@ class PipelineManager(BaseModule):
         self.log.info("Updating database with samples data")
         stderr.print("[blue]Updating database with samples data")
         # Update the database with the samples data
-        self.update_db_samples(join_validate)
+        join_validate = self.update_db_samples(join_validate)
 
         stderr.print("[blue]Collecting samples by organism")
         self.log.info("Collecting samples by organism")
