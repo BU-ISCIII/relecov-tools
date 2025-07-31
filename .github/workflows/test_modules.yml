@@ -72,11 +72,12 @@ jobs:
       OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
     steps:
+    - name: Clean workspace
+      run: git clean -xdf
     - name: Set up Python 3.10.0
       uses: actions/setup-python@v3
       with:
         python-version: '3.10.0'
-
     - name: Checkout code
       uses: actions/checkout@v3
       with:
