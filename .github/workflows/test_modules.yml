@@ -37,12 +37,6 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        fetch-depth: 0
-
     - name: Install package and dependencies
       run: |
         pip install -r requirements.txt
