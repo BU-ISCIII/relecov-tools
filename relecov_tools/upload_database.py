@@ -320,6 +320,9 @@ class UploadDatabase(BaseModule):
                     logtxt = f"Request to {post_url} already defined"
                     self.logsum.add_warning(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]{logtxt} for sample {req_sample}")
+                    # If the sample is already defined, we can continue
+                    # but we return the data of the already defined sample
+                    result_all.append(result["data"])
                     continue
                 else:
                     logtxt = f"Error {result['ERROR']} in request to {post_url}"
