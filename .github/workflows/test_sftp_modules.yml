@@ -38,10 +38,10 @@ jobs:
         target_folders: ["", "-t COD-test-1"]
       
     steps:
-    - name: Set up Python 3.10.0
+    - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
-        python-version: '3.10.0'
+        python-version: '3.10'
       
     - name: Checkout code
       uses: actions/checkout@v3
@@ -73,10 +73,10 @@ jobs:
         download_options: ["download_only", "download_clean"]
       
     steps:
-    - name: Set up Python 3.10.0
+    - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
-        python-version: '3.10.0'
+        python-version: '3.10'
       
     - name: Checkout code
       uses: actions/checkout@v3
