@@ -72,8 +72,6 @@ jobs:
       OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
     steps:
-    - name: Clean workspace
-      run: git clean -xdf
     - name: Set up Python 3.10.0
       uses: actions/setup-python@v3
       with:
