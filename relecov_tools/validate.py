@@ -3,6 +3,7 @@ import rich.console
 from jsonschema import Draft202012Validator, FormatChecker
 import os
 import re
+import re
 import openpyxl
 from datetime import datetime
 from collections import defaultdict
@@ -13,6 +14,7 @@ import relecov_tools.assets.schema_utils.custom_validators
 import relecov_tools.sftp_client
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.base_module import BaseModule
+from relecov_tools.rest_api import RestApi
 from relecov_tools.rest_api import RestApi
 
 
@@ -34,6 +36,7 @@ class Validate(BaseModule):
         excel_sheet=None,
         upload_files=False,
         logsum_file=None,
+        check_db=False,
         check_db=False,
     ):
         """Validate json file against the schema"""
@@ -62,6 +65,7 @@ class Validate(BaseModule):
                 f"Config file is missing required sections: {', '.join(missing)}"
             )
         if json_schema_file is None:
+            schema_name = self.config.get_topic_data("generic", "relecov_schema")
             schema_name = self.config.get_topic_data("generic", "relecov_schema")
             json_schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
@@ -159,6 +163,9 @@ class Validate(BaseModule):
         relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(
             self.json_schema, "2020-12"
         )
+        for prop_name, prop_def in self.json_schema["properties"].items():
+            if "label" not in prop_def:
+                self.log.debug(f"Property {prop_name} is missing 'label'")
         for prop_name, prop_def in self.json_schema["properties"].items():
             if "label" not in prop_def:
                 self.log.debug(f"Property {prop_name} is missing 'label'")
@@ -511,6 +518,7 @@ class Validate(BaseModule):
         return valid_file, invalid_file
 
     def validate_upload_args(self):
+    def validate_upload_args(self):
         """Validates that all required arguments for the upload process are present
         and that the log summary file exists.
 
@@ -518,6 +526,7 @@ class Validate(BaseModule):
             ValueError: If any required argument is missing or the log summary file does not exist.
         """
         required_args = ["user", "password"]
+        self.log.debug(f"Trying to validate args for upload: {required_args}")
         self.log.debug(f"Trying to validate args for upload: {required_args}")
         missing_args = []
         for arg in required_args:
@@ -553,6 +562,7 @@ class Validate(BaseModule):
             for samp, logs in previous_logsum[self.lab_code].get("samples", {}).items():
                 if not logs["valid"]:
                     self.log.debug(f"Found sample {samp} invalid in log_summary")
+                    self.log.debug(f"Found sample {samp} invalid in log_summary")
                     log_invalid_samples.append(samp)
         else:
             errtxt = f"Lab code {self.lab_code} not found in {self.logsum_file} to update invalid samples"
@@ -584,7 +594,10 @@ class Validate(BaseModule):
         def upload_and_clean(local_file, remote_dest, clean=True):
             """Upload file to remote sftp and log the process."""
             self.log.debug(f"Uploading {local_file} → {remote_dest}")
+            """Upload file to remote sftp and log the process."""
+            self.log.debug(f"Uploading {local_file} → {remote_dest}")
             if not sftp_client.upload_file(local_file, remote_dest):
+                self.log.error(f"Could not upload {local_file} to sftp.")
                 self.log.error(f"Could not upload {local_file} to sftp.")
                 return False
             self.log.debug(f"{remote_dest} uploaded successfully")
@@ -595,7 +608,17 @@ class Validate(BaseModule):
                     self.log.error(f"Could not remove {local_file}: {e}")
                     return False
             return True
+            self.log.debug(f"{remote_dest} uploaded successfully")
+            if clean:
+                try:
+                    os.remove(local_file)
+                except OSError as e:
+                    self.log.error(f"Could not remove {local_file}: {e}")
+                    return False
+            return True
 
+        # ── 1· Connection and remote folders ──────────────────────────
+        self.log.info("Initiating sftp client to upload invalid files")
         # ── 1· Connection and remote folders ──────────────────────────
         self.log.info("Initiating sftp client to upload invalid files")
         sftp_client = relecov_tools.sftp_client.SftpClient(
@@ -609,11 +632,33 @@ class Validate(BaseModule):
             else self.lab_code
         )
 
+
+        remote_labfold = (
+            os.path.join(self.lab_code, self.subfolder)
+            if self.subfolder
+            else self.lab_code
+        )
+
         self.log.info(f"Output folder set to {remote_labfold}")
         if f"./{remote_labfold}" not in sftp_client.list_remote_folders(
             ".", recursive=bool(self.subfolder)
         ):
+        if f"./{remote_labfold}" not in sftp_client.list_remote_folders(
+            ".", recursive=bool(self.subfolder)
+        ):
             raise FileNotFoundError(f"Couldn't find remote lab folder {remote_labfold}")
+
+        invalid_remote_folder = f"{self.batch_id}_invalid_samples"
+        self.remote_outfold = os.path.join(f"./{remote_labfold}", invalid_remote_folder)
+        if invalid_remote_folder not in sftp_client.list_remote_folders(
+            f"./{remote_labfold}"
+        ):
+            self.log.info(f"{invalid_remote_folder} not found, creating it…")
+            sftp_client.make_dir(self.remote_outfold)
+
+        stderr.print(f"[blue]Uploading invalid files to remote {remote_labfold}...")
+
+        # ── 2· Build map path → sample_id  ─────────────────────
 
         invalid_remote_folder = f"{self.batch_id}_invalid_samples"
         self.remote_outfold = os.path.join(f"./{remote_labfold}", invalid_remote_folder)
@@ -641,8 +686,27 @@ class Validate(BaseModule):
                     path_to_sample[file_path] = samp_id
 
         # ── 3· Try to upload each FASTQ ────────────────────────────
+        path_to_sample = {}
+        invalid_files = []
+        for row in invalid_json:
+            samp_id = row.get(self.sample_id_field, "UnknownSample")
+            for p, f in path_fields:
+                if p in row and f in row:
+                    file_path = os.path.join(row[p], row[f])
+                    invalid_files.append(file_path)
+                    path_to_sample[file_path] = samp_id
+
+        # ── 3· Try to upload each FASTQ ────────────────────────────
         failed_uploads = []
         for file in invalid_files:
+            if not os.path.isfile(file):
+                failed_uploads.append(file)
+                self.log.warning(f"Local file not found, skipping upload: {file}")
+                self.logsum.add_warning(
+                    sample=path_to_sample[file],
+                    entry="File missing when uploading invalid FastQ",
+                )
+                continue
             if not os.path.isfile(file):
                 failed_uploads.append(file)
                 self.log.warning(f"Local file not found, skipping upload: {file}")
@@ -654,6 +718,11 @@ class Validate(BaseModule):
             remote_dest = os.path.join(self.remote_outfold, os.path.basename(file))
             if not upload_and_clean(file, remote_dest):
                 failed_uploads.append(file)
+                self.logsum.add_warning(
+                    sample=path_to_sample[file], entry="Failed to upload invalid FastQ"
+                )
+
+        # ── 4· Upload invalid.xlsx ────────────────────────
                 self.logsum.add_warning(
                     sample=path_to_sample[file], entry="Failed to upload invalid FastQ"
                 )
@@ -674,7 +743,28 @@ class Validate(BaseModule):
                 failed_uploads.append(local_path)
 
         # ── 6· Screen summary & log_summary ───────────────────
+
+        # ── 5· Locate & upload the *_metadata_report.xlsx ───────────
+        pattern = re.compile(
+            rf"^{re.escape(self.lab_code)}_{re.escape(self.batch_id)}.*_metadata_report\.xlsx$"
+        )
+        for rpt in (f for f in os.listdir(self.out_folder) if pattern.match(f)):
+            local_path = os.path.join(self.out_folder, rpt)
+            remote_dest = os.path.join(self.remote_outfold, rpt)
+            if not upload_and_clean(local_path, remote_dest, clean=False):
+                failed_uploads.append(local_path)
+
+        # ── 6· Screen summary & log_summary ───────────────────
         if failed_uploads:
+            preview = ", ".join(os.path.basename(x) for x in failed_uploads[:3])
+            stderr.print(
+                f"[yellow]{len(failed_uploads)} files could not be uploaded "
+                f"(first ones: {preview}). "
+                "For the complete list check the validate*.log file."
+                "Note: if the files were corrupted or not referenced in metadata "
+                "they may already have been uploaded during the download step.[/]"
+            )
+            self.log.warning(f"Files failed to upload: {failed_uploads}")
             preview = ", ".join(os.path.basename(x) for x in failed_uploads[:3])
             stderr.print(
                 f"[yellow]{len(failed_uploads)} files could not be uploaded "
@@ -787,6 +877,7 @@ class Validate(BaseModule):
         self.validate_schema()
         self.log.info("Preparing validator based on config")
         starting_date = self.config.get_topic_data("generic", "starting_date")
+        starting_date = self.config.get_topic_data("generic", "starting_date")
         date_checker = (
             relecov_tools.assets.schema_utils.custom_validators.make_date_checker(
                 datetime.strptime(starting_date, "%Y-%m-%d").date(),
@@ -811,12 +902,37 @@ class Validate(BaseModule):
             )
         else:
             stderr.print("[green]No errors found during metadata validation!")
+            stderr.print("[green]No errors found during metadata validation!")
         invalid_json = [x for x in self.json_data if x not in valid_json_data]
         return valid_json_data, invalid_json
 
     def execute_validation_process(self):
         """Execute all the validation process start to end"""
+        """Execute all the validation process start to end"""
         valid_json_data, invalid_json = self.validate()
+        if self.check_db:
+            stderr.print(
+                "[blue]Checking if samples are already uploaded to platform..."
+            )
+            try:
+                self.validate_db_args()
+                valid_json_data, invalid_json = self.search_sample_dups_in_db(
+                    valid_json_data, invalid_json
+                )
+            except ValueError as e:
+                stderr.print(f"[red]Could not check if samples are already in db: {e}")
+                self.log.error(f"Could not check if samples are already in db: {e}")
+                self.create_validation_files(valid_json_data, invalid_json)
+                raise
+        if self.logsum_file:
+            previous_logsum = relecov_tools.utils.read_json_file(self.logsum_file)
+            merged_logs = self.logsum.merge_logs([previous_logsum, self.logsum.logs])
+            invalid_json = self.update_invalid_with_logsum(invalid_json, merged_logs)
+        else:
+            invalid_json = self.update_invalid_with_logsum(
+                invalid_json, self.logsum.logs
+            )
+        valid_json_data = [x for x in valid_json_data if x not in invalid_json]
         if self.check_db:
             stderr.print(
                 "[blue]Checking if samples are already uploaded to platform..."
@@ -844,6 +960,7 @@ class Validate(BaseModule):
             stderr.print(f"Starting uploading process for {self.lab_code}...")
             self.log.info(f"Starting uploading process for {self.lab_code}...")
             try:
+                self.validate_upload_args()
                 self.validate_upload_args()
             except ValueError as e:
                 stderr.print(f"[red]Could not upload validation files: {e}")

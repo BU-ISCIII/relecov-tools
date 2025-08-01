@@ -50,6 +50,7 @@ class Download(BaseModule):
         super().__init__(output_dir=output_dir, called_module="download")
         self.log.info("Initiating download process")
         config_json = ConfigJson()
+        config_json = ConfigJson()
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
@@ -94,6 +95,12 @@ class Download(BaseModule):
                 self.platform_storage_folder = config_json.get_topic_data(
                     "sftp_handle", "platform_storage_folder"
                 )
+            try:
+                self.platform_storage_folder = config["platform_storage_folder"]
+            except KeyError:
+                self.platform_storage_folder = config_json.get_topic_data(
+                    "sftp_handle", "platform_storage_folder"
+                )
 
         if output_dir is not None:
             if os.path.isdir(output_dir):
@@ -125,6 +132,7 @@ class Download(BaseModule):
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
         self.metadata_lab_heading = config_json.get_topic_data(
             "read_lab_metadata", "metadata_lab_heading"
+            "read_lab_metadata", "metadata_lab_heading"
         )
         self.metadata_processing = config_json.get_topic_data(
             "sftp_handle", "metadata_processing"
@@ -133,6 +141,7 @@ class Download(BaseModule):
             "sftp_handle", "skip_when_found"
         )
         self.samples_json_fields = config_json.get_topic_data(
+            "read_lab_metadata", "samples_json_fields"
             "read_lab_metadata", "samples_json_fields"
         )
         sample_pattern = config_json.get_topic_data("sftp_handle", "sample_name_regex")
@@ -1151,6 +1160,7 @@ class Download(BaseModule):
         if self.target_folders is None:
             target_folders = clean_root_list
             selected_folders = target_folders.copy()
+            selected_folders = target_folders.copy()
         elif self.target_folders[0] == "ALL":
             self.log.info("Showing folders from remote SFTP for user selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
@@ -1158,7 +1168,12 @@ class Download(BaseModule):
                 choices=sorted(clean_root_list),
             )
             selected_folders = target_folders.copy()
+            selected_folders = target_folders.copy()
         else:
+            target_folders = [
+                f.strip() for f in self.target_folders if f.strip() in clean_root_list
+            ]
+            selected_folders = self.target_folders
             target_folders = [
                 f.strip() for f in self.target_folders if f.strip() in clean_root_list
             ]
@@ -1175,6 +1190,13 @@ class Download(BaseModule):
                     )
             target_folders = new_target_folders.copy()
         if not target_folders:
+            errtxt = f"No remote folders matching selection {selected_folders}"
+            if self.subfolder is not None:
+                errtxt += f" Check if subfolder {str(self.subfolder)} is present"
+            self.log.error(errtxt)
+            stderr.print(errtxt)
+            stderr.print(f"List of available remote folders: {str(clean_root_list)}")
+            raise ValueError(errtxt)
             errtxt = f"No remote folders matching selection {selected_folders}"
             if self.subfolder is not None:
                 errtxt += f" Check if subfolder {str(self.subfolder)} is present"
