@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix "target_folders": "" handling in download module [#760](https://github.com/BU-ISCIII/relecov-tools/pull/760)
 - minor fix in pipeline_manager so it finds valided json [#764](https://github.com/BU-ISCIII/relecov-tools/pull/764)
 - Fix triple-counting folder-only samples in log_summary.json [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
+- Fix python version on .github/workflows [#769](https://github.com/BU-ISCIII/relecov-tools/pull/769)
 
 #### Changed
 
