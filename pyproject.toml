@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "relecov-tools"
-version = "1.6.0"
+version = "1.6.2"
 description = "Tools for managing and proccessing relecov network data."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
     {name = "Sara Monzon", email = "smonzon@isciii.es"},
     {name = "Luis Chapado", email = "lchapado@externos.isciii.es"},

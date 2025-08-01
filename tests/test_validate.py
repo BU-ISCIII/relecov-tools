@@ -45,13 +45,6 @@ def main():
         help="Path to the JSON schema file used for validation.",
     )
     parser.add_argument(
-        "-r",
-        "--registry",
-        type=str,
-        required=True,
-        help="Path to the unique sample ID registry JSON file.",
-    )
-    parser.add_argument(
         "-l",
         "--logsum_file",
         type=str,
@@ -92,7 +85,6 @@ def generate_config_yaml():
             "output_dir": "",
             "excel_sheet": "",
             "json_schema_file": "relecov_tools/schema/relecov_schema.json",
-            "registry": "tests/data/map_validate/unique_sampleid_registry.json",
         },
     }
 

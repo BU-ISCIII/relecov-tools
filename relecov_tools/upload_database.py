@@ -64,7 +64,7 @@ class UploadDatabase(BaseModule):
         schema = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "schema",
-            self.config_json.get_topic_data("json_schemas", "relecov_schema"),
+            self.config_json.get_topic_data("generic", "relecov_schema"),
         )
         self.schema = relecov_tools.utils.read_json_file(schema)
         if full_update is True:
@@ -105,7 +105,7 @@ class UploadDatabase(BaseModule):
         # Get configuration settings for upload database
         try:
             self.platform_settings = self.config_json.get_topic_data(
-                "upload_database", "platform"
+                "update_db", "platform"
             )
         except KeyError as e:
             logtxt = f"Unable to fetch parameters for {platform} {e}"
@@ -156,7 +156,7 @@ class UploadDatabase(BaseModule):
                         s_dict[pfield] = value
             # include the fixed value
             fixed_value = self.config_json.get_topic_data(
-                "upload_database", "iskylims_fixed_values"
+                "update_db", "iskylims_fixed_values"
             )
             for prop, val in fixed_value.items():
                 s_dict[prop] = val
@@ -188,7 +188,7 @@ class UploadDatabase(BaseModule):
             stderr.print(f"[red]{logtxt1 + logtxt2}")
             sys.exit(1)
 
-        for _, values in sample_fields_raw["DATA"].items():
+        for _, values in sample_fields_raw["data"].items():
             if "ontology" in values:
                 try:
                     property = ontology_dict[values["ontology"]]
@@ -218,7 +218,7 @@ class UploadDatabase(BaseModule):
         else:
             self.log.info("Fetched sample project fields from iSkyLIMS")
             stderr.print("[blue] Fetched sample project fields from iSkyLIMS")
-        for field in s_project_fields_raw["DATA"]:
+        for field in s_project_fields_raw["data"]:
             s_project_fields.append(field["sample_project_field_name"])
         return [sample_fields, s_project_fields]
 
@@ -226,7 +226,7 @@ class UploadDatabase(BaseModule):
         """Select the values from self.json_data"""
         field_values = []
         r_fields = self.config_json.get_topic_data(
-            "upload_database", "relecov_sample_metadata"
+            "update_db", "relecov_sample_metadata"
         )
 
         for row in self.json_data:
@@ -291,13 +291,13 @@ class UploadDatabase(BaseModule):
                         stderr.print(f"[red]{logtxt}")
                         continue
 
-                elif "is not defined" in result["ERROR_TEST"].lower():
-                    error_txt = result["ERROR_TEST"]
+                elif "is not defined" in result["ERROR"].lower():
+                    error_txt = result["ERROR"]
                     logtxt = f"Sample {req_sample} failed in {post_url}: {error_txt}"
                     self.logsum.add_error(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]Warning: {logtxt}")
                     continue
-                elif "already defined" in result["ERROR_TEST"].lower():
+                elif "already defined" in result["ERROR"].lower():
                     logtxt = f"Request to {post_url} already defined"
                     self.logsum.add_warning(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]{logtxt} for sample {req_sample}")

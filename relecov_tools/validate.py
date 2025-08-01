@@ -2,6 +2,7 @@
 import rich.console
 from jsonschema import Draft202012Validator, FormatChecker
 import os
+import re
 import openpyxl
 from datetime import datetime
 from collections import defaultdict
@@ -12,6 +13,7 @@ import relecov_tools.assets.schema_utils.custom_validators
 import relecov_tools.sftp_client
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.base_module import BaseModule
+from relecov_tools.rest_api import RestApi
 
 
 stderr = rich.console.Console(
@@ -30,18 +32,15 @@ class Validate(BaseModule):
         metadata=None,
         output_dir=None,
         excel_sheet=None,
-        registry=None,
         upload_files=False,
         logsum_file=None,
+        check_db=False,
     ):
         """Validate json file against the schema"""
         super().__init__(output_dir=output_dir, called_module=__name__)
         self.config = ConfigJson(extra_config=True)
         self.log.info("Initiating validation process")
-        if upload_files:
-            req_conf = ["download", "validate"]
-        else:
-            req_conf = ["validate"]
+        req_conf = ["download"] * bool(upload_files) + ["update_db"] * bool(check_db)
         missing = [
             conf for conf in req_conf if self.config.get_configuration(conf) is None
         ]
@@ -63,7 +62,7 @@ class Validate(BaseModule):
                 f"Config file is missing required sections: {', '.join(missing)}"
             )
         if json_schema_file is None:
-            schema_name = self.config.get_topic_data("json_schemas", "relecov_schema")
+            schema_name = self.config.get_topic_data("generic", "relecov_schema")
             json_schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
             )
@@ -126,8 +125,7 @@ class Validate(BaseModule):
         self.set_batch_id(batch_id)
         self.metadata = metadata
 
-        # TODO: Include this field in configuration.json
-        sample_id_ontology = "GENEPIO:0000079"
+        sample_id_ontology = self.config.get_topic_data("generic", "sample_id_ontology")
         try:
             self.sample_id_field = Validate.get_field_from_schema(
                 sample_id_ontology, self.json_schema
@@ -135,10 +133,12 @@ class Validate(BaseModule):
         except ValueError as e:
             self.sample_id_field = None
             self.log.error(f"Could not extract sample_id_field: {e}. Set to None")
+
         self.excel_sheet = excel_sheet
-        self.registry_path = registry
         self.logsum_file = logsum_file
         self.upload_files = upload_files
+        self.check_db = check_db
+
         if upload_files:
             upload_config = self.config.get_configuration("download")
             if upload_config:
@@ -147,14 +147,21 @@ class Validate(BaseModule):
                 self.subfolder = upload_config.get("subfolder")
                 self.sftp_port = self.config.get_topic_data("sftp_handle", "sftp_port")
 
+        if check_db:
+            platform_config = self.config.get_configuration("update_db")
+            if platform_config:
+                self.db_user = platform_config.get("user")
+                self.db_pass = platform_config.get("password")
+                self.db_platform = platform_config.get("platform")
+
     def validate_schema(self):
         """Validate json schema against draft and check if all properties have label"""
         relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(
             self.json_schema, "2020-12"
         )
-        for prop in self.json_schema["properties"]:
-            if "label" not in prop:
-                self.log.debug(f"Property {prop} is missing 'label'")
+        for prop_name, prop_def in self.json_schema["properties"].items():
+            if "label" not in prop_def:
+                self.log.debug(f"Property {prop_name} is missing 'label'")
         return
 
     @staticmethod
@@ -456,48 +463,6 @@ class Validate(BaseModule):
         relecov_tools.utils.write_json_to_file(valid_json_data, file_path)
         return file_path
 
-    def validate_registry_file(self):
-        """Validate specified registry file path. Try to get it from config if invalid."""
-        # Parse file containing sample IDs registry
-        if self.registry_path is not None and relecov_tools.utils.file_exists(
-            os.path.abspath(os.path.expanduser(self.registry_path))
-        ):
-            self.registry_path = os.path.abspath(os.path.expanduser(self.registry_path))
-        else:
-            config_json = ConfigJson(extra_config=True)
-            try:
-                default_path = config_json.get_topic_data(
-                    "validate_config", "default_sample_id_registry"
-                )
-            except KeyError:
-                default_path = None
-
-            if default_path and relecov_tools.utils.file_exists(default_path):
-                self.registry_path = default_path
-            else:
-                stderr.print(
-                    "[yellow]No valid ID registry found. Please select the file manually."
-                )
-                prompted_path = relecov_tools.utils.prompt_path(
-                    "Select the JSON file with registered unique sample IDs"
-                )
-                if relecov_tools.utils.file_exists(prompted_path):
-                    self.registry_path = prompted_path
-                else:
-                    stderr.print(
-                        "[red]No valid ID registry file could be found or selected."
-                    )
-                    raise FileNotFoundError("No valid ID registry file could be found")
-
-        # Read id registry file
-        try:
-            self.id_registry = relecov_tools.utils.read_json_file(self.registry_path)
-        except Exception as e:
-            stderr.print(f"[red]Failed to read ID registry JSON: {e}")
-            self.log.error(f"Failed to read ID registry JSON: {e}")
-            raise
-        return
-
     def validate_invexcel_args(self):
         """Validate arguments needed to create invalid_samples.xlsx file"""
         if not self.excel_sheet:
@@ -511,65 +476,8 @@ class Validate(BaseModule):
                 raise
         return
 
-    def update_unique_id_registry(self, valid_json_data):
-        """Prepare ID registry. Validated samples will be asigned with an unique ID"""
-        new_ids_to_save = {}
-        for sample in valid_json_data:
-            # If sample has validated, then assign an unique id
-            if "unique_sample_id" not in sample:
-                new_id = self.generate_incremental_unique_id(
-                    {**self.id_registry, **new_ids_to_save}
-                )
-                sample["unique_sample_id"] = new_id
-            # If sample has validated, then assign an unique id
-            if "unique_sample_id" not in sample:
-                new_id = self.generate_incremental_unique_id(
-                    {**self.id_registry, **new_ids_to_save}
-                )
-                sample["unique_sample_id"] = new_id
-                new_ids_to_save[new_id] = {
-                    "sequencing_sample_id": sample["sequencing_sample_id"],
-                    "lab_code": self.lab_code,
-                    "generated_at": datetime.now().isoformat(timespec="seconds"),
-                }
-        self.save_new_ids(new_ids_to_save)
-        return valid_json_data
-
-    def generate_incremental_unique_id(self, current_registry, prefix="RLCV"):
-        """Generates an incremental unique ID using as baseline the latest record
-        in a registry.
-
-        Args:
-            current_registry (dict): dict containing sample's unique IDs
-            prefix (str, optional): String that preceeds the unique ID. Defaults to "RLCV".
-
-        Returns:
-            string: An unique ID
-        """
-        existing_numbers = []
-        for uid in current_registry:
-            if uid.startswith(prefix):
-                try:
-                    number = int(uid.replace(f"{prefix}-", ""))
-                    existing_numbers.append(number)
-                except ValueError:
-                    continue
-        next_number = max(existing_numbers, default=0) + 1
-        return f"{prefix}-{next_number:09d}"
-
-    def save_new_ids(self, new_ids_dict):
-        """Updates sample id registry by adding sample unique ids of new validated samples.
-
-        Args:
-            new_ids_dict (dict): Dict of new unique sample IDs.
-        """
-        updated_registry = {**self.id_registry, **new_ids_dict}
-        relecov_tools.utils.write_json_to_file(updated_registry, self.registry_path)
-        self.log.info(f"Added {len(new_ids_dict)} new sample IDs to registry")
-
     def create_validation_files(self, valid_json_data, invalid_json):
-        """Creates validated and invalid metadata files based on the provided JSON data and
-        adds valid samples to the unique ID registry.
+        """Creates validated and invalid metadata files based on the provided JSON data.
 
         Args:
             valid_json_data (list[dict]): List of valid sample metadata dictionaries.
@@ -579,9 +487,6 @@ class Validate(BaseModule):
             valid_file (str): Path to the created file with valid samples, or None if not created
             invalid_file (str): Path to the created file with invalid samples, or None if not created
         """
-        # Add all valid samples to the unique_id registry file
-        self.validate_registry_file()
-        valid_json_data = self.update_unique_id_registry(valid_json_data)
         valid_file = invalid_file = None
         if valid_json_data:
             self.log.info("Creating json_file with validated samples...")
@@ -605,7 +510,7 @@ class Validate(BaseModule):
             self.log.info("Sucessful validation, no invalid file created.")
         return valid_file, invalid_file
 
-    def validate_whole_proc_args(self):
+    def validate_upload_args(self):
         """Validates that all required arguments for the upload process are present
         and that the log summary file exists.
 
@@ -613,7 +518,7 @@ class Validate(BaseModule):
             ValueError: If any required argument is missing or the log summary file does not exist.
         """
         required_args = ["user", "password"]
-        self.log.debug(f"Trying to validate args for whole_proc: {required_args}")
+        self.log.debug(f"Trying to validate args for upload: {required_args}")
         missing_args = []
         for arg in required_args:
             if not self.__dict__.get(arg):
@@ -646,8 +551,8 @@ class Validate(BaseModule):
         self.log.info("Updating invalid samples with previous log_summary")
         if self.lab_code in previous_logsum.keys():
             for samp, logs in previous_logsum[self.lab_code].get("samples", {}).items():
-                self.log.debug(f"Found sample {samp} invalid in previous log_summary")
                 if not logs["valid"]:
+                    self.log.debug(f"Found sample {samp} invalid in log_summary")
                     log_invalid_samples.append(samp)
         else:
             errtxt = f"Lab code {self.lab_code} not found in {self.logsum_file} to update invalid samples"
@@ -677,83 +582,110 @@ class Validate(BaseModule):
         """
 
         def upload_and_clean(local_file, remote_dest, clean=True):
-            """Upload file to remote sftp and log the process"""
-            self.log.debug(f"Uploading {local_file} to remote sftp: {remote_dest}")
+            """Upload file to remote sftp and log the process."""
+            self.log.debug(f"Uploading {local_file} → {remote_dest}")
             if not sftp_client.upload_file(local_file, remote_dest):
-                self.log.error(f"Could not upload {invalid_excel} to sftp.")
+                self.log.error(f"Could not upload {local_file} to sftp.")
                 return False
-            else:
-                self.log.debug(f"{remote_dest} uploaded successfully")
-                if clean:
-                    try:
-                        os.remove(local_file)
-                        return True
-                    except OSError as e:
-                        self.log.error(f"Could not remove {local_file}: {e}")
-                        return False
-                else:
-                    return True
+            self.log.debug(f"{remote_dest} uploaded successfully")
+            if clean:
+                try:
+                    os.remove(local_file)
+                except OSError as e:
+                    self.log.error(f"Could not remove {local_file}: {e}")
+                    return False
+            return True
 
-        self.log.info("Initating sftp client to upload invalid files")
+        # ── 1· Connection and remote folders ──────────────────────────
+        self.log.info("Initiating sftp client to upload invalid files")
         sftp_client = relecov_tools.sftp_client.SftpClient(
             username=self.user, password=self.password
         )
         sftp_client.sftp_port = self.sftp_port
-        if self.subfolder:
-            remote_labfold = os.path.join(self.lab_code, self.subfolder)
-            flag = True
-        else:
-            remote_labfold = self.lab_code
-            flag = False
+
+        remote_labfold = (
+            os.path.join(self.lab_code, self.subfolder)
+            if self.subfolder
+            else self.lab_code
+        )
+
         self.log.info(f"Output folder set to {remote_labfold}")
-        stderr.print(f"[blue]Uploading invalid files to remote {remote_labfold}...")
-        remote_labfold = "./" + remote_labfold
-        if remote_labfold not in sftp_client.list_remote_folders(".", recursive=flag):
+        if f"./{remote_labfold}" not in sftp_client.list_remote_folders(
+            ".", recursive=bool(self.subfolder)
+        ):
             raise FileNotFoundError(f"Couldn't find remote lab folder {remote_labfold}")
+
+        invalid_remote_folder = f"{self.batch_id}_invalid_samples"
+        self.remote_outfold = os.path.join(f"./{remote_labfold}", invalid_remote_folder)
+        if invalid_remote_folder not in sftp_client.list_remote_folders(
+            f"./{remote_labfold}"
+        ):
+            self.log.info(f"{invalid_remote_folder} not found, creating it…")
+            sftp_client.make_dir(self.remote_outfold)
+
+        stderr.print(f"[blue]Uploading invalid files to remote {remote_labfold}...")
+
+        # ── 2· Build map path → sample_id  ─────────────────────
         path_fields = [
             ("sequence_file_path_R1", "sequence_file_R1"),
             ("sequence_file_path_R2", "sequence_file_R2"),
         ]
-        invalid_files = [
-            os.path.join(x[tup[0]], x[tup[1]])
-            for x in invalid_json
-            for tup in path_fields
-            if all(f in x for f in tup)
-        ]
-        if not any(os.path.isfile(f) for f in invalid_files):
-            raise FileNotFoundError(
-                f"No files from metadata found to upload: {invalid_files}"
-            )
-        invalid_remote_folder = self.batch_id + "_invalid_samples"
-        self.remote_outfold = os.path.join(remote_labfold, invalid_remote_folder)
+        path_to_sample = {}
+        invalid_files = []
+        for row in invalid_json:
+            samp_id = row.get(self.sample_id_field, "UnknownSample")
+            for p, f in path_fields:
+                if p in row and f in row:
+                    file_path = os.path.join(row[p], row[f])
+                    invalid_files.append(file_path)
+                    path_to_sample[file_path] = samp_id
+
+        # ── 3· Try to upload each FASTQ ────────────────────────────
         failed_uploads = []
-        if invalid_remote_folder not in sftp_client.list_remote_folders(remote_labfold):
-            self.log.info(f"{invalid_remote_folder} not found in sftp, creating it...")
-            sftp_client.make_dir(self.remote_outfold)
         for file in invalid_files:
+            if not os.path.isfile(file):
+                failed_uploads.append(file)
+                self.log.warning(f"Local file not found, skipping upload: {file}")
+                self.logsum.add_warning(
+                    sample=path_to_sample[file],
+                    entry="File missing when uploading invalid FastQ",
+                )
+                continue
             remote_dest = os.path.join(self.remote_outfold, os.path.basename(file))
             if not upload_and_clean(file, remote_dest):
                 failed_uploads.append(file)
+                self.logsum.add_warning(
+                    sample=path_to_sample[file], entry="Failed to upload invalid FastQ"
+                )
+
+        # ── 4· Upload invalid.xlsx ────────────────────────
         remote_dest = os.path.join(self.remote_outfold, os.path.basename(invalid_excel))
         if not upload_and_clean(invalid_excel, remote_dest, clean=False):
             failed_uploads.append(invalid_excel)
-        report_file = self.lab_code + "_" + self.batch_id + "_metadata_report.xlsx"
-        if report_file in os.listdir(self.out_folder):
-            remote_dest = os.path.join(
-                self.remote_outfold, os.path.basename(report_file)
-            )
-            report_file_path = os.path.join(self.out_folder, report_file)
-            if not upload_and_clean(report_file_path, remote_dest, clean=False):
-                failed_uploads.append(report_file_path)
-        else:
-            self.log.error(
-                f"Could not upload report file {report_file}. File not in {self.out_folder}"
-            )
+
+        # ── 5· Locate & upload the *_metadata_report.xlsx ───────────
+        pattern = re.compile(
+            rf"^{re.escape(self.lab_code)}_{re.escape(self.batch_id)}.*_metadata_report\.xlsx$"
+        )
+        for rpt in (f for f in os.listdir(self.out_folder) if pattern.match(f)):
+            local_path = os.path.join(self.out_folder, rpt)
+            remote_dest = os.path.join(self.remote_outfold, rpt)
+            if not upload_and_clean(local_path, remote_dest, clean=False):
+                failed_uploads.append(local_path)
+
+        # ── 6· Screen summary & log_summary ───────────────────
         if failed_uploads:
-            stderr.print(f"[red]Some files could not be uploaded: {failed_uploads}")
+            preview = ", ".join(os.path.basename(x) for x in failed_uploads[:3])
+            stderr.print(
+                f"[yellow]{len(failed_uploads)} files could not be uploaded "
+                f"(first ones: {preview}). "
+                "For the complete list check the validate*.log file."
+                "Note: if the files were corrupted or not referenced in metadata "
+                "they may already have been uploaded during the download step.[/]"
+            )
+            self.log.warning(f"Files failed to upload: {failed_uploads}")
         else:
             stderr.print("[green]Finished uploading files to remote sftp successfully")
-        return
 
     def process_validation_upload(self, valid_json_data, invalid_json, previous_logsum):
         """
@@ -768,7 +700,6 @@ class Validate(BaseModule):
             invalid_json (list[dict]): Current list of invalid sample metadata.
             previous_logsum (dict): Dictionary containing results from a prior validation run.
         """
-        invalid_json = self.update_invalid_with_logsum(invalid_json, previous_logsum)
         merged_logsum = self.logsum.merge_logs(
             [previous_logsum, self.logsum.logs], key_name=self.lab_code
         )
@@ -789,6 +720,65 @@ class Validate(BaseModule):
             self.log.info("No invalid samples were found, no upload needed")
         return
 
+    def validate_db_args(self):
+        """Validates that all required arguments to check if samples are
+        already in platform database are present.
+
+        Raises:
+            ValueError: If any required argument or configuration is missing.
+        """
+        required_args = ["db_user", "db_pass", "db_platform"]
+        self.log.debug(f"Trying to validate args to check database: {required_args}")
+        missing_args = []
+        for arg in required_args:
+            if not self.__dict__.get(arg):
+                missing_args.append(arg)
+        if missing_args:
+            raise ValueError(
+                f"Missing mandatory args to check samples in db: {missing_args}"
+            )
+        p_settings = self.config.get_topic_data("update_db", "platform-params")
+        if self.db_platform not in p_settings:
+            raise ValueError(f"No configuration found for platform {self.db_platform}")
+        if "server_url" not in p_settings[self.db_platform]:
+            raise ValueError(f"Missing 'server_url' in config for {self.db_platform}")
+        if "api_url" not in p_settings[self.db_platform]:
+            raise ValueError(f"Missing 'api_url' in config for {self.db_platform}")
+        return
+
+    def search_sample_dups_in_db(self, valid_json_data, invalid_json):
+        """Connect to configured platform and turn invalid those samples that are already
+        uploaded to the database from the workflow. Update jsons based on this clause"""
+        p_settings = self.config.get_topic_data("update_db", "platform-params")
+        server_url = p_settings[self.db_platform]["server_url"]
+        api_url = p_settings[self.db_platform]["api_url"]
+        credentials = {
+            "user": self.db_user,
+            "pass": self.db_pass,
+        }
+        api_rest = RestApi(server_url, api_url)
+        apifunc = p_settings[self.db_platform]["check_sample"]
+        for sample in self.json_data:
+            sample_seqid = sample.get("sequencing_sample_id")
+            self.log.info(f"Checking sample {sample_seqid} in {self.db_platform} db")
+            try:
+                samp_in_db = api_rest.sample_already_in_db(apifunc, credentials, sample)
+            except ValueError as e:
+                errtxt = f"Could not check for sample {sample_seqid} in db: {e}"
+                stderr.print(f"[red]{errtxt}")
+                self.log.error(errtxt)
+                self.logsum.add_error(errtxt, sample=sample_seqid)
+                continue
+            if samp_in_db:
+                errtxt = f"Sample {sample_seqid} already defined in db. Skipped"
+                stderr.print(f"[yellow]{errtxt}")
+                self.log.error(errtxt)
+                self.logsum.add_error(errtxt, sample=sample_seqid)
+                if sample in valid_json_data:
+                    valid_json_data.remove(sample)
+                    invalid_json.append(sample)
+        return valid_json_data, invalid_json
+
     def validate(self):
         """Validate samples from metadata, create an excel with invalid samples,
         and a json file with the validated ones.
@@ -796,7 +786,7 @@ class Validate(BaseModule):
         self.log.info("Validate the given schema")
         self.validate_schema()
         self.log.info("Preparing validator based on config")
-        starting_date = self.config.get_topic_data("validate_config", "starting_date")
+        starting_date = self.config.get_topic_data("generic", "starting_date")
         date_checker = (
             relecov_tools.assets.schema_utils.custom_validators.make_date_checker(
                 datetime.strptime(starting_date, "%Y-%m-%d").date(),
@@ -820,23 +810,46 @@ class Validate(BaseModule):
                 f"[red]{len(valid_json_data)}/{len(self.json_data)} samples were valid"
             )
         else:
-            stderr.print("[green]No errors found during validation!")
+            stderr.print("[green]No errors found during metadata validation!")
         invalid_json = [x for x in self.json_data if x not in valid_json_data]
         return valid_json_data, invalid_json
 
     def execute_validation_process(self):
+        """Execute all the validation process start to end"""
         valid_json_data, invalid_json = self.validate()
+        if self.check_db:
+            stderr.print(
+                "[blue]Checking if samples are already uploaded to platform..."
+            )
+            try:
+                self.validate_db_args()
+                valid_json_data, invalid_json = self.search_sample_dups_in_db(
+                    valid_json_data, invalid_json
+                )
+            except ValueError as e:
+                stderr.print(f"[red]Could not check if samples are already in db: {e}")
+                self.log.error(f"Could not check if samples are already in db: {e}")
+                self.create_validation_files(valid_json_data, invalid_json)
+                raise
+        if self.logsum_file:
+            previous_logsum = relecov_tools.utils.read_json_file(self.logsum_file)
+            merged_logs = self.logsum.merge_logs([previous_logsum, self.logsum.logs])
+            invalid_json = self.update_invalid_with_logsum(invalid_json, merged_logs)
+        else:
+            invalid_json = self.update_invalid_with_logsum(
+                invalid_json, self.logsum.logs
+            )
+        valid_json_data = [x for x in valid_json_data if x not in invalid_json]
         if self.upload_files:
             stderr.print(f"Starting uploading process for {self.lab_code}...")
             self.log.info(f"Starting uploading process for {self.lab_code}...")
             try:
-                self.validate_whole_proc_args()
+                self.validate_upload_args()
             except ValueError as e:
                 stderr.print(f"[red]Could not upload validation files: {e}")
                 self.log.error(f"Could not upload validation files: {e}")
                 self.create_validation_files(valid_json_data, invalid_json)
                 raise
-            previous_logsum = relecov_tools.utils.read_json_file(self.logsum_file)
             self.process_validation_upload(
                 valid_json_data, invalid_json, previous_logsum
             )

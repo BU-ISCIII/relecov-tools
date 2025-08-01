@@ -1,9 +1,0 @@
-sftp_server: "sftprelecov.isciii.es"
-sftp_port: "22"
-sftp_user : "usuario_test"
-sftp_passwd : "U[9[Gpyu3."
-storage_local_folder: "/tmp/relecov"
-tmp_folder_for_metadata: "/tmp/relecov/tmp"
-allowed_sample_extensions:
-    - .fastq.gz
-    - .fasta

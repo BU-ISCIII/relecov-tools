@@ -32,10 +32,10 @@ jobs:
       matrix:
         map_args: ["-d 'ENA' -f relecov_tools/schema/ena_schema.json", "-d 'GISAID' -f relecov_tools/schema/gisaid_schema.json"]
     steps:
-    - name: Set up Python 3.9.16
+    - name: Set up Python 3.12
       uses: actions/setup-python@v3
       with:
-        python-version: '3.9.16'
+        python-version: '3.12'
 
     - name: Checkout code
       uses: actions/checkout@v3
@@ -72,11 +72,10 @@ jobs:
       OUTPUT_LOCATION: ${{ github.workspace }}/tests/
 
     steps:
-    - name: Set up Python 3.9.16
+    - name: Set up Python 3.12
       uses: actions/setup-python@v3
       with:
-        python-version: '3.9.16'
-
+        python-version: '3.12'
     - name: Checkout code
       uses: actions/checkout@v3
       with:
@@ -115,7 +114,6 @@ jobs:
           --upload_files \
           -o tests/data/map_validate/ \
           -s relecov_tools/schema/relecov_schema.json \
-          -r tests/data/map_validate/unique_sampleid_registry.json \
           -l tests/data/map_validate/previous_processes_log_summary.json
       env:
         TEST_USER: ${{ secrets.TEST_USER }}

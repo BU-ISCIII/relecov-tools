@@ -4,6 +4,71 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2025-08-01 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.2
+
+### Credits
+
+- [Alejandro Bernabeu](https://github.com/aberdur)
+- [Sara Monzon](https://github.com/saramonzon)
+
+#### Added enhancements
+
+#### Fixes
+
+- Fix "target_folders": "" handling in download module [#760](https://github.com/BU-ISCIII/relecov-tools/pull/760)
+- minor fix in pipeline_manager so it finds valided json [#764](https://github.com/BU-ISCIII/relecov-tools/pull/764)
+- Fix triple-counting folder-only samples in log_summary.json [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
+
+#### Changed
+
+- Update __main__ & config_json for new merged-config structure (commands + params) [#765](https://github.com/BU-ISCIII/relecov-tools/pull/765)
+- Propagate wrapper --output_dir down to download [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
+- Update error message when output_dir is missing in extra_config [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
+
+#### Removed
+
+- Removed registry related functionality [#767](https://github.com/BU-ISCIII/relecov-tools/pull/767)
+
+### Requirements
+
+## [1.6.1] - 2025-07-28 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.1
+
+### Credits
+
+- [Pablo Mata](https://github.com/shettland)
+- [Victor Lopez](https://github.com/victor5lm)
+- [Alejandro Bernabeu](https://github.com/aberdur)
+
+#### Added enhancements
+
+- Expanded rest_api.get_request() method to also accept credentials and params [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
+- Included a new validation workflow to discard samples that are already in the platform database [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
+- New flag 'check_db' was introduced in validate to activate checking of samples in platform [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
+- Included docstrings for all methods in rest_api.py [#721](https://github.com/BU-ISCIII/relecov-tools/pull/721)
+- Updated create_summary_tables.py to organize data jointly [#722](https://github.com/BU-ISCIII/relecov-tools/pull/722).
+- Updated schema and configuration for Ion Torrent [#724](https://github.com/BU-ISCIII/relecov-tools/pull/724)
+- Refactor configuration.json structure by grouping fields by module usage[#725](https://github.com/BU-ISCIII/relecov-tools/pull/725)
+- Standardized rest_api responses for all methods with a new static method called standardize_response [#741](https://github.com/BU-ISCIII/relecov-tools/pull/741)
+
+
+#### Fixes
+
+- Fixed target_folders selection problems in download module [#736](https://github.com/BU-ISCIII/relecov-tools/pull/736)
+- Removed override of init input params using config in download [#736](https://github.com/BU-ISCIII/relecov-tools/pull/736)
+- Fix detection of missing label in JSON-Schema properties [#743](https://github.com/BU-ISCIII/relecov-tools/pull/743)
+- Fix wrapper file-name lookup and prevent upload errors of invalid sample uploaded by download module [#748](https://github.com/BU-ISCIII/relecov-tools/pull/748)
+
+#### Changed
+
+- Moved sample_id_ontology previously hard-coded in validate.py to configuration.json [#733](https://github.com/BU-ISCIII/relecov-tools/pull/733)
+- Removed RELECOV as default subfolder for upload-results and download from __main__.py [#736](https://github.com/BU-ISCIII/relecov-tools/pull/736)
+- Adapted upload_database to new standard RestApi responses [#741](https://github.com/BU-ISCIII/relecov-tools/pull/741)
+- RestApi methods now return Response.json.data if possible in data key [#744](https://github.com/BU-ISCIII/relecov-tools/pull/744)
+
+#### Removed
+
+### Requirements
+
 ## [1.6.0] - 2025-07-04 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.0
 
 ### Credits

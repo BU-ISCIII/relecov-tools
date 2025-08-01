@@ -2,7 +2,9 @@
 import copy
 import json
 import os
+import re
 import yaml
+import collections
 import warnings
 import rich.console
 import paramiko
@@ -47,7 +49,7 @@ class Download(BaseModule):
         """Initializes the sftp object"""
         super().__init__(output_dir=output_dir, called_module="download")
         self.log.info("Initiating download process")
-        config_json = ConfigJson(extra_config=True)
+        config_json = ConfigJson()
         self.allowed_file_ext = config_json.get_topic_data(
             "sftp_handle", "allowed_file_extensions"
         )
@@ -87,38 +89,42 @@ class Download(BaseModule):
             with open(conf_file, "r") as fh:
                 config = yaml.load(fh, Loader=yaml.FullLoader)
             try:
-                # self.sftp_server = config["sftp_server"]
-                # self.sftp_port = config["sftp_port"]
-                self.target_folders = config["target_folders"]
-                try:
-                    self.platform_storage_folder = config["platform_storage_folder"]
-                except KeyError:
-                    self.platform_storage_folder = config_json.get_topic_data(
-                        "sftp_handle", "platform_storage_folder"
-                    )
-                sftp_user = config["sftp_user"]
-                sftp_passwd = config["sftp_passwd"]
-            except KeyError as e:
-                self.log.error("Invalid configuration file. Missing %s", e)
-                stderr.print(f"[red] Invalid configuration file. Missing {e} !")
-                raise ValueError(f"Invalid configuration file. Missing {e}")
+                self.platform_storage_folder = config["platform_storage_folder"]
+            except KeyError:
+                self.platform_storage_folder = config_json.get_topic_data(
+                    "sftp_handle", "platform_storage_folder"
+                )
 
         if output_dir is not None:
             if os.path.isdir(output_dir):
                 self.platform_storage_folder = os.path.realpath(output_dir)
             else:
-                self.log.error("Output location does not exist, aborting")
-                stderr.print("[red] Output location does not exist, aborting")
+                msg = (
+                    "Output directory not found or not set.\n"
+                    f"Current value: {repr(output_dir)}\n"
+                    "Please set --output_dir or define download.output_dir in extra_config.json"
+                )
+                self.log.error(msg)
+                stderr.print(f"[red]{msg}")
                 raise FileNotFoundError(f"Output dir does not exist {output_dir}")
         if sftp_user is None:
             sftp_user = relecov_tools.utils.prompt_text(msg="Enter the user id")
         if isinstance(self.target_folders, str):
-            self.target_folders = self.target_folders.split(",")
+            self.target_folders = [
+                f.strip()
+                for f in self.target_folders.strip("[").strip("]").split(",")
+                if f.strip()
+            ]
+        elif isinstance(self.target_folders, list):
+            self.target_folders = [f.strip() for f in self.target_folders if f.strip()]
+        if not self.target_folders:
+            self.target_folders = None
+
         self.logsum = self.parent_log_summary(output_dir=self.platform_storage_folder)
         if sftp_passwd is None:
             sftp_passwd = relecov_tools.utils.prompt_password(msg="Enter your password")
         self.metadata_lab_heading = config_json.get_topic_data(
-            "lab_metadata", "metadata_lab_heading"
+            "read_lab_metadata", "metadata_lab_heading"
         )
         self.metadata_processing = config_json.get_topic_data(
             "sftp_handle", "metadata_processing"
@@ -127,8 +133,10 @@ class Download(BaseModule):
             "sftp_handle", "skip_when_found"
         )
         self.samples_json_fields = config_json.get_topic_data(
-            "lab_metadata", "samples_json_fields"
+            "read_lab_metadata", "samples_json_fields"
         )
+        sample_pattern = config_json.get_topic_data("sftp_handle", "sample_name_regex")
+        self.sample_regex = re.compile(sample_pattern, flags=re.IGNORECASE | re.VERBOSE)
         # initialize the sftp client
         self.relecov_sftp = relecov_tools.sftp_client.SftpClient(
             conf_file, sftp_user, sftp_passwd
@@ -567,7 +575,32 @@ class Download(BaseModule):
             return local_meta_file
 
         remote_files_list = self.relecov_sftp.get_file_list(remote_folder)
-        meta_files = [fi for fi in remote_files_list if fi.endswith(".xlsx")]
+
+        LOCK_PREFIXES = (".~lock", "~$")  # LibreOffice / MS Office
+        lock_files = [
+            f
+            for f in remote_files_list
+            if os.path.basename(f).startswith(LOCK_PREFIXES)
+        ]
+
+        meta_files = [
+            f for f in remote_files_list if f.endswith(".xlsx") and f not in lock_files
+        ]
+        # Check if metadata file is locked by another program
+        if lock_files and not meta_files:
+            msg = (
+                "Metadata file appears to be locked/open in another program: "
+                f"{', '.join(os.path.basename(f) for f in lock_files)}. "
+                "Close Excel and re-upload the file."
+            )
+            self.log.error(msg)
+            stderr.print(f"[red]{msg}")
+            raise MetadataError(msg)
+        elif lock_files:
+            self.log.warning(
+                "Ignoring lock file(s): %s",
+                ", ".join(os.path.basename(f) for f in lock_files),
+            )
 
         if not meta_files:
             raise FileNotFoundError(f"Missing metadata file for {remote_folder}")
@@ -657,9 +690,15 @@ class Download(BaseModule):
             if mismatch_files:
                 error_text1 = "Files in folder missing in metadata: %s"
                 self.include_warning(error_text1 % str(mismatch_files))
-                miss_text = "This file does not have any associated sample in metadata"
-                for file in mismatch_files:
-                    self.include_error(sample=file, entry=miss_text)
+                # --- Group R1/R2 or chunks under a single Sample ID ---
+                grouped = collections.defaultdict(list)
+                for f in mismatch_files:
+                    m = self.sample_regex.match(f)
+                    grouped[m.group("sample") if m else f].append(f)
+
+                miss_text = "Sample present in folder but missing in metadata"
+                for sample_id in grouped:
+                    self.include_error(sample=sample_id, entry=miss_text)
             if mismatch_rev:
                 error_text2 = "Files in metadata missing in folder: %s"
                 self.include_warning(error_text2 % str(mismatch_rev))
@@ -1112,14 +1151,19 @@ class Download(BaseModule):
             raise ConnectionError("Error while listing folders in remote")
         if self.target_folders is None:
             target_folders = clean_root_list
+            selected_folders = target_folders.copy()
         elif self.target_folders[0] == "ALL":
             self.log.info("Showing folders from remote SFTP for user selection")
             target_folders = relecov_tools.utils.prompt_checkbox(
                 msg="Select the folders that will be targeted",
                 choices=sorted(clean_root_list),
             )
+            selected_folders = target_folders.copy()
         else:
-            target_folders = [tf for tf in self.target_folders if tf in clean_root_list]
+            target_folders = [
+                f.strip() for f in self.target_folders if f.strip() in clean_root_list
+            ]
+            selected_folders = self.target_folders
         if self.subfolder is not None:
             new_target_folders = []
             for tfolder in target_folders:
@@ -1132,14 +1176,13 @@ class Download(BaseModule):
                     )
             target_folders = new_target_folders.copy()
         if not target_folders:
-            self.log.error(
-                "No remote folders matching selection %s", self.target_folders
-            )
-            stderr.print("Found no remote folders matching selection")
-            stderr.print(f"List of remote folders: {str(clean_root_list)}")
-            raise ValueError(
-                f"Found no remote folders matching selection {self.target_folders}"
-            )
+            errtxt = f"No remote folders matching selection {selected_folders}"
+            if self.subfolder is not None:
+                errtxt += f" Check if subfolder {str(self.subfolder)} is present"
+            self.log.error(errtxt)
+            stderr.print(errtxt)
+            stderr.print(f"List of available remote folders: {str(clean_root_list)}")
+            raise ValueError(errtxt)
         folders_to_process = {}
         for targeted_folder in target_folders:
             try:
@@ -1229,6 +1272,45 @@ class Download(BaseModule):
                     if val and val in file:
                         processed_dict[sample][key] = file
         return processed_dict
+
+    def _cleanup_remote_locks(self, parent: str = "."):
+        """
+        Recursively traverses the SFTP from `parent` and deletes:
+          - Folders whose basename starts with ` ~lock`.
+          - Files whose basename starts with ` ~lock`.
+        """
+        try:
+            dir_candidates = self.relecov_sftp.list_remote_folders(
+                parent, recursive=True
+            )
+            file_candidates = []
+            for d in dir_candidates + [parent]:
+                try:
+                    file_candidates.extend(self.relecov_sftp.get_file_list(d))
+                except Exception:
+                    continue
+        except Exception as e:
+            self.log.warning("Lock-cleanup: no pude listar %s: %s", parent, e)
+            return
+
+        # --- 1. Directories ---
+        for d in dir_candidates:
+            if os.path.basename(d).startswith("~lock"):
+                try:
+                    self.delete_remote_files(d)
+                    self.clean_remote_folder(d)
+                    self.log.info("Removed stale lock dir: %s", d)
+                except Exception as e:
+                    self.log.warning("No pude borrar dir %s: %s", d, e)
+
+        # --- 2. Files ---
+        for f in file_candidates:
+            if os.path.basename(f).startswith("~lock"):
+                try:
+                    self.relecov_sftp.remove_file(f)
+                    self.log.info("Removed stale lock file: %s", f)
+                except Exception as e:
+                    self.log.warning("No pude borrar file %s: %s", f, e)
 
     def download(self, target_folders):
         """Manages all the different functions to download files, verify their

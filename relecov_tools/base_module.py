@@ -43,7 +43,7 @@ class BaseModule:
         self.batch_id = "temp_id"
         self.basemod_date = datetime.today().strftime("%Y%m%d%H%M%S")
         config = ConfigJson(extra_config=True)
-        logs_config = config.get_configuration("logs_config")
+        logs_config = config.get_topic_data("generic", "logs_config")
         if self.called_module in logs_config.get("modules_outpath", {}):
             output_dir = logs_config["modules_outpath"][self.called_module]
         else:

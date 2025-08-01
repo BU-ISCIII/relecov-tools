@@ -108,7 +108,7 @@ $ relecov-tools --help
 \    \  /   |__ / |__  |    |___ |    |   |  \    /
 /    /  \   |  \  |    |    |    |    |   |   \  /
 /    |--|   |   \ |___ |___ |___ |___ |___|    \/
-RELECOV-tools version 1.6.0
+RELECOV-tools version 1.6.2
 Usage: relecov-tools [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -312,7 +312,6 @@ Usage: relecov-tools validate [OPTIONS]
     -m, --metadata PATH             Origin file containing metadata
     -o, --output_dir,               Directory where the generated output will be saved.
     -e, --excel_sheet TEXT          Optional: Name of the sheet in excel file to validate.
-    -r, --registry TEXT             Path to registry (JSON file) with validated samples and their unique IDs.
     --upload_files                  Wether to upload the resulting files from validation process or not.
     -l, --logsum_file TEXT          Required if --upload_files. Path to the log_summary.json file merged from all
                                     previous processes, used to check for invalid samples.  

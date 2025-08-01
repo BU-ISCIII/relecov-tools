@@ -24,7 +24,7 @@ class MetadataHomogeneizer:
         self.config_json = ConfigJson()
         # read heading from config
         self.heading = self.config_json.get_topic_data(
-            "lab_metadata", "metadata_lab_heading"
+            "read_lab_metadata", "metadata_lab_heading"
         )
 
         # handle institution
@@ -40,9 +40,7 @@ class MetadataHomogeneizer:
             os.path.dirname(__file__),
             "schema",
             "institution_schemas",
-            self.config_json.get_topic_data(
-                "institution_mapping_file", self.institution
-            ),
+            self.config_json.get_topic_data("generic", "self.institution"),
         )
 
         self.mapping_json_data = relecov_tools.utils.read_json_file(mapping_json_file)
