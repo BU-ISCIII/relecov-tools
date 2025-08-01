@@ -1296,8 +1296,8 @@ class Download(BaseModule):
         for d in dir_candidates:
             if os.path.basename(d).startswith("~lock"):
                 try:
-                    self.delete_remote_files(d)  # vacía
-                    self.clean_remote_folder(d)  # y borra
+                    self.delete_remote_files(d)
+                    self.clean_remote_folder(d)
                     self.log.info("Removed stale lock dir: %s", d)
                 except Exception as e:
                     self.log.warning("No pude borrar dir %s: %s", d, e)
