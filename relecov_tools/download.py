@@ -575,7 +575,32 @@ class Download(BaseModule):
             return local_meta_file
 
         remote_files_list = self.relecov_sftp.get_file_list(remote_folder)
-        meta_files = [fi for fi in remote_files_list if fi.endswith(".xlsx")]
+
+        LOCK_PREFIXES = (".~lock", "~$")  # LibreOffice / MS Office
+        lock_files = [
+            f
+            for f in remote_files_list
+            if os.path.basename(f).startswith(LOCK_PREFIXES)
+        ]
+
+        meta_files = [
+            f for f in remote_files_list if f.endswith(".xlsx") and f not in lock_files
+        ]
+        # Check if metadata file is locked by another program
+        if lock_files and not meta_files:
+            msg = (
+                "Metadata file appears to be locked/open in another program: "
+                f"{', '.join(os.path.basename(f) for f in lock_files)}. "
+                "Close Excel and re-upload the file."
+            )
+            self.log.error(msg)
+            stderr.print(f"[red]{msg}")
+            raise MetadataError(msg)
+        elif lock_files:
+            self.log.warning(
+                "Ignoring lock file(s): %s",
+                ", ".join(os.path.basename(f) for f in lock_files),
+            )
 
         if not meta_files:
             raise FileNotFoundError(f"Missing metadata file for {remote_folder}")
@@ -1247,6 +1272,45 @@ class Download(BaseModule):
                     if val and val in file:
                         processed_dict[sample][key] = file
         return processed_dict
+
+    def _cleanup_remote_locks(self, parent: str = "."):
+        """
+        Recursively traverses the SFTP from `parent` and deletes:
+          - Folders whose basename starts with ` ~lock`.
+          - Files whose basename starts with ` ~lock`.
+        """
+        try:
+            dir_candidates = self.relecov_sftp.list_remote_folders(
+                parent, recursive=True
+            )
+            file_candidates = []
+            for d in dir_candidates + [parent]:
+                try:
+                    file_candidates.extend(self.relecov_sftp.get_file_list(d))
+                except Exception:
+                    continue
+        except Exception as e:
+            self.log.warning("Lock-cleanup: no pude listar %s: %s", parent, e)
+            return
+
+        # --- 1. Directories ---
+        for d in dir_candidates:
+            if os.path.basename(d).startswith("~lock"):
+                try:
+                    self.delete_remote_files(d)
+                    self.clean_remote_folder(d)
+                    self.log.info("Removed stale lock dir: %s", d)
+                except Exception as e:
+                    self.log.warning("No pude borrar dir %s: %s", d, e)
+
+        # --- 2. Files ---
+        for f in file_candidates:
+            if os.path.basename(f).startswith("~lock"):
+                try:
+                    self.relecov_sftp.remove_file(f)
+                    self.log.info("Removed stale lock file: %s", f)
+                except Exception as e:
+                    self.log.warning("No pude borrar file %s: %s", f, e)
 
     def download(self, target_folders):
         """Manages all the different functions to download files, verify their
