@@ -590,7 +590,7 @@ class Download(BaseModule):
             msg = (
                 "Metadata file appears to be locked/open in another program: "
                 f"{', '.join(os.path.basename(f) for f in lock_files)}. "
-                "Cierra el Excel y vuelve a subir el archivo."
+                "Close Excel and re-upload the file."
             )
             self.log.error(msg)
             stderr.print(f"[red]{msg}")
@@ -664,34 +664,6 @@ class Download(BaseModule):
             os.path.basename(file)
             for file in self.relecov_sftp.get_file_list(remote_folder)
         ]
-        # 1️⃣ identifica cualquier fichero-lock, tenga o no “.xlsx” final
-        LOCK_PREFIXES = (".~lock", "~$")  # LibreOffice y MS Office
-        lock_files = [
-            f
-            for f in remote_files_list
-            if os.path.basename(f).startswith(LOCK_PREFIXES)
-        ]
-
-        # 2️⃣ los verdaderos .xlsx (excluyendo los locks)
-        meta_files = [
-            f for f in remote_files_list if f.endswith(".xlsx") and f not in lock_files
-        ]
-
-        if lock_files and not meta_files:
-            # solo hay locks
-            msg = (
-                "Metadata file appears to be locked/open in another program: "
-                f"{', '.join(os.path.basename(f) for f in lock_files)}. "
-                "Cierra el Excel y vuelve a subir el archivo."
-            )
-            self.log.error(msg)
-            stderr.print(f"[red]{msg}")
-            raise MetadataError(msg)
-        elif lock_files:
-            self.log.warning(
-                "Ignoring lock file(s): %s",
-                ", ".join(os.path.basename(f) for f in lock_files),
-            )
         filtered_files_list = sorted(
             [fi for fi in remote_files_list if fi.endswith(tuple(allowed_extensions))]
         )
@@ -1302,16 +1274,14 @@ class Download(BaseModule):
 
     def _cleanup_remote_locks(self, parent: str = "."):
         """
-        Recorre recursivamente el SFTP desde `parent` y elimina:
-          • Carpetas cuyo basename empiece por '~lock'
-          • Ficheros  cuyo basename empiece por '~lock'
+        Recursively traverses the SFTP from `parent` and deletes:
+          - Folders whose basename starts with ` ~lock`.
+          - Files whose basename starts with ` ~lock`.
         """
         try:
-            # Carpetas (recursivo)
             dir_candidates = self.relecov_sftp.list_remote_folders(
                 parent, recursive=True
             )
-            # Ficheros (recursivo simulando un walk)
             file_candidates = []
             for d in dir_candidates + [parent]:
                 try:
@@ -1322,7 +1292,7 @@ class Download(BaseModule):
             self.log.warning("Lock-cleanup: no pude listar %s: %s", parent, e)
             return
 
-        # --- 1. Carpetas ---
+        # --- 1. Directories ---
         for d in dir_candidates:
             if os.path.basename(d).startswith("~lock"):
                 try:
@@ -1332,7 +1302,7 @@ class Download(BaseModule):
                 except Exception as e:
                     self.log.warning("No pude borrar dir %s: %s", d, e)
 
-        # --- 2. Ficheros ---
+        # --- 2. Files ---
         for f in file_candidates:
             if os.path.basename(f).startswith("~lock"):
                 try:
