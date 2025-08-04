@@ -288,20 +288,29 @@ class PipelineManager(BaseModule):
             the files that received an error while trying to copy.
         """
         samp_errors = {}
+        # Create the output folder for symbolic links
         links_folder = os.path.join(
             output_dir, self.analysis_folder, self.linked_sample_folder
         )
+        # Create the symbolic links folder if it does not exist
         os.makedirs(links_folder, exist_ok=True)
+
+        # Process and copy files for each sample
         for sample in samples_data:
-            sample_id = sample["sequencing_sample_id"]
+            seq_sample_id = sample.get("sequencing_sample_id", "")
+            unique_sample_id = sample.get("unique_sample_id", "")
+
             # fetch the file extension
             ext_found = re.match(r".*(fastq.*|bam)", sample["sequence_file_path_R1"])
             if not ext_found:
-                self.log.error("No valid file extension found for %s", sample_id)
-                samp_errors[sample_id].append(sample["sequence_file_path_R1"])
+                self.log.error("No valid file extension found for %s", seq_sample_id)
+                samp_errors[seq_sample_id].append(sample["sequence_file_path_R1"])
                 continue
+
             ext = ext_found.group(1)
-            seq_r1_sample_id = sample["sequencing_sample_id"] + "_R1." + ext
+
+            # Create sample filename with unique_sample_id and sequencing_sample_id
+            seq_r1_sample_id = seq_sample_id + "_" + unique_sample_id + "_R1." + ext
             # copy r1 sequencing file into the output folder self.analysis_folder
             sample_raw_r1 = os.path.join(
                 output_dir, self.copied_sample_folder, seq_r1_sample_id
@@ -316,14 +325,15 @@ class PipelineManager(BaseModule):
                 os.symlink(r1_link_path_ori, r1_link_path)
             except FileNotFoundError as e:
                 self.log.error("File not found %s", e)
-                samp_errors[sample_id] = []
-                samp_errors[sample_id].append(sample["sequence_file_path_R1"])
+                samp_errors[seq_sample_id] = []
+                samp_errors[seq_sample_id].append(sample["sequence_file_path_R1"])
                 if "sequence_file_path_R2" in sample:
-                    samp_errors[sample_id].append(sample["sequence_file_path_R2"])
+                    samp_errors[seq_sample_id].append(sample["sequence_file_path_R2"])
                 continue
+
             # check if there is a r2 file
             if "sequence_file_path_R2" in sample:
-                seq_r2_sample_id = sample["sequencing_sample_id"] + "_R2." + ext
+                seq_r2_sample_id = seq_sample_id + "_" + unique_sample_id + "_R2." + ext
                 sample_raw_r2 = os.path.join(
                     output_dir,
                     self.copied_sample_folder,
@@ -336,9 +346,9 @@ class PipelineManager(BaseModule):
                     os.symlink(r2_link_path_ori, r2_link_path)
                 except FileNotFoundError as e:
                     self.log.error("File not found %s", e)
-                    if not samp_errors.get(sample_id):
-                        samp_errors[sample_id] = []
-                    samp_errors[sample_id].append(sample["sequence_file_path_R2"])
+                    if not samp_errors.get(seq_sample_id):
+                        samp_errors[seq_sample_id] = []
+                    samp_errors[seq_sample_id].append(sample["sequence_file_path_R2"])
                     continue
         return samp_errors
 
@@ -355,6 +365,7 @@ class PipelineManager(BaseModule):
                 [
                   {
                     "sequencing_sample_id":XXXX,
+                    "unique_sample_id":XXXX,
                     "sequence_file_path_R1": XXXX,
                     "sequence_file_path_R2":XXXX
                   }
@@ -363,7 +374,8 @@ class PipelineManager(BaseModule):
         samples_data = []
         for item in json_data:
             sample = {}
-            sample["sequencing_sample_id"] = item["sequencing_sample_id"]
+            sample["sequencing_sample_id"] = item.get("sequencing_sample_id", "")
+            sample["unique_sample_id"] = item.get("unique_sample_id", "")
             sample["sequence_file_path_R1"] = os.path.join(
                 item["sequence_file_path_R1"], item["sequence_file_R1"]
             )
@@ -456,17 +468,22 @@ class PipelineManager(BaseModule):
         """
         global_samp_errors = {}
         keys_to_split = org_conf.get("group_by_fields", [])
+
         # iterate over the sample_data to copy the fastq files in the output folder
         for idx, list_of_samples in enumerate(splitted_json, start=1):
+            # Create a unique tag for the group based on the latest date and service tag
             group_tag = f"{latest_date}_{org_conf['service_tag']}{idx:02d}"
             self.log.info("Processing group %s", group_tag)
             fields = {k: list_of_samples[0].get(k, "") for k in keys_to_split}
+            # Log the group being processed
             if keys_to_split:
                 logtxt = f"[blue]Processing group {group_tag} with fields: {fields}..."
                 stderr.print(logtxt)
             else:
                 logtxt = f"[blue]Processing group {group_tag}"
                 stderr.print(logtxt)
+
+            # Create the output folder for the group
             group_outfolder = os.path.join(
                 self.output_dir, self.out_folder_namevar % group_tag
             )
@@ -477,12 +494,17 @@ class PipelineManager(BaseModule):
                     continue
                 shutil.rmtree(group_outfolder)
                 self.log.info(f"Folder {group_outfolder} removed")
+
             samples_data = self.create_samples_data(list(list_of_samples))
+
             # Create a folder for the group of samples and copy the files there
             self.log.info("Creating folder for group %s", group_tag)
             stderr.print(f"[blue]Creating folder for group {group_tag}")
 
+            # Copy template analysis for the group analysis
+            # pipeline_templates if list of templates to copy or pipeline_template if a single template
             pipeline_templates = org_conf.get("pipeline_templates")
+            # If pipeline_templates is a list, copy all templates
             if pipeline_templates is not None:
                 if not isinstance(pipeline_templates, list):
                     raise ValueError(
@@ -502,6 +524,7 @@ class PipelineManager(BaseModule):
                             shutil.copytree(s, d, dirs_exist_ok=True)
                         else:
                             shutil.copy2(s, d)
+            # if pipeline_templates is None check for pipeline_template which is a string in the conf
             else:
                 if "pipeline_template" not in org_conf:
                     raise ValueError(
@@ -519,23 +542,27 @@ class PipelineManager(BaseModule):
 
             # Check for possible duplicates
             self.log.info("Samples to copy %s", len(samples_data))
-            # Extract the sequencing_sample_id from the list of dictionaries
-            sample_ids = [item["sequencing_sample_id"] for item in samples_data]
+            # Extract the unique_sample_id - sequencing_sample_id from the list of dictionaries
+            sample_ids = [f"{item['sequencing_sample_id']}_{item['unique_sample_id']}" for item in samples_data]
             # Use Counter to count the occurrences of each sequencing_sample_id
             id_counts = Counter(sample_ids)
             # Find the sequencing_sample_id values that are duplicated (count > 1)
+            # This must never happen as unique_sample_id should be unique
             duplicates = [
                 sample_id for sample_id, count in id_counts.items() if count > 1
             ]
             if duplicates:
-                self.log.error(
+                self.log.warning(
                     "Duplicate samples in group %s: %s" % (group_tag, duplicates)
                 )
                 stderr.print(
-                    f"[red] There are duplicated samples in group {group_tag}: {duplicates}. Please handle manually"
+                    f"[orange] There are duplicated samples in group {group_tag}: {duplicates}. Just information as this should never happen, we use unique_sample_id to avoid this."
                 )
                 continue
+
+            # Copy the samples files to the group output folder
             samp_errors = self.copy_process(samples_data, group_outfolder)
+
             if len(samp_errors) > 0:
                 stderr.print(
                     f"[red]Unable to copy files from {len(samp_errors)} samples in group {group_tag}"
@@ -546,6 +573,8 @@ class PipelineManager(BaseModule):
                     shutil.rmtree(group_outfolder)
                     self.log.info(f"Folder {group_outfolder} removed")
                     continue
+
+            # Log the number of samples copied and errors
             global_samp_errors[group_tag] = samp_errors
             samples_copied = len(list_of_samples) - len(samp_errors)
             copied_samps_log = f"Group {group_tag}: {samples_copied} samples copied out of {len(list_of_samples)}"
@@ -595,7 +624,6 @@ class PipelineManager(BaseModule):
             stderr.print(
                 f"[blue]Generating sample_id.txt file in {group_analysis_folder}..."
             )
-
             with open(os.path.join(group_analysis_folder, "samples_id.txt"), "w") as f:
                 for sample_id in sample_ids:
                     f.write(f"{sample_id}\n")
@@ -734,6 +762,7 @@ class PipelineManager(BaseModule):
             initial_date=init_date,
             folder_list=self.folder_list,
         )
+
         latest_date = str(latest_date).replace("-", "")
         if len(join_validate) == 0:
             stderr.print("[yellow]No samples were found. Aborting")
