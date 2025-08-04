@@ -862,5 +862,7 @@ class Validate(BaseModule):
             )
         else:
             self.create_validation_files(valid_json_data, invalid_json)
-            self.parent_create_error_summary(called_module="validate")
+
+        # Always create a summary log file for validation process
+        self.parent_create_error_summary(called_module="validate")
         return
