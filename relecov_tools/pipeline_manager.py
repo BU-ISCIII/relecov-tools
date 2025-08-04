@@ -737,7 +737,10 @@ class PipelineManager(BaseModule):
         latest_date = str(latest_date).replace("-", "")
         if len(join_validate) == 0:
             stderr.print("[yellow]No samples were found. Aborting")
-            sys.exit(0)
+            self.log.error("No samples were found. Aborting")
+            raise ValueError("No samples were found. Aborting")
+
+        # get the latest batch id from the data
         batch_id = self.get_batch_id_from_data(join_validate)
         # If more than one batch is included, current date will be set as batch_id
         self.set_batch_id(batch_id)
