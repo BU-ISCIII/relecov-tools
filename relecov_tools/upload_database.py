@@ -72,7 +72,9 @@ class UploadDatabase(BaseModule):
         self.long_table_file = None
         if full_update or type == "variantdata":
             if not long_table or not os.path.isfile(long_table):
-                raise ValueError(f"Provided long_table file does not exist: {long_table}")
+                raise ValueError(
+                    f"Provided long_table file does not exist: {long_table}"
+                )
             self.long_table_file = os.path.realpath(long_table)
 
         # Configure full update or specific type and platform
@@ -117,9 +119,7 @@ class UploadDatabase(BaseModule):
             logtxt = f"Unable to fetch parameters for {platform} {e}"
             stderr.print(f"[red]{logtxt}")
             self.log.error(logtxt)
-            raise KeyError(
-                f"Unable to fetch parameters for {platform} {e}"
-            )
+            raise KeyError(f"Unable to fetch parameters for {platform} {e}")
 
     def get_schema_ontology_values(self):
         """Read the schema and extract the values of ontology with the label"""
@@ -181,7 +181,11 @@ class UploadDatabase(BaseModule):
         s_project_fields = []
         # get the ontology values for mapping values in sample fields
         ontology_dict = self.get_schema_ontology_values()
-        if not self.platform_settings or "iskylims" not in self.platform_settings or self.platform_settings["iskylims"] is None:
+        if (
+            not self.platform_settings
+            or "iskylims" not in self.platform_settings
+            or self.platform_settings["iskylims"] is None
+        ):
             logtxt = "Platform settings for 'iskylims' are not properly configured in configuration.json."
             self.logsum.add_error(entry=logtxt)
             stderr.print(f"[red]{logtxt}")
@@ -413,9 +417,7 @@ class UploadDatabase(BaseModule):
             logtxt = f"Unable to fetch parameters for {platform} {e}"
             stderr.print(f"[red]{logtxt}")
             self.logsum.add_error(entry=logtxt)
-            raise KeyError(
-                f"Unable to fetch parameters for {platform} {e}"
-            )
+            raise KeyError(f"Unable to fetch parameters for {platform} {e}")
         if self.server_url is None:
             server_url = p_settings["server_url"]
         else:
