@@ -394,11 +394,20 @@ class BioinfoMetadata(BaseModule):
         Raises:
             ValueError: If no sample from the JSON input matches the samples in the samples_id.txt.
         """
+        # Check if samples_id.txt exists
         samplesid_path = os.path.join(self.input_folder, "samples_id.txt")
         with open(samplesid_path, "r") as file:
             samplesid_list = [line.strip() for line in file.readlines()]
-        json_samples = [sample["sequencing_sample_id"] for sample in self.j_data]
+
+        # Get sample names from JSON input. 
+        # if unique_sample_id is not present, it will use only sequencing_sample_id.
+        json_samples = [
+            f"{sample['sequencing_sample_id']}_{sample['unique_sample_id']}"
+            if sample.get("unique_sample_id") else sample["sequencing_sample_id"]
+            for sample in self.j_data
+        ]
         matching_samples = set(json_samples).intersection(samplesid_list)
+
         if not matching_samples:
             raise ValueError(
                 "No sample from the JSON input matches the samples in the provided analysis folder."
