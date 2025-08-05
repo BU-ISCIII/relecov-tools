@@ -119,10 +119,18 @@ def process_json_files(
                                 "WEEK": week,
                                 "SEASON": season,
                                 "LINEAGE": sample.get("lineage_assignment", "-"),
-                                "COVERAGE_10X": sample.get("per_genome_greater_10x", "-"),
-                                "COLLECTING_INSTITUTION": sample.get("collecting_institution", "-"),
-                                "SUBMITTING_INSTITUTION": sample.get("submitting_institution", "-"),
-                                "SUBMITTING_INSTITUTION_ID": sample.get("submitting_institution_id", "-"),
+                                "COVERAGE_10X": sample.get(
+                                    "per_genome_greater_10x", "-"
+                                ),
+                                "COLLECTING_INSTITUTION": sample.get(
+                                    "collecting_institution", "-"
+                                ),
+                                "SUBMITTING_INSTITUTION": sample.get(
+                                    "submitting_institution", "-"
+                                ),
+                                "SUBMITTING_INSTITUTION_ID": sample.get(
+                                    "submitting_institution_id", "-"
+                                ),
                                 "CCAA": sample.get("geo_loc_state", "-"),
                                 "PROVINCE": sample.get("geo_loc_region", "-"),
                                 "ANALYSIS_DATE": analysis_date,
@@ -141,7 +149,7 @@ def process_json_files(
                                 "GISAID_ACCESSION_ID": sample.get(
                                     "gisaid_accession_id", "-"
                                 ),
-                                "QC_TEST": sample.get("qc_test", "-")
+                                "QC_TEST": sample.get("qc_test", "-"),
                             }
                         )
 
@@ -187,25 +195,29 @@ def process_json_files(
                                     if af > 0.75:
                                         if season not in season_variants:
                                             season_variants[season] = []
-                                        season_variants[season].append({
-                                            "SAMPLE": variant.get("sample", "-"),
-                                            "CHROM": variant.get("chromosome", "-"),
-                                            "POS": variant.get("pos", "-"),
-                                            "ALT": variant.get("alt", "-"),
-                                            "REF": variant.get("ref", "-"),
-                                            "FILTER": variant.get("Filter", "-"),
-                                            "DP": variant.get("dp", "-"),
-                                            "REF_DP": variant.get("ref_dp", "-"),
-                                            "ALT_DP": variant.get("alt_dp", "-"),
-                                            "AF": variant.get("af", "-"),
-                                            "GENE": variant.get("gene", "-"),
-                                            "EFFECT": variant.get("effect", "-"),
-                                            "HGVS_C": variant.get("hgvs_c", "-"),
-                                            "HGVS_P": variant.get("hgvs_p", "-"),
-                                            "HGVS_P_1LETTER": variant.get("hgvs_p_1_letter", "-"),
-                                            "CALLER": variant.get("caller", "-"),
-                                            "LINEAGE": variant.get("lineage", "-"),
-                                        })
+                                        season_variants[season].append(
+                                            {
+                                                "SAMPLE": variant.get("sample", "-"),
+                                                "CHROM": variant.get("chromosome", "-"),
+                                                "POS": variant.get("pos", "-"),
+                                                "ALT": variant.get("alt", "-"),
+                                                "REF": variant.get("ref", "-"),
+                                                "FILTER": variant.get("Filter", "-"),
+                                                "DP": variant.get("dp", "-"),
+                                                "REF_DP": variant.get("ref_dp", "-"),
+                                                "ALT_DP": variant.get("alt_dp", "-"),
+                                                "AF": variant.get("af", "-"),
+                                                "GENE": variant.get("gene", "-"),
+                                                "EFFECT": variant.get("effect", "-"),
+                                                "HGVS_C": variant.get("hgvs_c", "-"),
+                                                "HGVS_P": variant.get("hgvs_p", "-"),
+                                                "HGVS_P_1LETTER": variant.get(
+                                                    "hgvs_p_1_letter", "-"
+                                                ),
+                                                "CALLER": variant.get("caller", "-"),
+                                                "LINEAGE": variant.get("lineage", "-"),
+                                            }
+                                        )
                                 break
             except json.JSONDecodeError:
                 print(
@@ -225,9 +237,13 @@ def process_json_files(
             season_consensus_dir = os.path.join(season_dir, "consensus_files")
             os.makedirs(season_consensus_dir, exist_ok=True)
             for fa_path in fa_paths:
-                dest_path = os.path.join(season_consensus_dir, os.path.basename(fa_path))
+                dest_path = os.path.join(
+                    season_consensus_dir, os.path.basename(fa_path)
+                )
                 shutil.copy(fa_path, dest_path)
-            print(f"Copied {len(fa_paths)} consensus.fa files to {season_consensus_dir}")
+            print(
+                f"Copied {len(fa_paths)} consensus.fa files to {season_consensus_dir}"
+            )
 
     # Handle Excel file (read existing if present)
     existing_sample_ids = set()
