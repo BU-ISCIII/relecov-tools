@@ -2,21 +2,22 @@
 """
 Common utility function used for relecov_tools package.
 """
+import json
+import logging
 import os
 import re
 import sys
-import yaml
-import logging
-import rich
-import json
-
-from pathlib import Path
+from collections.abc import Callable
 from datetime import datetime
+from pathlib import Path
+
+import rich
+import yaml
 from Bio import SeqIO
 
+import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.read_bioinfo_metadata import BioinfoReportLog
-import relecov_tools.utils
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -226,13 +227,16 @@ class LongTableParse:
 # END of Class
 
 
-def parse_long_table(files_list, file_tag, pipeline_name, output_folder=None):
+def parse_long_table(files_list: list, file_tag: str, pipeline_name: str, output_folder: str | None = None) -> None:
     """File handler to retrieve data from long table files and convert it into a JSON structured format.
     This function utilizes the LongTableParse class to parse the long table data.
     Since this utility handles and maps data using a custom way, it returns None to be avoid being  transferred to method read_bioinfo_metadata.BioinfoMetadata.mapping_over_table().
 
     Args:
         files_list (list): A list of paths to long table files.
+        file_tag (str): A tag to be used in the output file name.
+        pipeline_name (str): The name of the pipeline for which the long table is being parsed.
+        output_folder (str | None): The folder where the output file will be saved.
 
     Returns:
         None: Indicates that the function does not return any meaningful value.
@@ -276,7 +280,7 @@ def parse_long_table(files_list, file_tag, pipeline_name, output_folder=None):
         )
 
 
-def extract_consensus_stats(files_list, file_tag, pipeline_name, output_folder=None):
+def extract_consensus_stats(files_list: list) -> dict:
     """File handler to parse consensus data (fasta) into JSON structured format.
 
     Args:
@@ -322,7 +326,7 @@ def extract_consensus_stats(files_list, file_tag, pipeline_name, output_folder=N
     return consensus_data_processed
 
 
-def get_software_versions_yml(files_list, file_tag, pipeline_name, output_folder=None):
+def get_software_versions_yml(files_list: list) -> dict:
     """File handler to parse software versions from yaml.
 
     Args:
@@ -374,13 +378,12 @@ def get_software_versions_yml(files_list, file_tag, pipeline_name, output_folder
 
 
 def evaluate_qc_samples(
-    data, thresholds, conditions, invert_operator, is_not_evaluable
-):
+    data: list[dict], thresholds: dict, conditions: dict, invert_operator: Callable, is_not_evaluable: Callable
+) -> tuple[list[dict], list[str]]:
     """
     Perform QC evaluation on a list of sample data dictionaries using provided threshold logic.
 
-    Parameters:
-    -----------
+    Args:
     data : list of dict
         Each dict represents a sample and contains metrics to be evaluated.
     thresholds : dict
@@ -390,16 +393,9 @@ def evaluate_qc_samples(
     invert_operator : function
         Function that returns the inverse of a comparison operator.
     is_not_evaluable : function
-        Function to detect if a metric value should be skipped.
-    log_report : BioinfoReportLog
-        Logger to record validation and warning messages.
-    log : Logger
-        Standard Python logger for logging events.
-    method_name : str
-        Name of the method for logging purposes.
+        Function to detect if a metric value should be skipped
 
     Returns:
-    --------
     Tuple of:
     - data : List[Dict[str, Any]]
         The input list with added 'qc_test' and optional 'qc_failed' keys.

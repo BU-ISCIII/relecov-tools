@@ -14,7 +14,7 @@ stderr = rich.console.Console(
 )
 
 
-def handle_pangolin_data(files_list, file_tag, pipeline_name, output_folder=None):
+def handle_pangolin_data(files_list: list) -> dict:
     """File handler to parse pangolin data (csv) into JSON structured format.
 
     Args:
@@ -64,17 +64,15 @@ def handle_pangolin_data(files_list, file_tag, pipeline_name, output_folder=None
     return pango_data_processed
 
 
-def quality_control_evaluation(data):
+def quality_control_evaluation(data: list[dict]) -> list[dict]:
     """Evaluates QC status for each sample based on predefined thresholds.
 
-    Parameters:
-    -----------
+    Args:
     data : list of dict
         List of sample metadata dictionaries containing metrics such as coverage,
         ambiguity, number of Ns, %LDMutations, etc.
 
     Returns:
-    --------
     list of dict
         The same list with an added 'qc_test' field per sample:
         - 'pass' if all evaluable conditions are met
