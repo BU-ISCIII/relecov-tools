@@ -1,17 +1,18 @@
 #!/usr/bin/env python
+import importlib
 import os
-import rich.console
 import re
 import shutil
-import importlib
-import numpy as np
 from datetime import datetime
+
+import numpy as np
+import pandas as pd
+import rich.console
 from rich.prompt import Prompt
 
-import pandas as pd
 import relecov_tools.utils
-from relecov_tools.config_json import ConfigJson
 from relecov_tools.base_module import BaseModule
+from relecov_tools.config_json import ConfigJson
 
 stderr = rich.console.Console(
     stderr=True,
