@@ -541,7 +541,10 @@ class BioinfoMetadata(BaseModule):
                 data = self.handling_tables(files_dict[key], file_name)
             else:
                 data = self.process_metadata(
-                    files_dict[key], file_tag=file_tag, func_name=func_name, out_path=output_dir
+                    files_dict[key],
+                    file_tag=file_tag,
+                    func_name=func_name,
+                    out_path=output_dir,
                 )
 
             if current_config.get("split_by_batch") and current_config.get(
@@ -673,7 +676,12 @@ class BioinfoMetadata(BaseModule):
             module = importlib.import_module(utils_name)
             # Get method from func_name and execute it.
             func_obj = getattr(module, func_name)
-            data = func_obj(file_list, file_tag=file_tag, pipeline_name=self.software_name, output_folder=out_path)
+            data = func_obj(
+                file_list,
+                file_tag=file_tag,
+                pipeline_name=self.software_name,
+                output_folder=out_path,
+            )
 
         except Exception as e:
             self.update_all_logs(
@@ -1105,15 +1113,25 @@ class BioinfoMetadata(BaseModule):
         filename: str
             The file name of the first item in filtered_batch_data.
         """
+        # Get the sample names from batch_data
+        # If unique_sample_id is present, it will be used to create the sample name,
+        # otherwise only sequencing_sample_id will be used.
         sample_names_in_batch = {
-            sample_data["sequencing_sample_id"] for sample_data in batch_data
+            (
+                f"{sample_data['sequencing_sample_id']}_{sample_data['unique_sample_id']}"
+                if sample_data["unique_sample_id"]
+                else sample_data["sequencing_sample_id"]
+            )
+            for sample_data in batch_data
         }
+        # filter extra_data based on sample names in batch_data
         filtered_batch_data = [
             sample_data
             for sample_data in extra_data
             if sample_data["sample_name"] in sample_names_in_batch
         ]
 
+        # get the file name from the first item in filtered_batch_data
         filename = filtered_batch_data[0]["file_name"]
 
         return filtered_batch_data, filename
