@@ -967,8 +967,16 @@ class BioinfoMetadata(BaseModule):
             return
 
         method_name = self.split_tables_by_batch.__name__
-        namekey = "sequencing_sample_id"
-        batch_samples = [row.get(namekey) for row in batch_data]
+        # sample names are created by concatenating sequencing_sample_id and unique_sample_id
+        # if unique_sample_id is not present, it will use only sequencing_sample_id.
+        batch_samples = [
+            (
+                f"{row.get('sequencing_sample_id')}_{row.get('unique_sample_id')}"
+                if row.get("unique_sample_id")
+                else row.get("sequencing_sample_id")
+            )
+            for row in batch_data
+        ]
         for key, files in files_found_dict.items():
             if not self.software_config[key].get("split_by_batch"):
                 continue
