@@ -297,7 +297,6 @@ class UploadDatabase(BaseModule):
             if "ERROR" in result:
                 if result["ERROR"] == "Server not available":
                     # retry to connect to server
-                    i = 0
                     for i in range(10):
                         # wait 5 sec before resending the request
                         time.sleep(5)
