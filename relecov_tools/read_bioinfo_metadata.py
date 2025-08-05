@@ -297,11 +297,14 @@ class BioinfoMetadata(BaseModule):
         field_valid = {}
 
         # get sample ids from j_data
+        # If unique_sample_id is not present, it will use only sequencing_sample_id.
+        # else it will use both to create a unique sample id.
         sample_ids = {
             row.get("sequencing_sample_id")
             for row in j_data
             if row.get("sequencing_sample_id")
         }
+
         # check if map_data contains sample ids
         matched_samples = sample_ids & set(map_data.keys())
         no_samples = not matched_samples
@@ -323,7 +326,7 @@ class BioinfoMetadata(BaseModule):
             if "unique_sample_id" in row:
                 sample_name = f"{row['sequencing_sample_id']}_{row['unique_sample_id']}"
             else:
-            sample_name = row["sequencing_sample_id"]
+                sample_name = row["sequencing_sample_id"]
 
             # Check if sample_name is in map_data
             if sample_name in map_data:

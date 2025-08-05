@@ -489,9 +489,7 @@ def select_most_recent_files_per_sample(paths_list):
         for sample_name, file_paths in filename_groups.items()
         for file_path in file_paths
     ]
-    # Reformat variable to retrieve a list of file paths
-    file_path_list = [sample_file_path for _, sample_file_path in filename_groups]
-    return file_path_list
+    return [sample_file_path for _, sample_file_path in filename_groups]
 
 
 def print_log_report(

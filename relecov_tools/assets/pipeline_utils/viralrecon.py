@@ -16,7 +16,7 @@ stderr = rich.console.Console(
 )
 
 
-def handle_pangolin_data(files_list: list) -> dict:
+def handle_pangolin_data(files_list: list, **kwargs) -> dict:
     """File handler to parse pangolin data (csv) into JSON structured format.
 
     Args:
@@ -66,7 +66,7 @@ def handle_pangolin_data(files_list: list) -> dict:
     return pango_data_processed
 
 
-def quality_control_evaluation(data: list[dict]) -> list[dict]:
+def quality_control_evaluation(data: list[dict], **kwargs) -> list[dict]:
     """Evaluates QC status for each sample based on predefined thresholds.
 
     Args:
