@@ -71,21 +71,24 @@ class BioinfoReportLog:
 class BioinfoMetadata(BaseModule):
     def __init__(
         self,
-        json_file=None,
-        json_schema_file=None,
-        input_folder=None,
-        output_dir=None,
-        software_name=None,
-        update=False,
-        soft_validation=False,
-        **kwargs,
+        json_file: str | None = None,
+        json_schema_file: str | None = None,
+        input_folder: str | None = None,
+        output_dir: str | None = None,
+        software_name: str | None = None,
+        update: bool = False,
+        soft_validation: bool = False,
     ):
+        #
         super().__init__(output_dir=output_dir, called_module=__name__)
-        config_json = ConfigJson()
-        self.log.info("Initiating read-bioinfo-metadata process")
-        # Init process log
 
+        # Init process log
+        self.log.info("Initiating read-bioinfo-metadata process")
+
+        # Check CLI arguments
+        # Read json schema file
         if json_schema_file is None:
+            config_json = ConfigJson()
             schema_name = config_json.get_topic_data("generic", "relecov_schema")
             json_schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
@@ -93,19 +96,22 @@ class BioinfoMetadata(BaseModule):
 
         self.json_schema = relecov_tools.utils.read_json_file(json_schema_file)
 
+        # Set output directory
         if output_dir is None:
             self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
             )
         else:
             self.output_dir = os.path.realpath(output_dir)
+
+        # Set log summary and log report
         self.logsum = self.parent_log_summary(output_dir=output_dir)
         self.log_report = BioinfoReportLog(output_dir=output_dir)
 
         # Parse read-lab-meta-data
         if json_file is None:
             json_file = relecov_tools.utils.prompt_path(
-                msg="Select the json file that was created by the read-lab-metadata"
+                msg="Select the json file that was created by the pipeline-manager or read-lab-metadata module."
             )
         if not os.path.isfile(json_file):
             self.update_all_logs(
@@ -124,10 +130,12 @@ class BioinfoMetadata(BaseModule):
         self.j_data = self.collect_info_from_lab_json()
         batch_id = self.get_batch_id_from_data(self.j_data)
         self.set_batch_id(batch_id)
+
+        # set if update or soft_validation
         self.update = update
         self.soft_validation = soft_validation
 
-        # Parse input/output folder
+        # Parse input folder
         if input_folder is None:
             self.input_folder = relecov_tools.utils.prompt_path(
                 msg="Select the input folder"
@@ -135,24 +143,22 @@ class BioinfoMetadata(BaseModule):
         else:
             self.input_folder = input_folder
 
-        # Parse bioinfo configuration
-        self.bioinfo_json_file = os.path.join(
-            os.path.dirname(__file__), "conf", "bioinfo_config.json"
-        )
+        # set software name
         if software_name is None:
             software_name = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
             )
         self.software_name = software_name
-        available_software = relecov_tools.utils.get_available_software(
-            self.bioinfo_json_file
+
+        # Parse bioinfo configuration
+        self.bioinfo_json_file = os.path.join(
+            os.path.dirname(__file__), "conf", "bioinfo_config.json"
         )
         bioinfo_config = ConfigJson(self.bioinfo_json_file)
 
-        self.schema_path = os.path.join(
-            os.path.dirname(__file__), "schema", "relecov_schema.json"
+        available_software = relecov_tools.utils.get_available_software(
+            self.bioinfo_json_file
         )
-        self.bioinfo_schema = relecov_tools.utils.load_schema(self.schema_path)
 
         if self.software_name in available_software:
             self.software_config = bioinfo_config.get_configuration(self.software_name)
