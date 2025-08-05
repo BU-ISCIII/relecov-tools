@@ -216,7 +216,7 @@ class BioinfoMetadata(BaseModule):
             self.logsum.add_warning(key=method_name, entry=message)
         return report
 
-    def scann_directory(self) -> dict:
+    def scann_directory(self) -> dict:  # sourcery skip: class-extract-method, use-named-expression
         """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json.
 
         Returns:
@@ -302,11 +302,7 @@ class BioinfoMetadata(BaseModule):
         }
         # check if map_data contains sample ids
         matched_samples = sample_ids & set(map_data.keys())
-
-        if not matched_samples:
-            no_samples = True
-        else:
-            no_samples = False
+        no_samples = not matched_samples
 
         for row in j_data:
             # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
@@ -322,7 +318,7 @@ class BioinfoMetadata(BaseModule):
             # Get sample name from row
             sample_name = row["sequencing_sample_id"]
             # Check if sample_name is in map_data
-            if sample_name in map_data.keys():
+            if sample_name in map_data:
                 # for each field in mapping_fields, try to map the data
                 for field, value in mapping_fields.items():
                     try:
@@ -345,7 +341,7 @@ class BioinfoMetadata(BaseModule):
                 not self.software_config[self.current_config_key].get(
                     "multiple_samples"
                 )
-                and no_samples is True
+                and no_samples
             ):  # When sample ID is not in mapping_fields because is not a multiple_sample table
                 for field, value_dict in mapping_fields.items():
                     for json_field, software_key in value_dict.items():
@@ -368,7 +364,7 @@ class BioinfoMetadata(BaseModule):
                             row[json_field] = "Not Provided [SNOMED:434941000124101]"
             else:
                 errors.append(sample_name)
-                for field in mapping_fields.keys():
+                for field in mapping_fields:
                     row[field] = "Not Provided [SNOMED:434941000124101]"
 
         # work around when map_data comes from several per-sample tables/files instead of single table
@@ -436,13 +432,12 @@ class BioinfoMetadata(BaseModule):
             raise ValueError(
                 "No sample from the JSON input matches the samples in the provided analysis folder."
             )
-        else:
-            print(
-                f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
-            )
-            self.log.info(
-                f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
-            )
+        print(
+            f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
+        )
+        self.log.info(
+            f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
+        )
 
     def validate_software_mandatory_files(self, files_dict: dict) -> None:
         """Validates the presence of all mandatory files as defined in the software configuration JSON.
@@ -670,7 +665,7 @@ class BioinfoMetadata(BaseModule):
                 f"Error occurred while parsing '{func_name}': {e}.",
             )
             self.log_report.print_log_report(method_name, ["error"])
-            raise ValueError(f"Error occurred while parsing '{func_name}': {e}.")
+            raise ValueError(f"Error occurred while parsing '{func_name}': {e}.") from e
         return data
 
     def add_fixed_values(self, j_data: list[dict], out_filename: str) -> list[dict]:
@@ -695,7 +690,7 @@ class BioinfoMetadata(BaseModule):
             self.update_all_logs(
                 method_name, "warning", f"Error found while adding fixed values: {e}"
             )
-            pass
+
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
@@ -760,9 +755,7 @@ class BioinfoMetadata(BaseModule):
                 file_path = []
                 if values:  # Check if value is not empty
                     for file in values:
-                        if key in multiple_sample_files:
-                            file_path.append(file)
-                        elif sample_name in file:
+                        if key in multiple_sample_files or sample_name in file:
                             file_path.append(file)
                 else:
                     file_path.append("Not Provided [SNOMED:434941000124101]")
@@ -824,7 +817,7 @@ class BioinfoMetadata(BaseModule):
             json_lab_data = relecov_tools.utils.read_json_file(
                 self.readlabmeta_json_file
             )
-        except ValueError:
+        except ValueError as e:
             errtxt = (
                 f"Invalid lab-metadata json file: self.{self.readlabmeta_json_file}"
             )
@@ -834,7 +827,7 @@ class BioinfoMetadata(BaseModule):
                 errtxt,
             )
             self.log_report.print_log_report(method_name, ["error"])
-            raise ValueError(errtxt)
+            raise ValueError(errtxt) from e
         return json_lab_data
 
     def get_sample_idx_colpos(self, config_key: str) -> int:
@@ -906,9 +899,9 @@ class BioinfoMetadata(BaseModule):
             data_by_batch (dict(list(dict))): Dictionary containing parts of j_data corresponding to each
             different folder with samples (batch) included in the original json metadata used as input
         """
-        unique_batchs = set([x.get("sequence_file_path_R1") for x in j_data])
+        unique_batchs = {x.get("sequence_file_path_R1") for x in j_data}
         data_by_batch = {batch_dir: {} for batch_dir in unique_batchs}
-        for batch_dir in data_by_batch.keys():
+        for batch_dir in data_by_batch:
             data_by_batch[batch_dir]["j_data"] = [
                 samp
                 for samp in j_data
@@ -968,10 +961,7 @@ class BioinfoMetadata(BaseModule):
                         new_filename = f"{base}_{file_tag}{ext}"
                     extract_batch_rows_to_file(file, new_filename)
                 except Exception as e:
-                    if self.software_config[key].get("required"):
-                        log_type = "error"
-                    else:
-                        log_type = "warning"
+                    log_type = "error" if self.software_config[key].get("required") else "warning"
                     self.update_all_logs(
                         method_name,
                         log_type,
@@ -1049,9 +1039,11 @@ class BioinfoMetadata(BaseModule):
             multiple_sample_files (list[str]): A list of keys from the software configuration
         """
         multiple_sample_files = []
-        for key in self.software_config.keys():
-            if self.software_config[key].get("multiple_samples"):
-                multiple_sample_files.append(key)
+        multiple_sample_files.extend(
+            key
+            for key in self.software_config.keys()
+            if self.software_config[key].get("multiple_samples")
+        )
         return multiple_sample_files
 
     def filter_properties(self, data: list[dict]) -> list[dict]:
@@ -1176,11 +1168,11 @@ class BioinfoMetadata(BaseModule):
             self.logsum.feed_key(key=out_path, sample=sample)
         if len(invalid_rows) > 0:
             unique_failed_samples = list(
-                set(
+                {
                     sample
                     for samples in invalid_rows["samples"].values()
                     for sample in samples
-                )
+                }
             )
             for error_message, failed_samples in invalid_rows["samples"].items():
                 num_samples = len(failed_samples)
@@ -1227,14 +1219,13 @@ class BioinfoMetadata(BaseModule):
                 f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
             )
             self.log.info(
-                "Bioinfo metadata %s file already exists. Merging new data if possible."
-                % batch_filepath
+                f"Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
             )
             self.j_data = self.merge_metadata(batch_filepath, self.j_data)
         else:
             relecov_tools.utils.write_json_to_file(self.j_data, batch_filepath)
 
-        self.log.info("Created output json file: %s" % batch_filepath)
+        self.log.info(f"Created output json file: {batch_filepath}")
         stderr.print(f"[green]Created batch json file: {batch_filepath}")
 
         self.log.info("Splitting data by batch")
@@ -1276,8 +1267,7 @@ class BioinfoMetadata(BaseModule):
                     f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
                 )
                 self.log.info(
-                    "Bioinfo metadata %s file already exists. Merging new data if possible."
-                    % batch_filepath
+                    f"Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
                 )
                 batch_data = self.merge_metadata(batch_filepath, batch_data)
             else:
@@ -1286,7 +1276,7 @@ class BioinfoMetadata(BaseModule):
                 self.logsum.feed_key(
                     key=batch_dir, sample=sample.get("sequencing_sample_id")
                 )
-            self.log.info("Created output json file: %s" % batch_filepath)
+            self.log.info(f"Created output json file: {batch_filepath}")
             stderr.print(f"[green]Created batch json file: {batch_filepath}")
 
             for extra_json in extra_json_data:
