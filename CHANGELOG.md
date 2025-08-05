@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Alejandro Bernabeu](https://github.com/aberdur)
 - [Sara Monzon](https://github.com/saramonzon)
+- [Victor Lopez](https://github.com/victor5lm)
 
 #### Added enhancements
 
@@ -24,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Update __main__ & config_json for new merged-config structure (commands + params) [#765](https://github.com/BU-ISCIII/relecov-tools/pull/765)
 - Propagate wrapper --output_dir down to download [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
 - Update error message when output_dir is missing in extra_config [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
+- Updated create_summary_tables.py to organize data according to the epidemiological season [#772](https://github.com/BU-ISCIII/relecov-tools/pull/772)
 
 #### Removed
 
