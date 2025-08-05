@@ -1076,7 +1076,9 @@ def metadata_homogeneizer(ctx, institution, directory, output_dir):
     help="Skip the database upload step. This is useful for testing purposes.",
 )
 @click.pass_context
-def pipeline_manager(ctx, input, templates_root, output_dir, folder_names, skip_db_upload):
+def pipeline_manager(
+    ctx, input, templates_root, output_dir, folder_names, skip_db_upload
+):
     """
     Create the symbolic links for the samples which are validated to prepare for
     bioinformatics pipeline execution.

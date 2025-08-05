@@ -556,7 +556,10 @@ class PipelineManager(BaseModule):
             self.log.info("Samples to copy %s", len(samples_data))
             if not self.skip_db_upload:
                 # Extract the unique_sample_id - sequencing_sample_id from the list of dictionaries
-                sample_ids = [f"{item['sequencing_sample_id']}_{item['unique_sample_id']}" for item in samples_data]
+                sample_ids = [
+                    f"{item['sequencing_sample_id']}_{item['unique_sample_id']}"
+                    for item in samples_data
+                ]
             else:
                 # If skip_db_upload is True, we don't have unique_sample_id
                 sample_ids = [item["sequencing_sample_id"] for item in samples_data]
@@ -655,7 +658,9 @@ class PipelineManager(BaseModule):
             stderr.print(f"[blue]Folder {group_outfolder} finished. Ready to launch")
         return global_samp_errors
 
-    def assign_unique_ids_by_fingerprint(self, json_data: list[dict], result: list[dict]) -> list[dict]:
+    def assign_unique_ids_by_fingerprint(
+        self, json_data: list[dict], result: list[dict]
+    ) -> list[dict]:
         """
         Assigns unique_sample_id to each entry in json_data based on sample_fingerprint,
         using the data returned in the result list (from DB/API).
@@ -689,11 +694,13 @@ class PipelineManager(BaseModule):
                         sample["sequencing_sample_id"],
                         sample["collecting_lab_sample_id"],
                         sample["submitting_institution"],
-                        sample["collecting_institution"]
+                        sample["collecting_institution"],
                     )
                     sample["sample_fingerprint"] = fingerprint
                 except KeyError as e:
-                    self.log.warning(f"Missing field {e} while generating fingerprint for sample: {sample}")
+                    self.log.warning(
+                        f"Missing field {e} while generating fingerprint for sample: {sample}"
+                    )
                     continue
 
             # Assign unique_sample_id from lookup table
