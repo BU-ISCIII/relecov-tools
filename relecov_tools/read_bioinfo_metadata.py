@@ -4,13 +4,15 @@ import os
 import re
 import shutil
 from datetime import datetime
+from typing import Any
 
-import numpy as np
+import numpy as np  # pyright: ignore[reportMissingImports]
 import pandas as pd
 import rich.console
 from rich.prompt import Prompt
 
 import relecov_tools.utils
+import relecov_tools.validate
 from relecov_tools.base_module import BaseModule
 from relecov_tools.config_json import ConfigJson
 
@@ -23,7 +25,7 @@ stderr = rich.console.Console(
 
 
 class BioinfoReportLog:
-    def __init__(self, log_report=None, output_dir="/tmp/"):
+    def __init__(self, log_report=None):
         if not log_report:
             self.report = {"error": {}, "valid": {}, "warning": {}}
         else:
@@ -92,7 +94,7 @@ class BioinfoMetadata(BaseModule):
             config_json = ConfigJson()
             schema_name = config_json.get_topic_data("generic", "relecov_schema")
             json_schema_file = os.path.join(
-                os.path.dirname(os.path.realpath(__file__)), "schema", schema_name
+                os.path.dirname(os.path.realpath(__file__)), "schema", str(schema_name)
             )
 
         self.json_schema = relecov_tools.utils.read_json_file(json_schema_file)
@@ -107,14 +109,14 @@ class BioinfoMetadata(BaseModule):
 
         # Set log summary and log report
         self.logsum = self.parent_log_summary(output_dir=output_dir)
-        self.log_report = BioinfoReportLog(output_dir=output_dir)
+        self.log_report = BioinfoReportLog()
 
         # Parse read-lab-meta-data
         if json_file is None:
             json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file that was created by the pipeline-manager or read-lab-metadata module."
             )
-        if not os.path.isfile(json_file):
+        if json_file is None or not os.path.isfile(json_file):
             self.update_all_logs(
                 self.__init__.__name__,
                 "error",
@@ -149,7 +151,16 @@ class BioinfoMetadata(BaseModule):
             software_name = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
             )
-        self.software_name = software_name
+        if software_name:
+            self.software_name = software_name
+        else:
+            self.update_all_logs(
+                self.__init__.__name__,
+                "error",
+                "No software name provided, cannot continue.",
+            )
+            self.log_report.print_log_report(self.__init__.__name__, ["error"])
+            raise ValueError("No software name provided, cannot continue.")
 
         # Parse bioinfo configuration
         self.bioinfo_json_file = os.path.join(
@@ -162,7 +173,17 @@ class BioinfoMetadata(BaseModule):
         )
 
         if self.software_name in available_software:
-            self.software_config = bioinfo_config.get_configuration(self.software_name)
+            config = bioinfo_config.get_configuration(self.software_name)
+            if config is None:
+                errtxt = f"No configuration found for '{self.software_name}' in {self.bioinfo_json_file}."
+                self.update_all_logs(
+                    self.__init__.__name__,
+                    "error",
+                    errtxt,
+                )
+                self.log_report.print_log_report(self.__init__.__name__, ["error"])
+                raise ValueError(errtxt)
+            self.software_config: dict[str, Any] = config
         else:
             errtxt = f"No configuration available for '{self.software_name}'. Currently, the only available software options are:: {', '.join(available_software)}"
             self.update_all_logs(
@@ -399,11 +420,14 @@ class BioinfoMetadata(BaseModule):
         with open(samplesid_path, "r") as file:
             samplesid_list = [line.strip() for line in file.readlines()]
 
-        # Get sample names from JSON input. 
+        # Get sample names from JSON input.
         # if unique_sample_id is not present, it will use only sequencing_sample_id.
         json_samples = [
-            f"{sample['sequencing_sample_id']}_{sample['unique_sample_id']}"
-            if sample.get("unique_sample_id") else sample["sequencing_sample_id"]
+            (
+                f"{sample['sequencing_sample_id']}_{sample['unique_sample_id']}"
+                if sample.get("unique_sample_id")
+                else sample["sequencing_sample_id"]
+            )
             for sample in self.j_data
         ]
         matching_samples = set(json_samples).intersection(samplesid_list)
@@ -478,6 +502,7 @@ class BioinfoMetadata(BaseModule):
         """
         method_name = f"{self.add_bioinfo_results_metadata.__name__}"
         extra_json_data = []
+        j_data_mapped = j_data  # Ensure j_data_mapped is always defined
         for key in self.software_config.keys():
             # Reset map_data flag so it only activates when table expects mapping
             map_data_flag = False
@@ -485,7 +510,7 @@ class BioinfoMetadata(BaseModule):
             self.current_config_key = key
             map_method_name = f"{method_name}:{self.software_name}.{key}"
             # This skip files that will be parsed with other methods
-            if key == "workflow_summary" or key == "fixed_values":
+            if key in ("workflow_summary", "fixed_values"):
                 continue
             try:
                 files_dict[key]
@@ -514,6 +539,7 @@ class BioinfoMetadata(BaseModule):
                 "extra_dict"
             ):
                 extra_json_data.append(data)
+                data_to_map = None
                 map_data_flag = False
             else:
                 data_to_map = data
@@ -529,6 +555,7 @@ class BioinfoMetadata(BaseModule):
                 )
                 self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
+
             if data_to_map and map_data_flag:
                 j_data_mapped = self.mapping_over_table(
                     j_data=j_data,
@@ -543,6 +570,7 @@ class BioinfoMetadata(BaseModule):
                     f"No metadata found to perform standard mapping when processing '{self.software_name}.{key}'",
                 )
                 continue
+
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data_mapped, extra_json_data
 
@@ -671,7 +699,7 @@ class BioinfoMetadata(BaseModule):
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
-    def replace_na_value_if_needed(self, field: str, raw_val: str | None) -> str:
+    def replace_na_value_if_needed(self, field: str, raw_val: str | None) -> str | None:
         """
         Replace 'NA', None or NaN with 'Not Provided [SNOMED:434941000124101]'
         if the field is not required in the schema.
@@ -767,14 +795,17 @@ class BioinfoMetadata(BaseModule):
                     row[path_key] = ", ".join(analysis_results_paths)
                 else:
                     path_key = key
+
                 if self.software_config[key].get("extract"):
                     self.extract_file(
                         file=file_path,
-                        dest_folder=row.get("sequence_file_path_R1"),
+                        dest_folder=row.get("sequence_file_path_R1", ""),
                         sample_name=sample_name,
                         path_key=path_key,
                     )
+
         self.log_report.print_log_report(method_name, ["warning"])
+
         if sample_name_error == 0:
             self.update_all_logs(method_name, "valid", "File paths added successfully.")
         self.log_report.print_log_report(method_name, ["valid", "warning"])
@@ -828,14 +859,14 @@ class BioinfoMetadata(BaseModule):
 
     def extract_file(
         self,
-        file: str,
+        file: list[str],
         dest_folder: str,
         sample_name: str | None = None,
         path_key: str | None = None,
     ) -> bool:
         """Copy input file to the given destination, include sample name and key in log
         Args:
-            file (str): Path the file that is going to be copied
+            file (list[str]): Paths of the files that are going to be copied
             dest_folder (str): Folder with files from batch of samples
             sample_name (str, optional): Name of the sample in metadata. Defaults to None.
             path_key (str, optional): Metadata field for the file. Defaults to None.
@@ -913,7 +944,8 @@ class BioinfoMetadata(BaseModule):
 
             os.makedirs(os.path.join(output_dir, "analysis_results"), exist_ok=True)
             output_path = os.path.join(output_dir, "analysis_results", new_filename)
-            file_df.to_csv(output_path, index=False, sep=extdict.get(file_extension))
+            sep = extdict.get(file_extension, ",")
+            file_df.to_csv(output_path, index=False, sep=sep)
             return
 
         method_name = self.split_tables_by_batch.__name__
@@ -1043,14 +1075,14 @@ class BioinfoMetadata(BaseModule):
         return data
 
     def split_extra_json_data(
-        self, extra_data: list[dict], batch_data: list[dict]
+        self, extra_data: dict, batch_data: list[dict]
     ) -> tuple[list[dict], str]:
         """
         Split extra json data based on the sample names in the batch_data.
 
         Args:
         extra_data
-            list[dict]: List of dictionaries containing extra metadata that needs to be filtered based on the samples in
+            dict: List of dictionaries containing extra metadata that needs to be filtered based on the samples in
         batch_data
             list[dict]: List of dictionaries containing metadata for the current batch of samples.
 

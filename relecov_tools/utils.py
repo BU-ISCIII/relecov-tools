@@ -631,7 +631,7 @@ def get_schema_url():
     package_name = get_package_name()
     branch_name = get_git_branch()
     base_url = "https://github.com/BU-ISCIII"
-    schema_path = f"{package_name}/blob/{branch_name}/{package_name.replace('-','_')}/schema/relecov_schema.json"
+    schema_path = f"{package_name}/blob/{branch_name}/{package_name.replace('-', '_')}/schema/relecov_schema.json"
 
     return f"{base_url}/{schema_path}"
 

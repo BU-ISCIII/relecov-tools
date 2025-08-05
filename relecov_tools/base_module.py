@@ -21,7 +21,7 @@ class BaseModule:
     _current_version = None
     _cli_command = None
 
-    def __init__(self, output_dir: str = None, called_module: str = None):
+    def __init__(self, output_dir: str | None = None, called_module: str | None = None):
         """Set logs output path based on the module being executed
 
         Args:
