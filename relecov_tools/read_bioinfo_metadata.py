@@ -172,7 +172,21 @@ class BioinfoMetadata(BaseModule):
             self.log_report.print_log_report(self.__init__.__name__, ["error"])
             raise ValueError(errtxt)
 
-    def update_all_logs(self, method_name, status, message):
+    def update_all_logs(self, method_name: str, status: str, message: str) -> dict:
+        """
+        Updates the log report with the given method name, status, and message.
+
+        Args:
+        method_name (str)
+            The name of the method being logged.
+        status (str)
+            The status of the log message, can be one of 'valid', 'error', or 'warning'.
+        message (str)
+            The message to be logged.
+
+        Returns:
+            report (dict): The updated log report.
+        """
         report = self.log_report.update_log_report(method_name, status, message)
         if status == "error":
             self.logsum.add_error(key=method_name, entry=message)
@@ -180,22 +194,29 @@ class BioinfoMetadata(BaseModule):
             self.logsum.add_warning(key=method_name, entry=message)
         return report
 
-    def scann_directory(self):
+    def scann_directory(self) -> dict:
         """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json.
 
         Returns:
-            files_found: A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
+            files_found (dict): A dictionary containing file paths found based on the definitions provided
+            in the bioinformatic JSON file within the software scope (self.software_config).
         """
+        # set method name, total_files, files_found and all_scanned_things
         method_name = f"{self.scann_directory.__name__}"
         total_files = 0
         files_found = {}
         all_scanned_things = []
+
+        # Walk through the input folder and collect all files
         for root, dirs, files in os.walk(self.input_folder, topdown=True):
             # Skipping nextflow's work junk directory
             dirs[:] = [d for d in dirs if "work" not in root.split("/")]
             total_files = total_files + len(files)
             all_scanned_things.append((root, files))
+
+        # For each topic in the software configuration, search for matching files
         for topic_key, topic_scope in self.software_config.items():
+            # skip topics with no file name pattern
             if "fn" not in topic_scope:  # try/except fn
                 self.update_all_logs(
                     method_name,
@@ -203,6 +224,7 @@ class BioinfoMetadata(BaseModule):
                     f"No 'fn' (file pattern) found in '{self.software_name}.{topic_key}'.",
                 )
                 continue
+            # check all_scanned_things for files matching the pattern
             for tup in all_scanned_things:
                 matching_files = [
                     os.path.join(tup[0], file_name)
@@ -213,6 +235,8 @@ class BioinfoMetadata(BaseModule):
                     if topic_key not in files_found:
                         files_found[topic_key] = []
                     files_found[topic_key].extend(matching_files)
+
+        # check if any files were found matching the patterns
         if len(files_found) < 1:
             errtxt = f"No files found in '{self.input_folder}' according to '{os.path.basename(self.bioinfo_json_file)}' file name patterns."
             self.update_all_logs(
@@ -231,7 +255,9 @@ class BioinfoMetadata(BaseModule):
             self.log_report.print_log_report(method_name, ["valid", "warning"])
             return files_found
 
-    def mapping_over_table(self, j_data, map_data, mapping_fields, table_name):
+    def mapping_over_table(
+        self, j_data: list[dict], map_data: dict, mapping_fields: dict, table_name: str
+    ) -> list[dict]:
         """Maps bioinformatics metadata from map_data to j_data based on the mapping_fields.
         Args:
             j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
@@ -246,11 +272,13 @@ class BioinfoMetadata(BaseModule):
         field_errors = {}
         field_valid = {}
 
+        # get sample ids from j_data
         sample_ids = {
             row.get("sequencing_sample_id")
             for row in j_data
             if row.get("sequencing_sample_id")
         }
+        # check if map_data contains sample ids
         matched_samples = sample_ids & set(map_data.keys())
 
         if not matched_samples:
@@ -268,14 +296,18 @@ class BioinfoMetadata(BaseModule):
                     f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
                 )
                 continue
+
+            # Get sample name from row
             sample_name = row["sequencing_sample_id"]
+            # Check if sample_name is in map_data
             if sample_name in map_data.keys():
+                # for each field in mapping_fields, try to map the data
                 for field, value in mapping_fields.items():
                     try:
                         raw_val = map_data[sample_name][value]
                         raw_val = self.replace_na_value_if_needed(field, raw_val)
                         expected_type = (
-                            self.bioinfo_schema["properties"]
+                            self.json_schema["properties"]
                             .get(field, {})
                             .get("type", "string")
                         )
@@ -298,7 +330,7 @@ class BioinfoMetadata(BaseModule):
                         try:
                             raw_val = map_data[software_key][field]
                             expected_type = (
-                                self.bioinfo_schema["properties"]
+                                self.json_schema["properties"]
                                 .get(json_field, {})
                                 .get("type", "string")
                             )
@@ -316,6 +348,7 @@ class BioinfoMetadata(BaseModule):
                 errors.append(sample_name)
                 for field in mapping_fields.keys():
                     row[field] = "Not Provided [SNOMED:434941000124101]"
+
         # work around when map_data comes from several per-sample tables/files instead of single table
         if len(table_name) > 2:
             table_name = os.path.dirname(table_name[0])
@@ -335,6 +368,7 @@ class BioinfoMetadata(BaseModule):
                 "valid",
                 f"All samples were successfully found in {table_name}.",
             )
+
         # Parse missing fields errors
         # TODO: this stdout can be improved
         if len(field_errors) > 0:
@@ -353,7 +387,7 @@ class BioinfoMetadata(BaseModule):
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
-    def validate_samplenames(self):
+    def validate_samplenames(self) -> None:
         """Validate that the sequencing_sample_id from the JSON input is present in the samples_id.txt.
 
         Raises:
@@ -376,7 +410,7 @@ class BioinfoMetadata(BaseModule):
                 f"Found {len(matching_samples)}/{len(json_samples)} matching samples in the samplesheet."
             )
 
-    def validate_software_mandatory_files(self, files_dict):
+    def validate_software_mandatory_files(self, files_dict: dict) -> None:
         """Validates the presence of all mandatory files as defined in the software configuration JSON.
 
         Args:
@@ -412,8 +446,12 @@ class BioinfoMetadata(BaseModule):
         return
 
     def add_bioinfo_results_metadata(
-        self, files_dict, file_tag, j_data, output_dir=None
-    ):
+        self,
+        files_dict: dict,
+        file_tag: str,
+        j_data: list[dict],
+        output_dir: str | None = None,
+    ) -> tuple[list[dict], list[dict]]:
         """Adds metadata from bioinformatics results to j_data.
         It first calls file_handlers and then maps the handled
         data into j_data.
@@ -498,7 +536,7 @@ class BioinfoMetadata(BaseModule):
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data_mapped, extra_json_data
 
-    def handling_tables(self, file_list, conf_tab_name):
+    def handling_tables(self, file_list: list, conf_tab_name: str) -> dict:
         """Reads a tabular file in different formats and returns a dictionary containing
         the corresponding data for each sample.
 
@@ -552,7 +590,13 @@ class BioinfoMetadata(BaseModule):
             )
             raise ValueError(self.log_report.print_log_report(method_name, ["error"]))
 
-    def process_metadata(self, file_list, file_tag, func_name, out_path):
+    def process_metadata(
+        self,
+        file_list: list,
+        file_tag: str,
+        func_name: str,
+        out_path: str | None = None,
+    ) -> dict:
         """This method dynamically loads and executes the functions especified in config file.
         It is used to apply standard or custom metadata processing depending on the current
         software context (`self.software_name`).
@@ -591,7 +635,7 @@ class BioinfoMetadata(BaseModule):
             raise ValueError(f"Error occurred while parsing '{func_name}': {e}.")
         return data
 
-    def add_fixed_values(self, j_data, out_filename):
+    def add_fixed_values(self, j_data: list[dict], out_filename: str) -> list[dict]:
         """Add fixed values to j_data as defined in the bioinformatics configuration (definition: "fixed values")
 
         Args:
@@ -617,12 +661,18 @@ class BioinfoMetadata(BaseModule):
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
-    def replace_na_value_if_needed(self, field, raw_val):
+    def replace_na_value_if_needed(self, field: str, raw_val: str | None) -> str:
         """
         Replace 'NA', None or NaN with 'Not Provided [SNOMED:434941000124101]'
         if the field is not required in the schema.
+
+        Args:
+            field (str): The field name to check.
+            raw_val (str | None): The value to check and potentially replace.
+        Returns:
+            str: The original value if it is not 'NA', None or NaN, otherwise Not Provided.
         """
-        required_fields = self.bioinfo_schema.get("required", [])
+        required_fields = self.json_schema.get("required", [])
         is_na = (
             raw_val is None
             or (isinstance(raw_val, str) and raw_val.strip().upper() in ["NA", "NONE"])
@@ -632,7 +682,9 @@ class BioinfoMetadata(BaseModule):
             return "Not Provided [SNOMED:434941000124101]"
         return raw_val
 
-    def add_bioinfo_files_path(self, files_found_dict, j_data):
+    def add_bioinfo_files_path(
+        self, files_found_dict: dict, j_data: list[dict]
+    ) -> list[dict]:
         """Adds file paths essential for handling and mapping bioinformatics metadata to the j_data.
         For each sample in j_data, the function assigns the corresponding file path based on the identified files in files_found_dict.
 
@@ -718,7 +770,7 @@ class BioinfoMetadata(BaseModule):
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
-    def collect_info_from_lab_json(self):
+    def collect_info_from_lab_json(self) -> list[dict]:
         """Reads lab metadata from a JSON file and creates a list of dictionaries.
         Reads lab metadata from the specified JSON file and converts it into a list of dictionaries.
         This list is used to add the rest of the fields.
@@ -744,8 +796,11 @@ class BioinfoMetadata(BaseModule):
             raise ValueError(errtxt)
         return json_lab_data
 
-    def get_sample_idx_colpos(self, config_key):
+    def get_sample_idx_colpos(self, config_key: str) -> int:
         """Extract which column contain sample names for that specific file from config
+
+        Args:
+            config_key (str): Key of the configuration item in the software configuration JSON.
 
         Returns:
             sample_idx_possition: column number which contains sample names
@@ -761,7 +816,13 @@ class BioinfoMetadata(BaseModule):
             )
         return sample_idx_colpos
 
-    def extract_file(self, file, dest_folder, sample_name=None, path_key=None):
+    def extract_file(
+        self,
+        file: str,
+        dest_folder: str,
+        sample_name: str | None = None,
+        path_key: str | None = None,
+    ) -> bool:
         """Copy input file to the given destination, include sample name and key in log
         Args:
             file (str): Path the file that is going to be copied
@@ -796,7 +857,7 @@ class BioinfoMetadata(BaseModule):
                 continue
         return True
 
-    def split_data_by_batch(self, j_data):
+    def split_data_by_batch(self, j_data: list[dict]) -> dict:
         """Split metadata from json for each batch of samples found according to folder location of the samples.
         Args:
             j_data (list(dict)): List of dictionaries, one per sample, including metadata for that sample
@@ -814,7 +875,13 @@ class BioinfoMetadata(BaseModule):
             ]
         return data_by_batch
 
-    def split_tables_by_batch(self, files_found_dict, file_tag, batch_data, output_dir):
+    def split_tables_by_batch(
+        self,
+        files_found_dict: dict,
+        file_tag: str,
+        batch_data: list[dict],
+        output_dir: str,
+    ) -> None:
         """Filter table content to output a new table containing only the samples present in given metadata
         Args:
             files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
@@ -871,7 +938,7 @@ class BioinfoMetadata(BaseModule):
         self.log_report.print_log_report(method_name, ["valid", "warning", "error"])
         return
 
-    def merge_metadata(self, batch_filepath, batch_data):
+    def merge_metadata(self, batch_filepath: str, batch_data: list[dict]) -> list[dict]:
         """
         Merge metadata json if sample does not exist in the metadata file,
         or prompt the user to update if --update flag is provided and sample differs.
@@ -932,24 +999,28 @@ class BioinfoMetadata(BaseModule):
         relecov_tools.utils.write_json_to_file(merged_metadata, batch_filepath)
         return merged_metadata
 
-    def get_multiple_sample_files(self):
+    def get_multiple_sample_files(self) -> list[str]:
+        """
+        Get a list of software configuration keys that have multiple samples.
+
+        Returns:
+            multiple_sample_files (list[str]): A list of keys from the software configuration
+        """
         multiple_sample_files = []
         for key in self.software_config.keys():
             if self.software_config[key].get("multiple_samples"):
                 multiple_sample_files.append(key)
         return multiple_sample_files
 
-    def filter_properties(self, data):
+    def filter_properties(self, data: list[dict]) -> list[dict]:
         """
         Remove properties from bioinfo_metadata that are not in the schema properties.
 
-        Parameters
-        ----------
+        Args:
         data : list[dict]
             Dictionary with the bioinfo metadata
 
-        Returns
-        -------
+        Returns:
         data: list[dict]
             Bioinfo metadata json filtered
         """
@@ -961,7 +1032,24 @@ class BioinfoMetadata(BaseModule):
                     sample.pop(k)
         return data
 
-    def split_extra_json_data(self, extra_data, batch_data):
+    def split_extra_json_data(
+        self, extra_data: list[dict], batch_data: list[dict]
+    ) -> tuple[list[dict], str]:
+        """
+        Split extra json data based on the sample names in the batch_data.
+
+        Args:
+        extra_data
+            list[dict]: List of dictionaries containing extra metadata that needs to be filtered based on the samples in
+        batch_data
+            list[dict]: List of dictionaries containing metadata for the current batch of samples.
+
+        Returns:
+        filtered_batch_data: list[dict]
+            List of dictionaries containing extra metadata filtered based on the samples in batch_data.
+        filename: str
+            The file name of the first item in filtered_batch_data.
+        """
         sample_names_in_batch = {
             sample_data["sequencing_sample_id"] for sample_data in batch_data
         }
@@ -975,7 +1063,7 @@ class BioinfoMetadata(BaseModule):
 
         return filtered_batch_data, filename
 
-    def create_bioinfo_file(self):
+    def create_bioinfo_file(self) -> bool:
         """Create the bioinfodata json with collecting information from lab
         metadata json, mapping_stats, and more information from the files
         inside input directory.
