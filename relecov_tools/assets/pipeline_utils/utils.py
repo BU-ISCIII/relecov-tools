@@ -13,7 +13,7 @@ from pathlib import Path
 
 import rich
 import yaml
-from Bio import SeqIO
+from Bio import SeqIO  # type: ignore
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
@@ -37,7 +37,12 @@ class LongTableParse:
         - calling first to parse_a_list_of_dictionaries() and then calling to saving_file()
     """
 
-    def __init__(self, file_path=None, pipeline_name=None, output_folder=None):
+    def __init__(
+        self,
+        file_path: str | None = None,
+        pipeline_name: str | None = None,
+        output_folder: str | None = None,
+    ):
         if file_path is None:
             self.file_path = relecov_tools.utils.prompt_path(
                 msg="Select the csv file which contains variant long table information"
@@ -50,14 +55,18 @@ class LongTableParse:
             stderr.print(
                 f"[red] Variant long table file {self.file_path} does not exist"
             )
-            sys.exit(1)
+            raise FileNotFoundError(
+                f"Variant long table file {self.file_path} does not exist"
+            )
 
         if not self.file_path.endswith(".csv"):
             log.error("Variant long table file %s is not a csv file ", self.file_path)
             stderr.print(
                 f"[red] Variant long table file {self.file_path} must be a csv file"
             )
-            sys.exit(1)
+            raise ValueError(
+                f"Variant long table file {self.file_path} must be a csv file"
+            )
 
         if output_folder is None:
             use_default = relecov_tools.utils.prompt_yn_question("Use default path?: ")
@@ -74,11 +83,30 @@ class LongTableParse:
         json_file = os.path.join(
             os.path.dirname(__file__), "..", "..", "conf", "bioinfo_config.json"
         )
-        config_json = ConfigJson(json_file)
-        self.software_config = config_json.get_configuration(pipeline_name)
-        self.long_table_heading = self.software_config["variants_long_table"]["content"]
 
-    def validate_file(self, heading):
+        if not pipeline_name:
+            pipeline_name = relecov_tools.utils.prompt_text(
+                msg="Enter the pipeline name for long table parsing"
+            )
+
+        config_json = ConfigJson(json_file)
+        if pipeline_name:
+            self.software_config = config_json.get_configuration(pipeline_name)
+        else:
+            log.error("Pipeline name is required for long table parsing")
+            stderr.print("[red]Pipeline name is required for long table parsing")
+            raise ValueError("Pipeline name is required for long table parsing")
+
+        if self.software_config:
+            self.long_table_heading = self.software_config["variants_long_table"][
+                "content"
+            ]
+        else:
+            log.error("No configuration found for pipeline %s", pipeline_name)
+            stderr.print(f"[red]No configuration found for pipeline {pipeline_name}")
+            raise ValueError(f"No configuration found for pipeline {pipeline_name}")
+
+    def validate_file(self, heading: list[str]) -> bool:
         """Check if long table file has all mandatory fields defined in
         configuration file
         """
@@ -97,11 +125,11 @@ class LongTableParse:
         with open(self.file_path, encoding="utf-8-sig") as fh:
             lines = fh.readlines()
 
-        heading_index = {}
         headings_from_csv = lines[0].strip().split(",")
-        for heading in self.long_table_heading.values():
-            heading_index[heading] = headings_from_csv.index(heading)
-
+        heading_index = {
+            heading: headings_from_csv.index(heading)
+            for heading in self.long_table_heading.values()
+        }
         stderr.print("[green]\tSuccessful checking heading fields")
         log.info("Successful checking heading fields")
 
@@ -141,7 +169,7 @@ class LongTableParse:
         j_list = []
         # Grab date from filename
         result_regex = re.search(
-            "variants_long_table(?:_\d{14})?\.csv", os.path.basename(self.file_path)
+            r"variants_long_table(?:_\d{14})?\.csv", os.path.basename(self.file_path)
         )
         if result_regex is None:
             stderr.print(
@@ -153,28 +181,37 @@ class LongTableParse:
             sys.exit(1)
         else:
             analysis_date = relecov_tools.utils.get_file_date(self.file_path)
-            if len(analysis_date) == 8:
-                analysis_date = datetime.strptime(analysis_date, "%Y%m%d").strftime(
-                    "%Y-%m-%d"
-                )
+            if analysis_date:
+                if len(analysis_date) == 8:
+                    analysis_date = datetime.strptime(analysis_date, "%Y%m%d").strftime(
+                        "%Y-%m-%d"
+                    )
+                else:
+                    log.error(
+                        "Analysis date could not be parsed from file name %s",
+                        self.file_path
+                    )
+
         for key, values in samp_dict.items():
-            j_dict = {"sample_name": key, "bioinformatics_analysis_date": analysis_date}
-            j_dict["file_name"] = "long_table"
-            j_dict["variants"] = values
+            j_dict = {
+                "sample_name": key,
+                "bioinformatics_analysis_date": analysis_date,
+                "file_name": "long_table",
+                "variants": values,
+            }
             j_list.append(j_dict)
         return j_list
 
     def save_to_file(self, j_list, file_tag):
         """Transform the parsed data into a json file"""
-        file_name = "long_table_" + file_tag + ".json"
+        file_name = f"long_table_{file_tag}.json"
         file_path = os.path.join(self.output_folder, file_name)
         if os.path.exists(file_path):
             stderr.print(
                 f"[blue]Long table {file_path} file already exists. Merging new data if possible."
             )
             log.info(
-                "Long table %s file already exists. Merging new data if possible."
-                % file_path
+                f"Long table {file_path} file already exists. Merging new data if possible."
             )
             original_table = relecov_tools.utils.read_json_file(file_path)
             samples_indict = {item["sample_name"]: item for item in original_table}
@@ -186,8 +223,7 @@ class LongTableParse:
                             f"[red]Same sample {sample_name} has different data in both long tables."
                         )
                         log.error(
-                            "Sample %s has different data in %s and new long table. Can't merge."
-                            % (sample_name, file_path)
+                            f"Sample {sample_name} has different data in {file_path} and new long table. Can't merge."
                         )
                         return None
                 else:
@@ -220,14 +256,18 @@ class LongTableParse:
         """
         # Parsing longtable file
         parsed_data = self.parse_file()
-        j_list = self.convert_to_json(parsed_data)
-        return j_list
+        return self.convert_to_json(parsed_data)
 
 
 # END of Class
 
 
-def parse_long_table(files_list: list, file_tag: str, pipeline_name: str, output_folder: str | None = None) -> None:
+def parse_long_table(
+    files_list: list,
+    file_tag: str,
+    pipeline_name: str,
+    output_folder: str | None = None,
+) -> None | list[dict]:
     """File handler to retrieve data from long table files and convert it into a JSON structured format.
     This function utilizes the LongTableParse class to parse the long table data.
     Since this utility handles and maps data using a custom way, it returns None to be avoid being  transferred to method read_bioinfo_metadata.BioinfoMetadata.mapping_over_table().
@@ -274,10 +314,12 @@ def parse_long_table(files_list: list, file_tag: str, pipeline_name: str, output
             "warning",
             f"Found {len(files_list)} variants_long_table files. This version is unable to process more than one variants long table each time.",
         )
+        return None
     else:
         method_log_report.update_log_report(
             method_name, "error", "No valid variants_long_table file found."
         )
+        return None
 
 
 def extract_consensus_stats(files_list: list) -> dict:
@@ -378,7 +420,11 @@ def get_software_versions_yml(files_list: list) -> dict:
 
 
 def evaluate_qc_samples(
-    data: list[dict], thresholds: dict, conditions: dict, invert_operator: Callable, is_not_evaluable: Callable
+    data: list[dict],
+    thresholds: dict,
+    conditions: dict,
+    invert_operator: Callable,
+    is_not_evaluable: Callable,
 ) -> tuple[list[dict], list[str]]:
     """
     Perform QC evaluation on a list of sample data dictionaries using provided threshold logic.
