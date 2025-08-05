@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 import logging
+
 import rich
 
+import relecov_tools.assets.pipeline_utils.utils
 import relecov_tools.utils
 from relecov_tools.read_bioinfo_metadata import BioinfoReportLog
 
@@ -39,10 +41,10 @@ def handle_pangolin_data(files_list: list) -> dict:
                 )
                 pango_data_key = next(iter(pango_data))
                 pango_data_updated = {
-                    key.split()[0]: value for key, value in pango_data.items()
+                    str(key).split()[0]: value for key, value in pango_data.items()
                 }
                 pango_data_processed.update(pango_data_updated)
-                valid_samples.append(pango_data_key.split()[0])
+                valid_samples.append(str(pango_data_key).split()[0])
             except (FileNotFoundError, IndexError) as e:
                 method_log_report.update_log_report(
                     method_name,
@@ -54,7 +56,7 @@ def handle_pangolin_data(files_list: list) -> dict:
         method_log_report.update_log_report(
             method_name, "warning", f"Error occurred while processing files: {e}"
         )
-    if len(valid_samples) > 0:
+    if valid_samples:
         method_log_report.update_log_report(
             method_name,
             "valid",
@@ -127,6 +129,6 @@ def quality_control_evaluation(data: list[dict]) -> list[dict]:
     )
 
     for warn in warnings:
-        log_report.update_log_report(method_name, warn)
+        log_report.update_log_report(method_name, "warning", warn)
 
     return data
