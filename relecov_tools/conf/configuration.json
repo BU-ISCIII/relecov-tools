@@ -416,14 +416,14 @@
                 "token": ""
             },
             "relecov": {
-            "server_url": "http://relecov-platform.isciiides.es",
-            "api_url": "/api/",
-            "store_samples": "createSampleData",
-            "bioinfodata": "createBioinfoData",
-            "variantdata": "createVariantData",
-            "check_sample": "checkSampleExists",
-            "sftp_info": "sftpInfo",
-            "token": ""
+                "server_url": "http://relecov-platform.isciiides.es",
+                "api_url": "/api/",
+                "store_samples": "createSampleData",
+                "bioinfodata": "createBioinfoData",
+                "variantdata": "createVariantData",
+                "check_sample": "checkSampleExists",
+                "sftp_info": "sftpInfo",
+                "token": ""
             }
         },
         "iskylims_fixed_values": {
