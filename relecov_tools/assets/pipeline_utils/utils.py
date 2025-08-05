@@ -189,7 +189,7 @@ class LongTableParse:
                 else:
                     log.error(
                         "Analysis date could not be parsed from file name %s",
-                        self.file_path
+                        self.file_path,
                     )
 
         for key, values in samp_dict.items():
