@@ -308,8 +308,13 @@ class PipelineManager(BaseModule):
 
             ext = ext_found.group(1)
 
-            # Create sample filename with unique_sample_id and sequencing_sample_id
-            seq_r1_sample_id = seq_sample_id + "_" + unique_sample_id + "_R1." + ext
+            if not self.skip_db_upload:
+                # Create sample filename with unique_sample_id and sequencing_sample_id
+                seq_r1_sample_id = seq_sample_id + "_" + unique_sample_id + "_R1." + ext
+            else:
+                # If skip_db_upload is True, we don't have unique_sample_id
+                seq_r1_sample_id = seq_sample_id + "_R1." + ext
+
             # copy r1 sequencing file into the output folder self.analysis_folder
             sample_raw_r1 = os.path.join(
                 output_dir, self.copied_sample_folder, seq_r1_sample_id
@@ -332,7 +337,15 @@ class PipelineManager(BaseModule):
 
             # check if there is a r2 file
             if "sequence_file_path_R2" in sample:
-                seq_r2_sample_id = seq_sample_id + "_" + unique_sample_id + "_R2." + ext
+                if not self.skip_db_upload:
+                    # Create sample filename with unique_sample_id and sequencing_sample_id
+                    seq_r2_sample_id = (
+                        seq_sample_id + "_" + unique_sample_id + "_R2." + ext
+                    )
+                else:
+                    # If skip_db_upload is True, we don't have unique_sample_id
+                    seq_r2_sample_id = seq_sample_id + "_R2." + ext
+
                 sample_raw_r2 = os.path.join(
                     output_dir,
                     self.copied_sample_folder,
@@ -541,8 +554,13 @@ class PipelineManager(BaseModule):
 
             # Check for possible duplicates
             self.log.info("Samples to copy %s", len(samples_data))
-            # Extract the unique_sample_id - sequencing_sample_id from the list of dictionaries
-            sample_ids = [f"{item['sequencing_sample_id']}_{item['unique_sample_id']}" for item in samples_data]
+            if not self.skip_db_upload:
+                # Extract the unique_sample_id - sequencing_sample_id from the list of dictionaries
+                sample_ids = [f"{item['sequencing_sample_id']}_{item['unique_sample_id']}" for item in samples_data]
+            else:
+                # If skip_db_upload is True, we don't have unique_sample_id
+                sample_ids = [item["sequencing_sample_id"] for item in samples_data]
+
             # Use Counter to count the occurrences of each sequencing_sample_id
             id_counts = Counter(sample_ids)
             # Find the sequencing_sample_id values that are duplicated (count > 1)
@@ -555,7 +573,7 @@ class PipelineManager(BaseModule):
                     "Duplicate samples in group %s: %s" % (group_tag, duplicates)
                 )
                 stderr.print(
-                    f"[orange] There are duplicated samples in group {group_tag}: {duplicates}. Just information as this should never happen, we use unique_sample_id to avoid this."
+                    f"[orange] There are duplicated samples in group {group_tag}: {duplicates}. This should never happen if skip_db_upload is False."
                 )
                 continue
 
