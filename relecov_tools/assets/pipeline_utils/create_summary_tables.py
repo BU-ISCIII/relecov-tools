@@ -53,8 +53,6 @@ def process_json_files(
     os.makedirs(output_dir, exist_ok=True)
 
     excel_file = os.path.join(output_dir, "epidemiological_data.xlsx")
-    variant_csv = os.path.join(output_dir, "variant_data.csv")
-    consensus_dir = os.path.join(output_dir, "consensus_files")
 
     bioinfo_files = []
     if metadata_list:
