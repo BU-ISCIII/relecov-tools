@@ -322,7 +322,7 @@ def parse_long_table(
         return None
 
 
-def extract_consensus_stats(files_list: list) -> dict:
+def extract_consensus_stats(files_list: list, **kwargs) -> dict:
     """File handler to parse consensus data (fasta) into JSON structured format.
 
     Args:
@@ -368,7 +368,7 @@ def extract_consensus_stats(files_list: list) -> dict:
     return consensus_data_processed
 
 
-def get_software_versions_yml(files_list: list) -> dict:
+def get_software_versions_yml(files_list: list, **kwargs) -> dict:
     """File handler to parse software versions from yaml.
 
     Args:

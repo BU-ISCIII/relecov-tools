@@ -216,7 +216,9 @@ class BioinfoMetadata(BaseModule):
             self.logsum.add_warning(key=method_name, entry=message)
         return report
 
-    def scann_directory(self) -> dict:  # sourcery skip: class-extract-method, use-named-expression
+    def scann_directory(
+        self,
+    ) -> dict:
         """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json.
 
         Returns:
@@ -316,7 +318,13 @@ class BioinfoMetadata(BaseModule):
                 continue
 
             # Get sample name from row
+            # If unique_sample_id is present, it will use both sequencing_sample_id and unique_sample_id to create a unique sample name.
+            # else only sequencing_sample_id will be used.
+            if "unique_sample_id" in row:
+                sample_name = f"{row['sequencing_sample_id']}_{row['unique_sample_id']}"
+            else:
             sample_name = row["sequencing_sample_id"]
+
             # Check if sample_name is in map_data
             if sample_name in map_data:
                 # for each field in mapping_fields, try to map the data
@@ -495,13 +503,16 @@ class BioinfoMetadata(BaseModule):
             j_data_mapped: A list of dictionaries with bioinformatics metadata mapped into j_data.
             extra_json_data: List of dictionaries with data that hasn't to be mapped in order to be processed afterwards.
         """
+        # set method name and initialize extra_json_data
         method_name = f"{self.add_bioinfo_results_metadata.__name__}"
         extra_json_data = []
         j_data_mapped = j_data  # Ensure j_data_mapped is always defined
-        for key in self.software_config.keys():
+
+        # For each key in the software configuration, process the files
+        for key in self.software_config:
             # Reset map_data flag so it only activates when table expects mapping
             map_data_flag = False
-            # Update bioinfo cofiguration key/scope
+            # Update bioinfo configuration key/scope
             self.current_config_key = key
             map_method_name = f"{method_name}:{self.software_name}.{key}"
             # This skip files that will be parsed with other methods
@@ -520,14 +531,14 @@ class BioinfoMetadata(BaseModule):
                 continue
 
             current_config = self.software_config[self.current_config_key]
-            file_name = current_config.get("fn")
-            func_name = current_config.get("function")
+            file_name = current_config.get("fn", None)
+            func_name = current_config.get("function", None)
 
             if func_name is None:
                 data = self.handling_tables(files_dict[key], file_name)
             else:
                 data = self.process_metadata(
-                    files_dict[key], file_tag, func_name, output_dir
+                    files_dict[key], file_tag=file_tag, func_name=func_name, out_path=output_dir
                 )
 
             if current_config.get("split_by_batch") and current_config.get(
@@ -581,9 +592,12 @@ class BioinfoMetadata(BaseModule):
             data (dict): A dictionary containing metadata as defined in handling_files.
         """
         method_name = f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_tables.__name__}"
+        # get file extension and sample index column position
         file_ext = os.path.splitext(conf_tab_name)[1]
         sample_idx_colpos = self.get_sample_idx_colpos(self.current_config_key)
+        # allowed file extensions and their separators
         extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
+
         mapping_fields = self.software_config[self.current_config_key].get("content")
 
         if not mapping_fields:
@@ -656,7 +670,7 @@ class BioinfoMetadata(BaseModule):
             module = importlib.import_module(utils_name)
             # Get method from func_name and execute it.
             func_obj = getattr(module, func_name)
-            data = func_obj(file_list, file_tag, self.software_name, out_path)
+            data = func_obj(file_list, file_tag=file_tag, pipeline_name=self.software_name, output_folder=out_path)
 
         except Exception as e:
             self.update_all_logs(
@@ -961,7 +975,11 @@ class BioinfoMetadata(BaseModule):
                         new_filename = f"{base}_{file_tag}{ext}"
                     extract_batch_rows_to_file(file, new_filename)
                 except Exception as e:
-                    log_type = "error" if self.software_config[key].get("required") else "warning"
+                    log_type = (
+                        "error"
+                        if self.software_config[key].get("required")
+                        else "warning"
+                    )
                     self.update_all_logs(
                         method_name,
                         log_type,
@@ -1127,7 +1145,7 @@ class BioinfoMetadata(BaseModule):
         self.log.info("Validating required files")
         self.validate_software_mandatory_files(files_found_dict)
         stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
-        self.log.info("Adding bioinfo metadata to read lab metadat")
+        self.log.info("Adding bioinfo metadata to read lab metadata")
         self.j_data, extra_json_data = self.add_bioinfo_results_metadata(
             files_found_dict, file_tag, self.j_data, out_path
         )
@@ -1201,8 +1219,8 @@ class BioinfoMetadata(BaseModule):
                 return False
 
         else:
-            stderr.print("[green]Bioinfo json succesfully validated.")
-            self.log.info("Bioinfo json succesfully validated.")
+            stderr.print("[green]Bioinfo json successfully validated.")
+            self.log.info("Bioinfo json successfully validated.")
 
         self.j_data = valid_rows
 
