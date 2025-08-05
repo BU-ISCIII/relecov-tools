@@ -274,7 +274,7 @@ class ConfigJson:
                 additional_config = file_content
             else:
                 additional_config = {config_name: file_content}
-            summary["Included"].extend([k for k in additional_config.keys()])
+            summary["Included"].extend(list(additional_config.keys()))
         relecov_tools.utils.write_json_to_file(
             additional_config, ConfigJson._extra_config_path
         )
