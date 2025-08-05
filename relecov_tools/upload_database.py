@@ -297,7 +297,7 @@ class UploadDatabase(BaseModule):
             if "ERROR" in result:
                 if result["ERROR"] == "Server not available":
                     # retry to connect to server
-                    for i in range(10):
+                    for _ in range(10):
                         # wait 5 sec before resending the request
                         time.sleep(5)
                         result = self.platform_rest_api.post_request(
@@ -307,11 +307,12 @@ class UploadDatabase(BaseModule):
                         )
                         if "ERROR" not in result:
                             break
-                    if i == 9 and "ERROR" in result:
-                        logtxt = f"Unable to sent the request to {post_url}"
-                        self.logsum.add_error(entry=logtxt, sample=req_sample)
-                        stderr.print(f"[red]{logtxt}")
-                        continue
+                    else:
+                        if "ERROR" in result:
+                            logtxt = f"Unable to sent the request to {post_url}"
+                            self.logsum.add_error(entry=logtxt, sample=req_sample)
+                            stderr.print(f"[red]{logtxt}")
+                            continue
 
                 elif "is not defined" in result["ERROR"].lower():
                     error_txt = result["ERROR"]
