@@ -18,11 +18,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Implemented fingerprint generation utility to create stable sample identifiers [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Included handling for already registered samples in the upload process [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Added new parameter `skip_upload_db` in `pipeline_manager` to allow skipping DB upload for testing purposes [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Support for using `unique_sample_id` as a key identifier in `read_bioinfo_metadata`, including fallback to combined ID format [#738](https://github.com/BU-ISCIII/relecov-tools/issues/738) [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
 
 #### Fixes
 
 - Fixed potential inconsistency when no folder name is found in metadata, now raises warning and skips entry [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Fixed broken platform config references (`platform` → `platform-data`, then to `platform-params`) to reflect changes in `configuration.json` [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Improved robustness and internal consistency of `pipeline_utils` and `viralrecon.py` through annotations, docstrings, and variable cleanup [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
 
 #### Changed
 
@@ -33,6 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `upload_database` now returns API upload results for downstream consumption [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Changed exit behavior in `pipeline_manager` to raise exceptions instead of using `exit(0)` [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Updated method signatures and added type annotations and docstrings for better code clarity [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Enhanced `validate_samplenames` logic to support combined identifier format (`sequencing_sample_id_unique_sample_id`) when present [#738](https://github.com/BU-ISCIII/relecov-tools/issues/738) [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
 
 #### Removed
 
