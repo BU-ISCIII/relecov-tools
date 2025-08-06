@@ -354,7 +354,7 @@ class BioinfoMetadata(BaseModule):
 
         for row in j_data:
             # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
-            #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warings
+            #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warnings
             if not row.get("sequencing_sample_id"):
                 self.update_all_logs(
                     method_name,
@@ -428,11 +428,11 @@ class BioinfoMetadata(BaseModule):
             table_name = table_name[0]
         # Parse missing sample errors
         if errors:
-            lenerrs = len(errors)
+            len_errs = len(errors)
             self.update_all_logs(
                 method_name,
                 "warning",
-                f"{lenerrs} samples missing in '{table_name}': {', '.join(errors)}.",
+                f"{len_errs} samples missing in '{table_name}': {', '.join(errors)}.",
             )
         else:
             self.update_all_logs(
@@ -443,7 +443,7 @@ class BioinfoMetadata(BaseModule):
 
         # Parse missing fields errors
         # TODO: this stdout can be improved
-        if len(field_errors) > 0:
+        if field_errors:
             self.update_all_logs(
                 method_name,
                 "warning",
@@ -459,16 +459,16 @@ class BioinfoMetadata(BaseModule):
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
 
-    def validate_samplenames(self) -> None:
+    def validate_sample_names(self) -> None:
         """Validate that the sequencing_sample_id from the JSON input is present in the samples_id.txt.
 
         Raises:
             ValueError: If no sample from the JSON input matches the samples in the samples_id.txt.
         """
         # Check if samples_id.txt exists
-        samplesid_path = os.path.join(self.input_folder, "samples_id.txt")
-        with open(samplesid_path, "r") as file:
-            samplesid_list = [line.strip() for line in file.readlines()]
+        samples_id_path = os.path.join(self.input_folder, "samples_id.txt")
+        with open(samples_id_path, "r") as file:
+            samples_id_list = [line.strip() for line in file.readlines()]
 
         # Get sample names from JSON input.
         # if unique_sample_id is not present, it will use only sequencing_sample_id.
@@ -480,7 +480,7 @@ class BioinfoMetadata(BaseModule):
             )
             for sample in self.j_data
         ]
-        matching_samples = set(json_samples).intersection(samplesid_list)
+        matching_samples = set(json_samples).intersection(samples_id_list)
 
         if not matching_samples:
             raise ValueError(
@@ -512,18 +512,18 @@ class BioinfoMetadata(BaseModule):
                     continue
             else:
                 continue
-        if len(missing_required) >= 1:
-            errtxt = f"Missing mandatory files in {self.software_name}:{', '.join(missing_required)}"
+        if missing_required:
+            error_msg = f"Missing mandatory files in {self.software_name}:{', '.join(missing_required)}"
             self.update_all_logs(
                 method_name,
                 "error",
-                errtxt,
+                error_msg,
             )
             self.log_report.print_log_report(method_name, ["error"])
-            raise ValueError(errtxt)
+            raise ValueError(error_msg)
         else:
             self.update_all_logs(
-                method_name, "valid", "Successfull validation of mandatory files."
+                method_name, "valid", "Successful validation of mandatory files."
             )
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return
@@ -643,9 +643,9 @@ class BioinfoMetadata(BaseModule):
         method_name = f"{self.add_bioinfo_results_metadata.__name__}:{self.handling_tables.__name__}"
         # get file extension and sample index column position
         file_ext = os.path.splitext(conf_tab_name)[1]
-        sample_idx_colpos = self.get_sample_idx_colpos(self.current_config_key)
+        sample_idx_col_pos = self.get_sample_idx_col_pos(self.current_config_key)
         # allowed file extensions and their separators
-        extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
+        ext_dict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
 
         mapping_fields = self.software_config[self.current_config_key].get("content")
 
@@ -654,7 +654,7 @@ class BioinfoMetadata(BaseModule):
 
         if conf_tab_name.endswith(".gz"):
             inner_ext = os.path.splitext(conf_tab_name.strip(".gz"))[1]
-            if inner_ext in extdict:
+            if inner_ext in ext_dict:
                 self.update_all_logs(
                     method_name,
                     "warning",
@@ -662,12 +662,12 @@ class BioinfoMetadata(BaseModule):
                 )
             return {}
 
-        if file_ext in extdict:
+        if file_ext in ext_dict:
             try:
                 return relecov_tools.utils.read_csv_file_return_dict(
                     file_name=file_list[0],
-                    sep=extdict[file_ext],
-                    key_position=sample_idx_colpos,
+                    sep=ext_dict[file_ext],
+                    key_position=sample_idx_col_pos,
                 )
             except FileNotFoundError as e:
                 self.update_all_logs(
@@ -693,7 +693,7 @@ class BioinfoMetadata(BaseModule):
         func_name: str,
         out_path: str | None = None,
     ) -> dict:
-        """This method dynamically loads and executes the functions especified in config file.
+        """This method dynamically loads and executes the functions specified in config file.
         It is used to apply standard or custom metadata processing depending on the current
         software context (`self.software_name`).
 
@@ -744,7 +744,7 @@ class BioinfoMetadata(BaseModule):
             out_filename (str): File name of the bioinfo_lab_metadata json
 
         Returns:
-            j_data: updated j_data with fixxed values added in it.
+            j_data: updated j_data with fixed values added in it.
         """
         method_name = f"{self.add_fixed_values.__name__}"
         try:
@@ -837,8 +837,8 @@ class BioinfoMetadata(BaseModule):
                         ):
                             if self.software_config[key].get("split_by_batch"):
                                 base, ext = os.path.splitext(os.path.basename(paths))
-                                batchid = row["batch_id"]
-                                new_fname = f"{base}_{batchid}_{self.hex}{ext}"
+                                batch_id = row["batch_id"]
+                                new_fname = f"{base}_{batch_id}_{self.hex}{ext}"
                                 analysis_results_path = os.path.join(
                                     base_cod_path,
                                     "analysis_results",
@@ -886,37 +886,37 @@ class BioinfoMetadata(BaseModule):
                 self.readlabmeta_json_file
             )
         except ValueError as e:
-            errtxt = (
+            error_msg = (
                 f"Invalid lab-metadata json file: self.{self.readlabmeta_json_file}"
             )
             self.update_all_logs(
                 method_name,
                 "error",
-                errtxt,
+                error_msg,
             )
             self.log_report.print_log_report(method_name, ["error"])
-            raise ValueError(errtxt) from e
+            raise ValueError(error_msg) from e
         return json_lab_data
 
-    def get_sample_idx_colpos(self, config_key: str) -> int:
+    def get_sample_idx_col_pos(self, config_key: str) -> int:
         """Extract which column contain sample names for that specific file from config
 
         Args:
             config_key (str): Key of the configuration item in the software configuration JSON.
 
         Returns:
-            sample_idx_possition: column number which contains sample names
+            sample_idx_col_pos: column number which contains sample names
         """
         try:
-            sample_idx_colpos = self.software_config[config_key]["sample_col_idx"] - 1
+            sample_idx_col_pos = self.software_config[config_key]["sample_col_idx"] - 1
         except (KeyError, TypeError):
-            sample_idx_colpos = 0
+            sample_idx_col_pos = 0
             self.update_all_logs(
-                "get_sample_idx_colpos",
+                "get_sample_idx_col_pos",
                 "warning",
                 f"No valid sample-index-column defined in '{self.software_name}.{config_key}'. Using default instead.",
             )
-        return sample_idx_colpos
+        return sample_idx_col_pos
 
     def extract_file(
         self,
@@ -994,18 +994,18 @@ class BioinfoMetadata(BaseModule):
 
         def extract_batch_rows_to_file(file, new_filename):
             """Create a new table file only with rows matching samples in batch_data"""
-            extdict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
+            ext_dict = {".csv": ",", ".tsv": "\t", ".tab": "\t"}
             file_extension = os.path.splitext(file)[1]
             file_df = pd.read_csv(
-                file, sep=extdict.get(file_extension), header=header_pos
+                file, sep=ext_dict.get(file_extension), header=header_pos
             )
-            sample_col = file_df.columns[sample_colpos]
+            sample_col = file_df.columns[sample_col_pos]
             file_df[sample_col] = file_df[sample_col].astype(str)
             file_df = file_df[file_df[sample_col].isin(batch_samples)]
 
             os.makedirs(os.path.join(output_dir, "analysis_results"), exist_ok=True)
             output_path = os.path.join(output_dir, "analysis_results", new_filename)
-            sep = extdict.get(file_extension, ",")
+            sep = ext_dict.get(file_extension, ",")
             file_df.to_csv(output_path, index=False, sep=sep)
             return
 
@@ -1024,7 +1024,7 @@ class BioinfoMetadata(BaseModule):
             if not self.software_config[key].get("split_by_batch"):
                 continue
             header_pos = self.software_config[key].get("header_row_idx", 1) - 1
-            sample_colpos = self.get_sample_idx_colpos(key)
+            sample_col_pos = self.get_sample_idx_col_pos(key)
             for file in files:
                 try:
                     if self.software_config[key].get("filepath_name"):
@@ -1100,10 +1100,10 @@ class BioinfoMetadata(BaseModule):
                             prev_metadata_dict[sample_id] = item
                             stderr.print(f"[green]Sample '{sample_id}' updated (auto).")
                     else:
-                        errtxt = f"Sample '{sample_id}' has different data in {batch_filepath} and new metadata. Can't merge."
-                        stderr.print(f"[red]{errtxt}")
-                        self.log.error(errtxt)
-                        raise ValueError(errtxt)
+                        error_msg = f"Sample '{sample_id}' has different data in {batch_filepath} and new metadata. Can't merge."
+                        stderr.print(f"[red]{error_msg}")
+                        self.log.error(error_msg)
+                        raise ValueError(error_msg)
             else:
                 prev_metadata_dict[sample_id] = item
 
@@ -1207,12 +1207,12 @@ class BioinfoMetadata(BaseModule):
         batch_filepath = os.path.join(out_path, out_filename)
 
         # Check samplesheet for matching samples
-        self.validate_samplenames()
+        self.validate_sample_names()
 
         # Find and validate bioinfo files
         stderr.print("[blue]Scanning input directory...")
         self.log.info("Scanning input directory")
-        files_found_dict = self.scann_directory()
+        files_found_dict = self.scan_directory()
         stderr.print("[blue]Validating required files...")
         self.log.info("Validating required files")
         self.validate_software_mandatory_files(files_found_dict)
@@ -1256,7 +1256,7 @@ class BioinfoMetadata(BaseModule):
         valid_samples = [sample.get("sequencing_sample_id") for sample in valid_rows]
         for sample in valid_samples:
             self.logsum.feed_key(key=out_path, sample=sample)
-        if len(invalid_rows) > 0:
+        if invalid_rows:
             unique_failed_samples = list(
                 {
                     sample
@@ -1276,18 +1276,18 @@ class BioinfoMetadata(BaseModule):
                 self.log.info(error_text)
                 stderr.print(f"[red]{error_text}")
 
-                for failsamp in failed_samples:
+                for fail_samp in failed_samples:
                     self.logsum.add_error(
-                        key=out_path, sample=failsamp, entry=error_text
+                        key=out_path, sample=fail_samp, entry=error_text
                     )
 
             if not self.soft_validation:
                 self.parent_create_error_summary(
                     called_module="read-bioinfo-metadata", logs=self.logsum.logs
                 )
-                errtxt = "Metadata was not completely validate, fix the errors or run with --soft_validation"
-                self.log.warning(errtxt)
-                stderr.print(f"[red]{errtxt}")
+                error_msg = "Metadata was not completely validate, fix the errors or run with --soft_validation"
+                self.log.warning(error_msg)
+                stderr.print(f"[red]{error_msg}")
                 return False
 
         else:
