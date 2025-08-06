@@ -422,131 +422,101 @@ class BioinfoMetadata(BaseModule):
         return matching_files
 
     def mapping_over_table(
-        self, j_data: list[dict], map_data: dict, mapping_fields: dict, table_name: str
+        self,
+        j_data: list[dict],
+        map_data: dict,
+        mapping_fields: dict,
+        table_name: str,
     ) -> list[dict]:
-        """Maps bioinformatics metadata from map_data to j_data based on the mapping_fields.
-        Args:
-            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
-            map_data (dict(dict{str:str})): A dictionary containing bioinfo metadata handled by the method handling_files().
-            mapping_fields (dict{str:str}): A dictionary of mapping fields defined in the 'content' definition under each software scope (see conf/bioinfo.config).
-            table_name (str): Path to the mapping file/table.
-        Returns:
-            j_data: updated j_data with bioinformatic metadata mapped in it.
         """
+        Maps bioinformatics metadata from map_data to j_data based on the mapping_fields.
+
+        Args:
+            j_data (list[dict]): Metadata from the lab (one item per sample).
+            map_data (dict): Processed bioinformatic metadata, indexed by sample name.
+            mapping_fields (dict): Mapping from JSON fields to software fields as defined in the config.
+            table_name (str): Name or path of the mapping table.
+
+        Returns:
+            list[dict]: The updated j_data list with mapped bioinformatic fields.
+        """
+        # Set method name and initialize error lists
         method_name = f"{self.mapping_over_table.__name__}:{self.software_name}.{self.current_config_key}"
-        errors = []
-        field_errors = {}
-        field_valid = {}
+        errors: list[str] = []
+        field_errors: dict = {}
+        field_valid: dict = {}
 
-        # get sample ids from j_data
-        # If unique_sample_id is not present, it will use only sequencing_sample_id.
-        # else it will use both to create a unique sample id.
+        # Get sample ids from j_data and map_data
         sample_ids = {
-            row.get("sequencing_sample_id")
-            for row in j_data
-            if row.get("sequencing_sample_id")
+            sample_name for row in j_data if (sample_name := self._get_sample_name(row))
         }
-
-        # check if map_data contains sample ids
         matched_samples = sample_ids & set(map_data.keys())
+        # check if samples from j_data match the samples in map_data
         no_samples = not matched_samples
 
+        # iterate over j_data
         for row in j_data:
-            # TODO: We should consider an independent module that verifies that sample's name matches this pattern.
-            #       If we add warnings within this module, every time mapping_over_table is invoked it will print redundant warnings
-            if not row.get("sequencing_sample_id"):
+            # get sample name from row
+            sample_name = self._get_sample_name(row)
+
+            if not sample_name:
                 self.update_all_logs(
                     method_name,
                     "warning",
-                    f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
+                    f"Sequencing_sample_id missing in {row.get('collecting_sample_id')}... Skipping...",
                 )
                 continue
-
-            # Get sample name from row
-            # If unique_sample_id is present, it will use both sequencing_sample_id and unique_sample_id to create a unique sample name.
-            # else only sequencing_sample_id will be used.
-            if "unique_sample_id" in row:
-                sample_name = f"{row['sequencing_sample_id']}_{row['unique_sample_id']}"
-            else:
-                sample_name = row["sequencing_sample_id"]
-
-            # Check if sample_name is in map_data
+            # If sample_name is in map_data, map the fields
             if sample_name in map_data:
-                # for each field in mapping_fields, try to map the data
-                for field, value in mapping_fields.items():
-                    try:
-                        raw_val = map_data[sample_name][value]
-                        raw_val = self.replace_na_value_if_needed(field, raw_val)
-                        expected_type = (
-                            self.json_schema["properties"]
-                            .get(field, {})
-                            .get("type", "string")
-                        )
-                        row[field] = relecov_tools.utils.cast_value_to_schema_type(
-                            raw_val, expected_type
-                        )
-                        field_valid[sample_name] = {field: value}
-                    except KeyError as e:
-                        field_errors[sample_name] = {field: e}
-                        row[field] = "Not Provided [SNOMED:434941000124101]"
-                        continue
+                self._map_fields_to_row(
+                    row,
+                    map_data,
+                    mapping_fields,
+                    sample_name,
+                    field_valid,
+                    field_errors,
+                )
+            # If the software configuration allows multiple samples and no samples were matched, handle it accordingly
+            # Used for tools that do not have a table with samples but rather individual files
             elif (
                 not self.software_config[self.current_config_key].get(
                     "multiple_samples"
                 )
                 and no_samples
-            ):  # When sample ID is not in mapping_fields because is not a multiple_sample table
-                for field, value_dict in mapping_fields.items():
-                    for json_field, software_key in value_dict.items():
-                        try:
-                            raw_val = map_data[software_key][field]
-                            expected_type = (
-                                self.json_schema["properties"]
-                                .get(json_field, {})
-                                .get("type", "string")
-                            )
-
-                            row[json_field] = (
-                                relecov_tools.utils.cast_value_to_schema_type(
-                                    raw_val, expected_type
-                                )
-                            )
-                            field_valid[software_key] = {json_field: field}
-                        except KeyError as e:
-                            field_errors[software_key] = {json_field: str(e)}
-                            row[json_field] = "Not Provided [SNOMED:434941000124101]"
+            ):
+                self._map_non_multiple_sample(
+                    row, map_data, mapping_fields, field_valid, field_errors
+                )
             else:
                 errors.append(sample_name)
                 for field in mapping_fields:
                     row[field] = "Not Provided [SNOMED:434941000124101]"
 
         # work around when map_data comes from several per-sample tables/files instead of single table
-        if len(table_name) > 2:
-            table_name = os.path.dirname(table_name[0])
-        else:
-            table_name = table_name[0]
-        # Parse missing sample errors
+        # get the dirname where the tables/files are or basename of the table_name
+        resolved_table = (
+            os.path.dirname(table_name[0]) if len(table_name) > 2 else table_name[0]
+        )
+
+        # Manage errors and field validations
         if errors:
-            len_errs = len(errors)
             self.update_all_logs(
                 method_name,
                 "warning",
-                f"{len_errs} samples missing in '{table_name}': {', '.join(errors)}.",
+                f"{len(errors)} samples missing in '{resolved_table}': {', '.join(errors)}.",
             )
         else:
             self.update_all_logs(
                 method_name,
                 "valid",
-                f"All samples were successfully found in {table_name}.",
+                f"All samples were successfully found in {resolved_table}.",
             )
 
-        # Parse missing fields errors
-        # TODO: this stdout can be improved
         if field_errors:
             self.update_all_logs(
                 method_name,
                 "warning",
-                f"Missing fields in {table_name}:\n\t{field_errors}",
+                f"Missing fields in {resolved_table}:\n\t{field_errors}",
             )
         else:
             self.update_all_logs(
@@ -554,9 +524,107 @@ class BioinfoMetadata(BaseModule):
                 "valid",
                 f"Successfully mapped fields in {', '.join(field_valid.keys())}.",
             )
-        # Print report
+
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data
+
+    def _get_sample_name(self, row: dict) -> str | None:
+        """
+        Generates a sample name from sequencing_sample_id and unique_sample_id if present.
+
+        Args:
+            row (dict): The metadata row from j_data.
+
+        Returns:
+            str | None: A unique sample identifier, or None if sequencing_sample_id is missing.
+        """
+        # get sample ids from j_data
+        # If unique_sample_id is not present, it will use only sequencing_sample_id.
+        # else it will use both to create a unique sample id.
+        seq_id = row.get("sequencing_sample_id")
+        if not seq_id:
+            return None
+        uniq_id = row.get("unique_sample_id")
+        return f"{seq_id}_{uniq_id}" if uniq_id else seq_id
+
+    def _map_fields_to_row(
+        self,
+        row: dict,
+        map_data: dict,
+        mapping_fields: dict,
+        sample_name: str,
+        field_valid: dict,
+        field_errors: dict,
+    ) -> None:
+        """
+        Maps fields for a given sample from map_data using the mapping_fields.
+
+        Args:
+            row (dict): The metadata row to update.
+            map_data (dict): Dictionary with bioinfo values by sample name.
+            mapping_fields (dict): Mapping of fields.
+            sample_name (str): The key in map_data.
+            field_valid (dict): Accumulator for successfully mapped fields.
+            field_errors (dict): Accumulator for mapping errors.
+        """
+        # Iterate over mapping fields and map values to the row
+        for field, value in mapping_fields.items():
+            try:
+                # Get the raw value from map_data for the sample
+                raw_val = map_data[sample_name][value]
+                # Replace NA values if needed
+                raw_val = self.replace_na_value_if_needed(field, raw_val)
+                # get the expected type from the JSON schema
+                expected_type = (
+                    self.json_schema["properties"].get(field, {}).get("type", "string")
+                )
+                # convert the raw value to the expected type
+                row[field] = relecov_tools.utils.cast_value_to_schema_type(
+                    raw_val, expected_type
+                )
+                # assign the field to field value validated
+                field_valid[sample_name] = {field: value}
+
+            except KeyError as e:
+                field_errors[sample_name] = {field: str(e)}
+                row[field] = "Not Provided [SNOMED:434941000124101]"
+
+    def _map_non_multiple_sample(
+        self,
+        row: dict,
+        map_data: dict,
+        mapping_fields: dict,
+        field_valid: dict,
+        field_errors: dict,
+    ) -> None:
+        """
+        Handles mapping for tools where samples are not in a table but individually defined.
+
+        Args:
+            row (dict): The metadata row to update.
+            map_data (dict): Bioinfo metadata from config-defined keys.
+            mapping_fields (dict): Dictionary with nested mappings.
+            field_valid (dict): Collector for valid mappings.
+            field_errors (dict): Collector for failed mappings.
+        """
+        # Iterate over mapping fields and map values to the row
+        for field, value_dict in mapping_fields.items():
+            # iterate over the value_dict which contains json_field and software_key
+            for json_field, software_key in value_dict.items():
+                try:
+                    raw_val = map_data[software_key][field]
+                    expected_type = (
+                        self.json_schema["properties"]
+                        .get(json_field, {})
+                        .get("type", "string")
+                    )
+                    row[json_field] = relecov_tools.utils.cast_value_to_schema_type(
+                        raw_val, expected_type
+                    )
+                    field_valid[software_key] = {json_field: field}
+                except KeyError as e:
+                    field_errors[software_key] = {json_field: str(e)}
+                    row[json_field] = "Not Provided [SNOMED:434941000124101]"
 
     def validate_sample_names(self) -> None:
         """Validate that the sequencing_sample_id from the JSON input is present in the samples_id.txt.
@@ -572,12 +640,9 @@ class BioinfoMetadata(BaseModule):
         # Get sample names from JSON input.
         # if unique_sample_id is not present, it will use only sequencing_sample_id.
         json_samples = [
-            (
-                f"{sample['sequencing_sample_id']}_{sample['unique_sample_id']}"
-                if sample.get("unique_sample_id")
-                else sample["sequencing_sample_id"]
-            )
+            sample_name
             for sample in self.j_data
+            if (sample_name := self._get_sample_name(sample)) is not None
         ]
         matching_samples = set(json_samples).intersection(samples_id_list)
 
@@ -600,6 +665,7 @@ class BioinfoMetadata(BaseModule):
         """
         method_name = f"{self.validate_software_mandatory_files.__name__}"
         missing_required = []
+        # Iterate over the software configuration keys to check for required files
         for key in self.software_config:
             if key == "fixed_values":
                 continue
@@ -611,6 +677,7 @@ class BioinfoMetadata(BaseModule):
                     continue
             else:
                 continue
+        # If any required files are missing, log an error and raise a ValueError
         if missing_required:
             error_msg = f"Missing mandatory files in {self.software_name}:{', '.join(missing_required)}"
             self.update_all_logs(
