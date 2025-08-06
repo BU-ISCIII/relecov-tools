@@ -1437,32 +1437,32 @@ class BioinfoMetadata(BaseModule):
         os.makedirs(out_path, exist_ok=True)
         batch_filepath = os.path.join(out_path, out_filename)
 
-        # Check samplesheet for matching samples
         self.validate_sample_names()
 
-        # Find and validate bioinfo files
         stderr.print("[blue]Scanning input directory...")
         self.log.info("Scanning input directory")
         files_found_dict = self.scan_directory()
+
         stderr.print("[blue]Validating required files...")
         self.log.info("Validating required files")
         self.validate_software_mandatory_files(files_found_dict)
+
         stderr.print("[blue]Adding bioinfo metadata to read lab metadata...")
         self.log.info("Adding bioinfo metadata to read lab metadata")
         self.j_data, extra_json_data = self.add_bioinfo_results_metadata(
             files_found_dict, file_tag, self.j_data, out_path
         )
+
         stderr.print("[blue]Adding fixed values")
         self.log.info("Adding fixed values")
         self.j_data = self.add_fixed_values(self.j_data, batch_filename)
-        # Adding files path
+
         stderr.print("[blue]Adding files path to read lab metadata")
         self.log.info("Adding files path to read lab metadata")
         self.j_data = self.map_and_extract_bioinfo_paths(files_found_dict, self.j_data)
 
-        # Dynamically import the function from the specified module
-        # to perform quality control evaluation
         stderr.print("[blue]Evaluating quality control...")
+        self.log.info("Evaluating quality control")
         module = importlib.import_module(
             f"relecov_tools.assets.pipeline_utils.{self.software_name}"
         )
@@ -1470,7 +1470,6 @@ class BioinfoMetadata(BaseModule):
             if hasattr(module, "quality_control_evaluation"):
                 qc_func = getattr(module, "quality_control_evaluation")
                 self.j_data = qc_func(self.j_data)
-
         except (AttributeError, NameError, TypeError, ValueError) as e:
             self.update_all_logs(
                 self.create_bioinfo_file.__name__,
@@ -1481,140 +1480,122 @@ class BioinfoMetadata(BaseModule):
                 f"[orange]Could not evaluate quality_control_evaluation for batch {self.j_data}: {e}"
             )
 
-        # Filter properties from batch_data that are not included in the schema
+        stderr.print("[blue]Validating bioinfo metadata...")
+        self.log.info("Validating bioinfo metadata")
+        if not self._validate_jdata_and_log_errors(out_path):
+            return False
+
+        stderr.print("[blue]Writing and splitting batches...")
+        self.log.info("Writing and splitting batches")
+        self._write_and_split_batches(
+            files_found_dict=files_found_dict,
+            batch_filepath=batch_filepath,
+            extra_json_data=extra_json_data,
+            out_path=out_path,
+        )
+
+        return True
+
+    def _validate_jdata_and_log_errors(self, out_path: str) -> bool:
         self.j_data = self.filter_properties(self.j_data)
+
         valid_rows, invalid_rows = relecov_tools.validate.Validate.validate_instances(
             self.j_data, self.json_schema, "sequencing_sample_id"
         )
-        valid_samples = [sample.get("sequencing_sample_id") for sample in valid_rows]
-        for sample in valid_samples:
-            self.logsum.feed_key(key=out_path, sample=sample)
+
+        for sample in valid_rows:
+            self.logsum.feed_key(key=out_path, sample=sample.get("sequencing_sample_id"))
+
         if invalid_rows:
-            unique_failed_samples = list(
-                {
-                    sample
-                    for samples in invalid_rows["samples"].values()
-                    for sample in samples
-                }
-            )
+            unique_failed_samples = list({
+                sample for samples in invalid_rows["samples"].values() for sample in samples
+            })
             for error_message, failed_samples in invalid_rows["samples"].items():
-                num_samples = len(failed_samples)
                 field_with_error = invalid_rows["fields"][error_message]
                 sample_list = "', '".join(failed_samples)
-                error_text = f"{error_message} in field '{field_with_error}' for {num_samples} sample/s: '{sample_list}'"
-                if len(unique_failed_samples) == len(self.j_data):
-                    self.logsum.add_error(key=out_path, entry=error_text)
-                else:
-                    self.logsum.add_warning(key=out_path, entry=error_text)
-                self.log.info(error_text)
-                stderr.print(f"[red]{error_text}")
-
+                error_text = (
+                    f"{error_message} in field '{field_with_error}' for {len(failed_samples)} sample/s: '{sample_list}'"
+                )
+                log_fn = self.logsum.add_error if len(unique_failed_samples) == len(self.j_data) else self.logsum.add_warning
+                log_fn(key=out_path, entry=error_text)
                 for fail_samp in failed_samples:
-                    self.logsum.add_error(
-                        key=out_path, sample=fail_samp, entry=error_text
-                    )
+                    self.logsum.add_error(key=out_path, sample=fail_samp, entry=error_text)
 
             if not self.soft_validation:
                 self.parent_create_error_summary(
                     called_module="read-bioinfo-metadata", logs=self.logsum.logs
                 )
-                error_msg = "Metadata was not completely validate, fix the errors or run with --soft_validation"
-                self.log.warning(error_msg)
-                stderr.print(f"[red]{error_msg}")
+                self.log.warning("Metadata was not completely validate, fix the errors or run with --soft_validation")
                 return False
-
         else:
-            stderr.print("[green]Bioinfo json successfully validated.")
+            self.j_data = valid_rows
             self.log.info("Bioinfo json successfully validated.")
 
-        self.j_data = valid_rows
+        return True
 
-        for sample in self.j_data:
-            self.logsum.feed_key(
-                key=out_path, sample=sample.get("sequencing_sample_id")
-            )
-
-        # Split files found based on each batch of samples
-        data_by_batch = self.split_data_by_batch(self.j_data)
-
-        if os.path.exists(batch_filepath):
-            stderr.print(
-                f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
-            )
-            self.log.info(
-                f"Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
-            )
-            self.j_data = self.merge_metadata(batch_filepath, self.j_data)
-        else:
-            relecov_tools.utils.write_json_to_file(self.j_data, batch_filepath)
-
+    def _write_and_split_batches(
+        self,
+        files_found_dict: dict,
+        batch_filepath: str,
+        extra_json_data: list[dict],
+        out_path: str,
+    ) -> None:
+        self.j_data = self._write_or_merge_json(batch_filepath, self.j_data)
         self.log.info(f"Created output json file: {batch_filepath}")
-        stderr.print(f"[green]Created batch json file: {batch_filepath}")
 
-        self.log.info("Splitting data by batch")
-        stderr.print("[blue]Splitting data by batch")
-
-        # Add bioinfo metadata to j_data
+        data_by_batch = self.split_data_by_batch(self.j_data)
         for batch_dir, batch_dict in data_by_batch.items():
             batch_data = batch_dict["j_data"]
             if not batch_data:
-                self.log.warning(
-                    f"Data from batch {batch_dir} was completely empty. Skipped."
-                )
+                self.log.warning(f"Data from batch {batch_dir} was completely empty. Skipped.")
                 self.update_all_logs(
                     self.create_bioinfo_file.__name__,
                     "warning",
                     f"Data from batch {batch_dir} was completely empty. Skipped.",
                 )
                 continue
-            first_sample = batch_data[0]
-            lab_code = first_sample.get(
-                "submitting_institution_id", batch_dir.split("/")[-2]
-            )
-            batch_date = first_sample.get("batch_id", batch_dir.split("/")[-1])
+
+            lab_code = batch_data[0].get("submitting_institution_id", batch_dir.split("/")[-2])
+            batch_date = batch_data[0].get("batch_id", batch_dir.split("/")[-1])
             file_tag = batch_date + "_" + self.hex
-            stderr.print(f"[blue]Processing data from {batch_dir}")
+
             self.log.info(f"Processing data from {batch_dir}")
+            self.split_tables_by_batch(files_found_dict, file_tag, batch_data, batch_dir)
 
-            self.split_tables_by_batch(
-                files_found_dict, file_tag, batch_data, batch_dir
-            )
-
-            tag = "bioinfo_lab_metadata_"
-            batch_filename = tag + lab_code + ".json"
-            batch_filename = self.tag_filename(batch_filename)
+            batch_filename = self.tag_filename("bioinfo_lab_metadata_" + lab_code + ".json")
             batch_filepath = os.path.join(batch_dir, batch_filename)
 
-            if os.path.exists(batch_filepath):
-                stderr.print(
-                    f"[blue]Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
-                )
-                self.log.info(
-                    f"Bioinfo metadata {batch_filepath} file already exists. Merging new data if possible."
-                )
-                batch_data = self.merge_metadata(batch_filepath, batch_data)
-            else:
-                relecov_tools.utils.write_json_to_file(batch_data, batch_filepath)
-            for sample in batch_data:
-                self.logsum.feed_key(
-                    key=batch_dir, sample=sample.get("sequencing_sample_id")
-                )
+            batch_data = self._write_or_merge_json(batch_filepath, batch_data)
             self.log.info(f"Created output json file: {batch_filepath}")
-            stderr.print(f"[green]Created batch json file: {batch_filepath}")
+
+            for sample in batch_data:
+                self.logsum.feed_key(key=batch_dir, sample=sample.get("sequencing_sample_id"))
 
             for extra_json in extra_json_data:
-                filtered_batch_data, filename = self.split_extra_json_data(
-                    extra_json, batch_data
-                )
-
-                extra_filename = filename + "_" + lab_code + "_" + file_tag + ".json"
+                filtered_batch_data, filename = self.split_extra_json_data(extra_json, batch_data)
+                extra_filename = f"{filename}_{lab_code}_{file_tag}.json"
                 extra_filepath = os.path.join(batch_dir, extra_filename)
-
-                relecov_tools.utils.write_json_to_file(
-                    filtered_batch_data, extra_filepath
-                )
+                relecov_tools.utils.write_json_to_file(filtered_batch_data, extra_filepath)
 
         self.parent_create_error_summary(
             called_module="read-bioinfo-metadata", logs=self.logsum.logs
         )
-        return True
+
+    def _write_or_merge_json(self, filepath: str, data: list[dict]) -> list[dict]:
+        """
+        Writes data to a JSON file, or merges with existing data if the file already exists.
+
+        Args:
+            filepath (str): Path to the output JSON file.
+            data (list[dict]): List of dictionaries to write or merge.
+
+        Returns:
+            list[dict]: The resulting data after potential merge.
+        """
+        if os.path.exists(filepath):
+            stderr.print(f"[blue]Bioinfo metadata {filepath} file already exists. Merging new data if possible.")
+            self.log.info(f"Bioinfo metadata {filepath} file already exists. Merging new data if possible.")
+            return self.merge_metadata(filepath, data)
+
+        relecov_tools.utils.write_json_to_file(data, filepath)
+        return data
