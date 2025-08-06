@@ -225,39 +225,43 @@ class BioinfoMetadata(BaseModule):
         """Initializes the bioinformatics configuration based on the provided software name.
 
         Raises:
-        ValueError
-            If the software name is not found in the available software configurations or if no configuration is found for the given software name.
-        ValueError
-            If no configuration is available for the given software name, it raises a ValueError and logs an error message.
+            ValueError: If the software name is not found or no configuration is available for it.
         """
         self.bioinfo_json_file = os.path.join(
             os.path.dirname(__file__), "conf", "bioinfo_config.json"
         )
+
         bioinfo_config = ConfigJson(self.bioinfo_json_file)
         available_software = relecov_tools.utils.get_available_software(
             self.bioinfo_json_file
         )
-        if self.software_name in available_software:
-            config = bioinfo_config.get_configuration(self.software_name)
-            if config is None:
-                error_msg = f"No configuration found for '{self.software_name}' in {self.bioinfo_json_file}."
-                self.update_all_logs(
-                    self.__init__.__name__,
-                    "error",
-                    error_msg,
-                )
-                self.log_report.print_log_report(self.__init__.__name__, ["error"])
-                raise ValueError(error_msg)
-            self.software_config: dict[str, Any] = config
-        else:
-            error_msg = f"No configuration available for '{self.software_name}'. Currently, the only available software options are:: {', '.join(available_software)}"
-            self.update_all_logs(
-                self.__init__.__name__,
-                "error",
-                error_msg,
+        method_name = self.__init__.__name__
+
+        # Raises ValueError if the software name is not in the available software list
+        if self.software_name not in available_software:
+            options = ", ".join(available_software)
+            error_msg = (
+                f"No configuration available for '{self.software_name}'. "
+                f"Currently, the only available software options are: {options}"
             )
+            self.update_all_logs(method_name, "error", error_msg)
             self.log_report.print_log_report(self.__init__.__name__, ["error"])
             raise ValueError(error_msg)
+
+        config = bioinfo_config.get_configuration(self.software_name)
+        # Raises ValueError if the configuration for the software is None
+        if config is None:
+            error_msg = (
+                f"No configuration found for '{self.software_name}' "
+                f"in {self.bioinfo_json_file}."
+            )
+            self.update_all_logs(method_name, "error", error_msg)
+            self.log_report.print_log_report(self.__init__.__name__, ["error"])
+            raise ValueError(error_msg)
+
+        # set software configuration indicating that it is a dictionary
+        # and access its keys and values directly making sure that's it not going to ever be None.
+        self.software_config: dict[str, Any] = config
 
     def update_all_logs(self, method_name: str, status: str, message: str) -> dict:
         """
@@ -326,6 +330,7 @@ class BioinfoMetadata(BaseModule):
         scanned_files_per_folder = []
         for root, dirs, files in os.walk(self.input_folder, topdown=True):
             # Skipping nextflow's work junk directory
+            # dirs[:] is used to modify the list of directories in place
             dirs[:] = [d for d in dirs if d != "work"]
             total_files += len(files)
             scanned_files_per_folder.append((root, files))
@@ -344,17 +349,22 @@ class BioinfoMetadata(BaseModule):
         files_found (dict): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
         """
         files_found = {}
-
+        # Iterate over each topic in the software configuration
         for topic_key, topic_scope in self.software_config.items():
+            # if topic has not fn (file pattern) defined, skip it
             if not self._topic_has_file_pattern(topic_key, topic_scope, method_name):
                 continue
 
+            # get file pattern from topic scope now that we know it has a valid pattern
             file_pattern = topic_scope["fn"]
 
+            # Search for files matching the pattern in the scanned files
             for root_path, file_list in scanned_files_per_folder:
                 if matching_files := self._get_matching_files_for_pattern(
                     file_list, root_path, file_pattern
                 ):
+                    # If matching files are found, add them to the files_found dictionary
+                    # set default to an empty list if the topic_key is not already present
                     files_found.setdefault(topic_key, []).extend(matching_files)
 
         return files_found
@@ -362,7 +372,16 @@ class BioinfoMetadata(BaseModule):
     def _topic_has_file_pattern(
         self, topic_key: str, topic_scope: dict, method_name: str
     ) -> bool:
-        """Check if topic_scope has a valid pattern; log warning if not."""
+        """Check if topic_scope has a valid pattern; log warning if not.
+
+        Args:
+            topic_key (str): The key of the topic in the software configuration.
+            topic_scope (dict): The scope of the topic in the software configuration.
+            method_name (str): The name of the method being logged.
+
+        Returns:
+            bool: True if the topic has a valid file pattern, False otherwise.
+        """
         # set pattern
         pattern = topic_scope.get("fn")
 
@@ -370,7 +389,7 @@ class BioinfoMetadata(BaseModule):
         is_invalid_type = not isinstance(pattern, str)
         # Check if pattern is an empty string
         is_empty_string = isinstance(pattern, str) and not pattern.strip()
-
+        # If pattern is invalid or empty, log a warning and return False
         if is_invalid_type or is_empty_string:
             topic_name = f"{self.software_name}.{topic_key}"
             error_msg = f"Invalid or missing 'fn' (file pattern) in '{topic_name}'."
@@ -381,10 +400,20 @@ class BioinfoMetadata(BaseModule):
     def _get_matching_files_for_pattern(
         self, file_list: list[str], root_path: str, file_pattern: str
     ) -> list[str]:
-        """Return a list of files in file_list under root_path that match file_pattern."""
+        """Return a list of files in file_list under root_path that match file_pattern.
+        Args:
+            file_list (list[str]): A list of file names to search for.
+            root_path (str): The root path where the files are located.
+            file_pattern (str): The regex pattern to match the files.
+        Returns:
+            matching_files (list[str]): A list of file paths that match the file_pattern.
+        """
         matching_files = []
+        # Iterate over each file in the file_list
         for file_name in file_list:
             file_path = os.path.join(root_path, file_name)
+            # Check if the file matches the pattern
+            # update matching_files with the file matching the pattern
             if re.search(file_pattern, file_path):
                 matching_files.append(file_path)
         return matching_files
