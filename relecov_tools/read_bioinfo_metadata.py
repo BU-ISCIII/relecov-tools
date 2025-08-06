@@ -85,10 +85,15 @@ class BioinfoMetadata(BaseModule):
 
         super().__init__(output_dir=output_dir, called_module=__name__)
         self.log.info("Initiating read-bioinfo-metadata process")
-
-        # Init attributes
+        # Init params
         self.update = update
         self.soft_validation = soft_validation
+
+        # Init logs
+        self.log_report = BioinfoReportLog()
+        self.logsum = self.parent_log_summary(output_dir=output_dir)
+
+        # Init attributes
         self._init_input_folder(input_folder)
         self._init_software_name(software_name)
         self._init_json_schema(json_schema_file)
@@ -96,10 +101,8 @@ class BioinfoMetadata(BaseModule):
         self._init_readlabmeta_json(json_file)
         self._init_j_data_and_batch()
 
-        # Init logs
-        self.logsum = self.parent_log_summary(output_dir=output_dir)
+        # Init config
         self._init_bioinfo_config()
-        self.log_report = BioinfoReportLog()
 
     def _init_json_schema(self, json_schema_file: str | None = None) -> None:
         """Initializes the JSON schema for bioinformatics metadata.
