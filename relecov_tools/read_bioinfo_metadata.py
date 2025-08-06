@@ -968,94 +968,140 @@ class BioinfoMetadata(BaseModule):
             return "Not Provided [SNOMED:434941000124101]"
         return raw_val
 
-    def add_bioinfo_files_path(
+    def map_and_extract_bioinfo_paths(
         self, files_found_dict: dict, j_data: list[dict]
     ) -> list[dict]:
-        """Adds file paths essential for handling and mapping bioinformatics metadata to the j_data.
-        For each sample in j_data, the function assigns the corresponding file path based on the identified files in files_found_dict.
-
-        If multiple files are identified per configuration item (e.g., viralrecon.mapping_consensus → *.consensus.fa), each sample in j_data receives its respective file path.
-        If no file path is located, the function appends "Not Provided [SNOMED:434941000124101]" to indicate missing data.
+        """
+        Adds file paths to j_data for each sample, using the provided files_found_dict
+        and the current software configuration.
 
         Args:
-            files_found_dict (dict): A dictionary containing file paths identified for each configuration item.
-            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (one item per sample).
+            files_found_dict (dict): Mapping of config keys to file paths found.
+            j_data (list[dict]): Sample metadata.
 
         Returns:
-            j_data: Updated j_data with file paths mapped for bioinformatic metadata.
+            list[dict]: Updated j_data with file paths.
         """
-        method_name = f"{self.add_bioinfo_files_path.__name__}"
+        method_name = self.map_and_extract_bioinfo_paths.__name__
         sample_name_error = 0
         multiple_sample_files = self.get_multiple_sample_files()
+
         for row in j_data:
-            if not row.get("sequencing_sample_id"):
+            # ger sample_name that will be a combination of sequencing_sample_id and unique_sample_id
+            # if unique_sample_id is not present, it will use only sequencing_sample_id.
+            sample_name = self._get_sample_name(row)
+            base_cod_path = row.get("sequence_file_path_R1")
+
+            if not sample_name:
                 self.update_all_logs(
                     method_name,
                     "warning",
-                    f'Sequencing_sample_id missing in {row.get("collecting_sample_id")}... Skipping...',
+                    f"Sequencing_sample_id missing in {row.get('collecting_sample_id')}... Skipping...",
                 )
                 continue
-            sample_name = row["sequencing_sample_id"]
-            base_cod_path = row.get("sequence_file_path_R1")
-            if base_cod_path is None:
+
+            if not base_cod_path:
                 self.update_all_logs(
                     method_name,
                     "error",
                     f"No 'sequence_file_path_R1' found for sample {sample_name}. Unable to generate paths.",
                 )
                 continue
-            for key, values in files_found_dict.items():
-                file_path = []
-                if values:  # Check if value is not empty
-                    for file in values:
-                        if key in multiple_sample_files or sample_name in file:
-                            file_path.append(file)
-                else:
-                    file_path.append("Not Provided [SNOMED:434941000124101]")
-                if self.software_config[key].get("filepath_name"):
-                    path_key = self.software_config[key].get("filepath_name")
-                    analysis_results_paths = []
-                    for paths in file_path:
-                        if file_path != "Not Provided [SNOMED:434941000124101]" and (
-                            self.software_config[key].get("extract")
-                            or self.software_config[key].get("function")
-                        ):
-                            if self.software_config[key].get("split_by_batch"):
-                                base, ext = os.path.splitext(os.path.basename(paths))
-                                batch_id = row["batch_id"]
-                                new_fname = f"{base}_{batch_id}_{self.hex}{ext}"
-                                analysis_results_path = os.path.join(
-                                    base_cod_path,
-                                    "analysis_results",
-                                    new_fname,
-                                )
-                            else:
-                                analysis_results_path = os.path.join(
-                                    base_cod_path,
-                                    "analysis_results",
-                                    os.path.basename(paths),
-                                )
-                            analysis_results_paths.append(analysis_results_path)
-                        else:
-                            analysis_results_paths = file_path
-                    row[path_key] = ", ".join(analysis_results_paths)
-                else:
-                    path_key = key
+            # Iterate over each key (mapping_stats, quality_control, etc.) in files_found_dict
+            # Process files associated with each key
+            for key, files in files_found_dict.items():
+                # select matching file paths based on sample_name and key
+                file_paths = self._select_matching_paths(
+                    files, sample_name, key, multiple_sample_files
+                )
+                # set matched file paths to appropriate field in json row
+                path_key = self._assign_file_paths_to_row(row, key, file_paths, base_cod_path)
 
+                # Extract files to analysis_results folder if configured
                 if self.software_config[key].get("extract"):
                     self.extract_file(
-                        file=file_path,
-                        dest_folder=row.get("sequence_file_path_R1", ""),
+                        file=file_paths,
+                        dest_folder=base_cod_path,
                         sample_name=sample_name,
                         path_key=path_key,
                     )
 
         self.log_report.print_log_report(method_name, ["warning"])
-
         if sample_name_error == 0:
             self.update_all_logs(method_name, "valid", "File paths added successfully.")
         self.log_report.print_log_report(method_name, ["valid", "warning"])
+
         return j_data
+
+    def _select_matching_paths(
+        self, files: list[str], sample_name: str, key: str, multi_sample_keys: list[str]
+    ) -> list[str]:
+        """
+        Selects matching file paths for a given sample name and config key.
+        Args:
+            files (list[str]): List of file paths to search.
+            sample_name (str): The sample name to match against file paths.
+            key (str): The configuration key to check against multi-sample keys.
+            multi_sample_keys (list[str]): List of keys that allow multiple samples.
+        Returns:
+            list[str]: Matching paths or placeholder.
+        """
+        if not files:
+            return ["Not Provided [SNOMED:434941000124101]"]
+        # if key is in multi_sample_keys, return all files
+        if key in multi_sample_keys:
+            return files
+        # else return files that match the sample_name
+        return [f for f in files if sample_name in f]
+
+    def _assign_file_paths_to_row(
+        self,
+        row: dict,
+        key: str,
+        file_paths: list[str],
+        base_cod_path: str,
+    ) -> None:
+        """
+        Assigns file path(s) to the row, handling renaming and extraction if needed.
+        """
+        # get config for the current key
+        config = self.software_config[key]
+        path_key = config.get("filepath_name", key)
+
+        # get the name of the field configured in config file "filepath_name"
+        if config.get("filepath_name"):
+            analysis_results_paths = []
+            # for each file_path in file_paths
+            for f in file_paths:
+                # If not provided append and continue
+                if f == "Not Provided [SNOMED:434941000124101]":
+                    analysis_results_paths.append(f)
+                    continue
+                # check if configured as extract or function
+                extract_or_func = config.get("extract") or config.get("function")
+                # if not configured as extract or function, append the file path and continue
+                if not extract_or_func:
+                    analysis_results_paths.append(f)
+                    continue
+                # if configured as split_by_batch, rename the file to match the COD
+                if config.get("split_by_batch"):
+                    base, ext = os.path.splitext(os.path.basename(f))
+                    batch_id = row["batch_id"]
+                    new_fname = f"{base}_{batch_id}_{self.hex}{ext}"
+                else:
+                    new_fname = os.path.basename(f)
+
+                analysis_results_path = os.path.join(
+                    base_cod_path, "analysis_results", new_fname
+                )
+                analysis_results_paths.append(analysis_results_path)
+            # in case of multiple files, join them with a comma
+            row[path_key] = ", ".join(analysis_results_paths)
+        else:
+            # in case there is no file_path_name defined, use key as path_key
+            row[path_key] = ", ".join(file_paths)
+
+        return path_key
 
     def collect_info_from_lab_json(self) -> list[dict]:
         """Reads lab metadata from a JSON file and creates a list of dictionaries.
@@ -1412,9 +1458,11 @@ class BioinfoMetadata(BaseModule):
         # Adding files path
         stderr.print("[blue]Adding files path to read lab metadata")
         self.log.info("Adding files path to read lab metadata")
-        self.j_data = self.add_bioinfo_files_path(files_found_dict, self.j_data)
+        self.j_data = self.map_and_extract_bioinfo_paths(files_found_dict, self.j_data)
 
         # Dynamically import the function from the specified module
+        # to perform quality control evaluation
+        stderr.print("[blue]Evaluating quality control...")
         module = importlib.import_module(
             f"relecov_tools.assets.pipeline_utils.{self.software_name}"
         )
