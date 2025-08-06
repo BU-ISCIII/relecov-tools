@@ -701,40 +701,35 @@ class BioinfoMetadata(BaseModule):
         j_data: list[dict],
         output_dir: str | None = None,
     ) -> tuple[list[dict], list[dict]]:
-        """Adds metadata from bioinformatics results to j_data.
-        It first calls file_handlers and then maps the handled
-        data into j_data.
+        """
+        Adds metadata from bioinformatics results to j_data.
+        Calls file handler and maps handled data into j_data.
 
         Args:
-            files_dict (dict{str:str}): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
-            j_data (list(dict{str:str}): A list of dictionaries containing metadata lab (list item per sample).
-            output_dir (str): Path to save output files generated during handling_files() process.
-            file_tag (str): Tag that will be used for output filenames includes batch date (same as download date) and hex.
+            files_dict (dict): Mapping of config keys to file paths.
+            file_tag (str): Tag used for output filenames.
+            j_data (list[dict]): List of lab metadata entries.
+            output_dir (str, optional): Path to write outputs.
 
         Returns:
-            j_data_mapped: A list of dictionaries with bioinformatics metadata mapped into j_data.
-            extra_json_data: List of dictionaries with data that hasn't to be mapped in order to be processed afterwards.
+            tuple: (updated j_data, extra_json_data)
         """
-        # set method name and initialize extra_json_data
-        method_name = f"{self.add_bioinfo_results_metadata.__name__}"
-        extra_json_data = []
-        j_data_mapped = j_data  # Ensure j_data_mapped is always defined
 
-        # For each key in the software configuration, process the files
+        # Initialize method name and extra_json_data
+        method_name = self.add_bioinfo_results_metadata.__name__
+        extra_json_data: list[dict] = []
+        j_data_mapped = j_data
+
+        # Iterate over each key in the software configuration
         for key in self.software_config:
-            # Reset map_data flag so it only activates when table expects mapping
-            map_data_flag = False
-            # Update bioinfo configuration key/scope
-            self.current_config_key = key
-            map_method_name = f"{method_name}:{self.software_name}.{key}"
-            # This skip files that will be parsed with other methods
+            # skip workflow_summary and fixed_values keys that will be handled later
             if key in ("workflow_summary", "fixed_values"):
                 continue
-            try:
-                files_dict[key]
-                stderr.print(f"[blue]Start processing {self.software_name}.{key}")
-                self.log.info(f"Start processing {self.software_name}.{key}")
-            except KeyError:
+
+            self.current_config_key = key
+            map_method_name = f"{method_name}:{self.software_name}.{key}"
+
+            if key not in files_dict:
                 self.update_all_logs(
                     method_name,
                     "warning",
@@ -742,31 +737,18 @@ class BioinfoMetadata(BaseModule):
                 )
                 continue
 
-            current_config = self.software_config[self.current_config_key]
-            file_name = current_config.get("fn", None)
-            func_name = current_config.get("function", None)
+            stderr.print(f"[blue]Start processing {self.software_name}.{key}")
+            self.log.info(f"Start processing {self.software_name}.{key}")
 
-            if func_name is None:
-                data = self.handling_tables(files_dict[key], file_name)
-            else:
-                data = self.process_metadata(
-                    files_dict[key],
-                    file_tag=file_tag,
-                    func_name=func_name,
-                    out_path=output_dir,
-                )
+            # Process the config key to get data to map and extra data if any
+            data_to_map, extra_data = self._process_config_key(
+                key, files_dict[key], file_tag, output_dir
+            )
 
-            if current_config.get("split_by_batch") and current_config.get(
-                "extra_dict"
-            ):
-                extra_json_data.append(data)
-                data_to_map = None
-                map_data_flag = False
-            else:
-                data_to_map = data
-                map_data_flag = True
+            if extra_data:
+                extra_json_data.append(extra_data)
 
-            # Mapping data to j_data
+            # get mapping fields from the software configuration
             mapping_fields = self.software_config[key].get("content")
             if not mapping_fields:
                 self.update_all_logs(
@@ -777,11 +759,12 @@ class BioinfoMetadata(BaseModule):
                 self.log_report.print_log_report(map_method_name, ["warning"])
                 continue
 
-            if data_to_map and map_data_flag:
+            # If data_to_map is not empty, perform mapping
+            if data_to_map:
                 j_data_mapped = self.mapping_over_table(
                     j_data=j_data,
                     map_data=data_to_map,
-                    mapping_fields=self.software_config[key]["content"],
+                    mapping_fields=mapping_fields,
                     table_name=files_dict[key],
                 )
             else:
@@ -790,10 +773,46 @@ class BioinfoMetadata(BaseModule):
                     "warning",
                     f"No metadata found to perform standard mapping when processing '{self.software_name}.{key}'",
                 )
-                continue
 
         self.log_report.print_log_report(method_name, ["valid", "warning"])
         return j_data_mapped, extra_json_data
+
+    def _process_config_key(
+        self,
+        key: str,
+        file_path: list[str],
+        file_tag: str,
+        output_dir: str | None,
+    ) -> tuple[dict | None, dict | None]:
+        """
+        Handles the data processing logic for a single config key.
+
+        Args:
+            key (str): The config key to process.
+            file_path (list): Path to the corresponding file.
+            file_tag (str): Tag for generated outputs.
+            output_dir (str | None): Output directory.
+            method_name (str): Name for logging context.
+
+        Returns:
+            tuple: (data_to_map, extra_json_data)
+        """
+        config = self.software_config[key]
+        file_name = config.get("fn")
+        func_name = config.get("function")
+        # If func_name is None, it means we will handle the file as a table with a default function
+        if func_name is None:
+            data = self.handling_tables(file_path, file_name)
+        # If func_name is defined, we will process the file using the function defined in the config
+        # and present in assets.pipeline_utils
+        else:
+            data = self.process_metadata(
+                file_path, file_tag=file_tag, func_name=func_name, out_path=output_dir
+            )
+
+        if config.get("split_by_batch") and config.get("extra_dict"):
+            return None, data
+        return data, None
 
     def handling_tables(self, file_list: list, conf_tab_name: str) -> dict:
         """Reads a tabular file in different formats and returns a dictionary containing
