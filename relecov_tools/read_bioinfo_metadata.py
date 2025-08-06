@@ -98,7 +98,16 @@ class BioinfoMetadata(BaseModule):
         self._init_software_name(software_name)
         self._init_bioinfo_config()
 
-    def _init_json_schema(self, json_schema_file):
+    def _init_json_schema(self, json_schema_file: str | None = None) -> None:
+        """Initializes the JSON schema for bioinformatics metadata.
+
+        Args:
+            json_schema_file (str) optional
+                Path to the JSON schema file. If not provided, it will use the default schema defined in the config.
+
+        Returns:
+            None
+        """
         if json_schema_file is None:
             config_json = ConfigJson()
             schema_name = config_json.get_topic_data("generic", "relecov_schema")
@@ -107,7 +116,16 @@ class BioinfoMetadata(BaseModule):
             )
         self.json_schema = relecov_tools.utils.read_json_file(json_schema_file)
 
-    def _init_output_dir(self, output_dir):
+    def _init_output_dir(self, output_dir: str | None = None) -> None:
+        """Initializes the output directory for storing results.
+
+        Args:
+            output_dir (str | None)
+                Path to the output directory. If not provided, it will prompt the user to select one.
+
+        Returns:
+            None
+        """
         if output_dir is None:
             self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
@@ -115,7 +133,19 @@ class BioinfoMetadata(BaseModule):
         else:
             self.output_dir = os.path.realpath(output_dir)
 
-    def _init_readlabmeta_json(self, json_file):
+    def _init_readlabmeta_json(self, json_file: str | None = None) -> None:
+        """Initializes the readlab metadata JSON file.
+
+        Args:
+            json_file (str | None): Path to the readlab metadata JSON file.
+            If not provided, it will prompt the user to select one.
+
+        Raises:
+            ValueError
+                If the provided JSON file does not exist or is not a valid file.
+        Returns:
+            None
+        """
         if json_file is None:
             json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file that was created by the pipeline-manager or read-lab-metadata module."
@@ -130,13 +160,27 @@ class BioinfoMetadata(BaseModule):
             raise ValueError(f"Json file {json_file} does not exist, cannot continue.")
         self.readlabmeta_json_file = json_file
 
-    def _init_j_data_and_batch(self):
+    def _init_j_data_and_batch(self) -> None:
+        """Initializes the j_data and batch ID from the readlab metadata JSON file.
+        Args:
+            None
+        Returns:
+            None
+        """
         stderr.print("[blue]Reading lab metadata json")
         self.j_data = self.collect_info_from_lab_json()
         batch_id = self.get_batch_id_from_data(self.j_data)
         self.set_batch_id(batch_id)
 
-    def _init_input_folder(self, input_folder):
+    def _init_input_folder(self, input_folder: str | None = None) -> None:
+        """Initializes the input folder for bioinformatics analysis files.
+
+        Args:
+        input_folder (str | None)
+            Path to the input folder. If not provided, it will prompt the user to select one.
+        Returns:
+            None
+        """
         if input_folder is None:
             self.input_folder = relecov_tools.utils.prompt_path(
                 msg="Select the input folder"
@@ -144,7 +188,21 @@ class BioinfoMetadata(BaseModule):
         else:
             self.input_folder = input_folder
 
-    def _init_software_name(self, software_name):
+    def _init_software_name(self, software_name: str | None = None) -> None:
+        """Initializes the software name used in the bioinformatic analysis.
+
+        Args:
+        software_name (str | None)
+            Name of the software, pipeline or tool used in the bioinformatic analysis.
+            If not provided, it will prompt the user to select one.
+
+        Raises:
+        ValueError
+            If no software name is provided, it raises a ValueError and logs an error message.
+
+        Returns:
+            None
+        """
         if software_name is None:
             software_name = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
@@ -160,7 +218,15 @@ class BioinfoMetadata(BaseModule):
             self.log_report.print_log_report(self.__init__.__name__, ["error"])
             raise ValueError("No software name provided, cannot continue.")
 
-    def _init_bioinfo_config(self):
+    def _init_bioinfo_config(self) -> None:
+        """Initializes the bioinformatics configuration based on the provided software name.
+
+        Raises:
+        ValueError
+            If the software name is not found in the available software configurations or if no configuration is found for the given software name.
+        ValueError
+            If no configuration is available for the given software name, it raises a ValueError and logs an error message.
+        """
         self.bioinfo_json_file = os.path.join(
             os.path.dirname(__file__), "conf", "bioinfo_config.json"
         )
@@ -226,9 +292,7 @@ class BioinfoMetadata(BaseModule):
 
         # Get the total number of files and scanned files in all folders in self.input_folder
         total_files, scanned_files_per_folder = self._walk_input_folder()
-        files_found = self._find_matching_files(
-            method_name, scanned_files_per_folder
-        )
+        files_found = self._find_matching_files(method_name, scanned_files_per_folder)
         # search for files matching the patterns defined in the software configuration
         if files_found:
             # If files are found, update the log report and return the files_found dictionary
@@ -253,7 +317,7 @@ class BioinfoMetadata(BaseModule):
 
     def _walk_input_folder(self) -> tuple[int, list[tuple[str, list[str]]]]:
         """Walk through the input folder and collect all files.
-        Returns: 
+        Returns:
         """
         total_files = 0
         scanned_files_per_folder = []
@@ -268,13 +332,13 @@ class BioinfoMetadata(BaseModule):
         self, method_name: str, scanned_files_per_folder: list[tuple[str, list[str]]]
     ) -> dict[str, list[str]]:
         """For each topic in the software configuration, search for matching files.
-            
-            Args:
-            scanned_files_per_folder (list[tuple[str, list[str]]]): A list of tuples containing the root path and a list of files in that path.
-            method_name (str): The name of the method being logged.
-            
-            Returns:
-            files_found (dict): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
+
+        Args:
+        scanned_files_per_folder (list[tuple[str, list[str]]]): A list of tuples containing the root path and a list of files in that path.
+        method_name (str): The name of the method being logged.
+
+        Returns:
+        files_found (dict): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
         """
         files_found = {}
 
