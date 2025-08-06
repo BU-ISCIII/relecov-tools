@@ -82,24 +82,32 @@ class BioinfoMetadata(BaseModule):
         update: bool = False,
         soft_validation: bool = False,
     ):
-        #
-        super().__init__(output_dir=output_dir, called_module=__name__)
 
-        # Init process log
+        super().__init__(output_dir=output_dir, called_module=__name__)
         self.log.info("Initiating read-bioinfo-metadata process")
 
-        # Check CLI arguments
-        # Read json schema file
+        self._init_json_schema(json_schema_file)
+        self._init_output_dir(output_dir)
+        self.logsum = self.parent_log_summary(output_dir=output_dir)
+        self.log_report = BioinfoReportLog()
+        self._init_readlabmeta_json(json_file)
+        self._init_j_data_and_batch()
+        self.update = update
+        self.soft_validation = soft_validation
+        self._init_input_folder(input_folder)
+        self._init_software_name(software_name)
+        self._init_bioinfo_config()
+
+    def _init_json_schema(self, json_schema_file):
         if json_schema_file is None:
             config_json = ConfigJson()
             schema_name = config_json.get_topic_data("generic", "relecov_schema")
             json_schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "schema", str(schema_name)
             )
-
         self.json_schema = relecov_tools.utils.read_json_file(json_schema_file)
 
-        # Set output directory
+    def _init_output_dir(self, output_dir):
         if output_dir is None:
             self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
@@ -107,11 +115,7 @@ class BioinfoMetadata(BaseModule):
         else:
             self.output_dir = os.path.realpath(output_dir)
 
-        # Set log summary and log report
-        self.logsum = self.parent_log_summary(output_dir=output_dir)
-        self.log_report = BioinfoReportLog()
-
-        # Parse read-lab-meta-data
+    def _init_readlabmeta_json(self, json_file):
         if json_file is None:
             json_file = relecov_tools.utils.prompt_path(
                 msg="Select the json file that was created by the pipeline-manager or read-lab-metadata module."
@@ -124,21 +128,15 @@ class BioinfoMetadata(BaseModule):
             )
             self.log_report.print_log_report(self.__init__.__name__, ["error"])
             raise ValueError(f"Json file {json_file} does not exist, cannot continue.")
-
-        #  Assign a new name for better readability
         self.readlabmeta_json_file = json_file
 
-        # Initialize j_data object
+    def _init_j_data_and_batch(self):
         stderr.print("[blue]Reading lab metadata json")
         self.j_data = self.collect_info_from_lab_json()
         batch_id = self.get_batch_id_from_data(self.j_data)
         self.set_batch_id(batch_id)
 
-        # set if update or soft_validation
-        self.update = update
-        self.soft_validation = soft_validation
-
-        # Parse input folder
+    def _init_input_folder(self, input_folder):
         if input_folder is None:
             self.input_folder = relecov_tools.utils.prompt_path(
                 msg="Select the input folder"
@@ -146,7 +144,7 @@ class BioinfoMetadata(BaseModule):
         else:
             self.input_folder = input_folder
 
-        # set software name
+    def _init_software_name(self, software_name):
         if software_name is None:
             software_name = relecov_tools.utils.prompt_path(
                 msg="Select the software, pipeline or tool use in the bioinformatic analysis: "
@@ -162,37 +160,35 @@ class BioinfoMetadata(BaseModule):
             self.log_report.print_log_report(self.__init__.__name__, ["error"])
             raise ValueError("No software name provided, cannot continue.")
 
-        # Parse bioinfo configuration
+    def _init_bioinfo_config(self):
         self.bioinfo_json_file = os.path.join(
             os.path.dirname(__file__), "conf", "bioinfo_config.json"
         )
         bioinfo_config = ConfigJson(self.bioinfo_json_file)
-
         available_software = relecov_tools.utils.get_available_software(
             self.bioinfo_json_file
         )
-
         if self.software_name in available_software:
             config = bioinfo_config.get_configuration(self.software_name)
             if config is None:
-                errtxt = f"No configuration found for '{self.software_name}' in {self.bioinfo_json_file}."
+                error_msg = f"No configuration found for '{self.software_name}' in {self.bioinfo_json_file}."
                 self.update_all_logs(
                     self.__init__.__name__,
                     "error",
-                    errtxt,
+                    error_msg,
                 )
                 self.log_report.print_log_report(self.__init__.__name__, ["error"])
-                raise ValueError(errtxt)
+                raise ValueError(error_msg)
             self.software_config: dict[str, Any] = config
         else:
-            errtxt = f"No configuration available for '{self.software_name}'. Currently, the only available software options are:: {', '.join(available_software)}"
+            error_msg = f"No configuration available for '{self.software_name}'. Currently, the only available software options are:: {', '.join(available_software)}"
             self.update_all_logs(
                 self.__init__.__name__,
                 "error",
-                errtxt,
+                error_msg,
             )
             self.log_report.print_log_report(self.__init__.__name__, ["error"])
-            raise ValueError(errtxt)
+            raise ValueError(error_msg)
 
     def update_all_logs(self, method_name: str, status: str, message: str) -> dict:
         """
