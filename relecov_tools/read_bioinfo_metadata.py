@@ -212,68 +212,115 @@ class BioinfoMetadata(BaseModule):
             self.logsum.add_warning(key=method_name, entry=message)
         return report
 
-    def scann_directory(
+    def scan_directory(
         self,
-    ) -> dict:
+    ) -> dict[str, list[str]]:
         """Scanns bioinfo analysis directory and identifies files according to the file name patterns defined in the software configuration json.
 
         Returns:
             files_found (dict): A dictionary containing file paths found based on the definitions provided
             in the bioinformatic JSON file within the software scope (self.software_config).
         """
-        # set method name, total_files, files_found and all_scanned_things
-        method_name = f"{self.scann_directory.__name__}"
-        total_files = 0
-        files_found = {}
-        all_scanned_things = []
+        # set method name
+        method_name = f"{self.scan_directory.__name__}"
 
-        # Walk through the input folder and collect all files
-        for root, dirs, files in os.walk(self.input_folder, topdown=True):
-            # Skipping nextflow's work junk directory
-            dirs[:] = [d for d in dirs if "work" not in root.split("/")]
-            total_files = total_files + len(files)
-            all_scanned_things.append((root, files))
-
-        # For each topic in the software configuration, search for matching files
-        for topic_key, topic_scope in self.software_config.items():
-            # skip topics with no file name pattern
-            if "fn" not in topic_scope:  # try/except fn
-                self.update_all_logs(
-                    method_name,
-                    "warning",
-                    f"No 'fn' (file pattern) found in '{self.software_name}.{topic_key}'.",
-                )
-                continue
-            # check all_scanned_things for files matching the pattern
-            for tup in all_scanned_things:
-                matching_files = [
-                    os.path.join(tup[0], file_name)
-                    for file_name in tup[1]
-                    if re.search(topic_scope["fn"], os.path.join(tup[0], file_name))
-                ]
-                if matching_files:
-                    if topic_key not in files_found:
-                        files_found[topic_key] = []
-                    files_found[topic_key].extend(matching_files)
-
-        # check if any files were found matching the patterns
-        if len(files_found) < 1:
-            errtxt = f"No files found in '{self.input_folder}' according to '{os.path.basename(self.bioinfo_json_file)}' file name patterns."
+        # Get the total number of files and scanned files in all folders in self.input_folder
+        total_files, scanned_files_per_folder = self._walk_input_folder()
+        files_found = self._find_matching_files(
+            method_name, scanned_files_per_folder
+        )
+        # search for files matching the patterns defined in the software configuration
+        if files_found:
+            # If files are found, update the log report and return the files_found dictionary
+            scan_success_msg = f"Scanning process succeed. Scanned {total_files} files."
             self.update_all_logs(
-                method_name,
-                "error",
-                errtxt,
-            )
-            self.log_report.print_log_report(method_name, ["error"])
-            raise ValueError(errtxt)
-        else:
-            self.update_all_logs(
-                self.scann_directory.__name__,
+                self.scan_directory.__name__,
                 "valid",
-                f"Scanning process succeed. Scanned {total_files} files.",
+                scan_success_msg,
             )
             self.log_report.print_log_report(method_name, ["valid", "warning"])
             return files_found
+        else:
+            # If no files are found matching the patterns, log an error and raise a ValueError
+            err_msg = f"No files found in '{self.input_folder}' according to '{os.path.basename(self.bioinfo_json_file)}' file name patterns."
+            self.update_all_logs(
+                method_name,
+                "error",
+                err_msg,
+            )
+            self.log_report.print_log_report(method_name, ["error"])
+            raise ValueError(err_msg)
+
+    def _walk_input_folder(self) -> tuple[int, list[tuple[str, list[str]]]]:
+        """Walk through the input folder and collect all files.
+        Returns: 
+        """
+        total_files = 0
+        scanned_files_per_folder = []
+        for root, dirs, files in os.walk(self.input_folder, topdown=True):
+            # Skipping nextflow's work junk directory
+            dirs[:] = [d for d in dirs if d != "work"]
+            total_files += len(files)
+            scanned_files_per_folder.append((root, files))
+        return total_files, scanned_files_per_folder
+
+    def _find_matching_files(
+        self, method_name: str, scanned_files_per_folder: list[tuple[str, list[str]]]
+    ) -> dict[str, list[str]]:
+        """For each topic in the software configuration, search for matching files.
+            
+            Args:
+            scanned_files_per_folder (list[tuple[str, list[str]]]): A list of tuples containing the root path and a list of files in that path.
+            method_name (str): The name of the method being logged.
+            
+            Returns:
+            files_found (dict): A dictionary containing file paths found based on the definitions provided in the bioinformatic JSON file within the software scope (self.software_config).
+        """
+        files_found = {}
+
+        for topic_key, topic_scope in self.software_config.items():
+            if not self._topic_has_file_pattern(topic_key, topic_scope, method_name):
+                continue
+
+            file_pattern = topic_scope["fn"]
+
+            for root_path, file_list in scanned_files_per_folder:
+                if matching_files := self._get_matching_files_for_pattern(
+                    file_list, root_path, file_pattern
+                ):
+                    files_found.setdefault(topic_key, []).extend(matching_files)
+
+        return files_found
+
+    def _topic_has_file_pattern(
+        self, topic_key: str, topic_scope: dict, method_name: str
+    ) -> bool:
+        """Check if topic_scope has a valid pattern; log warning if not."""
+        # set pattern
+        pattern = topic_scope.get("fn")
+
+        # Check if pattern is valid
+        is_invalid_type = not isinstance(pattern, str)
+        # Check if pattern is an empty string
+        is_empty_string = isinstance(pattern, str) and not pattern.strip()
+
+        if is_invalid_type or is_empty_string:
+            topic_name = f"{self.software_name}.{topic_key}"
+            error_msg = f"Invalid or missing 'fn' (file pattern) in '{topic_name}'."
+            self.update_all_logs(method_name, "warning", error_msg)
+            return False
+        return True
+
+    def _get_matching_files_for_pattern(
+        self, file_list: list[str], root_path: str, file_pattern: str
+    ) -> list[str]:
+        """Return a list of files in file_list under root_path that match file_pattern."""
+        matching_files = []
+        for file_name in file_list:
+            file_path = os.path.join(root_path, file_name)
+            if re.search(file_pattern, file_path):
+                matching_files.append(file_path)
+        return matching_files
 
     def mapping_over_table(
         self, j_data: list[dict], map_data: dict, mapping_fields: dict, table_name: str
