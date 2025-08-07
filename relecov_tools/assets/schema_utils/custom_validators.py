@@ -2,6 +2,8 @@
 from jsonschema import FormatChecker, exceptions
 import datetime
 
+import relecov_tools.config_json
+
 
 def validate_with_exceptions(schema, data, errors):
     """Filter validation errors based on known exceptions.
@@ -29,7 +31,10 @@ def validate_with_exceptions(schema, data, errors):
         # allow not provided for numeric types
         if (
             error.validator == "type"
-            and error.instance == "Not Provided [SNOMED:434941000124101]"
+            and error.instance
+            == relecov_tools.config_json.ConfigJson().get_topic_data(
+                "generic", "not_provided_field"
+            )
             and prop_schema.get("type") in ["integer", "number"]
         ):
             continue
@@ -37,7 +42,10 @@ def validate_with_exceptions(schema, data, errors):
         # allow not provided for date format types
         if (
             error.validator == "format"
-            and error.instance == "Not Provided [SNOMED:434941000124101]"
+            and error.instance
+            == relecov_tools.config_json.ConfigJson().get_topic_data(
+                "generic", "not_provided_field"
+            )
             and prop_schema.get("type") == "string"
             and prop_schema.get("format") == "date"
         ):

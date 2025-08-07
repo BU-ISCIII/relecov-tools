@@ -73,15 +73,17 @@ class LabMetadata(BaseModule):
         else:
             self.output_dir = output_dir
 
-        config_json = ConfigJson(extra_config=True)
+        self.config_json = ConfigJson(extra_config=True)
 
         # TODO: remove hardcoded schema selection
-        relecov_schema = config_json.get_topic_data("generic", "relecov_schema")
+        relecov_schema = self.config_json.get_topic_data("generic", "relecov_schema")
         relecov_sch_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
         )
-        self.configuration = config_json
-        self.institution_config = config_json.get_configuration("institutions_config")
+        self.configuration = self.config_json
+        self.institution_config = self.config_json.get_configuration(
+            "institutions_config"
+        )
 
         out_path = os.path.realpath(self.output_dir)
         self.lab_code = out_path.split("/")[-2]
@@ -113,15 +115,15 @@ class LabMetadata(BaseModule):
                 )
                 continue
         self.date = dtime.now().strftime("%Y%m%d%H%M%S")
-        self.json_req_files = config_json.get_topic_data(
+        self.json_req_files = self.config_json.get_topic_data(
             "read_lab_metadata", "lab_metadata_req_json"
         )
         self.schema_name = self.relecov_sch_json["title"]
         self.schema_version = self.relecov_sch_json["version"]
-        self.metadata_processing = config_json.get_topic_data(
+        self.metadata_processing = self.config_json.get_topic_data(
             "sftp_handle", "metadata_processing"
         )
-        self.samples_json_fields = config_json.get_topic_data(
+        self.samples_json_fields = self.config_json.get_topic_data(
             "read_lab_metadata", "samples_json_fields"
         )
         self.unique_sample_id = "sequencing_sample_id"
@@ -143,7 +145,7 @@ class LabMetadata(BaseModule):
             try:
                 return relecov_tools.utils.calculate_md5(file)
             except IOError:
-                return "Not Provided [SNOMED:434941000124101]"
+                return self.config_json.get_topic_data("generic", "not_provided_field")
 
         # The files are and md5file are supposed to be located together
         dir_path = self.files_folder
@@ -401,7 +403,9 @@ class LabMetadata(BaseModule):
                         continue
                     # TODO: Include Not Provided as a configuration field
                     fields_to_add = {
-                        x: "Not Provided [SNOMED:434941000124101]"
+                        x: self.config_json.get_topic_data(
+                            "generic", "not_provided_field"
+                        )
                         for x in json_fields["adding_fields"]
                     }
                     m_data[idx].update(fields_to_add)
@@ -444,7 +448,9 @@ class LabMetadata(BaseModule):
             if file_format_val:
                 row["file_format"] = file_format_val
             else:
-                row["file_format"] = "Not Provided [SNOMED:434941000124101]"
+                row["file_format"] = self.config_json.get_topic_data(
+                    "generic", "not_provided_field"
+                )
 
         return metadata
 

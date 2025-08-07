@@ -28,6 +28,8 @@ import semantic_version
 import subprocess
 import importlib.metadata
 
+import relecov_tools.config_json
+
 log = logging.getLogger(__name__)
 
 
@@ -96,7 +98,11 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
             for idx in range(0, len(heading)):
                 if l_row[idx] is None:
                     data_row[heading[idx]] = (
-                        None if leave_empty else "Not Provided [SNOMED:434941000124101]"
+                        None
+                        if leave_empty
+                        else relecov_tools.config_json.ConfigJson().get_topic_data(
+                            "generic", "not_provided_field"
+                        )
                     )
                 else:
                     data_row[heading[idx]] = l_row[idx]
@@ -126,7 +132,9 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
                         data_row[heading[idx]] = (
                             None
                             if leave_empty
-                            else "Not Provided [SNOMED:434941000124101]"
+                            else relecov_tools.config_json.ConfigJson().get_topic_data(
+                                "generic", "not_provided_field"
+                            )
                         )
                     else:
                         data_row[heading[idx]] = val

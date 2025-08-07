@@ -492,7 +492,9 @@ class BioinfoMetadata(BaseModule):
             else:
                 errors.append(sample_name)
                 for field in mapping_fields:
-                    row[field] = "Not Provided [SNOMED:434941000124101]"
+                    row[field] = self.config_json.get_topic_data(
+                        "generic", "not_provided_field"
+                    )
 
         # work around when map_data comes from several per-sample tables/files instead of single table
         # get the dirname where the tables/files are or basename of the table_name
