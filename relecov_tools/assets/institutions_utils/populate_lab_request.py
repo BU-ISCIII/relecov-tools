@@ -39,7 +39,11 @@ FIELD_MAP = {
 DEFAULTS = {"lab_unit": "-", "lab_contact_name": "-"}
 DEFAULT_APPS = "wetlab"
 MAX_CODING_LEN = 50
-_quote = lambda c: f"`{c}`"
+
+
+def _quote(column: str) -> str:
+    """Wrap a column name in back-ticks for MySQL."""
+    return f"`{column}`"
 
 
 # ────── Generic helpers ──────────────────────────────────────────────────
