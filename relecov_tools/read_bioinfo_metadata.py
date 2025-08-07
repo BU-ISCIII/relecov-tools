@@ -1282,7 +1282,6 @@ class BioinfoMetadata(BaseModule):
                         log_type,
                         f"Could not create batch table for {file}: {e}",
                     )
-        self.log_report.print_log_report(method_name, ["valid", "warning", "error"])
         return
 
     def merge_metadata(self, batch_filepath: str, batch_data: list[dict]) -> list[dict]:
@@ -1473,10 +1472,12 @@ class BioinfoMetadata(BaseModule):
                 self.log.warning(
                     "Metadata was not completely validate, fix the errors or run with --soft_validation"
                 )
+                stderr.print("Metadata was not completely validate, fix the errors or run with --soft_validation")
                 return False
         else:
             self.j_data = valid_rows
             self.log.info("Bioinfo json successfully validated.")
+            stderr.print("[green] Bioinfo json successfully validated.")
 
         return True
 
@@ -1498,7 +1499,8 @@ class BioinfoMetadata(BaseModule):
             batch_data.
         """
         self.j_data = self._write_or_merge_json(batch_filepath, self.j_data)
-        self.log.info(f"Created output json file: {batch_filepath}")
+        self.log.info(f"Created complete batch json file: {batch_filepath}")
+        stderr.print(f"Created complete batch json file: {batch_filepath}")
 
         data_by_batch = self.split_data_by_batch(self.j_data)
         for batch_dir, batch_dict in data_by_batch.items():
@@ -1531,7 +1533,8 @@ class BioinfoMetadata(BaseModule):
             batch_filepath = os.path.join(batch_dir, batch_filename)
 
             batch_data = self._write_or_merge_json(batch_filepath, batch_data)
-            self.log.info(f"Created output json file: {batch_filepath}")
+            self.log.info(f"Created output laboratory json file: {batch_filepath}")
+            stderr.print(f"Created output laboratory json file: {batch_filepath}")
 
             for sample in batch_data:
                 self.logsum.feed_key(
