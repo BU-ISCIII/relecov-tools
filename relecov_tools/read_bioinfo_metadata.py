@@ -452,9 +452,8 @@ class BioinfoMetadata(BaseModule):
         sample_ids = {
             sample_name for row in j_data if (sample_name := self._get_sample_name(row))
         }
-        matched_samples = sample_ids & set(map_data.keys())
         # check if samples from j_data match the samples in map_data
-        no_samples = not matched_samples
+        matched_samples = sample_ids & set(map_data.keys())
 
         # iterate over j_data
         for row in j_data:
@@ -484,7 +483,7 @@ class BioinfoMetadata(BaseModule):
                 not self.software_config[self.current_config_key].get(
                     "multiple_samples"
                 )
-                and no_samples
+                and not matched_samples
             ):
                 self._map_non_multiple_sample(
                     row, map_data, mapping_fields, field_valid, field_errors
