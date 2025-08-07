@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added new parameter `skip_upload_db` in `pipeline_manager` to allow skipping DB upload for testing purposes [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Support for using `unique_sample_id` as a key identifier in `read_bioinfo_metadata`, including fallback to combined ID format [#738](https://github.com/BU-ISCIII/relecov-tools/issues/738) [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
 - Refactored `read_bioinfo_metadata` module for improved structure, readability, and maintainability [#777](https://github.com/BU-ISCIII/relecov-tools/pull/777)
+- Included project name in email subject for upload_results module [#780](https://github.com/BU-ISCIII/relecov-tools/pull/780)
 
 #### Fixes
 
