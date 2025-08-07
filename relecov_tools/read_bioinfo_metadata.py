@@ -428,7 +428,7 @@ class BioinfoMetadata(BaseModule):
         j_data: list[dict],
         map_data: dict,
         mapping_fields: dict,
-        table_name: str,
+        table_name: list[str],
     ) -> list[dict]:
         """
         Maps bioinformatics metadata from map_data to j_data based on the mapping_fields.
@@ -437,7 +437,7 @@ class BioinfoMetadata(BaseModule):
             j_data (list[dict]): Metadata from the lab (one item per sample).
             map_data (dict): Processed bioinformatic metadata, indexed by sample name.
             mapping_fields (dict): Mapping from JSON fields to software fields as defined in the config.
-            table_name (str): Name or path of the mapping table.
+            table_name (list[str]): Name or path of the mapping table.
 
         Returns:
             list[dict]: The updated j_data list with mapped bioinformatic fields.
