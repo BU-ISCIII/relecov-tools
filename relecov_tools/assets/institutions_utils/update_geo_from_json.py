@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, csv, datetime, json, logging, os
+import argparse
+import csv
+import datetime
+import json
+import logging
+import os
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from typing import Any, Dict, Tuple, List
