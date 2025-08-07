@@ -93,6 +93,9 @@ class BioinfoMetadata(BaseModule):
         self.log_report = BioinfoReportLog()
         self.logsum = self.parent_log_summary(output_dir=output_dir)
 
+        # Init config
+        self.config_json = ConfigJson()
+
         # Init attributes
         self._init_input_folder(input_folder)
         self._init_software_name(software_name)
@@ -115,8 +118,7 @@ class BioinfoMetadata(BaseModule):
             None
         """
         if json_schema_file is None:
-            config_json = ConfigJson()
-            schema_name = config_json.get_topic_data("generic", "relecov_schema")
+            schema_name = self.config_json.get_topic_data("generic", "relecov_schema")
             json_schema_file = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "schema", str(schema_name)
             )
@@ -574,7 +576,9 @@ class BioinfoMetadata(BaseModule):
                 raw_val = map_data[sample_name][table_field]
             except KeyError as e:
                 field_errors[sample_name] = {schema_field: str(e)}
-                row[schema_field] = "Not Provided [SNOMED:434941000124101]"
+                row[schema_field] = self.config_json.get_topic_data(
+                    "generic", "not_provided_field"
+                )
             # Replace NA values if needed
             raw_val = self.replace_na_value_if_needed(schema_field, raw_val)
             # get the expected type from the JSON schema
@@ -625,7 +629,9 @@ class BioinfoMetadata(BaseModule):
                     field_valid[software_key] = {json_field: field}
                 except KeyError as e:
                     field_errors[software_key] = {json_field: str(e)}
-                    row[json_field] = "Not Provided [SNOMED:434941000124101]"
+                    row[json_field] = self.config_json.get_topic_data(
+                        "generic", "not_provided_field"
+                    )
 
     def validate_sample_names(self) -> None:
         """Validate that the sequencing_sample_id from the JSON input is present in the samples_id.txt.
@@ -968,7 +974,7 @@ class BioinfoMetadata(BaseModule):
             or (isinstance(raw_val, float) and np.isnan(raw_val))
         )
         if is_na and field not in required_fields:
-            return "Not Provided [SNOMED:434941000124101]"
+            return self.config_json.get_topic_data("generic", "not_provided_field")
         return raw_val
 
     def map_and_extract_bioinfo_paths(
@@ -1052,7 +1058,7 @@ class BioinfoMetadata(BaseModule):
             list[str]: Matching paths or placeholder.
         """
         if not files:
-            return ["Not Provided [SNOMED:434941000124101]"]
+            return [self.config_json.get_topic_data("generic", "not_provided_field")]
         # if key is in multi_sample_keys, return all files
         if key in multi_sample_keys:
             return files
@@ -1079,7 +1085,9 @@ class BioinfoMetadata(BaseModule):
             # for each file_path in file_paths
             for f in file_paths:
                 # If not provided append and continue
-                if f == "Not Provided [SNOMED:434941000124101]":
+                if f == self.config_json.get_topic_data(
+                    "generic", "not_provided_field"
+                ):
                     analysis_results_paths.append(f)
                     continue
                 # check if configured as extract or function
@@ -1177,7 +1185,9 @@ class BioinfoMetadata(BaseModule):
             if os.path.isfile(out_filepath):
                 self.log.debug(f"{out_filepath} already exists, not extracted")
                 continue
-            if filepath == "Not Provided [SNOMED:434941000124101]":
+            if filepath == self.config_json.get_topic_data(
+                "generic", "not_provided_field"
+            ):
                 self.update_all_logs(
                     self.extract_file.__name__,
                     "warning",
