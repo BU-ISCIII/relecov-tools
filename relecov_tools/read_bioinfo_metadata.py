@@ -1472,7 +1472,9 @@ class BioinfoMetadata(BaseModule):
                 self.log.warning(
                     "Metadata was not completely validate, fix the errors or run with --soft_validation"
                 )
-                stderr.print("Metadata was not completely validate, fix the errors or run with --soft_validation")
+                stderr.print(
+                    "Metadata was not completely validate, fix the errors or run with --soft_validation"
+                )
                 return False
         else:
             self.j_data = valid_rows
