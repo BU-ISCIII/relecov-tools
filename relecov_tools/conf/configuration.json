@@ -16,7 +16,8 @@
         "institution_mapping_file": {
             "ISCIII": "ISCIII.json",
             "HUGTiP": "HUGTiP.json"
-        }
+        },
+        "not_provided_field": "Not Provided [SNOMED:434941000124101]"
     },
     "pipeline_manager": {
         "analysis_group": "RLV",
