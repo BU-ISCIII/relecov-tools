@@ -568,26 +568,27 @@ class BioinfoMetadata(BaseModule):
             field_errors (dict): Accumulator for mapping errors.
         """
         # Iterate over mapping fields and map values to the row
-        for field, value in mapping_fields.items():
+        for schema_field, table_field in mapping_fields.items():
             try:
                 # Get the raw value from map_data for the sample
-                raw_val = map_data[sample_name][value]
-                # Replace NA values if needed
-                raw_val = self.replace_na_value_if_needed(field, raw_val)
-                # get the expected type from the JSON schema
-                expected_type = (
-                    self.json_schema["properties"].get(field, {}).get("type", "string")
-                )
-                # convert the raw value to the expected type
-                row[field] = relecov_tools.utils.cast_value_to_schema_type(
-                    raw_val, expected_type
-                )
-                # assign the field to field value validated
-                field_valid[sample_name] = {field: value}
-
+                raw_val = map_data[sample_name][table_field]
             except KeyError as e:
-                field_errors[sample_name] = {field: str(e)}
-                row[field] = "Not Provided [SNOMED:434941000124101]"
+                field_errors[sample_name] = {schema_field: str(e)}
+                row[schema_field] = "Not Provided [SNOMED:434941000124101]"
+            # Replace NA values if needed
+            raw_val = self.replace_na_value_if_needed(schema_field, raw_val)
+            # get the expected type from the JSON schema
+            expected_type = (
+                self.json_schema["properties"]
+                .get(schema_field, {})
+                .get("type", "string")
+            )
+            # convert the raw value to the expected type
+            row[schema_field] = relecov_tools.utils.cast_value_to_schema_type(
+                raw_val, expected_type
+            )
+            # assign the field to field value validated
+            field_valid[sample_name] = {schema_field: table_field}
 
     def _map_non_multiple_sample(
         self,
