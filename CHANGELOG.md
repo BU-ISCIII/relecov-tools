@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Included handling for already registered samples in the upload process [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Added new parameter `skip_upload_db` in `pipeline_manager` to allow skipping DB upload for testing purposes [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Support for using `unique_sample_id` as a key identifier in `read_bioinfo_metadata`, including fallback to combined ID format [#738](https://github.com/BU-ISCIII/relecov-tools/issues/738) [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
+- Refactored `read_bioinfo_metadata` module for improved structure, readability, and maintainability [#777](https://github.com/BU-ISCIII/relecov-tools/pull/777)
 
 #### Fixes
 
@@ -34,8 +35,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Modified `upload_database` to accept `json_data` as either a path or a list of dicts [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - `upload_database` now returns API upload results for downstream consumption [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Changed exit behavior in `pipeline_manager` to raise exceptions instead of using `exit(0)` [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
-- Updated method signatures and added type annotations and docstrings for better code clarity [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Updated method signatures and added type annotations and docstring for better code clarity [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Enhanced `validate_samplenames` logic to support combined identifier format (`sequencing_sample_id_unique_sample_id`) when present [#738](https://github.com/BU-ISCIII/relecov-tools/issues/738) [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
+- Renamed `add_bioinfo_files_path` to `map_and_extract_bioinfo_paths` in `read_bioinfo_metadata` for clarity and consistency [#777](https://github.com/BU-ISCIII/relecov-tools/pull/777)
 
 #### Removed
 
