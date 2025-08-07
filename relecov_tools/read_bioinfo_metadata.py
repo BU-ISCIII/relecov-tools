@@ -814,7 +814,9 @@ class BioinfoMetadata(BaseModule):
             return None, data
         return data, None
 
-    def extract_sample_metadata_from_table(self, file_list: list, conf_tab_name: str) -> dict:
+    def extract_sample_metadata_from_table(
+        self, file_list: list, conf_tab_name: str
+    ) -> dict:
         """Reads a tabular file in different formats and returns a dictionary containing
         the corresponding data for each sample.
 
@@ -1421,7 +1423,7 @@ class BioinfoMetadata(BaseModule):
         return filtered_batch_data, filename
 
     def _validate_jdata_and_log_errors(self, out_path: str) -> bool:
-        """ Validate the j_data against the JSON schema and log errors if any.
+        """Validate the j_data against the JSON schema and log errors if any.
 
         Args:
         out_path (str)
@@ -1484,7 +1486,7 @@ class BioinfoMetadata(BaseModule):
         batch_filepath: str,
         extra_json_data: list[dict],
     ) -> None:
-        """ Splits json data by batch and writes it to the output file.
+        """Splits json data by batch and writes it to the output file.
 
         Args:
         files_found_dict
