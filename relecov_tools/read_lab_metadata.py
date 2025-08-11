@@ -485,21 +485,12 @@ class LabMetadata(BaseModule):
         if empty_codes:
             stderr.print(
                 f"[yellow]{len(empty_codes)} samples without {col_label}; "
-<<<<<<< HEAD
-                " review log"
-            )
-        if unknown_codes:
-            stderr.print(
-                f"[yellow]{len(unknown_codes)} {col_label} values not found "
-                f"in {json_fields['file']}; review log"
-=======
                 "check the log"
             )
         if unknown_codes:
             stderr.print(
                 f"[yellow]{len(unknown_codes)} values of {col_label} not found "
                 f"en {json_fields['file']}; check the log"
->>>>>>> c83bddb (Fix spanish to english in read-lab-metadata)
             )
 
         return m_data
