@@ -2,6 +2,7 @@
 import logging
 import requests
 import rich.console
+from typing import Any
 import relecov_tools.utils
 from requests.auth import HTTPBasicAuth
 
@@ -44,7 +45,7 @@ class RestApi:
             safe (bool): If True, errors are logged and not raised. Defaults to True.
             credentials ([dict, tuple, list, None]): Basic auth credentials. Can be a dict with
             'user' and 'pass' as keys, or a tuple/list (user, pass).
-            params (dict): Dictionary of params for the get request
+            params (dict): dictionary of params for the get request
 
         Returns:
             dict: Same as RestApi.standardize_response() dict
@@ -140,7 +141,7 @@ class RestApi:
         Args:
             api_func (str): Api functionality to check if sample is present
             credentials (dict["user": user, "pass": pass]): Credentials dictionary
-            sample_data (dict): Dictionary with sample metadata to use as input
+            sample_data (dict): dictionary with sample metadata to use as input
 
         Raises:
             ValueError: if the conection was interrupted unexpectedly.
@@ -160,49 +161,142 @@ class RestApi:
             raise ValueError(f"Error trying to check for sample: {response}")
 
     @staticmethod
-    def standardize_response(response, success_codes=[200], method=""):
+    def standardize_response(
+        response,
+        success_codes: list[int] = [200],
+        method: str = "",
+        *,
+        message_keys: list[str] = ["message", "detail", "msg"],
+        error_keys: list[str] = ["ERROR", "error"],
+        data_keys: list[str] = ["data", "payload", "result"],
+        include_raw_on_non_json: bool = False,
+    ) -> dict[str, Any]:
         """
-        Parses a `requests.Response` object into a standardized dictionary format.
+        Normalize a `requests.Response` into your canonical shape while preserving API-provided fields.
 
-        Args:
-            response (requests.Response): The HTTP response object to parse.
-            success_code (list(int)): Expected HTTP status codes indicating success. Default is [200].
-
-        Returns:
-            dict: Standardized dictionary with:
-                - "Success" or "ERROR": response.text
-                - "status_code": HTTP status code
-                - "data": Parsed JSON body if content-type is application/json, else empty dict.
-        """
-        response_header = response.headers.get("Content-Type", "")
-        try:
-            data = response.json() if "application/json" in response_header else {}
-        except ValueError:
-            data = {}
-        if data and isinstance(data, dict):
-            message = (
-                data.get("detail")
-                or data.get("error")
-                or data.get("ERROR")
-                or data.get("message")
-                or "Unexpected error"
-            )
-            data = data.get("data", data)
-        else:
-            if response.status_code not in success_codes:
-                message = "Unexpected error"
-            else:
-                message = "No message"
-        if response.status_code not in success_codes:
-            logtxt = f"Unable to {method} parameters. Received '{message}' with status code: {response.status_code}"
-            log.error(logtxt)
-            stderr.print(f"[red]{logtxt}")
-            return {"ERROR": message, "status_code": response.status_code, "data": data}
-        else:
-            logtxt = f"Successful {method} response. Received '{message}' with status code: {response.status_code}"
-            log.info(logtxt)
-            return {
-                "Success": message,
-                "status_code": response.status_code,
-                "data": data,
+        Canonical output:
+            {
+              "message": <str>,                # Prefer API 'message'/'detail'/...
+              "status_code": <int>,            # Always present
+              "data": <obj>,                   # Prefer API 'data'/'payload'/'result', else {}
+              "ERROR": <str> (optional)        # Included if API provided it, or if status is not success
+              ["raw"]: <str> (optional)        # Raw text for non-JSON responses if enabled
             }
+
+        Flexibility:
+          - Accepts alternative key names via message_keys, error_keys, data_keys.
+          - If the API already provides 'message', 'data', 'ERROR', those are preserved.
+          - If response is not JSON, still returns the canonical keys.
+        """
+        status_code = getattr(response, "status_code", None)
+        content_type = (
+            response.headers.get("Content-Type", "")
+            if hasattr(response, "headers")
+            else ""
+        )
+        is_success = status_code in success_codes
+
+        # Try to parse JSON safely
+        payload: Any = None
+        if "application/json" in content_type.lower():
+            try:
+                payload = response.json()
+            except Exception:
+                payload = None
+        else:
+            # Some APIs forget the content-type; try JSON parse as best effort
+            try:
+                payload = response.json()
+            except Exception:
+                payload = None
+
+        # Initialize canonical result
+        result: dict[str, Any] = {
+            "message": "",
+            "status_code": status_code,
+            "data": {},
+        }
+
+        def _first_key(d: dict[str, Any], keys: list[str]):
+            """ Get the first key from `keys` that is present in `d`
+
+            Args:
+            d : dict
+                d is a dict to search
+            keys
+                list of keys to search
+
+            Returns:
+            key, value : tuple  returns the first key and value
+            """
+            for k in keys:
+                if isinstance(d, dict) and k in d and d[k] not in (None, ""):
+                    return k, d[k]
+            return None, None
+
+        if isinstance(payload, dict):
+            # Prefer exact API fields if present
+            # ERROR
+            err_key, err_val = _first_key(payload, list(error_keys))
+            if err_key is not None:
+                result["ERROR"] = err_val
+
+            # message - prefer API 'message'/'detail'/...
+            if "message" in payload and payload["message"] is not None:
+                result["message"] = payload["message"]
+            else:
+                _, alt_msg = _first_key(payload, list(message_keys))
+                if alt_msg is not None:
+                    result["message"] = alt_msg
+                elif "ERROR" in result:
+                    result["message"] = str(result["ERROR"])  # fallback to error text
+                else:
+                    result["message"] = "OK" if is_success else "Unexpected error"
+
+            # data - prefer API 'data'/'payload'/'result'
+            if "data" in payload:
+                result["data"] = payload["data"]
+            else:
+                _, alt_data = _first_key(payload, list(data_keys))
+                result["data"] = alt_data if alt_data is not None else {}
+
+            # If HTTP status is not success and API did not include ERROR, synthesize it
+            if not is_success and "ERROR" not in result:
+                result["ERROR"] = result["message"] or f"HTTP {status_code}"
+
+        else:
+            # Non-JSON response
+            text = ""
+            try:
+                text = response.text or ""
+            except Exception:
+                text = ""
+
+            if not is_success:
+                # On error, surface the body as ERROR (truncated to avoid huge logs)
+                truncated = text.strip()[:1000]
+                result["ERROR"] = truncated or "Unexpected error"
+                result["message"] = truncated or "Unexpected error"
+            else:
+                # On success without JSON, be conservative
+                result["message"] = "OK"
+                result["data"] = {}
+
+            if include_raw_on_non_json:
+                result["raw"] = text
+
+        # Logging
+        if not is_success:
+            logtxt = (
+                f"Unable to {method} parameters. Received '{result.get('ERROR','Unexpected error')}' "
+                f"with status code: {status_code}"
+            )
+            log.error(logtxt)
+        else:
+            logtxt = (
+                f"Successful {method} response. Received '{result.get('message','OK')}' "
+                f"with status code: {status_code}"
+            )
+            log.info(logtxt)
+
+        return result
