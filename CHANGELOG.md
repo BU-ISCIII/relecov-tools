@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Sara Monzon](https://github.com/saramonzon)
 - [Victor Lopez](https://github.com/victor5lm)
+- [Sarai Varona](https://github.com/svarona)
 
 #### Added enhancements
 
@@ -21,12 +22,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Support for using `unique_sample_id` as a key identifier in `read_bioinfo_metadata`, including fallback to combined ID format [#738](https://github.com/BU-ISCIII/relecov-tools/issues/738) [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
 - Refactored `read_bioinfo_metadata` module for improved structure, readability, and maintainability [#777](https://github.com/BU-ISCIII/relecov-tools/pull/777)
 - Included project name in email subject for upload_results module [#780](https://github.com/BU-ISCIII/relecov-tools/pull/780)
+- Integrated REGCESS as the main institutional metadata source, merging CCN and CODCNH datasets, standardizing codes, enriching with geolocation, and updating schema and validation logic [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
 
 #### Fixes
 
 - Fixed potential inconsistency when no folder name is found in metadata, now raises warning and skips entry [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Fixed broken platform config references (`platform` → `platform-data`, then to `platform-params`) to reflect changes in `configuration.json` [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
 - Improved robustness and internal consistency of `pipeline_utils` and `viralrecon.py` through annotations, docstrings, and variable cleanup [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
+- Fixed geolocation cities file and improved city name normalization [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
+- Fixed issues with submitting institutions metadata [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
 
 #### Changed
 
@@ -41,6 +45,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Renamed `add_bioinfo_files_path` to `map_and_extract_bioinfo_paths` in `read_bioinfo_metadata` for clarity and consistency [#777](https://github.com/BU-ISCIII/relecov-tools/pull/777)
 - Updated the hospital database generation to merge REGCESS and CNH data, handle complexes, enrich and normalize metadata, auto-geolocate cities, and generate all related JSON outputs [#726](https://github.com/BU-ISCIII/relecov-tools/pull/726)
 - Added "Complejo" to the "Nombre del Complejo" [#749](https://github.com/BU-ISCIII/relecov-tools/pull/749)
+- Updated read-lab-metadata to extract and use CCN from Excel hospital fields [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
+- Updated build-schema to generate hospital dropdowns using hospital-city-CCN mappings [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
+- Replaced collecting institution CCN/CODCNH fields with standardized `collecting_institution_code_[1,2]` [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
 
 #### Removed
 
@@ -69,6 +76,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Update __main__ & config_json for new merged-config structure (commands + params) [#765](https://github.com/BU-ISCIII/relecov-tools/pull/765)
 - Propagate wrapper --output_dir down to download [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
 - Update error message when output_dir is missing in extra_config [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
+- Check_db fixed due to configuration.json changes. Now wrapper uses update_db for validation as default [#767](https://github.com/BU-ISCIII/relecov-tools/pull/767)
 
 #### Removed
 
@@ -83,7 +91,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Pablo Mata](https://github.com/shettland)
 - [Victor Lopez](https://github.com/victor5lm)
 - [Alejandro Bernabeu](https://github.com/aberdur)
-- [Sarai Varona](https://github.com/svarona)
 
 #### Added enhancements
 
