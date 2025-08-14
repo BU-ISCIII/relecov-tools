@@ -153,10 +153,17 @@ class RestApi:
             api_func, credentials=credentials, params=sample_data, safe=False
         )
         log.info(str(response))
+        if missing_keys := [
+            key for key in ["message", "data", "status_code"] if key not in response 
+        ]:
+            log.error(f"Missing keys in API response: {missing_keys}")
+            stderr.print(f"Missing keys in API response: {missing_keys}")
+            raise KeyError(f"Missing keys in API response: {missing_keys}")
+
         if response["status_code"] == 404:
             return False
         elif response["status_code"] == 200:
-            return True
+            return not bool(response["message"] != "Sample not found" or response["data"])
         else:
             raise ValueError(f"Error trying to check for sample: {response}")
 
@@ -218,7 +225,7 @@ class RestApi:
         }
 
         def _first_key(d: dict[str, Any], keys: list[str]):
-            """ Get the first key from `keys` that is present in `d`
+            """Get the first key from `keys` that is present in `d`
 
             Args:
             d : dict
