@@ -69,6 +69,29 @@ def read_json_file(j_file):
     return data
 
 
+def write_to_excel_file(data, f_name, sheet_name, post_process=None):
+    book = openpyxl.Workbook()
+    sheet = book.active
+    for row in data:
+        sheet.append(row)
+    # adding one column with row number
+    if "insert_cols" in post_process:
+        sheet.insert_cols(post_process["insert_cols"])
+        sheet["A1"] = "CAMPO"
+        counter = 1
+        for i in range(len(data) - 1):
+            idx = "A" + str(counter + 1)
+            sheet[idx] = counter
+            counter += 1
+    # adding 3 empty rows
+    if "insert_rows" in post_process:
+        for x in range(post_process["insert_rows"]):
+            sheet.insert_rows(1)
+        sheet.title = sheet_name
+    book.save(f_name)
+    return
+
+
 def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
     """Read the input excel file and return the data as a list of dictionaries.
     If openpyxl fails, fall back to pandas but return in the same format.

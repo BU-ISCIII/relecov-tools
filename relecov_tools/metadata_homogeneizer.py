@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 import os
-import sys
-import logging
+import importlib
 import rich.console
 
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
+from relecov_tools.base_module import BaseModule
 
-log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -16,17 +15,20 @@ stderr = rich.console.Console(
 )
 
 
-class MetadataHomogeneizer:
+class MetadataHomogeneizer(BaseModule):
     """MetadataHomogeneizer object"""
 
     def __init__(self, institution=None, directory=None, output_dir=None):
+        super().__init__(output_directory=output_dir, called_module=__name__)
         # open config
         self.config_json = ConfigJson()
         # read heading from config
         self.heading = self.config_json.get_topic_data(
             "read_lab_metadata", "metadata_lab_heading"
         )
-
+        self.metadata_processing = self.config_json.get_topic_data(
+            "sftp_handle", "metadata_processing"
+        )
         # handle institution
         if institution is None:
             self.institution = relecov_tools.utils.prompt_selection(
@@ -50,27 +52,26 @@ class MetadataHomogeneizer:
                 msg="Select the directory which contains additional files for metadata"
             )
         if not os.path.exists(directory):
-            log.error("Folder for additional files %s does not exist ", directory)
-            stderr.print(
-                "[red] Folder for additional files " + directory + " does not exist"
-            )
-            sys.exit(1)
+            errtxt = f"Folder for additional files {directory} does not exist"
+            self.log.error(errtxt)
+            stderr.print(f"[red]{errtxt}")
+            raise FileNotFoundError({errtxt})
 
         try:
             lab_metadata = self.mapping_json_data["required_files"]["metadata_file"][
                 "file_name"
             ]
         except KeyError:
-            log.error("Metadata File is not defined in schema")
+            self.log.error("Metadata File is not defined in schema")
             stderr.print("[red] Metadata File is not defined in schema")
-            sys.exit(1)
+            raise ValueError("Metadata file is not defined in schema")
 
         metadata_path = os.path.join(directory, lab_metadata)
 
         if not os.path.isfile(metadata_path):
-            log.error("Metadata File %s does not exists", metadata_path)
+            self.log.error("Metadata File %s does not exists", metadata_path)
             stderr.print("[red] Metadata File " + metadata_path + "does not exists")
-            sys.exit(1)
+            raise FileNotFoundError(f"Metadata File {metadata_path} does not exists")
         self.lab_metadata = self.mapping_json_data["required_files"]["metadata_file"]
         self.lab_metadata["file_name"] = metadata_path
 
@@ -85,9 +86,9 @@ class MetadataHomogeneizer:
                     continue
                 f_path = os.path.join(directory, values["file_name"])
                 if not os.path.isfile(f_path):
-                    log.error("Additional file %s does not exist ", f_path)
+                    self.log.error("Additional file %s does not exist ", f_path)
                     stderr.print("[red] Additional file " + f_path + " does not exist")
-                    sys.exit(1)
+                    raise FileNotFoundError(f"Additional file {f_path} does not exist ")
                 values["file_name"] = f_path
                 self.additional_files.append(values)
 
@@ -101,13 +102,10 @@ class MetadataHomogeneizer:
                 os.path.dirname(__file__), "institution_scripts", function_file
             )
             if not os.path.isfile(self.function_file):
-                log.error("File with functions %s does not exist ", self.function_file)
-                stderr.print(
-                    "[red] File with functions "
-                    + self.function_file
-                    + " does not exist"
-                )
-                sys.exit(1)
+                errtxt = f"File with functions {self.function_file} does not exist"
+                self.log.error(errtxt)
+                stderr.print(f"[red]{errtxt}")
+                raise FileNotFoundError(errtxt)
         if output_dir is None:
             self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
@@ -162,16 +160,15 @@ class MetadataHomogeneizer:
             elif f_name.endswith(".csv"):
                 data = relecov_tools.utils.read_csv_file_return_dict(f_name, ",")
             elif f_name.endswith(".xlsx"):
-                header_flag = self.metadata_processing.get("header_flag")
-                data = relecov_tools.utils.read_excel_file(
-                    f_name, "Sheet", header_flag, leave_empty=True
+                excel_sheet = self.metadata_processing.get("excel_sheet")
+                data, _ = relecov_tools.utils.read_excel_file(
+                    f_name, excel_sheet, "ID CNM", leave_empty=True
                 )
             else:
-                log.error("Additional file extension %s is not supported ", f_name)
-                stderr.print(
-                    "[red] Additional file extension " + f_name + " is not supported"
-                )
-                sys.exit(1)
+                errtxt = f"Additional file extension {f_name} is not supported"
+                self.log.error(errtxt)
+                stderr.print(f"[red]{errtxt}")
+                raise ValueError(errtxt)
         else:
             data = ""
         if not self.processed_metadata:
@@ -186,44 +183,37 @@ class MetadataHomogeneizer:
                 try:
                     item_data = data[s_value]
                 except KeyError:
-                    log.info(
-                        "Additional file %s does not have the information for %s ",
-                        f_name,
-                        s_value,
+                    errtxt = (
+                        f"Additional file {f_name} does not have the information for {s_value} ",
                     )
-                    stderr.print(
-                        "[yellow] Additional file "
-                        + f_name
-                        + " does not have information for "
-                        + str(s_value)
-                    )
+                    self.log.info(errtxt)
+                    stderr.print(f"[yellow]{errtxt}")
                     continue
-                    # sys.exit(1)
+
                 for m_field, f_field in file_data["mapped_fields"].items():
                     try:
                         meta_idx = self.heading.index(m_field)
                     except ValueError as e:
-                        log.error("Field %s does not exist in Metadata ", e)
+                        self.log.error(
+                            "Field %s does not exist in Metadata heading, check config",
+                            e,
+                        )
                         stderr.print(f"[red] Field {e} does not exist")
-                        sys.exit(1)
+                        continue
                     row[meta_idx] = item_data[f_field]
 
         else:
+            if data == {"ERROR": "not valid format"}:
+                raise ValueError(
+                    f"Unknown error during processing of {file_data['file_name']}"
+                )
             func_name = file_data["function"]
             stderr.print("[yellow] Start processing function " + func_name)
-            exec(
-                "from relecov_tools.institution_scripts."
-                + self.institution
-                + " import "
-                + func_name
-            )
-            # somehow this overrides additional_data working as a pointer
-            eval(
-                func_name
-                + "(data_to_add, data, file_data['mapped_fields'], self.heading)"
-            )
-
-        stderr.print("[green] Succesful processing of additional file ")
+            import_statement = f"relecov_tools.institution_scripts.{self.institution}"
+            module = importlib.import_module(import_statement)
+            func_obj = getattr(module, func_name)
+            data = func_obj(data_to_add, data, file_data["mapped_fields"], self.heading)
+        stderr.print("[green]Succesful processing of additional file")
         return data_to_add
 
     def converting_metadata(self):
