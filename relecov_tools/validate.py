@@ -784,6 +784,8 @@ class Validate(BaseModule):
                 if sample in valid_json_data:
                     valid_json_data.remove(sample)
                     invalid_json.append(sample)
+            else:
+                self.log.info("Sample not found in db.")
         return valid_json_data, invalid_json
 
     def validate(self):
