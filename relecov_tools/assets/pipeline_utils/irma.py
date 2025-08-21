@@ -18,7 +18,7 @@ stderr = rich.console.Console(
 )
 
 
-def quality_control_evaluation(data):
+def quality_control_evaluation(data: list[dict], **kwargs) -> list[dict]:
     """Evaluates QC status for each sample based on predefined thresholds.
 
     Parameters:
@@ -73,12 +73,12 @@ def quality_control_evaluation(data):
     )
 
     for warn in warnings:
-        log_report.update_log_report(method_name, warn)
+        log_report.update_log_report(method_name, "warning", warn)
 
     return data
 
 
-def get_software_versions(files_list, file_tag, pipeline_name, output_dir=None):
+def get_software_versions(files_list: list, **kwargs) -> dict:
     """File handler to parse software versions from csv.
 
     Args:
