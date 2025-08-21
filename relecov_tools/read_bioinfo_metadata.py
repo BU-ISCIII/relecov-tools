@@ -1485,7 +1485,7 @@ class BioinfoMetadata(BaseModule):
                     "Metadata was not completely validate, fix the errors or run with --soft_validation"
                 )
                 stderr.print(
-                    "Metadata was not completely validate, fix the errors or run with --soft_validation"
+                    "[red]Metadata was not completely validate, fix the errors or run with --soft_validation"
                 )
                 return False
         else:
