@@ -456,7 +456,11 @@ def evaluate_qc_samples(
             failed_reasons = []
 
             for param, condition in conditions.items():
-                value = sample.get(param)
+                value = (
+                    float(sample.get(param))
+                    if isinstance(sample.get(param), str)
+                    else sample.get(param)
+                )
                 try:
                     if value is None or not condition(value):
                         if is_not_evaluable(value):
