@@ -1,3 +1,4 @@
+import copy
 import datetime
 import json
 import os
@@ -725,6 +726,7 @@ class PipelineManager(BaseModule):
         Returns:
             list(dict): Updated list of dictionaries with unique_sample_id added
         """
+
         upload_db_conf = self.config.get_configuration("update_db")
         if not upload_db_conf:
             self.log.error("No update_db configuration found")
@@ -749,7 +751,7 @@ class PipelineManager(BaseModule):
         upload_db = relecov_tools.upload_database.UploadDatabase(
             user=upload_db_conf["user"],
             password=upload_db_conf["password"],
-            json=json_data,
+            json=copy.deepcopy(json_data),
             type="sample",
             platform=upload_db_conf["platform"],
         )
