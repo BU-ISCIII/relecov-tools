@@ -220,8 +220,8 @@
                 "bioinformatics_analysis_date": "analysis_date",
                 "clade_assignment_date": "clade_assignment_date",
                 "clade_assignment_software_database_version": "clade_assignment_software_database_version",
-                "per_hagene_coverage": "10xcov_HA(%)",
-                "per_nagene_coverage": "10xcov_NA(%)"
+                "per_hagene_coverage": "Coverage>10xHA(%)",
+                "per_nagene_coverage": "Coverage>10xNA(%)"
             }
         },
         "variants_long_table": {
