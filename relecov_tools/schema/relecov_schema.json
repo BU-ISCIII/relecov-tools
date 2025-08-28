@@ -1,9 +1,9 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/relecov_schema.json",
+    "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/HEAD/relecov_tools/schema/relecov_schema.json",
     "title": "relecov-tools Schema.",
     "description": "Json Schema that specifies the structure, content, and validation rules for relecov-tools",
-    "version": "3.1.4",
+    "version": "3.2.0",
     "type": "object",
     "properties": {
         "organism": {
@@ -3435,6 +3435,7 @@
                 "Illumina COVIDSeq Test [CIDO:0020172]",
                 "Illumina COVIDSeq Assay",
                 "ABL DeepChek® Assay WG SC2 V1",
+                "ABL DeepChek® Assay WG SC2 V4",
                 "Not Provided [SNOMED:434941000124101]",
                 "Other [NCIT:C17649]"
             ],
@@ -4827,7 +4828,7 @@
             "ontology": "NCIT:C142175",
             "type": "string",
             "description": "The nature of the investigation or the investigational use for which the study is being done",
-            "classification": "Submission ENA",
+            "classification": "Public databases",
             "label": "Study type",
             "fill_mode": "batch",
             "header": "N"
@@ -6015,7 +6016,7 @@
             "ontology": "GENEPIO:0001498",
             "type": "string",
             "description": "The variant classification of the lineage i.e. alpha, beta, etc.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Variant Name",
             "fill_mode": "batch",
             "header": "N"
@@ -6034,7 +6035,7 @@
             "ontology": "GENEPIO:0001503",
             "type": "string",
             "description": "The variant classification of the lineage i.e. variant, variant of concern.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Variant designation",
             "fill_mode": "batch",
             "header": "N"
@@ -6270,7 +6271,7 @@
             "ontology": "NCIT:C179767",
             "type": "string",
             "description": "An indication of the taxonomic clade grouping of organisms.",
-            "classification": "Clade fields",
+            "classification": "Genomic Typing fields",
             "label": "Clade Assignment",
             "fill_mode": "batch",
             "header": "N"
@@ -6282,7 +6283,7 @@
             "ontology": "GENEPIO:0001501",
             "type": "string",
             "description": "The name of the software used to determine the clade.",
-            "classification": "Clade fields",
+            "classification": "Genomic Typing fields",
             "label": "Clade Assignment Software Name",
             "fill_mode": "batch",
             "header": "N"
@@ -6294,7 +6295,7 @@
             "ontology": "0",
             "type": "string",
             "description": "Other software used to determine clade.",
-            "classification": "Clade fields",
+            "classification": "Genomic Typing fields",
             "label": "Other Clade Assignment Software",
             "fill_mode": "batch",
             "header": "N"
@@ -6306,7 +6307,7 @@
             "ontology": "GENEPIO:0001502",
             "type": "string",
             "description": "The version of the software used to determine the clade.",
-            "classification": "Clade fields",
+            "classification": "Genomic Typing fields",
             "label": "Clade Assignment Software Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6318,7 +6319,7 @@
             "ontology": "MS:1001016",
             "type": "string",
             "description": "Version of the search database to determine the clade.",
-            "classification": "Clade fields",
+            "classification": "Genomic Typing fields",
             "label": "Clade Assignment Software Database Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6331,7 +6332,7 @@
             "type": "string",
             "format": "date",
             "description": "Date when the clade analysis was performed via Nextclade",
-            "classification": "Clade fields",
+            "classification": "Genomic Typing fields",
             "label": "Clade Assignment Date",
             "fill_mode": "batch",
             "header": "N"
@@ -6343,7 +6344,7 @@
             "ontology": "NCIT:C179767",
             "type": "string",
             "description": "An indication of the taxonomic lineage grouping of organisms.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Lineage Assignment",
             "fill_mode": "batch",
             "header": "N"
@@ -6355,7 +6356,7 @@
             "ontology": "GENEPIO:0001501",
             "type": "string",
             "description": "The name of the software used to determine the lineage.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Lineage Assignment Software Name",
             "fill_mode": "batch",
             "header": "N"
@@ -6367,7 +6368,7 @@
             "ontology": "0",
             "type": "string",
             "description": "Other software used to determine lineage.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Other Lineage Assignment Software",
             "fill_mode": "batch",
             "header": "N"
@@ -6379,7 +6380,7 @@
             "ontology": "GENEPIO:0001502",
             "type": "string",
             "description": "The version of the software used to determine the lineage.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Lineage Assignment Software Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6391,7 +6392,7 @@
             "ontology": "0",
             "type": "string",
             "description": "Version of the algorithm used by the lineage assignment software",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Lineage Algorithm Software Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6403,7 +6404,7 @@
             "ontology": "NCIT:C111093",
             "type": "string",
             "description": "The version of the scorpio data used to determine the lineage.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Lineage Assignment Scorpio Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6415,7 +6416,7 @@
             "ontology": "NCIT:C111093",
             "type": "string",
             "description": "The version of the constellations databases used to determine the lineage.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Lineage Assignment Constellation Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6428,7 +6429,7 @@
             "type": "string",
             "format": "date",
             "description": "Date when the lineage analysis was performed",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Lineage Assignment Date",
             "fill_mode": "batch",
             "header": "N"
@@ -6440,7 +6441,7 @@
             "ontology": "0",
             "type": "string",
             "description": "File containing results from lineage analysis",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Lineage Assignment File",
             "fill_mode": "batch",
             "header": "N"
@@ -6452,7 +6453,7 @@
             "ontology": "0",
             "type": "string",
             "description": "Version of the lineage assignment database",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Pangolin Database Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6464,7 +6465,7 @@
             "ontology": "NCIT:C179767",
             "type": "string",
             "description": "An indication of the taxonomic grouping of organisms.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Type Assignment",
             "fill_mode": "batch",
             "header": "N"
@@ -6476,7 +6477,7 @@
             "ontology": "GENEPIO:0001501",
             "type": "string",
             "description": "The name of the software used to determine the type.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Type Assignment Software Name",
             "fill_mode": "batch",
             "header": "N"
@@ -6488,7 +6489,7 @@
             "ontology": "0",
             "type": "string",
             "description": "Other software iused to determine Type.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Other Type Assignment Software",
             "fill_mode": "batch",
             "header": "N"
@@ -6500,7 +6501,7 @@
             "ontology": "GENEPIO:0001502",
             "type": "string",
             "description": "The version of the software used to determine thetype.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Type Assignment Software Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6512,7 +6513,7 @@
             "ontology": "MS:1001016",
             "type": "string",
             "description": "Version of the search database.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Type Assignment Software Database Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6524,7 +6525,7 @@
             "ontology": "NCIT:C179767",
             "type": "string",
             "description": "An indication of the taxonomic grouping of organisms.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Subtype Assignment",
             "fill_mode": "batch",
             "header": "N"
@@ -6536,7 +6537,7 @@
             "ontology": "GENEPIO:0001501",
             "type": "string",
             "description": "The name of the software used to determine the subtype.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Subtype Assignment Software Name",
             "fill_mode": "batch",
             "header": "N"
@@ -6548,7 +6549,7 @@
             "ontology": "0",
             "type": "string",
             "description": "Other software used to determine Subtype.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Other Subtype Assignment Software",
             "fill_mode": "batch",
             "header": "N"
@@ -6560,7 +6561,7 @@
             "ontology": "GENEPIO:0001502",
             "type": "string",
             "description": "The version of the software used to determine the subtype.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": " Subtype Assignment Software Version",
             "fill_mode": "batch",
             "header": "N"
@@ -6572,7 +6573,7 @@
             "ontology": "MS:1001016",
             "type": "string",
             "description": "Version of the search database.",
-            "classification": "Lineage fields",
+            "classification": "Genomic Typing fields",
             "label": "Subtype Assignment Software Database Version",
             "fill_mode": "batch",
             "header": "N"
