@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Sara Monzon](https://github.com/saramonzon)
 - [Victor Lopez](https://github.com/victor5lm)
 - [Sarai Varona](https://github.com/svarona)
+- [Pablo Mata](https://github.com/shettland)
 
 #### Added enhancements
 
@@ -23,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Refactored `read_bioinfo_metadata` module for improved structure, readability, and maintainability [#777](https://github.com/BU-ISCIII/relecov-tools/pull/777)
 - Included project name in email subject for upload_results module [#780](https://github.com/BU-ISCIII/relecov-tools/pull/780)
 - Integrated REGCESS as the main institutional metadata source, merging CCN and CODCNH datasets, standardizing codes, enriching with geolocation, and updating schema and validation logic [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
+- Updated relecov_schema to v3.2.0 with new classification Genomic Typing fields [#783](https://github.com/BU-ISCIII/relecov-tools/pull/783)
 
 #### Fixes
 
