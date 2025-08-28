@@ -154,7 +154,7 @@ class RestApi:
         )
         log.info(str(response))
         if missing_keys := [
-            key for key in ["message", "data", "status_code"] if key not in response 
+            key for key in ["message", "data", "status_code"] if key not in response
         ]:
             log.error(f"Missing keys in API response: {missing_keys}")
             stderr.print(f"Missing keys in API response: {missing_keys}")
@@ -163,7 +163,9 @@ class RestApi:
         if response["status_code"] == 404:
             return False
         elif response["status_code"] == 200:
-            return not bool(response["message"] != "Sample not found" or response["data"])
+            return not bool(
+                response["message"] != "Sample not found" or response["data"]
+            )
         else:
             raise ValueError(f"Error trying to check for sample: {response}")
 
