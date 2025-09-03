@@ -22,101 +22,104 @@ stderr = rich.console.Console(
 class UploadDatabase(BaseModule):
     def __init__(
         self,
-        user=None,
-        password=None,
-        json=None,
-        type=None,
-        platform=None,
-        server_url=None,
-        full_update=False,
-        long_table=None,
+        user: str | None = None,
+        password: str | None = None,
+        json: list[dict] | str | None = None,
+        type: str | None = None,
+        platform: str | None = None,
+        server_url: str | None = None,
+        full_update: bool = False,
+        long_table: str | None = None,
     ):
-        if json is None:
-            json = relecov_tools.utils.prompt_path(
-                msg="Select the json file which have the data to map"
-            )
-        json_dir = os.path.dirname(os.path.realpath(json))
-        super().__init__(output_dir=json_dir, called_module="update-db")
+
+        super().__init__(called_module="update-db")
+        # create the instance for logging the summary information
+        self.logsum = self.parent_log_summary()
+
+        # Check CLI arguments
+        if isinstance(json, list):
+            self.json_data = json
+        else:
+            if json is None:
+                json = relecov_tools.utils.prompt_path(
+                    msg="Select the json file which has the data to map"
+                )
+            if not (isinstance(json, str) and os.path.isfile(json)):
+                stderr.print(f"[red] JSON data file {json} does not exist")
+                raise FileNotFoundError(f"JSON data file {json} does not exist")
+            self.json_data = relecov_tools.utils.read_json_file(json)
+
+        # Convert all values in json_data to strings
+        # This is to ensure that all values are strings before uploading as they
+        # are expected to be strings in the database
+        for row in self.json_data:
+            for key, value in row.items():
+                if not isinstance(value, str):
+                    row[key] = str(value)
+
         # Get the user and password for the database
         if user is None:
             user = relecov_tools.utils.prompt_text(
                 msg="Enter username for upload data to server"
             )
         self.user = user
+
         if password is None:
             password = relecov_tools.utils.prompt_text(msg="Enter credential password")
         self.passwd = password
-        # get the default coonfiguration used the instance
+
+        # Validate long_table file if provided
+        self.long_table_file = None
+        if full_update or type == "variantdata":
+            if not long_table or not os.path.isfile(long_table):
+                raise ValueError(
+                    f"Provided long_table file does not exist: {long_table}"
+                )
+            self.long_table_file = os.path.realpath(long_table)
+
+        # Configure full update or specific type and platform
+        self.full_update = bool(full_update)
+        if self.full_update:
+            self.server_url = None
+        else:
+            self.type_of_info = type or relecov_tools.utils.prompt_selection(
+                "Select:",
+                ["sample", "bioinfodata", "variantdata"],
+            )
+
+            self.platform = platform or relecov_tools.utils.prompt_selection(
+                "Select:",
+                ["iskylims", "relecov"],
+            )
+
+            self.server_url = server_url
+
+        # Check and load configuration
         self.config_json = ConfigJson()
 
-        if not os.path.isfile(json):
-            self.log.error("json data file %s does not exist ", json)
-            stderr.print(f"[red] json data file {json} does not exist")
-            sys.exit(1)
-        self.json_data = relecov_tools.utils.read_json_file(json)
         batch_id = self.get_batch_id_from_data(self.json_data)
         self.set_batch_id(batch_id)
-        for row in self.json_data:
-            for key, value in row.items():
-                if not isinstance(value, str):
-                    row[key] = str(value)
-        self.json_file = json
+
+        schema_filename = self.config_json.get_topic_data("generic", "relecov_schema")
+        if not isinstance(schema_filename, str) or not schema_filename:
+            stderr.print("[red] Schema filename is not defined in the configuration.")
+            raise ValueError("Schema filename is not defined in the configuration.")
         schema = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "schema",
-            self.config_json.get_topic_data("generic", "relecov_schema"),
+            schema_filename,
         )
         self.schema = relecov_tools.utils.read_json_file(schema)
-        if full_update is True:
-            if not os.path.isfile(long_table):
-                raise ValueError(
-                    f"Provided long_table file does not exist {long_table}"
-                )
-            self.full_update = True
-            self.server_url = None
-            self.long_table_file = os.path.realpath(long_table)
-        else:
-            self.full_update = False
-            if type is None:
-                type = relecov_tools.utils.prompt_selection(
-                    "Select:",
-                    ["sample", "bioinfodata", "variantdata"],
-                )
-            self.type_of_info = type
-            if self.type_of_info == "variantdata":
-                if long_table is None:
-                    json = relecov_tools.utils.prompt_path(
-                        msg="Select the json file which have the data to map"
-                    )
-                    if not os.path.isfile(long_table):
-                        raise ValueError(
-                            f"Provided long_table file does not exist {long_table}"
-                        )
-                self.long_table_file = os.path.realpath(long_table)
-            # collect data for plarform to upload data
-            if platform is None:
-                platform = relecov_tools.utils.prompt_selection(
-                    "Select:",
-                    ["iskylims", "relecov"],
-                )
-            self.platform = platform
-            if server_url is None:
-                self.server_url = server_url
-        # Get configuration settings for upload database
+
         try:
             self.platform_settings = self.config_json.get_topic_data(
-                "update_db", "platform"
+                "update_db", "platform-params"
             )
         except KeyError as e:
             logtxt = f"Unable to fetch parameters for {platform} {e}"
             stderr.print(f"[red]{logtxt}")
             self.log.error(logtxt)
-            sys.exit(1)
-        # create the instance for logging the summary information
-        lab_code = json_dir.split("/")[-2]
-        self.logsum = self.parent_log_summary(
-            output_dir=json_dir, lab_code=lab_code, path=json_dir
-        )
+            raise KeyError(f"Unable to fetch parameters for {platform} {e}")
 
     def get_schema_ontology_values(self):
         """Read the schema and extract the values of ontology with the label"""
@@ -178,6 +181,15 @@ class UploadDatabase(BaseModule):
         s_project_fields = []
         # get the ontology values for mapping values in sample fields
         ontology_dict = self.get_schema_ontology_values()
+        if (
+            not self.platform_settings
+            or "iskylims" not in self.platform_settings
+            or self.platform_settings["iskylims"] is None
+        ):
+            logtxt = "Platform settings for 'iskylims' are not properly configured in configuration.json."
+            self.logsum.add_error(entry=logtxt)
+            stderr.print(f"[red]{logtxt}")
+            raise ValueError(logtxt)
         sample_url = self.platform_settings["iskylims"]["url_sample_fields"]
         sample_fields_raw = self.platform_rest_api.get_request(sample_url, "", "")
 
@@ -250,12 +262,19 @@ class UploadDatabase(BaseModule):
 
     def update_database(self, field_values, post_url):
         """Send the request to update database"""
+
+        if not self.platform_settings or self.platform not in self.platform_settings:
+            raise ValueError("Platform is not set. Cannot update database.")
+
         post_url = self.platform_settings[self.platform][post_url]
-        suces_count = 0
+        success_count = 0
         request_count = 0
+        req_sample = None  # Ensure req_sample is always defined
+        result_all = []
         for chunk in field_values:
             req_sample = ""
             request_count += 1
+
             if "sample_name" in chunk:
                 stderr.print(
                     f"[blue] sending request for sample {chunk['sample_name']}"
@@ -266,16 +285,19 @@ class UploadDatabase(BaseModule):
                     f"[blue] sending request for sample {chunk['sequencing_sample_id']}"
                 )
                 req_sample = chunk["sequencing_sample_id"]
+
             self.logsum.feed_key(sample=req_sample)
+
             result = self.platform_rest_api.post_request(
                 json.dumps(chunk),
                 {"user": self.user, "pass": self.passwd},
                 post_url,
             )
+
             if "ERROR" in result:
                 if result["ERROR"] == "Server not available":
                     # retry to connect to server
-                    for i in range(10):
+                    for _ in range(10):
                         # wait 5 sec before resending the request
                         time.sleep(5)
                         result = self.platform_rest_api.post_request(
@@ -285,11 +307,12 @@ class UploadDatabase(BaseModule):
                         )
                         if "ERROR" not in result:
                             break
-                    if i == 9 and "ERROR" in result:
-                        logtxt = f"Unable to sent the request to {post_url}"
-                        self.logsum.add_error(entry=logtxt, sample=req_sample)
-                        stderr.print(f"[red]{logtxt}")
-                        continue
+                    else:
+                        if "ERROR" in result:
+                            logtxt = f"Unable to sent the request to {post_url}"
+                            self.logsum.add_error(entry=logtxt, sample=req_sample)
+                            stderr.print(f"[red]{logtxt}")
+                            continue
 
                 elif "is not defined" in result["ERROR"].lower():
                     error_txt = result["ERROR"]
@@ -301,6 +324,9 @@ class UploadDatabase(BaseModule):
                     logtxt = f"Request to {post_url} already defined"
                     self.logsum.add_warning(entry=logtxt, sample=req_sample)
                     stderr.print(f"[yellow]{logtxt} for sample {req_sample}")
+                    # If the sample is already defined, we can continue
+                    # but we return the data of the already defined sample
+                    result_all.append(result["data"])
                     continue
                 else:
                     logtxt = f"Error {result['ERROR']} in request to {post_url}"
@@ -308,26 +334,38 @@ class UploadDatabase(BaseModule):
                     stderr.print(f"[red]{logtxt}")
                     continue
             self.log.info(
-                "stored data in %s iskylims for sample %s",
+                "stored data in %s iskylims for sample %s with unique id %s and fingerprint %s",
                 self.platform,
                 req_sample,
+                result["data"]["sample_unique_id"],
+                result["data"]["sample_fingerprint"],
             )
             stderr.print(f"[green] Successful request for {req_sample}")
-            suces_count += 1
-        if request_count == suces_count:
+            result_all.append(result["data"])
+            success_count += 1
+
+        if request_count == success_count:
             stderr.print(
-                f"All {self.type_of_info} data sent sucessfuly to {self.platform}"
+                f"All {self.type_of_info} data sent sucessfully to {self.platform}"
+            )
+            stderr.print(f"[green]Upload process to {self.platform} completed")
+            self.log.info(
+                "%s of the %s requests were sent to %s",
+                success_count,
+                request_count,
+                self.platform,
             )
         else:
             logtxt = "%s of the %s requests were sent to %s"
             self.logsum.add_warning(
-                entry=logtxt % (suces_count, request_count, self.platform),
+                entry=logtxt % (success_count, request_count, self.platform),
                 sample=req_sample,
             )
             stderr.print(
-                f"[yellow]{logtxt % (suces_count, request_count, self.platform)}"
+                f"[yellow]{logtxt % (success_count, request_count, self.platform)}"
             )
-        return
+
+        return result_all
 
     def store_data(self, type_of_info, server_name):
         """Collect data from json file and split them to store data in iSkyLIMS
@@ -335,6 +373,7 @@ class UploadDatabase(BaseModule):
         """
         map_fields = {}
 
+        post_url = "store_samples"
         if type_of_info == "sample":
             if server_name == "iskylims":
                 self.log.info("Getting sample fields from %s", server_name)
@@ -361,19 +400,24 @@ class UploadDatabase(BaseModule):
             post_url = "variantdata"
             map_fields = self.json_data
 
-        self.update_database(map_fields, post_url)
-        stderr.print(f"[green]Upload process to {self.platform} completed")
+        result = self.update_database(map_fields, post_url)
+        return result
 
     def start_api(self, platform):
         """Open connection torwards database server API"""
         # Get database settings
+        if not self.platform_settings or platform not in self.platform_settings:
+            logtxt = f"Platform settings for '{platform}' are not properly configured in configuration.json."
+            stderr.print(f"[red]{logtxt}")
+            self.logsum.add_error(entry=logtxt)
+            raise ValueError(logtxt)
         try:
             p_settings = self.platform_settings[platform]
         except KeyError as e:
             logtxt = f"Unable to fetch parameters for {platform} {e}"
             stderr.print(f"[red]{logtxt}")
             self.logsum.add_error(entry=logtxt)
-            sys.exit(1)
+            raise KeyError(f"Unable to fetch parameters for {platform} {e}")
         if self.server_url is None:
             server_url = p_settings["server_url"]
         else:
@@ -417,5 +461,6 @@ class UploadDatabase(BaseModule):
                     self.long_table_file
                 )
             self.store_data(self.type_of_info, self.platform)
+
         self.parent_create_error_summary(called_module="update-db")
         return

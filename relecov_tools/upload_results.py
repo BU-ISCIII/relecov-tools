@@ -229,7 +229,7 @@ class UploadResults(BaseModule):
         try:
             self.email_sender.send_email(
                 receiver_email=receiver_email,
-                subject=f"Batch {batch_name} - Resultados del análisis",
+                subject=f"{self.project}. Batch {batch_name} - Resultados del análisis",
                 body=email_body,
                 attachments=[],
                 email_psswd=email_psswd,

@@ -1,14 +1,17 @@
+import copy
 import datetime
 import json
 import os
 import re
 import shutil
-import sys
 from collections import Counter, defaultdict
 
 import rich.console
+
+import relecov_tools.upload_database
 import relecov_tools.utils
 from relecov_tools.base_module import BaseModule
+from relecov_tools.config_json import ConfigJson
 
 stderr = rich.console.Console(
     stderr=True,
@@ -21,67 +24,48 @@ stderr = rich.console.Console(
 class PipelineManager(BaseModule):
     def __init__(
         self,
-        input=None,
-        templates_root=None,
-        output_dir=None,
-        config=None,
+        input: str | None = None,
+        templates_root: str | None = None,
+        output_dir: str | None = None,
+        skip_db_upload: bool = False,
         folder_names=None,
     ):
         super().__init__(output_dir=output_dir, called_module=__name__)
-        self.current_date = datetime.date.today().strftime("%Y%m%d")
+
+        # Check CLI arguments
+
         self.log.info("Initiating pipeline-manager process")
+        self.current_date = datetime.date.today().strftime("%Y%m%d")
+        self.skip_db_upload = skip_db_upload
+
         if input is None:
             self.input_folder = relecov_tools.utils.prompt_path(
                 msg="Select the folder which contains the fastq file of samples"
             )
         else:
             self.input_folder = input
+
         if not os.path.exists(self.input_folder):
             self.log.error("Input folder %s does not exist ", self.input_folder)
             stderr.print("[red] Input folder " + self.input_folder + " does not exist")
-            sys.exit(1)
+            raise FileNotFoundError(f"Input folder {self.input_folder} does not exist")
+
         if templates_root is None:
             self.templates_root = relecov_tools.utils.prompt_path(
                 msg="Select the folder path which contains the templates"
             )
         else:
             self.templates_root = templates_root
+
         if not os.path.exists(self.templates_root):
             self.log.error("Template folder %s does not exist ", self.templates_root)
             stderr.print(
                 "[red] Template folder " + self.templates_root + " does not exist"
             )
-            sys.exit(1)
-        if config is None:
-            config = os.path.join(
-                os.path.dirname(os.path.realpath(__file__)),
-                "conf",
-                "configuration.json",
+            raise FileNotFoundError(
+                f"Template folder {self.templates_root} does not exist"
             )
-        if not os.path.exists(config):
-            self.log.error("Pipeline config file %s does not exist ", config)
-            stderr.print("[red] Pipeline config file " + config + " does not exist")
-            sys.exit(1)
-        conf_settings = relecov_tools.utils.read_json_file(config)
-        try:
-            config_data = conf_settings["pipeline_manager"]
-        except KeyError:
-            self.log.error("Invalid pipeline config file %s ", config)
-            stderr.print("[red] Invalid pipeline config file " + config)
-        required_conf = [
-            "analysis_user",
-            "analysis_group",
-            "analysis_folder",
-            "sample_stored_folder",
-            "sample_link_folder",
-            "doc_folder",
-            "organism_config",
-        ]
-        missing_conf = [k for k in required_conf if k not in config_data]
-        if missing_conf:
-            self.log.error("Invalid pipeline config file. Missing %s", missing_conf)
-            stderr.print(f"[red]Invalid pipeline config file. Missing {missing_conf}")
-            sys.exit(1)
+
         if output_dir is None:
             self.output_dir = relecov_tools.utils.prompt_path(
                 msg="Select the output folder"
@@ -95,8 +79,36 @@ class PipelineManager(BaseModule):
         except OSError or FileExistsError as e:
             self.log.error("Unable to create output folder %s ", e)
             stderr.print("[red] Unable to create output folder ", e)
-            sys.exit(1)
+            raise OSError(f"Unable to create output folder {self.output_dir}: {e}")
+
         self.folder_list = folder_names
+
+        # Check and load config params
+        self.config = ConfigJson(extra_config=True)
+        config_data = self.config.get_configuration("pipeline_manager")
+
+        if not config_data:
+            self.log.error("Invalid pipeline config file")
+            stderr.print("[red] Invalid pipeline config file")
+            raise ValueError("Invalid pipeline config file")
+
+        required_conf = [
+            "analysis_user",
+            "analysis_group",
+            "analysis_folder",
+            "sample_stored_folder",
+            "sample_link_folder",
+            "doc_folder",
+            "organism_config",
+        ]
+
+        missing_conf = [k for k in required_conf if k not in config_data]
+
+        if missing_conf:
+            self.log.error("Invalid pipeline config file. Missing %s", missing_conf)
+            stderr.print(f"[red]Invalid pipeline config file. Missing {missing_conf}")
+            raise ValueError(f"Invalid pipeline config file. Missing {missing_conf}")
+
         # Update the output folder with the current date and analysis name
         self.out_folder_namevar = f"{self.current_date}_{config_data['analysis_group']}_%s_{config_data['analysis_user']}"
         self.analysis_folder = config_data["analysis_folder"]
@@ -105,7 +117,31 @@ class PipelineManager(BaseModule):
         self.doc_folder = config_data["doc_folder"]
         self.organism_config = config_data["organism_config"]
 
-    def get_latest_lab_folders(self, initial_date):
+        req_conf = ["update_db"] * bool(self.skip_db_upload)
+        missing = [
+            conf for conf in req_conf if self.config.get_configuration(conf) is None
+        ]
+        if missing:
+            self.log.error(
+                "Extra config file () is missing required sections: %s"
+                % ", ".join(missing)
+            )
+            self.log.error(
+                "Please use add-extra-config to add them to the config file."
+            )
+            stderr.print(
+                f"[red]Config file is missing required sections: {', '.join(missing)}"
+            )
+            stderr.print(
+                "[red]Please use add-extra-config to add them to the config file."
+            )
+            raise ValueError(
+                f"Config file is missing required sections: {', '.join(missing)}"
+            )
+
+    def get_latest_lab_folders(
+        self, initial_date: datetime.date
+    ) -> tuple[list[str], datetime.date]:
         """Get latest folder with the newest date
         Args:
             initial_date(datetime.date()): Starting date to search for
@@ -119,6 +155,7 @@ class PipelineManager(BaseModule):
         for lab_folder in lab_folders:
             existing_upload_folders = False
             last_folder_date = initial_date
+            latest_folder_name = None
             scan_folder = os.path.join(self.input_folder, lab_folder)
             lab_sub_folders = [f.path for f in os.scandir(scan_folder) if f.is_dir()]
             for lab_sub_folder in lab_sub_folders:
@@ -130,27 +167,42 @@ class PipelineManager(BaseModule):
                     last_folder_date = sub_f_date.date()
                     latest_folder_name = lab_sub_folder
                     existing_upload_folders = True
-            if existing_upload_folders:
+            if existing_upload_folders and latest_folder_name is not None:
                 lab_latest_folders[lab_folder] = {
                     "path": latest_folder_name,
                     "date": last_folder_date,
                 }
                 if last_folder_date > latest_date:
                     latest_date = last_folder_date
+            else:
+                self.log.warning(
+                    "No valid subfolders found in %s. Skipping this lab folder",
+                    lab_folder,
+                )
+                stderr.print(
+                    f"[yellow] No valid subfolders found in {lab_folder}. Skipping this lab folder"
+                )
+
         # keep only folders with the latest date to process
         lab_latest_folders = [
             d["path"] for d in lab_latest_folders.values() if d["date"] == latest_date
         ]
         self.log.info("Latest date to process is %s", latest_date)
         stderr.print("[blue] Collecting samples from date ", latest_date)
+
         return lab_latest_folders, latest_date
 
-    def join_valid_items(self, input_folder, folder_list=[], initial_date="20220101"):
+    def join_valid_items(
+        self,
+        input_folder: str | None = None,
+        folder_list: list | None = [],
+        initial_date: datetime.date = datetime.date(2022, 1, 1),
+    ) -> tuple[list[dict], datetime.date]:
         """Join validated metadata for the latest batches downloaded into a single one
 
         Args:
             input_folder (str): Folder to start the searching process.
-            initial_date (str): Only search for folders newer than this date.
+            initial_date (datetime): Only search for folders newer than this date.
             folder_list (list(str)): Only retrieve folders with these basenames. Defaults to list()
 
         Returns:
@@ -163,7 +215,7 @@ class PipelineManager(BaseModule):
             # TODO: Change this for os.walk but with multithreading because its too slow
             lab_folders = [f.path for f in os.scandir(self.input_folder) if f.is_dir()]
             for lab_folder in lab_folders:
-                full_path = os.path.join(input_folder, lab_folder)
+                full_path = os.path.join(input_folder or "", lab_folder)
                 lab_subfolders = [
                     f.path for f in os.scandir(full_path) if f.path if f.is_dir()
                 ]
@@ -174,14 +226,28 @@ class PipelineManager(BaseModule):
                 raise FileNotFoundError("No folders found with the given names")
             last_folder = sorted(folder_list)[-1]
             try:
-                latest_date = relecov_tools.utils.string_to_date(last_folder).date()
+                last_folder_date_obj = relecov_tools.utils.string_to_date(last_folder)
+                if last_folder_date_obj is not None:
+                    latest_date = last_folder_date_obj.date()
+                else:
+                    raise ValueError("Could not parse date from folder name")
             except ValueError:
                 self.log.error(
                     "Failed to get date from folder names. Using last mod date"
                 )
-                latest_date = max(
-                    [relecov_tools.utils.get_file_date(f) for f in folders_to_process]
-                ).date()
+                file_dates = [
+                    relecov_tools.utils.get_file_date(f) for f in folders_to_process
+                ]
+                # Filter out None values
+                file_dates = [d for d in file_dates if d is not None]
+                if not file_dates:
+                    raise ValueError("No valid dates found in folders_to_process")
+                # Ensure file_dates are datetime objects before calling .date()
+                if isinstance(file_dates[0], str):
+                    file_dates = [
+                        datetime.datetime.strptime(d, "%Y%m%d") for d in file_dates
+                    ]
+                latest_date = max(file_dates).date()  # type: ignore
         else:
             folders_to_process, latest_date = self.get_latest_lab_folders(initial_date)
         join_validate = list()
@@ -208,7 +274,7 @@ class PipelineManager(BaseModule):
         stderr.print(f"[blue]Found a total of {len(join_validate)} samples")
         return join_validate, latest_date
 
-    def copy_process(self, samples_data, output_dir):
+    def copy_process(self, samples_data: list[dict], output_dir: str) -> dict:
         """Copies all the necessary samples files in the given samples_data list
         to the output folder. Also creates symbolic links into the link folder
         given in config_file.
@@ -222,20 +288,34 @@ class PipelineManager(BaseModule):
             the files that received an error while trying to copy.
         """
         samp_errors = {}
+        # Create the output folder for symbolic links
         links_folder = os.path.join(
             output_dir, self.analysis_folder, self.linked_sample_folder
         )
+        # Create the symbolic links folder if it does not exist
         os.makedirs(links_folder, exist_ok=True)
+
+        # Process and copy files for each sample
         for sample in samples_data:
-            sample_id = sample["sequencing_sample_id"]
+            seq_sample_id = sample.get("sequencing_sample_id", "")
+            unique_sample_id = sample.get("unique_sample_id", "")
+
             # fetch the file extension
             ext_found = re.match(r".*(fastq.*|bam)", sample["sequence_file_path_R1"])
             if not ext_found:
-                self.log.error("No valid file extension found for %s", sample_id)
-                samp_errors[sample_id].append(sample["sequence_file_path_R1"])
+                self.log.error("No valid file extension found for %s", seq_sample_id)
+                samp_errors[seq_sample_id].append(sample["sequence_file_path_R1"])
                 continue
+
             ext = ext_found.group(1)
-            seq_r1_sample_id = sample["sequencing_sample_id"] + "_R1." + ext
+
+            if not self.skip_db_upload:
+                # Create sample filename with unique_sample_id and sequencing_sample_id
+                seq_r1_sample_id = seq_sample_id + "_" + unique_sample_id + "_R1." + ext
+            else:
+                # If skip_db_upload is True, we don't have unique_sample_id
+                seq_r1_sample_id = seq_sample_id + "_R1." + ext
+
             # copy r1 sequencing file into the output folder self.analysis_folder
             sample_raw_r1 = os.path.join(
                 output_dir, self.copied_sample_folder, seq_r1_sample_id
@@ -250,14 +330,23 @@ class PipelineManager(BaseModule):
                 os.symlink(r1_link_path_ori, r1_link_path)
             except FileNotFoundError as e:
                 self.log.error("File not found %s", e)
-                samp_errors[sample_id] = []
-                samp_errors[sample_id].append(sample["sequence_file_path_R1"])
+                samp_errors[seq_sample_id] = []
+                samp_errors[seq_sample_id].append(sample["sequence_file_path_R1"])
                 if "sequence_file_path_R2" in sample:
-                    samp_errors[sample_id].append(sample["sequence_file_path_R2"])
+                    samp_errors[seq_sample_id].append(sample["sequence_file_path_R2"])
                 continue
+
             # check if there is a r2 file
             if "sequence_file_path_R2" in sample:
-                seq_r2_sample_id = sample["sequencing_sample_id"] + "_R2." + ext
+                if not self.skip_db_upload:
+                    # Create sample filename with unique_sample_id and sequencing_sample_id
+                    seq_r2_sample_id = (
+                        seq_sample_id + "_" + unique_sample_id + "_R2." + ext
+                    )
+                else:
+                    # If skip_db_upload is True, we don't have unique_sample_id
+                    seq_r2_sample_id = seq_sample_id + "_R2." + ext
+
                 sample_raw_r2 = os.path.join(
                     output_dir,
                     self.copied_sample_folder,
@@ -270,13 +359,13 @@ class PipelineManager(BaseModule):
                     os.symlink(r2_link_path_ori, r2_link_path)
                 except FileNotFoundError as e:
                     self.log.error("File not found %s", e)
-                    if not samp_errors.get(sample_id):
-                        samp_errors[sample_id] = []
-                    samp_errors[sample_id].append(sample["sequence_file_path_R2"])
+                    if not samp_errors.get(seq_sample_id):
+                        samp_errors[seq_sample_id] = []
+                    samp_errors[seq_sample_id].append(sample["sequence_file_path_R2"])
                     continue
         return samp_errors
 
-    def create_samples_data(self, json_data):
+    def create_samples_data(self, json_data: list[dict]) -> list[dict]:
         """Creates a copy of the json_data but only with relevant keys to copy files.
         Here 'sequence_file_path_R1' is created joining the original 'sequence_file_path_R1'
         and 'sequence_file_R1' fields. The same goes for 'sequence_file_path_R2'
@@ -289,6 +378,7 @@ class PipelineManager(BaseModule):
                 [
                   {
                     "sequencing_sample_id":XXXX,
+                    "unique_sample_id":XXXX,
                     "sequence_file_path_R1": XXXX,
                     "sequence_file_path_R2":XXXX
                   }
@@ -297,7 +387,8 @@ class PipelineManager(BaseModule):
         samples_data = []
         for item in json_data:
             sample = {}
-            sample["sequencing_sample_id"] = item["sequencing_sample_id"]
+            sample["sequencing_sample_id"] = item.get("sequencing_sample_id", "")
+            sample["unique_sample_id"] = item.get("unique_sample_id", "")
             sample["sequence_file_path_R1"] = os.path.join(
                 item["sequence_file_path_R1"], item["sequence_file_R1"]
             )
@@ -308,7 +399,9 @@ class PipelineManager(BaseModule):
             samples_data.append(sample)
         return samples_data
 
-    def split_data_by_key(self, json_data, keylist):
+    def split_data_by_key(
+        self, json_data: list[dict], keylist: list[str]
+    ) -> list[list[dict]]:
         """Split a given json data into different lists based on a given list of keys.
         From a single list of samples (dicts), the output will now be a list of lists
         where each new list is a subset of the original samples with the same values
@@ -339,7 +432,7 @@ class PipelineManager(BaseModule):
             list_of_jsons_by_key.extend(self.split_data_by_key(group, next_keys))
         return list_of_jsons_by_key
 
-    def split_samples_by_organism(self, join_validate):
+    def split_samples_by_organism(self, join_validate: list[dict]) -> dict:
         """Split the input JSON into groups for each organism, which will later
         be analysed differently depending on its configuration.
 
@@ -370,15 +463,17 @@ class PipelineManager(BaseModule):
             jsons_by_organism_dict[organism] = splitted_json
         return jsons_by_organism_dict
 
-    def process_samples(self, splitted_json, org_conf, latest_date):
+    def process_samples(
+        self, splitted_json: list[dict], org_conf: dict, latest_date: datetime.date
+    ) -> dict:
         """Create the output folder, the required template for the pipeline and
         all the files necessary for each group of samples depending on the organism
         config given. Copy the samples and log the ones that could not be copied.
 
         Args:
-            splitted_json (list(list)): List of jsons, one for each group
+            splitted_json (list(dict)): List of jsons, one for each group
             org_conf (dict): organism params from configuration.json
-            latest_date (str): Latest date found. Used to tag the analysis folder
+            latest_date (datetime): Latest date found. Used to tag the analysis folder
 
         Returns:
             global_samp_errors(dict): Dictionary holding the samples with errors for
@@ -386,17 +481,22 @@ class PipelineManager(BaseModule):
         """
         global_samp_errors = {}
         keys_to_split = org_conf.get("group_by_fields", [])
+
         # iterate over the sample_data to copy the fastq files in the output folder
         for idx, list_of_samples in enumerate(splitted_json, start=1):
+            # Create a unique tag for the group based on the latest date and service tag
             group_tag = f"{latest_date}_{org_conf['service_tag']}{idx:02d}"
             self.log.info("Processing group %s", group_tag)
             fields = {k: list_of_samples[0].get(k, "") for k in keys_to_split}
+            # Log the group being processed
             if keys_to_split:
                 logtxt = f"[blue]Processing group {group_tag} with fields: {fields}..."
                 stderr.print(logtxt)
             else:
                 logtxt = f"[blue]Processing group {group_tag}"
                 stderr.print(logtxt)
+
+            # Create the output folder for the group
             group_outfolder = os.path.join(
                 self.output_dir, self.out_folder_namevar % group_tag
             )
@@ -407,12 +507,17 @@ class PipelineManager(BaseModule):
                     continue
                 shutil.rmtree(group_outfolder)
                 self.log.info(f"Folder {group_outfolder} removed")
-            samples_data = self.create_samples_data(list_of_samples)
+
+            samples_data = self.create_samples_data(list(list_of_samples))
+
             # Create a folder for the group of samples and copy the files there
             self.log.info("Creating folder for group %s", group_tag)
             stderr.print(f"[blue]Creating folder for group {group_tag}")
 
+            # Copy template analysis for the group analysis
+            # pipeline_templates if list of templates to copy or pipeline_template if a single template
             pipeline_templates = org_conf.get("pipeline_templates")
+            # If pipeline_templates is a list, copy all templates
             if pipeline_templates is not None:
                 if not isinstance(pipeline_templates, list):
                     raise ValueError(
@@ -432,6 +537,7 @@ class PipelineManager(BaseModule):
                             shutil.copytree(s, d, dirs_exist_ok=True)
                         else:
                             shutil.copy2(s, d)
+            # if pipeline_templates is None check for pipeline_template which is a string in the conf
             else:
                 if "pipeline_template" not in org_conf:
                     raise ValueError(
@@ -449,23 +555,35 @@ class PipelineManager(BaseModule):
 
             # Check for possible duplicates
             self.log.info("Samples to copy %s", len(samples_data))
-            # Extract the sequencing_sample_id from the list of dictionaries
-            sample_ids = [item["sequencing_sample_id"] for item in samples_data]
+            if not self.skip_db_upload:
+                # Extract the unique_sample_id - sequencing_sample_id from the list of dictionaries
+                sample_ids = [
+                    f"{item['sequencing_sample_id']}_{item['unique_sample_id']}"
+                    for item in samples_data
+                ]
+            else:
+                # If skip_db_upload is True, we don't have unique_sample_id
+                sample_ids = [item["sequencing_sample_id"] for item in samples_data]
+
             # Use Counter to count the occurrences of each sequencing_sample_id
             id_counts = Counter(sample_ids)
             # Find the sequencing_sample_id values that are duplicated (count > 1)
+            # This must never happen as unique_sample_id should be unique
             duplicates = [
                 sample_id for sample_id, count in id_counts.items() if count > 1
             ]
             if duplicates:
-                self.log.error(
+                self.log.warning(
                     "Duplicate samples in group %s: %s" % (group_tag, duplicates)
                 )
                 stderr.print(
-                    f"[red] There are duplicated samples in group {group_tag}: {duplicates}. Please handle manually"
+                    f"[orange] There are duplicated samples in group {group_tag}: {duplicates}. This should never happen if skip_db_upload is False."
                 )
                 continue
+
+            # Copy the samples files to the group output folder
             samp_errors = self.copy_process(samples_data, group_outfolder)
+
             if len(samp_errors) > 0:
                 stderr.print(
                     f"[red]Unable to copy files from {len(samp_errors)} samples in group {group_tag}"
@@ -476,6 +594,8 @@ class PipelineManager(BaseModule):
                     shutil.rmtree(group_outfolder)
                     self.log.info(f"Folder {group_outfolder} removed")
                     continue
+
+            # Log the number of samples copied and errors
             global_samp_errors[group_tag] = samp_errors
             samples_copied = len(list_of_samples) - len(samp_errors)
             copied_samps_log = f"Group {group_tag}: {samples_copied} samples copied out of {len(list_of_samples)}"
@@ -525,7 +645,6 @@ class PipelineManager(BaseModule):
             stderr.print(
                 f"[blue]Generating sample_id.txt file in {group_analysis_folder}..."
             )
-
             with open(os.path.join(group_analysis_folder, "samples_id.txt"), "w") as f:
                 for sample_id in sample_ids:
                     f.write(f"{sample_id}\n")
@@ -540,6 +659,116 @@ class PipelineManager(BaseModule):
             stderr.print(f"[blue]Folder {group_outfolder} finished. Ready to launch")
         return global_samp_errors
 
+    def assign_unique_ids_by_fingerprint(
+        self, json_data: list[dict], result: list[dict]
+    ) -> list[dict]:
+        """
+        Assigns unique_sample_id to each entry in json_data based on sample_fingerprint,
+        using the data returned in the result list (from DB/API).
+
+        If sample_fingerprint is missing in a sample, it will be generated using a deterministic
+        hash of four key fields.
+
+        Args:
+            json_data (list[dict]): List of sample metadata to be updated
+            result (list[dict]): List of database entries with sample_fingerprint and sample_unique_id
+
+        Returns:
+            list[dict]: Updated list with unique_sample_id set when available
+        """
+
+        # Create lookup table from fingerprint to unique_sample_id
+        fingerprint_to_unique_id = {
+            r["sample_fingerprint"]: r["sample_unique_id"]
+            for r in result
+            if "sample_fingerprint" in r and "sample_unique_id" in r
+        }
+
+        # Update each sample with its unique_sample_id
+        for sample in json_data:
+            fingerprint = sample.get("sample_fingerprint")
+
+            # Generate fingerprint if missing
+            if not fingerprint:
+                try:
+                    fingerprint = relecov_tools.utils.generate_fingerprint(
+                        sample["sequencing_sample_id"],
+                        sample["collecting_lab_sample_id"],
+                        sample["submitting_institution"],
+                        sample["collecting_institution"],
+                    )
+                    sample["sample_fingerprint"] = fingerprint
+                except KeyError as e:
+                    self.log.warning(
+                        f"Missing field {e} while generating fingerprint for sample: {sample}"
+                    )
+                    continue
+
+            # Assign unique_sample_id from lookup table
+            unique_id = fingerprint_to_unique_id.get(fingerprint)
+            if unique_id:
+                sample["unique_sample_id"] = unique_id
+            else:
+                seq_id = sample.get("sequencing_sample_id", "unknown")
+                self.log.warning(
+                    f"Fingerprint '{fingerprint}' not found in DB result "
+                    f"(sequencing_sample_id: '{seq_id}', unique_sample_id: missing)"
+                )
+
+        return json_data
+
+    def update_db_samples(self, json_data: list[dict]) -> list[dict]:
+        """Update the database with the samples data.
+
+        Args:
+            json_data (list(dict)): List of dictionaries with sample data to update
+
+        Returns:
+            list(dict): Updated list of dictionaries with unique_sample_id added
+        """
+
+        upload_db_conf = self.config.get_configuration("update_db")
+        if not upload_db_conf:
+            self.log.error("No update_db configuration found")
+            stderr.print("[red] No update_db configuration found")
+            raise ValueError("No update_db configuration found")
+        req_conf = [
+            "user",
+            "password",
+            "platform",
+        ]
+        missing_conf = [k for k in req_conf if k not in upload_db_conf]
+        if missing_conf:
+            self.log.error(
+                "Missing required configuration for upload_db: %s", missing_conf
+            )
+            stderr.print(
+                f"[red] Missing required configuration for upload_db: {missing_conf}"
+            )
+            raise ValueError(
+                f"Missing required configuration for upload_db: {missing_conf}"
+            )
+        upload_db = relecov_tools.upload_database.UploadDatabase(
+            user=upload_db_conf["user"],
+            password=upload_db_conf["password"],
+            json=copy.deepcopy(json_data),
+            type="sample",
+            platform=upload_db_conf["platform"],
+        )
+        upload_db.start_api(upload_db_conf["platform"])
+        result = upload_db.store_data("sample", upload_db_conf["platform"])
+
+        if not result:
+            self.log.error("No data was uploaded to the database")
+            stderr.print("[red] No data was uploaded to the database")
+            raise ValueError("No data was uploaded to the database")
+        self.log.info("Database updated with %s samples", len(json_data))
+        stderr.print(f"[blue] Database updated with {len(json_data)} samples")
+
+        json_data = self.assign_unique_ids_by_fingerprint(json_data, result)
+
+        return json_data
+
     def pipeline_exc(self):
         """Prepare folder for analysis in HPC
         Copies template selected as input
@@ -553,22 +782,40 @@ class PipelineManager(BaseModule):
         """
         # collect json with all validated samples
         init_date = datetime.datetime.strptime("20220101", "%Y%m%d").date()
+
         join_validate, latest_date = self.join_valid_items(
             input_folder=self.input_folder,
             initial_date=init_date,
             folder_list=self.folder_list,
         )
+
         latest_date = str(latest_date).replace("-", "")
         if len(join_validate) == 0:
             stderr.print("[yellow]No samples were found. Aborting")
-            sys.exit(0)
+            self.log.error("No samples were found. Aborting")
+            raise ValueError("No samples were found. Aborting")
+
+        # get the latest batch id from the data
         batch_id = self.get_batch_id_from_data(join_validate)
         # If more than one batch is included, current date will be set as batch_id
         self.set_batch_id(batch_id)
+        self.log.info("Batch ID set to %s", batch_id)
+        stderr.print(f"[blue]Batch ID set to {batch_id}")
+
+        self.log.info("Updating database with samples data")
+        stderr.print("[blue]Updating database with samples data")
+        # Update the database with the samples data
+        join_validate = self.update_db_samples(join_validate)
+
+        stderr.print("[blue]Collecting samples by organism")
+        self.log.info("Collecting samples by organism")
+        # Split the samples by organism
         jsons_by_organism_dict = self.split_samples_by_organism(join_validate)
         if not jsons_by_organism_dict:
             self.log.error("No samples found for any of the organisms in config")
             raise ValueError("No samples found for any of the organisms in config")
+
+        # Process each organism's samples
         global_samp_errors = {}
         for organism, splitted_json in jsons_by_organism_dict.items():
             stderr.print(f"[blue]Processing samples for organism: {organism}")
@@ -594,40 +841,3 @@ class PipelineManager(BaseModule):
         self.log.info("Finished execution")
         stderr.print("Finished execution")
         return
-
-
-class ResultUpload:
-    def __init__(self, input_folder=None, conf_file=None):
-        if input_folder is None:
-            self.input_folder = relecov_tools.utils.prompt_path(
-                msg="Select the folder which contains the results"
-            )
-        else:
-            self.input_folder = input_folder
-        if not os.path.exists(self.input_folder):
-            self.log.error("Input folder %s does not exist ", self.input_folder)
-            stderr.print("[red] Input folder " + self.input_folder + " does not exist")
-            sys.exit(1)
-
-        conf_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            "conf",
-            "configuration.json",
-        )
-        if not os.path.exists(conf_file):
-            self.log.error("Configuration file %s does not exist ", self.conf_file)
-            stderr.print(
-                "[red] Pipeline config file "
-                + self.pipeline_conf_file
-                + " does not exist"
-            )
-            sys.exit(1)
-        conf_settings = relecov_tools.utils.read_json_file(conf_file)
-        try:
-            data = conf_settings["pipelines"]["relecov"]
-        except KeyError:
-            self.log.error("Invalid pipeline config file %s ", self.pipeline_conf_file)
-            stderr.print(
-                "[red] Invalid pipeline config file " + self.pipeline_conf_file
-            )
-        stderr.print(f"[blue] Configuration file loaded  {data}")

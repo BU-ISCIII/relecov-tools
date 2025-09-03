@@ -28,6 +28,8 @@ import semantic_version
 import subprocess
 import importlib.metadata
 
+import relecov_tools.config_json
+
 log = logging.getLogger(__name__)
 
 
@@ -96,7 +98,11 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
             for idx in range(0, len(heading)):
                 if l_row[idx] is None:
                     data_row[heading[idx]] = (
-                        None if leave_empty else "Not Provided [SNOMED:434941000124101]"
+                        None
+                        if leave_empty
+                        else relecov_tools.config_json.ConfigJson().get_topic_data(
+                            "generic", "not_provided_field"
+                        )
                     )
                 else:
                     data_row[heading[idx]] = l_row[idx]
@@ -126,7 +132,9 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
                         data_row[heading[idx]] = (
                             None
                             if leave_empty
-                            else "Not Provided [SNOMED:434941000124101]"
+                            else relecov_tools.config_json.ConfigJson().get_topic_data(
+                                "generic", "not_provided_field"
+                            )
                         )
                     else:
                         data_row[heading[idx]] = val
@@ -489,9 +497,7 @@ def select_most_recent_files_per_sample(paths_list):
         for sample_name, file_paths in filename_groups.items()
         for file_path in file_paths
     ]
-    # Reformat variable to retrieve a list of file paths
-    file_path_list = [sample_file_path for _, sample_file_path in filename_groups]
-    return file_path_list
+    return [sample_file_path for _, sample_file_path in filename_groups]
 
 
 def print_log_report(
@@ -631,7 +637,7 @@ def get_schema_url():
     package_name = get_package_name()
     branch_name = get_git_branch()
     base_url = "https://github.com/BU-ISCIII"
-    schema_path = f"{package_name}/blob/{branch_name}/{package_name.replace('-','_')}/schema/relecov_schema.json"
+    schema_path = f"{package_name}/blob/{branch_name}/{package_name.replace('-', '_')}/schema/relecov_schema.json"
 
     return f"{base_url}/{schema_path}"
 
@@ -747,3 +753,13 @@ def get_safe_hex(output_dir, length=3):
 
     hex_id = get_new_hex(token_hex(length).upper(), output_dir)
     return hex_id
+
+
+def generate_fingerprint(
+    sequencing_sample_id,
+    collecting_lab_sample_id,
+    submitting_institution,
+    collecting_institution,
+):
+    combined = f"{sequencing_sample_id}|{collecting_lab_sample_id}|{submitting_institution}|{collecting_institution}".lower()
+    return hashlib.sha256(combined.encode()).hexdigest()[:24]

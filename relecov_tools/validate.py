@@ -38,29 +38,10 @@ class Validate(BaseModule):
     ):
         """Validate json file against the schema"""
         super().__init__(output_dir=output_dir, called_module=__name__)
-        self.config = ConfigJson(extra_config=True)
+
         self.log.info("Initiating validation process")
-        req_conf = ["download"] * bool(upload_files) + ["update_db"] * bool(check_db)
-        missing = [
-            conf for conf in req_conf if self.config.get_configuration(conf) is None
-        ]
-        if missing:
-            self.log.error(
-                "Extra config file () is missing required sections: %s"
-                % ", ".join(missing)
-            )
-            self.log.error(
-                "Please use add-extra-config to add them to the config file."
-            )
-            stderr.print(
-                f"[red]Config file is missing required sections: {', '.join(missing)}"
-            )
-            stderr.print(
-                "[red]Please use add-extra-config to add them to the config file."
-            )
-            raise ValueError(
-                f"Config file is missing required sections: {', '.join(missing)}"
-            )
+
+        # Check CLI arguments
         if json_schema_file is None:
             schema_name = self.config.get_topic_data("generic", "relecov_schema")
             json_schema_file = os.path.join(
@@ -119,13 +100,44 @@ class Validate(BaseModule):
         except Exception as e:
             self.log.warning(f"Could not extract lab_code from json_data: {e}")
             self.lab_code = out_path.split("/")[-2]
+
         self.logsum = self.parent_log_summary(
             output_dir=self.out_folder, lab_code=self.lab_code, path=out_path
         )
         self.set_batch_id(batch_id)
         self.metadata = metadata
+        self.excel_sheet = excel_sheet
+        self.logsum_file = logsum_file
+        self.upload_files = upload_files
+        self.check_db = check_db
+
+        # Check and load config params
+        self.config = ConfigJson(extra_config=True)
+
+        req_conf = ["download"] * bool(upload_files) + ["update_db"] * bool(check_db)
+        missing = [
+            conf for conf in req_conf if self.config.get_configuration(conf) is None
+        ]
+        if missing:
+            self.log.error(
+                "Extra config file () is missing required sections: %s"
+                % ", ".join(missing)
+            )
+            self.log.error(
+                "Please use add-extra-config to add them to the config file."
+            )
+            stderr.print(
+                f"[red]Config file is missing required sections: {', '.join(missing)}"
+            )
+            stderr.print(
+                "[red]Please use add-extra-config to add them to the config file."
+            )
+            raise ValueError(
+                f"Config file is missing required sections: {', '.join(missing)}"
+            )
 
         sample_id_ontology = self.config.get_topic_data("generic", "sample_id_ontology")
+
         try:
             self.sample_id_field = Validate.get_field_from_schema(
                 sample_id_ontology, self.json_schema
@@ -133,11 +145,6 @@ class Validate(BaseModule):
         except ValueError as e:
             self.sample_id_field = None
             self.log.error(f"Could not extract sample_id_field: {e}. Set to None")
-
-        self.excel_sheet = excel_sheet
-        self.logsum_file = logsum_file
-        self.upload_files = upload_files
-        self.check_db = check_db
 
         if upload_files:
             upload_config = self.config.get_configuration("download")
@@ -777,6 +784,8 @@ class Validate(BaseModule):
                 if sample in valid_json_data:
                     valid_json_data.remove(sample)
                     invalid_json.append(sample)
+            else:
+                self.log.info("Sample not found in db.")
         return valid_json_data, invalid_json
 
     def validate(self):
@@ -855,5 +864,7 @@ class Validate(BaseModule):
             )
         else:
             self.create_validation_files(valid_json_data, invalid_json)
-            self.parent_create_error_summary(called_module="validate")
+
+        # Always create a summary log file for validation process
+        self.parent_create_error_summary(called_module="validate")
         return

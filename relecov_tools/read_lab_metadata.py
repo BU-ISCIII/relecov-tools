@@ -73,15 +73,17 @@ class LabMetadata(BaseModule):
         else:
             self.output_dir = output_dir
 
-        config_json = ConfigJson(extra_config=True)
+        self.config_json = ConfigJson(extra_config=True)
 
         # TODO: remove hardcoded schema selection
-        relecov_schema = config_json.get_topic_data("generic", "relecov_schema")
+        relecov_schema = self.config_json.get_topic_data("generic", "relecov_schema")
         relecov_sch_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
         )
-        self.configuration = config_json
-        self.institution_config = config_json.get_configuration("institutions_config")
+        self.configuration = self.config_json
+        self.institution_config = self.config_json.get_configuration(
+            "institutions_config"
+        )
 
         out_path = os.path.realpath(self.output_dir)
         self.lab_code = out_path.split("/")[-2]
@@ -113,18 +115,42 @@ class LabMetadata(BaseModule):
                 )
                 continue
         self.date = dtime.now().strftime("%Y%m%d%H%M%S")
-        self.json_req_files = config_json.get_topic_data(
+        self.json_req_files = self.config_json.get_topic_data(
             "read_lab_metadata", "lab_metadata_req_json"
         )
         self.schema_name = self.relecov_sch_json["title"]
         self.schema_version = self.relecov_sch_json["version"]
-        self.metadata_processing = config_json.get_topic_data(
+        self.metadata_processing = self.config_json.get_topic_data(
             "sftp_handle", "metadata_processing"
         )
-        self.samples_json_fields = config_json.get_topic_data(
+        self.samples_json_fields = self.config_json.get_topic_data(
             "read_lab_metadata", "samples_json_fields"
         )
         self.unique_sample_id = "sequencing_sample_id"
+
+    def _split_institution(self, raw: str) -> tuple[str, str]:
+        """
+        Split a free-text institution string into:
+
+            1. **name** – the visible name without any bracketed tags.
+            2. **code** – the last bracketed element, assumed to be the CCN
+            (e.g. `[1328000027]`). If no second bracket exists, returns "".
+
+        Example
+        -------
+        _split_institution("Hospital X [Madrid] [1328000027]")
+        ("Hospital X", "1328000027")
+        """
+        name = re.split(r"\s*\[", raw, maxsplit=1)[0].strip()
+        brackets = re.findall(r"\[([^\]]+)\]", raw)
+        code = brackets[-1].strip() if len(brackets) >= 2 else ""
+        return name, code
+
+    INSTITUTION_FIELDS = {
+        "collecting_institution",
+        "submitting_institution",
+        "sequencing_institution",
+    }
 
     def get_samples_files_data(self, clean_metadata_rows):
         """Include the fields that would be included in samples_data.json
@@ -143,7 +169,7 @@ class LabMetadata(BaseModule):
             try:
                 return relecov_tools.utils.calculate_md5(file)
             except IOError:
-                return "Not Provided [SNOMED:434941000124101]"
+                return self.config_json.get_topic_data("generic", "not_provided_field")
 
         # The files are and md5file are supposed to be located together
         dir_path = self.files_folder
@@ -368,43 +394,105 @@ class LabMetadata(BaseModule):
         return m_data
 
     def process_from_json(self, m_data, json_fields):
-        """Find the labels that are missing in the file to match the given schema."""
+        """
+        Fill in the fields defined in *json_fields* for each sample.
+
+        This is done in two phases:
+
+        1.  **Per-sample
+            - If *map_field* is empty → warning in `log_summary.json`.
+            - If the code exists but is not found in the auxiliary JSON → warning in `log_summary.json`.
+            - If the code exists and is found → add the fields specified in *adding_fields*.
+            - If any of these fields are `Not Provided`, they are filled with `Not Provided [SNOMED:434941000124101]`.
+
+        2.  **console summary** (`stderr`)
+            - On completion, a **single line** per type of problem
+              (empty codes or unknown codes) is displayed indicating how many samples
+              are affected and the affected property.
+            Example:
+                `13 samples without CCN; check log`.
+
+        Parameters
+        ----------
+            m_data : list[dict]
+            Metadata already read from Excel.
+            json_fields : dict
+            Dict taken from *configuration.json* with:
+                        - map_field
+                        - adding_fields
+                        - file
+                        - j_data (previously loaded in adding_fields())
+
+        Returns
+        -------
+            list[dict]
+            Metadata with the new fields added.
+        """
         map_field = json_fields["map_field"]
-        col_name = self.relecov_sch_json["properties"].get(map_field).get("label")
+        col_label = self.relecov_sch_json["properties"][map_field]["label"]
         json_data = json_fields["j_data"]
-        for idx in range(len(m_data)):
-            sample_id = str(m_data[idx].get(self.unique_sample_id))
-            if m_data[idx].get(map_field):
-                # Remove potential ontology tags from value like [SNOMED:258500001]
-                cleaned_key = re.sub(" [\[].*?[\]]", "", m_data[idx][map_field])
-                try:
-                    adding_data = {
-                        k: v
-                        for k, v in json_data[cleaned_key].items()
-                        if k in json_fields["adding_fields"]
-                    }
-                    m_data[idx].update(adding_data)
-                except KeyError as error:
-                    clean_error = re.sub("[\[].*?[\]]", "", str(error.args[0]))
-                    if str(clean_error).lower().strip() == "not provided":
-                        log_text = (
-                            f"Label {col_name} was not provided in sample "
-                            + f"{sample_id}, auto-completing with Not Provided"
-                        )
-                        self.logsum.add_warning(sample=sample_id, entry=log_text)
-                    else:
-                        log_text = (
-                            f"Unknown field value {error} for json data: "
-                            + f"{str(col_name)} in sample {sample_id}. Skipped"
-                        )
-                        self.logsum.add_warning(sample=sample_id, entry=log_text)
-                        continue
-                    # TODO: Include Not Provided as a configuration field
-                    fields_to_add = {
-                        x: "Not Provided [SNOMED:434941000124101]"
-                        for x in json_fields["adding_fields"]
-                    }
-                    m_data[idx].update(fields_to_add)
+
+        # ─── counters for the summary ─────────────────────────────────────────
+        empty_codes = []  # samples without value in map_field
+        unknown_codes = []  # value present but not found in auxiliary json
+
+        for row in m_data:
+            sample_id = str(row.get(self.unique_sample_id))
+            code = (row.get(map_field) or "").strip()
+
+            # ╭─ 1. Empty field ───────────────────────────────────────────────╮
+            if not code:
+                msg = (
+                    f"{col_label} not provided; cannot map "
+                    f"{json_fields['file']} data"
+                )
+                self.logsum.add_warning(sample=sample_id, entry=msg)
+                empty_codes.append(sample_id)
+                continue
+            # ╰────────────────────────────────────────────────────────────────╯
+
+            # ─── 2. Attempt Mapping ────────────────────────────────────────────
+            try:
+                adding_data = {
+                    k: v
+                    for k, v in json_data[code].items()
+                    if k in json_fields["adding_fields"]
+                }
+                row.update(adding_data)
+
+            except KeyError:
+                # Code present but does not exist in the auxiliary JSON
+                msg = (
+                    f"Unknown {col_label} '{code}' in {json_fields['file']} "
+                    f"for sample {sample_id}"
+                )
+                self.logsum.add_warning(sample=sample_id, entry=msg)
+                unknown_codes.append(sample_id)
+                continue
+
+            # ─── 3. Fill Not Provided in the added fields ─────────────
+            for field in json_fields["adding_fields"]:
+                if (
+                    field not in row
+                    or not row[field]
+                    or str(row[field]).lower().startswith("not provided")
+                ):
+                    row[field] = self.config_json.get_topic_data(
+                        "generic", "not_provided_field"
+                    )
+
+        # ─── 4. Summary in stderr ──────────────────────────────────────────
+        if empty_codes:
+            stderr.print(
+                f"[yellow]{len(empty_codes)} samples without {col_label}; "
+                "check the log"
+            )
+        if unknown_codes:
+            stderr.print(
+                f"[yellow]{len(unknown_codes)} values of {col_label} not found "
+                f"en {json_fields['file']}; check the log"
+            )
+
         return m_data
 
     def infer_file_format_from_schema(self, metadata):
@@ -444,7 +532,9 @@ class LabMetadata(BaseModule):
             if file_format_val:
                 row["file_format"] = file_format_val
             else:
-                row["file_format"] = "Not Provided [SNOMED:434941000124101]"
+                row["file_format"] = self.config_json.get_topic_data(
+                    "generic", "not_provided_field"
+                )
 
         return metadata
 
@@ -502,14 +592,16 @@ class LabMetadata(BaseModule):
         return c_files
 
     def read_metadata_file(self):
-        """Reads the input metadata file from header row, changes the metadata heading
-        with their property name values defined in schema. Convert the date columns
-        value to the yyyy/mm/dd format. Return list of dicts with data
+        """
+        Reads the input metadata file, converts headings to schema properties
+        and returns a list[dict] with the cleaned rows.
         """
         meta_sheet = self.metadata_processing.get("excel_sheet")
         header_flag = self.metadata_processing.get("header_flag")
         sample_id_col = self.metadata_processing.get("sample_id_col")
         self.alternative_heading = False
+
+        # ────────── 0. Open sheet ──────────
         try:
             ws_metadata_lab, heading_row_number = relecov_tools.utils.read_excel_file(
                 self.metadata_file, meta_sheet, header_flag, leave_empty=False
@@ -521,26 +613,33 @@ class LabMetadata(BaseModule):
             sample_id_col = self.metadata_processing.get("alternative_sample_id_col")
             logtxt = f"No excel sheet named {meta_sheet}. Using {alt_sheet}"
             stderr.print(f"[yellow]{logtxt}")
-            self.log.error(f"{logtxt}")
+            self.log.error(logtxt)
             ws_metadata_lab, heading_row_number = relecov_tools.utils.read_excel_file(
                 self.metadata_file, alt_sheet, header_flag, leave_empty=False
             )
-        valid_metadata_rows = []
-        included_sample_ids = []
+
+        valid_metadata_rows, included_sample_ids = [], []
         row_number = heading_row_number
+
         for row in ws_metadata_lab:
             row_number += 1
             property_row = {}
+
+            # ────────── 1. Validate sample_id ──────────
             try:
                 sample_id = str(row[sample_id_col]).strip()
             except KeyError:
                 self.logsum.add_error(entry=f"No {sample_id_col} found in excel file")
                 continue
-            # Validations on the sample_id
+
             if sample_id in included_sample_ids:
-                log_text = f"Skipped duplicated sample {sample_id} in row {row_number}. Sequencing sample id must be unique"
+                log_text = (
+                    f"Skipped duplicated sample {sample_id} in row {row_number}. "
+                    f"Sequencing sample id must be unique"
+                )
                 self.logsum.add_warning(entry=log_text)
                 continue
+
             if not row[sample_id_col] or "Not Provided" in sample_id:
                 if row.get("collecting_lab_sample_id"):
                     sample_id = row["collecting_lab_sample_id"]
@@ -557,45 +656,67 @@ class LabMetadata(BaseModule):
                     log_text = f"{sample_id_col} not provided for {sample_id}"
                     self.logsum.add_error(entry=log_text, sample=sample_id)
                     stderr.print(f"[red]{log_text}")
+
             included_sample_ids.append(sample_id)
+
+            # ────────── 2. Process columns ──────────
             for key in row.keys():
                 if header_flag in key:
                     continue
+
+                schema_key = self.label_prop_dict.get(key, key)
                 value = row[key]
-                # Omitting empty or not provided values
+
+                # 2.1  Institution fields
+                if schema_key in self.INSTITUTION_FIELDS and value:
+                    name, code = self._split_institution(str(value))
+                    value = name
+                    if schema_key == "collecting_institution":
+                        if code:
+                            property_row["collecting_institution_code_1"] = code
+                        else:
+                            self.logsum.add_warning(
+                                sample=sample_id,
+                                entry="CCN not provided for collecting_institution",
+                            )
+
+                # 2.2  Omit empty properties
                 if value is None or value == "" or "not provided" in str(value).lower():
                     log_text = f"{key} not provided for sample {sample_id}"
                     self.logsum.add_warning(sample=sample_id, entry=log_text)
                     continue
-                # Get JSON schema type
-                schema_key = self.label_prop_dict.get(key, key)
+
+                # 2.3  Cast to schema type
                 schema_type = (
                     self.relecov_sch_json["properties"]
                     .get(schema_key, {})
                     .get("type", "string")
                 )
-                # Conversion of values according to expected type
                 try:
                     value = relecov_tools.utils.cast_value_to_schema_type(
                         value, schema_type
                     )
                 except (ValueError, TypeError) as e:
-                    log_text = f"Type conversion error for {key} (expected {schema_type}): {value}. {str(e)}"
+                    log_text = (
+                        f"Type conversion error for {key} (expected {schema_type}): "
+                        f"{value}. {e}"
+                    )
                     self.logsum.add_error(sample=sample_id, entry=log_text)
                     stderr.print(f"[red]{log_text}")
                     continue
+
+                # 2.4  Normalise dates and numbers
                 if "date" in key.lower():
-                    # Check if date is a string. Format YYYY/MM/DD to YYYY-MM-DD
                     pattern = r"^\d{4}[-/.]\d{2}[-/.]\d{2}"
                     if isinstance(row[key], dtime):
-                        row[key] = str(row[key].date())
+                        value = str(row[key].date())
                     elif re.match(pattern, str(row[key])):
-                        row[key] = str(row[key]).replace("/", "-").replace(".", "-")
-                        row[key] = re.match(pattern, row[key]).group(0)
-                        value = row[key]
+                        value = re.match(
+                            pattern, str(row[key]).replace("/", "-").replace(".", "-")
+                        ).group(0)
                     else:
                         try:
-                            row[key] = str(int(float(str(row[key]))))
+                            value = str(int(float(str(row[key]))))
                             self.log.info(
                                 "Date given as an integer. Understood as a year"
                             )
@@ -604,18 +725,20 @@ class LabMetadata(BaseModule):
                             self.logsum.add_error(sample=sample_id, entry=log_text)
                             stderr.print(f"[red]{log_text} for sample {sample_id}")
                             continue
-                elif "sample id" in key.lower():
-                    if isinstance(row[key], float) or isinstance(row[key], int):
-                        row[key] = str(int(row[key]))
-                else:
-                    if isinstance(row[key], float) or isinstance(row[key], int):
-                        row[key] = str(row[key])
+                elif "sample id" in key.lower() and isinstance(row[key], (float, int)):
+                    value = str(int(row[key]))
+                elif isinstance(row[key], (float, int)):
+                    value = str(row[key])
+
                 if "date" not in key.lower() and isinstance(row[key], dtime):
                     logtxt = f"Non-date field {key} provided as date. Parsed as int"
                     self.logsum.add_warning(sample=sample_id, entry=logtxt)
-                    row[key] = str(relecov_tools.utils.excel_date_to_num(row[key]))
+                    value = str(relecov_tools.utils.excel_date_to_num(row[key]))
+
                 property_row[schema_key] = value
+
             valid_metadata_rows.append(property_row)
+
         return valid_metadata_rows
 
     def create_metadata_json(self):

@@ -4,7 +4,63 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.6.2] - 2025-08-01 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.2
+## [1.7.0] - 2025-09-03 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.0>
+
+### Credits
+
+- [Sara Monzon](https://github.com/saramonzon)
+- [Victor Lopez](https://github.com/victor5lm)
+- [Sarai Varona](https://github.com/svarona)
+- [Pablo Mata](https://github.com/shettland)
+- [Alejandro Bernabeu](https://github.com/aberdur)
+
+#### Added enhancements
+
+- Added support for uploading samples to `relecov-platform` from `pipeline_manager`, storing the returned `unique_sample_id` in `json_data` closing issue [#737](https://github.com/BU-ISCIII/relecov-tools/issues/737) [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Added support in `pipeline_manager` for renaming FASTQ and analysis files using `unique_sample_id`, while retaining `sequencing_sample_id` for traceability closing issue [#738](https://github.com/BU-ISCIII/relecov-tools/issues/738) [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Implemented fingerprint generation utility to create stable sample identifiers [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Included handling for already registered samples in the upload process [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Added new parameter `skip_upload_db` in `pipeline_manager` to allow skipping DB upload for testing purposes [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Support for using `unique_sample_id` as a key identifier in `read_bioinfo_metadata`, including fallback to combined ID format [#738](https://github.com/BU-ISCIII/relecov-tools/issues/738) [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
+- Refactored `read_bioinfo_metadata` module for improved structure, readability, and maintainability [#777](https://github.com/BU-ISCIII/relecov-tools/pull/777)
+- Included project name in email subject for upload_results module [#780](https://github.com/BU-ISCIII/relecov-tools/pull/780)
+- Integrated REGCESS as the main institutional metadata source, merging CCN and CODCNH datasets, standardizing codes, enriching with geolocation, and updating schema and validation logic [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
+- Updated relecov_schema to v3.2.0 with new classification Genomic Typing fields [#783](https://github.com/BU-ISCIII/relecov-tools/pull/783)
+- Add database–helper scripts (populate_lab_request.py, update_geo_from_json.py) & update README [#786](https://github.com/BU-ISCIII/relecov-tools/pull/786)
+
+#### Fixes
+
+- Fixed potential inconsistency when no folder name is found in metadata, now raises warning and skips entry [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Fixed broken platform config references (`platform` → `platform-data`, then to `platform-params`) to reflect changes in `configuration.json` [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Improved robustness and internal consistency of `pipeline_utils` and `viralrecon.py` through annotations, docstrings, and variable cleanup [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
+- Fixed geolocation cities file and improved city name normalization [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
+- Fixed issues with submitting institutions metadata [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
+
+#### Changed
+
+- Updated create_summary_tables.py to organize data according to the epidemiological season [#772](https://github.com/BU-ISCIII/relecov-tools/pull/772)
+- Reordered initializations in `validate` and `upload_database` classes to follow consistent structure defined in [#692](https://github.com/BU-ISCIII/relecov-tools/issues/692) [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Replaced use of custom `config` dict in `pipeline_manager` with `ConfigJson` for consistency and better validation [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Modified `upload_database` to accept `json_data` as either a path or a list of dicts [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- `upload_database` now returns API upload results for downstream consumption [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Changed exit behavior in `pipeline_manager` to raise exceptions instead of using `exit(0)` [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Updated method signatures and added type annotations and docstring for better code clarity [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Enhanced `validate_samplenames` logic to support combined identifier format (`sequencing_sample_id_unique_sample_id`) when present [#738](https://github.com/BU-ISCIII/relecov-tools/issues/738) [#775](https://github.com/BU-ISCIII/relecov-tools/pull/775)
+- Renamed `add_bioinfo_files_path` to `map_and_extract_bioinfo_paths` in `read_bioinfo_metadata` for clarity and consistency [#777](https://github.com/BU-ISCIII/relecov-tools/pull/777)
+- Updated the hospital database generation to merge REGCESS and CNH data, handle complexes, enrich and normalize metadata, auto-geolocate cities, and generate all related JSON outputs [#726](https://github.com/BU-ISCIII/relecov-tools/pull/726)
+- Added "Complejo" to the "Nombre del Complejo" [#749](https://github.com/BU-ISCIII/relecov-tools/pull/749)
+- Updated read-lab-metadata to extract and use CCN from Excel hospital fields [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
+- Updated build-schema to generate hospital dropdowns using hospital-city-CCN mappings [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
+- Replaced collecting institution CCN/CODCNH fields with standardized `collecting_institution_code_[1,2]` [#781](https://github.com/BU-ISCIII/relecov-tools/pull/781)
+
+#### Removed
+
+- Removed unused class `ResultsUpload` and stale internal variables (e.g. `self.json_file`) [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+- Cleaned up unused imports [#774](https://github.com/BU-ISCIII/relecov-tools/pull/774)
+
+### Requirements
+
+## [1.6.2] - 2025-08-01 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.2>
 
 ### Credits
 
@@ -24,6 +80,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Update __main__ & config_json for new merged-config structure (commands + params) [#765](https://github.com/BU-ISCIII/relecov-tools/pull/765)
 - Propagate wrapper --output_dir down to download [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
 - Update error message when output_dir is missing in extra_config [#766](https://github.com/BU-ISCIII/relecov-tools/pull/766)
+- Check_db fixed due to configuration.json changes. Now wrapper uses update_db for validation as default [#767](https://github.com/BU-ISCIII/relecov-tools/pull/767)
 
 #### Removed
 
@@ -31,7 +88,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.6.1] - 2025-07-28 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.1
+## [1.6.1] - 2025-07-28 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.1>
 
 ### Credits
 
@@ -49,7 +106,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated schema and configuration for Ion Torrent [#724](https://github.com/BU-ISCIII/relecov-tools/pull/724)
 - Refactor configuration.json structure by grouping fields by module usage[#725](https://github.com/BU-ISCIII/relecov-tools/pull/725)
 - Standardized rest_api responses for all methods with a new static method called standardize_response [#741](https://github.com/BU-ISCIII/relecov-tools/pull/741)
-
 
 #### Fixes
 
@@ -69,7 +125,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.6.0] - 2025-07-04 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.0
+## [1.6.0] - 2025-07-04 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.0>
 
 ### Credits
 
@@ -157,7 +213,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.5.5] - 2025-06-16 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.5
+## [1.5.5] - 2025-06-16 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.5>
 
 ### Credits
 
@@ -215,12 +271,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Removed hardcoded `sample_entry_date` and legacy fallback logic from `upload_database` mapping. [#610](https://github.com/BU-ISCIII/relecov-tools/pull/610)
 
-
 ### Requirements
 
 - A new dependency has been added to `relecov-tools`: the 7-Zip software is now required. [#622](https://github.com/BU-ISCIII/relecov-tools/pull/622)
 
-## [1.5.4] - 2025-05-19 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.4
+## [1.5.4] - 2025-05-19 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.4>
 
 ### Credits
 
@@ -242,7 +297,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.5.3] - 2025-05-14 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.3
+## [1.5.3] - 2025-05-14 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.3>
 
 ### Credits
 
@@ -268,7 +323,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.5.2] - 2025-05-13 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.2
+## [1.5.2] - 2025-05-13 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.2>
 
 ### Credits
 
@@ -295,7 +350,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.5.1] - 2025-05-12 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.1
+## [1.5.1] - 2025-05-12 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.1>
 
 ### Credits
 
@@ -351,7 +406,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.5.0] - 2025-05-06 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.0
+## [1.5.0] - 2025-05-06 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.0>
 
 ### Credits
 
@@ -457,7 +512,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.4.0] - 2025-01-27 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.4.0
+## [1.4.0] - 2025-01-27 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.4.0>
 
 ### Credits
 
@@ -488,7 +543,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.3.0] - 2024-12-23 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.3.0
+## [1.3.0] - 2024-12-23 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.3.0>
 
 ### Credits
 
@@ -518,7 +573,7 @@ Code contributions to the release:
 - Added support for multiple recipients in the email_receiver field. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
 - Introduced a new Jinja template for successful and error validation reports. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
 - Modified the module logic to dynamically select and render email templates based on user input. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
-- Enhanced email formatting and added a default CC to bioinformatica@isciii.es. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
+- Enhanced email formatting and added a default CC to <bioinformatica@isciii.es>. [#349](https://github.com/BU-ISCIII/relecov-tools/pull/349)
 - Validate module now takes an optional argument to select the name of the sheet to check in excel file [#357](https://github.com/BU-ISCIII/relecov-tools/pull/357)
 - Fixed email module [#361](https://github.com/BU-ISCIII/relecov-tools/pull/361)
 
@@ -538,7 +593,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.2.0] - 2024-10-11 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.2.0
+## [1.2.0] - 2024-10-11 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.2.0>
 
 ### Credits
 
@@ -557,10 +612,10 @@ Code contributions to the release:
 
 - Now also check for gzip file integrity after download. Moved cleaning process to end of workflow [#313](https://github.com/BU-ISCIII/relecov-tools/pull/313)
 - Introduced a decorator in sftp_client.py to reconnect when conection is lost [#313](https://github.com/BU-ISCIII/relecov-tools/pull/313)
-- Add Hospital Universitari Doctor Josep Trueta to laboratory_address.json [#316] (https://github.com/BU-ISCIII/relecov-tools/pull/316)
+- Add Hospital Universitari Doctor Josep Trueta to laboratory_address.json [#316] (<https://github.com/BU-ISCIII/relecov-tools/pull/316>)
 - samples_data json file is no longer mandatory as input in read-lab-metadata [#314](https://github.com/BU-ISCIII/relecov-tools/pull/314)
 - Included handling of alternative column names to support two distinct headers using the same schema in read-lab-metadata [#314](https://github.com/BU-ISCIII/relecov-tools/pull/314)
-- Included a new hospital (Hospital Universitario Araba) to laboratory_address.json [#315](https://github.com/BU-ISCIII/relecov-tools/pull/315) 
+- Included a new hospital (Hospital Universitario Araba) to laboratory_address.json [#315](https://github.com/BU-ISCIII/relecov-tools/pull/315)
 - More accurate cleaning process, skipping only sequencing files instead of whole folder [#321](https://github.com/BU-ISCIII/relecov-tools/pull/321)
 - Now single logs summaries are also created for each folder during download [#321](https://github.com/BU-ISCIII/relecov-tools/pull/321)
 - Introduced handling for missing/dup files and more accurate information in prompt for pipeline_manager [#321](https://github.com/BU-ISCIII/relecov-tools/pull/321)
@@ -572,6 +627,7 @@ Code contributions to the release:
 - Add SQK-RBK114-96 to library_preparation_kit schema [#333](https://github.com/BU-ISCIII/relecov-tools/pull/333)
 - Corrected the Submitting_institution for Hospital de Valdepeñas, Centro de Salud Altagracia and Hospital General de Santa Bárbara.[#334](https://github.com/BU-ISCIII/relecov-tools/pull/334)
 - Added Hospital General de Tomelloso. [#334](https://github.com/BU-ISCIII/relecov-tools/pull/334)
+
 #### Fixes
 
 - Fixed wrong city name in relecov_tools/conf/laboratory_address.json [#320](https://github.com/BU-ISCIII/relecov-tools/pull/320)
@@ -590,7 +646,7 @@ Code contributions to the release:
 - Now download skips folders containing "invalid_samples" in its name [#321](https://github.com/BU-ISCIII/relecov-tools/pull/321)
 - read-lab-metadata: Some warnings now include label. Also removed trailing spaces [#322](https://github.com/BU-ISCIII/relecov-tools/pull/322)
 - Renamed launch-pipeline for pipeline-manager and updated keys in configuration.json [#324](https://github.com/BU-ISCIII/relecov-tools/pull/324)
-- Pipeline manager now splits data based on enrichment_panel and version. One folder for each group [#324](https://github.com/BU-ISCIII/relecov-tools/pull/324) 
+- Pipeline manager now splits data based on enrichment_panel and version. One folder for each group [#324](https://github.com/BU-ISCIII/relecov-tools/pull/324)
 
 #### Removed
 
@@ -600,7 +656,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.1.0] - 2024-09-13 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.1.0
+## [1.1.0] - 2024-09-13 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.1.0>
 
 ### Credits
 
@@ -635,7 +691,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.0.0] - 2024-09-02 : https://github.com/BU-ISCIII/relecov-tools/releases/tag/1.0.0
+## [1.0.0] - 2024-09-02 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/1.0.0>
 
 ### Credits
 

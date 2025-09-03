@@ -18,7 +18,7 @@ stderr = rich.console.Console(
 )
 
 
-def quality_control_evaluation(data):
+def quality_control_evaluation(data: list[dict], **kwargs) -> list[dict]:
     """Evaluates QC status for each sample based on predefined thresholds.
 
     Parameters:
@@ -42,9 +42,9 @@ def quality_control_evaluation(data):
         "number_of_unambiguous_bases": (">", 11000),
         "number_of_Ns": ("<", 2300),
         "per_genome_greater_10x": (">", 90.0),
-        "per_reads_host": ("<", 20.0),
-        "per_hagene_coverage": (">", 98.0),
-        "per_nagene_coverage": (">", 98.0),
+        "per_reads_host": ("<", 30.0),
+        "per_hagene_coverage": (">", 95.0),
+        "per_nagene_coverage": (">", 95.0),
     }
 
     def is_not_evaluable(value):
@@ -73,12 +73,12 @@ def quality_control_evaluation(data):
     )
 
     for warn in warnings:
-        log_report.update_log_report(method_name, warn)
+        log_report.update_log_report(method_name, "warning", warn)
 
     return data
 
 
-def get_software_versions(files_list, file_tag, pipeline_name, output_dir=None):
+def get_software_versions(files_list: list, **kwargs) -> dict:
     """File handler to parse software versions from csv.
 
     Args:

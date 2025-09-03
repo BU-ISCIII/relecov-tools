@@ -136,3 +136,6 @@ dmypy.json
 
 # Custom config file
 relecov_tools/conf/initial_config.yaml
+
+# IDE
+.vscode/

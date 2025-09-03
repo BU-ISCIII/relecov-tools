@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 import logging
+
 import rich
 
+import relecov_tools.assets.pipeline_utils.utils
 import relecov_tools.utils
 from relecov_tools.read_bioinfo_metadata import BioinfoReportLog
 
@@ -14,7 +16,7 @@ stderr = rich.console.Console(
 )
 
 
-def handle_pangolin_data(files_list, file_tag, pipeline_name, output_folder=None):
+def handle_pangolin_data(files_list: list, **kwargs) -> dict:
     """File handler to parse pangolin data (csv) into JSON structured format.
 
     Args:
@@ -39,10 +41,10 @@ def handle_pangolin_data(files_list, file_tag, pipeline_name, output_folder=None
                 )
                 pango_data_key = next(iter(pango_data))
                 pango_data_updated = {
-                    key.split()[0]: value for key, value in pango_data.items()
+                    str(key).split()[0]: value for key, value in pango_data.items()
                 }
                 pango_data_processed.update(pango_data_updated)
-                valid_samples.append(pango_data_key.split()[0])
+                valid_samples.append(str(pango_data_key).split()[0])
             except (FileNotFoundError, IndexError) as e:
                 method_log_report.update_log_report(
                     method_name,
@@ -54,7 +56,7 @@ def handle_pangolin_data(files_list, file_tag, pipeline_name, output_folder=None
         method_log_report.update_log_report(
             method_name, "warning", f"Error occurred while processing files: {e}"
         )
-    if len(valid_samples) > 0:
+    if valid_samples:
         method_log_report.update_log_report(
             method_name,
             "valid",
@@ -64,17 +66,15 @@ def handle_pangolin_data(files_list, file_tag, pipeline_name, output_folder=None
     return pango_data_processed
 
 
-def quality_control_evaluation(data):
+def quality_control_evaluation(data: list[dict], **kwargs) -> list[dict]:
     """Evaluates QC status for each sample based on predefined thresholds.
 
-    Parameters:
-    -----------
+    Args:
     data : list of dict
         List of sample metadata dictionaries containing metrics such as coverage,
         ambiguity, number of Ns, %LDMutations, etc.
 
     Returns:
-    --------
     list of dict
         The same list with an added 'qc_test' field per sample:
         - 'pass' if all evaluable conditions are met
@@ -129,6 +129,6 @@ def quality_control_evaluation(data):
     )
 
     for warn in warnings:
-        log_report.update_log_report(method_name, warn)
+        log_report.update_log_report(method_name, "warning", warn)
 
     return data

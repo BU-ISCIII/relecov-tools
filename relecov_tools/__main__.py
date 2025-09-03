@@ -39,7 +39,7 @@ stderr = rich.console.Console(
     stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
 )
 
-__version__ = "1.6.2"
+__version__ = "1.7.0"
 
 # IMPORTANT: When defining a Click command function in this script,
 # you MUST include both 'ctx' (for @click.pass_context) and ALL the parameters
@@ -1048,12 +1048,6 @@ def metadata_homogeneizer(ctx, institution, directory, output_dir):
     help="Path to folder containing the pipeline templates from buisciii-tools",
 )
 @click.option(
-    "-c",
-    "--config",
-    type=click.Path(),
-    help="select the template config file",
-)
-@click.option(
     "-o",
     "--output_dir",
     "--output-dir",
@@ -1074,8 +1068,17 @@ def metadata_homogeneizer(ctx, institution, directory, output_dir):
     default=None,
     help="Folder basenames to process. Target folders names should match the given dates. E.g. ... -f folder1 -f folder2 -f folder3",
 )
+@click.option(
+    "-s",
+    "--skip_db_upload",
+    multiple=False,
+    default=False,
+    help="Skip the database upload step. This is useful for testing purposes.",
+)
 @click.pass_context
-def pipeline_manager(ctx, input, templates_root, output_dir, config, folder_names):
+def pipeline_manager(
+    ctx, input, templates_root, output_dir, folder_names, skip_db_upload
+):
     """
     Create the symbolic links for the samples which are validated to prepare for
     bioinformatics pipeline execution.
