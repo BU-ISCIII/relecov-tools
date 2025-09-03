@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, csv, datetime, json, logging, os, re, unicodedata
+import argparse
+import csv
+import datetime
+import json
+import logging
+import os
+import re
+import unicodedata
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from typing import Any, Dict, Set
@@ -32,8 +39,9 @@ FIELD_MAP = {
 DEFAULTS = {"lab_unit": "-", "lab_contact_name": "-"}
 DEFAULT_APPS = "wetlab"
 MAX_CODING_LEN = 50
-_quote = lambda c: f"`{c}`"
-
+def _quote(column: str) -> str:
+    """Wrap a column name in back-ticks for MySQL."""
+    return f"`{column}`"
 
 # ────── Generic helpers ──────────────────────────────────────────────────
 def load_json(p: str | Path) -> Any:
