@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1dev] - 2025-XX-XX : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.1dev>
+
+### Credits
+
+- [Alejandro Bernabeu](https://github.com/aberdur)
+
+#### Added enhancements
+
+#### Fixes
+
+- Remove sample_fingerprint from upload-database module [#790](https://github.com/BU-ISCIII/relecov-tools/pull/790)
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [1.7.0] - 2025-09-03 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.0>
 
 ### Credits
