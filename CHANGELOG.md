@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Fixes
 
 - Remove sample_fingerprint from upload-database module [#790](https://github.com/BU-ISCIII/relecov-tools/pull/790)
+- Fix data completeness in rest_api.standardize_response [#791](https://github.com/BU-ISCIII/relecov-tools/pull/791)
 
 #### Changed
 
