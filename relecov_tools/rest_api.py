@@ -283,6 +283,20 @@ class RestApi:
             if not is_success and "ERROR" not in result:
                 result["ERROR"] = result["message"] or f"HTTP {status_code}"
 
+        elif isinstance(payload, list):
+            # JSON list payload (e.g., sample-info returning rows). Keep as data.
+            if is_success:
+                result["message"] = (
+                    "OK"
+                    if not isinstance(payload, dict)
+                    else result.get("message", "OK")
+                )
+                result["data"] = payload
+            else:
+                # On error with list (unlikely), still surface as data and set message
+                result["message"] = "Unexpected error"
+                result["data"] = payload
+
         else:
             # Non-JSON response
             text = ""
