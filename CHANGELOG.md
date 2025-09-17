@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Remove sample_fingerprint from upload-database module [#790](https://github.com/BU-ISCIII/relecov-tools/pull/790)
 - Fix data completeness in rest_api.standardize_response [#791](https://github.com/BU-ISCIII/relecov-tools/pull/791)
-- Fix list handling in rest_api.py [#792](https://github.com/BU-ISCIII/relecov-tools/pull/792)
+- Fix list handling in rest_api.py; Fix download invalid_folder processing; Fix pipeline-manager R1 check [#792](https://github.com/BU-ISCIII/relecov-tools/pull/792)
 
 #### Changed
 
