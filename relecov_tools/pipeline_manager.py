@@ -116,6 +116,10 @@ class PipelineManager(BaseModule):
         self.linked_sample_folder = config_data["sample_link_folder"]
         self.doc_folder = config_data["doc_folder"]
         self.organism_config = config_data["organism_config"]
+        self.not_provided_field = (
+            self.config.get_topic_data("generic", "not_provided_field")
+            or "Not Provided [SNOMED:434941000124101]"
+        )
 
         req_conf = ["update_db"] * bool(self.skip_db_upload)
         missing = [
@@ -288,6 +292,7 @@ class PipelineManager(BaseModule):
             the files that received an error while trying to copy.
         """
         samp_errors = {}
+        not_provided = self.not_provided_field
         # Create the output folder for symbolic links
         links_folder = os.path.join(
             output_dir, self.analysis_folder, self.linked_sample_folder
@@ -304,7 +309,9 @@ class PipelineManager(BaseModule):
             ext_found = re.match(r".*(fastq.*|bam)", sample["sequence_file_path_R1"])
             if not ext_found:
                 self.log.error("No valid file extension found for %s", seq_sample_id)
-                samp_errors[seq_sample_id].append(sample["sequence_file_path_R1"])
+                samp_errors.setdefault(seq_sample_id, []).append(
+                    sample["sequence_file_path_R1"]
+                )
                 continue
 
             ext = ext_found.group(1)
@@ -337,7 +344,8 @@ class PipelineManager(BaseModule):
                 continue
 
             # check if there is a r2 file
-            if "sequence_file_path_R2" in sample:
+            r2_path = sample.get("sequence_file_path_R2")
+            if r2_path and not_provided not in r2_path and os.path.isfile(r2_path):
                 if not self.skip_db_upload:
                     # Create sample filename with unique_sample_id and sequencing_sample_id
                     seq_r2_sample_id = (
@@ -353,7 +361,7 @@ class PipelineManager(BaseModule):
                     seq_r2_sample_id,
                 )
                 try:
-                    shutil.copy(sample["sequence_file_path_R2"], sample_raw_r2)
+                    shutil.copy(r2_path, sample_raw_r2)
                     r2_link_path = os.path.join(links_folder, seq_r2_sample_id)
                     r2_link_path_ori = os.path.join("../../RAW", seq_r2_sample_id)
                     os.symlink(r2_link_path_ori, r2_link_path)
@@ -361,7 +369,7 @@ class PipelineManager(BaseModule):
                     self.log.error("File not found %s", e)
                     if not samp_errors.get(seq_sample_id):
                         samp_errors[seq_sample_id] = []
-                    samp_errors[seq_sample_id].append(sample["sequence_file_path_R2"])
+                    samp_errors[seq_sample_id].append(r2_path)
                     continue
         return samp_errors
 
@@ -385,17 +393,36 @@ class PipelineManager(BaseModule):
                 ]
         """
         samples_data = []
+        not_provided = self.not_provided_field
         for item in json_data:
             sample = {}
             sample["sequencing_sample_id"] = item.get("sequencing_sample_id", "")
             sample["unique_sample_id"] = item.get("unique_sample_id", "")
-            sample["sequence_file_path_R1"] = os.path.join(
-                item["sequence_file_path_R1"], item["sequence_file_R1"]
-            )
-            if "sequence_file_path_R2" in item:
-                sample["sequence_file_path_R2"] = os.path.join(
-                    item["sequence_file_path_R2"], item["sequence_file_R2"]
+            r1_path = item.get("sequence_file_path_R1")
+            r1_name = item.get("sequence_file_R1")
+            if (
+                r1_path
+                and r1_name
+                and r1_path != not_provided
+                and r1_name != not_provided
+            ):
+                sample["sequence_file_path_R1"] = os.path.join(r1_path, r1_name)
+            else:
+                self.log.warning(
+                    "Skipping sample %s because R1 file information is missing",
+                    sample["sequencing_sample_id"],
                 )
+                continue
+
+            r2_path = item.get("sequence_file_path_R2")
+            r2_name = item.get("sequence_file_R2")
+            if (
+                r2_path
+                and r2_name
+                and r2_path != not_provided
+                and r2_name != not_provided
+            ):
+                sample["sequence_file_path_R2"] = os.path.join(r2_path, r2_name)
             samples_data.append(sample)
         return samples_data
 
