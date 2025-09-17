@@ -508,6 +508,7 @@ class Download(BaseModule):
                     log_text = "Sequence File R1 not defined in Metadata for sample %s"
                     stderr.print(f"[red]{str(log_text % s_name)}")
                     self.include_error(entry=str(log_text % s_name), sample=s_name)
+                    continue
                 try:
                     if not row[index_layout]:
                         error_text = "Missing 'Library Layout' value for sample %s."
@@ -1363,6 +1364,9 @@ class Download(BaseModule):
             self.log.info("Finished download for folder: %s", folder)
             stderr.print(f"Finished download for folder {folder}")
             remote_md5sum = self.find_remote_md5sum(folder)
+            remote_md5_basename = (
+                os.path.basename(remote_md5sum) if remote_md5sum else None
+            )
             corrupted = []
             if remote_md5sum and fetched_files:
                 # Get the md5checksum to validate integrity of files after download
@@ -1507,7 +1511,10 @@ class Download(BaseModule):
                     )
             self.log.info(f"Finished processing {folder}")
             stderr.print(f"[green]Finished processing {folder}")
-            self.finished_folders[folder] = list(files_md5_dict.keys())
+            downloaded_items = list(files_md5_dict.keys())
+            if remote_md5_basename:
+                downloaded_items.append(remote_md5_basename)
+            self.finished_folders[folder] = downloaded_items
             self.finished_folders[folder].append(meta_file)
         return
 
