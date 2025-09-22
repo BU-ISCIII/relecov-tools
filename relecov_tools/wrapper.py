@@ -256,11 +256,9 @@ class Wrapper(BaseModule):
                 continue
             self.wrapper_logsum.create_error_summary(
                 called_module="metadata",
-                filepath=os.path.join(
-                    folder, self.tag_filename(f"{key}.json")
-                ),
+                filepath=os.path.join(folder, self.tag_filename(f"{key}.json")),
                 logs={key: merged_logs[key]},
-                to_excel=True
+                to_excel=True,
             )
             self.wrapper_logsum.logs[key] = merged_logs[key]
 
