@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Alejandro Bernabeu](https://github.com/aberdur)
+- [Pablo Mata](https://github.com/shettland)
 
 #### Added enhancements
 
@@ -19,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix list handling in rest_api.py [#792](https://github.com/BU-ISCIII/relecov-tools/pull/792)
 - Fix download invalid_folder processing [#792](https://github.com/BU-ISCIII/relecov-tools/pull/792)
 - Fix pipeline-manager R1 check [#792](https://github.com/BU-ISCIII/relecov-tools/pull/792)
+- Fixed missing and empty report.xlsx after wrapper execution [#798](https://github.com/BU-ISCIII/relecov-tools/pull/798)
 
 #### Changed
 
