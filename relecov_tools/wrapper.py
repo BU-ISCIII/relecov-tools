@@ -207,7 +207,7 @@ class Wrapper(BaseModule):
         except OSError:
             self.log.warning(f"Could not remove {temp_logsum}")
         merged_logs = self.wrapper_logsum.merge_logs(
-            key_name=key, logs_list=[{key: folder_logs}, read_meta_logs, validate_logs]
+            key_name=key, logs_list=[previous_logs, validate_logs]
         )
         stderr.print(f"[green]Merged logs from all processes in {local_folder}")
         self.log.info(f"Merged logs from all processes in {local_folder}")
@@ -254,8 +254,17 @@ class Wrapper(BaseModule):
                     to_excel=False,
                 )
                 continue
+            self.wrapper_logsum.create_error_summary(
+                called_module="metadata",
+                filepath=os.path.join(
+                    folder, self.tag_filename(f"{key}.json")
+                ),
+                logs={key: merged_logs[key]},
+                to_excel=True
+            )
             self.wrapper_logsum.logs[key] = merged_logs[key]
 
+        self.base_logsum.logs = self.wrapper_logsum.logs
         self.parent_create_error_summary(
             called_module="wrapper",
             to_excel=True,
