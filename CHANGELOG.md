@@ -24,6 +24,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Changed
 
+- Updated relecov schema version to v3.2.1 [#800](https://github.com/BU-ISCIII/relecov-tools/pull/800)
+
 #### Removed
 
 ### Requirements
