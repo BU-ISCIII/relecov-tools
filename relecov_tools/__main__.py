@@ -39,7 +39,7 @@ stderr = rich.console.Console(
     stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
 )
 
-__version__ = "1.7.1dev"
+__version__ = "1.7.1"
 
 # IMPORTANT: When defining a Click command function in this script,
 # you MUST include both 'ctx' (for @click.pass_context) and ALL the parameters
