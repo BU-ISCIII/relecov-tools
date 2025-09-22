@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2025-09-22 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.1>
+
+### Credits
+
+- [Alejandro Bernabeu](https://github.com/aberdur)
+- [Pablo Mata](https://github.com/shettland)
+
+#### Added enhancements
+
+#### Fixes
+
+- Remove sample_fingerprint from upload-database module [#790](https://github.com/BU-ISCIII/relecov-tools/pull/790)
+- Fix data completeness in rest_api.standardize_response [#791](https://github.com/BU-ISCIII/relecov-tools/pull/791)
+- Fix list handling in rest_api.py [#792](https://github.com/BU-ISCIII/relecov-tools/pull/792)
+- Fix download invalid_folder processing [#792](https://github.com/BU-ISCIII/relecov-tools/pull/792)
+- Fix pipeline-manager R1 check [#792](https://github.com/BU-ISCIII/relecov-tools/pull/792)
+- Fixed missing and empty report.xlsx after wrapper execution [#798](https://github.com/BU-ISCIII/relecov-tools/pull/798)
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [1.7.0] - 2025-09-03 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.0>
 
 ### Credits

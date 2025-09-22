@@ -267,11 +267,35 @@ class RestApi:
                 result["data"] = payload["data"]
             else:
                 _, alt_data = _first_key(payload, list(data_keys))
-                result["data"] = alt_data if alt_data is not None else {}
+                if alt_data is not None:
+                    result["data"] = alt_data
+                else:
+                    # fallback: use all non-canonical keys
+                    canon_keys = set(message_keys) | set(error_keys) | set(data_keys)
+                    canon_keys |= {"message", "ERROR", "data"}
+                    extra = {k: v for k, v in payload.items() if k not in canon_keys}
+                    if extra:
+                        result["data"] = extra
+                    else:
+                        result["data"] = {}
 
             # If HTTP status is not success and API did not include ERROR, synthesize it
             if not is_success and "ERROR" not in result:
                 result["ERROR"] = result["message"] or f"HTTP {status_code}"
+
+        elif isinstance(payload, list):
+            # JSON list payload (e.g., sample-info returning rows). Keep as data.
+            if is_success:
+                result["message"] = (
+                    "OK"
+                    if not isinstance(payload, dict)
+                    else result.get("message", "OK")
+                )
+                result["data"] = payload
+            else:
+                # On error with list (unlikely), still surface as data and set message
+                result["message"] = "Unexpected error"
+                result["data"] = payload
 
         else:
             # Non-JSON response
