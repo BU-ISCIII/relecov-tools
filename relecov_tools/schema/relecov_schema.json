@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/fix_classification/relecov_tools/schema/relecov_schema.json",
+    "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/relecov_schema.json",
     "title": "relecov-tools Schema.",
     "description": "Json Schema that specifies the structure, content, and validation rules for relecov-tools",
     "version": "3.2.2",
