@@ -190,7 +190,7 @@ class UploadDatabase(BaseModule):
             else:
                 self.log.info("Fetched lab_request fields from iSkyLIMS")
                 stderr.print("[blue]Fetched lab_request fields from iSkyLIMS")
-                if not "data" in lab_request_response:
+                if "data" not in lab_request_response:
                     logtxt = "No data entry found in lab_request fields response. No mapping will be made."
                     self.logsum.add_warning(entry=logtxt)
                     stderr.print(f"[yellow]{logtxt}")
