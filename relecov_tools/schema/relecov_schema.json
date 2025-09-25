@@ -1,9 +1,9 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/relecov_schema.json",
+    "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/fix_classification/relecov_tools/schema/relecov_schema.json",
     "title": "relecov-tools Schema.",
     "description": "Json Schema that specifies the structure, content, and validation rules for relecov-tools",
-    "version": "3.2.1",
+    "version": "3.2.2",
     "type": "object",
     "properties": {
         "organism": {
@@ -4221,7 +4221,7 @@
             "examples": [
                 "40059"
             ],
-            "ontology": "SNOMED:423901009",
+            "ontology": "NCIT:C101703",
             "type": "string",
             "description": "CODCNH code from the agency/institution that collected the sample.",
             "classification": "Sample collection and processing",
@@ -4257,11 +4257,11 @@
             "examples": [
                 "11380"
             ],
-            "ontology": "0",
+            "ontology": "GENEPIO:0001803",
             "type": "string",
-            "description": "Autonomous Community Code",
+            "description": "Autonomic center Code",
             "classification": "Sample collection and processing",
-            "label": "Autonomous Community Code",
+            "label": "Autonomic Center Code",
             "fill_mode": "batch",
             "header": "N"
         },
@@ -4615,7 +4615,7 @@
             "examples": [
                 "1"
             ],
-            "ontology": "0",
+            "ontology": "NCIT:C218832",
             "type": "string",
             "description": "Official Code of the state/province/territory of origin of the sample.",
             "classification": "Sample collection and processing",
@@ -4741,7 +4741,7 @@
             "examples": [
                 "Servicios O Institutos De Salud De Las Comunidades Autónomas"
             ],
-            "ontology": "0",
+            "ontology": "mesh:D009935",
             "type": "string",
             "description": "The type of entity to which the facility is affiliated",
             "classification": "Sample collection and processing",
@@ -4753,7 +4753,7 @@
             "examples": [
                 "C11"
             ],
-            "ontology": "0",
+            "ontology": "NCIT:C93878",
             "type": "string",
             "description": "Official code of Institution’s functional classification or primary service purpose",
             "classification": "Sample collection and processing",
@@ -4765,7 +4765,7 @@
             "examples": [
                 "Hospitales Generales"
             ],
-            "ontology": "0",
+            "ontology": "NCIT:C188820",
             "type": "string",
             "description": "Institution’s functional classification or primary service purpose",
             "classification": "Sample collection and processing",
