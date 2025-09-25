@@ -367,10 +367,12 @@ class UploadDatabase(BaseModule):
                     stderr.print(f"[red]{logtxt}")
                     continue
             self.log.info(
-                "stored data in %s iskylims for sample %s with unique id %s",
+                "stored data in %s for sample %s with unique id %s",
                 self.platform,
                 req_sample,
-                result["data"]["sample_unique_id"],
+                result["data"].get(
+                    "sample_unique_id", result["data"].get("sample_name")
+                ),
             )
             stderr.print(f"[green] Successful request for {req_sample}")
             result_all.append(result["data"])
