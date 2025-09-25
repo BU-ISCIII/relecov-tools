@@ -9,10 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Alejandro Bernabeu](https://github.com/aberdur)
+- [Pablo Mata](https://github.com/shettland)
 
 #### Added enhancements
 
+- Introduced new function to feed iskylims POST data with lab_requests fields in upload_database.py [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
+- Included new iskylims api url to get mapping for lab_request fields in configuration.json [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
+
 #### Fixes
+
+- Fixed wrong message and keyerror when uploading to iskylims [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
 
 #### Changed
 
