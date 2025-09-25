@@ -185,7 +185,7 @@ class UploadDatabase(BaseModule):
             )
             if "ERROR" in lab_request_response:
                 logtxt1 = f"Unable to fetch lab_request fields from {self.platform}."
-                logtxt2 = f"Received error {lab_request_response.get('ERROR', lab_request_response.get("message", "Unknown error"))}"
+                logtxt2 = f"Received error {lab_request_response.get('ERROR', lab_request_response.get('message', 'Unknown error'))}"
                 self.logsum.add_error(entry=str(logtxt1 + logtxt2))
             else:
                 self.log.info("Fetched lab_request fields from iSkyLIMS")
