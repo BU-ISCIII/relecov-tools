@@ -177,6 +177,38 @@ class UploadDatabase(BaseModule):
         mapped using the label value.
         """
 
+        def map_lab_request_fields(ontology_dict, s_project_fields):
+            """Map the lab request fields from iskylims using ontology values"""
+            # fetch fields for lab_request model
+            lab_request_response = self.platform_rest_api.get_request(
+                self.platform_settings["iskylims"]["url_lab_request_mapping"], "", ""
+            )
+            if "ERROR" in lab_request_response:
+                logtxt1 = f"Unable to fetch lab_request fields from {self.platform}."
+                logtxt2 = f"Received error {lab_request_response.get('ERROR', lab_request_response.get("message", "Unknown error"))}"
+                self.logsum.add_error(entry=str(logtxt1 + logtxt2))
+            else:
+                self.log.info("Fetched lab_request fields from iSkyLIMS")
+                stderr.print("[blue]Fetched lab_request fields from iSkyLIMS")
+                if not "data" in lab_request_response:
+                    logtxt = "No data entry found in lab_request fields response. No mapping will be made."
+                    self.logsum.add_warning(entry=logtxt)
+                    stderr.print(f"[yellow]{logtxt}")
+                    return s_project_fields
+                else:
+                    self.log.debug(
+                        "LabRequest mapping: %s", str(lab_request_response["data"])
+                    )
+                for ontology in lab_request_response["data"]:
+                    if ontology in ontology_dict:
+                        if ontology_dict[ontology] not in s_project_fields:
+                            s_project_fields.append(ontology_dict[ontology])
+                        else:
+                            self.log.warning(
+                                f"Ontology {ontology} already in sample project fields"
+                            )
+            return s_project_fields
+
         sample_fields = {}
         s_project_fields = []
         # get the ontology values for mapping values in sample fields
@@ -232,6 +264,7 @@ class UploadDatabase(BaseModule):
             stderr.print("[blue] Fetched sample project fields from iSkyLIMS")
         for field in s_project_fields_raw["data"]:
             s_project_fields.append(field["sample_project_field_name"])
+        s_project_fields = map_lab_request_fields(ontology_dict, s_project_fields)
         return [sample_fields, s_project_fields]
 
     def map_relecov_sample_data(self):
