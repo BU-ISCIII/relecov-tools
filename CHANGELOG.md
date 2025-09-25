@@ -37,6 +37,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Added enhancements
 
+- Updated relecov-schema version to v3.2.2 [#805](https://github.com/BU-ISCIII/relecov-tools/pull/805)
+
 #### Fixes
 
 - Remove sample_fingerprint from upload-database module [#790](https://github.com/BU-ISCIII/relecov-tools/pull/790)
