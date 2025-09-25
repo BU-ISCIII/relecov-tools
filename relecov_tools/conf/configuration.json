@@ -425,6 +425,7 @@
                 "store_samples": "create-sample",
                 "url_project_fields": "projects-fields",
                 "url_sample_fields": "sample-fields",
+                "url_lab_request_mapping": "lab-request-mapping",
                 "param_sample_project": "project",
                 "project_name": "relecov",
                 "token": ""
