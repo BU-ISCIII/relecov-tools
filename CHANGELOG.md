@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Changed
 
 - Update relecov_schema from v3.2.0 to v3.2.1 [#802](https://github.com/BU-ISCIII/relecov-tools/pull/802)
+- Update relecov_schema from v3.2.2 to v3.2.3 [#807](https://github.com/BU-ISCIII/relecov-tools/pull/807)
 
 #### Removed
 
