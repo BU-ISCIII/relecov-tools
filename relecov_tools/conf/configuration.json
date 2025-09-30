@@ -450,6 +450,7 @@
         "relecov_sample_metadata": [
             "authors",
             "collecting_institution",
+            "collecting_institution_code_1",
             "collecting_lab_sample_id",
             "ena_broker_name",
             "ena_sample_accession",
