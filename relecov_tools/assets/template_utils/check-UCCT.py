@@ -21,7 +21,6 @@ Output:
 import argparse
 import re
 from datetime import datetime
-from pathlib import Path
 import pandas as pd
 
 
@@ -176,8 +175,6 @@ def compute_tables(df: pd.DataFrame, mapping: dict, since_date=None) -> pd.DataF
 
 
 def main():
-    import argparse
-
     ap = argparse.ArgumentParser(
         description="Per-lab stats with historical Total and filtered 'Recently Processed'."
     )
