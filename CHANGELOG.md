@@ -10,12 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Alejandro Bernabeu](https://github.com/aberdur)
 - [Pablo Mata](https://github.com/shettland)
+- [Victor Lopez](https://github.com/victor5lm)
 
 #### Added enhancements
 
 - Introduced new function to feed iskylims POST data with lab_requests fields in upload_database.py [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
 - Included new iskylims api url to get mapping for lab_request fields in configuration.json [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
 - Add UCCT status analytics script & send collecting_institution_code_1 to Relecov Platform [#806](https://github.com/BU-ISCIII/relecov-tools/pull/806)
+- Added Midnight amplicon panel versions in the schema [#807](https://github.com/BU-ISCIII/relecov-tools/pull/807)
 
 #### Fixes
 
