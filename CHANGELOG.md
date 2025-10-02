@@ -18,10 +18,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Included new iskylims api url to get mapping for lab_request fields in configuration.json [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
 - Add UCCT status analytics script & send collecting_institution_code_1 to Relecov Platform [#806](https://github.com/BU-ISCIII/relecov-tools/pull/806)
 - Added Midnight amplicon panel versions in the schema [#807](https://github.com/BU-ISCIII/relecov-tools/pull/807)
+- Add input_directories to upload-results [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808)
+- update ERROR handling in mail [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808) 
 
 #### Fixes
 
 - Fixed wrong message and keyerror when uploading to iskylims [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
+- Fix upload of corrupted files to SFTP in wrapper [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808)
 - Fixed create_summary_tables.py to properly create csv variant files [#809](https://github.com/BU-ISCIII/relecov-tools/pull/809).
 
 #### Changed
