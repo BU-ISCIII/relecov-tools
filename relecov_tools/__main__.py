@@ -1345,10 +1345,26 @@ def wrapper(ctx, output_dir):
     help="Path to relecov-tools templates folder",
 )
 @click.option(
+    "-i",
+    "--input_directory",
+    "--input-dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    required=False,
+    help="Directory containing COD* folders to scan",
+)
+@click.option(
     "-r", "--project", default=None, help="Project to which the samples belong"
 )
 @click.pass_context
-def upload_results(ctx, user, password, batch_id, template_path, project):
+def upload_results(
+    ctx,
+    user,
+    password,
+    batch_id,
+    template_path,
+    input_directory,
+    project,
+):
     """Upload batch results to sftp server."""
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
     debug = ctx.obj.get("debug", False)
