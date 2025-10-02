@@ -35,6 +35,7 @@ class Validate(BaseModule):
         upload_files=False,
         logsum_file=None,
         check_db=False,
+        blocked_filenames=None,
     ):
         """Validate json file against the schema"""
         super().__init__(output_dir=output_dir, called_module=__name__)
@@ -110,6 +111,9 @@ class Validate(BaseModule):
         self.logsum_file = logsum_file
         self.upload_files = upload_files
         self.check_db = check_db
+        self.blocked_filenames = {
+            os.path.basename(x) for x in (blocked_filenames or []) if isinstance(x, str)
+        }
 
         # Check and load config params
         self.config = ConfigJson(extra_config=True)
@@ -576,13 +580,17 @@ class Validate(BaseModule):
         invalid_json.extend([x for x in updated_invalid if x not in invalid_json])
         return invalid_json
 
-    def upload_validation_results(self, invalid_json, invalid_excel):
+    def upload_validation_results(
+        self, invalid_json, invalid_excel, blocked_filenames=None
+    ):
         """Uploads invalid sample files and related reports to a remote SFTP server.
         Checks that required remote directories exist or creates them.
 
         Args:
             invalid_json (list[dict]): List of invalid samples containing file paths.
             invalid_excel (str): Path to the Excel metadata report file.
+            blocked_filenames (iterable[str] | None): Collection of basenames that
+                must not be re-uploaded (e.g. corrupted during download).
 
         Raises:
             FileNotFoundError: If expected files or folders are not found locally or remotely.
@@ -639,10 +647,33 @@ class Validate(BaseModule):
         ]
         path_to_sample = {}
         invalid_files = []
+        if blocked_filenames is None:
+            blocked = set(self.blocked_filenames)
+        else:
+            blocked = {os.path.basename(x) for x in blocked_filenames}
+        skipped_files = []
+        if blocked:
+            msg = ", ".join(sorted(blocked))
+            self.log.info("Skipping upload for corrupted files: %s", msg)
+            stderr.print(f"[yellow]Skipping upload for corrupted files: {msg}")
         for row in invalid_json:
             samp_id = row.get(self.sample_id_field, "UnknownSample")
             for p, f in path_fields:
                 if p in row and f in row:
+                    file_name = os.path.basename(row[f])
+                    if file_name in blocked:
+                        msg = f"Corrupted file detected, not uploaded: {file_name}"
+                        self.logsum.add_warning(sample=samp_id, entry=msg)
+                        self.log.info(msg)
+                        skipped_files.append(file_name)
+                        remote_candidate = os.path.join(
+                            self.remote_outfold, os.path.basename(file_name)
+                        )
+                        try:
+                            sftp_client.remove_file(remote_candidate)
+                        except Exception:
+                            pass
+                        continue
                     file_path = os.path.join(row[p], row[f])
                     invalid_files.append(file_path)
                     path_to_sample[file_path] = samp_id
@@ -691,6 +722,13 @@ class Validate(BaseModule):
                 "they may already have been uploaded during the download step.[/]"
             )
             self.log.warning(f"Files failed to upload: {failed_uploads}")
+        elif skipped_files:
+            preview = ", ".join(skipped_files[:3])
+            stderr.print(
+                f"[yellow]Skipped {len(skipped_files)} corrupted files "
+                f"(first ones: {preview})."
+            )
+            self.log.info(f"Skipped corrupted files: {skipped_files}")
         else:
             stderr.print("[green]Finished uploading files to remote sftp successfully")
 
@@ -721,7 +759,11 @@ class Validate(BaseModule):
         _, invalid_file = self.create_validation_files(valid_json_data, invalid_json)
         if invalid_file:
             self.log.info("Starting upload process of invalid_samples...")
-            self.upload_validation_results(invalid_json, invalid_file)
+            self.upload_validation_results(
+                invalid_json,
+                invalid_file,
+                blocked_filenames=set(self.blocked_filenames),
+            )
         else:
             stderr.print("[green]No invalid samples were found, no upload needed")
             self.log.info("No invalid samples were found, no upload needed")
