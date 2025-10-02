@@ -12,6 +12,10 @@ from jinja2 import Environment, FileSystemLoader
 log = logging.getLogger(__name__)
 
 
+class MailSendError(RuntimeError):
+    """Raised when sending an email fails."""
+
+
 class Mail:
     def __init__(self, config=None, template_path=None):
         self.config = config
@@ -93,8 +97,9 @@ class Mail:
 
         credentials = relecov_tools.utils.read_yml_file(self.yaml_cred_path)
         if not credentials:
-            print("No credentials found.")
-            return
+            message = "No email credentials found."
+            log.error(message)
+            raise MailSendError(message)
 
         sender_email = self.config["email_host_user"]
 
@@ -103,8 +108,9 @@ class Mail:
         )
 
         if not email_password:
-            print("The e-mail password could not be found.")
-            return
+            message = "The e-mail password could not be found."
+            log.error(message)
+            raise MailSendError(message)
 
         default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart()
@@ -134,4 +140,6 @@ class Mail:
             log.info("Mail sent successfully.")
             print("Mail sent successfully.")
         except smtplib.SMTPException as e:
-            log.error(f"Error sending the mail to {receiver_email}: {e}")
+            message = f"Error sending the mail to {receiver_email}: {e}"
+            log.error(message)
+            raise MailSendError(message) from e
