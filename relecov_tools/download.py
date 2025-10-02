@@ -246,7 +246,12 @@ class Download(BaseModule):
         return successful_files, required_retransmition
 
     def create_files_with_metadata_info(
-        self, local_folder, samples_dict, md5_dict, metadata_file
+        self,
+        local_folder,
+        samples_dict,
+        md5_dict,
+        metadata_file,
+        corrupted_files=None,
     ):
         """Copy metadata file from folder, extend samples_dict with md5hash for
         each file. Then create a Json file with this dict
@@ -266,6 +271,7 @@ class Download(BaseModule):
         os.rename(metadata_file, os.path.join(local_folder, new_meta_file))
         error_text = "Sample %s incomplete. Not added to final Json"
 
+        corrupted_set = {os.path.basename(x) for x in corrupted_files or []}
         data = copy.deepcopy(samples_dict)
         for sample, values in data.items():
             if not all(val for val in values):
@@ -283,6 +289,12 @@ class Download(BaseModule):
                     values["sequence_file_R2"], ""
                 )
             values["batch_id"] = self.batch_id
+            file_names = {
+                os.path.basename(values.get("sequence_file_R1") or ""),
+                os.path.basename(values.get("sequence_file_R2") or ""),
+            }
+            if corrupted_set.intersection(file_names):
+                values["corrupted"] = True
         if samples_to_delete:
             data = {k: v for k, v in data.items() if k not in samples_to_delete}
         with open(sample_data_path, "w", encoding="utf-8") as fh:
@@ -1490,7 +1502,11 @@ class Download(BaseModule):
                 valid_filedict, clean_fetchlist, corrupted=corrupted, md5miss=not_md5sum
             )
             self.create_files_with_metadata_info(
-                local_folder, processed_filedict, files_md5_dict, meta_file
+                local_folder,
+                processed_filedict,
+                files_md5_dict,
+                meta_file,
+                corrupted_files=corrupted,
             )
             if self.logsum.logs.get(self.current_folder):
                 self.logsum.logs[self.current_folder].update({"path": local_folder})
