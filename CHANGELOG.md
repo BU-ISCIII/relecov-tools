@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Fixes
 
 - Fixed wrong message and keyerror when uploading to iskylims [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
+- Fixed create_summary_tables.py to properly create csv variant files [#809](https://github.com/BU-ISCIII/relecov-tools/pull/809).
 
 #### Changed
 
