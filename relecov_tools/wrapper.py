@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import json
 import re
 import os
 import inspect
@@ -166,7 +165,6 @@ class Wrapper(BaseModule):
             samples_file = [x for x in files if re.search("samples_data.*.json", x)][0]
         except IndexError:
             raise ValueError("No metadata/samples files found after download")
-        corrupted_files = self._get_corrupted_from_samples(samples_file)
         self.readmeta_params.update(
             {
                 "metadata_file": metadata_file,
@@ -200,7 +198,7 @@ class Wrapper(BaseModule):
                 "logsum_file": temp_logsum,
                 "output_dir": local_folder,
                 "upload_files": True,
-                "blocked_filenames": sorted(corrupted_files),
+                "samples_json": samples_file,
                 "check_db": True,
             }
         )
@@ -215,26 +213,6 @@ class Wrapper(BaseModule):
         stderr.print(f"[green]Merged logs from all processes in {local_folder}")
         self.log.info(f"Merged logs from all processes in {local_folder}")
         return merged_logs
-
-    def _get_corrupted_from_samples(self, sample_json_path):
-        """Extract corrupted filenames from samples_data json if present."""
-        corrupted = set()
-        try:
-            with open(sample_json_path, "r", encoding="utf-8") as fh:
-                samples = json.load(fh)
-        except (OSError, ValueError, TypeError):
-            return corrupted
-
-        for entry in samples.values():
-            if not isinstance(entry, dict):
-                continue
-            if not entry.get("corrupted"):
-                continue
-            for key in ("sequence_file_R1", "sequence_file_R2"):
-                fname = entry.get(key)
-                if fname:
-                    corrupted.add(os.path.basename(fname))
-        return corrupted
 
     def run_wrapper(self):
         """Execute each given process in config file sequentially, starting with download.

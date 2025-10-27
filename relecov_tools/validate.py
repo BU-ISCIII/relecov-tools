@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import json
 import rich.console
 from jsonschema import Draft202012Validator, FormatChecker
 import os
@@ -36,6 +37,7 @@ class Validate(BaseModule):
         logsum_file=None,
         check_db=False,
         blocked_filenames=None,
+        samples_json=None,
     ):
         """Validate json file against the schema"""
         super().__init__(output_dir=output_dir, called_module=__name__)
@@ -111,9 +113,21 @@ class Validate(BaseModule):
         self.logsum_file = logsum_file
         self.upload_files = upload_files
         self.check_db = check_db
+        raw_blocked = blocked_filenames or []
         self.blocked_filenames = {
-            os.path.basename(x) for x in (blocked_filenames or []) if isinstance(x, str)
+            os.path.basename(x) for x in raw_blocked if isinstance(x, str)
         }
+        self.samples_json = samples_json
+        if self.samples_json:
+            corrupted_from_samples = self._load_corrupted_from_samples(
+                self.samples_json
+            )
+            if corrupted_from_samples:
+                self.blocked_filenames.update(corrupted_from_samples)
+                self.log.info(
+                    "Loaded %s corrupted files from samples data",
+                    len(corrupted_from_samples),
+                )
 
         # Check and load config params
         self.config = ConfigJson(extra_config=True)
@@ -174,6 +188,36 @@ class Validate(BaseModule):
             if "label" not in prop_def:
                 self.log.debug(f"Property {prop_name} is missing 'label'")
         return
+
+    @staticmethod
+    def _load_corrupted_from_samples(sample_json_path):
+        """Extract corrupted filenames from samples_data JSON if present."""
+        corrupted = set()
+        if not sample_json_path:
+            return corrupted
+        try:
+            with open(sample_json_path, "r", encoding="utf-8") as fh:
+                samples = json.load(fh)
+        except (OSError, ValueError, TypeError):
+            return corrupted
+
+        if isinstance(samples, dict):
+            iterator = samples.values()
+        elif isinstance(samples, list):
+            iterator = samples
+        else:
+            return corrupted
+
+        for entry in iterator:
+            if not isinstance(entry, dict):
+                continue
+            if not entry.get("corrupted"):
+                continue
+            for key in ("sequence_file_R1", "sequence_file_R2"):
+                fname = entry.get(key)
+                if fname:
+                    corrupted.add(os.path.basename(fname))
+        return corrupted
 
     @staticmethod
     def get_field_from_schema(ontology, schema_json):

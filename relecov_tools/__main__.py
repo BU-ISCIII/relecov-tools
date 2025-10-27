@@ -448,6 +448,13 @@ def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_fo
     help="Required if --upload_files. Path to the log_summary.json file merged from all previous processes, used to check for invalid samples.",
 )
 @click.option(
+    "-s",
+    "--samples_json",
+    type=click.Path(exists=True, dir_okay=False, resolve_path=True),
+    required=False,
+    help="Optional: Path to samples_data*.json to auto-detect corrupted files.",
+)
+@click.option(
     "-c",
     "--check_db",
     is_flag=True,
@@ -464,6 +471,7 @@ def validate(
     excel_sheet,
     upload_files,
     logsum_file,
+    samples_json,
     check_db,
 ):
     """Validate json file against schema."""
