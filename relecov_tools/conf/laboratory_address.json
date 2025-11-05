@@ -19842,5 +19842,41 @@
         "lab_geo_loc_longitude": "-3.6940267",
         "collecting_institution_phone": "915961089",
         "collecting_institution": "Ministerio Sanidad"
+    },
+    "Centro Militar de Veterinaria de la Defensa": {
+        "collecting_institution_code_1": "9999999001",
+        "collecting_institution_address": "Carretera de Campamento, s/n",
+        "collecting_institution_email": "contacto@defensa.es",
+        "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_region": "Madrid",
+        "geo_loc_city": "Madrid",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Centro Militar de Veterinaria de la Defensa",
+        "submitting_institution_address": "Carretera de Campamento, s/n",
+        "submitting_institution_email": "contacto@defensa.es"
+    },
+    "Hospital Universitario Lucus Augusti": {
+        "collecting_institution_code_1": "9999999002",
+        "collecting_institution_address": "Rúa Dr. Ulises Romero, s/n",
+        "collecting_institution_email": "info@lucusaugusti.gal",
+        "geo_loc_state": "Galicia",
+        "geo_loc_region": "Lugo",
+        "geo_loc_city": "Lugo",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Hospital Universitario Lucus Augusti",
+        "submitting_institution_address": "Rúa Dr. Ulises Romero, s/n",
+        "submitting_institution_email": "info@lucusaugusti.gal"
+    },
+    "Gerencia de Salud de Area de Soria": {
+        "collecting_institution_code_1": "9999999003",
+        "collecting_institution_address": "Calle Nicolás Rabal, 1",
+        "collecting_institution_email": "informacion@sanidadsoria.es",
+        "geo_loc_state": "Castilla y León",
+        "geo_loc_region": "Soria",
+        "geo_loc_city": "Soria",
+        "geo_loc_country": "Spain",
+        "submitting_institution": "Gerencia de Salud de Área de Soria",
+        "submitting_institution_address": "Calle Nicolás Rabal, 1",
+        "submitting_institution_email": "informacion@sanidadsoria.es"
     }
 }
