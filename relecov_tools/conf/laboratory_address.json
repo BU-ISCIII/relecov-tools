@@ -19843,40 +19843,70 @@
         "collecting_institution_phone": "915961089",
         "collecting_institution": "Ministerio Sanidad"
     },
-    "Centro Militar de Veterinaria de la Defensa": {
+    "9999999001": {
         "collecting_institution_code_1": "9999999001",
+        "collecting_institution_code_2": "9999999001",
         "collecting_institution_address": "Carretera de Campamento, s/n",
         "collecting_institution_email": "contacto@defensa.es",
+        "autonom_cod": "N/A",
         "geo_loc_state": "Comunidad de Madrid",
+        "geo_loc_state_cod": "13",
         "geo_loc_region": "Madrid",
+        "geo_loc_region_cod": "28",
         "geo_loc_city": "Madrid",
+        "geo_loc_city_cod": "28079",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Centro Militar de Veterinaria de la Defensa",
-        "submitting_institution_address": "Carretera de Campamento, s/n",
-        "submitting_institution_email": "contacto@defensa.es"
+        "post_code": "28024",
+        "dep_func": "N/A",
+        "center_class_code": "N/A",
+        "collecting_institution_function": "Defensa",
+        "lab_geo_loc_latitude": "40.393500",
+        "lab_geo_loc_longitude": "-3.773200",
+        "collecting_institution_phone": "910000000",
+        "collecting_institution": "Centro Militar de Veterinaria de la Defensa"
     },
-    "Hospital Universitario Lucus Augusti": {
+    "9999999002": {
         "collecting_institution_code_1": "9999999002",
+        "collecting_institution_code_2": "9999999002",
         "collecting_institution_address": "Rúa Dr. Ulises Romero, s/n",
         "collecting_institution_email": "info@lucusaugusti.gal",
+        "autonom_cod": "N/A",
         "geo_loc_state": "Galicia",
+        "geo_loc_state_cod": "12",
         "geo_loc_region": "Lugo",
+        "geo_loc_region_cod": "27",
         "geo_loc_city": "Lugo",
+        "geo_loc_city_cod": "27028",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Hospital Universitario Lucus Augusti",
-        "submitting_institution_address": "Rúa Dr. Ulises Romero, s/n",
-        "submitting_institution_email": "info@lucusaugusti.gal"
+        "post_code": "27003",
+        "dep_func": "N/A",
+        "center_class_code": "N/A",
+        "collecting_institution_function": "Hospital",
+        "lab_geo_loc_latitude": "43.000600",
+        "lab_geo_loc_longitude": "-7.558000",
+        "collecting_institution_phone": "982296000",
+        "collecting_institution": "Hospital Universitario Lucus Augusti"
     },
-    "Gerencia de Salud de Area de Soria": {
+    "9999999003": {
         "collecting_institution_code_1": "9999999003",
+        "collecting_institution_code_2": "9999999003",
         "collecting_institution_address": "Calle Nicolás Rabal, 1",
         "collecting_institution_email": "informacion@sanidadsoria.es",
+        "autonom_cod": "N/A",
         "geo_loc_state": "Castilla y León",
+        "geo_loc_state_cod": "07",
         "geo_loc_region": "Soria",
+        "geo_loc_region_cod": "42",
         "geo_loc_city": "Soria",
+        "geo_loc_city_cod": "42173",
         "geo_loc_country": "Spain",
-        "submitting_institution": "Gerencia de Salud de Área de Soria",
-        "submitting_institution_address": "Calle Nicolás Rabal, 1",
-        "submitting_institution_email": "informacion@sanidadsoria.es"
+        "post_code": "42002",
+        "dep_func": "N/A",
+        "center_class_code": "N/A",
+        "collecting_institution_function": "Gerencia de Salud",
+        "lab_geo_loc_latitude": "41.763600",
+        "lab_geo_loc_longitude": "-2.465600",
+        "collecting_institution_phone": "975206000",
+        "collecting_institution": "Gerencia de Salud de Área de Soria"
     }
 }
