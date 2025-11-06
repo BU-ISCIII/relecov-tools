@@ -42,6 +42,7 @@ class LongTableParse:
         file_path: str | None = None,
         pipeline_name: str | None = None,
         output_folder: str | None = None,
+        metadata: list[dict] | None = None,
     ):
         if file_path is None:
             self.file_path = relecov_tools.utils.prompt_path(
@@ -80,6 +81,14 @@ class LongTableParse:
             self.output_folder = output_folder
         Path(self.output_folder).mkdir(parents=True, exist_ok=True)
 
+        self.metadata = metadata or []
+        self.seq_to_unique: dict[str, str] = {}
+        self.unique_to_seq: dict[str, str] = {}
+        self._raw_to_unique: dict[str, str] = {}
+        self._metadata_missing_unique: set[str] = set()
+        self._warned_missing_in_metadata: set[str] = set()
+        self._warned_inferred_from_csv: set[str] = set()
+
         json_file = os.path.join(
             os.path.dirname(__file__), "..", "..", "conf", "bioinfo_config.json"
         )
@@ -101,10 +110,149 @@ class LongTableParse:
             self.long_table_heading = self.software_config["variants_long_table"][
                 "content"
             ]
+            self._initialize_sample_lookup()
         else:
             log.error("No configuration found for pipeline %s", pipeline_name)
             stderr.print(f"[red]No configuration found for pipeline {pipeline_name}")
             raise ValueError(f"No configuration found for pipeline {pipeline_name}")
+
+    @staticmethod
+    def _clean_identifier(value: str | int | None) -> str:
+        """Normalize identifiers into clean strings."""
+        if value is None:
+            return ""
+        return str(value).strip()
+
+    def _register_mapping(self, seq_id: str, unique_id: str, context: str) -> None:
+        """Register validated mapping between sequencing and unique identifiers."""
+        existing_unique = self.seq_to_unique.get(seq_id)
+        if existing_unique and existing_unique != unique_id:
+            msg = (
+                f"Conflicting unique_sample_id for sequencing_sample_id '{seq_id}': "
+                f"'{existing_unique}' vs '{unique_id}' (source: {context})."
+            )
+            stderr.print(f"[red]{msg}")
+            log.error(msg)
+            raise ValueError(msg)
+
+        existing_seq = self.unique_to_seq.get(unique_id)
+        if existing_seq and existing_seq != seq_id:
+            msg = (
+                f"unique_sample_id '{unique_id}' is already linked to sequencing_sample_id "
+                f"'{existing_seq}' (source: {context})."
+            )
+            stderr.print(f"[red]{msg}")
+            log.error(msg)
+            raise ValueError(msg)
+
+        self.seq_to_unique[seq_id] = unique_id
+        self.unique_to_seq[unique_id] = seq_id
+
+    def _initialize_sample_lookup(self) -> None:
+        """Build initial mapping between sequencing_sample_id and unique_sample_id."""
+        for entry in self.metadata:
+            seq_id = self._clean_identifier(entry.get("sequencing_sample_id"))
+            unique_id = self._clean_identifier(entry.get("unique_sample_id"))
+            if not seq_id:
+                continue
+            if not unique_id:
+                self._metadata_missing_unique.add(seq_id)
+                continue
+            self._register_mapping(seq_id, unique_id, context="metadata")
+
+    def _normalize_sample_name(self, raw_sample: str) -> str:
+        """Validate and convert raw sample identifier into unique_sample_id."""
+        if raw_sample is None:
+            msg = "Found empty sample value in variants_long_table."
+            stderr.print(f"[red]{msg}")
+            log.error(msg)
+            raise ValueError(msg)
+
+        raw_sample = raw_sample.strip()
+        if not raw_sample:
+            msg = "Found empty sample value in variants_long_table."
+            stderr.print(f"[red]{msg}")
+            log.error(msg)
+            raise ValueError(msg)
+
+        cached = self._raw_to_unique.get(raw_sample)
+        if cached:
+            return cached
+
+        if "_" in raw_sample:
+            seq_id, candidate_unique = raw_sample.split("_", 1)
+        else:
+            seq_id, candidate_unique = raw_sample, ""
+
+        seq_id = self._clean_identifier(seq_id)
+        candidate_unique = self._clean_identifier(candidate_unique)
+
+        if not seq_id:
+            msg = (
+                f"Unable to determine sequencing_sample_id from variants_long_table sample "
+                f"value '{raw_sample}'."
+            )
+            stderr.print(f"[red]{msg}")
+            log.error(msg)
+            raise ValueError(msg)
+
+        metadata_unique = self.seq_to_unique.get(seq_id)
+
+        if metadata_unique and candidate_unique and metadata_unique != candidate_unique:
+            msg = (
+                f"Mismatch between metadata unique_sample_id '{metadata_unique}' and "
+                f"variants_long_table sample '{candidate_unique}' for sequencing_sample_id "
+                f"'{seq_id}'."
+            )
+            stderr.print(f"[red]{msg}")
+            log.error(msg)
+            raise ValueError(msg)
+
+        unique_id = metadata_unique or candidate_unique
+
+        if not unique_id:
+            msg = (
+                f"No unique_sample_id found for sequencing_sample_id '{seq_id}'. "
+                "Ensure it is present in the bioinfo metadata or encoded in the variants_long_table."
+            )
+            stderr.print(f"[red]{msg}")
+            log.error(msg)
+            raise ValueError(msg)
+
+        context = "metadata"
+        if not metadata_unique:
+            context = "variants_long_table"
+            if (
+                seq_id in self._metadata_missing_unique
+                and seq_id not in self._warned_missing_in_metadata
+            ):
+                stderr.print(
+                    f"[yellow]unique_sample_id for sequencing_sample_id '{seq_id}' missing in metadata. "
+                    "Using value from variants_long_table."
+                )
+                log.warning(
+                    "unique_sample_id for sequencing_sample_id '%s' missing in metadata. "
+                    "Using value from variants_long_table.",
+                    seq_id,
+                )
+                self._warned_missing_in_metadata.add(seq_id)
+            elif (
+                seq_id not in self._metadata_missing_unique
+                and seq_id not in self._warned_inferred_from_csv
+            ):
+                stderr.print(
+                    f"[yellow]Sequencing_sample_id '{seq_id}' not present in metadata. "
+                    "Using mapping from variants_long_table."
+                )
+                log.warning(
+                    "Sequencing_sample_id '%s' not present in metadata. Using mapping from variants_long_table.",
+                    seq_id,
+                )
+                self._warned_inferred_from_csv.add(seq_id)
+
+        self._register_mapping(seq_id, unique_id, context=context)
+        self._raw_to_unique[raw_sample] = unique_id
+        return unique_id
 
     def validate_file(self, heading: list[str]) -> bool:
         """Check if long table file has all mandatory fields defined in
@@ -137,9 +285,10 @@ class LongTableParse:
         for line in lines[1:]:
             line_s = line.strip().split(",")
 
-            sample = line_s[heading_index["SAMPLE"]]
-            if sample not in samp_dict:
-                samp_dict[sample] = []
+            raw_sample = line_s[heading_index["SAMPLE"]]
+            unique_sample = self._normalize_sample_name(raw_sample)
+            if unique_sample not in samp_dict:
+                samp_dict[unique_sample] = []
 
             variant_dict = {
                 key: (
@@ -149,6 +298,7 @@ class LongTableParse:
                 )
                 for key, value in self.long_table_heading.items()
             }
+            variant_dict["sample"] = unique_sample
 
             if re.search("&", line_s[heading_index["GENE"]]):
                 # Example
@@ -158,9 +308,9 @@ class LongTableParse:
                 for gene in genes:
                     variant_dict_copy = variant_dict.copy()
                     variant_dict_copy["Gene"] = gene
-                    samp_dict[sample].append(variant_dict_copy)
+                    samp_dict[unique_sample].append(variant_dict_copy)
             else:
-                samp_dict[sample].append(variant_dict)
+                samp_dict[unique_sample].append(variant_dict)
         stderr.print("[green]\tSuccessful parsing data")
         log.info("Successful parsing long table data")
         return samp_dict
@@ -267,6 +417,7 @@ def parse_long_table(
     file_tag: str,
     pipeline_name: str,
     output_folder: str | None = None,
+    metadata: list[dict] | None = None,
 ) -> None | list[dict]:
     """File handler to retrieve data from long table files and convert it into a JSON structured format.
     This function utilizes the LongTableParse class to parse the long table data.
@@ -297,6 +448,7 @@ def parse_long_table(
             file_path=csv_path,
             pipeline_name=pipeline_name,
             output_folder=output_folder,
+            metadata=metadata,
         )
         # Parsing long table data and saving it
         long_table_json = parser.parsing_csv()
