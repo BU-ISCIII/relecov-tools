@@ -187,6 +187,17 @@ class LongTableParse:
         seq_id = self._clean_identifier(seq_id)
         candidate_unique = self._clean_identifier(candidate_unique)
 
+        # Handle case where sample name already equals a known unique_sample_id
+        if not candidate_unique:
+            seq_from_unique = self.unique_to_seq.get(seq_id)
+            if seq_from_unique:
+                unique_id = seq_id
+                self._register_mapping(
+                    seq_from_unique, unique_id, context="variants_long_table"
+                )
+                self._raw_to_unique[raw_sample] = unique_id
+                return unique_id
+
         if not seq_id:
             msg = (
                 f"Unable to determine sequencing_sample_id from variants_long_table sample "
