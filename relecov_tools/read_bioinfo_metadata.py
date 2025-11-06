@@ -1580,12 +1580,10 @@ class BioinfoMetadata(BaseModule):
                 filtered_batch_data, filename = self.split_extra_json_data(
                     extra_json, batch_data
                 )
-                if not filtered_batch_data:
-                    continue
                 extra_filename = f"{filename}_{lab_code}_{file_tag}.json"
                 extra_filepath = os.path.join(batch_dir, extra_filename)
                 relecov_tools.utils.write_json_to_file(
-                    filtered_batch_data, extra_filepath
+                    filtered_batch_data if filtered_batch_data else [], extra_filepath
                 )
 
         self.parent_create_error_summary(
