@@ -48,6 +48,7 @@ class Mail:
         if institutions_data and institution_code in institutions_data:
             return institutions_data[institution_code]
         else:
+            print(f"No information found for code {institution_code}")
             self.log.warning(f"No information found for code {institution_code}")
             return None
 
@@ -122,7 +123,7 @@ class Mail:
             self.log.error(message)
             raise MailSendError(message)
 
-        default_cc = "abernabeu@externos.isciii.es"
+        default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart()
         msg["From"] = sender_email
         msg["To"] = ", ".join(receiver_email)
@@ -144,7 +145,7 @@ class Mail:
         try:
             server = smtplib.SMTP(self.config["email_host"], self.config["email_port"])
             server.starttls()
-            # server.login(sender_email, email_password)
+            server.login(sender_email, email_password)
             server.sendmail(sender_email, all_recipients, msg.as_string())
             server.quit()
             self.log.info("Mail sent successfully.")
