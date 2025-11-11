@@ -1,12 +1,15 @@
 import logging
 import os
 import smtplib
-import relecov_tools.utils
+
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
+
 from jinja2 import Environment, FileSystemLoader
+
+import relecov_tools.utils
 
 
 log = logging.getLogger(__name__)
@@ -17,10 +20,11 @@ class MailSendError(RuntimeError):
 
 
 class Mail:
-    def __init__(self, config=None, template_path=None):
+    def __init__(self, config=None, template_path=None, logger=None):
         self.config = config
         self.template_path = template_path
         self.yaml_cred_path = self.config.get("yaml_cred_path")
+        self.log = logger or log
 
         if not self.config:
             raise ValueError("Configuration not loaded correctly.")
@@ -44,7 +48,7 @@ class Mail:
         if institutions_data and institution_code in institutions_data:
             return institutions_data[institution_code]
         else:
-            print(f"No information found for code {institution_code}")
+            self.log.warning(f"No information found for code {institution_code}")
             return None
 
     def render_email_template(
@@ -95,10 +99,16 @@ class Mail:
         if not all(isinstance(email, str) for email in receiver_email):
             raise ValueError("All elements in receiver_emails must be strings.")
 
+        self.log.info(
+            "Preparing to send email to %s with subject '%s'",
+            ", ".join(receiver_email),
+            subject,
+        )
+
         credentials = relecov_tools.utils.read_yml_file(self.yaml_cred_path)
         if not credentials:
             message = "No email credentials found."
-            log.error(message)
+            self.log.error(message)
             raise MailSendError(message)
 
         sender_email = self.config["email_host_user"]
@@ -109,10 +119,10 @@ class Mail:
 
         if not email_password:
             message = "The e-mail password could not be found."
-            log.error(message)
+            self.log.error(message)
             raise MailSendError(message)
 
-        default_cc = "bioinformatica@isciii.es"
+        default_cc = "abernabeu@externos.isciii.es"
         msg = MIMEMultipart()
         msg["From"] = sender_email
         msg["To"] = ", ".join(receiver_email)
@@ -134,12 +144,12 @@ class Mail:
         try:
             server = smtplib.SMTP(self.config["email_host"], self.config["email_port"])
             server.starttls()
-            server.login(sender_email, email_password)
+            # server.login(sender_email, email_password)
             server.sendmail(sender_email, all_recipients, msg.as_string())
             server.quit()
-            log.info("Mail sent successfully.")
+            self.log.info("Mail sent successfully.")
             print("Mail sent successfully.")
         except smtplib.SMTPException as e:
             message = f"Error sending the mail to {receiver_email}: {e}"
-            log.error(message)
+            self.log.error(message)
             raise MailSendError(message) from e
