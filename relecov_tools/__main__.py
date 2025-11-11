@@ -593,86 +593,16 @@ def send_mail(
         ):
             additional_info = click.prompt("Enter additional information").strip()
 
-    config_loader = relecov_tools.config_json.ConfigJson(extra_config=True)
-    config = config_loader.get_configuration("mail_sender")
-    if not config:
-        raise ValueError(
-            "Error: The configuration for 'mail_sender' could not be loaded."
-        )
-
-    validate_data = relecov_tools.utils.read_json_file(validate_file)
-    if not validate_data:
-        raise ValueError("Error: Validation data could not be loaded.")
-
-    submitting_institution_code = list(validate_data.keys())[0]
-    invalid_count = relecov_tools.log_summary.LogSum.get_invalid_count(validate_data)
-    batch = os.path.basename(os.path.dirname(os.path.abspath(validate_file)))
-
-    if not template_path:
-        template_path = config.get("delivery_template_path_file")
-    if not template_path or not os.path.exists(template_path):
-        raise FileNotFoundError(
-            "The template path could not be determined or does not exist. "
-            "Please provide it via --template_path or define 'delivery_template_path_file' in the configuration."
-        )
-
-    log_destination = os.path.dirname(os.path.abspath(validate_file))
-    mail_basemodule = relecov_tools.base_module.BaseModule(
-        output_dir=None, called_module="mail"
-    )
-    mail_basemodule.set_batch_id(batch)
-    log.info(f"Mail module log file: {mail_basemodule.final_log_path}")
-    stderr.print(
-        f"[blue]Log file stored in configured path: {mail_basemodule.final_log_path}"
-    )
-
-    email_sender = relecov_tools.mail.Mail(
-        config=config, template_path=template_path, logger=mail_basemodule.log
-    )
-
-    institution_info = email_sender.get_institution_info(submitting_institution_code)
-    if not institution_info:
-        raise ValueError("Error: Could not obtain institution information.")
-
-    institution_name = institution_info["institution_name"]
-    email_receiver_from_json = institution_info["email_receiver"]
-
-    email_body = email_sender.render_email_template(
-        additional_info=additional_info,
-        invalid_count=invalid_count,
-        submitting_institution_code=submitting_institution_code,
-        template_name=template_name,
-        batch=batch,
-    )
-
-    if email_body is None:
-        raise RuntimeError("Error: Could not generate mail.")
-
-    if not receiver_email:
-        final_receiver_email = [
-            email.strip() for email in email_receiver_from_json.split(";")
-        ]
-    else:
-        final_receiver_email = (
-            [email.strip() for email in receiver_email.split(";")]
-            if isinstance(receiver_email, str)
-            else receiver_email
-        )
-
-    if not final_receiver_email:
-        raise ValueError("Error: Could not obtain the recipient's email address.")
-
-    subject = (
-        f"RELECOV - Informe de Validación de Muestras {batch} - {institution_name}"
-    )
-
     try:
-        email_sender.send_email(
-            final_receiver_email,
-            subject,
-            email_body,
-            list(attachments) if attachments else [],
-            email_psswd,
+        mail_result = relecov_tools.mail.run_mail(
+            validate_file=validate_file,
+            receiver_email=receiver_email,
+            attachments=list(attachments) if attachments else [],
+            template_path=template_path,
+            email_psswd=email_psswd,
+            additional_info=additional_info,
+            template_name=template_name,
+            stderr=stderr,
         )
     except Exception as e:
         if debug:
@@ -682,18 +612,13 @@ def send_mail(
             log.exception(f"EXCEPTION FOUND: {e}")
             stderr.print(f"EXCEPTION FOUND: {e}")
             sys.exit(1)
-    finally:
-        copied_log = mail_basemodule.copy_log_to_directory(log_destination)
-        if copied_log:
-            log.info(f"Mail log copied to batch folder: {copied_log}")
-            stderr.print(f"[green]Log copied to batch folder: {copied_log}")
-        else:
-            log.warning(
-                f"Mail log could not be copied to batch folder {log_destination}. Check permissions."
-            )
-            stderr.print(
-                f"[red]Warning: log could not be copied to {log_destination}. Check permissions."
-            )
+    else:
+        log_path = mail_result.get("log_path")
+        batch_log = mail_result.get("batch_log_path")
+        if log_path:
+            log.info(f"Mail log stored at {log_path}")
+        if batch_log:
+            log.info(f"Mail log copied to batch folder: {batch_log}")
 
 
 # mapping to ENA schema
