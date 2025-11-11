@@ -104,6 +104,18 @@ class BaseModule:
         )
         return log_fh
 
+    @staticmethod
+    def _flush_logger_handler(logger, log_filepath: str):
+        """Flush file handlers writing to log_filepath to avoid stale buffers."""
+        if logger is None or not log_filepath:
+            return
+        for handler in getattr(logger, "handlers", []):
+            if (
+                isinstance(handler, logging.FileHandler)
+                and getattr(handler, "baseFilename", None) == log_filepath
+            ):
+                handler.flush()
+
     def redirect_logs(
         self,
         new_log_path: str,
@@ -164,6 +176,42 @@ class BaseModule:
         self.log.addHandler(new_handler)
         self.log.debug(f"Redirected logs from {log_file} to {new_log_path}")
         return
+
+    def copy_log_to_directory(self, destination_dir: str, filename: str | None = None):
+        """Copy the active log file into destination_dir."""
+        log_file = self.get_log_file()
+        if not log_file or not os.path.isfile(log_file):
+            self.log.warning("No log file available to copy.")
+            return None
+        if not destination_dir:
+            self.log.warning("No destination directory provided to save logs.")
+            return None
+        try:
+            os.makedirs(destination_dir, exist_ok=True)
+        except OSError as exc:
+            self.log.error(
+                f"Could not create destination directory {destination_dir}: {exc}"
+            )
+            return None
+        BaseModule._flush_logger_handler(self.log, log_file)
+        BaseModule._flush_logger_handler(logging.getLogger(), log_file)
+        target_name = filename or os.path.basename(log_file)
+        destination_path = os.path.join(destination_dir, target_name)
+        if os.path.realpath(destination_path) == os.path.realpath(log_file):
+            self.log.debug(
+                "Destination log copy skipped because paths are identical: %s",
+                destination_path,
+            )
+            return destination_path
+        try:
+            shutil.copyfile(log_file, destination_path)
+            self.log.debug(f"Copied log file to {destination_path}")
+            return destination_path
+        except OSError as exc:
+            self.log.error(
+                f"Could not copy log file {log_file} to {destination_path}: {exc}"
+            )
+            return None
 
     def get_log_file(self):
         """Retrieve the output path for the active logger"""
