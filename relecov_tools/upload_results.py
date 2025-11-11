@@ -266,6 +266,9 @@ class UploadResults(BaseModule):
         """Runs the complete flow: search, compress, upload, logging and sending the email."""
         cod_batches = self.find_cod_for_batch()
 
+        self.log.info(f"Upload-results log stored at {self.final_log_path}")
+        stderr.print(f"[blue]Log file stored in configured path: {self.final_log_path}")
+
         with open(self.guide, "r") as f:
             institutions_data = json.load(f)
 
