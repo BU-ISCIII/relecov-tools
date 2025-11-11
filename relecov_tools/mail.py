@@ -127,7 +127,7 @@ class Mail:
             self.log.error(message)
             raise MailSendError(message)
 
-        default_cc = "abernabeu@externos.isciii.es"
+        default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart()
         msg["From"] = sender_email
         msg["To"] = ", ".join(receiver_email)
