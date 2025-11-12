@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add input_directories to upload-results [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808)
 - update ERROR handling in mail [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808) 
 - Add labs to laboratory_adress.json [#813](https://github.com/BU-ISCIII/relecov-tools/pull/813)
+- Add metadata-precheck module to validate SFTP metadata excels upfront [#816](https://github.com/BU-ISCIII/relecov-tools/pull/816)
 
 #### Fixes
 
