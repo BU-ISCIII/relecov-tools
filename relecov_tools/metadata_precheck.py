@@ -27,10 +27,6 @@ stderr = rich.console.Console(
 )
 
 
-class MetadataPrecheckError(RuntimeError):
-    """Custom error raised when a metadata file cannot be processed."""
-
-
 class SchemaMapper:
     """Handle Excel header normalisation and schema-aware casting."""
 
@@ -461,7 +457,7 @@ class MetadataPrecheck(BaseModule):
 
             try:
                 sheet_data = self._read_metadata_sheet(local_target)
-            except MetadataPrecheckError as exc:
+            except RuntimeError as exc:
                 message = f"Unable to read metadata sheet {remote_file}: {exc}"
                 self._record_error(folder, file_errors, message)
                 self.log.error(message)
@@ -629,8 +625,8 @@ class MetadataPrecheck(BaseModule):
             except Exception as exc:  # pragma: no cover - passthrough for runtime
                 errors.append(f"{option['sheet']}: {exc}")
         if errors:
-            raise MetadataPrecheckError("; ".join(errors))
-        raise MetadataPrecheckError("No readable sheet found in metadata Excel")
+            raise RuntimeError("; ".join(errors))
+        raise RuntimeError("No readable sheet found in metadata Excel")
 
     def _validate_payload(
         self,
