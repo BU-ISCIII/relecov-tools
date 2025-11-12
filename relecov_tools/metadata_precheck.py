@@ -31,6 +31,188 @@ class MetadataPrecheckError(RuntimeError):
     """Custom error raised when a metadata file cannot be processed."""
 
 
+class SchemaMapper:
+    """Handle Excel header normalisation and schema-aware casting."""
+
+    SAMPLE_FALLBACKS = [
+        "Sample ID given by the submitting laboratory",
+        "Sample ID given by originating laboratory",
+        "Sample ID given in the microbiology lab",
+        "Sample ID given if multiple rna-extraction or passages",
+        "Sequence file R1",
+        "Sequence file R1 fastq",
+    ]
+
+    def __init__(
+        self,
+        schema_properties: dict[str, Any],
+        label_to_prop: dict[str, str],
+        heading_aliases: dict[str, str] | None,
+        not_provided_field: str | None,
+    ) -> None:
+        self.schema_properties = schema_properties
+        self.label_to_prop = label_to_prop
+        self.heading_aliases = heading_aliases or {}
+        self.not_provided_field = (not_provided_field or "").lower()
+        self.sample_fallbacks = [
+            self.canonical_label(label) for label in self.SAMPLE_FALLBACKS
+        ]
+
+    def canonical_label(self, label: Any) -> str:
+        if label is None:
+            return ""
+        label_str = str(label).strip()
+        return self.heading_aliases.get(label_str, label_str)
+
+    def canonicalize_row(
+        self, excel_row: dict[str, Any], header_flag: str
+    ) -> dict[str, Any]:
+        """Normalise header names and drop the metadata flag column."""
+        canon_row = {}
+        for key, value in excel_row.items():
+            if key == header_flag:
+                continue
+            canon_row[self.canonical_label(key)] = value
+        return canon_row
+
+    def normalise_sample_id(
+        self, canonical_row: dict[str, Any], sample_column: str
+    ) -> str | None:
+        """Try to extract the sequencing sample id with sensible fallbacks."""
+        lookup_order = [sample_column] + self.sample_fallbacks
+        for key in lookup_order:
+            candidate = canonical_row.get(key)
+            cleaned = self._clean_cell(candidate)
+            if cleaned:
+                return str(cleaned).strip()
+        return None
+
+    def row_to_payload(self, canonical_row: dict[str, Any]) -> dict[str, Any]:
+        """Convert a canonical Excel row into a schema-ready dict."""
+        payload: dict[str, Any] = {}
+        for label, value in canonical_row.items():
+            schema_key = self.label_to_prop.get(label, label)
+            if schema_key not in self.schema_properties:
+                continue
+            prepared = self._prepare_value(schema_key, value)
+            if prepared is not None:
+                payload[schema_key] = prepared
+        return payload
+
+    # ── Helpers ──────────────────────────────────────────────────────────
+    def _prepare_value(self, schema_key: str, value: Any) -> Any:
+        cleaned = self._clean_cell(value)
+        if cleaned is None:
+            return None
+        if isinstance(cleaned, str) and not cleaned.strip():
+            return None
+
+        schema_def = self.schema_properties.get(schema_key, {})
+        schema_type = schema_def.get("type")
+        if isinstance(schema_type, list):
+            schema_type = [s for s in schema_type if s != "null"]
+            schema_type = schema_type[0] if schema_type else None
+
+        if schema_type == "string":
+            string_value = self._normalise_string(schema_key, cleaned)
+            return self._align_to_enum(schema_key, string_value)
+
+        if schema_type in {"integer", "number", "boolean"}:
+            return relecov_tools.utils.cast_value_to_schema_type(cleaned, schema_type)
+
+        if schema_type == "array":
+            return self._prepare_array(schema_key, cleaned)
+
+        return cleaned
+
+    def _prepare_array(self, schema_key: str, value: Any) -> list[Any] | Any:
+        if isinstance(value, list):
+            raw_items = value
+        elif isinstance(value, str):
+            delimiter = self.schema_properties.get(schema_key, {}).get("delimiter", ";")
+            raw_items = [
+                part.strip() for part in value.split(delimiter) if part.strip()
+            ]
+        else:
+            return value
+
+        normalised = []
+        for item in raw_items:
+            normalised_item = self._normalise_string(schema_key, item)
+            aligned_item = self._align_to_enum(
+                schema_key, normalised_item, is_array_item=True
+            )
+            normalised.append(aligned_item)
+        return normalised
+
+    def _normalise_string(self, schema_key: str, value: Any) -> str:
+        if isinstance(value, datetime):
+            return (
+                value.date().isoformat()
+                if "date" in schema_key.lower()
+                else value.isoformat()
+            )
+        if isinstance(value, (int, float)):
+            text = str(int(value)) if float(value).is_integer() else str(value)
+        else:
+            text = str(value)
+        text = text.strip()
+        if "date" in schema_key.lower():
+            return self._normalise_date(text)
+        return text
+
+    def _normalise_date(self, value: str) -> str:
+        if not value:
+            return value
+        if value.lower() == self.not_provided_field:
+            return value
+        clean = value.replace("/", "-").replace(".", "-")
+        match = re.match(r"^\d{4}-\d{2}-\d{2}", clean)
+        if match:
+            return match.group(0)
+        try:
+            parsed = datetime.strptime(clean, "%Y%m%d").date()
+            return parsed.isoformat()
+        except ValueError:
+            return value
+
+    def _align_to_enum(
+        self, schema_key: str, value: Any, *, is_array_item: bool = False
+    ) -> Any:
+        schema_def = self.schema_properties.get(schema_key, {})
+        enum_values = schema_def.get("enum")
+        if is_array_item and not enum_values:
+            enum_values = schema_def.get("items", {}).get("enum", [])
+        if not enum_values or value is None:
+            return value
+        if value in enum_values:
+            return value
+        stripped_map = {
+            self._strip_ontology(enum_val).lower(): enum_val for enum_val in enum_values
+        }
+        candidate = self._strip_ontology(value).lower()
+        if candidate in stripped_map:
+            return stripped_map[candidate]
+        for enum_val in enum_values:
+            if enum_val.lower() == str(value).lower():
+                return enum_val
+        return value
+
+    @staticmethod
+    def _strip_ontology(value: Any) -> str:
+        text = str(value)
+        if "[" in text and text.strip().endswith("]"):
+            return text.split("[", 1)[0].strip()
+        return text.strip()
+
+    def _clean_cell(self, value: Any) -> Any:
+        if isinstance(value, float) and value != value:  # NaN
+            return None
+        if isinstance(value, str):
+            return value.strip()
+        return value
+
+
 class MetadataPrecheck(BaseModule):
     def __init__(
         self,
@@ -74,12 +256,6 @@ class MetadataPrecheck(BaseModule):
                 self.label_to_prop[label] = prop
                 self.prop_to_label[prop] = label
 
-        self.required_labels = [
-            self.prop_to_label[prop]
-            for prop in self.required_properties
-            if self.prop_to_label.get(prop)
-        ]
-
         default_sample_label = self.metadata_processing.get("sample_id_col")
         self.sample_id_property = self.label_to_prop.get(
             default_sample_label, default_sample_label
@@ -100,6 +276,13 @@ class MetadataPrecheck(BaseModule):
         )
         self.validator = Draft202012Validator(
             self.schema, format_checker=self._date_checker
+        )
+
+        self.mapper = SchemaMapper(
+            self.schema_properties,
+            self.label_to_prop,
+            self.heading_aliases,
+            self.not_provided_field,
         )
 
         self.sheet_options = self._build_sheet_options()
@@ -259,7 +442,6 @@ class MetadataPrecheck(BaseModule):
         file_warnings: list[dict[str, Any]] = []
         sample_count = 0
         seen_samples: set[str] = set()
-        row_contexts: list[dict[str, Any]] = []
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             local_target = os.path.join(tmp_dir, os.path.basename(remote_file))
@@ -309,7 +491,7 @@ class MetadataPrecheck(BaseModule):
                 "warnings": file_warnings,
             }
 
-        canonical_header = [self._canonical_label(col) for col in raw_header]
+        canonical_header = [self.mapper.canonical_label(col) for col in raw_header]
         if canonical_header and canonical_header[0] == header_flag:
             data_columns = canonical_header[1:]
         else:
@@ -335,12 +517,7 @@ class MetadataPrecheck(BaseModule):
             self._record_warning(folder, file_warnings, message)
             self.log.warning(message)
 
-        sample_column = self._canonical_label(sample_column_raw)
-        required_labels_in_sheet = [
-            self._canonical_label(label)
-            for label in self.required_labels
-            if self._canonical_label(label) in data_columns
-        ]
+        sample_column = self.mapper.canonical_label(sample_column_raw)
 
         available_schema_keys = {
             self.label_to_prop.get(column, column)
@@ -350,9 +527,9 @@ class MetadataPrecheck(BaseModule):
 
         for idx, row in enumerate(rows):
             row_number = header_row_index + 1 + idx
-            canonical_row = self._canonicalize_row(row, header_flag)
+            canonical_row = self.mapper.canonicalize_row(row, header_flag)
             sample_value_raw = canonical_row.get(sample_column)
-            sample_value = self._normalise_sample_id(canonical_row, sample_value_raw)
+            sample_value = self.mapper.normalise_sample_id(canonical_row, sample_column)
 
             if not sample_value:
                 message = f"Missing sequencing sample identifier at row {row_number}"
@@ -380,17 +557,15 @@ class MetadataPrecheck(BaseModule):
                 seen_samples.add(sample_value)
                 sample_count += 1
 
-            schema_payload = self._row_to_schema_payload(canonical_row)
-            row_contexts.append(
-                {
-                    "row": row_number,
-                    "sample": sample_value if sample_value else None,
-                    "payload": schema_payload,
-                    "available_properties": available_schema_keys,
-                }
+            schema_payload = self.mapper.row_to_payload(canonical_row)
+            self._validate_payload(
+                payload=schema_payload,
+                sample_label=sample_value if sample_value else None,
+                row_number=row_number,
+                available_props=available_schema_keys,
+                folder=folder,
+                file_errors=file_errors,
             )
-
-        self._apply_schema_validation(row_contexts, folder, file_errors)
 
         invalid_samples_details: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for err in file_errors:
@@ -457,186 +632,51 @@ class MetadataPrecheck(BaseModule):
             raise MetadataPrecheckError("; ".join(errors))
         raise MetadataPrecheckError("No readable sheet found in metadata Excel")
 
-    def _canonicalize_row(
-        self, row: dict[str, Any], header_flag: str
-    ) -> dict[str, Any]:
-        canonical = {}
-        for key, value in row.items():
-            if key == header_flag:
-                continue
-            canonical_key = self._canonical_label(key)
-            canonical[canonical_key] = value
-        return canonical
-
-    def _row_to_schema_payload(self, canonical_row: dict[str, Any]) -> dict[str, Any]:
-        payload: dict[str, Any] = {}
-        for label, value in canonical_row.items():
-            schema_key = self.label_to_prop.get(label, label)
-            if schema_key not in self.schema_properties:
-                continue
-            prepared = self._prepare_schema_value(schema_key, value)
-            if prepared is None:
-                continue
-            payload[schema_key] = prepared
-        return payload
-
-    def _prepare_schema_value(self, schema_key: str, value: Any) -> Any:
-        cleaned = self._clean_cell(value)
-        if cleaned is None:
-            return None
-        if isinstance(cleaned, str) and not cleaned.strip():
-            return None
-        schema_def = self.schema_properties.get(schema_key, {})
-        schema_type = schema_def.get("type")
-        if isinstance(schema_type, list):
-            schema_type = [t for t in schema_type if t != "null"]
-            schema_type = schema_type[0] if schema_type else None
-        if schema_type == "string":
-            string_value = self._normalise_string_value(schema_key, cleaned)
-            return self._align_to_enum(schema_key, string_value)
-        if schema_type in {"integer", "number", "boolean"}:
-            return relecov_tools.utils.cast_value_to_schema_type(cleaned, schema_type)
-        if schema_type == "array":
-            if isinstance(cleaned, list):
-                raw_items = cleaned
-            elif isinstance(cleaned, str):
-                delimiter = schema_def.get("delimiter", ";")
-                raw_items = [
-                    part.strip() for part in cleaned.split(delimiter) if part.strip()
-                ]
-            else:
-                return cleaned
-            normalised_items = []
-            for item in raw_items:
-                normalised_item = self._normalise_string_value(schema_key, item)
-                aligned_item = self._align_to_enum(
-                    schema_key, normalised_item, is_array_item=True
-                )
-                normalised_items.append(aligned_item)
-            return normalised_items
-        return cleaned
-
-    def _normalise_string_value(self, schema_key: str, value: Any) -> str:
-        if isinstance(value, datetime):
-            if "date" in schema_key.lower():
-                return value.date().isoformat()
-            return value.isoformat()
-        if isinstance(value, str):
-            text = value.strip()
-            if "date" in schema_key.lower():
-                return self._normalise_date_string(text)
-            return text
-        if isinstance(value, (int, float)):
-            if "date" in schema_key.lower():
-                return self._normalise_date_string(str(int(value)))
-            return str(value)
-        return str(value)
-
-    def _normalise_date_string(self, value: str) -> str:
-        if value is None:
-            return value
-        value = str(value)
-        if not value:
-            return value
-        low_value = value.lower()
-        if self.not_provided_field and low_value == self.not_provided_field.lower():
-            return value
-        value = value.replace("/", "-").replace(".", "-")
-        pattern_match = re.match(r"^\d{4}-\d{2}-\d{2}", value)
-        if pattern_match:
-            return pattern_match.group(0)
-        try:
-            parsed = datetime.strptime(value, "%Y%m%d").date()
-            return parsed.isoformat()
-        except ValueError:
-            return value
-
-    def _strip_ontology(self, value: str) -> str:
-        if not isinstance(value, str):
-            return str(value)
-        if "[" in value and value.strip().endswith("]"):
-            return value.split("[", 1)[0].strip()
-        return value.strip()
-
-    def _align_to_enum(
-        self, schema_key: str, value: Any, *, is_array_item: bool = False
-    ) -> Any:
-        schema_def = self.schema_properties.get(schema_key, {})
-        enum_values = schema_def.get("enum")
-        if is_array_item and not enum_values:
-            enum_values = schema_def.get("items", {}).get("enum", [])
-        if not enum_values or value is None:
-            return value
-        if value in enum_values:
-            return value
-        stripped_map = {
-            self._strip_ontology(enum_val).lower(): enum_val for enum_val in enum_values
-        }
-        value_stripped = self._strip_ontology(str(value)).lower()
-        matched = stripped_map.get(value_stripped)
-        if matched:
-            return matched
-        # fall back to case insensitive direct comparison
-        for enum_val in enum_values:
-            if enum_val.lower() == str(value).lower():
-                return enum_val
-        return value
-
-    def _apply_schema_validation(
+    def _validate_payload(
         self,
-        contexts: list[dict[str, Any]],
+        *,
+        payload: dict[str, Any],
+        sample_label: str | None,
+        row_number: int | None,
+        available_props: set[str],
         folder: str,
         file_errors: list[dict[str, Any]],
     ) -> None:
+        if not payload:
+            return
+        validation_errors = list(self.validator.iter_errors(payload))
+        validation_errors = relecov_tools.assets.schema_utils.custom_validators.validate_with_exceptions(
+            self.schema, payload, validation_errors
+        )
+        if not validation_errors:
+            return
+
         schema_props = self.schema_properties
-        seen_errors: set[tuple[str | None, int | None, str]] = set()
-        for idx, context in enumerate(contexts):
-            payload = context.get("payload") or {}
-            if not payload:
-                continue
-            available_props = set(context.get("available_properties") or [])
-            validation_errors = list(self.validator.iter_errors(payload))
-            validation_errors = relecov_tools.assets.schema_utils.custom_validators.validate_with_exceptions(
-                self.schema, payload, validation_errors
-            )
-            if not validation_errors:
-                continue
-            sample_label = context.get("sample")
-            schema_sample = (
-                payload.get(self.sample_id_property)
-                if self.sample_id_property
-                else None
-            )
-            if not sample_label and schema_sample:
-                sample_label = schema_sample
-            row_number = context.get("row")
-            display_label = (
-                sample_label
-                if sample_label
-                else (f"row {row_number}" if row_number is not None else None)
-            )
-            for error in validation_errors:
-                if error.cause:
-                    error.message = str(error.cause)
-                if error.validator == "required":
-                    try:
-                        missing_field = list(error.message.split("'"))[1]
-                    except Exception:
-                        missing_field = None
-                    if missing_field and missing_field not in available_props:
-                        continue
-                error_text = self._format_validation_error(error, schema_props)
-                error_key = (display_label, row_number, error_text)
-                if error_key in seen_errors:
+        schema_sample = (
+            payload.get(self.sample_id_property) if self.sample_id_property else None
+        )
+        display_label = sample_label or schema_sample
+        if not display_label and row_number is not None:
+            display_label = f"row {row_number}"
+
+        for error in validation_errors:
+            if error.cause:
+                error.message = str(error.cause)
+            if error.validator == "required":
+                try:
+                    missing_field = list(error.message.split("'"))[1]
+                except Exception:
+                    missing_field = None
+                if missing_field and missing_field not in available_props:
                     continue
-                seen_errors.add(error_key)
-                self._record_error(
-                    folder,
-                    file_errors,
-                    error_text,
-                    sample=display_label,
-                    row=row_number,
-                )
+            error_text = self._format_validation_error(error, schema_props)
+            self._record_error(
+                folder,
+                file_errors,
+                error_text,
+                sample=display_label,
+                row=row_number,
+            )
 
     def _format_validation_error(self, error, schema_props: dict[str, Any]) -> str:
         def get_property_label(prop_key: str) -> str:
@@ -680,51 +720,6 @@ class MetadataPrecheck(BaseModule):
         field_label = get_property_label(error_field)
         message = error.message.replace(str(error_field), field_label)
         return f"Error in column {field_label}: {message}"
-
-    def _canonical_label(self, label: Any) -> str:
-        if label is None:
-            return ""
-        label_str = str(label).strip()
-        return self.heading_aliases.get(label_str, label_str)
-
-    def _normalise_sample_id(
-        self, row: dict[str, Any], sample_value_raw: Any
-    ) -> str | None:
-        candidates = [sample_value_raw]
-        fallback_keys = [
-            "Sample ID given by the submitting laboratory",
-            "Sample ID given by originating laboratory",
-            "Sample ID given in the microbiology lab",
-            "Sample ID given if multiple rna-extraction or passages",
-            "Sequence file R1",
-            "Sequence file R1 fastq",
-        ]
-        for key in fallback_keys:
-            candidates.append(row.get(key))
-        for value in candidates:
-            value_clean = self._clean_cell(value)
-            if self._value_is_present(value_clean):
-                return str(value_clean).strip()
-        return None
-
-    def _clean_cell(self, value: Any) -> Any:
-        if isinstance(value, float) and value != value:
-            return None
-        if isinstance(value, str):
-            stripped = value.strip()
-            return stripped
-        return value
-
-    def _value_is_present(self, value: Any) -> bool:
-        if value is None:
-            return False
-        if isinstance(value, str):
-            stripped = value.strip()
-            if not stripped:
-                return False
-            if "not provided" in stripped.lower():
-                return False
-        return True
 
     def _record_error(
         self,
