@@ -28,7 +28,7 @@ stderr = rich.console.Console(
 
 
 class SchemaMapper:
-    """Handle Excel header normalisation and schema-aware casting."""
+    """Keep all header normalisation + casting logic encapsulated for reuse and readability."""
 
     SAMPLE_FALLBACKS = [
         "Sample ID given by the submitting laboratory",
@@ -274,6 +274,7 @@ class MetadataPrecheck(BaseModule):
             self.schema, format_checker=self._date_checker
         )
 
+        # Mapper centralises Excel→schema conversions so the flow below stays compact.
         self.mapper = SchemaMapper(
             self.schema_properties,
             self.label_to_prop,
@@ -312,6 +313,7 @@ class MetadataPrecheck(BaseModule):
         self.set_batch_id(datetime.utcnow().strftime("%Y%m%d%H%M%S"))
 
     def _build_sheet_options(self) -> list[dict[str, str]]:
+        """Collect sheet/header settings (primary + alternative) from config."""
         opts = []
         primary = {
             "sheet": self.metadata_processing.get("excel_sheet"),
@@ -331,6 +333,7 @@ class MetadataPrecheck(BaseModule):
     def _parse_target_folders(
         self, target_folders: Iterable[str] | str | None
     ) -> tuple[list[str] | None, bool]:
+        """Normalise CLI/extra_config target folders and detect interactive mode."""
         if target_folders is None:
             return None, False
         if isinstance(target_folders, str):
@@ -346,6 +349,7 @@ class MetadataPrecheck(BaseModule):
         return clean_list or None, False
 
     def execute_process(self) -> None:
+        """Connect to SFTP, validate every metadata Excel, and emit reports."""
         if not self.sftp_client.open_connection():
             msg = "Unable to establish sftp connection"
             self.log.error(msg)
@@ -368,6 +372,7 @@ class MetadataPrecheck(BaseModule):
         self._print_summary()
 
     def _discover_metadata_targets(self) -> dict[str, list[str]]:
+        """Walk the remote tree and collect folders that contain metadata files."""
         directory_list = self.sftp_client.list_remote_folders(".", recursive=True)
         clean_dirs = sorted(
             {d.replace("./", "", 1) for d in directory_list if d and d != "."}
@@ -384,6 +389,7 @@ class MetadataPrecheck(BaseModule):
                 or part.lower().endswith("_invalid_samples")
                 for part in path_parts
             ):
+                # Skip already-analysed folders to avoid generating duplicate reports.
                 self.log.info(
                     "Skipping %s because it points to an *_invalid_samples folder",
                     directory,
@@ -405,6 +411,7 @@ class MetadataPrecheck(BaseModule):
         return metadata_targets
 
     def _select_target_directories(self, clean_dirs: list[str]) -> list[str]:
+        """Return the final list of folders to scan (after filters/prompts)."""
         if self.prompt_for_targets:
             choices = sorted(clean_dirs)
             if not choices:
@@ -422,6 +429,7 @@ class MetadataPrecheck(BaseModule):
         return [folder for folder in self.target_folders if folder in clean_dirs]
 
     def _process_folder(self, folder: str, meta_files: list[str]) -> None:
+        """Run validation for each metadata file inside a remote folder."""
         stderr.print(f"[blue]Processing folder {folder}")
         self.log.info("Processing folder %s", folder)
         self.logsum.feed_key(key=folder)
@@ -434,6 +442,7 @@ class MetadataPrecheck(BaseModule):
     def _validate_remote_metadata(
         self, folder: str, remote_file: str
     ) -> dict[str, Any]:
+        """Download, parse, and validate a single metadata Excel."""
         file_errors: list[dict[str, Any]] = []
         file_warnings: list[dict[str, Any]] = []
         sample_count = 0
@@ -605,6 +614,7 @@ class MetadataPrecheck(BaseModule):
         }
 
     def _read_metadata_sheet(self, local_path: str) -> dict[str, Any]:
+        """Load the Excel using configured sheet/header flag (primary or fallback)."""
         errors: list[str] = []
         for option in self.sheet_options:
             try:
@@ -638,6 +648,7 @@ class MetadataPrecheck(BaseModule):
         folder: str,
         file_errors: list[dict[str, Any]],
     ) -> None:
+        """Run JSON-schema validation for one row and log any issues."""
         if not payload:
             return
         validation_errors = list(self.validator.iter_errors(payload))
@@ -675,6 +686,8 @@ class MetadataPrecheck(BaseModule):
             )
 
     def _format_validation_error(self, error, schema_props: dict[str, Any]) -> str:
+        """Translate jsonschema errors into human-friendly messages."""
+
         def get_property_label(prop_key: str) -> str:
             prop_def = schema_props.get(prop_key, {})
             return prop_def.get("label", prop_key)
@@ -725,6 +738,7 @@ class MetadataPrecheck(BaseModule):
         sample: str | None = None,
         row: int | None = None,
     ) -> None:
+        """Store an error both in log summary and in the per-file error list."""
         if sample:
             self.logsum.add_error(entry=message, key=folder, sample=sample)
         else:
@@ -739,6 +753,7 @@ class MetadataPrecheck(BaseModule):
         sample: str | None = None,
         row: int | None = None,
     ) -> None:
+        """Store a warning both in log summary and in the per-file warning list."""
         if sample:
             self.logsum.add_warning(entry=message, key=folder, sample=sample)
         else:
@@ -748,6 +763,7 @@ class MetadataPrecheck(BaseModule):
     def _update_lab_summary(
         self, lab_code: str, folder: str, file_summary: dict[str, Any]
     ) -> None:
+        """Aggregate per-lab stats so later reports/table can be generated."""
         lab_entry = self.lab_summary[lab_code]
         lab_entry["total_samples"] += file_summary.get("samples", 0)
         lab_entry["invalid_sample_count"] += len(
@@ -774,6 +790,7 @@ class MetadataPrecheck(BaseModule):
         )
 
     def _export_report(self) -> None:
+        """Persist the merged JSON report with lab/folder breakdown."""
         report = {
             "generated_at": self.generated_at,
             "total_labs": len(self.lab_summary),
@@ -793,6 +810,7 @@ class MetadataPrecheck(BaseModule):
             stderr.print(f"[red]Could not write metadata precheck report: {exc}")
 
     def _print_summary(self) -> None:
+        """Render an at-a-glance Rich table with lab counts and top issues."""
         if not self.lab_summary:
             return
         table = Table(title="Metadata precheck summary", show_lines=False)
@@ -804,6 +822,7 @@ class MetadataPrecheck(BaseModule):
         table.add_column("Top issues", justify="left")
 
         def _collect_lab_messages(files: list[dict[str, Any]], limit: int = 3):
+            """Return up to `limit` distinct error messages for a lab."""
             messages = []
             for fdata in files:
                 for inv in fdata.get("invalid_samples", []):
