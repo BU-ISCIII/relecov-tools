@@ -533,7 +533,6 @@ class MetadataPrecheck(BaseModule):
         for idx, row in enumerate(rows):
             row_number = header_row_index + 1 + idx
             canonical_row = self.mapper.canonicalize_row(row, header_flag)
-            sample_value_raw = canonical_row.get(sample_column)
             sample_value = self.mapper.normalise_sample_id(canonical_row, sample_column)
 
             if not sample_value:
