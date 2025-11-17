@@ -198,6 +198,7 @@ class Wrapper(BaseModule):
                 "logsum_file": temp_logsum,
                 "output_dir": local_folder,
                 "upload_files": True,
+                "samples_json": samples_file,
                 "check_db": True,
             }
         )

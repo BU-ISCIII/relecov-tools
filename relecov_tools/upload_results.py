@@ -26,6 +26,7 @@ class UploadResults(BaseModule):
         password=None,
         batch_id=None,
         template_path=None,
+        input_directory=None,
         project="Relecov",
     ):
         """Starts the SFTP upload process"""
@@ -69,10 +70,22 @@ class UploadResults(BaseModule):
 
         self.processed_batches = {}  # Dictionary to store results
         self.template_path = template_path
-        self.email_sender = relecov_tools.mail.Mail(config, template_path)
+        self.email_sender = relecov_tools.mail.Mail(
+            config, template_path, logger=self.log
+        )
         self.guide = config.get("institutions_guide_path")
         self.analysis_folder = sftp_config.get("analysis_results_folder")
         self.project = project
+        if input_directory:
+            resolved_input = os.path.realpath(input_directory)
+            if not os.path.isdir(resolved_input):
+                errtxt = f"Input directory '{input_directory}' is not valid"
+                self.log.error(errtxt)
+                raise FileNotFoundError(errtxt)
+            self.input_directory = resolved_input
+        else:
+            self.input_directory = os.getcwd()
+        self.log.debug(f"Using input directory: {self.input_directory}")
         valid_projects = ["Relecov", "Redlabra"]
         if self.project not in valid_projects:
             self.log.error(f"Error: Only valid projects: {valid_projects}")
@@ -80,9 +93,11 @@ class UploadResults(BaseModule):
 
     def find_cod_for_batch(self):
         """Find all COD* folders containing the batch_id"""
-        base_dir = os.getcwd()  # This module should be run in root directory
+        base_dir = self.input_directory
         cod_dirs = [
-            d for d in os.listdir(base_dir) if os.path.isdir(d) and d.startswith("COD")
+            d
+            for d in os.listdir(base_dir)
+            if os.path.isdir(os.path.join(base_dir, d)) and d.startswith("COD")
         ]
         self.log.debug(f"List of directories found: {cod_dirs}")
         matching_cod = {}
@@ -252,6 +267,9 @@ class UploadResults(BaseModule):
     def execute_process(self):
         """Runs the complete flow: search, compress, upload, logging and sending the email."""
         cod_batches = self.find_cod_for_batch()
+
+        self.log.info(f"Upload-results log stored at {self.final_log_path}")
+        stderr.print(f"[blue]Log file stored in configured path: {self.final_log_path}")
 
         with open(self.guide, "r") as f:
             institutions_data = json.load(f)

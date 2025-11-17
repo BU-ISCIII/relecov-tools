@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.2] - 2025-11-12 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.2>
+
+### Credits
+
+- [Alejandro Bernabeu](https://github.com/aberdur)
+- [Pablo Mata](https://github.com/shettland)
+- [Victor Lopez](https://github.com/victor5lm)
+
+#### Added enhancements
+
+- Introduced new function to feed iskylims POST data with lab_requests fields in upload_database.py [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
+- Included new iskylims api url to get mapping for lab_request fields in configuration.json [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
+- Add UCCT status analytics script & send collecting_institution_code_1 to Relecov Platform [#806](https://github.com/BU-ISCIII/relecov-tools/pull/806)
+- Added Midnight amplicon panel versions in the schema [#807](https://github.com/BU-ISCIII/relecov-tools/pull/807)
+- Add input_directories to upload-results [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808)
+- update ERROR handling in mail [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808) 
+- Add labs to laboratory_adress.json [#813](https://github.com/BU-ISCIII/relecov-tools/pull/813)
+
+#### Fixes
+
+- Fixed wrong message and keyerror when uploading to iskylims [#803](https://github.com/BU-ISCIII/relecov-tools/pull/803)
+- Fix upload of corrupted files to SFTP in wrapper [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808)
+- Fixed create_summary_tables.py to properly create csv variant files [#809](https://github.com/BU-ISCIII/relecov-tools/pull/809).
+
+#### Changed
+
+- Update relecov_schema from v3.2.0 to v3.2.1 [#802](https://github.com/BU-ISCIII/relecov-tools/pull/802)
+- Update relecov_schema from v3.2.2 to v3.2.3 [#807](https://github.com/BU-ISCIII/relecov-tools/pull/807)
+- Normalize long-table IDs to unique_sample_id in read-bioinfo-metadata [#813](https://github.com/BU-ISCIII/relecov-tools/pull/813)
+- Improve Mail Module Logging Consistency [#814](https://github.com/BU-ISCIII/relecov-tools/pull/814)
+
+#### Removed
+
+### Requirements
+
 ## [1.7.1] - 2025-09-22 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.1>
 
 ### Credits
@@ -12,6 +47,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Pablo Mata](https://github.com/shettland)
 
 #### Added enhancements
+
+- Updated relecov-schema version to v3.2.2 [#805](https://github.com/BU-ISCIII/relecov-tools/pull/805)
 
 #### Fixes
 

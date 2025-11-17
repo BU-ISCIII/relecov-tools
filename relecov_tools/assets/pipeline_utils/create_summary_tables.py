@@ -144,6 +144,9 @@ def process_json_files(
                                 "MICROBIOLOGY_LAB_SAMPLE_ID": sample.get(
                                     "microbiology_lab_sample_id", "-"
                                 ),
+                                "CONSENSUS_SEQUENCE_FILENAME": sample.get(
+                                    "consensus_sequence_filename", "-"
+                                ),
                                 "GISAID_ACCESSION_ID": sample.get(
                                     "gisaid_accession_id", "-"
                                 ),
@@ -182,7 +185,7 @@ def process_json_files(
                         sample_variant_data[sample_id] = sample
                         # Determination of the season for each sample
                         for entry in all_data:
-                            if str(entry["SEQUENCING_SAMPLE_ID"]) == sample_id:
+                            if str(entry["CONSENSUS_SEQUENCE_FILENAME"]) == sample_id:
                                 season = entry["SEASON"]
                                 variant_entries = sample.get("variants", [])
                                 for variant in variant_entries:

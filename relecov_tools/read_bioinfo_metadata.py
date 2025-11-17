@@ -750,7 +750,7 @@ class BioinfoMetadata(BaseModule):
 
             # Process the config key to get data to map and extra data if any
             data_to_map, extra_data = self._process_config_key(
-                key, files_dict[key], file_tag, output_dir
+                key, files_dict[key], file_tag, output_dir, metadata=j_data
             )
 
             if extra_data:
@@ -791,6 +791,7 @@ class BioinfoMetadata(BaseModule):
         file_path: list[str],
         file_tag: str,
         output_dir: str | None,
+        metadata: list[dict] | None = None,
     ) -> tuple[dict | None, dict | None]:
         """
         Handles the data processing logic for a single config key.
@@ -814,8 +815,15 @@ class BioinfoMetadata(BaseModule):
         # If func_name is defined, we will process the file using the function defined in the config
         # and present in assets.pipeline_utils
         else:
+            extra_kwargs = {}
+            if func_name == "utils/parse_long_table":
+                extra_kwargs["metadata"] = metadata
             data = self.process_metadata(
-                file_path, file_tag=file_tag, func_name=func_name, out_path=output_dir
+                file_path,
+                file_tag=file_tag,
+                func_name=func_name,
+                out_path=output_dir,
+                **extra_kwargs,
             )
 
         if config.get("split_by_batch") and config.get("extra_dict"):
@@ -887,6 +895,7 @@ class BioinfoMetadata(BaseModule):
         file_tag: str,
         func_name: str,
         out_path: str | None = None,
+        **kwargs,
     ) -> dict:
         """This method dynamically loads and executes the functions specified in config file.
         It is used to apply standard or custom metadata processing depending on the current
@@ -919,6 +928,7 @@ class BioinfoMetadata(BaseModule):
                 file_tag=file_tag,
                 pipeline_name=self.software_name,
                 output_folder=out_path,
+                **kwargs,
             )
 
         except Exception as e:
@@ -1410,23 +1420,34 @@ class BioinfoMetadata(BaseModule):
         filename: str
             The file name of the first item in filtered_batch_data.
         """
-        # Get the sample names from batch_data
-        # If unique_sample_id is present, it will be used to create the sample name,
-        # otherwise only sequencing_sample_id will be used.
-        sample_names_in_batch = {
-            (
-                f"{sample_data['sequencing_sample_id']}_{sample_data['unique_sample_id']}"
-                if sample_data["unique_sample_id"]
-                else sample_data["sequencing_sample_id"]
-            )
-            for sample_data in batch_data
-        }
+        # Build the set of sample identifiers accepted for the extra data.
+        # Accept both the combined sequencing_unique identifier and the unique id alone.
+        sample_names_in_batch: set[str] = set()
+        for sample_data in batch_data:
+            seq_id = str(sample_data.get("sequencing_sample_id") or "").strip()
+            unique_id = str(sample_data.get("unique_sample_id") or "").strip()
+            if unique_id:
+                sample_names_in_batch.add(unique_id)
+                if seq_id:
+                    sample_names_in_batch.add(f"{seq_id}_{unique_id}")
+            elif seq_id:
+                sample_names_in_batch.add(seq_id)
+
         # filter extra_data based on sample names in batch_data
         filtered_batch_data = [
             sample_data
             for sample_data in extra_data
             if sample_data["sample_name"] in sample_names_in_batch
         ]
+
+        if not filtered_batch_data:
+            self.update_all_logs(
+                self.split_extra_json_data.__name__,
+                "warning",
+                "No extra metadata matched samples in current batch.",
+            )
+            filename = extra_data[0]["file_name"] if extra_data else "extra_data"
+            return filtered_batch_data, filename
 
         # get the file name from the first item in filtered_batch_data
         filename = filtered_batch_data[0]["file_name"]
@@ -1562,7 +1583,7 @@ class BioinfoMetadata(BaseModule):
                 extra_filename = f"{filename}_{lab_code}_{file_tag}.json"
                 extra_filepath = os.path.join(batch_dir, extra_filename)
                 relecov_tools.utils.write_json_to_file(
-                    filtered_batch_data, extra_filepath
+                    filtered_batch_data if filtered_batch_data else [], extra_filepath
                 )
 
         self.parent_create_error_summary(
