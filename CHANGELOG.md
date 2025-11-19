@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.3dev] - 2025-XX-XX : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.3>
+
+### Credits
+
+- [Pablo Mata](https://github.com/shettland)
+
+#### Added enhancements
+
+#### Fixes
+
+- Fixed long_table unique_id selection when seq_id had underscore [#818](https://github.com/BU-ISCIII/relecov-tools/pull/818)
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [1.7.2] - 2025-11-12 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.2>
 
 ### Credits
