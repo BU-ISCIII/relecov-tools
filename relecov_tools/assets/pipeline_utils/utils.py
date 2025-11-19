@@ -202,7 +202,10 @@ class LongTableParse:
             unique_sample = self._raw_to_unique.get(raw_sample)
             if unique_sample is None:
                 if "_" in raw_sample:
-                    seq_id, candidate_unique = raw_sample.split("_", 1)
+                    split_ids = raw_sample.split("_")
+                    # This part assumes that unique-ids NEVER include an underscore
+                    candidate_unique = split_ids.pop(-1)
+                    seq_id = "_".join(split_ids)
                 else:
                     seq_id, candidate_unique = raw_sample, ""
 
