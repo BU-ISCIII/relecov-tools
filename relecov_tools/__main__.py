@@ -28,6 +28,7 @@ import relecov_tools.gisaid_upload
 import relecov_tools.ena_upload
 import relecov_tools.pipeline_manager
 import relecov_tools.build_schema
+import relecov_tools.metadata_precheck
 import relecov_tools.wrapper
 import relecov_tools.upload_results
 import relecov_tools.base_module
@@ -333,6 +334,70 @@ def download(
     try:
         download = relecov_tools.download.Download(**args_merged)
         download.execute_process()
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
+
+
+@relecov_tools_cli.command(help_priority=3)
+@click.option("-u", "--user", help="User name for login to sftp server")
+@click.option("-p", "--password", help="Password for the user to login")
+@click.option(
+    "-f",
+    "--conf_file",
+    help="Configuration file (not params file)",
+)
+@click.option(
+    "-o",
+    "--output_dir",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where the generated output and logs will be saved",
+)
+@click.option(
+    "-t",
+    "--target_folders",
+    is_flag=False,
+    flag_value="ALL",
+    default=None,
+    help='Flag: Select which folders will be targeted giving [paths] or via prompt. For multiple folders use ["folder1", "folder2"]',
+)
+@click.option(
+    "--export-excel/--no-export-excel",
+    default=False,
+    help="Generate an Excel summary alongside the JSON report",
+)
+@click.pass_context
+def metadata_precheck(
+    ctx,
+    user,
+    password,
+    conf_file,
+    output_dir,
+    target_folders,
+    export_excel,
+):
+    """Inspect remote metadata Excels and report missing required data."""
+    debug = ctx.obj.get("debug", False)
+    args_merged = merge_with_extra_config(
+        ctx=ctx,
+        add_extra_config=True,
+    )
+    try:
+        precheck = relecov_tools.metadata_precheck.MetadataPrecheck(**args_merged)
+        precheck.execute_process()
     except Exception as e:
         if debug:
             log.exception(f"EXCEPTION FOUND: {e}")
