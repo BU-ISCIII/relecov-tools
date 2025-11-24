@@ -401,19 +401,28 @@ Usage: relecov-tools update-db [OPTIONS]
 
 Options:
   -j, --json TEXT                 data in json format
-  -t, --type [sample|bioinfodata|variantdata]
-                                  Select the type of information to upload to
-                                  database
+  -t, --type TEXT                 Without --full_update choose one of
+                                  [sample|bioinfodata|variantdata]. With --full_update
+                                  this flag is ignored.
   -plat, --platform [iskylims|relecov]
                                   name of the platform where data is uploaded
   -u, --user TEXT                 user name for login
   -p, --password TEXT             password for the user to login
   -s, --server_url TEXT           url of the platform server
-  -f, --full_update               Sequentially run every update option
+  -f, --full_update [TEXT]        Run the full update. Use without value to run all
+                                  steps. Optionally pass a comma-separated list of
+                                  step numbers (e.g. -f 2,3,4) to run only those:
+                                  1=sample->iskylims, 2=sample->relecov,
+                                  3=bioinfodata->relecov, 4=variantdata->relecov.
   -l, --long_table TEXT           Long_table.json file from read-bioinfo-
                                   metadata + viralrecon
   --help                          Show this message and exit.
 ```
+When running with `--full_update`:
+- `-f` (sin argumentos) ejecuta los cuatro pasos en orden.
+- `-f 2,3,4` ejecuta sólo sample->relecov, bioinfodata->relecov y
+  variantdata->relecov en ese orden.
+
 
 #### pipeline-manager
 
