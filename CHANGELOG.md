@@ -4,13 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.7.3dev] - 2025-XX-XX : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.3>
+## [1.7.3] - 2025-11-24 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.3>
 
 ### Credits
 
 - [Pablo Mata](https://github.com/shettland)
+- [Alejandro Bernabeu](https://github.com/aberdur)
 
 #### Added enhancements
+
+- Extend update_database to Support Full Update Modes (1–4) [#820](https://github.com/BU-ISCIII/relecov-tools/pull/820)
 
 #### Fixes
 
