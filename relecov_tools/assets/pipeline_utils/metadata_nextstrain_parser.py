@@ -5,7 +5,6 @@ import sys
 import argparse
 import json
 import glob
-from pathlib import Path
 from datetime import datetime
 
 
@@ -262,7 +261,6 @@ def main(args=None):
     successful_files = 0
     total_influenza_excluded = 0
     total_no_consensus_excluded = 0
-    total_sequences_written = 0
 
     # Open sequences output file once
     with open(sequences_output, "w", encoding="utf-8") as sequences_f:
@@ -288,8 +286,8 @@ def main(args=None):
                             == "unknown"
                         ):
                             total_no_consensus_excluded += 1
-            except:
-                pass  # If we can't count exclusions, just continue
+            except Exception:
+                pass
 
     print(f"Successfully processed {successful_files} out of {len(json_files)} files")
     print(f"Total records collected: {total_records}")
@@ -333,7 +331,7 @@ def main(args=None):
 
         # Print summary of generated files
         print(f"\n=== SUMMARY ===")
-        print(f"All output files have been generated in: {output_dir}/")
+        print("All output files have been generated in: " + output_dir + "/")
         print(f"✓ {os.path.basename(metadata_output)} - Metadata file for Nextstrain")
         print(
             f"✓ {os.path.basename(sequences_output)} - Concatenated consensus sequences"
