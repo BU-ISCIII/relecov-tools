@@ -330,7 +330,7 @@ def main(args=None):
         print(f"Generated {lat_long_output}")
 
         # Print summary of generated files
-        print(f"\n=== SUMMARY ===")
+        print("\n=== SUMMARY ===")
         print("All output files have been generated in: " + output_dir + "/")
         print(f"✓ {os.path.basename(metadata_output)} - Metadata file for Nextstrain")
         print(
