@@ -441,6 +441,17 @@
                 "token": ""
             }
         },
+        "data_upload_types": [
+            "sample",
+            "bioinfodata",
+            "variantdata"
+        ],
+        "full_update_steps": [
+            { "id": "1", "type": "sample", "platform": "iskylims" },
+            { "id": "2", "type": "sample", "platform": "relecov" },
+            { "id": "3", "type": "bioinfodata", "platform": "relecov" },
+            { "id": "4", "type": "variantdata", "platform": "relecov" }
+        ],
         "iskylims_fixed_values": {
             "patient_core": "",
             "sample_project": "Relecov",
