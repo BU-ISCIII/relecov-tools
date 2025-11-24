@@ -486,8 +486,7 @@ class UploadDatabase(BaseModule):
             )
 
             if "ERROR" in result:
-                err_raw = result.get("ERROR")
-                err_str = "" if err_raw is None else str(err_raw)
+                err_str = str(result.get("ERROR", ""))
                 err_lower = err_str.lower()
                 if err_str == "Server not available":
                     # retry to connect to server
