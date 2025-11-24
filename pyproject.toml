@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "relecov-tools"
-version = "1.7.2"
+version = "1.7.3"
 description = "Tools for managing and proccessing relecov network data."
 readme = "README.md"
 requires-python = ">=3.10"
