@@ -813,10 +813,15 @@ def upload_to_gisaid(
 @click.option(
     "-t",
     "--type",
-    type=click.Choice(["sample", "bioinfodata", "variantdata"]),
-    multiple=False,
+    type=str,
+    multiple=True,
     default=None,
-    help="Select the type of information to upload to database",
+    help=(
+        "Select the upload target. Without --full_update choose one of "
+        "[sample|bioinfodata|variantdata]. With --full_update provide the "
+        "step numbers to run in order: 1=sample->iSkyLIMS, 2=sample->relecov, "
+        "3=bioinfodata->relecov, 4=variantdata->relecov."
+    ),
 )
 @click.option(
     "-plat",
@@ -837,9 +842,14 @@ def upload_to_gisaid(
 @click.option(
     "-f",
     "--full_update",
-    is_flag=True,
-    default=False,
-    help="Sequentially run every update option",
+    flag_value="ALL",
+    is_flag=False,
+    default=None,
+    help=(
+        "Run the full update. Use without value to run all steps. "
+        "Optionally pass a comma-separated list of step numbers to run only those: "
+        "1=sample->iSkyLIMS, 2=sample->relecov, 3=bioinfodata->relecov, 4=variantdata->relecov."
+    ),
 )
 @click.option(
     "-l",
