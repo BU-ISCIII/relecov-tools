@@ -12,6 +12,7 @@ log = logging.getLogger(__name__)
 timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
 log_filename = f"metadata_nextstrain_parser_{timestamp}.log"
 
+
 def parse_args(args=None):
     description = "Convert multiple JSON sample files to Nextstrain metadata TSV and concatenate consensus sequences."
     epilog = """Example usage: python metadata_nextstrain_parser.py --input-dir /path/to/json/files"""
@@ -27,10 +28,7 @@ def parse_args(args=None):
 
 def extract_strain_from_filepath(filepath):
     """Extract strain name from consensus_sequence_filepath"""
-    if (
-        not filepath
-        or filepath.startswith("Not Provided")
-    ):
+    if not filepath or filepath.startswith("Not Provided"):
         return "unknown"
 
     # Get the filename from the path
@@ -198,7 +196,11 @@ def process_json_file(json_file, sequences_output_handle):
 
 def main(args=None):
     # Logging
-    logging.basicConfig(level=logging.INFO, format='[%(asctime)s] - [%(levelname)s] - %(message)s', handlers=[logging.FileHandler(log_filename), logging.StreamHandler(sys.stdout)])
+    logging.basicConfig(
+        level=logging.INFO,
+        format="[%(asctime)s] - [%(levelname)s] - %(message)s",
+        handlers=[logging.FileHandler(log_filename), logging.StreamHandler(sys.stdout)],
+    )
 
     # Process args
     args = parse_args(args)
@@ -208,7 +210,9 @@ def main(args=None):
 
     # Check if output directory exists
     if not os.path.exists(output_dir):
-        log.error(f"Output directory '{output_dir}' does not exist. Please create the directory first")
+        log.error(
+            f"Output directory '{output_dir}' does not exist. Please create the directory first"
+        )
         sys.exit(1)
 
     # Get current date in YYYY-MM-DD format
@@ -228,11 +232,15 @@ def main(args=None):
     json_files = glob.glob(os.path.join(args.input_dir, "bioinfo_lab_metadata*.json"))
 
     if not json_files:
-        log.error(f"No JSON files starting with 'bioinfo_lab_metadata' found in {args.input_dir}")
+        log.error(
+            f"No JSON files starting with 'bioinfo_lab_metadata' found in {args.input_dir}"
+        )
         log.info(f"Available files: {os.listdir(args.input_dir)}")
         sys.exit(1)
 
-    log.info(f"Found {len(json_files)} JSON files starting with 'bioinfo_lab_metadata' to process")
+    log.info(
+        f"Found {len(json_files)} JSON files starting with 'bioinfo_lab_metadata' to process"
+    )
 
     # Define the header
     header = [
@@ -293,7 +301,9 @@ def main(args=None):
             except Exception as e:
                 log.warning(f"Failed to count exclusions from {json_file}: {str(e)}")
 
-    log.info(f"Successfully processed {successful_files} out of {len(json_files)} files")
+    log.info(
+        f"Successfully processed {successful_files} out of {len(json_files)} files"
+    )
     log.info(f"Total records collected: {total_records}")
     if total_influenza_excluded > 0:
         log.info(f"Influenza samples excluded: {total_influenza_excluded}")
@@ -336,7 +346,9 @@ def main(args=None):
         # Print summary of generated files
         log.info("\n=== SUMMARY ===")
         log.info("All output files have been generated in: " + output_dir + "/")
-        log.info(f"✓ {os.path.basename(metadata_output)} - Metadata file for Nextstrain")
+        log.info(
+            f"✓ {os.path.basename(metadata_output)} - Metadata file for Nextstrain"
+        )
         log.info(
             f"✓ {os.path.basename(sequences_output)} - Concatenated consensus sequences"
         )
