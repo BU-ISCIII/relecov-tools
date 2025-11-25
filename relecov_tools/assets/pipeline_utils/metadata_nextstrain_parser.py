@@ -9,6 +9,8 @@ import logging
 from datetime import datetime
 
 log = logging.getLogger(__name__)
+timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+log_filename = f"metadata_nextstrain_parser_{timestamp}.log"
 
 def parse_args(args=None):
     description = "Convert multiple JSON sample files to Nextstrain metadata TSV and concatenate consensus sequences."
@@ -196,7 +198,7 @@ def process_json_file(json_file, sequences_output_handle):
 
 def main(args=None):
     # Logging
-    logging.basicConfig(level=logging.INFO, format='[%(asctime)s] - [%(levelname)s] - %(message)s', handlers=[logging.FileHandler('metadata_nextstrain_parser.log'),logging.StreamHandler(sys.stdout)])
+    logging.basicConfig(level=logging.INFO, format='[%(asctime)s] - [%(levelname)s] - %(message)s', handlers=[logging.FileHandler(log_filename), logging.StreamHandler(sys.stdout)])
 
     # Process args
     args = parse_args(args)
