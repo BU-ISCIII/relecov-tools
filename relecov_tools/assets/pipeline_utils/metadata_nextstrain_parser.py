@@ -5,8 +5,10 @@ import sys
 import argparse
 import json
 import glob
+import logging
 from datetime import datetime
 
+log = logging.getLogger(__name__)
 
 def parse_args(args=None):
     description = "Convert multiple JSON sample files to Nextstrain metadata TSV and concatenate consensus sequences."
@@ -25,7 +27,6 @@ def extract_strain_from_filepath(filepath):
     """Extract strain name from consensus_sequence_filepath"""
     if (
         not filepath
-        or filepath == "Not Provided [SNOMED:434941000124101]"
         or filepath.startswith("Not Provided")
     ):
         return "unknown"
@@ -34,7 +35,7 @@ def extract_strain_from_filepath(filepath):
     filename = os.path.basename(filepath)
     # Remove the .consensus.fa extension if present
     if filename.endswith(".consensus.fa"):
-        return filename[:-13]  # Remove '.consensus.fa'
+        return filename.replace(".consensus.fa", "")
     elif filename.endswith(".fa") or filename.endswith(".fasta"):
         return os.path.splitext(filename)[0]
     else:
@@ -81,14 +82,16 @@ def read_consensus_sequence(filepath, strain_name):
 
     try:
         if not os.path.exists(filepath):
-            print(f"Warning: Consensus file not found: {filepath}")
+            message = f"Consensus file not found: {filepath}"
+            log.warning(message)
             return None
 
         with open(filepath, "r") as f:
             content = f.read().strip()
 
         if not content:
-            print(f"Warning: Empty consensus file: {filepath}")
+            message = f"Empty consensus file: {filepath}"
+            log.warning(message)
             return None
 
         # Ensure proper FASTA format
@@ -101,7 +104,8 @@ def read_consensus_sequence(filepath, strain_name):
             return f">{strain_name}\n{content}"
 
     except Exception as e:
-        print(f"Error reading consensus file {filepath}: {e}")
+        message = f"Error reading consensus file {filepath}: {e}"
+        log.error(message)
         return None
 
 
@@ -113,7 +117,8 @@ def process_json_file(json_file, sequences_output_handle):
 
         # Verify it's an array
         if not isinstance(data, list):
-            print(f"Warning: {json_file} is not a JSON array. Skipping.")
+            message = f"{json_file} is not a JSON array. Skipping."
+            log.warning(message)
             return []
 
         records = []
@@ -175,22 +180,24 @@ def process_json_file(json_file, sequences_output_handle):
             records.append(tsv_record)
 
         if influenza_count > 0:
-            print(
-                f"Processed {json_file}: {len(records)} records, {sequences_written} sequences written ({influenza_count} influenza samples excluded)"
-            )
+            message = f"Processed {json_file}: {len(records)} records, {sequences_written} sequences written ({influenza_count} influenza samples excluded)"
+            log.info(message)
         else:
-            print(
-                f"Processed {json_file}: {len(records)} records, {sequences_written} sequences written"
-            )
+            message = f"Processed {json_file}: {len(records)} records, {sequences_written} sequences written"
+            log.info(message)
 
         return records
 
     except Exception as e:
-        print(f"Error processing {json_file}: {e}")
+        message = f"Error processing {json_file}: {e}"
+        log.error(message)
         return []
 
 
 def main(args=None):
+    # Logging
+    logging.basicConfig(level=logging.INFO, format='[%(asctime)s] - [%(levelname)s] - %(message)s', handlers=[logging.FileHandler('metadata_nextstrain_parser.log'),logging.StreamHandler(sys.stdout)])
+
     # Process args
     args = parse_args(args)
 
@@ -199,8 +206,7 @@ def main(args=None):
 
     # Check if output directory exists
     if not os.path.exists(output_dir):
-        print(f"Error: Output directory '{output_dir}' does not exist.")
-        print(f"Please create the directory first: mkdir -p {output_dir}")
+        log.error(f"Output directory '{output_dir}' does not exist. Please create the directory first")
         sys.exit(1)
 
     # Get current date in YYYY-MM-DD format
@@ -211,26 +217,22 @@ def main(args=None):
     sequences_output = os.path.join(output_dir, f"sequences_{current_date}.fasta")
     lat_long_output = os.path.join(output_dir, f"metadata_lat_long_{current_date}.tsv")
 
-    print(f"Output files will be generated in: {output_dir}/")
-    print(f"  - Metadata: {os.path.basename(metadata_output)}")
-    print(f"  - Sequences: {os.path.basename(sequences_output)}")
-    print(f"  - Coordinates: {os.path.basename(lat_long_output)}")
+    log.info(f"Output files will be generated in: {output_dir}/")
+    log.info(f"  - Metadata: {os.path.basename(metadata_output)}")
+    log.info(f"  - Sequences: {os.path.basename(sequences_output)}")
+    log.info(f"  - Coordinates: {os.path.basename(lat_long_output)}")
 
     # Find all JSON files in the input directory that start with "bioinfo_lab_metadata"
     json_files = glob.glob(os.path.join(args.input_dir, "bioinfo_lab_metadata*.json"))
 
     if not json_files:
-        print(
-            f"No JSON files starting with 'bioinfo_lab_metadata' found in {args.input_dir}"
-        )
-        print(f"Available files: {os.listdir(args.input_dir)}")
+        log.error(f"No JSON files starting with 'bioinfo_lab_metadata' found in {args.input_dir}")
+        log.info(f"Available files: {os.listdir(args.input_dir)}")
         sys.exit(1)
 
-    print(
-        f"Found {len(json_files)} JSON files starting with 'bioinfo_lab_metadata' to process"
-    )
+    log.info(f"Found {len(json_files)} JSON files starting with 'bioinfo_lab_metadata' to process")
 
-    # Define the header - removed genbank_accession and url columns
+    # Define the header
     header = [
         "strain",
         "virus",
@@ -263,9 +265,9 @@ def main(args=None):
     total_no_consensus_excluded = 0
 
     # Open sequences output file once
-    with open(sequences_output, "w", encoding="utf-8") as sequences_f:
+    with open(sequences_output, "w", encoding="utf-8") as sequences_file:
         for json_file in json_files:
-            records = process_json_file(json_file, sequences_f)
+            records = process_json_file(json_file, sequences_file)
             if records is not None:  # records could be empty list (which is valid)
                 all_records.extend(records)
                 total_records += len(records)
@@ -286,39 +288,39 @@ def main(args=None):
                             == "unknown"
                         ):
                             total_no_consensus_excluded += 1
-            except Exception:
-                pass
+            except Exception as e:
+                log.warning(f"Failed to count exclusions from {json_file}: {str(e)}")
 
-    print(f"Successfully processed {successful_files} out of {len(json_files)} files")
-    print(f"Total records collected: {total_records}")
+    log.info(f"Successfully processed {successful_files} out of {len(json_files)} files")
+    log.info(f"Total records collected: {total_records}")
     if total_influenza_excluded > 0:
-        print(f"Influenza samples excluded: {total_influenza_excluded}")
+        log.info(f"Influenza samples excluded: {total_influenza_excluded}")
     if total_no_consensus_excluded > 0:
-        print(
+        log.info(
             f"Samples without consensus filepath excluded: {total_no_consensus_excluded}"
         )
 
     if not all_records:
-        print("No valid records to write")
+        message = "No valid records to write"
+        log.error(message)
         sys.exit(1)
 
     # Write the global TSV file
     try:
-        with open(metadata_output, "w", encoding="utf-8") as fout:
+        with open(metadata_output, "w", encoding="utf-8") as mdata:
             # Write header
-            fout.write("\t".join(header) + "\n")
+            mdata.write("\t".join(header) + "\n")
 
             # Write all records (without latitude/longitude in the main TSV)
             for record in all_records:
                 line = "\t".join(str(record.get(field, "NA")) for field in header)
-                fout.write(line + "\n")
+                mdata.write(line + "\n")
 
-        print(f"Successfully wrote {len(all_records)} records to {metadata_output}")
-        print(f"Successfully wrote consensus sequences to {sequences_output}")
+        log.info(f"Successfully wrote {len(all_records)} records to {metadata_output}")
+        log.info(f"Successfully wrote consensus sequences to {sequences_output}")
 
-        # Generate additional lat_long file with ACTUAL coordinates
+        # Generate additional lat_long file with coordinates
         with open(lat_long_output, "w", encoding="utf-8") as f_latlong:
-            # NO header - just data rows
             for record in all_records:
                 # Use the actual coordinates from the JSON
                 latitude = record.get("latitude", "NA")
@@ -327,19 +329,20 @@ def main(args=None):
                 # Format: division[TAB]division_value[TAB]latitude[TAB]longitude
                 f_latlong.write(f"division\t{division}\t{latitude}\t{longitude}\n")
 
-        print(f"Generated {lat_long_output}")
+        log.info(f"Generated {lat_long_output}")
 
         # Print summary of generated files
-        print("\n=== SUMMARY ===")
-        print("All output files have been generated in: " + output_dir + "/")
-        print(f"✓ {os.path.basename(metadata_output)} - Metadata file for Nextstrain")
-        print(
+        log.info("\n=== SUMMARY ===")
+        log.info("All output files have been generated in: " + output_dir + "/")
+        log.info(f"✓ {os.path.basename(metadata_output)} - Metadata file for Nextstrain")
+        log.info(
             f"✓ {os.path.basename(sequences_output)} - Concatenated consensus sequences"
         )
-        print(f"✓ {os.path.basename(lat_long_output)} - Geographic coordinates data")
+        log.info(f"✓ {os.path.basename(lat_long_output)} - Geographic coordinates data")
 
     except Exception as e:
-        print(f"Error writing output file: {e}")
+        message = f"Error writing output file: {e}"
+        log.error(message)
         sys.exit(1)
 
 
