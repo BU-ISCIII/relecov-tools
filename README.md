@@ -23,6 +23,7 @@ relecov-tools is a set of helper tools for the assembly of the different element
       - [send-mail](#send-mail)
       - [read-bioinfo-metadata](#read-bioinfo-metadata)
         - [Configuration of module `read-bioinfo-metadata`](#configuration-of-module-read-bioinfo-metadata)
+      - [metadata-precheck](#metadata-precheck)
       - [validate](#validate)
       - [map](#map)
       - [upload-to-ena](#upload-to-ena)
@@ -132,6 +133,7 @@ Commands:
   upload-to-gisaid       parsed data to create files to upload to gisaid
   update-db              upload the information included in json file to...
   read-bioinfo-metadata  Create the json compliant from the Bioinfo...
+  metadata-precheck      Scan metadata excels in the SFTP before download.
   metadata-homogeneizer  Parse institution metadata lab to the one used...
   pipeline-manager       Create the symbolic links for the samples which...
   build-schema           Generates and updates JSON Schema files from...
@@ -270,6 +272,45 @@ Options:
 - Note: Software-specific configurations are available in [bioinfo_config.json](./relecov_tools/conf/bioinfo_config.json).
 
 ##### Configuration of module `read-bioinfo-metadata`
+
+#### metadata-precheck
+
+Use this module at the very beginning of the SFTP workflow to inspect every metadata Excel uploaded by the labs before launching the heavy download/processing steps. It reads the files in place (without deleting them), verifies that the template columns are present, and performs a deep JSON-schema validation on each row so you immediately know which lab/sample must be corrected.
+
+```
+$ relecov-tools metadata-precheck --help
+Usage: relecov-tools metadata-precheck [OPTIONS]
+
+  Inspect remote metadata Excels and report missing required data.
+
+Options:
+  -u, --user TEXT             User name for login to sftp server.
+  -p, --password TEXT         Password for the user to login.
+  -f, --conf_file TEXT        Configuration file (not params file). If omitted,
+                              default values are taken from configuration.json and
+                              extra_config.json.
+  -o, --output_dir TEXT       Directory where logs and reports will be saved. Falls
+                              back to the default logs path when not provided.
+  -t, --target_folders TEXT   Target remote folders. Accepts a JSON-like list
+                              (e.g. ["LAB001/batch1","LAB002"]). Use "ALL" to open an
+                              interactive selector or leave empty to scan every folder.
+  --export-excel / --no-export-excel
+                              Generate an Excel summary alongside the JSON report.
+                              Disabled by default.
+  --help                      Show this message and exit.
+```
+
+**Highlights**
+
+- Recursively scans the SFTP tree (skipping folders tagged as `_invalid_samples`) and only downloads metadata `.xlsx` files to a temporary location for validation.
+- Checks Excel structure (headers, duplicated samples, missing IDs) and runs the same JSON-schema validation used by `validate`, including enum/type/anyOf rules.
+- Outputs per-lab/per-file reports under the selected `output_dir`, including:
+  - `<timestamp>_metadata_precheck.log` + `*_log_summary.json`.
+  - `metadata_precheck_report_<batch>_<hex>.json` with the list of labs, files, number of samples per status, and detailed invalid samples/errors.
+  - Optional Excel summary when `--export-excel` is enabled.
+- Prints a Rich table summarising, per lab, the number of valid/invalid files, samples, invalid samples, and the top validation issues so you can spot problems at a glance.
+
+Run this module before `download`/`wrapper` to ensure the labs fix their metadata first; once the report is clean, `validate` should succeed on the first try.
 
 The [`bioinfo_config.json`](relecov_tools/conf/bioinfo_config.json) file is a configuration file used by the `read-bioinfo-metadata` module. Its purpose is to specify **which files to search for** and **how to extract relevant information** from a folder containing bioinformatics results. With this configuration, the module identifies parameters and results for each sample and returns them in a standardized JSON format.
 
