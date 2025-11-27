@@ -20,53 +20,72 @@ stderr = rich.console.Console(
 )
 
 
-def schema_to_flatten_json(json_data):
-    """This function flattens schema when nested items are found"""
+def schema_to_flatten_json(json_data, required_properties=None):
+    """Return the schema flattened to a list while keeping parent metadata."""
     try:
-        flatten_json = {}
+        required_set = set(required_properties or [])
+        flatten_rows = []
         for property_id, features in json_data.items():
             try:
-                if features.get("type") == "array":
-                    complex_properties = json_data[property_id]["items"].get(
-                        "properties"
-                    )
+                is_complex_array = (
+                    isinstance(features, dict)
+                    and features.get("type") == "array"
+                    and features.get("items", {}).get("type") == "object"
+                )
+                if is_complex_array:
+                    complex_properties = features.get("items", {}).get("properties", {})
+                    complex_required = set(features.get("required", []))
                     for (
                         complex_property_id,
                         complex_feature,
                     ) in complex_properties.items():
-                        flatten_json.update({complex_property_id: complex_feature})
+                        row = dict(complex_feature)
+                        row["property_id"] = f"{property_id}.{complex_property_id}"
+                        row["field_id"] = complex_property_id
+                        row["parent_property_id"] = property_id
+                        row["parent_label"] = features.get("label", "")
+                        row["parent_classification"] = features.get(
+                            "classification", ""
+                        )
+                        row["is_required"] = complex_property_id in complex_required
+                        flatten_rows.append(row)
                 else:
-                    flatten_json.update({property_id: features})
+                    row = dict(features)
+                    row["property_id"] = property_id
+                    row["field_id"] = property_id
+                    row["parent_property_id"] = None
+                    row["parent_label"] = ""
+                    row["parent_classification"] = ""
+                    row["is_required"] = property_id in required_set
+                    flatten_rows.append(row)
             except Exception as e:
                 stderr.print(f"[red]Error processing property {property_id}: {e}")
-        return flatten_json
+        return flatten_rows
     except Exception as e:
         stderr.print(f"[red]Error in schema_to_flatten_json: {e}")
-        return None
+        return []
 
 
 def schema_properties_to_df(json_data):
     try:
-        # Initialize an empty list to store the rows of the DataFrame
-        rows = []
+        if json_data is None:
+            return pd.DataFrame()
+        if isinstance(json_data, dict):
+            rows = []
+            for property_id, property_features in json_data.items():
+                try:
+                    row = {"property_id": property_id}
+                    row.update(property_features)
+                    rows.append(row)
+                except Exception as e:
+                    stderr.print(f"[red]Error processing property {property_id}: {e}")
+            return pd.DataFrame(rows)
 
-        # Iterate over each property in the JSON data
-        for property_id, property_features in json_data.items():
-            try:
-                # Create a dictionary to hold the property features
-                row = {"property_id": property_id}
-                row.update(property_features)
+        if isinstance(json_data, list):
+            return pd.DataFrame(json_data)
 
-                # Append the row to the list of rows
-                rows.append(row)
-            except Exception as e:
-                stderr.print(f"[red]Error processing property {property_id}: {e}")
-
-        # Create a DataFrame from the list of rows
-        df = pd.DataFrame(rows)
-
-        # Return the DataFrame
-        return df
+        stderr.print("[yellow]schema_properties_to_df received unsupported data.")
+        return pd.DataFrame()
     except Exception as e:
         stderr.print(f"[red]Error in schema_properties_to_df: {e}")
         return None

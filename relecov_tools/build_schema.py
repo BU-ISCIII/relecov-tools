@@ -111,8 +111,10 @@ class BuildSchema(BaseModule):
 
         # Config params
         config_build_schema = ConfigJson(self.build_schema_json_file)
-        config_data = config_build_schema.get_configuration("projects")
-        self.configurables = config_data.get("configurables", {})
+        config_data = config_build_schema.get_configuration("projects") or {}
+        self.configurables = (
+            config_build_schema.get_configuration("configurables") or {}
+        )
         config_json = ConfigJson()
 
         if self.project in available_projects:
@@ -177,6 +179,7 @@ class BuildSchema(BaseModule):
                 "[green]RELECOV schema successfully found in the configuration."
             )
 
+            # TODO: What if no previous template exist?
             if excel_template:
                 self.excel_template = excel_template
             else:
@@ -184,6 +187,7 @@ class BuildSchema(BaseModule):
                     excel_template_path = os.path.join(
                         os.path.dirname(os.path.realpath(__file__)), "assets"
                     )
+                    # FIXME: filenames should inherit project name.
                     excel_template = [
                         f
                         for f in os.listdir(excel_template_path)
@@ -810,7 +814,16 @@ class BuildSchema(BaseModule):
                 self.log.warning(
                     f"Error reading previous VERSION sheet: {e}. Setting 1.0.0 as default."
                 )
-                version_history = "1.0.0"
+                version_history = pd.DataFrame(
+                    [
+                        {
+                            "FILE_VERSION": "Relecov_metadata_template_v1.0.0",
+                            "CODE": "1.0.0",
+                            "NOTES CONTROL": "Initial version",
+                            "DATE": datetime.now().strftime("%Y-%m-%d"),
+                        }
+                    ]
+                )
 
             next_version = self.version
             version_info = {
@@ -829,7 +842,7 @@ class BuildSchema(BaseModule):
             # ------------------------------------------------------------------ #
             # 2.  Schema filtering and dataframe preparation
             # ------------------------------------------------------------------ #
-            required_classification = [
+            default_classification_filter = [
                 "Database Identifiers",
                 "Sample collection and processing",
                 "Host information",
@@ -839,21 +852,33 @@ class BuildSchema(BaseModule):
                 "Public databases",
                 "Bioinformatics and QC metrics fields",
             ]
-            required_properties = json_schema.get("required")
+            required_properties = set(json_schema.get("required", []))
             schema_properties = json_schema.get("properties")
 
             try:
                 schema_properties_flatten = relecov_tools.assets.schema_utils.metadatalab_template.schema_to_flatten_json(
-                    schema_properties
+                    schema_properties, required_properties
                 )
                 df = relecov_tools.assets.schema_utils.metadatalab_template.schema_properties_to_df(
                     schema_properties_flatten
                 )
 
-                df = df[df["classification"].isin(required_classification)]
-                df["required"] = df["property_id"].apply(
-                    lambda x: "Y" if x in required_properties else "N"
+                classification_overrides = self.configurables.get(
+                    "classification_filters", {}
                 )
+                classification_filter = classification_overrides.get(
+                    self.project, default_classification_filter
+                )
+                if classification_filter and "classification" in df.columns:
+                    df = df[df["classification"].isin(classification_filter)]
+                if "is_required" in df.columns:
+                    df["required"] = df["is_required"].apply(
+                        lambda value: "Y" if bool(value) else "N"
+                    )
+                else:
+                    df["required"] = df["property_id"].apply(
+                        lambda x: "Y" if x in required_properties else "N"
+                    )
 
                 def clean_ontologies(enums):
                     return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
