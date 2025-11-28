@@ -64,16 +64,19 @@ def schema_to_flatten_json(json_data, required_properties=None):
                     flatten_rows.append(row)
             except Exception as e:
                 stderr.print(f"[red]Error processing property {property_id}: {e}")
+                log.error(f"Error processing property {property_id}, {e}")
+                raise
         return flatten_rows
     except Exception as e:
         stderr.print(f"[red]Error in schema_to_flatten_json: {e}")
-        return []
+        log.error(f"Error in schema_to_flatten_json: {e}")
+        raise
 
 
 def schema_properties_to_df(json_data):
     try:
-        if json_data is None:
-            return pd.DataFrame()
+        if not json_data:
+            raise ValueError("schema_properties_to_df received None or empty data")
         if isinstance(json_data, dict):
             rows = []
             for property_id, property_features in json_data.items():
@@ -82,17 +85,17 @@ def schema_properties_to_df(json_data):
                     row.update(property_features)
                     rows.append(row)
                 except Exception as e:
+                    log.error(f"Error processing property {property_id}: {e}")
                     stderr.print(f"[red]Error processing property {property_id}: {e}")
             return pd.DataFrame(rows)
 
         if isinstance(json_data, list):
             return pd.DataFrame(json_data)
-
-        stderr.print("[yellow]schema_properties_to_df received unsupported data.")
-        return pd.DataFrame()
+        raise TypeError("schema_properties_to_df received unsupported data")
     except Exception as e:
+        log.error(f"Error in schema_properties_to_df: {e}")
         stderr.print(f"[red]Error in schema_properties_to_df: {e}")
-        return None
+        raise
 
 
 def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=True):
