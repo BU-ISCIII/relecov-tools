@@ -483,6 +483,7 @@ class BuildSchema(BaseModule):
             json_dict (dict): The complex JSON Schema object.
         """
         json_dict = {"type": "object", "properties": {}}
+        required_fields = []
 
         # Read tab-dedicated sheet in excell database
         try:
@@ -505,6 +506,15 @@ class BuildSchema(BaseModule):
                 if feature_schema:
                     complex_json_feature[json_key] = feature_schema[db_feature_key]
             json_dict["properties"][sub_property_id] = complex_json_feature
+
+            required_flag = str(
+                complex_json_data[sub_property_id].get("required (Y/N)", "")
+            ).strip()
+            if required_flag.upper() == "Y":
+                required_fields.append(sub_property_id)
+
+        if required_fields:
+            json_dict["required"] = required_fields
 
         return json_dict
 
@@ -575,9 +585,6 @@ class BuildSchema(BaseModule):
                         schema_property["type"] = "array"
                         schema_property["items"] = complex_json_feature
                         schema_property["additionalProperties"] = False
-                        schema_property["required"] = [
-                            key for key in complex_json_feature["properties"].keys()
-                        ]
                 # For those that follows standard format, add them to json schema as well.
                 else:
                     for db_feature_key, schema_feature_key in mapping_features.items():
