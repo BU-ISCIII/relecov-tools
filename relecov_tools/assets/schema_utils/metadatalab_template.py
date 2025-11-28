@@ -33,8 +33,12 @@ def schema_to_flatten_json(json_data, required_properties=None):
                     and features.get("items", {}).get("type") == "object"
                 )
                 if is_complex_array:
-                    complex_properties = features.get("items", {}).get("properties", {})
-                    complex_required = set(features.get("required", []))
+                    items_schema = features.get("items", {})
+                    complex_properties = items_schema.get("properties", {})
+                    required_list = items_schema.get(
+                        "required", features.get("required", [])
+                    )
+                    complex_required = set(required_list)
                     for (
                         complex_property_id,
                         complex_feature,
