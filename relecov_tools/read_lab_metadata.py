@@ -205,6 +205,7 @@ class LabMetadata(BaseModule):
     }
 
     def _deep_merge_dicts(self, base: dict | None, override: dict | None) -> dict:
+        """Return a copy of `base` with any override keys merged recursively."""
         base = copy.deepcopy(base) if isinstance(base, dict) else {}
         if not override:
             return base
@@ -221,6 +222,7 @@ class LabMetadata(BaseModule):
     def _load_project_config(
         self, base_config: dict, project: str, default_project: str | None = None
     ) -> dict:
+        """Merge base read_lab_metadata configuration with the requested project."""
         if not isinstance(base_config, dict):
             return {}
         project_map = {
@@ -242,6 +244,7 @@ class LabMetadata(BaseModule):
         return merged
 
     def _build_schema_field_map(self) -> dict[str, SchemaField]:
+        """Create a lookup for every schema property label/path, including arrays."""
         mapping: dict[str, SchemaField] = {}
 
         def _walk(properties: dict, parent_path: tuple[str, ...] = ()):
@@ -278,6 +281,7 @@ class LabMetadata(BaseModule):
         return mapping
 
     def _build_header_alias_index(self, alias_map: dict) -> dict[str, set[str]]:
+        """Index canonical headers to all aliases (plus themselves) for fast lookup."""
         lookup: dict[str, set[str]] = {}
         for alias, canonical in alias_map.items():
             if not isinstance(alias, str) or not isinstance(canonical, str):
@@ -288,12 +292,14 @@ class LabMetadata(BaseModule):
         return lookup
 
     def _normalize_header(self, header):
+        """Return alias-normalised header or original if no mapping exists."""
         if not isinstance(header, str):
             return header
         header = header.strip()
         return self.alt_heading_equivalences.get(header, header)
 
     def _get_row_value(self, row: dict, label: str):
+        """Fetch row value checking canonical header name first, then aliases."""
         if label in row:
             return row[label]
         for candidate in self.header_alias_lookup.get(label, []):
@@ -303,6 +309,7 @@ class LabMetadata(BaseModule):
 
     @staticmethod
     def _finalize_array_items(array_data: dict[str, dict]) -> dict[str, list[dict]]:
+        """Convert temporary dict values into schema-compliant array entries."""
         finalized = {}
         for array_name, values in array_data.items():
             cleaned = {k: v for k, v in values.items() if v not in (None, "")}
@@ -311,6 +318,7 @@ class LabMetadata(BaseModule):
         return finalized
 
     def _set_if_allowed(self, row: dict, key: str, value):
+        """Assign metadata value only if the schema exposes that property."""
         if key in self.schema_property_names:
             row[key] = value
 
