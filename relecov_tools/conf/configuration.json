@@ -94,6 +94,9 @@
         "sample_name_regex": "(?P<sample>.+?)(?:[_\\. -]R?[12]|[_\\. -]read[12]|[_\\. -][12])?(?:_L\\d{3})?(?:_\\d{3})?(?:\\.(?:f(?:ast)?q(?:\\.gz)?|bam|cram))$"
     },
     "read_lab_metadata": {
+        "default_project": "relecov",
+        "schema_file": "relecov_schema.json",
+        "unique_sample_id": "sequencing_sample_id",
         "fixed_fields": {
             "study_type": "Whole Genome Sequencing",
             "collector_name": "Not Provided [SNOMED:434941000124101]"
@@ -259,7 +262,28 @@
             "sequence_file_path_R1",
             "sequence_file_path_R2",
             "batch_id"
-        ]
+        ],
+        "projects": {
+            "mepram": {
+                "schema_file": "mepram_schema.json",
+                "unique_sample_id": "sequencing_sample_id",
+                "metadata_processing": {
+                    "sample_id_col": "Isolate ID given for sequencing",
+                    "header_flag": "CAMPO",
+                    "excel_sheet": "METADATA_LAB",
+                    "alternative_sheet": "METADATA_LAB",
+                    "alternative_flag": "CAMPO",
+                    "alternative_sample_id_col": "Isolate ID given for sequencing"
+                },
+                "fixed_fields": {
+                    "project_name": "mepram"
+                },
+                "alt_heading_equivalences": {
+                    "Samples ID for sequencing": "Isolate ID given for sequencing",
+                    "Sample ID given for sequencing": "Isolate ID given for sequencing"
+                }
+            }
+        }
     },
     "upload_to_gisaid": {
         "gisaid_csv_headers": [
