@@ -378,8 +378,17 @@ def download(
     type=click.Path(),
     help="Path to folder where samples files are located",
 )
+@click.option(
+    "-p",
+    "--project",
+    default="relecov",
+    type=str,
+    help="Project configuration key defined under read_lab_metadata.projects",
+)
 @click.pass_context
-def read_lab_metadata(ctx, metadata_file, sample_list_file, output_dir, files_folder):
+def read_lab_metadata(
+    ctx, metadata_file, sample_list_file, output_dir, files_folder, project
+):
     """
     Create the json compliant to the relecov schema from the Metadata file.
     """
