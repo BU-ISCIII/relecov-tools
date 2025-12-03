@@ -47,7 +47,9 @@ def validate_nested_fields(rows):
         raise AssertionError("Unexpected sequencing_sample_id in first row")
 
     organism = first_row.get("organism")
-    if not (isinstance(organism, list) and organism[0]["species"] == "Klebsiella pneumoniae"):
+    if not (
+        isinstance(organism, list) and organism[0]["species"] == "Klebsiella pneumoniae"
+    ):
         raise AssertionError("Organism entry not parsed as expected")
 
     typing = first_row.get("typing")
@@ -57,7 +59,10 @@ def validate_nested_fields(rows):
         raise AssertionError("Typing value mismatch")
 
     amr_detection = first_row.get("amr_detection")
-    if not (isinstance(amr_detection, list) and amr_detection[0]["amr_detection_method"].lower() == "sanger"):
+    if not (
+        isinstance(amr_detection, list)
+        and amr_detection[0]["amr_detection_method"].lower() == "sanger"
+    ):
         raise AssertionError("AMR detection block not parsed as expected")
 
     mic = first_row.get("MIC")
