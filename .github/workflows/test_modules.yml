@@ -65,6 +65,7 @@ jobs:
       matrix:
         modules: 
         - "read-lab-metadata"
+        - "read-lab-metadata-mepram"
         - "read-bioinfo-metadata"
         - "validate"
         - "build-schema"
@@ -93,6 +94,15 @@ jobs:
         relecov-tools read-lab-metadata \
           -m tests/data/read_lab_metadata/metadata_lab_test.xlsx \
           -s tests/data/read_lab_metadata/samples_data_test.json \
+          -o $OUTPUT_LOCATION
+
+    - name: Run read-lab-metadata module (MePRAM)
+      if: matrix.modules == 'read-lab-metadata-mepram'
+      run: |
+        relecov-tools read-lab-metadata \
+          -m tests/data/read_lab_metadata/mepram_metadata_lab_test.xlsx \
+          -s tests/data/read_lab_metadata/mepram_samples_data_test.json \
+          -p mepram \
           -o $OUTPUT_LOCATION
 
     - name: Run read-bioinfo-metadata module
