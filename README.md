@@ -211,6 +211,7 @@ Options:
   -s, --sample_list_file PATH  Json with the additional metadata to add to the received user metadata
   -o, --output_dir, TEXT       Directory where the generated output will be saved
   -f, --files_folder PATH      Path to folder where samples files are located
+  -p, --project TEXT           Project key defined under read_lab_metadata.projects (e.g. `mepram`). If omitted, the default project from configuration.json is used.
   --help                       Show this message and exit.
 ```
 
