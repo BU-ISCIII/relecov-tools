@@ -103,17 +103,15 @@ class LabMetadata(BaseModule):
         self.readmeta_config = (
             self.configuration.get_configuration("read_lab_metadata") or {}
         )
-        default_project = (
-            self.readmeta_config.get("default_project") or "relecov"
-        )
+        default_project = self.readmeta_config.get("default_project") or "relecov"
         self.project = (project or default_project).lower()
         self.project_config = self._load_project_config(
             self.readmeta_config, self.project, default_project
         )
         self.log.info("Using project configuration '%s'", self.project)
-        schema_file = self.project_config.get("schema_file") or self.config_json.get_topic_data(
-            "generic", "relecov_schema"
-        )
+        schema_file = self.project_config.get(
+            "schema_file"
+        ) or self.config_json.get_topic_data("generic", "relecov_schema")
         relecov_sch_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "schema", schema_file
         )
@@ -156,15 +154,13 @@ class LabMetadata(BaseModule):
         base_metadata_processing = (
             self.config_json.get_topic_data("sftp_handle", "metadata_processing") or {}
         )
-        project_metadata_processing = self.project_config.get(
-            "metadata_processing", {}
-        ) or {}
+        project_metadata_processing = (
+            self.project_config.get("metadata_processing", {}) or {}
+        )
         self.metadata_processing = self._deep_merge_dicts(
             base_metadata_processing, project_metadata_processing
         )
-        self.samples_json_fields = self.project_config.get(
-            "samples_json_fields", []
-        )
+        self.samples_json_fields = self.project_config.get("samples_json_fields", [])
         if not self.samples_json_fields:
             self.samples_json_fields = self.config_json.get_topic_data(
                 "read_lab_metadata", "samples_json_fields"
@@ -210,10 +206,7 @@ class LabMetadata(BaseModule):
         if not override:
             return base
         for key, value in override.items():
-            if (
-                isinstance(value, dict)
-                and isinstance(base.get(key), dict)
-            ):
+            if isinstance(value, dict) and isinstance(base.get(key), dict):
                 base[key] = self._deep_merge_dicts(base.get(key), value)
             else:
                 base[key] = value
@@ -257,7 +250,9 @@ class LabMetadata(BaseModule):
                     prop_type == "array"
                     and conf.get("items", {}).get("type") == "object"
                 ):
-                    for child, child_conf in conf["items"].get("properties", {}).items():
+                    for child, child_conf in (
+                        conf["items"].get("properties", {}).items()
+                    ):
                         child_label = child_conf.get("label")
                         descriptor = SchemaField(
                             path=current_path + (child,),
@@ -617,7 +612,9 @@ class LabMetadata(BaseModule):
         col_label = prop_conf.get("label", map_field)
         json_data = json_fields["j_data"]
         allowed_fields = [
-            field for field in json_fields["adding_fields"] if field in self.schema_property_names
+            field
+            for field in json_fields["adding_fields"]
+            if field in self.schema_property_names
         ]
 
         # ─── counters for the summary ─────────────────────────────────────────
@@ -859,14 +856,14 @@ class LabMetadata(BaseModule):
                 if isinstance(canonical_key, str):
                     descriptor = self.schema_field_map.get(canonical_key)
                     if descriptor is None:
-                        descriptor = self.schema_field_map.get(
-                            canonical_key.strip()
-                        )
+                        descriptor = self.schema_field_map.get(canonical_key.strip())
 
                 value = raw_value
 
-                if value is None or value == "" or (
-                    isinstance(value, str) and "not provided" in value.lower()
+                if (
+                    value is None
+                    or value == ""
+                    or (isinstance(value, str) and "not provided" in value.lower())
                 ):
                     log_text = f"{raw_key} not provided for sample {sample_id}"
                     self.logsum.add_warning(sample=sample_id, entry=log_text)
@@ -880,7 +877,9 @@ class LabMetadata(BaseModule):
                 schema_type = (
                     descriptor.schema_type
                     if descriptor
-                    else self.schema_properties.get(schema_key, {}).get("type", "string")
+                    else self.schema_properties.get(schema_key, {}).get(
+                        "type", "string"
+                    )
                 )
                 try:
                     value = relecov_tools.utils.cast_value_to_schema_type(
@@ -918,7 +917,10 @@ class LabMetadata(BaseModule):
                             self.logsum.add_error(sample=sample_id, entry=log_text)
                             stderr.print(f"[red]{log_text} for sample {sample_id}")
                             continue
-                elif isinstance(key_for_checks, str) and "sample id" in key_for_checks.lower():
+                elif (
+                    isinstance(key_for_checks, str)
+                    and "sample id" in key_for_checks.lower()
+                ):
                     if isinstance(raw_value, (float, int)):
                         value = str(int(raw_value))
                 elif isinstance(raw_value, (float, int)) and not isinstance(value, str):
