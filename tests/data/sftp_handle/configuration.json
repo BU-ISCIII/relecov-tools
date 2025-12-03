@@ -96,15 +96,15 @@
             "collector_name": "Not Provided [SNOMED:434941000124101]"
         },
         "organism_mapping": {
-            "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]": {
+            "Severe acute respiratory syndrome coronavirus 2": {
                 "tax_id": "2697049",
                 "host_disease": "COVID-19 [SNOMED:840539006]"
             },
-            "Respiratory syncytial virus [SNOMED:6415009]": {
+            "Respiratory syncytial virus": {
                 "tax_id": "1281",
                 "host_disease": "Respiratory Syncytial Virus Infection [SNOMED:55735004]"
             },
-            "Influenza virus [SNOMED:725894000]": {
+            "Influenza virus": {
                 "tax_id": "11320",
                 "host_disease": "Influenza Infection [SNOMED:408687004]"
             }
