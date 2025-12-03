@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Fixes
 
+- Fix download module compression handling (log summary report) and remove legacy organism ontology mappings [#831](https://github.com/BU-ISCIII/relecov-tools/pull/831).
+
 #### Changed
 
 #### Removed
