@@ -9,6 +9,8 @@ from datetime import datetime as dtime
 
 import rich.console
 
+import relecov_tools.assets.schema_utils.jsonschema_draft
+
 import relecov_tools.utils
 from relecov_tools.base_module import BaseModule
 from relecov_tools.config_json import ConfigJson
