@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added metadata_nextstrain_parser.py to pipeline_utils [#822](https://github.com/BU-ISCIII/relecov-tools/pull/822).
 - Adapt schema builder Excel generation to nested/complex fields [#826](https://github.com/BU-ISCIII/relecov-tools/pull/826).
+- Add support of complex fields parsing to read_lab_metadata [#832](https://github.com/BU-ISCIII/relecov-tools/pull/832).
 
 #### Fixes
 
