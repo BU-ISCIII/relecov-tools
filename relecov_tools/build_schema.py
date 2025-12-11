@@ -255,6 +255,8 @@ class BuildSchema(BaseModule):
     def validate_database_definition(self, json_data):
         """Validate the mandatory features and ensure:
         - No duplicate enum values in the JSON schema.
+        - All fields have an example.
+        - All examples should have the same type as JSON schema.
         - Date formats follow 'YYYY-MM-DD'.
 
         Args:
@@ -263,11 +265,14 @@ class BuildSchema(BaseModule):
         Returns:
             dict: A dictionary containing errors found, categorized by:
                 - Missing features
+                - Missing examples
                 - Duplicate enums
+                - Invalid example types
                 - Incorrect date formats
         """
         log_errors = {
             "missing_features": {},
+            "missing_examples": {},
             "duplicate_enums": {},
             "invalid_example_types": {},
             "invalid_date_formats": {},
@@ -308,25 +313,37 @@ class BuildSchema(BaseModule):
                             if enum_values.count(value) > 1
                         ]
                         log_errors["duplicate_enums"][prop_name] = duplicates
-
-            # Check date format for properties with type=string and format=date
-            if (
-                prop_features["type"] == "string"
-                and prop_features.get("format") == "date"
-            ):
-                example = prop_features.get("examples")
-                if example:
-                    if isinstance(example, datetime):
-                        example = example.strftime("%Y-%m-%d")
-                    if isinstance(example, str):
-                        try:
-                            datetime.strptime(example, "%Y-%m-%d")
-                        except ValueError:
-                            if prop_name not in log_errors["invalid_date_formats"]:
-                                log_errors["invalid_date_formats"][prop_name] = []
-                            log_errors["invalid_date_formats"][prop_name].append(
-                                f"Invalid date format '{example}', expected 'YYYY-MM-DD'"
-                            )
+            
+            # Check for missing examples
+            example = prop_features.get("examples")
+            if not example:
+                log_errors["missing_examples"][prop_name] = [f"Missing example."]
+            
+            feature_type = prop_features["type"]
+            match feature_type:
+                # Check date format for properties with type=string and format=date
+                case "string":
+                    if prop_features.get("format") == "date":
+                        if isinstance(example, datetime):
+                            example = example.strftime("%Y-%m-%d")
+                        if isinstance(example, str):
+                            try:
+                                datetime.strptime(example, "%Y-%m-%d")
+                            except ValueError:
+                                if prop_name not in log_errors["invalid_date_formats"]:
+                                    log_errors["invalid_date_formats"][prop_name] = []
+                                log_errors["invalid_date_formats"][prop_name].append(
+                                    f"Invalid date format '{example}', expected 'YYYY-MM-DD'"
+                                )
+                
+                case "integer" | "number":
+                    function_to_convert = float if feature_type == "number" else int
+                    try:
+                        example = function_to_convert(example)
+                    except ValueError:
+                        log_errors["invalid_example_types"][prop_name] = [
+                            f"Value {example} is not a valid {feature_type}"
+                        ]
 
         # return log errors if any
         if any(log_errors.values()):
