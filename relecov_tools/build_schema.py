@@ -480,9 +480,19 @@ class BuildSchema(BaseModule):
                 items = value.split("; ")
                 if remove_ontology and target_key == "enum":
                     items = [re.sub(r"\s*\[.*?\]", "", item).strip() for item in items]
-                json_dict[target_key] = items if target_key == "enum" else [value]
+                # Examples for integer/number fields should be consistent.
+                try:
+                    items = [float(x) for x in items]
+                    items  = [int(x) if x.is_integer() else x for x in items]
+                except ValueError:
+                    pass
+                json_dict[target_key] = items
         elif target_key == "description":
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
+            json_dict[target_key] = json_dict[target_key].strip()
+            if (not json_dict[target_key].endswith(".") 
+                and not json_dict["description"].endswith(")")):
+                json_dict[target_key] = f"{json_dict['target_key']}."
         else:
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
         return json_dict
