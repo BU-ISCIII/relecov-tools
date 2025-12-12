@@ -29,8 +29,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Requirements
 
 - Updated GitHub action: `python_lint` now uses Python 3.10 [#839](https://github.com/BU-ISCIII/relecov-tools/issues/839)
-## [1.7.3] - 2025-11-24 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.3>
 - Updated `README.md`: Python requirements now correctly display Python>=3.10 [#839](https://github.com/BU-ISCIII/relecov-tools/issues/839)
+
+## [1.7.3] - 2025-11-24 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.3>
 
 ### Credits
 
