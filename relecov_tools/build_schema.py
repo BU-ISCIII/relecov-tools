@@ -909,6 +909,7 @@ class BuildSchema(BaseModule):
             ]
             required_properties = set(json_schema.get("required", []))
             schema_properties = json_schema.get("properties")
+            enum_defs = json_schema.get("$defs", {}).get("enums", {})
 
             try:
                 schema_properties_flatten = relecov_tools.assets.schema_utils.metadatalab_template.schema_to_flatten_json(
@@ -938,13 +939,13 @@ class BuildSchema(BaseModule):
                 def clean_ontologies(enums):
                     return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
 
-                df["enum"] = df["enum"].apply(
-                    lambda enum_list: (
-                        clean_ontologies(enum_list)
-                        if isinstance(enum_list, list)
-                        else enum_list
-                    )
-                )
+                def resolve_enum_ref(ref: str, enum_defs: dict) -> list[str]:
+                    property_id = ref.split("/")[-1]
+                    values = enum_defs[property_id]['enum']
+                    return clean_ontologies(values) if isinstance(values, list) else values
+
+                df["enum"] = df["$ref"].apply(lambda row: resolve_enum_ref(row, enum_defs=enum_defs) if not pd.isna(row) else row)
+                
                 common_dropdown = self._lab_dropdowns["collecting_institution"]
 
                 lab_fields = [
