@@ -480,12 +480,6 @@ class BuildSchema(BaseModule):
                 items = value.split("; ")
                 if remove_ontology and target_key == "enum":
                     items = [re.sub(r"\s*\[.*?\]", "", item).strip() for item in items]
-                # Examples for integer/number fields should be consistent.
-                try:
-                    items = [float(x) for x in items]
-                    items = [int(x) if x.is_integer() else x for x in items]
-                except ValueError:
-                    pass
                 json_dict[target_key] = items
         elif target_key == "description":
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
@@ -493,7 +487,7 @@ class BuildSchema(BaseModule):
             if not json_dict[target_key].endswith(".") and not json_dict[
                 "description"
             ].endswith(")"):
-                json_dict[target_key] = f"{json_dict['target_key']}."
+                json_dict[target_key] = f"{json_dict[target_key]}."
         else:
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
         return json_dict
@@ -665,6 +659,20 @@ class BuildSchema(BaseModule):
                                 definitions["enums"][property_id] = enums_value
                                 reference = {"$ref": f"#/$defs/enums/{property_id}"}
                                 schema_property.update(reference)
+                        elif db_feature_key == "examples":
+                            examples_value = self.standard_jsonschema_object(
+                                db_features_dic, db_feature_key, remove_ontology=False
+                            )
+                            if db_features_dic["type"] != "string":
+                                # Examples for integer/number fields should be consistent.
+                                try:
+                                    examples_value[db_feature_key] = [float(x) for x in examples_value[db_feature_key]]
+                                    examples_value[db_feature_key] = [int(x) if x.is_integer() else x for x in examples_value[db_feature_key]]
+                                except ValueError:
+                                    pass
+                            schema_property[schema_feature_key] = examples_value[
+                                db_feature_key
+                            ]
                         else:
                             std_json_feature = self.standard_jsonschema_object(
                                 db_features_dic, db_feature_key, remove_ontology=False
