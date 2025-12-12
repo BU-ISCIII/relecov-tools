@@ -313,12 +313,12 @@ class BuildSchema(BaseModule):
                             if enum_values.count(value) > 1
                         ]
                         log_errors["duplicate_enums"][prop_name] = duplicates
-            
+
             # Check for missing examples
             example = prop_features.get("examples")
             if example is None:
-                log_errors["missing_examples"][prop_name] = [f"Missing example."]
-            
+                log_errors["missing_examples"][prop_name] = ["Missing example."]
+
             feature_type = prop_features["type"]
             match feature_type:
                 # Check date format for properties with type=string and format=date
@@ -335,7 +335,7 @@ class BuildSchema(BaseModule):
                                 log_errors["invalid_date_formats"][prop_name].append(
                                     f"Invalid date format '{example}', expected 'YYYY-MM-DD'"
                                 )
-                
+
                 case "integer" | "number":
                     function_to_convert = float if feature_type == "number" else int
                     try:
@@ -483,15 +483,16 @@ class BuildSchema(BaseModule):
                 # Examples for integer/number fields should be consistent.
                 try:
                     items = [float(x) for x in items]
-                    items  = [int(x) if x.is_integer() else x for x in items]
+                    items = [int(x) if x.is_integer() else x for x in items]
                 except ValueError:
                     pass
                 json_dict[target_key] = items
         elif target_key == "description":
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
             json_dict[target_key] = json_dict[target_key].strip()
-            if (not json_dict[target_key].endswith(".") 
-                and not json_dict["description"].endswith(")")):
+            if not json_dict[target_key].endswith(".") and not json_dict[
+                "description"
+            ].endswith(")"):
                 json_dict[target_key] = f"{json_dict['target_key']}."
         else:
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
@@ -589,9 +590,7 @@ class BuildSchema(BaseModule):
             common_lab_enum = "; ".join(self._lab_uniques["collecting_institution"])
 
             # Define definitions property. This will hold all $refs for the properties.
-            definitions = {
-                "enums": {}
-            }
+            definitions = {"enums": {}}
 
             # Read property_ids in the database.
             #   Perform checks and create (for each property) feature object like:
@@ -606,9 +605,7 @@ class BuildSchema(BaseModule):
                     "submitting_institution",
                     "sequencing_institution",
                 ):
-                    definitions["enums"][property_id] = {
-                        "enum": common_lab_enum
-                    }
+                    definitions["enums"][property_id] = {"enum": common_lab_enum}
 
                 # Parse property_ids that needs to be incorporated as complex fields in json_schema
                 if json_data[property_id].get("complex_field (Y/N)") == "Y":
@@ -666,9 +663,7 @@ class BuildSchema(BaseModule):
                             )
                             if enums_value:
                                 definitions["enums"][property_id] = enums_value
-                                reference = {
-                                    "$ref": f"#/$defs/enums/{property_id}"
-                                }
+                                reference = {"$ref": f"#/$defs/enums/{property_id}"}
                                 schema_property.update(reference)
                         else:
                             std_json_feature = self.standard_jsonschema_object(
