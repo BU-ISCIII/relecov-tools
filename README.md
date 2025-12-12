@@ -45,7 +45,7 @@ relecov-tools is a set of helper tools for the assembly of the different element
 
 These tools require
 
-- Python > 3.8
+- Python >= 3.10
 - [7-Zip](https://www.7-zip.org/) (via the `p7zip` package) to handle compressed files. Please make sure it is installed before running the code.
 
 #### Install 7-Zip on Linux
