@@ -666,8 +666,13 @@ class BuildSchema(BaseModule):
                             if db_features_dic["type"] != "string":
                                 # Examples for integer/number fields should be consistent.
                                 try:
-                                    examples_value[db_feature_key] = [float(x) for x in examples_value[db_feature_key]]
-                                    examples_value[db_feature_key] = [int(x) if x.is_integer() else x for x in examples_value[db_feature_key]]
+                                    examples_value[db_feature_key] = [
+                                        float(x) for x in examples_value[db_feature_key]
+                                    ]
+                                    examples_value[db_feature_key] = [
+                                        int(x) if x.is_integer() else x
+                                        for x in examples_value[db_feature_key]
+                                    ]
                                 except ValueError:
                                     pass
                             schema_property[schema_feature_key] = examples_value[
@@ -941,11 +946,19 @@ class BuildSchema(BaseModule):
 
                 def resolve_enum_ref(ref: str, enum_defs: dict) -> list[str]:
                     property_id = ref.split("/")[-1]
-                    values = enum_defs[property_id]['enum']
-                    return clean_ontologies(values) if isinstance(values, list) else values
+                    values = enum_defs[property_id]["enum"]
+                    return (
+                        clean_ontologies(values) if isinstance(values, list) else values
+                    )
 
-                df["enum"] = df["$ref"].apply(lambda row: resolve_enum_ref(row, enum_defs=enum_defs) if not pd.isna(row) else row)
-                
+                df["enum"] = df["$ref"].apply(
+                    lambda row: (
+                        resolve_enum_ref(row, enum_defs=enum_defs)
+                        if not pd.isna(row)
+                        else row
+                    )
+                )
+
                 common_dropdown = self._lab_dropdowns["collecting_institution"]
 
                 lab_fields = [
