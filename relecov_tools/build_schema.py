@@ -314,7 +314,6 @@ class BuildSchema(BaseModule):
                         ]
                         log_errors["duplicate_enums"][prop_name] = duplicates
 
-            
             # Check for missing examples
             example = prop_features.get("examples")
             if example is None:
@@ -481,10 +480,12 @@ class BuildSchema(BaseModule):
                 items = value.split("; ")
                 if remove_ontology and target_key == "enum":
                     items = [re.sub(r"\s*\[.*?\]", "", item).strip() for item in items]
+                json_dict[target_key] = items
         elif target_key == "description":
             json_dict[target_key] = handle_nan(data_dict.get(target_key, "")).strip()
-            if (not json_dict[target_key].endswith(".") 
-                and not json_dict["description"].endswith(")")):
+            if not json_dict[target_key].endswith(".") and not json_dict[
+                "description"
+            ].endswith(")"):
                 json_dict[target_key] = f"{json_dict[target_key]}."
         else:
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
@@ -582,9 +583,7 @@ class BuildSchema(BaseModule):
             common_lab_enum = "; ".join(self._lab_uniques["collecting_institution"])
 
             # Define "$defs" property. This will hold all enum values for all the properties.
-            definitions = {
-                "enums": {}
-            }
+            definitions = {"enums": {}}
 
             # Read property_ids in the database.
             #   Perform checks and create (for each property) feature object like:
@@ -599,9 +598,7 @@ class BuildSchema(BaseModule):
                     "submitting_institution",
                     "sequencing_institution",
                 ):
-                    definitions["enums"][property_id] = {
-                        "enum": common_lab_enum
-                    }
+                    definitions["enums"][property_id] = {"enum": common_lab_enum}
 
                 # Parse property_ids that needs to be incorporated as complex fields in json_schema
                 if json_data[property_id].get("complex_field (Y/N)") == "Y":
@@ -659,9 +656,7 @@ class BuildSchema(BaseModule):
                             )
                             if enums_value:
                                 definitions["enums"][property_id] = enums_value
-                                reference = {
-                                    "$ref": f"#/$defs/enums/{property_id}"
-                                }
+                                reference = {"$ref": f"#/$defs/enums/{property_id}"}
                                 schema_property.update(reference)
                         elif db_feature_key == "examples":
                             examples_value = self.standard_jsonschema_object(
@@ -670,8 +665,13 @@ class BuildSchema(BaseModule):
                             if db_features_dic["type"] in ("integer", "number"):
                                 # Examples for integer/number fields should be consistent.
                                 try:
-                                    examples_value[db_feature_key] = [float(x) for x in examples_value[db_feature_key]]
-                                    examples_value[db_feature_key] = [int(x) if x.is_integer() else x for x in examples_value[db_feature_key]]
+                                    examples_value[db_feature_key] = [
+                                        float(x) for x in examples_value[db_feature_key]
+                                    ]
+                                    examples_value[db_feature_key] = [
+                                        int(x) if x.is_integer() else x
+                                        for x in examples_value[db_feature_key]
+                                    ]
                                 except ValueError:
                                     pass
                             schema_property[schema_feature_key] = examples_value[
@@ -913,6 +913,7 @@ class BuildSchema(BaseModule):
             ]
             required_properties = set(json_schema.get("required", []))
             schema_properties = json_schema.get("properties")
+            enum_defs = json_schema.get("$defs", {}).get("enums", {})
 
             try:
                 schema_properties_flatten = relecov_tools.assets.schema_utils.metadatalab_template.schema_to_flatten_json(
@@ -942,11 +943,18 @@ class BuildSchema(BaseModule):
                 def clean_ontologies(enums):
                     return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
 
-                df["enum"] = df["enum"].apply(
-                    lambda enum_list: (
-                        clean_ontologies(enum_list)
-                        if isinstance(enum_list, list)
-                        else enum_list
+                def resolve_enum_ref(ref: str, enum_defs: dict) -> list[str]:
+                    property_id = ref.split("/")[-1]
+                    values = enum_defs[property_id]["enum"]
+                    return (
+                        clean_ontologies(values) if isinstance(values, list) else values
+                    )
+
+                df["enum"] = df["$ref"].apply(
+                    lambda row: (
+                        resolve_enum_ref(row, enum_defs=enum_defs)
+                        if not pd.isna(row)
+                        else row
                     )
                 )
                 common_dropdown = self._lab_dropdowns["collecting_institution"]
