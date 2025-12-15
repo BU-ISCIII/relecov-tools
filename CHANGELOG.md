@@ -4,13 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.7.4dev] - 2025-XX-XX : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.4dev>
+## [1.7.4] - 2025-12-15 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.4>
 
 ### Credits
 
 - [Victor Lopez](https://github.com/victor5lm)
 - [Daniel Valle](https://github.com/Daniel-VM)
 - [Enrique Sapena](https://github.com/ESapenaVentura)
+- [Alejandro Bernabeu](https://github.com/aberdur)
 
 #### Added enhancements
 
