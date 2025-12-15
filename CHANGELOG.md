@@ -17,10 +17,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added metadata_nextstrain_parser.py to pipeline_utils [#822](https://github.com/BU-ISCIII/relecov-tools/pull/822).
 - Adapt schema builder Excel generation to nested/complex fields [#826](https://github.com/BU-ISCIII/relecov-tools/pull/826).
 - Add support of complex fields parsing to read_lab_metadata [#832](https://github.com/BU-ISCIII/relecov-tools/pull/832).
+- Added handling of $refs for enums and typo fixing/style formatting for build_schema module [#838](https://github.com/BU-ISCIII/relecov-tools/pull/838)
 
 #### Fixes
 
 - Fix download module compression handling (log summary report) and remove legacy organism ontology mappings [#831](https://github.com/BU-ISCIII/relecov-tools/pull/831).
+- Fix small bug on type/examples consistency for float/integer fields in JSON schema generation (build_schema module) [#838](https://github.com/BU-ISCIII/relecov-tools/pull/838)
 
 #### Changed
 
