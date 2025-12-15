@@ -317,7 +317,7 @@ class BuildSchema(BaseModule):
             # Check for missing examples
             example = prop_features.get("examples")
             if example is None:
-                log_errors["missing_examples"][prop_name] = [f"Missing example."]
+                log_errors["missing_examples"][prop_name] = ["Missing example."]
 
             feature_type = prop_features["type"]
             match feature_type:
