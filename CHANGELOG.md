@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.5dev] - 2025-XX-XX : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.5dev>
+
+### Credits
+
+- [Enrique Sapena](https://github.com/ESapenaVentura)
+
+#### Added enhancements
+
+- Added handling of $refs for enums and typo fixing/style formatting for build_schema module [#844](https://github.com/BU-ISCIII/relecov-tools/pull/844)
+
+#### Fixes
+
+- Fix small bug on type/examples consistency for float/integer fields in JSON schema generation (build_schema module) [#844](https://github.com/BU-ISCIII/relecov-tools/pull/844)
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [1.7.4] - 2025-12-15 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.4>
 
 ### Credits
