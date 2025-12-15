@@ -111,8 +111,10 @@ class BuildSchema(BaseModule):
 
         # Config params
         config_build_schema = ConfigJson(self.build_schema_json_file)
-        config_data = config_build_schema.get_configuration("projects")
-        self.configurables = config_data.get("configurables", {})
+        config_data = config_build_schema.get_configuration("projects") or {}
+        self.configurables = (
+            config_build_schema.get_configuration("configurables") or {}
+        )
         config_json = ConfigJson()
 
         if self.project in available_projects:
@@ -177,6 +179,7 @@ class BuildSchema(BaseModule):
                 "[green]RELECOV schema successfully found in the configuration."
             )
 
+            # TODO: What if no previous template exist?
             if excel_template:
                 self.excel_template = excel_template
             else:
@@ -184,6 +187,7 @@ class BuildSchema(BaseModule):
                     excel_template_path = os.path.join(
                         os.path.dirname(os.path.realpath(__file__)), "assets"
                     )
+                    # FIXME: filenames should inherit project name.
                     excel_template = [
                         f
                         for f in os.listdir(excel_template_path)
@@ -479,6 +483,7 @@ class BuildSchema(BaseModule):
             json_dict (dict): The complex JSON Schema object.
         """
         json_dict = {"type": "object", "properties": {}}
+        required_fields = []
 
         # Read tab-dedicated sheet in excell database
         try:
@@ -501,6 +506,15 @@ class BuildSchema(BaseModule):
                 if feature_schema:
                     complex_json_feature[json_key] = feature_schema[db_feature_key]
             json_dict["properties"][sub_property_id] = complex_json_feature
+
+            required_flag = str(
+                complex_json_data[sub_property_id].get("required (Y/N)", "")
+            ).strip()
+            if required_flag.upper() == "Y":
+                required_fields.append(sub_property_id)
+
+        if required_fields:
+            json_dict["required"] = required_fields
 
         return json_dict
 
@@ -571,9 +585,6 @@ class BuildSchema(BaseModule):
                         schema_property["type"] = "array"
                         schema_property["items"] = complex_json_feature
                         schema_property["additionalProperties"] = False
-                        schema_property["required"] = [
-                            key for key in complex_json_feature["properties"].keys()
-                        ]
                 # For those that follows standard format, add them to json schema as well.
                 else:
                     for db_feature_key, schema_feature_key in mapping_features.items():
@@ -810,7 +821,16 @@ class BuildSchema(BaseModule):
                 self.log.warning(
                     f"Error reading previous VERSION sheet: {e}. Setting 1.0.0 as default."
                 )
-                version_history = "1.0.0"
+                version_history = pd.DataFrame(
+                    [
+                        {
+                            "FILE_VERSION": "Relecov_metadata_template_v1.0.0",
+                            "CODE": "1.0.0",
+                            "NOTES CONTROL": "Initial version",
+                            "DATE": datetime.now().strftime("%Y-%m-%d"),
+                        }
+                    ]
+                )
 
             next_version = self.version
             version_info = {
@@ -829,7 +849,7 @@ class BuildSchema(BaseModule):
             # ------------------------------------------------------------------ #
             # 2.  Schema filtering and dataframe preparation
             # ------------------------------------------------------------------ #
-            required_classification = [
+            default_classification_filter = [
                 "Database Identifiers",
                 "Sample collection and processing",
                 "Host information",
@@ -839,21 +859,33 @@ class BuildSchema(BaseModule):
                 "Public databases",
                 "Bioinformatics and QC metrics fields",
             ]
-            required_properties = json_schema.get("required")
+            required_properties = set(json_schema.get("required", []))
             schema_properties = json_schema.get("properties")
 
             try:
                 schema_properties_flatten = relecov_tools.assets.schema_utils.metadatalab_template.schema_to_flatten_json(
-                    schema_properties
+                    schema_properties, required_properties
                 )
                 df = relecov_tools.assets.schema_utils.metadatalab_template.schema_properties_to_df(
                     schema_properties_flatten
                 )
 
-                df = df[df["classification"].isin(required_classification)]
-                df["required"] = df["property_id"].apply(
-                    lambda x: "Y" if x in required_properties else "N"
+                classification_overrides = self.configurables.get(
+                    "classification_filters", {}
                 )
+                classification_filter = classification_overrides.get(
+                    self.project, default_classification_filter
+                )
+                if classification_filter and "classification" in df.columns:
+                    df = df[df["classification"].isin(classification_filter)]
+                if "is_required" in df.columns:
+                    df["required"] = df["is_required"].apply(
+                        lambda value: "Y" if bool(value) else "N"
+                    )
+                else:
+                    df["required"] = df["property_id"].apply(
+                        lambda x: "Y" if x in required_properties else "N"
+                    )
 
                 def clean_ontologies(enums):
                     return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]

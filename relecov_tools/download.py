@@ -700,21 +700,31 @@ class Download(BaseModule):
             mismatch_files = [fi for fi in filtered_files_list if fi not in set_list]
             mismatch_rev = [fi for fi in set_list if fi not in filtered_files_list]
 
-            if mismatch_files:
-                error_text1 = "Files in folder missing in metadata: %s"
-                self.include_warning(error_text1 % str(mismatch_files))
-                # --- Group R1/R2 or chunks under a single Sample ID ---
-                grouped = collections.defaultdict(list)
-                for f in mismatch_files:
-                    m = self.sample_regex.match(f)
-                    grouped[m.group("sample") if m else f].append(f)
+            # Normalise to ignore gzip-only differences
+            compression_only = {
+                (f[:-3] if f.endswith(".gz") else f) for f in filtered_files_list
+            } == {(f[:-3] if f.endswith(".gz") else f) for f in metafiles_list}
 
-                miss_text = "Sample present in folder but missing in metadata"
-                for sample_id in grouped:
-                    self.include_error(sample=sample_id, entry=miss_text)
-            if mismatch_rev:
-                error_text2 = "Files in metadata missing in folder: %s"
-                self.include_warning(error_text2 % str(mismatch_rev))
+            if not compression_only:
+                if mismatch_files:
+                    error_text1 = "Files in folder missing in metadata: %s"
+                    self.include_warning(error_text1 % str(mismatch_files))
+                    # --- Group R1/R2 or chunks under a single Sample ID ---
+                    grouped = collections.defaultdict(list)
+                    for f in mismatch_files:
+                        m = self.sample_regex.match(f)
+                        grouped[m.group("sample") if m else f].append(f)
+
+                    miss_text = "Sample present in folder but missing in metadata"
+                    for sample_id in grouped:
+                        self.include_error(sample=sample_id, entry=miss_text)
+                if mismatch_rev:
+                    error_text2 = "Files in metadata missing in folder: %s"
+                    self.include_warning(error_text2 % str(mismatch_rev))
+            else:
+                self.log.info(
+                    "Metadata filenames match remote once gzip extension is ignored."
+                )
             # Try to check if the metadata filename lacks the proper extension
             self.log.info("Trying to match files without proper file extension")
             sample_files_dict = self.process_filedict(
@@ -743,9 +753,23 @@ class Download(BaseModule):
         else:
             files_to_remove = files
         for file in files_to_remove:
-            if skip_seqs and file.endswith(tuple(self.allowed_file_ext)):
+            basename = os.path.basename(file)
+            if skip_seqs and basename.endswith(tuple(self.allowed_file_ext)):
                 continue
-            matched_path = file_paths.get(os.path.basename(file))
+
+            # Try to match both compressed/uncompressed names when deleting
+            candidates = [basename]
+            if basename.endswith(".gz"):
+                candidates.append(basename[:-3])
+            else:
+                candidates.append(f"{basename}.gz")
+
+            matched_path = None
+            for cand in candidates:
+                matched_path = file_paths.get(cand)
+                if matched_path:
+                    break
+
             if matched_path:
                 try:
                     self.relecov_sftp.remove_file(matched_path)
@@ -1266,6 +1290,7 @@ class Download(BaseModule):
         processed_dict = {}
         error_text = "corrupted or md5 mismatch for %s"
         warning_text = "File %s not found in md5sum. Creating hash"
+
         for sample, vals in valid_filedict.items():
             processed_dict[sample] = {}
             for key, val in vals.items():
@@ -1273,7 +1298,21 @@ class Download(BaseModule):
                     self.include_error(error_text % val, sample=sample)
                 if val in md5miss:
                     self.include_warning(warning_text % val, sample=sample)
-                if not val or not any(val in file for file in clean_fetchlist):
+                if not val:
+                    processed_dict[sample][key] = val
+                    continue
+
+                matched_file = None
+                base_val = val[:-3] if val.endswith(".gz") else val
+                for file in clean_fetchlist:
+                    base_file = file[:-3] if file.endswith(".gz") else file
+                    if val in file or base_val == base_file:
+                        matched_file = file
+                        break
+
+                if matched_file:
+                    processed_dict[sample][key] = matched_file
+                else:
                     err = f"File in metadata {val} does not match any file in sftp"
                     folder_logs = self.logsum.logs.get(self.current_folder, {})
                     if err not in folder_logs.get("samples", {}).get(sample, {}).get(
@@ -1281,9 +1320,6 @@ class Download(BaseModule):
                     ):
                         self.include_error(err, sample)
                     processed_dict[sample][key] = val
-                for file in clean_fetchlist:
-                    if val and val in file:
-                        processed_dict[sample][key] = file
         return processed_dict
 
     def _cleanup_remote_locks(self, parent: str = "."):

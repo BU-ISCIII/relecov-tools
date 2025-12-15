@@ -45,7 +45,7 @@ relecov-tools is a set of helper tools for the assembly of the different element
 
 These tools require
 
-- Python > 3.8
+- Python >= 3.10
 - [7-Zip](https://www.7-zip.org/) (via the `p7zip` package) to handle compressed files. Please make sure it is installed before running the code.
 
 #### Install 7-Zip on Linux
@@ -108,7 +108,7 @@ $ relecov-tools --help
 \    \  /   |__ / |__  |    |___ |    |   |  \    /
 /    /  \   |  \  |    |    |    |    |   |   \  /
 /    |--|   |   \ |___ |___ |___ |___ |___|    \/
-RELECOV-tools version 1.7.3
+RELECOV-tools version 1.7.4
 Usage: relecov-tools [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -211,6 +211,7 @@ Options:
   -s, --sample_list_file PATH  Json with the additional metadata to add to the received user metadata
   -o, --output_dir, TEXT       Directory where the generated output will be saved
   -f, --files_folder PATH      Path to folder where samples files are located
+  -p, --project TEXT           Project key defined under read_lab_metadata.projects (e.g. `mepram`). If omitted, the default project from configuration.json is used.
   --help                       Show this message and exit.
 ```
 

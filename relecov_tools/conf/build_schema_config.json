@@ -64,6 +64,19 @@
     },
     "configurables" : {
         "freeze_panel" : "E1",
-        "protection.password" : "password123"
+        "protection.password" : "password123",
+        "classification_filters": {
+            "relecov": [
+                "Database Identifiers",
+                "Sample collection and processing",
+                "Host information",
+                "Sequencing",
+                "Pathogen diagnostic testing",
+                "Contributor Acknowledgement",
+                "Public databases",
+                "Bioinformatics and QC metrics fields"
+            ],
+            "mepram": []
+        }
     }
 }

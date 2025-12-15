@@ -4,9 +4,10 @@
 # This script is run in order to organise data from the RELECOV analyses according to their corresponding epidemiological weeks and seasons.
 # By default, all data will be stored in a folder called surveillance_files.
 # Inside, the following items are stored:
-# - epidemiological_data.xlsx: an excel file containing lineage information for all the samples. This information is also aggregated in another sheet.
+# - epidemiological_data.xlsx: an excel file containing relevant information for all the samples. This information is also aggregated in another sheet (in the case of SARS data).
 # - variant_data.csv: a .csv file containing information regarding the variants identified for all the samples.
 # - consensus_files: a subfolder containing all the consensus.fa files obtained after the analysis of samples.
+# This data is generated separately for SARS and flu samples.
 
 # =============================================================
 
@@ -52,7 +53,11 @@ def process_json_files(
 ):
     os.makedirs(output_dir, exist_ok=True)
 
-    excel_file = os.path.join(output_dir, "epidemiological_data.xlsx")
+    # Root folders depending on the organism
+    sars_output_dir = os.path.join(output_dir, "SARS")
+    flu_output_dir = os.path.join(output_dir, "FLU")
+    os.makedirs(sars_output_dir, exist_ok=True)
+    os.makedirs(flu_output_dir, exist_ok=True)
 
     bioinfo_files = []
     if metadata_list:
@@ -81,10 +86,11 @@ def process_json_files(
             if filename.startswith("long_table_") and filename.endswith(".json")
         ]
 
-    all_data = []
+    all_data_sars = []
+    all_data_flu = []
     sample_variant_data = {}
-    season_fa_files = defaultdict(list)  # {season: [paths]}
-    season_variants = defaultdict(list)  # {season: [variant dicts]}
+    season_fa_files_sars = defaultdict(list)  # {season: [paths]}
+    season_variants_sars = defaultdict(list)  # {season: [variant dicts]}
 
     # Processing of bioinfo_lab_metadata_*.json
     for filepath in bioinfo_files:
@@ -106,8 +112,10 @@ def process_json_files(
 
                         analysis_date = sample.get("bioinformatics_analysis_date", "-")
 
-                        all_data.append(
-                            {
+                        organism = sample.get("organism", "").lower()
+
+                        if "influenza" in organism:
+                            sample_data = {
                                 "COLLECTING_LAB_SAMPLE_ID": sample.get(
                                     "collecting_lab_sample_id", "-"
                                 ),
@@ -116,7 +124,10 @@ def process_json_files(
                                 ),
                                 "WEEK": week,
                                 "SEASON": season,
-                                "LINEAGE": sample.get("lineage_assignment", "-"),
+                                "TYPE_ASSIGNMENT": sample.get("type_assignment", "-"),
+                                "SUBTYPE_ASSIGNMENT": sample.get(
+                                    "subtype_assignment", "-"
+                                ),
                                 "COVERAGE_10X": sample.get(
                                     "per_genome_greater_10x", "-"
                                 ),
@@ -132,18 +143,13 @@ def process_json_files(
                                 "CCAA": sample.get("geo_loc_state", "-"),
                                 "PROVINCE": sample.get("geo_loc_region", "-"),
                                 "ANALYSIS_DATE": analysis_date,
-                                "PANGOLIN_SOFTWARE_VERSION": sample.get(
-                                    "lineage_assignment_software_version", "-"
-                                ),
-                                "PANGOLIN_DATABASE_VERSION": sample.get(
-                                    "lineage_assignment_database_version", "-"
-                                ),
                                 "SEQUENCING_SAMPLE_ID": str(
                                     sample.get("sequencing_sample_id", "-")
                                 ),
                                 "MICROBIOLOGY_LAB_SAMPLE_ID": sample.get(
                                     "microbiology_lab_sample_id", "-"
                                 ),
+                                "UNIQUE_SAMPLE_ID": sample.get("unique_sample_id", "-"),
                                 "CONSENSUS_SEQUENCE_FILENAME": sample.get(
                                     "consensus_sequence_filename", "-"
                                 ),
@@ -152,19 +158,75 @@ def process_json_files(
                                 ),
                                 "QC_TEST": sample.get("qc_test", "-"),
                             }
-                        )
+                            all_data_flu.append(sample_data)
 
-                        # Search of consensus.fa files
-                        fa_path = sample.get("consensus_sequence_filepath")
-                        if copy_fasta and fa_path and os.path.exists(fa_path):
-                            season_fa_files[season].append(fa_path)
+                        elif (
+                            "severe acute respiratory syndrome coronavirus 2"
+                            in organism
+                        ):
+                            sample_data = {
+                                "COLLECTING_LAB_SAMPLE_ID": sample.get(
+                                    "collecting_lab_sample_id", "-"
+                                ),
+                                "SAMPLE_COLLECTION_DATE": sample.get(
+                                    "sample_collection_date", "-"
+                                ),
+                                "WEEK": week,
+                                "SEASON": season,
+                                "LINEAGE": sample.get("lineage_assignment", "-"),
+                                "PANGOLIN_SOFTWARE_VERSION": sample.get(
+                                    "lineage_assignment_software_version", "-"
+                                ),
+                                "PANGOLIN_DATABASE_VERSION": sample.get(
+                                    "lineage_assignment_database_version", "-"
+                                ),
+                                "COVERAGE_10X": sample.get(
+                                    "per_genome_greater_10x", "-"
+                                ),
+                                "COLLECTING_INSTITUTION": sample.get(
+                                    "collecting_institution", "-"
+                                ),
+                                "SUBMITTING_INSTITUTION": sample.get(
+                                    "submitting_institution", "-"
+                                ),
+                                "SUBMITTING_INSTITUTION_ID": sample.get(
+                                    "submitting_institution_id", "-"
+                                ),
+                                "CCAA": sample.get("geo_loc_state", "-"),
+                                "PROVINCE": sample.get("geo_loc_region", "-"),
+                                "ANALYSIS_DATE": analysis_date,
+                                "SEQUENCING_SAMPLE_ID": str(
+                                    sample.get("sequencing_sample_id", "-")
+                                ),
+                                "MICROBIOLOGY_LAB_SAMPLE_ID": sample.get(
+                                    "microbiology_lab_sample_id", "-"
+                                ),
+                                "UNIQUE_SAMPLE_ID": sample.get("unique_sample_id", "-"),
+                                "CONSENSUS_SEQUENCE_FILENAME": sample.get(
+                                    "consensus_sequence_filename", "-"
+                                ),
+                                "GISAID_ACCESSION_ID": sample.get(
+                                    "gisaid_accession_id", "-"
+                                ),
+                                "QC_TEST": sample.get("qc_test", "-"),
+                            }
+                            all_data_sars.append(sample_data)
+
+                            # Consensus files: only for SARS
+                            fa_path = sample.get("consensus_sequence_filepath")
+                            if copy_fasta and fa_path and os.path.exists(fa_path):
+                                season_fa_files_sars[season].append(fa_path)
+                        else:
+                            print(
+                                f"Organism '{organism}' not recognized for sample {sample.get('collecting_lab_sample_id')}"
+                            )
 
             except json.JSONDecodeError:
                 print(
                     f"Error! Could not read {filepath} properly, please make sure the file is not corrupt."
                 )
 
-    if not all_data:
+    if not all_data_sars and not all_data_flu:
         print("No bioinfo_lab_metadata_*.json files were found.")
         return
 
@@ -184,8 +246,8 @@ def process_json_files(
                     if sample_id:
                         sample_variant_data[sample_id] = sample
                         # Determination of the season for each sample
-                        for entry in all_data:
-                            if str(entry["CONSENSUS_SEQUENCE_FILENAME"]) == sample_id:
+                        for entry in all_data_sars:
+                            if str(entry["UNIQUE_SAMPLE_ID"]) == sample_id:
                                 season = entry["SEASON"]
                                 variant_entries = sample.get("variants", [])
                                 for variant in variant_entries:
@@ -194,9 +256,9 @@ def process_json_files(
                                     except ValueError:
                                         af = 0.0
                                     if af > 0.75:
-                                        if season not in season_variants:
-                                            season_variants[season] = []
-                                        season_variants[season].append(
+                                        if season not in season_variants_sars:
+                                            season_variants_sars[season] = []
+                                        season_variants_sars[season].append(
                                             {
                                                 "SAMPLE": variant.get("sample", "-"),
                                                 "CHROM": variant.get("chromosome", "-"),
@@ -229,64 +291,114 @@ def process_json_files(
         print("No long_table_*.json files were found.")
         return
 
-    df = pd.DataFrame(all_data)
+    if all_data_sars:
+        df_sars = pd.DataFrame(all_data_sars)
+        excel_file_sars = os.path.join(sars_output_dir, "epidemiological_data.xlsx")
 
-    # Handle consensus files
-    if copy_fasta:
-        for season, fa_paths in season_fa_files.items():
-            season_dir = os.path.join(output_dir, f"season_{season}")
-            season_consensus_dir = os.path.join(season_dir, "consensus_files")
-            os.makedirs(season_consensus_dir, exist_ok=True)
-            for fa_path in fa_paths:
-                dest_path = os.path.join(
-                    season_consensus_dir, os.path.basename(fa_path)
+        # Handle consensus files (SARS only)
+        if copy_fasta:
+            for season, fa_paths in season_fa_files_sars.items():
+                season_dir = os.path.join(sars_output_dir, f"season_{season}")
+                season_consensus_dir = os.path.join(season_dir, "consensus_files")
+                os.makedirs(season_consensus_dir, exist_ok=True)
+                for fa_path in fa_paths:
+                    dest_path = os.path.join(
+                        season_consensus_dir, os.path.basename(fa_path)
+                    )
+                    shutil.copy(fa_path, dest_path)
+                print(
+                    f"Copied {len(fa_paths)} consensus.fa files to {season_consensus_dir}"
                 )
-                shutil.copy(fa_path, dest_path)
-            print(
-                f"Copied {len(fa_paths)} consensus.fa files to {season_consensus_dir}"
+
+        # Handle Excel file (read existing if present) - SARS
+        existing_sample_ids_sars = set()
+        existing_df_sars = pd.DataFrame()
+
+        if os.path.exists(excel_file_sars):
+            with pd.ExcelFile(excel_file_sars) as reader:
+                existing_df_sars = reader.parse("per_sample_data", dtype=str)
+                existing_sample_ids_sars = set(existing_df_sars["SEQUENCING_SAMPLE_ID"])
+
+        # Only add new samples - SARS
+        new_samples_df_sars = df_sars[
+            ~df_sars["SEQUENCING_SAMPLE_ID"].astype(str).isin(existing_sample_ids_sars)
+        ]
+
+        if new_samples_df_sars.empty:
+            print("No new SARS samples found.")
+        else:
+            # Combine data - SARS
+            combined_samples_sars = pd.concat(
+                [existing_df_sars, new_samples_df_sars], ignore_index=True
             )
 
-    # Handle Excel file (read existing if present)
-    existing_sample_ids = set()
-    existing_df = pd.DataFrame()
+            # Recreate aggregated data from all samples - SARS
+            combined_agg_sars = (
+                combined_samples_sars.groupby("LINEAGE")
+                .size()
+                .reset_index(name="NUMBER_SAMPLES")
+            )
 
-    if os.path.exists(excel_file):
-        with pd.ExcelFile(excel_file) as reader:
-            existing_df = reader.parse("per_sample_data", dtype=str)
-            existing_sample_ids = set(existing_df["SEQUENCING_SAMPLE_ID"])
+            # Write to Excel file - SARS
+            with pd.ExcelWriter(excel_file_sars) as writer:
+                combined_samples_sars.to_excel(
+                    writer, sheet_name="per_sample_data", index=False
+                )
+                combined_agg_sars.to_excel(
+                    writer, sheet_name="aggregated_data", index=False
+                )
 
-    # Only add new samples
-    new_samples_df = df[
-        ~df["SEQUENCING_SAMPLE_ID"].astype(str).isin(existing_sample_ids)
-    ]
+            print(f"Excel file for SARS updated: {excel_file_sars}")
 
-    if new_samples_df.empty:
-        print("No new samples found. Skipping.")
-        return
+        # Write season-specific variant_data.csv files (SARS only)
+        for season, variant_rows in season_variants_sars.items():
+            season_dir = os.path.join(sars_output_dir, f"season_{season}")
+            os.makedirs(season_dir, exist_ok=True)
+            variant_csv_path = os.path.join(season_dir, "variant_data.csv")
+            df_variants = pd.DataFrame(variant_rows)
+            df_variants.to_csv(variant_csv_path, index=False)
+            print(
+                f"Written variant data for SARS season {season} to {variant_csv_path}"
+            )
+    else:
+        print("No SARS samples found.")
 
-    # Combine data
-    combined_samples = pd.concat([existing_df, new_samples_df], ignore_index=True)
+    # Flu data processing
+    if all_data_flu:
+        df_flu = pd.DataFrame(all_data_flu)
+        excel_file_flu = os.path.join(flu_output_dir, "epidemiological_data.xlsx")
 
-    # Recreate aggregated data from all samples
-    combined_agg = (
-        combined_samples.groupby("LINEAGE").size().reset_index(name="NUMBER_SAMPLES")
-    )
+        # Handle Excel file (read existing if present) - Flu
+        existing_sample_ids_flu = set()
+        existing_df_flu = pd.DataFrame()
 
-    # Write to Excel file
-    with pd.ExcelWriter(excel_file) as writer:
-        combined_samples.to_excel(writer, sheet_name="per_sample_data", index=False)
-        combined_agg.to_excel(writer, sheet_name="aggregated_data", index=False)
+        if os.path.exists(excel_file_flu):
+            with pd.ExcelFile(excel_file_flu) as reader:
+                existing_df_flu = reader.parse("per_sample_data", dtype=str)
+                existing_sample_ids_flu = set(existing_df_flu["SEQUENCING_SAMPLE_ID"])
 
-    print(f"Excel file updated: {excel_file}")
+        # Only add new samples - Flu
+        new_samples_df_flu = df_flu[
+            ~df_flu["SEQUENCING_SAMPLE_ID"].astype(str).isin(existing_sample_ids_flu)
+        ]
 
-    # Write season-specific variant_data.csv files
-    for season, variant_rows in season_variants.items():
-        season_dir = os.path.join(output_dir, f"season_{season}")
-        os.makedirs(season_dir, exist_ok=True)
-        variant_csv_path = os.path.join(season_dir, "variant_data.csv")
-        df = pd.DataFrame(variant_rows)
-        df.to_csv(variant_csv_path, index=False)
-        print(f"Written variant data for season {season} to {variant_csv_path}")
+        if new_samples_df_flu.empty:
+            print("No new Flu samples found.")
+        else:
+            # Combine data - Flu
+            combined_samples_flu = pd.concat(
+                [existing_df_flu, new_samples_df_flu], ignore_index=True
+            )
+
+            # Write to Excel file - Flu
+            with pd.ExcelWriter(excel_file_flu) as writer:
+                combined_samples_flu.to_excel(
+                    writer, sheet_name="per_sample_data", index=False
+                )
+
+            print(f"Excel file for Flu updated: {excel_file_flu}")
+    else:
+        print("No Flu samples found.")
 
 
 if __name__ == "__main__":

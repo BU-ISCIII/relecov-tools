@@ -1,12 +1,19 @@
 #!/usr/bin/env python
+import copy
 import json
-import rich.console
 import os
 import re
+from collections import defaultdict
+from dataclasses import dataclass
 from datetime import datetime as dtime
+
+import rich.console
+
+import relecov_tools.assets.schema_utils.jsonschema_draft
+
 import relecov_tools.utils
-from relecov_tools.config_json import ConfigJson
 from relecov_tools.base_module import BaseModule
+from relecov_tools.config_json import ConfigJson
 
 stderr = rich.console.Console(
     stderr=True,
@@ -16,6 +23,21 @@ stderr = rich.console.Console(
 )
 
 
+@dataclass
+class SchemaField:
+    path: tuple[str, ...]
+    schema_type: str = "string"
+    is_array_item: bool = False
+
+    @property
+    def top_level(self) -> str | None:
+        return self.path[0] if self.path else None
+
+    @property
+    def field_name(self) -> str | None:
+        return self.path[-1] if self.path else None
+
+
 class LabMetadata(BaseModule):
     def __init__(
         self,
@@ -23,6 +45,7 @@ class LabMetadata(BaseModule):
         sample_list_file=None,
         output_dir=None,
         files_folder=None,
+        project=None,
         **kwargs,
     ):
         super().__init__(output_dir=output_dir, called_module=__name__)
@@ -74,15 +97,25 @@ class LabMetadata(BaseModule):
             self.output_dir = output_dir
 
         self.config_json = ConfigJson(extra_config=True)
-
-        # TODO: remove hardcoded schema selection
-        relecov_schema = self.config_json.get_topic_data("generic", "relecov_schema")
-        relecov_sch_path = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "schema", relecov_schema
-        )
         self.configuration = self.config_json
         self.institution_config = self.config_json.get_configuration(
             "institutions_config"
+        )
+
+        self.readmeta_config = (
+            self.configuration.get_configuration("read_lab_metadata") or {}
+        )
+        default_project = self.readmeta_config.get("default_project") or "relecov"
+        self.project = (project or default_project).lower()
+        self.project_config = self._load_project_config(
+            self.readmeta_config, self.project, default_project
+        )
+        self.log.info("Using project configuration '%s'", self.project)
+        schema_file = self.project_config.get(
+            "schema_file"
+        ) or self.config_json.get_topic_data("generic", "relecov_schema")
+        relecov_sch_path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "schema", schema_file
         )
 
         out_path = os.path.realpath(self.output_dir)
@@ -103,30 +136,47 @@ class LabMetadata(BaseModule):
             stderr.print(f"[red]Error: JSON schema is not valid.\n{str(e)}")
             raise
 
-        self.label_prop_dict = {}
-
-        for prop, values in self.relecov_sch_json["properties"].items():
-            try:
-                self.label_prop_dict[values["label"]] = prop
-            except KeyError:
-                self.log.warning("Property %s does not have 'label' attribute", prop)
-                stderr.print(
-                    "[orange]Property " + prop + " does not have 'label' attribute"
-                )
-                continue
-        self.date = dtime.now().strftime("%Y%m%d%H%M%S")
-        self.json_req_files = self.config_json.get_topic_data(
-            "read_lab_metadata", "lab_metadata_req_json"
+        self.schema_properties = self.relecov_sch_json.get("properties", {})
+        self.schema_field_map = self._build_schema_field_map()
+        self.schema_property_names = set(self.schema_properties.keys())
+        self.not_provided_field = self.config_json.get_topic_data(
+            "generic", "not_provided_field"
         )
+        self.fixed_fields = self.project_config.get("fixed_fields", {}) or {}
+        self.organism_mapping = self.project_config.get("organism_mapping", {}) or {}
+        self.required_copy_fields = (
+            self.project_config.get("required_copy_from_other_field", {}) or {}
+        )
+        self.required_post_processing = (
+            self.project_config.get("required_post_processing", {}) or {}
+        )
+        self.json_req_files = self.project_config.get("lab_metadata_req_json", {}) or {}
         self.schema_name = self.relecov_sch_json["title"]
         self.schema_version = self.relecov_sch_json["version"]
-        self.metadata_processing = self.config_json.get_topic_data(
-            "sftp_handle", "metadata_processing"
+        base_metadata_processing = (
+            self.config_json.get_topic_data("sftp_handle", "metadata_processing") or {}
         )
-        self.samples_json_fields = self.config_json.get_topic_data(
-            "read_lab_metadata", "samples_json_fields"
+        project_metadata_processing = (
+            self.project_config.get("metadata_processing", {}) or {}
         )
-        self.unique_sample_id = "sequencing_sample_id"
+        self.metadata_processing = self._deep_merge_dicts(
+            base_metadata_processing, project_metadata_processing
+        )
+        self.samples_json_fields = self.project_config.get("samples_json_fields", [])
+        if not self.samples_json_fields:
+            self.samples_json_fields = self.config_json.get_topic_data(
+                "read_lab_metadata", "samples_json_fields"
+            )
+        self.unique_sample_id = self.project_config.get(
+            "unique_sample_id", "sequencing_sample_id"
+        )
+        self.alt_heading_equivalences = (
+            self.project_config.get("alt_heading_equivalences", {}) or {}
+        )
+        self.header_alias_lookup = self._build_header_alias_index(
+            self.alt_heading_equivalences
+        )
+        self.date = dtime.now().strftime("%Y%m%d%H%M%S")
 
     def _split_institution(self, raw: str) -> tuple[str, str]:
         """
@@ -151,6 +201,123 @@ class LabMetadata(BaseModule):
         "submitting_institution",
         "sequencing_institution",
     }
+
+    def _deep_merge_dicts(self, base: dict | None, override: dict | None) -> dict:
+        """Return a copy of `base` with any override keys merged recursively."""
+        base = copy.deepcopy(base) if isinstance(base, dict) else {}
+        if not override:
+            return base
+        for key, value in override.items():
+            if isinstance(value, dict) and isinstance(base.get(key), dict):
+                base[key] = self._deep_merge_dicts(base.get(key), value)
+            else:
+                base[key] = value
+        return base
+
+    def _load_project_config(
+        self, base_config: dict, project: str, default_project: str | None = None
+    ) -> dict:
+        """Merge base read_lab_metadata configuration with the requested project."""
+        if not isinstance(base_config, dict):
+            return {}
+        project_map = {
+            (key.lower() if isinstance(key, str) else key): value
+            for key, value in (base_config.get("projects") or {}).items()
+        }
+        overrides = project_map.get(project)
+        if (
+            overrides is None
+            and project_map
+            and (default_project or "relecov").lower() != project
+        ):
+            self.log.warning(
+                "Project '%s' not found in configuration. Using base settings", project
+            )
+        merged = self._deep_merge_dicts(base_config, overrides or {})
+        merged.pop("projects", None)
+        merged.pop("default_project", None)
+        return merged
+
+    def _build_schema_field_map(self) -> dict[str, SchemaField]:
+        """Create a lookup for every schema property label/path, including arrays."""
+        mapping: dict[str, SchemaField] = {}
+
+        def _walk(properties: dict, parent_path: tuple[str, ...] = ()):
+            """Walk through the schema properties recursively to build the mapping (it includes complex fields)"""
+            for prop, conf in properties.items():
+                current_path = parent_path + (prop,)
+                prop_type = conf.get("type", "string")
+                label = conf.get("label")
+                if (
+                    prop_type == "array"
+                    and conf.get("items", {}).get("type") == "object"
+                ):
+                    for child, child_conf in (
+                        conf["items"].get("properties", {}).items()
+                    ):
+                        child_label = child_conf.get("label")
+                        descriptor = SchemaField(
+                            path=current_path + (child,),
+                            schema_type=child_conf.get("type", "string"),
+                            is_array_item=True,
+                        )
+                        if child_label:
+                            mapping[child_label] = descriptor
+                        mapping[".".join((prop, child))] = descriptor
+                else:
+                    descriptor = SchemaField(
+                        path=current_path,
+                        schema_type=prop_type,
+                        is_array_item=False,
+                    )
+                    if label:
+                        mapping[label] = descriptor
+                    mapping[prop] = descriptor
+
+        _walk(self.relecov_sch_json.get("properties", {}))
+        return mapping
+
+    def _build_header_alias_index(self, alias_map: dict) -> dict[str, set[str]]:
+        """Index canonical headers to all aliases (plus themselves) for fast lookup."""
+        lookup: dict[str, set[str]] = {}
+        for alias, canonical in alias_map.items():
+            if not isinstance(alias, str) or not isinstance(canonical, str):
+                continue
+            lookup.setdefault(canonical, set()).add(alias)
+        for canonical in list(lookup.keys()):
+            lookup[canonical].add(canonical)
+        return lookup
+
+    def _normalize_header(self, header):
+        """Return alias-normalised header or original if no mapping exists."""
+        if not isinstance(header, str):
+            return header
+        header = header.strip()
+        return self.alt_heading_equivalences.get(header, header)
+
+    def _get_row_value(self, row: dict, label: str):
+        """Fetch row value checking canonical header name first, then aliases."""
+        if label in row:
+            return row[label]
+        for candidate in self.header_alias_lookup.get(label, []):
+            if candidate in row:
+                return row[candidate]
+        return row.get(label)
+
+    @staticmethod
+    def _finalize_array_items(array_data: dict[str, dict]) -> dict[str, list[dict]]:
+        """Convert temporary dict values into schema-compliant array entries."""
+        finalized = {}
+        for array_name, values in array_data.items():
+            cleaned = {k: v for k, v in values.items() if v not in (None, "")}
+            if cleaned:
+                finalized[array_name] = [cleaned]
+        return finalized
+
+    def _set_if_allowed(self, row: dict, key: str, value):
+        """Assign metadata value only if the schema exposes that property."""
+        if key in self.schema_property_names:
+            row[key] = value
 
     def get_samples_files_data(self, clean_metadata_rows):
         """Include the fields that would be included in samples_data.json
@@ -292,55 +459,64 @@ class LabMetadata(BaseModule):
 
     def adding_fixed_fields(self, m_data):
         """Include fixed data that are always the same for every sample"""
-        p_data = self.configuration.get_topic_data("read_lab_metadata", "fixed_fields")
-        organism_mapping = self.configuration.get_topic_data(
-            "read_lab_metadata", "organism_mapping"
-        )
-
         for idx in range(len(m_data)):
             organism = m_data[idx].get("organism", "")
-            if organism in organism_mapping:
-                m_data[idx]["tax_id"] = organism_mapping[organism]["tax_id"]
-                m_data[idx]["host_disease"] = organism_mapping[organism]["host_disease"]
+            if (
+                isinstance(organism, str)
+                and organism in self.organism_mapping
+                and "tax_id" in self.schema_property_names
+            ):
+                m_data[idx]["tax_id"] = self.organism_mapping[organism]["tax_id"]
+                if "host_disease" in self.schema_property_names:
+                    m_data[idx]["host_disease"] = self.organism_mapping[organism][
+                        "host_disease"
+                    ]
             else:
-                m_data[idx]["tax_id"] = "Missing [LOINC:LA14698-7]"
-                m_data[idx]["host_disease"] = "Missing [LOINC:LA14698-7]"
-            for key, value in p_data.items():
-                m_data[idx][key] = value
-            m_data[idx]["schema_name"] = self.schema_name
-            m_data[idx]["schema_version"] = self.schema_version
-            m_data[idx]["submitting_institution_id"] = self.lab_code
+                if "tax_id" in self.schema_property_names:
+                    m_data[idx]["tax_id"] = "Missing [LOINC:LA14698-7]"
+                if "host_disease" in self.schema_property_names:
+                    m_data[idx]["host_disease"] = "Missing [LOINC:LA14698-7]"
+            for key, value in self.fixed_fields.items():
+                self._set_if_allowed(m_data[idx], key, value)
+            if "schema_name" in self.schema_property_names:
+                m_data[idx]["schema_name"] = self.schema_name
+            if "schema_version" in self.schema_property_names:
+                m_data[idx]["schema_version"] = self.schema_version
+            if "submitting_institution_id" in self.schema_property_names:
+                m_data[idx]["submitting_institution_id"] = self.lab_code
         return m_data
 
     def adding_copy_from_other_field(self, m_data):
         """Add a new field with information based in another field."""
-        p_data = self.configuration.get_topic_data(
-            "read_lab_metadata", "required_copy_from_other_field"
-        )
         for idx in range(len(m_data)):
-            for key, value in p_data.items():
+            for key, value in self.required_copy_fields.items():
+                if key not in self.schema_property_names:
+                    continue
+                if value not in m_data[idx]:
+                    continue
                 m_data[idx][key] = m_data[idx][value]
         return m_data
 
     def adding_post_processing(self, m_data):
         """Add fields which values require post processing"""
-        p_data = self.configuration.get_topic_data(
-            "read_lab_metadata", "required_post_processing"
-        )
         for idx in range(len(m_data)):
-            for key, p_values in p_data.items():
+            for key, p_values in self.required_post_processing.items():
+                if key not in self.schema_property_names:
+                    continue
                 value = m_data[idx].get(key)
                 if not value:
                     continue
                 if value in p_values:
                     p_field, p_set = p_values[value].split("::")
-                    m_data[idx][p_field] = p_set
+                    if p_field in self.schema_property_names:
+                        m_data[idx][p_field] = p_set
                 else:
                     # Check if key p_values should match only part of the value
                     for reg_key, reg_value in p_values.items():
                         if reg_key in value:
                             p_field, p_set = reg_value.split("::")
-                            m_data[idx][p_field] = p_set
+                            if p_field in self.schema_property_names:
+                                m_data[idx][p_field] = p_set
 
         return m_data
 
@@ -429,8 +605,19 @@ class LabMetadata(BaseModule):
             Metadata with the new fields added.
         """
         map_field = json_fields["map_field"]
-        col_label = self.relecov_sch_json["properties"][map_field]["label"]
+        prop_conf = self.relecov_sch_json.get("properties", {}).get(map_field, {})
+        if not prop_conf:
+            self.log.warning(
+                "Map field '%s' not present in schema. Using fallback label.",
+                map_field,
+            )
+        col_label = prop_conf.get("label", map_field)
         json_data = json_fields["j_data"]
+        allowed_fields = [
+            field
+            for field in json_fields["adding_fields"]
+            if field in self.schema_property_names
+        ]
 
         # ─── counters for the summary ─────────────────────────────────────────
         empty_codes = []  # samples without value in map_field
@@ -453,12 +640,10 @@ class LabMetadata(BaseModule):
 
             # ─── 2. Attempt Mapping ────────────────────────────────────────────
             try:
-                adding_data = {
-                    k: v
-                    for k, v in json_data[code].items()
-                    if k in json_fields["adding_fields"]
-                }
-                row.update(adding_data)
+                for k, v in json_data[code].items():
+                    if k not in allowed_fields:
+                        continue
+                    row[k] = v
 
             except KeyError:
                 # Code present but does not exist in the auxiliary JSON
@@ -471,7 +656,7 @@ class LabMetadata(BaseModule):
                 continue
 
             # ─── 3. Fill Not Provided in the added fields ─────────────
-            for field in json_fields["adding_fields"]:
+            for field in allowed_fields:
                 if (
                     field not in row
                     or not row[field]
@@ -624,14 +809,14 @@ class LabMetadata(BaseModule):
         for row in ws_metadata_lab:
             row_number += 1
             property_row = {}
+            array_values = defaultdict(dict)
 
-            # ────────── 1. Validate sample_id ──────────
-            try:
-                sample_id = str(row[sample_id_col]).strip()
-            except KeyError:
+            sample_cell = self._get_row_value(row, sample_id_col)
+            if sample_cell is None:
                 self.logsum.add_error(entry=f"No {sample_id_col} found in excel file")
                 continue
 
+            sample_id = str(sample_cell).strip()
             if sample_id in included_sample_ids:
                 log_text = (
                     f"Skipped duplicated sample {sample_id} in row {row_number}. "
@@ -640,11 +825,14 @@ class LabMetadata(BaseModule):
                 self.logsum.add_warning(entry=log_text)
                 continue
 
-            if not row[sample_id_col] or "Not Provided" in sample_id:
-                if row.get("collecting_lab_sample_id"):
-                    sample_id = row["collecting_lab_sample_id"]
+            if not sample_cell or "Not Provided" in sample_id:
+                fallback_id = row.get("collecting_lab_sample_id") or row.get(
+                    "sequence_file_R1", ""
+                )
+                if isinstance(fallback_id, str):
+                    sample_id = fallback_id.split(".")[0]
                 else:
-                    sample_id = row.get("sequence_file_R1", "").split(".")[0]
+                    sample_id = str(fallback_id).split(".")[0]
                 if not sample_id:
                     log_text = (
                         f"{sample_id_col} not provided in row {row_number}. Skipped"
@@ -659,16 +847,102 @@ class LabMetadata(BaseModule):
 
             included_sample_ids.append(sample_id)
 
-            # ────────── 2. Process columns ──────────
-            for key in row.keys():
-                if header_flag in key:
+            for raw_key, raw_value in row.items():
+                if raw_key is None:
+                    continue
+                if header_flag and isinstance(raw_key, str) and header_flag in raw_key:
                     continue
 
-                schema_key = self.label_prop_dict.get(key, key)
-                value = row[key]
+                canonical_key = self._normalize_header(raw_key)
+                descriptor = None
+                if isinstance(canonical_key, str):
+                    descriptor = self.schema_field_map.get(canonical_key)
+                    if descriptor is None:
+                        descriptor = self.schema_field_map.get(canonical_key.strip())
 
-                # 2.1  Institution fields
-                if schema_key in self.INSTITUTION_FIELDS and value:
+                value = raw_value
+
+                if (
+                    value is None
+                    or value == ""
+                    or (isinstance(value, str) and "not provided" in value.lower())
+                ):
+                    log_text = f"{raw_key} not provided for sample {sample_id}"
+                    self.logsum.add_warning(sample=sample_id, entry=log_text)
+                    continue
+
+                schema_key = (
+                    descriptor.top_level
+                    if descriptor and descriptor.top_level
+                    else canonical_key
+                )
+                schema_type = (
+                    descriptor.schema_type
+                    if descriptor
+                    else self.schema_properties.get(schema_key, {}).get(
+                        "type", "string"
+                    )
+                )
+                try:
+                    value = relecov_tools.utils.cast_value_to_schema_type(
+                        value, schema_type
+                    )
+                except (ValueError, TypeError) as e:
+                    log_text = (
+                        f"Type conversion error for {raw_key} (expected {schema_type}): "
+                        f"{raw_value}. {e}"
+                    )
+                    self.logsum.add_error(sample=sample_id, entry=log_text)
+                    stderr.print(f"[red]{log_text}")
+                    continue
+
+                key_for_checks = (
+                    canonical_key if isinstance(canonical_key, str) else str(raw_key)
+                )
+                if isinstance(key_for_checks, str) and "date" in key_for_checks.lower():
+                    pattern = r"^\d{4}[-/.]\d{2}[-/.]\d{2}"
+                    if isinstance(raw_value, dtime):
+                        value = str(raw_value.date())
+                    elif re.match(pattern, str(raw_value)):
+                        value = re.match(
+                            pattern,
+                            str(raw_value).replace("/", "-").replace(".", "-"),
+                        ).group(0)
+                    else:
+                        try:
+                            value = str(int(float(str(raw_value))))
+                            self.log.info(
+                                "Date given as an integer. Understood as a year"
+                            )
+                        except (ValueError, TypeError):
+                            log_text = f"Invalid date format in {raw_key}: {raw_value}"
+                            self.logsum.add_error(sample=sample_id, entry=log_text)
+                            stderr.print(f"[red]{log_text} for sample {sample_id}")
+                            continue
+                elif (
+                    isinstance(key_for_checks, str)
+                    and "sample id" in key_for_checks.lower()
+                ):
+                    if isinstance(raw_value, (float, int)):
+                        value = str(int(raw_value))
+                elif isinstance(raw_value, (float, int)) and not isinstance(value, str):
+                    value = str(raw_value)
+
+                if (
+                    isinstance(key_for_checks, str)
+                    and "date" not in key_for_checks.lower()
+                    and isinstance(raw_value, dtime)
+                ):
+                    logtxt = f"Non-date field {raw_key} provided as date. Parsed as int"
+                    self.logsum.add_warning(sample=sample_id, entry=logtxt)
+                    value = str(relecov_tools.utils.excel_date_to_num(raw_value))
+
+                if (
+                    isinstance(schema_key, str)
+                    and schema_key in self.INSTITUTION_FIELDS
+                    and value
+                    and not (descriptor and descriptor.is_array_item)
+                ):
                     name, code = self._split_institution(str(value))
                     value = name
                     if schema_key == "collecting_institution":
@@ -680,63 +954,13 @@ class LabMetadata(BaseModule):
                                 entry="CCN not provided for collecting_institution",
                             )
 
-                # 2.2  Omit empty properties
-                if value is None or value == "" or "not provided" in str(value).lower():
-                    log_text = f"{key} not provided for sample {sample_id}"
-                    self.logsum.add_warning(sample=sample_id, entry=log_text)
+                if descriptor and descriptor.is_array_item:
+                    array_values[descriptor.top_level][descriptor.field_name] = value
                     continue
-
-                # 2.3  Cast to schema type
-                schema_type = (
-                    self.relecov_sch_json["properties"]
-                    .get(schema_key, {})
-                    .get("type", "string")
-                )
-                try:
-                    value = relecov_tools.utils.cast_value_to_schema_type(
-                        value, schema_type
-                    )
-                except (ValueError, TypeError) as e:
-                    log_text = (
-                        f"Type conversion error for {key} (expected {schema_type}): "
-                        f"{value}. {e}"
-                    )
-                    self.logsum.add_error(sample=sample_id, entry=log_text)
-                    stderr.print(f"[red]{log_text}")
-                    continue
-
-                # 2.4  Normalise dates and numbers
-                if "date" in key.lower():
-                    pattern = r"^\d{4}[-/.]\d{2}[-/.]\d{2}"
-                    if isinstance(row[key], dtime):
-                        value = str(row[key].date())
-                    elif re.match(pattern, str(row[key])):
-                        value = re.match(
-                            pattern, str(row[key]).replace("/", "-").replace(".", "-")
-                        ).group(0)
-                    else:
-                        try:
-                            value = str(int(float(str(row[key]))))
-                            self.log.info(
-                                "Date given as an integer. Understood as a year"
-                            )
-                        except (ValueError, TypeError):
-                            log_text = f"Invalid date format in {key}: {row[key]}"
-                            self.logsum.add_error(sample=sample_id, entry=log_text)
-                            stderr.print(f"[red]{log_text} for sample {sample_id}")
-                            continue
-                elif "sample id" in key.lower() and isinstance(row[key], (float, int)):
-                    value = str(int(row[key]))
-                elif isinstance(row[key], (float, int)):
-                    value = str(row[key])
-
-                if "date" not in key.lower() and isinstance(row[key], dtime):
-                    logtxt = f"Non-date field {key} provided as date. Parsed as int"
-                    self.logsum.add_warning(sample=sample_id, entry=logtxt)
-                    value = str(relecov_tools.utils.excel_date_to_num(row[key]))
 
                 property_row[schema_key] = value
 
+            property_row.update(self._finalize_array_items(array_values))
             valid_metadata_rows.append(property_row)
 
         return valid_metadata_rows

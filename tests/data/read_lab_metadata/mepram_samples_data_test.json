@@ -1,0 +1,47 @@
+{
+  "sample_good": {
+    "batch_id": "MEPRAM_BATCH_001",
+    "sequence_file_R1": "sample_good_R1.fastq.gz",
+    "sequence_file_R1_md5": "a1f3b0c47d9e8f1234567890abcdef12",
+    "sequence_file_R2": "sample_good_R2.fastq.gz",
+    "sequence_file_R2_md5": "b2e4c1d58e0f9a2345678901bcdefa23",
+    "sequence_file_path_R1": "tests/mepram/20250101",
+    "sequence_file_path_R2": "tests/mepram/20250101"
+  },
+  "sample_missing_required": {
+    "batch_id": "MEPRAM_BATCH_001",
+    "sequence_file_R1": "sample_missing_required_R1.fastq.gz",
+    "sequence_file_R1_md5": "c3f5d2e69f10ab3456789012cdefab34",
+    "sequence_file_R2": "sample_missing_required_R2.fastq.gz",
+    "sequence_file_R2_md5": "d4a6e3f7a021bc4567890123defabc45",
+    "sequence_file_path_R1": "tests/mepram/20250101",
+    "sequence_file_path_R2": "tests/mepram/20250101"
+  },
+  "sample_invalid_enum": {
+    "batch_id": "MEPRAM_BATCH_001",
+    "sequence_file_R1": "sample_invalid_enum_R1.fastq.gz",
+    "sequence_file_R1_md5": "e5b7f4a8b132cd5678901234efabcd56",
+    "sequence_file_R2": "sample_invalid_enum_R2.fastq.gz",
+    "sequence_file_R2_md5": "f6c805b9c243de6789012345fabcde67",
+    "sequence_file_path_R1": "tests/mepram/20250101",
+    "sequence_file_path_R2": "tests/mepram/20250101"
+  },
+  "sample_partial_optional": {
+    "batch_id": "MEPRAM_BATCH_001",
+    "sequence_file_R1": "sample_partial_optional_R1.fastq.gz",
+    "sequence_file_R1_md5": "0129f6cab354ef7890123456abcdef78",
+    "sequence_file_R2": "sample_partial_optional_R2.fastq.gz",
+    "sequence_file_R2_md5": "123a07dbc465f08912345667bcdef089",
+    "sequence_file_path_R1": "tests/mepram/20250101",
+    "sequence_file_path_R2": "tests/mepram/20250101"
+  },
+  "sample_mixed": {
+    "batch_id": "MEPRAM_BATCH_001",
+    "sequence_file_R1": "sample_mixed_R1.fastq.gz",
+    "sequence_file_R1_md5": "234b18ecd576019234567890cdef109a",
+    "sequence_file_R2": "sample_mixed_R2.fastq.gz",
+    "sequence_file_R2_md5": "345c29fde68712a345678901def210ab",
+    "sequence_file_path_R1": "tests/mepram/20250101",
+    "sequence_file_path_R2": "tests/mepram/20250101"
+  }
+}
