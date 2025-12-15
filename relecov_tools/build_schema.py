@@ -481,18 +481,11 @@ class BuildSchema(BaseModule):
                 items = value.split("; ")
                 if remove_ontology and target_key == "enum":
                     items = [re.sub(r"\s*\[.*?\]", "", item).strip() for item in items]
-                # Examples for integer/number fields should be consistent.
-                try:
-                    items = [float(x) for x in items]
-                    items  = [int(x) if x.is_integer() else x for x in items]
-                except ValueError:
-                    pass
-                json_dict[target_key] = items
         elif target_key == "description":
             json_dict[target_key] = handle_nan(data_dict.get(target_key, "")).strip()
             if (not json_dict[target_key].endswith(".") 
                 and not json_dict["description"].endswith(")")):
-                json_dict[target_key] = f"{json_dict['target_key']}."
+                json_dict[target_key] = f"{json_dict[target_key]}."
         else:
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
         return json_dict
@@ -588,6 +581,11 @@ class BuildSchema(BaseModule):
 
             common_lab_enum = "; ".join(self._lab_uniques["collecting_institution"])
 
+            # Define "$defs" property. This will hold all enum values for all the properties.
+            definitions = {
+                "enums": {}
+            }
+
             # Read property_ids in the database.
             #   Perform checks and create (for each property) feature object like:
             #       {'example':'A', 'ontology': 'B'...}.
@@ -601,7 +599,9 @@ class BuildSchema(BaseModule):
                     "submitting_institution",
                     "sequencing_institution",
                 ):
-                    db_features_dic["enum"] = common_lab_enum
+                    definitions["enums"][property_id] = {
+                        "enum": common_lab_enum
+                    }
 
                 # Parse property_ids that needs to be incorporated as complex fields in json_schema
                 if json_data[property_id].get("complex_field (Y/N)") == "Y":
@@ -653,6 +653,30 @@ class BuildSchema(BaseModule):
                                             pass
                                         options_dict[key] = value
                                 schema_property.update(options_dict)
+                        elif db_feature_key == "enum":
+                            enums_value = self.standard_jsonschema_object(
+                                db_features_dic, db_feature_key, remove_ontology=False
+                            )
+                            if enums_value:
+                                definitions["enums"][property_id] = enums_value
+                                reference = {
+                                    "$ref": f"#/$defs/enums/{property_id}"
+                                }
+                                schema_property.update(reference)
+                        elif db_feature_key == "examples":
+                            examples_value = self.standard_jsonschema_object(
+                                db_features_dic, db_feature_key, remove_ontology=False
+                            )
+                            if db_features_dic["type"] in ("integer", "number"):
+                                # Examples for integer/number fields should be consistent.
+                                try:
+                                    examples_value[db_feature_key] = [float(x) for x in examples_value[db_feature_key]]
+                                    examples_value[db_feature_key] = [int(x) if x.is_integer() else x for x in examples_value[db_feature_key]]
+                                except ValueError:
+                                    pass
+                            schema_property[schema_feature_key] = examples_value[
+                                db_feature_key
+                            ]
                         else:
                             std_json_feature = self.standard_jsonschema_object(
                                 db_features_dic, db_feature_key, remove_ontology=False
@@ -672,6 +696,7 @@ class BuildSchema(BaseModule):
                         required_property_unique.append(key)
             # TODO: So far it appears at the end of the new json schema. Ideally it should be placed before the properties statement.
             new_schema["required"] = required_property_unique
+            new_schema["$defs"] = definitions
             grouped_anyof = {}
 
             for prop_id, prop_data in json_data.items():
