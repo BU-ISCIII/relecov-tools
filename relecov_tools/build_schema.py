@@ -906,12 +906,8 @@ class BuildSchema(BaseModule):
                     try:
                         values = enum_defs[property_id]["enum"]
                     except KeyError:
-                        self.log.error(
-                            f"Error finding enum for property '{property_id}'; not found in $defs"
-                        )
-                        stderr.print(
-                            f"[red]Error finding enum for property '{property_id}'; not found in $defs"
-                        )
+                        self.log.error(f"Error finding enum for property '{property_id}'; not found in $defs")
+                        stderr.print(f"[red]Error finding enum for property '{property_id}'; not found in $defs")
                         return []
                     return (
                         clean_ontologies(values) if isinstance(values, list) else values
