@@ -945,7 +945,12 @@ class BuildSchema(BaseModule):
 
                 def resolve_enum_ref(ref: str, enum_defs: dict) -> list[str]:
                     property_id = ref.split("/")[-1]
-                    values = enum_defs[property_id]["enum"]
+                    try:
+                        values = enum_defs[property_id]["enum"]
+                    except KeyError:
+                        self.log.error(f"Error finding enum for property '{property_id}'; not found in $defs")
+                        stderr.print(f"[red]Error finding enum for property '{property_id}'; not found in $defs")
+                        return []
                     return (
                         clean_ontologies(values) if isinstance(values, list) else values
                     )
