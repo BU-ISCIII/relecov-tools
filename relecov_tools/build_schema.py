@@ -452,32 +452,28 @@ class BuildSchema(BaseModule):
             )
         )
         return draft_template
-    
-    def standard_jsonschema_object(self, property_id, property_feature_key: str, value: any, clean_ontologies=False):
+
+    def standard_jsonschema_object(
+        self, property_id: str, property_feature_key: str, value: any
+    ) -> dict[str, any]:
         """
-        Process a property from the resulting JSON from
+        Process a property keyword with their value and return a dictionary with fields for a property.
 
         Args:
-            property_id (_type_): _description_
-            value (_type_): _description_
-            clean_ontologies (bool, optional): _description_. Defaults to False.
+            property_id (str): Name of the property.
+            property_feature_key (str): Property keyword.
+            value (any): Property keyword value.
 
         Returns:
-            _type_: _description_
+            jsonschema_value (dict): {keyword: value}, parsed for each of the options
         """
-        
-        # Function to handle NaN values
-        def handle_nan(value):
-            if pd.isna(value) or value in ["nan", "NaN", "None", "none"]:
-                return ""
-            return str(value)
 
         jsonschema_value = {}
-        #value = handle_nan(value)
+        # Match/Case statement to evaluate the key:value pairs in the database and transform them to schema-compliant dictionaries.
         match property_feature_key, value:
             case "options", str(value):
                 options_list = [option.split(":") for option in value.split(",")]
-                # Handling minLengh, minimum, maximum etc
+                # Handling float/ints stored as str
                 for key, value in options_list:
                     key = key.strip()
                     value = value.strip()
@@ -487,18 +483,17 @@ class BuildSchema(BaseModule):
                     except ValueError:
                         pass
                     jsonschema_value[key] = value
+            # FIXME multiple examples will always be loaded as str, regardless of actual type
             case "examples", str(value):
                 jsonschema_value = {property_feature_key: value.split("; ")}
-            # KNOWN ISSUE: MORE THAN 1 EXAMPLE WILL BE TREATED AS STRING
-            # Known not a solution: if parse string, some str examples are parsed as int/number
             case "examples", int(value) | float(value):
                 value = float(value)
                 value = [int(value) if value.is_integer() else value]
                 jsonschema_value = {property_feature_key: value}
-            case "enum", str(enums):
+            case "enum", str():
                 jsonschema_value = {"$ref": f"#/$defs/enums/{property_id}"}
             case _, value if not pd.isna(value):
-                # Non-serializable JSON values (e.g. datetimes)
+                # Non-serializable JSON value check and parsing (e.g. datetimes)
                 try:
                     json.dumps(value)
                 except (TypeError, OverflowError):
@@ -506,17 +501,24 @@ class BuildSchema(BaseModule):
                 jsonschema_value = {property_feature_key: value}
             case _, _:
                 pass
-        
+
         return jsonschema_value
 
-    def handle_properties(self, json_data: dict) -> list[dict, list[str]]:
+    def handle_properties(self, json_data: dict[str, dict]) -> tuple[dict, list, dict]:
+        """
+        Handle the generation of simple and nested properties from the database definition.
+
+        Args:
+            json_data (dict): dictionary with structure {property_name: database_definition_dictionary}
+
+        Returns:
+            jsonschema_value (tuple): tuple containing the properties, required properties identified during the handling, and enums.
+        """
         schema_property = {}
-        required_property = []
+        required_properties = []
         definitions = {"$defs": {"enums": {}}}
 
-        # List of properties to check in the features dictionary (it maps values between database features and json schema features):
-        #       key[db_feature_key]: value[schema_feature_key]
-        # TODO mapping_features should be part of a config file, and this way it could be specific to each project (Maybe part of configJson?)
+        # TODO mapping_features should be part of a config file, and this way it could be specific to each project
         mapping_features = {
             "enum": "enum",
             "examples": "examples",
@@ -530,30 +532,30 @@ class BuildSchema(BaseModule):
             "required (Y/N)": "required",
             "submitting_lab_form": "header",
         }
-        exclude_fields = ["required (Y/N)", "submitting_lab_form"]
+        exclude_fields = ["required (Y/N)"]
         # Flag property values that belong outside the property:
         # - is_required: if required, goes to root 'required' keyword
         # - has_enum: if there is an enum, store it for '$defs'
         for property_id, db_features_dic in json_data.items():
-            is_required = True if db_features_dic.get("required (Y/N)", "") == "Y" else False
+            is_required = (
+                True if db_features_dic.get("required (Y/N)", "") == "Y" else False
+            )
             has_enum = db_features_dic.get("enum", False)
 
             # Create empty placeholder
             schema_property[property_id] = {}
             # If property is complex, call build schema again; else, continue function
-            is_complex = True if db_features_dic.get("complex_field (Y/N)", "") == "Y" else False
-            # FIXME CHECK HOW COMPLEX JSON_DATA IS HANDLED IN MEPRAM SCHEMA, but recursion should suffice
+            is_complex = (
+                True if db_features_dic.get("complex_field (Y/N)", "") == "Y" else False
+            )
             if is_complex:
-                # TODO check with team if we want more basic info in subschema (e.g. title)
-                schema_draft = {
-                    "type": "object",
-                    "properties": {},
-                    "required": []
-                    }
+                schema_draft = {"type": "object", "properties": {}, "required": []}
                 subschema = self.read_database_definition(property_id)
-                complex_json_feature = self.build_new_schema(subschema, schema_draft, root_schema=False)
+                complex_json_feature = self.build_new_schema(
+                    subschema, schema_draft, root_schema=False
+                )
                 if complex_json_feature:
-                    # I don't fully like this: enums this way wouldn't be fully unique (defs are identified by non-unique key)
+                    # FIXME: Find a way to make enums to point to a unique definition
                     if complex_json_feature.get("$defs"):
                         definitions.update(complex_json_feature["$defs"])
                         complex_json_feature.pop("$defs")
@@ -563,41 +565,56 @@ class BuildSchema(BaseModule):
                 for db_feature_key, db_feature_value in db_features_dic.items():
                     if db_feature_key in exclude_fields:
                         continue
-                    # Extra check to avoid non-mapping properties. Aun queda por evitar que se metan propiedades (e.g. required (Y/N))
+                    # Extra check to avoid non-mapping properties.
                     if db_feature_key in mapping_features:
-                        std_json_feature = self.standard_jsonschema_object(property_id, db_feature_key, db_feature_value)
+                        std_json_feature = self.standard_jsonschema_object(
+                            property_id, db_feature_key, db_feature_value
+                        )
                         if std_json_feature:
                             schema_property[property_id].update(std_json_feature)
-            
-            # If flag was set, update values accordingly per property
+
+            # If property is required, add it to list
             if is_required:
-                required_property.append(property_id)
-            
-            # TODO: FIX THIS CHECK, FOR SOME REASON NAN does this
+                required_properties.append(property_id)
+            # If there is an enum in the property, parse it and add it to definitions
             if isinstance(has_enum, str):
                 enum = [value.strip() for value in has_enum.split("; ")]
                 definitions["$defs"]["enums"][property_id] = {}
                 definitions["$defs"]["enums"][property_id]["enum"] = enum
 
         # Just to be completely sure, but it should be unique
-        required_property = list(set(required_property))
-            
+        required_properties = list(set(required_properties))
 
-        return schema_property, required_property, definitions
+        return schema_property, required_properties, definitions
 
-    def schema_build_all_of(self, json_data):
+    def schema_build_all_of(self, json_data: dict) -> list:
+        """
+        Build the subschemas in 'allOf' keyword from the database definition.
 
+        Args:
+            json_data (dict): dictionary with structure {property_name: database_definition_dictionary}
+
+        Returns:
+            all_of_base (list): list containing all the subschemas to test in 'allOf'
+        """
         all_of_base = []
 
         # Generate all the anyOf within
         all_any_of = []
-        conditional_required = {key: value.get("conditional_required_group").strip()
-                                for key, value in json_data.items()
-                                if not pd.isna(value.get("conditional_required_group"))}
+        conditional_required = {
+            key: value.get("conditional_required_group").strip()
+            for key, value in json_data.items()
+            if not pd.isna(value.get("conditional_required_group"))
+        }
         groups = list(set(conditional_required.values()))
-        conditional_required_by_group = {group: [key for key in conditional_required.keys() 
-                                                if conditional_required[key] == group]
-                                                for group in groups}
+        conditional_required_by_group = {
+            group: [
+                key
+                for key in conditional_required.keys()
+                if conditional_required[key] == group
+            ]
+            for group in groups
+        }
         for group, keys in conditional_required_by_group.items():
             any_of = [{"required": [key]} for key in keys]
             all_any_of.append({"anyOf": any_of})
@@ -609,8 +626,7 @@ class BuildSchema(BaseModule):
 
         return all_of_base
 
-
-    def build_new_schema(self, json_data, schema_draft, root_schema=True):
+    def build_new_schema(self, json_data: dict[str, dict], schema_draft: dict, root_schema: bool = True) -> dict[str, any]:
         """
         Build a new JSON Schema based on the provided JSON data and draft template, in three stages:
         - Pre-properties: all the operations needed prior to handling the properties (e.g. creation of root properties)
@@ -620,7 +636,7 @@ class BuildSchema(BaseModule):
         Parameters:
         json_data (dict): Dictionary containing the properties and values of the database definition.
         schema_draft (dict): The JSON Schema draft template.
-        root_schema(bool): True if is root of schema, False if not (e.g. complex property generation)
+        root_schema (bool): True if is root of schema, False if not (e.g. complex property generation)
 
         Returns:
             schema_draft (dict): The newly created JSON Schema.
@@ -660,7 +676,6 @@ class BuildSchema(BaseModule):
         if all_of:
             new_schema["allOf"] = all_of
         # Future: Here it can be extended to build other keywords at the end following the example above
-
 
         return new_schema
 
