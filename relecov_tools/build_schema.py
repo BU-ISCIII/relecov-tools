@@ -633,11 +633,21 @@ class BuildSchema(BaseModule):
             is_complex = True if db_features_dic.get("complex_field (Y/N)", "") == "Y" else False
             # FIXME CHECK HOW COMPLEX JSON_DATA IS HANDLED IN MEPRAM SCHEMA, but recursion should suffice
             if is_complex:
-                schema_draft = self.create_schema_draft_template()
-                complex_json_feature = self.build_new_schema(db_features_dic, schema_draft, root_schema=False)
+                # TODO check with team if we want more basic info in subschema (e.g. title)
+                schema_draft = {
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                    }
+                subschema = self.read_database_definition(property_id)
+                complex_json_feature = self.build_new_schema(subschema, schema_draft, root_schema=False)
                 if complex_json_feature:
-                    schema_property["type"] = "array"
-                    schema_property["items"] = complex_json_feature
+                    # I don't fully like this: enums this way wouldn't be fully unique (defs are identified by non-unique key)
+                    if complex_json_feature.get("$defs"):
+                        definitions.update(complex_json_feature["$defs"])
+                        complex_json_feature.pop("$defs")
+                    schema_property[property_id]["type"] = "array"
+                    schema_property[property_id]["items"] = complex_json_feature
             else:
                 for db_feature_key, db_feature_value in db_features_dic.items():
                     if db_feature_key in exclude_fields:
@@ -657,7 +667,7 @@ class BuildSchema(BaseModule):
                 enum = [value.strip() for value in has_enum.split("; ")]
                 definitions["$defs"]["enums"][property_id] = {}
                 definitions["$defs"]["enums"][property_id]["enum"] = enum
-        
+
         # Just to be completely sure, but it should be unique
         required_property = list(set(required_property))
             
@@ -670,9 +680,9 @@ class BuildSchema(BaseModule):
 
         # Generate all the anyOf within
         all_any_of = []
-        conditional_required = {key: value["conditional_required_group"].strip() 
+        conditional_required = {key: value.get("conditional_required_group").strip()
                                 for key, value in json_data.items()
-                                if not pd.isna(value["conditional_required_group"])}
+                                if not pd.isna(value.get("conditional_required_group"))}
         groups = list(set(conditional_required.values()))
         conditional_required_by_group = {group: [key for key in conditional_required.keys() 
                                                 if conditional_required[key] == group]
@@ -705,10 +715,10 @@ class BuildSchema(BaseModule):
             schema_draft (dict): The newly created JSON Schema.
         """
         # Pre-properties
+        new_schema = schema_draft
         if root_schema:
             # Fill schema header
             # FIXME: it gets 'relecov-tools' instead of RELECOV
-            new_schema = schema_draft
             project_name = relecov_tools.utils.get_package_name()
             new_schema["$id"] = relecov_tools.utils.get_schema_url()
             new_schema["title"] = f"{project_name} Schema."
@@ -724,18 +734,20 @@ class BuildSchema(BaseModule):
         except Exception as e:
             self.log.error(f"Error building properties: {str(e)}")
             stderr.print(f"[red]Error building properties: {str(e)}")
-            raise e from e
+            raise e
 
         # Post-properties
         # Finally, send schema_property object to the new json schema draft.
         new_schema["properties"] = properties
-        new_schema["required"] = required
-        new_schema.update(defs)
+        if required:
+            new_schema["required"] = required
+        if defs:
+            new_schema.update(defs)
 
         # Build the allOf keyword
         all_of = self.schema_build_all_of(json_data)
-        new_schema["allOf"] = all_of
-
+        if all_of:
+            new_schema["allOf"] = all_of
         # Future: Here it can be extended to build other keywords at the end following the example above
 
 
