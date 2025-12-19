@@ -652,7 +652,7 @@ class BuildSchema(BaseModule):
             if is_required:
                 required_property.append(property_id)
             
-            # TODO: FIX THIS CHECK, FOR SOME REASON NAN does this shit
+            # TODO: FIX THIS CHECK, FOR SOME REASON NAN does this
             if isinstance(has_enum, str):
                 enum = [value.strip() for value in has_enum.split("; ")]
                 definitions["$defs"]["enums"][property_id] = {}
