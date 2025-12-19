@@ -452,6 +452,7 @@ class BuildSchema(BaseModule):
             )
         )
         return draft_template
+<<<<<<< HEAD
 
     def standard_jsonschema_object(
         self, property_id: str, property_feature_key: str, value: any
@@ -467,6 +468,27 @@ class BuildSchema(BaseModule):
         Returns:
             jsonschema_value (dict): {keyword: value}, parsed for each of the options
         """
+=======
+    
+    def standard_jsonschema_object(self, property_id, property_feature_key: str, value: any, clean_ontologies=False):
+        """
+        Process a property from the resulting JSON from
+
+        Args:
+            property_id (_type_): _description_
+            value (_type_): _description_
+            clean_ontologies (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            _type_: _description_
+        """
+        
+        # Function to handle NaN values
+        def handle_nan(value):
+            if pd.isna(value) or value in ["nan", "NaN", "None", "none"]:
+                return ""
+            return str(value)
+>>>>>>> 2f8d2efe (Fixed typing error)
 
         jsonschema_value = {}
         # Match/Case statement to evaluate the key:value pairs in the database and transform them to schema-compliant dictionaries.
