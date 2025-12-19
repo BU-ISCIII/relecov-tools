@@ -452,9 +452,9 @@ class BuildSchema(BaseModule):
             )
         )
         return draft_template
-
+    """
     def standard_jsonschema_object(self, data_dict, target_key, remove_ontology=False):
-        """
+        
         Create a standard JSON Schema object for a given key in the data dictionary.
 
         Args:
@@ -463,7 +463,7 @@ class BuildSchema(BaseModule):
 
         Returns:
             json_dict (dict): The JSON Schema object for the target key.
-        """
+        
         # For enum and examples, wrap the value in a list
         json_dict = {}
 
@@ -472,6 +472,8 @@ class BuildSchema(BaseModule):
             if pd.isna(value) or value in ["nan", "NaN", "None", "none"]:
                 return ""
             return str(value)
+
+        
 
         if target_key in ["enum", "examples"]:
             value = handle_nan(data_dict.get(target_key, ""))
@@ -490,6 +492,7 @@ class BuildSchema(BaseModule):
         else:
             json_dict[target_key] = handle_nan(data_dict.get(target_key, ""))
         return json_dict
+    """
 
     # TODO: needs validation
     def complex_jsonschema_object(self, property_id, features_dict):
@@ -522,7 +525,7 @@ class BuildSchema(BaseModule):
                 if json_key == "required":
                     continue
                 feature_schema = self.standard_jsonschema_object(
-                    complex_json_data[sub_property_id], db_feature_key
+                    sub_property_id, complex_json_data[sub_property_id], db_feature_key
                 )
                 if feature_schema:
                     complex_json_feature[json_key] = feature_schema[db_feature_key]
@@ -538,188 +541,205 @@ class BuildSchema(BaseModule):
             json_dict["required"] = required_fields
 
         return json_dict
-
-    def build_new_schema(self, json_data, schema_draft):
+    
+    def standard_jsonschema_object(self, property_id, property_feature_key: str, value: any[str, int, float, pd.NaN], clean_ontologies=False):
         """
-        Build a new JSON Schema based on the provided JSON data and draft template.
+        Process a property from the resulting JSON from
+
+        Args:
+            property_id (_type_): _description_
+            value (_type_): _description_
+            clean_ontologies (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            _type_: _description_
+        """
+        
+        # Function to handle NaN values
+        def handle_nan(value):
+            if pd.isna(value) or value in ["nan", "NaN", "None", "none"]:
+                return ""
+            return str(value)
+
+        jsonschema_value = {}
+        #value = handle_nan(value)
+        match property_feature_key, value:
+            case "options", str(value):
+                options_list = [option.split(":") for option in value.split(",")]
+                # Handling minLengh, minimum, maximum etc
+                for key, value in options_list:
+                    key = key.strip()
+                    value = value.strip()
+                    try:
+                        value = float(value)
+                        value = int(value) if value.is_integer() else value
+                    except ValueError:
+                        pass
+                    jsonschema_value[key] = value
+            case "examples", str(value):
+                jsonschema_value = {property_feature_key: value.split("; ")}
+            # KNOWN ISSUE: MORE THAN 1 EXAMPLE WILL BE TREATED AS STRING
+            # Known not a solution: if parse string, some str examples are parsed as int/number
+            case "examples", int(value) | float(value):
+                value = float(value)
+                value = [int(value) if value.is_integer() else value]
+                jsonschema_value = {property_feature_key: value}
+            case "enum", str(enums):
+                jsonschema_value = {"$ref": f"#/$defs/enums/{property_id}"}
+            case _, value if not pd.isna(value):
+                # Non-serializable JSON values (e.g. datetimes)
+                try:
+                    json.dumps(value)
+                except (TypeError, OverflowError):
+                    value = str(value)
+                jsonschema_value = {property_feature_key: value}
+            case _, _:
+                pass
+        
+        return jsonschema_value
+
+    def handle_properties(self, json_data: dict) -> list[dict, list[str]]:
+        schema_property = {}
+        required_property = []
+        definitions = {"$defs": {"enums": {}}}
+
+        # List of properties to check in the features dictionary (it maps values between database features and json schema features):
+        #       key[db_feature_key]: value[schema_feature_key]
+        # TODO mapping_features should be part of a config file, and this way it could be specific to each project (Maybe part of configJson?)
+        mapping_features = {
+            "enum": "enum",
+            "examples": "examples",
+            "ontology_id": "ontology",
+            "type": "type",
+            "options": "options",
+            "description": "description",
+            "classification": "classification",
+            "label_name": "label",
+            "fill_mode": "fill_mode",
+            "required (Y/N)": "required",
+            "submitting_lab_form": "header",
+        }
+        exclude_fields = ["required (Y/N)", "submitting_lab_form"]
+        # Flag property values that belong outside the property:
+        # - is_required: if required, goes to root 'required' keyword
+        # - has_enum: if there is an enum, store it for '$defs'
+        for property_id, db_features_dic in json_data.items():
+            is_required = True if db_features_dic.get("required (Y/N)", "") == "Y" else False
+            has_enum = db_features_dic.get("enum", False)
+
+            # Create empty placeholder
+            schema_property[property_id] = {}
+            # If property is complex, call build schema again; else, continue function
+            is_complex = True if db_features_dic.get("complex_field (Y/N)", "") == "Y" else False
+            # FIXME CHECK HOW COMPLEX JSON_DATA IS HANDLED IN MEPRAM SCHEMA, but recursion should suffice
+            if is_complex:
+                schema_draft = self.create_schema_draft_template()
+                complex_json_feature = self.build_new_schema(db_features_dic, schema_draft, root_schema=False)
+                if complex_json_feature:
+                    schema_property["type"] = "array"
+                    schema_property["items"] = complex_json_feature
+            else:
+                for db_feature_key, db_feature_value in db_features_dic.items():
+                    if db_feature_key in exclude_fields:
+                        continue
+                    # Extra check to avoid non-mapping properties. Aun queda por evitar que se metan propiedades (e.g. required (Y/N))
+                    if db_feature_key in mapping_features:
+                        std_json_feature = self.standard_jsonschema_object(property_id, db_feature_key, db_feature_value)
+                        if std_json_feature:
+                            schema_property[property_id].update(std_json_feature)
+            
+            # If flag was set, update values accordingly per property
+            if is_required:
+                required_property.append(property_id)
+            
+            # TODO: FIX THIS CHECK, FOR SOME REASON NAN does this shit
+            if isinstance(has_enum, str):
+                enum = [value.strip() for value in has_enum.split("; ")]
+                definitions["$defs"]["enums"][property_id] = {}
+                definitions["$defs"]["enums"][property_id]["enum"] = enum
+        
+        # Just to be completely sure, but it should be unique
+        required_property = list(set(required_property))
+            
+
+        return schema_property, required_property, definitions
+
+    def schema_build_all_of(self, json_data):
+
+        all_of_base = []
+
+        # Generate all the anyOf within
+        all_any_of = []
+        conditional_required = {key: value["conditional_required_group"].strip() 
+                                for key, value in json_data.items()
+                                if not pd.isna(value["conditional_required_group"])}
+        groups = list(set(conditional_required.values()))
+        conditional_required_by_group = {group: [key for key in conditional_required.keys() 
+                                                if conditional_required[key] == group]
+                                                for group in groups}
+        for group, keys in conditional_required_by_group.items():
+            any_of = [{"required": [key]} for key in keys]
+            all_any_of.append({"anyOf": any_of})
+
+        all_of_base.extend(all_any_of)
+
+        # For future: generate if_then within (for required props when specific value)
+        # FUTURE: all_of_base.extend(all_if_then)
+
+        return all_of_base
+
+
+    def build_new_schema(self, json_data, schema_draft, root_schema=True):
+        """
+        Build a new JSON Schema based on the provided JSON data and draft template, in three stages:
+        - Pre-properties: all the operations needed prior to handling the properties (e.g. creation of root properties)
+        - properties: handling both simple and complex properties on a separate function
+        - Post-properties: All the operations needed after handling properties (e.g. defining which properties are required)
 
         Parameters:
         json_data (dict): Dictionary containing the properties and values of the database definition.
         schema_draft (dict): The JSON Schema draft template.
+        root_schema(bool): True if is root of schema, False if not (e.g. complex property generation)
 
         Returns:
             schema_draft (dict): The newly created JSON Schema.
         """
-        # Fill schema header
-        # FIXME: it gets 'relecov-tools' instead of RELECOV
-        new_schema = schema_draft
-        project_name = relecov_tools.utils.get_package_name()
-        new_schema["$id"] = relecov_tools.utils.get_schema_url()
-        new_schema["title"] = f"{project_name} Schema."
-        new_schema["description"] = (
-            f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
-        )
-        new_schema["version"] = self.version
+        # Pre-properties
+        if root_schema:
+            # Fill schema header
+            # FIXME: it gets 'relecov-tools' instead of RELECOV
+            new_schema = schema_draft
+            project_name = relecov_tools.utils.get_package_name()
+            new_schema["$id"] = relecov_tools.utils.get_schema_url()
+            new_schema["title"] = f"{project_name} Schema."
+            new_schema["description"] = (
+                f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
+            )
+            new_schema["version"] = self.version
 
         # Fill schema properties
+        # Properties
         try:
-            # List of properties to check in the features dictionary (it maps values between database features and json schema features):
-            #       key[db_feature_key]: value[schema_feature_key]
-            mapping_features = {
-                "enum": "enum",
-                "examples": "examples",
-                "ontology_id": "ontology",
-                "type": "type",
-                "options": "options",
-                "description": "description",
-                "classification": "classification",
-                "label_name": "label",
-                "fill_mode": "fill_mode",
-                "required (Y/N)": "required",
-                "submitting_lab_form": "header",
-            }
-            required_property_unique = []
-
-            common_lab_enum = "; ".join(self._lab_uniques["collecting_institution"])
-
-            # Define "$defs" property. This will hold all enum values for all the properties.
-            definitions = {"enums": {}}
-
-            # Read property_ids in the database.
-            #   Perform checks and create (for each property) feature object like:
-            #       {'example':'A', 'ontology': 'B'...}.
-            #   Finally this objet will be written to the new schema.
-            for property_id, db_features_dic in json_data.items():
-                schema_property = {}
-                required_property = {}
-
-                if property_id in (
-                    "collecting_institution",
-                    "submitting_institution",
-                    "sequencing_institution",
-                ):
-                    definitions["enums"][property_id] = {"enum": common_lab_enum}
-
-                # Parse property_ids that needs to be incorporated as complex fields in json_schema
-                if json_data[property_id].get("complex_field (Y/N)") == "Y":
-                    complex_json_feature = self.complex_jsonschema_object(
-                        property_id, mapping_features
-                    )
-                    if complex_json_feature:
-                        schema_property["type"] = "array"
-                        schema_property["items"] = complex_json_feature
-                        schema_property["additionalProperties"] = False
-                # For those that follows standard format, add them to json schema as well.
-                else:
-                    for db_feature_key, schema_feature_key in mapping_features.items():
-                        # Verifiy that db_feature_key is present in the database (processed excel (aka 'json_data'))
-                        if db_feature_key not in db_features_dic:
-                            self.log.info(
-                                f"Feature {db_feature_key} is not present in database ({self.excel_file_path})"
-                            )
-                            stderr.print(
-                                f"[INFO] Feature {db_feature_key} is not present in database ({self.excel_file_path})"
-                            )
-                            continue
-                        if (
-                            "required" in db_feature_key
-                            or "required" == schema_feature_key
-                        ):
-                            is_required = str(db_features_dic[db_feature_key])
-                            if is_required != "nan":
-                                required_property[property_id] = is_required
-                        elif db_feature_key == "options":
-                            options_value = str(
-                                db_features_dic.get("options", "")
-                            ).strip()
-                            if options_value:
-                                options_dict = {}
-                                options_list = options_value.split(",")
-
-                                for option in options_list:
-                                    key_value = option.split(":")
-                                    if len(key_value) == 2:
-                                        key = key_value[0].strip()
-                                        value = key_value[1].strip()
-                                        try:
-                                            if "." in value:
-                                                value = float(value)
-                                            else:
-                                                value = int(value)
-                                        except ValueError:
-                                            pass
-                                        options_dict[key] = value
-                                schema_property.update(options_dict)
-                        elif db_feature_key == "enum":
-                            enums_value = self.standard_jsonschema_object(
-                                db_features_dic, db_feature_key, remove_ontology=False
-                            )
-                            if enums_value:
-                                definitions["enums"][property_id] = enums_value
-                                reference = {"$ref": f"#/$defs/enums/{property_id}"}
-                                schema_property.update(reference)
-                        elif db_feature_key == "examples":
-                            examples_value = self.standard_jsonschema_object(
-                                db_features_dic, db_feature_key, remove_ontology=False
-                            )
-                            if db_features_dic["type"] in ("integer", "number"):
-                                # Examples for integer/number fields should be consistent.
-                                try:
-                                    examples_value[db_feature_key] = [
-                                        float(x) for x in examples_value[db_feature_key]
-                                    ]
-                                    examples_value[db_feature_key] = [
-                                        int(x) if x.is_integer() else x
-                                        for x in examples_value[db_feature_key]
-                                    ]
-                                except ValueError:
-                                    pass
-                            schema_property[schema_feature_key] = examples_value[
-                                db_feature_key
-                            ]
-                        else:
-                            std_json_feature = self.standard_jsonschema_object(
-                                db_features_dic, db_feature_key, remove_ontology=False
-                            )
-                            if std_json_feature:
-                                schema_property[schema_feature_key] = std_json_feature[
-                                    db_feature_key
-                                ]
-                            else:
-                                continue
-                # Finally, send schema_property object to the new json schema draft.
-                new_schema["properties"][property_id] = schema_property
-
-                # Add to schema draft the recorded porperty_ids.
-                for key, values in required_property.items():
-                    if values == "Y":
-                        required_property_unique.append(key)
-            # TODO: So far it appears at the end of the new json schema. Ideally it should be placed before the properties statement.
-            new_schema["required"] = required_property_unique
-            new_schema["$defs"] = definitions
-            grouped_anyof = {}
-
-            for prop_id, prop_data in json_data.items():
-                group = str(prop_data.get("conditional_required_group", "")).strip()
-                if group and group.lower() != "nan":
-                    grouped_anyof.setdefault(group, []).append(prop_id)
-            anyof_rules = []
-            for props in grouped_anyof.values():
-                if len(props) >= 1:
-                    anyof_rules.extend([{"required": [prop]} for prop in props])
-                    for prop in props:
-                        if prop in required_property_unique:
-                            required_property_unique.remove(prop)
-            if anyof_rules:
-                new_schema["anyOf"] = anyof_rules
-
-            # Return new schema
-            return new_schema
-
+            properties, required, defs = self.handle_properties(json_data)
         except Exception as e:
-            self.log.error(f"Error building schema: {str(e)}")
-            stderr.print(f"[red]Error building schema: {str(e)}")
-            raise
+            self.log.error(f"Error building properties: {str(e)}")
+            stderr.print(f"[red]Error building properties: {str(e)}")
+            raise e from e
+
+        # Post-properties
+        # Finally, send schema_property object to the new json schema draft.
+        new_schema["properties"] = properties
+        new_schema["required"] = required
+        new_schema.update(defs)
+
+        # Build the allOf keyword
+        all_of = self.schema_build_all_of(json_data)
+        new_schema["allOf"] = all_of
+
+        # Future: Here it can be extended to build other keywords at the end following the example above
+
+
+        return new_schema
 
     def verify_schema(self, schema):
         """
