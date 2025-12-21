@@ -541,20 +541,8 @@ class BuildSchema(BaseModule):
         definitions = {"$defs": {"enums": {}}}
 
         # TODO mapping_features should be part of a config file, and this way it could be specific to each project
-        mapping_features = {
-            "enum": "enum",
-            "examples": "examples",
-            "ontology_id": "ontology",
-            "type": "type",
-            "options": "options",
-            "description": "description",
-            "classification": "classification",
-            "label_name": "label",
-            "fill_mode": "fill_mode",
-            "required (Y/N)": "required",
-            "submitting_lab_form": "header",
-        }
-        exclude_fields = ["required (Y/N)"]
+        mapping_features = self.configurables.get("database_mapping_features", {})
+        exclude_fields = self.configurables.get("database_exclude_features", [])
         # Flag property values that belong outside the property:
         # - is_required: if required, goes to root 'required' keyword
         # - has_enum: if there is an enum, store it for '$defs'
