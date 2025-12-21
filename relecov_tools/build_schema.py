@@ -526,7 +526,7 @@ class BuildSchema(BaseModule):
 
         return jsonschema_value
 
-    def handle_properties(self, json_data: dict[str, dict]) -> tuple[dict, list, dict]:
+    def handle_properties(self, json_data: dict[str, dict]) -> tuple[dict, dict, dict]:
         """
         Handle the generation of simple and nested properties from the database definition.
 
@@ -593,11 +593,14 @@ class BuildSchema(BaseModule):
                 definitions["$defs"]["enums"][property_id]["enum"] = enum
 
         # Just to be completely sure, but it should be unique
-        required_properties = list(set(required_properties))
+        required_properties = {"required": list(set(required_properties))} if required_properties else {}
+
+        # Check that there are definitions
+        definitions = definitions if definitions["$defs"]["enums"].values() else {}
 
         return schema_property, required_properties, definitions
 
-    def schema_build_all_of(self, json_data: dict) -> list:
+    def schema_build_all_of(self, json_data: dict) -> dict:
         """
         Build the subschemas in 'allOf' keyword from the database definition.
 
@@ -634,7 +637,7 @@ class BuildSchema(BaseModule):
         # For future: generate if_then within (for required props when specific value)
         # FUTURE: all_of_base.extend(all_if_then)
 
-        return all_of_base
+        return {"allOf": all_of_base} if all_of_base else {}
 
     def build_new_schema(self, json_data: dict[str, dict], schema_draft: dict, root_schema: bool = True) -> dict[str, any]:
         """
@@ -676,15 +679,12 @@ class BuildSchema(BaseModule):
         # Post-properties
         # Finally, send schema_property object to the new json schema draft.
         new_schema["properties"] = properties
-        if required:
-            new_schema["required"] = required
-        if defs:
-            new_schema.update(defs)
+        new_schema.update(required)
+        new_schema.update(defs)
 
         # Build the allOf keyword
         all_of = self.schema_build_all_of(json_data)
-        if all_of:
-            new_schema["allOf"] = all_of
+        new_schema.update(all_of)
         # Future: Here it can be extended to build other keywords at the end following the example above
 
         return new_schema
