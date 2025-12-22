@@ -77,6 +77,20 @@
                 "Bioinformatics and QC metrics fields"
             ],
             "mepram": []
-        }
+        },
+        "database_mapping_features": {
+            "enum": "enum",
+            "examples": "examples",
+            "ontology_id": "ontology",
+            "type": "type",
+            "options": "options",
+            "description": "description",
+            "classification": "classification",
+            "label_name": "label",
+            "fill_mode": "fill_mode",
+            "required (Y/N)": "required",
+            "submitting_lab_form": "header"
+        },
+        "database_exclude_features": ["required (Y/N)"]
     }
 }
