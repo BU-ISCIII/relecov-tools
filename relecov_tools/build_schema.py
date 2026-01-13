@@ -540,7 +540,6 @@ class BuildSchema(BaseModule):
         required_properties = []
         definitions = {"$defs": {"enums": {}}}
 
-        # TODO mapping_features should be part of a config file, and this way it could be specific to each project
         mapping_features = self.configurables.get("database_mapping_features", {})
         exclude_fields = self.configurables.get("database_exclude_features", [])
         # Flag property values that belong outside the property:
@@ -555,9 +554,7 @@ class BuildSchema(BaseModule):
             # Create empty placeholder
             schema_property[property_id] = {}
             # If property is complex, call build schema again; else, continue function
-            is_complex = (
-                True if db_features_dic.get("complex_field (Y/N)", "") == "Y" else False
-            )
+            is_complex = db_features_dic.get("complex_field (Y/N)", "") == "Y"
             if is_complex:
                 schema_draft = {"type": "object", "properties": {}, "required": []}
                 subschema = self.read_database_definition(property_id)
@@ -567,8 +564,7 @@ class BuildSchema(BaseModule):
                 if complex_json_feature:
                     # FIXME: Find a way to make enums to point to a unique definition
                     if complex_json_feature.get("$defs"):
-                        definitions.update(complex_json_feature["$defs"])
-                        complex_json_feature.pop("$defs")
+                        definitions.update({"$defs": complex_json_feature.pop("$defs")})
                     schema_property[property_id]["type"] = "array"
                     schema_property[property_id]["items"] = complex_json_feature
             else:
