@@ -454,7 +454,7 @@ class BuildSchema(BaseModule):
         return draft_template
 <<<<<<< HEAD
 
-    def standard_jsonschema_object(
+    def jsonschema_object(
         self, property_id: str, property_feature_key: str, value: any
     ) -> dict[str, any]:
         """
@@ -577,7 +577,7 @@ class BuildSchema(BaseModule):
                         continue
                     # Extra check to avoid non-mapping properties.
                     if db_feature_key in mapping_features:
-                        std_json_feature = self.standard_jsonschema_object(
+                        std_json_feature = self.jsonschema_object(
                             property_id, db_feature_key, db_feature_value
                         )
                         if std_json_feature:
