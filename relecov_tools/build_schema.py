@@ -546,9 +546,7 @@ class BuildSchema(BaseModule):
         # - is_required: if required, goes to root 'required' keyword
         # - has_enum: if there is an enum, store it for '$defs'
         for property_id, db_features_dic in json_data.items():
-            is_required = (
-                True if db_features_dic.get("required (Y/N)", "") == "Y" else False
-            )
+            is_required = db_features_dic.get("required (Y/N)", "") == "Y"
             has_enum = db_features_dic.get("enum", False)
 
             # Create empty placeholder
@@ -562,9 +560,15 @@ class BuildSchema(BaseModule):
                     subschema, schema_draft, root_schema=False
                 )
                 if complex_json_feature:
-                    # FIXME: Find a way to make enums to point to a unique definition
                     if complex_json_feature.get("$defs"):
-                        definitions.update({"$defs": complex_json_feature.pop("$defs")})
+                        # Prune the defs from the complex property
+                        complex_defs = complex_json_feature.pop("$defs")
+                        complex_defs["enums"] = {property_id: complex_defs["enums"]}
+                        definitions["$defs"]["enums"].update(complex_defs["enums"])
+                        # Fix the "$refs" adding the name of the parent property
+                        for property_key, value in complex_json_feature["properties"].items():
+                            if "$ref" in value:
+                                value["$ref"] = value["$ref"].replace(f"/{property_key}", f"/{property_id}/{property_key}")
                     schema_property[property_id]["type"] = "array"
                     schema_property[property_id]["items"] = complex_json_feature
             else:
