@@ -685,7 +685,7 @@ class BuildSchema(BaseModule):
         # Build the allOf keyword
         all_of = self.schema_build_all_of(json_data)
         new_schema.update(all_of)
-        # Future: Here it can be extended to build other keywords at the end following the example above
+        # From here it can be extended to build other keywords at the end following the example above
 
         return new_schema
 
