@@ -578,7 +578,7 @@ class BuildSchema(BaseModule):
                     # Extra check to avoid non-mapping properties.
                     if db_feature_key in mapping_features:
                         std_json_feature = self.jsonschema_object(
-                            property_id, db_feature_key, db_feature_value
+                            property_id, mapping_features[db_feature_key], db_feature_value
                         )
                         if std_json_feature:
                             schema_property[property_id].update(std_json_feature)
@@ -912,15 +912,19 @@ class BuildSchema(BaseModule):
                     return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
 
                 def resolve_enum_ref(ref: str, enum_defs: dict) -> list[str]:
-                    property_id = ref.split("/")[-1]
+                    property_key = ref.split("enums/")[-1]
+                    property_id = property_key.split("/")
                     try:
-                        values = enum_defs[property_id]["enum"]
+                        values = enum_defs # Kinda ñejh workaround, like in pagination
+                        for property_node in property_id:
+                            values = values[property_node]
+                        values = values["enum"]
                     except KeyError:
                         self.log.error(
-                            f"Error finding enum for property '{property_id}'; not found in $defs"
+                            f"Error finding enum for property '{".".join(property_id)}'; not found in $defs"
                         )
                         stderr.print(
-                            f"[red]Error finding enum for property '{property_id}'; not found in $defs"
+                            f"[red]Error finding enum for property '{".".join(property_id)}'; not found in $defs"
                         )
                         return []
                     return (
@@ -957,8 +961,10 @@ class BuildSchema(BaseModule):
             # 3.  Headers / filtering
             # ------------------------------------------------------------------ #
             if "header" in df.columns:
+                print(df[df["label"] == "Organism species"])
                 df["header"] = df["header"].astype(str).str.strip()
                 df_filtered = df[df["header"].str.upper() == "Y"]
+                print(df_filtered["label"])
             else:
                 self.log.warning(
                     "No se encontró la columna 'header', usando df sin filtrar."
@@ -992,7 +998,7 @@ class BuildSchema(BaseModule):
 
             # -- METADATA_LAB
             try:
-                metadatalab_header = ["REQUERIDO", "EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
+                metadatalab_header = ["CAMPO", "DESCRIPCIÓN", "EJEMPLOS", "REQUERIDO"]
                 df_metadata = pd.DataFrame(columns=metadatalab_header)
                 df_metadata["REQUERIDO"] = df_filtered["required"].apply(
                     lambda x: "YES" if str(x).upper() in ["Y", "YES"] else ""
@@ -1002,6 +1008,7 @@ class BuildSchema(BaseModule):
                 )
                 df_metadata["DESCRIPCIÓN"] = df_filtered["description"]
                 df_metadata["CAMPO"] = df_filtered["label"]
+                print(len(df_metadata.index))
                 df_metadata = df_metadata.transpose()
             except Exception as e:
                 self.log.error(f"Error creating MetadataLab sheet: {e}")
