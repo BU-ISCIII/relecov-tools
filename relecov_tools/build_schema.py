@@ -909,7 +909,7 @@ class BuildSchema(BaseModule):
                         values = values["enum"]
                     except KeyError:
                         self.log.error(
-                            f"Error finding enum for property '{".".join(property_id)}'; not found in $defs"
+                            f"Error finding enum for property '{'.'.join(property_id)}'; not found in $defs"
                         )
                         stderr.print(
                             f"[red]Error finding enum for property '{".".join(property_id)}'; not found in $defs"
