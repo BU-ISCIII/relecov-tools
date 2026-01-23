@@ -903,7 +903,7 @@ class BuildSchema(BaseModule):
                     property_key = ref.split("enums/")[-1]
                     property_id = property_key.split("/")
                     try:
-                        values = enum_defs  # Kinda ñejh workaround, like in pagination
+                        values = enum_defs
                         for property_node in property_id:
                             values = values[property_node]
                         values = values["enum"]
