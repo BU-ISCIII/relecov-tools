@@ -452,7 +452,6 @@ class BuildSchema(BaseModule):
             )
         )
         return draft_template
-<<<<<<< HEAD
 
     def jsonschema_object(
         self, property_id: str, property_feature_key: str, value: any
@@ -468,27 +467,6 @@ class BuildSchema(BaseModule):
         Returns:
             jsonschema_value (dict): {keyword: value}, parsed for each of the options
         """
-=======
-    
-    def standard_jsonschema_object(self, property_id, property_feature_key: str, value: any, clean_ontologies=False):
-        """
-        Process a property from the resulting JSON from
-
-        Args:
-            property_id (_type_): _description_
-            value (_type_): _description_
-            clean_ontologies (bool, optional): _description_. Defaults to False.
-
-        Returns:
-            _type_: _description_
-        """
-        
-        # Function to handle NaN values
-        def handle_nan(value):
-            if pd.isna(value) or value in ["nan", "NaN", "None", "none"]:
-                return ""
-            return str(value)
->>>>>>> 2f8d2efe (Fixed typing error)
 
         jsonschema_value = {}
         # Match/Case statement to evaluate the key:value pairs in the database and transform them to schema-compliant dictionaries.
@@ -566,9 +544,13 @@ class BuildSchema(BaseModule):
                         complex_defs["enums"] = {property_id: complex_defs["enums"]}
                         definitions["$defs"]["enums"].update(complex_defs["enums"])
                         # Fix the "$refs" adding the name of the parent property
-                        for property_key, value in complex_json_feature["properties"].items():
+                        for property_key, value in complex_json_feature[
+                            "properties"
+                        ].items():
                             if "$ref" in value:
-                                value["$ref"] = value["$ref"].replace(f"/{property_key}", f"/{property_id}/{property_key}")
+                                value["$ref"] = value["$ref"].replace(
+                                    f"/{property_key}", f"/{property_id}/{property_key}"
+                                )
                     schema_property[property_id]["type"] = "array"
                     schema_property[property_id]["items"] = complex_json_feature
             else:
@@ -578,7 +560,9 @@ class BuildSchema(BaseModule):
                     # Extra check to avoid non-mapping properties.
                     if db_feature_key in mapping_features:
                         std_json_feature = self.jsonschema_object(
-                            property_id, mapping_features[db_feature_key], db_feature_value
+                            property_id,
+                            mapping_features[db_feature_key],
+                            db_feature_value,
                         )
                         if std_json_feature:
                             schema_property[property_id].update(std_json_feature)
@@ -593,7 +577,9 @@ class BuildSchema(BaseModule):
                 definitions["$defs"]["enums"][property_id]["enum"] = enum
 
         # Just to be completely sure, but it should be unique
-        required_properties = {"required": list(set(required_properties))} if required_properties else {}
+        required_properties = (
+            {"required": list(set(required_properties))} if required_properties else {}
+        )
 
         # Check that there are definitions
         definitions = definitions if definitions["$defs"]["enums"].values() else {}
@@ -639,7 +625,9 @@ class BuildSchema(BaseModule):
 
         return {"allOf": all_of_base} if all_of_base else {}
 
-    def build_new_schema(self, json_data: dict[str, dict], schema_draft: dict, root_schema: bool = True) -> dict[str, any]:
+    def build_new_schema(
+        self, json_data: dict[str, dict], schema_draft: dict, root_schema: bool = True
+    ) -> dict[str, any]:
         """
         Build a new JSON Schema based on the provided JSON data and draft template, in three stages:
         - Pre-properties: all the operations needed prior to handling the properties (e.g. creation of root properties)
@@ -915,7 +903,7 @@ class BuildSchema(BaseModule):
                     property_key = ref.split("enums/")[-1]
                     property_id = property_key.split("/")
                     try:
-                        values = enum_defs # Kinda ñejh workaround, like in pagination
+                        values = enum_defs  # Kinda ñejh workaround, like in pagination
                         for property_node in property_id:
                             values = values[property_node]
                         values = values["enum"]
@@ -1157,8 +1145,10 @@ class BuildSchema(BaseModule):
 
                 # We scroll through the columns of METADATA_LAB (original order of df)
                 column = 1
-                for col_idx, property_id in enumerate(df_filtered["property_id"], start=1):
-                    if not property_id in df_hasenum["property_id"].values:
+                for col_idx, property_id in enumerate(
+                    df_filtered["property_id"], start=1
+                ):
+                    if property_id not in df_hasenum["property_id"].values:
                         continue
                     # Select list of values
                     if property_id in special_dropdowns:
