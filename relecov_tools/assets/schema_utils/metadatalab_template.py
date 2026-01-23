@@ -10,7 +10,6 @@ from openpyxl.utils import column_index_from_string
 from openpyxl.formatting.rule import FormulaRule
 from openpyxl.styles import PatternFill
 
-
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
@@ -37,14 +36,18 @@ def schema_to_flatten_json(json_data, required_properties=None, parent_property_
                     required_list = items_schema.get(
                         "required", features.get("required", [])
                     )
-                    complex_row = schema_to_flatten_json(items_schema.get("properties", {}), required_properties=required_list, parent_property_id=f"{property_id}.")
+                    complex_row = schema_to_flatten_json(
+                        items_schema.get("properties", {}),
+                        required_properties=required_list,
+                        parent_property_id=f"{property_id}.",
+                    )
                     flatten_rows.extend(complex_row)
                 else:
                     row = dict(features)
                     row["property_id"] = f"{parent_property_id}{property_id}"
                     row["field_id"] = property_id
-                    row["parent_property_id"] = None #or parent_property_id
-                    row["parent_label"] = "" #parent_property_id
+                    row["parent_property_id"] = None  # or parent_property_id
+                    row["parent_label"] = ""  # parent_property_id
                     row["parent_classification"] = ""
                     row["is_required"] = property_id in required_set
                     flatten_rows.append(row)
