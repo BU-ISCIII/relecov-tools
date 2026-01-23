@@ -912,7 +912,7 @@ class BuildSchema(BaseModule):
                             f"Error finding enum for property '{'.'.join(property_id)}'; not found in $defs"
                         )
                         stderr.print(
-                            f"[red]Error finding enum for property '{".".join(property_id)}'; not found in $defs"
+                            f"[red]Error finding enum for property '{'.'.join(property_id)}'; not found in $defs"
                         )
                         return []
                     return (
