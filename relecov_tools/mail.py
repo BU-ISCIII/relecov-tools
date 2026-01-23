@@ -15,7 +15,6 @@ from relecov_tools.base_module import BaseModule
 from relecov_tools.config_json import ConfigJson
 from relecov_tools.log_summary import LogSum
 
-
 log = logging.getLogger(__name__)
 
 
