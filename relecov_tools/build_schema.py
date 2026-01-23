@@ -961,10 +961,8 @@ class BuildSchema(BaseModule):
             # 3.  Headers / filtering
             # ------------------------------------------------------------------ #
             if "header" in df.columns:
-                print(df[df["label"] == "Organism species"])
                 df["header"] = df["header"].astype(str).str.strip()
                 df_filtered = df[df["header"].str.upper() == "Y"]
-                print(df_filtered["label"])
             else:
                 self.log.warning(
                     "No se encontró la columna 'header', usando df sin filtrar."
@@ -1008,7 +1006,6 @@ class BuildSchema(BaseModule):
                 )
                 df_metadata["DESCRIPCIÓN"] = df_filtered["description"]
                 df_metadata["CAMPO"] = df_filtered["label"]
-                print(len(df_metadata.index))
                 df_metadata = df_metadata.transpose()
             except Exception as e:
                 self.log.error(f"Error creating MetadataLab sheet: {e}")
@@ -1017,8 +1014,9 @@ class BuildSchema(BaseModule):
 
             # -- DATA_VALIDATION
             try:
-                datavalidation_header = ["EJEMPLOS", "DESCRIPCIÓN", "CAMPO"]
+                datavalidation_header = ["CAMPO", "DESCRIPCIÓN", "EJEMPLOS"]
                 df_hasenum = df[pd.notnull(df.enum)]
+                df_hasenum = df_hasenum[df_hasenum["label"].isin(df_filtered["label"])]
                 df_validation = pd.DataFrame(columns=datavalidation_header)
                 df_validation["tmp_property"] = df_hasenum["property_id"]
                 df_validation["EJEMPLOS"] = df_hasenum["examples"].apply(
@@ -1158,7 +1156,10 @@ class BuildSchema(BaseModule):
                 # ------------------------------------------------------------------------------
 
                 # We scroll through the columns of METADATA_LAB (original order of df)
-                for col_idx, property_id in enumerate(df["property_id"], start=1):
+                column = 1
+                for col_idx, property_id in enumerate(df_filtered["property_id"], start=1):
+                    if not property_id in df_hasenum["property_id"].values:
+                        continue
                     # Select list of values
                     if property_id in special_dropdowns:
                         enum_values = special_dropdowns[property_id]
@@ -1169,9 +1170,9 @@ class BuildSchema(BaseModule):
 
                     if not isinstance(enum_values, list) or len(enum_values) == 0:
                         continue
-
+                    column += 1
                     # Write on sheet DROPDOWNS
-                    col_letter = openpyxl.utils.get_column_letter(col_idx)
+                    col_letter = openpyxl.utils.get_column_letter(column)
                     for i, val in enumerate(enum_values, start=1):
                         ws_dropdowns[f"{col_letter}{i}"].value = val
 
