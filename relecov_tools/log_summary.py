@@ -14,7 +14,6 @@ from relecov_tools.utils import rich_force_colors
 import relecov_tools.utils
 from relecov_tools.config_json import ConfigJson
 
-
 log = logging.getLogger(__name__)
 stderr = Console(
     stderr=True,
