@@ -139,6 +139,17 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
             }
         )
 
+        # First column format
+        no_fill_formater = workbook.add_format(
+            {
+                "bold": True,
+                "text_wrap": False,
+                "valign": "center",
+                "fg_color": "#D4D3D3",  # Light gray
+                "locked": True,
+            }
+        )
+
         cell_formater = workbook.add_format(
             {
                 "border": 1,  # Apply border to every cell
@@ -193,7 +204,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                             stderr.print(
                                 f"Error writing first column at row {row_num}: {e}"
                             )
-                        if row_num == 0 and col_num >= 0 and sheet == "METADATA_LAB":
+                        if row_num == 3 and col_num >= 0 and sheet == "METADATA_LAB":
                             try:
                                 worksheet.write(
                                     row_num,
@@ -211,6 +222,16 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                     worksheet.write(index_num, 0, index_val, first_col_formater)
                 except Exception as e:
                     stderr.print(f"Error writing first column at row {row_num}: {e}")
+        
+        if sheet == "METADATA_LAB":
+            # Format the first column for all data rows (from row 5 onwards)
+            max_rows = 1000  # Maximum number of rows to format
+            for row_num in range(len(df), max_rows):
+                try:
+                    worksheet.write(row_num, 0, "", no_fill_formater)
+                except Exception as e:
+                    stderr.print(f"Error formatting first column at row {row_num}: {e}")
+
     except Exception as e:
         stderr.print(f"Error in excel_formater: {e}")
 
@@ -220,7 +241,7 @@ def create_condition(ws_metadata, conditions, df_filtered):
     label_to_property = dict(zip(df_filtered["label"], df_filtered["property_id"]))
     column_map = {}
 
-    for cell in ws_metadata[4]:
+    for cell in ws_metadata[1]:
         property_id = label_to_property.get(cell.value)
         if property_id in conditions:
             column_map[property_id] = cell.column_letter
@@ -277,7 +298,7 @@ def add_conditional_format_age_check(
     label_to_property = dict(zip(df_filtered["label"], df_filtered["property_id"]))
 
     column_map = {}
-    for cell in ws_metadata[4]:
+    for cell in ws_metadata[1]:
         property_id = label_to_property.get(cell.value)
         if property_id:
             column_map[property_id] = cell.column_letter
