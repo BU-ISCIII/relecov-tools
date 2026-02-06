@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix small bug on type/examples consistency for float/integer fields in JSON schema generation (build_schema module) [#844](https://github.com/BU-ISCIII/relecov-tools/pull/844)
 - Fix header generation for `METADATA_LAB` and `DATA_VALIDATION`: now "CAMPO" is the first row, "REQUIRED" last [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
 - Now Metadatalab validation sheets (DATA_VALIDATION and DROPDOWNS) only generate the included fields, not all of them [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
+- Fixed datetime recognition for schema example generation and validation [#854](https://github.com/BU-ISCIII/relecov-tools/pull/854)
 
 #### Changed
 
