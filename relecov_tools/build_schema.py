@@ -323,7 +323,7 @@ class BuildSchema(BaseModule):
             match feature_type:
                 # Check date format for properties with type=string and format=date
                 case "string":
-                    if prop_features.get("format") == "date":
+                    if "format:date" in str(prop_features.get("options", "")):
                         if isinstance(example, datetime):
                             example = example.strftime("%Y-%m-%d")
                         if isinstance(example, str):
@@ -486,6 +486,10 @@ class BuildSchema(BaseModule):
             # FIXME multiple examples will always be loaded as str, regardless of actual type
             case "examples", str(value):
                 jsonschema_value = {property_feature_key: value.split("; ")}
+            case "examples", datetime():
+                value = value.strftime("%Y-%m-%dT%H:%M:%S")
+                value = value.replace("T00:00:00", "")
+                jsonschema_value = {property_feature_key: value}
             case "examples", int(value) | float(value):
                 value = float(value)
                 value = [int(value) if value.is_integer() else value]
