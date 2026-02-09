@@ -489,7 +489,7 @@ class BuildSchema(BaseModule):
             case "examples", datetime():
                 value = value.strftime("%Y-%m-%dT%H:%M:%S")
                 value = value.replace("T00:00:00", "")
-                jsonschema_value = {property_feature_key: value}
+                jsonschema_value = {property_feature_key: [value]}
             case "examples", int(value) | float(value):
                 value = float(value)
                 value = [int(value) if value.is_integer() else value]
