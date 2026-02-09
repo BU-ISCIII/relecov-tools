@@ -323,7 +323,7 @@ class BuildSchema(BaseModule):
             match feature_type:
                 # Check date format for properties with type=string and format=date
                 case "string":
-                    if "format:date" in str(prop_features.get("options", "")):
+                    if "format:date" in str(prop_features.get("options", "")).replace(" ", ""):
                         if isinstance(example, datetime):
                             example = example.strftime("%Y-%m-%d")
                         if isinstance(example, str):
