@@ -222,7 +222,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                     worksheet.write(index_num, 0, index_val, first_col_formater)
                 except Exception as e:
                     stderr.print(f"Error writing first column at row {row_num}: {e}")
-        
+
         if sheet == "METADATA_LAB":
             # Format the first column for all data rows (from row 5 onwards)
             max_rows = 1000  # Maximum number of rows to format
