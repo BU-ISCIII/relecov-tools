@@ -1,0 +1,1665 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/relecov_schema.json",
+    "title": "relecov-tools Schema.",
+    "description": "Json Schema that specifies the structure, content, and validation rules for relecov-tools",
+    "version": "1.0.0",
+    "type": "object",
+    "properties": {
+        "organism": {
+            "enum": [
+                "Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]",
+                "Influenza virus [SNOMED:725894000]"
+            ],
+            "examples": [
+                "Severe acute respiratory syndrome coronavirus 2 [NCBITaxon:2697049]"
+            ],
+            "ontology": "SNOMED:410607006",
+            "type": "string",
+            "description": "Taxonomic species name of the organism.",
+            "classification": "Sample collection and processing",
+            "label": "Organism",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "collecting_lab_sample_id": {
+            "examples": [
+                "1197677"
+            ],
+            "ontology": "GENEPIO:0001123",
+            "type": "string",
+            "description": "Sample ID provided by the laboratory that collects the sample.",
+            "classification": "Database Identifiers",
+            "label": "Sample ID given by originating laboratory",
+            "fill_mode": "sample",
+            "header": "Y"
+        },
+        "sample_received_date": {
+            "examples": [
+                "2021-05-13"
+            ],
+            "ontology": "SNOMED:281271004",
+            "type": "string",
+            "format": "date",
+            "description": "The date on which the sample was received. YYYY-MM-DD",
+            "classification": "Sample collection and processing",
+            "label": "Sample Received Date",
+            "fill_mode": "sample",
+            "header": "N"
+        },
+        "enrichment_protocol": {
+            "classification": "Sequencing",
+            "description": "Type of enrichment protocol",
+            "enum": [
+                "Amplicon [GENEPIO:0001974]",
+                "Probes [OMIT:0016121]",
+                "Custom probes [OMIT:0016112]",
+                "Custom amplicon [OMIT:0016112]"
+            ],
+            "examples": [
+                "Amplicon"
+            ],
+            "fill_mode": "batch",
+            "header": "Y",
+            "label": "Enrichment Protocol",
+            "ontology": "EFO_0009089",
+            "type": "string"
+        },
+        "enrichment_panel": {
+            "enum": [
+                "ARTIC",
+                "Exome 2.5",
+                "Illumina respiratory Virus Oligo Panel",
+                "Illumina AmpliSeq Community panel",
+                "Illumina AmpliSeq SARS-CoV-2 Research Panel for Illumina",
+                "Illumina FluA/B",
+                "Ion AmpliSeq SARS-CoV-2 Research Panel",
+                "xGen SC2 Midnight1200 Amplicon Panel",
+                "Oxford Nanopore Technologies Midnight Amplicon Panel",
+                "ViroKey SQ FLEX SARS-CoV-2 Primer Set",
+                "NEBNext VarSkip Short SARS-CoV-2 primers",
+                "Illumina Microbial Amplicon Prep-Influenza A/B",
+                "Illumina Respiratory Pathogen ID/AMR Enrichment Panel",
+                "Illumina Viral Surveillance Panel v2",
+                "Twist Bioscience Respiratory Virus Research Panel",
+                "Universal Influenza A primers (Zhou 2012 protocol)",
+                "Universal Influenza B primers (Zhou 2014 protocol)",
+                "Zhou 2009 single-reaction genomic amplification (in-silico)",
+                "CommonUni12/13 universal primers (Van den Hoecke 2015)",
+                "No Enrichment"
+            ],
+            "examples": [
+                "ARTIC"
+            ],
+            "ontology": "NGBO:6000323",
+            "type": "string",
+            "description": "Commercial or custom panel/assay used for enrichment.",
+            "classification": "Sequencing",
+            "label": "Enrichment panel/assay",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "enrichment_panel_version": {
+            "enum": [
+                "ARTIC v1",
+                "ARTIC v2",
+                "ARTIC v3",
+                "ARTIC v4",
+                "ARTIC v4.1",
+                "ARTIC v4.2",
+                "ARTIC v4.3",
+                "ARTIC v4.4",
+                "ARTIC v4.5",
+                "ARTIC v4.6",
+                "ARTIC v4.7",
+                "ARTIC v4.8",
+                "ARTIC v4.9",
+                "ARTIC v4.10",
+                "ARTIC v5",
+                "ARTIC v5.1",
+                "ARTIC v5.2",
+                "ARTIC v5.3",
+                "ARTIC v5.3.2",
+                "Illumina AmpliSeq Community panel",
+                "Illumina AmpliSeq SARS-CoV-2 Research Panel for Illumina",
+                "Illumina Respiratory Virus Oligos Panel V1",
+                "Illumina Respiratory Virus Oligos Panel V2",
+                "Ion AmpliSeq SARS-CoV-2 Insight",
+                "xGen SC2 Midnight1200 Amplicon Panel",
+                "Midnight Amplicon Panel v1",
+                "Midnight Amplicon Panel v2",
+                "Midnight Amplicon Panel v3",
+                "ViroKey SQ FLEX SARS-CoV-2 Primer Set",
+                "NEBNext VarSkip Short SARS-CoV-2 primers",
+                "Illumina Viral Surveillance Panel v2",
+                "Zhou 2009 single-reaction genomic amplification (in-silico) v1.0",
+                "CommonUni12/13 universal primers (Van den Hoecke 2015) v1.0"
+            ],
+            "examples": [
+                "ARTIC v4"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Version fo the enrichment panel",
+            "classification": "Sequencing",
+            "label": "Enrichment panel/assay version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "library_layout": {
+            "enum": [
+                "Single-end [OBI:0002481]",
+                "Paired-end [OBI:0001852]"
+            ],
+            "examples": [
+                "Single-end"
+            ],
+            "ontology": "NCIT:C175894",
+            "type": "string",
+            "description": "Single or paired sequencing configuration",
+            "classification": "Sequencing",
+            "label": "Library Layout",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "sequence_file_R1": {
+            "examples": [
+                "ABC123_S1_L001_R1_001.fastq.gz"
+            ],
+            "ontology": "GENEPIO:0001476",
+            "type": "string",
+            "description": "A data field which describes the user-specified filename of the read 1 (r1) file.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Sequence file R1",
+            "fill_mode": "sample",
+            "header": "Y"
+        },
+        "sequence_file_R2": {
+            "examples": [
+                "ABC123_S1_L001_R2_002.fastq.gz"
+            ],
+            "ontology": "GENEPIO:0001477",
+            "type": "string",
+            "description": "A data field which describes the user-specified filename of the read 2 (r2) file. ",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Sequence file R2",
+            "fill_mode": "sample",
+            "header": "Y"
+        },
+        "sequence_file_R1_md5": {
+            "examples": [
+                "b5242d60471e5a5a97b35531dbbe8c30"
+            ],
+            "ontology": "NCIT:C171276",
+            "type": "string",
+            "description": "Checksum md5 value to validate successful file transmission in R1.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Sequence fastq R1 md5",
+            "fill_mode": "sample",
+            "header": "N"
+        },
+        "sequence_file_R2_md5": {
+            "examples": [
+                "b5242d60471e5a5a97b35531dbbe8c30"
+            ],
+            "ontology": "NCIT:C171276",
+            "type": "string",
+            "description": "Checksum md5 value to validate successful file transmission in R2.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Sequence fastq R2 md5",
+            "fill_mode": "sample",
+            "header": "N"
+        },
+        "sequence_file_path_R1": {
+            "examples": [
+                "/User/Documents/RespLab/Data/"
+            ],
+            "ontology": "GENEPIO:0001478",
+            "type": "string",
+            "description": "The filepath of the r1 file.",
+            "classification": "Files info",
+            "label": "Filepath R1",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "sequence_file_path_R2": {
+            "examples": [
+                "/User/Documents/RespLab/Data/"
+            ],
+            "ontology": "GENEPIO:0001479",
+            "type": "string",
+            "description": "The filepath of the r2 file.",
+            "classification": "Files info",
+            "label": "Filepath R2",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "batch_id": {
+            "examples": [
+                "20250506140633"
+            ],
+            "ontology": "NCIT:C104504",
+            "type": "string",
+            "description": "Unique identifier for each analysis batch.",
+            "classification": "Sample collection and processing",
+            "label": "Batch identifier",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "file_format": {
+            "examples": [
+                "BAM,CRAM,FASTQ"
+            ],
+            "ontology": "MS:1001459",
+            "enum": [
+                "BAM [EDAM:2572]",
+                "CRAM [EDAM:3462]",
+                "FASTQ [EDAM:1930]",
+                "FASTA [EDAM:1929]",
+                "Not Provided [SNOMED:434941000124101]"
+            ],
+            "type": "string",
+            "description": "The run data file model.",
+            "classification": "Files info",
+            "label": "File format",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "sequencing_instrument_platform": {
+            "enum": [
+                "Oxford Nanopore [OBI:0002750]",
+                "Illumina [OBI:0000759]",
+                "Ion Torrent [GENEPIO:0002683]",
+                "PacBio [GENEPIO:0001927]",
+                "BGI [GENEPIO:0004324]",
+                "MGI [GENEPIO:0004325]"
+            ],
+            "examples": [
+                "Illumina"
+            ],
+            "ontology": "GENEPIO:0000071",
+            "type": "string",
+            "description": "A sequencing plaform (brand) is a name of a company that produces sequencer equipment.",
+            "classification": "Sequencing",
+            "label": "Sequencing Instrument Platform",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "sequencing_instrument_model": {
+            "enum": [
+                "Illumina sequencing instrument [GENEPIO:0100105]",
+                "Illumina Genome Analyzer [GENEPIO:0100106]",
+                "Illumina Genome Analyzer II [OBI:0000703]",
+                "Illumina Genome Analyzer IIx [OBI:0002000]",
+                "Illumina HiScanSQ [GENEPIO:0100109]",
+                "Illumina HiSeq [GENEPIO:0100110]",
+                "Illumina HiSeq X [GENEPIO:0100111]",
+                "Illumina HiSeq X Five [GENEPIO:0100112]",
+                "Illumina HiSeq X Ten [GENEPIO:0100113]",
+                "Illumina HiSeq 1000 [OBI:0002022]",
+                "Illumina HiSeq 1500 [GENEPIO:0100115]",
+                "Illumina HiSeq 2000 [OBI:0002001]",
+                "Illumina HiSeq 2500 [OBI:0002002]",
+                "Illumina HiSeq 3000 [OBI:0002048]",
+                "Illumina HiSeq 4000 [OBI:0002049]",
+                "Illumina iSeq [GENEPIO:0100120]",
+                "Illumina iSeq 100 [GENEPIO:0100121]",
+                "Illumina NovaSeq [GENEPIO:0100122]",
+                "Illumina NovaSeq 6000 [GENEPIO:0100123]",
+                "Illumina MiniSeq [GENEPIO:0100124]",
+                "Illumina MiSeq [OBI:0002003]",
+                "Illumina NextSeq [GENEPIO:0100126]",
+                "Illumina NextSeq 500 [OBI:0002021]",
+                "Illumina NextSeq 550 [GENEPIO:0100128]",
+                "Illumina NextSeq 1000 [OBI:0003606]",
+                "Illumina NextSeq 2000 [GENEPIO:0100129]",
+                "Illumina NextSeq 6000",
+                "Ion GeneStudio S5 Prime",
+                "Ion GeneStudio S5 Plus",
+                "Ion GeneStudio S5",
+                "Ion Torrent sequencing instrument [GENEPIO:0100135]",
+                "Ion Torrent Genexus",
+                "Ion Torrent PGM [GENEPIO:0100136]",
+                "Ion Torrent Proton [GENEPIO:0100137]",
+                "Ion Torrent S5 [GENEPIO:0100139]",
+                "Ion Torrent S5 XL [GENEPIO:0100138]",
+                "MinION [GENEPIO:0100142]",
+                "GridION [GENEPIO:0100141]",
+                "PromethION [GENEPIO:0100143]",
+                "Pacific Biosciences sequencing instrument [GENEPIO:0100130]",
+                "PacBio RS [GENEPIO:0100131]",
+                "PacBio RS II [OBI:0002012]",
+                "PacBio Sequel [GENEPIO:0100133]",
+                "PacBio Sequel II [GENEPIO:0100134]",
+                "Oxford Nanopore sequencing instrument [GENEPIO:0100140]",
+                "Oxford Nanopore GridION [GENEPIO:0100141]",
+                "Oxford Nanopore MinION [GENEPIO:0100142]",
+                "Oxford Nanopore PromethION [GENEPIO:0100143]",
+                "AB 310 Genetic Analyzer",
+                "AB 3130 Genetic Analyzer",
+                "AB 3130xL Genetic Analyzer",
+                "AB 3500 Genetic Analyzer",
+                "AB 3500xL Genetic Analyzer",
+                "AB 3730 Genetic Analyzer",
+                "AB 3730xL Genetic Analyzer",
+                "AB SOLID System [OBI:0000696]",
+                "AB SOLID System 2.0 [EFO:0004442]",
+                "AB SOLID System 3.0 [EFO:0004439]",
+                "AB SOLID 3 Plus System [OBI:0002007]",
+                "AB SOLID 4 System [EFO:0004438]",
+                "AB SOLID 4hq System [AB SOLID 4hq System]",
+                "AB SOLID PI System [EFO:0004437]",
+                "AB. 5500 Genetic Analyzer",
+                "AB 5500xl Genetic Analyzer",
+                "AB 5500xl-W Genetic Analysis System",
+                "BGI Genomics sequencing instrument [GENEPIO:0100144]",
+                "BGISEQ-500 [GENEPIO:0100145]",
+                "BGISEQ-50",
+                "DNBSEQ-T7 [GENEPIO:0100147]",
+                "DNBSEQ-G400 [GENEPIO:0100148]",
+                "DNBSEQ-G400 FAST [GENEPIO:0100149]",
+                "MGI sequencing instrument [GENEPIO:0100146]",
+                "MGISEQ-2000RS",
+                "MGI DNBSEQ-T7 [GENEPIO:0100147]",
+                "MGI DNBSEQ-G400 [GENEPIO:0100148]",
+                "MGI DNBSEQ-G400RS FAST [GENEPIO:0100149]",
+                "MGI DNBSEQ-G50 [GENEPIO:0100150]",
+                "454 GS [EFO:0004431]",
+                "454 GS 20 [EFO:0004206]",
+                "454 GS FLX + [EFO:0004432]",
+                "454 GS FLX Titanium [EFO:0004433]",
+                "454 GS FLX Junior [GENEPIO:0001938]",
+                "Not Applicable [SNOMED:385432009]",
+                "Not Collected [LOINC:LA4700-6]",
+                "Not Provided [SNOMED:434941000124101]",
+                "Missing [LOINC:LA14698-7]",
+                "Restricted Access [GENEPIO:0001810]"
+            ],
+            "examples": [
+                "Illumina NextSeq 550"
+            ],
+            "ontology": "GENEPIO:0001452",
+            "type": "string",
+            "description": "The model of the sequencing instrument used.",
+            "classification": "Sequencing",
+            "label": "Sequencing Instrument Model",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "read_length": {
+            "examples": [
+                "75"
+            ],
+            "ontology": "NCIT:C153362",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20000,
+            "description": "Number of base pairs per read",
+            "classification": "Sequencing",
+            "label": "Read length",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "fragment_size": {
+            "examples": [
+                "75"
+            ],
+            "ontology": "NCIT:C153362",
+            "type": "integer",
+            "description": "The number of nucleotides successfully ordered from each side of a nucleic acid fragment obtained after the completion of a sequencing process.",
+            "classification": "Sequencing",
+            "label": "Fragment size",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "submitting_institution_id": {
+            "enum": [
+                "COD-2401",
+                "COD-2402",
+                "COD-2403",
+                "COD-2404",
+                "COD-2405",
+                "COD-2406",
+                "COD-2407",
+                "COD-2408",
+                "COD-2409",
+                "COD-2410",
+                "COD-2411",
+                "COD-2412",
+                "COD-2413",
+                "COD-2414",
+                "COD-2415",
+                "COD-2417",
+                "COD-2418",
+                "COD-2419",
+                "COD-2421",
+                "COD-2422",
+                "COD-2423",
+                "COD-2424",
+                "COD-2425",
+                "COD-2426",
+                "COD-2427",
+                "COD-2428",
+                "COD-2429",
+                "COD-2430",
+                "COD-2431",
+                "COD-2432",
+                "COD-2433",
+                "COD-2434",
+                "COD-2435",
+                "COD-2436",
+                "COD-2437",
+                "COD-2438",
+                "COD-2439",
+                "COD-2440",
+                "COD-2441",
+                "COD-2442",
+                "COD-2443",
+                "COD-2444",
+                "COD-2445",
+                "COD-2446",
+                "COD-2447",
+                "COD-2448",
+                "COD-2449",
+                "COD-2450",
+                "COD-2451",
+                "COD-2452",
+                "COD-2453",
+                "COD-2454",
+                "COD-2455",
+                "COD-2456",
+                "COD-2458",
+                "COD-2459",
+                "COD-2460"
+            ],
+            "examples": [
+                "COD-1111-BU"
+            ],
+            "ontology": "NCIT:C81294",
+            "type": "string",
+            "description": "The Institution identifier that is submitting data or information.",
+            "classification": "Sample collection and processing",
+            "label": "Submitting Institution Identifier",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "bioinformatics_analysis_date": {
+            "examples": [
+                "2022-07-15 00:00:00"
+            ],
+            "ontology": "OBI:0002471",
+            "type": "string",
+            "format": "date",
+            "description": "The time of a sample analysis process YYYY-MM-DD",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "processing_date",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "dehosting_method_software_name": {
+            "enum": [
+                "BMTagger",
+                "Kraken2",
+                "NCBI Human Read Scrubber",
+                "Centrifuge",
+                "bowtie2",
+                "DeconSeq",
+                "BWA-Mem",
+                "Custom host removal script"
+            ],
+            "examples": [
+                "Kraken2"
+            ],
+            "ontology": "GENEPIO:0001459",
+            "type": "string",
+            "description": "The method used to remove host reads from the pathogen sequence.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Dehosting Method",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "dehosting_method_software_version": {
+            "examples": [
+                "2.4.1"
+            ],
+            "ontology": "LOINC:LA20883-7",
+            "type": "string",
+            "description": "The method version used to remove host reads from the pathogen sequence.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Dehosting Method Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "reference_genome_accession": {
+            "examples": [
+                "NC_045512.2"
+            ],
+            "ontology": "GENEPIO:0001485",
+            "type": "string",
+            "description": "A persistent, unique identifier of a genome database entry. If entering multiple entries, separate them with commas.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Reference genome accession",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "bioinformatics_protocol_software_name": {
+            "enum": [
+                "nf-core/viralrecon",
+                "IRMA",
+                "DRAGEN COVID Lineage",
+                "DRAGEN Targeted Microbial",
+                "Ion Torrent Suite",
+                "SeqCovid",
+                "DeepChek",
+                "Influenza virus NGS Analysis",
+                "INSaFLU",
+                "Artic pipeline",
+                "Custom pipeline/workflow"
+            ],
+            "examples": [
+                "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
+            ],
+            "ontology": "GENEPIO:0001489",
+            "type": "string",
+            "description": "The name of the bioinformatics protocol used.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Bioinformatics protocol",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "if_bioinformatic_protocol_is_other_specify": {
+            "examples": [
+                "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The name of the bioinformatics protocol used if other.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "If bioinformatics protocol Is Other, Specify",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "bioinformatics_protocol_software_version": {
+            "examples": [
+                "https://www.protocols.io/groups/cphln-sarscov2-sequencing-consortium/members"
+            ],
+            "ontology": "LOINC:LA20883-7",
+            "type": "string",
+            "description": "The version number of the bioinformatics protocol used.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Bioinformatics protocol version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "commercial_open_source_both": {
+            "enum": [
+                "Commercial [SWO:1000002]",
+                "Open Source [SWO:1000008]",
+                "Both"
+            ],
+            "examples": [
+                "Commercial"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "If bioinformatics protocol used was open-source or commercial",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Commercial/Open-source/both",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "preprocessing_software_name": {
+            "enum": [
+                "Torrent BaseCaller",
+                "Fastp",
+                "Trimmomatic",
+                "IRMA custom script",
+                "Ion Torrent Suite",
+                "BBduk",
+                "cutadapt",
+                "skewer",
+                "FASTX-Toolkit",
+                "NanoFilt",
+                "FiltLong",
+                "SOAPnuke",
+                "Trim Galore",
+                "Nanocorrect",
+                "PoreSeq",
+                "NaS",
+                "NanoPack",
+                "Porechop",
+                "Custom preprocessing script"
+            ],
+            "examples": [
+                "Fastp"
+            ],
+            "ontology": "MS_1002386",
+            "type": "string",
+            "description": "Software used for preprocessing step.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Preprocessing software",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "preprocessing_software_version": {
+            "examples": [
+                "v5.3.1"
+            ],
+            "ontology": "LOINC:LA20883-7",
+            "type": "string",
+            "description": "Version of the preprocessing software used.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Preprocessing software version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "if_preprocessing_other": {
+            "examples": [
+                "Seqtk"
+            ],
+            "ontology": "MS_1002386",
+            "type": "string",
+            "description": "Preprocessing software name if other",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "If preprocessing Is Other, Specify",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "preprocessing_params": {
+            "examples": [
+                "--cut_mean_quality 30"
+            ],
+            "ontology": "NCIT:C44175",
+            "type": "string",
+            "description": "The parameters and settings used to perform preprocessing analysis.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Preprocessing params",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "mapping_software_name": {
+            "enum": [
+                "bwa mem",
+                "bwa align",
+                "minimap2",
+                "bowtie2",
+                "tmap",
+                "BLAT",
+                "BBmap",
+                "HISAT2",
+                "KMA",
+                "GraphMap",
+                "NGMLR",
+                "marginAlign",
+                "Custom mapping script"
+            ],
+            "examples": [
+                "bowtie2"
+            ],
+            "ontology": "NCIT:C175896",
+            "type": "string",
+            "description": "Software used for mapping step.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Mapping software",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "mapping_software_version": {
+            "examples": [
+                "v7.0.1"
+            ],
+            "ontology": "LOINC:LA20883-7",
+            "type": "string",
+            "description": "Version of the mapper used.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Mapping software version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "if_mapping_other": {
+            "examples": [
+                "Mosaik"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Mapping software used if other",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "If mapping Is Other, Specify",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "mapping_params": {
+            "examples": [
+                "--seed 1"
+            ],
+            "ontology": "NCIT:C44175",
+            "type": "string",
+            "description": "Parameters used for mapping step.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Mapping params",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "assembly": {
+            "enum": [
+                "LABEL",
+                "SPAdes",
+                "viralSPAdes",
+                "Unicycler",
+                "AssemblerSPAdes plugin",
+                "Velvet",
+                "Trinity",
+                "Megahit",
+                "Trans-ABySS",
+                "Canu",
+                "Miniasm",
+                "Vicuna",
+                "SAVAGE",
+                "PEHaplo",
+                "SOAPdenovo",
+                "Custom assembly script"
+            ],
+            "examples": [
+                "SPAdes"
+            ],
+            "ontology": "GENEPIO:0000090",
+            "type": "string",
+            "description": "Software used for assembly of the pathogen genome.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Assembly software",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "assembly_version": {
+            "examples": [
+                "v3.1"
+            ],
+            "ontology": "NCIT:C164455",
+            "type": "string",
+            "description": "Version of the software used for assembly of the pathogen genome.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Assembly software version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "if_assembly_other": {
+            "examples": [
+                "ABySS"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Assembly software used if other",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "If assembly Is Other, Specify",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "assembly_params": {
+            "examples": [
+                "-k 127,56,27"
+            ],
+            "ontology": "NCIT:C44175",
+            "type": "string",
+            "description": "The parameters and settings used to perform genome assembly.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Assembly params",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "bioinfo_metadata_file": {
+            "examples": [
+                "bioinfo_lab_metadata_COD-1111-BU_20250506140633_3C412C.json"
+            ],
+            "ontology": "CAO:000237",
+            "type": "string",
+            "description": "Bioinfo JSON with metadata information",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Bioinfo JSON",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "vcf_filename": {
+            "examples": [
+                "sample_name.vcf"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Name of the vcf file. If entering multiple entries, separate them with commas.",
+            "classification": "Bioinformatic Variants",
+            "label": "VCF filename",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "variant_calling_software_name": {
+            "enum": [
+                "Ivar",
+                "bcftools",
+                "lofreq",
+                "Medaka",
+                "Clair3",
+                "Torrent VariantCaller plugin",
+                "IRMA custom VariantCaller",
+                "DRAGEN VariantCaller",
+                "Nanopolish",
+                "freebayes",
+                "Custom variant calling script"
+            ],
+            "examples": [
+                "Ivar"
+            ],
+            "ontology": "EDAM:operation_3227",
+            "type": "string",
+            "description": "Software used for variant calling.",
+            "classification": "Bioinformatic Variants",
+            "label": "Variant calling software",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "variant_calling_software_version": {
+            "examples": [
+                "v4.1"
+            ],
+            "ontology": "LOINC:LA20883-7",
+            "type": "string",
+            "description": "Version of the variant calling software used to generate the VCF",
+            "classification": "Bioinformatic Variants",
+            "label": "Variant calling software version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "if_variant_calling_other": {
+            "examples": [
+                "GATK HaplotypeCaller"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Specify if you have used another variant calling software",
+            "classification": "Bioinformatic Variants",
+            "label": "If variant calling Is Other, Specify",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "variant_calling_params": {
+            "examples": [
+                "-t 0.5 -Q 20"
+            ],
+            "ontology": "NCIT:C44175",
+            "type": "string",
+            "description": "Params used for variant calling",
+            "classification": "Bioinformatic Variants",
+            "label": "Variant calling params",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "consensus_sequence_name": {
+            "examples": [
+                "2018086 NC_045512.2"
+            ],
+            "ontology": "GENEPIO:0001460",
+            "type": "string",
+            "description": "The name of the consensus sequence. If entering multiple entries, separate them with commas.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus sequence name",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "consensus_sequence_filename": {
+            "examples": [
+                "2018102.consensus.fa"
+            ],
+            "ontology": "GENEPIO:0001461",
+            "type": "string",
+            "description": "Filename (including extension) of the consensus/assembled genome FASTA submitted for this sample. SARS-CoV-2: submit one FASTA file containing a single consensus sequence. Influenza: submit one FASTA file per sample containing all segments as a multi-FASTA (one record per segment).",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus sequence filename",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "consensus_sequence_md5": {
+            "examples": [
+                "5gaskañlkdak3143242ñlkas"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The md5 of the consensus sequence.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus sequence name md5",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "consensus_sequence_filepath": {
+            "examples": [
+                "/User/Documents/RespLab/Data/ncov123assembly.fasta"
+            ],
+            "ontology": "GENEPIO:0001462",
+            "type": "string",
+            "description": "The filepath of the consensus sequence file.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus sequence filepath",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "long_table_path": {
+            "examples": [
+                "/User/Documents/RespLab/ncov123_longtable.tsv"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "The path where the long table including all variants and annotations is.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Long table path",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "consensus_sequence_software_name": {
+            "enum": [
+                "Ivar consensus",
+                "bcftools consensus",
+                "Torrent Generateconsensus plugin",
+                "samtools consensus",
+                "Medaka consensus",
+                "IRMA consensus",
+                "DRAGEN consensus",
+                "Custom consensus script"
+            ],
+            "examples": [
+                "Ivar"
+            ],
+            "ontology": "GENEPIO:0001463",
+            "type": "string",
+            "description": "The name of software used to generate the consensus sequence.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus software",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "if_consensus_other": {
+            "examples": [
+                "Ivar"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Specify if you have used another consensus software",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "If consensus Is Other, Specify",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "consensus_sequence_software_version": {
+            "examples": [
+                "1.3"
+            ],
+            "ontology": "GENEPIO:0001469",
+            "type": "string",
+            "description": "The version of the software used to generate the consensus sequence.",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus software version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "consensus_params": {
+            "examples": [
+                "AF > 0.75"
+            ],
+            "ontology": "NCIT:C44175",
+            "type": "string",
+            "description": "Parameters used for consensus generation",
+            "classification": "Bioinformatic Analysis fields",
+            "label": "Consensus params",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "consensus_genome_length": {
+            "examples": [
+                "38677"
+            ],
+            "ontology": "GENEPIO:0001483",
+            "type": "string",
+            "description": "Size of the assembled genome described as the number of base pairs. For fragmented genome viruses, all segments that make up the complete genome must be taken into account (.i.e. influenza; HA segment, NA segment, ...)",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Consensus genome length",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "depth_of_coverage_threshold": {
+            "examples": [
+                "10x"
+            ],
+            "ontology": "GENEPIO:0001475",
+            "type": "string",
+            "description": "The threshold used as a cut-off for the depth of coverage.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Depth of coverage threshold",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "number_of_reads_sequenced": {
+            "examples": [
+                "387566"
+            ],
+            "ontology": "NCIT:C164667",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 50000000,
+            "description": "The number of total reads generated by the sequencing process.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of reads sequenced",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "pass_reads": {
+            "examples": [
+                "153812"
+            ],
+            "ontology": "GENEPIO:0000087",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 50000000,
+            "description": "Number of reads that pass quality control threshold",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of reads passing filters",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "per_reads_host": {
+            "examples": [
+                "0.19"
+            ],
+            "ontology": "NCIT:C185251",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of reads mapped to host",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "%Reads host",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "per_reads_virus": {
+            "examples": [
+                "99.69"
+            ],
+            "ontology": "NCIT:C185251",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of reads mapped to virus. For fragmented genome viruses, all segments that make up the complete genome must be taken into account (.i.e. influenza; HA segment, NA segment, ...)",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "%Reads virus",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "per_unmapped": {
+            "examples": [
+                "0.13"
+            ],
+            "ontology": "0",
+            "type": "number",
+            "maximum": 100,
+            "description": "Percentage of reads unmapped to virus or to host",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "%Unmapped",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "depth_of_coverage_value": {
+            "examples": [
+                "400"
+            ],
+            "ontology": "GENEPIO:0001474",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000,
+            "description": "The average number of reads representing each nucleotide in the reconstructed sequence. For fragmented genome viruses, all segments that make up the complete genome must be taken into account (.i.e. influenza; HA segment, NA segment, ...)",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Depth of coverage Mean value",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "per_genome_greater_10x": {
+            "examples": [
+                "96"
+            ],
+            "ontology": "0",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of genome with coverage greater than 10x. For fragmented genome viruses, all segments that make up the complete genome must be taken into account (.i.e. influenza; HA segment, NA segment, ...)",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "% Genome > 10x",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "per_Ns": {
+            "examples": [
+                "3"
+            ],
+            "ontology": "0",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of Ns. For fragmented genome viruses, all segments that make up the complete genome must be taken into account (.i.e. influenza; HA segment, NA segment, ...)",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "%Ns",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "number_of_Ns": {
+            "examples": [
+                "2000"
+            ],
+            "ontology": "0",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000,
+            "description": "Total count of undetermined bases ('N') in the final consensus sequence. For fragmented genome viruses, all segments that make up the complete genome must be taken into account (.i.e. influenza; HA segment, NA segment, ...)",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of Ns",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "ns_per_100_kbp": {
+            "examples": [
+                "300"
+            ],
+            "ontology": "GENEPIO:0001484",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000,
+            "description": "The number of N symbols present in the consensus fasta sequence, per 100kbp of sequence. For fragmented genome viruses, all segments that make up the complete genome must be taken into account (.i.e. influenza; HA segment, NA segment, ...)",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Ns per 100 kbp",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "number_of_variants_in_consensus": {
+            "examples": [
+                "130"
+            ],
+            "ontology": "NCIT:C181350",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000,
+            "description": "The number of variants found in consensus sequence. For fragmented genome viruses, all segments that make up the complete genome must be taken into account (.i.e. influenza; HA segment, NA segment, ...)",
+            "classification": "Bioinformatic Variants",
+            "label": "Number of variants (AF > 75%)",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "number_of_variants_with_effect": {
+            "examples": [
+                "93"
+            ],
+            "ontology": "NCIT:C181350",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000,
+            "description": "The number of missense variants. For fragmented genome viruses, all segments that make up the complete genome must be taken into account (.i.e. influenza; HA segment, NA segment, ...)",
+            "classification": "Bioinformatic Variants",
+            "label": "Number of variants with effect",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "number_of_sgene_frameshifts": {
+            "examples": [
+                "0"
+            ],
+            "ontology": "GENEPIO:0001457",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000,
+            "description": "Number of frameshift events detected within the SARS-CoV-2 Spike (S) gene region in the consensus",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of frameshifts in Sgene",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "number_of_unambiguous_bases": {
+            "examples": [
+                "29000"
+            ],
+            "ontology": "GENEPIO:0001457",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30000,
+            "description": "Total count of non-ambiguous bases (A/C/G/T) in the final consensus sequence",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Number of unambiguous bases",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "per_ldmutations": {
+            "examples": [
+                "98"
+            ],
+            "ontology": "GENEPIO:0001457",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of SARS-CoV-2 lineage-defining mutations (per assigned lineage) that are present in the sample.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Percentage of Lineage Defining Mutations",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "per_sgene_ambiguous": {
+            "examples": [
+                "0"
+            ],
+            "ontology": "GENEPIO:0001457",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of ambiguous bases ('N') within the SARS-CoV-2 Spike (S) gene region",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Percentage of sSgene ambiguous bases",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "per_sgene_coverage": {
+            "examples": [
+                "99"
+            ],
+            "ontology": "GENEPIO:0001457",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage (%) of positions within the SARS-CoV-2 Spike (S) gene that meet the pipeline's coverage threshold.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Percentage of Sgene coverage",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "qc_test": {
+            "enum": [
+                "Pass",
+                "Fail"
+            ],
+            "examples": [
+                "Pass"
+            ],
+            "ontology": "GENEPIO:0001457",
+            "type": "string",
+            "description": "Overall quality control outcome/determination for the sequence or analysis. If possible, align values to PHA4GE “quality control determination” terms for interoperability.",
+            "classification": "Bioinformatics and QC metrics fields",
+            "label": "Quality control evaluation",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "variant_name": {
+            "examples": [
+                "alpha"
+            ],
+            "ontology": "GENEPIO:0001498",
+            "type": "string",
+            "description": "The variant classification of the SARS-CoV-2 lineage i.e. alpha, beta, etc.",
+            "classification": "Genomic Typing fields",
+            "label": "Variant Name",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "variant_designation": {
+            "enum": [
+                "Variant of Interest (VOI) [GENEPIO:0100083]",
+                "Variant of Concern (VOC) [GENEPIO:0100082]",
+                "Variant Under Monitoring (VUM) [GENEPIO:0100279]"
+            ],
+            "examples": [
+                "Variant of Concern (VOC) [GENEPIO:0100083]"
+            ],
+            "ontology": "GENEPIO:0001503",
+            "type": "string",
+            "description": "The variant classification of the SARS-CoV-2 lineage i.e. variant, variant of concern.",
+            "classification": "Genomic Typing fields",
+            "label": "Variant designation",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "clade_assignment": {
+            "examples": [
+                "B.1.1.7"
+            ],
+            "ontology": "NCIT:C179767",
+            "type": "string",
+            "description": "An indication of the taxonomic clade grouping of organisms. Examples: SARS-CoV-2 (Nextclade) e.g., 24E; Influenza (HA clade) e.g., C.5.1.",
+            "classification": "Genomic Typing fields",
+            "label": "Clade Assignment",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "clade_assignment_software_name": {
+            "enum": [
+                "Nextclade",
+                "USHER",
+                "Custom clade assignment script"
+            ],
+            "examples": [
+                "Nextclade"
+            ],
+            "ontology": "GENEPIO:0001501",
+            "type": "string",
+            "description": "The name of the software used to determine the clade.",
+            "classification": "Genomic Typing fields",
+            "label": "Clade Assignment Software Name",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "if_clade_assignment_other": {
+            "examples": [
+                "Custom Pipeline"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Other software used to determine clade.",
+            "classification": "Genomic Typing fields",
+            "label": "Other Clade Assignment Software",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "clade_assignment_software_version": {
+            "examples": [
+                "3.1.2"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the software used to determine the clade.",
+            "classification": "Genomic Typing fields",
+            "label": "Clade Assignment Software Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "clade_assignment_software_database_version": {
+            "examples": [
+                "1.2.1"
+            ],
+            "ontology": "MS:1001016",
+            "type": "string",
+            "description": "Version of the search database to determine the clade. (https://github.com/nextstrain/nextclade_data/releases)",
+            "classification": "Genomic Typing fields",
+            "label": "Clade Assignment Software Database Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "clade_assignment_date": {
+            "examples": [
+                "20241204"
+            ],
+            "ontology": "LOINC:40783184",
+            "type": "string",
+            "format": "date",
+            "description": "Date when the clade analysis was performed via Nextclade",
+            "classification": "Genomic Typing fields",
+            "label": "Clade Assignment Date",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "lineage_assignment": {
+            "examples": [
+                "KP.3.1.1"
+            ],
+            "ontology": "NCIT:C179767",
+            "type": "string",
+            "description": "An indication of the SARS-CoV-2 taxonomic lineage grouping of organisms.",
+            "classification": "Genomic Typing fields",
+            "label": "Lineage Assignment",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "lineage_assignment_software_name": {
+            "enum": [
+                "Pangolin",
+                "Nextclade",
+                "USHER",
+                "Custom lineage assignment script"
+            ],
+            "examples": [
+                "Pangolin"
+            ],
+            "ontology": "GENEPIO:0001501",
+            "type": "string",
+            "description": "The name of the software used to determine the SARS-CoV-2 lineage.",
+            "classification": "Genomic Typing fields",
+            "label": "Lineage Assignment Software Name",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "if_lineage_assignment_other": {
+            "examples": [
+                "Custom Pipeline"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Other software used to determine SARS-CoV-2 lineage.",
+            "classification": "Genomic Typing fields",
+            "label": "Other Lineage Assignment Software",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "lineage_assignment_software_version": {
+            "examples": [
+                "2.2.1"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the software used to determine the SARS-CoV-2 lineage.",
+            "classification": "Genomic Typing fields",
+            "label": "Lineage Assignment Software Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "lineage_algorithm_software_version": {
+            "examples": [
+                "PUSHER-v1.28"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Version of the algorithm used by the SARS-CoV-2 lineage assignment software",
+            "classification": "Genomic Typing fields",
+            "label": "Lineage Algorithm Software Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "lineage_assignment_scorpio_version": {
+            "examples": [
+                "1.1.3"
+            ],
+            "ontology": "NCIT:C111093",
+            "type": "string",
+            "description": "The version of the scorpio data used to determine the SARS-CoV-2 lineage.",
+            "classification": "Genomic Typing fields",
+            "label": "Lineage Assignment Scorpio Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "lineage_assignment_constellation_version": {
+            "examples": [
+                "3.1.1"
+            ],
+            "ontology": "NCIT:C111093",
+            "type": "string",
+            "description": "The version of the constellations databases used to determine the SARS-CoV-2 lineage.",
+            "classification": "Genomic Typing fields",
+            "label": "Lineage Assignment Constellation Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "lineage_assignment_date": {
+            "examples": [
+                "20241204"
+            ],
+            "ontology": "LOINC:40783184",
+            "type": "string",
+            "format": "date",
+            "description": "Date when the SARS-CoV-2 lineage analysis was performed",
+            "classification": "Genomic Typing fields",
+            "label": "Lineage Assignment Date",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "lineage_assignment_file": {
+            "examples": [
+                "lineage_analysis_results.csv"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "File containing results from SARS-CoV-2 lineage analysis",
+            "classification": "Genomic Typing fields",
+            "label": "Lineage Assignment File",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "lineage_assignment_database_version": {
+            "examples": [
+                "2.26.0"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Version of the lineage assignment database. Fill in only for SARS-CoV-2. For Influenza, enter “0” (zero) since this field is mandatory. (https://github.com/cov-lineages/pangolin-data/releases)",
+            "classification": "Genomic Typing fields",
+            "label": "Pangolin Database Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "type_assignment": {
+            "examples": [
+                "B"
+            ],
+            "ontology": "NCIT:C179767",
+            "type": "string",
+            "description": "An indication of the taxonomic grouping of organisms. Examples: Influenza e.g., A/B/C ; RSV e.g., RSV-A|RSV-B.",
+            "classification": "Genomic Typing fields",
+            "label": "Type Assignment",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "type_assignment_software_name": {
+            "enum": [
+                "IRMA typing",
+                "INSaFLU",
+                "Custom typing script"
+            ],
+            "examples": [
+                "INSaFLU"
+            ],
+            "ontology": "GENEPIO:0001501",
+            "type": "string",
+            "description": "The name of the software used to determine the type.",
+            "classification": "Genomic Typing fields",
+            "label": "Type Assignment Software Name",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "if_type_assignment_software_other": {
+            "examples": [
+                "Manual curation"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Other software iused to determine Type.",
+            "classification": "Genomic Typing fields",
+            "label": "Other Type Assignment Software",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "type_assignment_software_version": {
+            "examples": [
+                "2.0.1"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the software used to determine thetype.",
+            "classification": "Genomic Typing fields",
+            "label": "Type Assignment Software Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "type_assignment_software_database_version": {
+            "examples": [
+                "1.5.2"
+            ],
+            "ontology": "MS:1001016",
+            "type": "string",
+            "description": "Version of the search database.",
+            "classification": "Genomic Typing fields",
+            "label": "Type Assignment Software Database Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "subtype_assignment": {
+            "examples": [
+                "H1N1"
+            ],
+            "ontology": "NCIT:C179767",
+            "type": "string",
+            "description": "An indication of the taxonomic grouping of organisms.",
+            "classification": "Genomic Typing fields",
+            "label": "Subtype Assignment",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "subtype_assignment_software_name": {
+            "enum": [
+                "IRMA subtyping",
+                "INSaFLU",
+                "Custom subtyping script"
+            ],
+            "examples": [
+                "INSaFLU"
+            ],
+            "ontology": "GENEPIO:0001501",
+            "type": "string",
+            "description": "The name of the software used to determine the subtype.",
+            "classification": "Genomic Typing fields",
+            "label": "Subtype Assignment Software Name",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "if_subtype_assignment_software_other": {
+            "examples": [
+                "Custom Pipeline"
+            ],
+            "ontology": "0",
+            "type": "string",
+            "description": "Other software used to determine Subtype.",
+            "classification": "Genomic Typing fields",
+            "label": "Other Subtype Assignment Software",
+            "fill_mode": "batch",
+            "header": "N"
+        },
+        "subtype_assignment_software_version": {
+            "examples": [
+                "3.2.2"
+            ],
+            "ontology": "GENEPIO:0001502",
+            "type": "string",
+            "description": "The version of the software used to determine the subtype.",
+            "classification": "Genomic Typing fields",
+            "label": "Subtype Assignment Software Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        },
+        "subtype_assignment_software_database_version": {
+            "examples": [
+                "3.1.3"
+            ],
+            "ontology": "MS:1001016",
+            "type": "string",
+            "description": "Version of the search database.",
+            "classification": "Genomic Typing fields",
+            "label": "Subtype Assignment Software Database Version",
+            "fill_mode": "batch",
+            "header": "Y"
+        }
+    },
+    "required": [
+        "organism",
+        "collecting_lab_sample_id",
+        "enrichment_panel",
+        "sequencing_instrument_platform",
+        "submitting_institution_id",
+        "clade_assignment_software_database_version",
+        "lineage_assignment_database_version",
+        "type_assignment_software_database_version",
+        "subtype_assignment_software_database_version"
+    ]
+}
