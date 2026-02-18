@@ -532,6 +532,14 @@ class BuildSchema(BaseModule):
         for property_id, db_features_dic in json_data.items():
             is_required = db_features_dic.get("required (Y/N)", "") == "Y"
             has_enum = db_features_dic.get("enum", False)
+            if property_id in [
+                "collecting_institution",
+                "submitting_institution",
+                "sequencing_institution",
+            ]:
+                lab_values = self._lab_uniques.get(property_id, [])
+                if lab_values:
+                    has_enum = "; ".join(lab_values)
 
             # Create empty placeholder
             schema_property[property_id] = {}
