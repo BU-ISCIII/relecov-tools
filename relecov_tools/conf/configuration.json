@@ -88,6 +88,7 @@
             "required_copy_from_other_field"
         ],
         "schema_file": "relecov_schema.json",
+        "cast_values_from_schema": false,
         "unique_sample_id": "sequencing_sample_id",
         "fixed_fields": {
             "study_type": "Whole Genome Sequencing",
