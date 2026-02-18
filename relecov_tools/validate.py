@@ -419,7 +419,10 @@ class Validate(BaseModule):
         collecting_lab_sample_id are removed from excel
         """
         if self.sample_id_field is None:
-            log_text = f"Invalid excel file won't be created: {self.SAMPLE_FIELD_ERROR}"
+            log_text = (
+                "Invalid excel file won't be created: sample_id_field could not be "
+                "resolved from schema ontology"
+            )
             self.logsum.add_error(entry=log_text)
             return
         self.log.info("Trying to create invalid metadata excel file...")
@@ -441,7 +444,9 @@ class Validate(BaseModule):
         stderr.print("Start preparation of invalid samples...")
         self.log.info("Start preparation of invalid samples")
         for row in invalid_json:
-            sample_list.append(str(row[self.sample_id_field]))
+            sid = row.get(self.sample_id_field)
+            if sid is not None:
+                sample_list.append(str(sid))
         wb = openpyxl.load_workbook(metadata)
         try:
             ws_sheet = wb[self.excel_sheet]
@@ -449,12 +454,22 @@ class Validate(BaseModule):
             logtxt = f"No sheet named {self.excel_sheet} could be found in {metadata}"
             self.log.error(logtxt)
             raise
-        tag = "Sample ID given for sequencing"
+        tag = (
+            self.json_schema.get("properties", {})
+            .get(self.sample_id_field, {})
+            .get("label", "Sample ID given for sequencing")
+        )
         # Check if mandatory colum ($tag) is defined in metadata.
         try:
-            header_row = [idx + 1 for idx, x in enumerate(ws_sheet.values) if tag in x][
-                0
-            ]
+            header_row = [
+                idx + 1
+                for idx, x in enumerate(ws_sheet.values)
+                if any(
+                    isinstance(v, str) and v.strip() == tag
+                    for v in x
+                    if v is not None
+                )
+            ][0]
         except IndexError:
             self.log.error(
                 f"Column with tag '{tag}' not found in any row of the Excel sheet."
@@ -467,7 +482,9 @@ class Validate(BaseModule):
         )
         consec_empty_rows = 0
         id_col = [
-            idx for idx, val in enumerate(ws_sheet[header_row]) if val.value == tag
+            idx
+            for idx, val in enumerate(ws_sheet[header_row])
+            if isinstance(val.value, str) and val.value.strip() == tag
         ][0]
         for row in row_iterator:
             # if no data in 10 consecutive rows, break loop
