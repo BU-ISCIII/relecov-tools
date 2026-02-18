@@ -1281,7 +1281,7 @@
             "label": "processing_date",
             "ontology": "OBI:0002471",
             "description": "The time of a sample analysis process YYYY-MM-DD",
-            "examples": "2022-07-15 00:00:00",
+            "examples": "2022-07-15",
             "classification": "Bioinformatics and QC metrics fields",
             "type": "string",
             "format": "date",
