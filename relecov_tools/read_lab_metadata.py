@@ -88,7 +88,9 @@ class LabMetadata(BaseModule):
             if not os.path.isdir(str(files_folder)):
                 stderr.print("[red]No samples file nor valid files folder provided")
                 self.log.error("No samples file nor valid files folder provided")
-                raise FileNotFoundError("No samples file nor valid files folder provided")
+                raise FileNotFoundError(
+                    "No samples file nor valid files folder provided"
+                )
             self.files_folder = os.path.abspath(files_folder)
 
         if sample_list_file is not None and not os.path.exists(sample_list_file):

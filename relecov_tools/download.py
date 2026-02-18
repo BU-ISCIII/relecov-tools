@@ -133,7 +133,9 @@ class Download(BaseModule):
             if heading_file:
                 if not os.path.isabs(heading_file):
                     heading_file = os.path.join(
-                        os.path.dirname(os.path.realpath(__file__)), "conf", heading_file
+                        os.path.dirname(os.path.realpath(__file__)),
+                        "conf",
+                        heading_file,
                     )
                 self.metadata_lab_heading = relecov_tools.utils.read_json_file(
                     heading_file
