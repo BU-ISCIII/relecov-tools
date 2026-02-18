@@ -465,9 +465,7 @@ class Validate(BaseModule):
                 idx + 1
                 for idx, x in enumerate(ws_sheet.values)
                 if any(
-                    isinstance(v, str) and v.strip() == tag
-                    for v in x
-                    if v is not None
+                    isinstance(v, str) and v.strip() == tag for v in x if v is not None
                 )
             ][0]
         except IndexError:
