@@ -126,6 +126,22 @@ class Download(BaseModule):
         self.metadata_lab_heading = config_json.get_topic_data(
             "read_lab_metadata", "metadata_lab_heading"
         )
+        if not self.metadata_lab_heading:
+            heading_file = config_json.get_topic_data(
+                "read_lab_metadata", "metadata_lab_heading_file"
+            )
+            if heading_file:
+                if not os.path.isabs(heading_file):
+                    heading_file = os.path.join(
+                        os.path.dirname(os.path.realpath(__file__)), "conf", heading_file
+                    )
+                self.metadata_lab_heading = relecov_tools.utils.read_json_file(
+                    heading_file
+                )
+            else:
+                raise KeyError(
+                    "Missing read_lab_metadata.metadata_lab_heading (or metadata_lab_heading_file) in configuration"
+                )
         self.metadata_processing = config_json.get_topic_data(
             "sftp_handle", "metadata_processing"
         )
@@ -488,8 +504,15 @@ class Download(BaseModule):
             return False
         sample_file_dict = {}
         metadata_ws, meta_header, header_row = self.read_metadata_file(meta_f_path)
-        # TODO Include these columns in config
-        index_sampleID = meta_header.index("Sample ID given for sequencing")
+        sample_id_col = self.metadata_processing.get(
+            "sample_id_col", "Sample ID given for sequencing"
+        )
+        try:
+            index_sampleID = meta_header.index(sample_id_col)
+        except ValueError:
+            raise MetadataError(
+                f"Configured sample_id_col '{sample_id_col}' not found in metadata header"
+            )
         index_layout = meta_header.index("Library Layout")
         index_fastq_r1 = meta_header.index("Sequence file R1")
         index_fastq_r2 = meta_header.index("Sequence file R2")
@@ -512,7 +535,10 @@ class Download(BaseModule):
                     ):
                         s_name = s_name + "_remove_" + str(counter)
                     else:
-                        log_text = "Found more samples with the same Sample ID given for sequencing. Only the first one remains."
+                        log_text = (
+                            f"Found more samples with the same {sample_id_col}. "
+                            "Only the first one remains."
+                        )
                         stderr.print(log_text)
                         self.include_warning(log_text, sample=s_name)
                         continue
