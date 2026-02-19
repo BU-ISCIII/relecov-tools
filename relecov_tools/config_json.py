@@ -478,7 +478,6 @@ class ConfigJson:
             log.warning(f"No matches found for topic={topic}, deep={deep}")
             return
 
-        # ---- write updated file ----
         relecov_tools.utils.write_json_to_file(
             additional_config, ConfigJson._extra_config_path
         )
