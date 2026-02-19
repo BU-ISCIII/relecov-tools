@@ -4,15 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.7.5dev] - 2025-XX-XX : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.5dev>
+## [1.8.0dev] - 2025-XX-XX : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.8.0dev>
 
 ### Credits
 
 - [Enrique Sapena](https://github.com/ESapenaVentura)
+- [Pablo Mata](https://github.com/shettland)
 
 #### Added enhancements
 
 - Added handling of $refs for enums and typo fixing/style formatting for build_schema module [#844](https://github.com/BU-ISCIII/relecov-tools/pull/844)
+- Included configuration overwriting and validation via add-extra-config module [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Included a new arg `topic_config` in add-extra-config to narrow config removal [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Updated add-extra-config and included Initial configuration description in README.md [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Updated test workflows to load initial_config-relecov.yaml first [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Included three initial_config.yaml files for three projects: relecov, mepram & EQA2026 [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
 
 #### Fixes
 
@@ -26,8 +32,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Changed `build_schema.build_new_schema` function: Now recursively iterates on complex properties to generate subschemas [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
 - Changed `assets/schema_utils/metadatalab_template.py`: Now supports iterative recursion to flatten nested schemas [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
+- Updated how project name is extracted from config in read-lab-metadata [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
 
 #### Removed
+
+- Removed all project-specific config from configuration.json and moved it to initial_config.yaml files [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
 
 ### Requirements
 
