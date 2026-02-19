@@ -150,7 +150,8 @@ Further explanation for each argument:
 
 ### Initial configuration.
 
-Prior to using any module you will need to setup specific configuration for your project using `add-extra-config` module, usage documentation [here](#add-extra-config). There are examples of `initial_config.yaml` files in `relecov_tools/conf/`. Make sure to preserve the `required_conf` keys defined in `relecov_tools/conf/configuration.json`, as they are always validated at runtime.
+Prior to using any module you will need to setup specific configuration for your project using `add-extra-config` module, usage documentation [here](#add-extra-config). There are examples of `initial_config.yaml` files in `relecov_tools/conf/` that can be used as template.
+You can also override the config in `relecov_tools/conf/configuration.json` with this method except for the `required_conf` keys which we recommend to preserve as they are always validated at runtime. You can add new `required_conf` elements into your `extra_config.json` but the resulting list will be the sum of both, not overriden.
 
 ## Modules
 
