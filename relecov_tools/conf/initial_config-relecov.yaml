@@ -4,10 +4,12 @@
 # IMPORTANT: Do not remove nor modify the required_conf keys unless you explicitly need to, that would surely break the code
 # NOTE: Each key in 'modules_outpath' must match with a Command as listed with `relecov-tools --help` (but with '_' instead of '-')
 
+# required_conf lists will be merged with the ones in configuration.json without override, keeping the sum of both
 required_conf: ['generic', 'pipeline_manager', 'sftp_handle', 'read_lab_metadata', 'upload_to_gisaid', 'upload_to_ena', 'update_db', 'build_schema', 'download', 'logs_to_excel', 'mail_sender', 'map', 'metadata_homogeneizer', 'read_bioinfo_metadata', 'upload_results', 'validate', 'wrapper']
 
 generic:
   required_conf: ["project_name", "json_schemas", "logs_config"]
+  # Keep in mind that a required field missing or equal to "" will raise a validation error
   project_name: "Relecov"
   logs_config:
     default_outpath: /tmp/
