@@ -53,6 +53,11 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install .
+
+    - name: Load profile config (relecov)
+      run: |
+        relecov-tools add-extra-config \
+          --config_file relecov_tools/conf/initial_config-relecov.yaml --force
       
     - name: Run sftp_handle tests
       run: |
@@ -88,7 +93,12 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install .
-                              
+      
+    - name: Load profile config (relecov)
+      run: |
+        relecov-tools add-extra-config \
+          --config_file relecov_tools/conf/initial_config-relecov.yaml --force
+
     - name: Run Wrapper tests
       run: |
         python3 tests/test_wrapper_handle.py --download_option ${{ matrix.download_options }}

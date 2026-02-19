@@ -47,6 +47,12 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install .
+
+    - name: Load profile config (relecov)
+      run: |
+        relecov-tools add-extra-config \
+          --config_file relecov_tools/conf/initial_config-relecov.yaml --force
+
     - name: Run each module tests
       run: |
         relecov-tools map -j tests/data/map_validate/processed_metadata_lab_test.json -p relecov_tools/schema/relecov_schema.json ${{ matrix.map_args }} -o .
