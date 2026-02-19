@@ -24,6 +24,7 @@ generic:
 # CONFIG FOR MODULE PARAMETERS
 mail_sender:
   required_conf: ["args"]
+  # args can be used to set default values for the modules, can be overriden via CLI
   args:
     delivery_template_path_file: /path/templates/
     email_host: host
