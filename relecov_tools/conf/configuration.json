@@ -52,7 +52,7 @@
         "metadata_processing": {},
         "abort_if_md5_mismatch": "False",
         "analysis_results_folder": "ANALYSIS_RESULTS",
-        "platform_storage_folder": "",
+        "platform_storage_folder": "/tmp/",
         "allowed_file_extensions": [
             ".fastq.gz",
             ".fastq",
