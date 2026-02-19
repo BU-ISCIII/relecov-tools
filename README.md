@@ -148,6 +148,10 @@ Further explanation for each argument:
 - `--debug`: Activate DEBUG logs. When not provided, logs will only show the most relevant information.
 - `--hex-code`: By default all files generated will include a date and an unique hexadecimal code which is randomly generated upon execution. Using this argument you can pre-define the resulting hexadecimal code. NOTE: Keep in mind that this could overwrite existing files.
 
+### Initial configuration.
+
+Prior to using any module you will need to setup specific configuration for your project using `add-extra-config` module, usage documentation [here](#add-extra-config). There are examples of `initial_config.yaml` files in `relecov_tools/conf/`. Make sure to preserve the `required_conf` keys defined in `relecov_tools/conf/configuration.json`, as they are always validated at runtime.
+
 ## Modules
 
 #### download
@@ -480,7 +484,7 @@ Options:
 
 #### add-extra-config
 
-This command is used to create an additional config file that will override the configuration in `conf/configuration.json`. You may pass this configuration in a YAML or JSON file. If you want the keys in your additional configuration to be grouped under a certain keyname, use param `-n, --config_name`. Otherwise, the file content will be parsed with no additional processing.
+This command is used to create an additional config file that will override the configuration in `conf/configuration.json` except for `required_conf` keys which are merged from the two configs. Passing the whole configuration in a YAML or JSON file is recommended. If you want the keys in your additional configuration to be grouped under a certain keyname, use param `-n, --config_name`. Otherwise, the file content will be parsed with no additional processing. The resulting configuration can be found in `/.relecov_tools/extra_config.json`
 
 ```
 Usage: relecov-tools add-extra-config [OPTIONS]
@@ -492,8 +496,10 @@ Options:
   -f, --config_file TEXT  Path to the input file: Json or Yaml format
   --force                 Force replacement of existing configuration if
                           needed
-  --clear_config          Remove given config_name from extra config: Use with
+  --remove_config         Remove given config_name from extra config: Use with
                           empty --config_name to remove all
+  --topic_config          Name of the primary config key. Only used with 
+                          --remove_config to narrow the search for --config_name"
   --help                  Show this message and exit.
 ```
 
