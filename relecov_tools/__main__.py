@@ -1402,7 +1402,9 @@ def add_extra_config(ctx, config_name, config_file, force, remove_config, topic_
         else:
             config_json = relecov_tools.config_json.ConfigJson()
         if remove_config:
-            config_json.remove_extra_config(topic=topic_config, deep=config_name, force=force)
+            config_json.remove_extra_config(
+                topic=topic_config, deep=config_name, force=force
+            )
         else:
             config_json.include_extra_config(
                 config_file, config_name=config_name, force=force
