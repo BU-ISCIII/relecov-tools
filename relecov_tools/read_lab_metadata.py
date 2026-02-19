@@ -105,7 +105,7 @@ class LabMetadata(BaseModule):
         self.readmeta_config = (
             self.configuration.get_configuration("read_lab_metadata") or {}
         )
-        default_project = self.readmeta_config.get("default_project") or "relecov"
+        default_project = self.configuration.get_topic_data("generic", "project_name")
         self.project = (project or default_project).lower()
         self.project_config = self._load_project_config(
             self.readmeta_config, self.project, default_project
