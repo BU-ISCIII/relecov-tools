@@ -91,8 +91,12 @@ class ConfigJson:
         self.json_data = self._nested_merge_with_args(self.base_conf, extra_conf)
         missing_required = self.validate_configuration(self.json_data)
         if missing_required:
-            log.error(f"Could not validate current configuration. Missing required config: {missing_required}")
-            raise ValueError(f"Required configuration missing in current config: {missing_required}")
+            log.error(
+                f"Could not validate current configuration. Missing required config: {missing_required}"
+            )
+            raise ValueError(
+                f"Required configuration missing in current config: {missing_required}"
+            )
         log.debug(
             "Loaded additional configuration."
             if active_extra
@@ -189,20 +193,21 @@ class ConfigJson:
 
         # ── 4. Legacy with deeper nesting ───────────────────────────────────
         return _recursive_lookup(topic_block, found)
-    
+
     def validate_configuration(self, config_dict: dict):
         """Validate the given configuration dictionary, preferably after merge.
-        
+
         Args:
             config_name (dict): Dictionary containing all the configuration from
             the JSON or YAML file.
 
         Raises:
             ValueError: If any there is any required field missing.
-        
+
         Returns:
             missing_required (list): List of the missing configuration fields.
         """
+
         def recursive_validation(deep_conf: dict, parent: str):
             """Recursively check if required keys are present in given config"""
             missing = []
@@ -239,9 +244,7 @@ class ConfigJson:
         """Check if config_name is already in configuration"""
         if config_name in current_conf.keys():
             if force:
-                log.info(
-                    f"`{config_name}` already in config. Replacing its content..."
-                )
+                log.info(f"`{config_name}` already in config. Replacing its content...")
                 return True
             else:
                 err_txt = f"Cannot add `{config_name}`: already in config. Set `force` to force replacement"
@@ -249,7 +252,7 @@ class ConfigJson:
                 return False
         else:
             return True
-    
+
     def merge_config(self, config_dict, new_config, force=True):
         """
         Recursively merge a new configuration dictionary into an existing one.
@@ -276,14 +279,19 @@ class ConfigJson:
                 - summary (dict): A dictionary summarizing merge actions with keys:
                     * "Included": list of applied changes
                     * "Canceled": list of rejected changes
-        """        
+        """
+
         def _rec_merge(current_conf, new_conf, force=False, parent=""):
             """Recursively add new configuration without deleting the existing keys"""
             for k, v in new_conf.items():
                 new_parent = ".".join([parent, k]) if parent else k
                 if k in current_conf and current_conf[k] == v:
                     continue
-                if isinstance(v, dict) and k in current_conf and isinstance(current_conf[k], dict):
+                if (
+                    isinstance(v, dict)
+                    and k in current_conf
+                    and isinstance(current_conf[k], dict)
+                ):
                     _rec_merge(current_conf[k], v, force=force, parent=new_parent)
                 else:
                     change_msg = f"{new_parent}: {current_conf.get(k, '')} -> {v}"
@@ -307,7 +315,6 @@ class ConfigJson:
         summary = {"Canceled": [], "Included": []}
         merged_dict = _rec_merge(config_dict, new_config, force=force)
         return merged_dict, summary
-        
 
     def include_extra_config(self, config_file, config_name=None, force=False):
         """Include given file content as additional configuration for later usage.
@@ -343,7 +350,9 @@ class ConfigJson:
                 )
         if additional_config is not None:
             if config_name is None:
-                additional_config, summary = self.merge_config(additional_config, file_content, force=force)
+                additional_config, summary = self.merge_config(
+                    additional_config, file_content, force=force
+                )
             else:
                 if self.insert_new_config(config_name, self.json_data, force=force):
                     msg = f"{config_name}: {file_content}"
@@ -360,8 +369,12 @@ class ConfigJson:
         )
         missing_required = self.validate_configuration(full_test_conf)
         if missing_required:
-            log.error(f"Could not validate incoming extra config. Missing required config: {missing_required}")
-            raise ValueError(f"Required configuration missing from incoming config: {missing_required}")
+            log.error(
+                f"Could not validate incoming extra config. Missing required config: {missing_required}"
+            )
+            raise ValueError(
+                f"Required configuration missing from incoming config: {missing_required}"
+            )
         relecov_tools.utils.write_json_to_file(
             additional_config, ConfigJson._extra_config_path
         )
@@ -467,8 +480,7 @@ class ConfigJson:
 
         # ---- write updated file ----
         relecov_tools.utils.write_json_to_file(
-            additional_config,
-            ConfigJson._extra_config_path
+            additional_config, ConfigJson._extra_config_path
         )
 
         log.info(f"Removed {len(removed_paths)} key(s)")
@@ -501,8 +513,12 @@ class ConfigJson:
         """
         merged = {}
 
-        base_reqs = base_conf.pop("required_conf") if "required_conf" in base_conf else []
-        extra_reqs = extra_conf.pop("required_conf") if "required_conf" in extra_conf else []
+        base_reqs = (
+            base_conf.pop("required_conf") if "required_conf" in base_conf else []
+        )
+        extra_reqs = (
+            extra_conf.pop("required_conf") if "required_conf" in extra_conf else []
+        )
         merged_reqs = list(set(base_reqs + extra_reqs))
         merged["required_conf"] = merged_reqs
 
