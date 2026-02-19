@@ -2,7 +2,7 @@
     "required_conf": ["generic", "pipeline_manager", "sftp_handle", "read_lab_metadata", "upload_to_gisaid", "upload_to_ena", "update_db"],
     "generic": {
         "required_conf": ["project_name", "logs_config", "validate_config", "json_schemas", "institution_mapping_file", "not_provided_field"],
-        "project_name": "",
+        "project_name": "default",
         "logs_config": {
             "default_outpath": "/tmp/",
             "modules_outpath": {}
@@ -28,8 +28,8 @@
             "sample_link_folder",
             "organism_config"
         ],
-        "analysis_group": "",
-        "analysis_user": "",
+        "analysis_group": "default",
+        "analysis_user": "default",
         "doc_folder": "DOC",
         "analysis_folder": "ANALYSIS",
         "sample_stored_folder": "RAW",
