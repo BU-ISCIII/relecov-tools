@@ -119,7 +119,7 @@ class EnaUpload(BaseModule):
                 stderr.print(f"[red]Unsupported metadata xml types: {wrong_types}")
                 sys.exit(1)
 
-        config_json = ConfigJson()
+        config_json = ConfigJson(extra_config=True)
         self.config_json = config_json
         self.checklist = self.config_json.get_configuration("upload_to_ena")[
             "checklist"
