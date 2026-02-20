@@ -55,7 +55,7 @@ jobs:
 
     - name: Run each module tests
       run: |
-        relecov-tools map -j tests/data/map_validate/processed_metadata_lab_test.json -p relecov_tools/schema/relecov_schema.json ${{ matrix.map_args }} -o .
+        relecov-tools --debug map -j tests/data/map_validate/processed_metadata_lab_test.json -p relecov_tools/schema/relecov_schema.json ${{ matrix.map_args }} -o .
       env:
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
     - name: Upload output file
