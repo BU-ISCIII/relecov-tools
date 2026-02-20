@@ -42,7 +42,7 @@ download:
     user: ''
     password: ''
     conf_file: ''
-    download_option: ''
+    download_option: 'download_clean'
     output_dir: ''
     target_folders: []
     subfolder: RELECOV
@@ -120,7 +120,7 @@ validate:
   required_conf: ["args"]
   args:
     json_file: ''
-    json_schema_file: ''
+    json_schema_file: 'relecov_tools/schema/relecov_schema.json'
     metadata: ''
     output_dir: ''
     excel_sheet: ''
@@ -282,7 +282,7 @@ read_bioinfo_metadata:
   required_conf: ["args"]
   args:
     json_file: ''
-    json_schema_file: 'relecov_schema.json'
+    json_schema_file: 'relecov_tools/schema/relecov_schema.json'
     input_folder: ''
     output_dir: ''
     software_name: ''
