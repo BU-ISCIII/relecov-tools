@@ -42,7 +42,8 @@ class Validate(BaseModule):
         super().__init__(output_dir=output_dir, called_module=__name__)
 
         self.log.info("Initiating validation process")
-
+        # Check and load config params
+        self.config = ConfigJson(extra_config=True)
         # Check CLI arguments
         if json_schema_file is None:
             schema_name = self.config.get_topic_data("generic", "relecov_schema")
@@ -127,9 +128,6 @@ class Validate(BaseModule):
                     "Loaded %s corrupted files from samples data",
                     len(corrupted_from_samples),
                 )
-
-        # Check and load config params
-        self.config = ConfigJson(extra_config=True)
 
         req_conf = ["download"] * bool(upload_files) + ["update_db"] * bool(check_db)
         missing = [
