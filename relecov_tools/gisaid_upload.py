@@ -128,7 +128,7 @@ class GisaidUpload:
         dataframe.loc[dataframe["covv_type"] == "", "covv_type"] = "betacoronavirus"
         dataframe.loc[dataframe["covv_passage"] == "", "covv_passage"] = "Original"
 
-        config_json = ConfigJson()
+        config_json = ConfigJson(extra_config=True)
         gisaid_config = config_json.get_configuration("upload_to_gisaid")[
             "GISAID_configuration"
         ]
@@ -150,7 +150,7 @@ class GisaidUpload:
         data = relecov_tools.utils.read_json_file(self.gisaid_json)
         df_data = pd.DataFrame(data)
 
-        config_json = ConfigJson()
+        config_json = ConfigJson(extra_config=True)
         fields = config_json.get_configuration("upload_to_gisaid")["gisaid_csv_headers"]
 
         col_df = list(df_data.columns)
@@ -158,7 +158,7 @@ class GisaidUpload:
             if field not in col_df:
                 df_data.insert(4, field, "")
 
-        config_lab_json = ConfigJson()
+        config_lab_json = ConfigJson(extra_config=True)
         lab_json_conf = config_lab_json.get_topic_data(
             "read_lab_metadata", "laboratory_data"
         )

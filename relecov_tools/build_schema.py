@@ -115,7 +115,7 @@ class BuildSchema(BaseModule):
         self.configurables = (
             config_build_schema.get_configuration("configurables") or {}
         )
-        config_json = ConfigJson()
+        config_json = ConfigJson(extra_config=True)
 
         if self.project in available_projects:
             self.project_config = config_data.get(self.project, {})

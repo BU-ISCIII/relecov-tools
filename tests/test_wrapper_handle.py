@@ -131,7 +131,7 @@ def prepare_remote_test(**kwargs):
     )
 
     print("Initiating ProcessWrapper")
-    config_json = ConfigJson()
+    config_json = ConfigJson(extra_config=True)
     config_json.include_extra_config(conf_file, config_name=None, force=True)
     wrapper_manager = Wrapper(  # Initialize ProcessWrapper with the config file
         output_dir=kwargs["output_dir"],
