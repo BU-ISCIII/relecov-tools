@@ -38,7 +38,7 @@ class UploadDatabase(BaseModule):
         self.logsum = self.parent_log_summary()
 
         # Load configuration early to access update_db settings
-        self.config_json = ConfigJson()
+        self.config_json = ConfigJson(extra_config=True)
         self.data_upload_types = self._load_data_upload_types()
         self.full_update_steps = self._load_full_update_steps()
 
