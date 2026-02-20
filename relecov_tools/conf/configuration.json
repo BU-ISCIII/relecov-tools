@@ -181,7 +181,7 @@
     },
     "upload_to_ena": {
         "ENA_configuration": {},
-        "checklist": "",
+        "checklist": "default_checklist",
         "templates_path": "",
         "tool": {
             "tool_name": "ena-upload-cli",
