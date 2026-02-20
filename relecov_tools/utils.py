@@ -101,9 +101,9 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
                     data_row[heading[idx]] = (
                         None
                         if leave_empty
-                        else relecov_tools.config_json.ConfigJson().get_topic_data(
-                            "generic", "not_provided_field"
-                        )
+                        else relecov_tools.config_json.ConfigJson(
+                            extra_config=True
+                        ).get_topic_data("generic", "not_provided_field")
                     )
                 else:
                     data_row[heading[idx]] = l_row[idx]
@@ -133,9 +133,9 @@ def read_excel_file(f_name, sheet_name, header_flag, leave_empty=True):
                         data_row[heading[idx]] = (
                             None
                             if leave_empty
-                            else relecov_tools.config_json.ConfigJson().get_topic_data(
-                                "generic", "not_provided_field"
-                            )
+                            else relecov_tools.config_json.ConfigJson(
+                                extra_config=True
+                            ).get_topic_data("generic", "not_provided_field")
                         )
                     else:
                         data_row[heading[idx]] = val
