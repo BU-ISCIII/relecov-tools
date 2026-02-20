@@ -13,11 +13,7 @@ generic:
   project_name: "Relecov"
   logs_config:
     default_outpath: /tmp/
-    modules_outpath:
-      wrapper: /tmp/wrapper
-      download: /tmp/download
-      pipeline_manager: /tmp/pipeline_manager
-      read_bioinfo_metadata: /tmp/read_bioinfo_metadata
+    modules_outpath: {}
   json_schemas:
     relecov_schema: relecov_schema.json
     ena_schema: ena_schema.json
