@@ -2,11 +2,9 @@
 import os
 import sys
 import argparse
-import yaml
 import json
 from relecov_tools.validate import Validate
 from relecov_tools.download import Download
-from relecov_tools.config_json import ConfigJson
 
 
 def main():
