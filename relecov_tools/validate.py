@@ -40,6 +40,7 @@ class Validate(BaseModule):
     ):
         """Validate json file against the schema"""
         super().__init__(output_dir=output_dir, called_module=__name__)
+        self.config = ConfigJson(extra_config=True)
 
         self.log.info("Initiating validation process")
         # Check and load config params
