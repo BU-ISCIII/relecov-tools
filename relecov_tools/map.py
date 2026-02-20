@@ -31,7 +31,7 @@ class Map(BaseModule):
         output_dir=None,
     ):
         super().__init__(output_dir=output_dir, called_module=__name__)
-        config_json = ConfigJson()
+        config_json = ConfigJson(extra_config=True)
         self.config_json = config_json
         if origin_schema is None:
             origin_schema = os.path.join(
