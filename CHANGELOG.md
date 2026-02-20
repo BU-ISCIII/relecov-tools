@@ -27,12 +27,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Now Metadatalab validation sheets (DATA_VALIDATION and DROPDOWNS) only generate the included fields, not all of them [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
 - Fixed datetime recognition for schema example generation and validation [#854](https://github.com/BU-ISCIII/relecov-tools/pull/854)
 - Restore formatting and validation behavior after header reordering + add Excel warnings for MEPRAM [#856] (https://github.com/BU-ISCIII/relecov-tools/pull/856)
+- Adapted github actions workflows to load extra_config first [#863](https://github.com/BU-ISCIII/relecov-tools/pull/863)
 
 #### Changed
 
 - Changed `build_schema.build_new_schema` function: Now recursively iterates on complex properties to generate subschemas [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
 - Changed `assets/schema_utils/metadatalab_template.py`: Now supports iterative recursion to flatten nested schemas [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
 - Updated how project name is extracted from config in read-lab-metadata [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Include extra_config=True in all modules that did not have it [#863](https://github.com/BU-ISCIII/relecov-tools/pull/863)
 
 #### Removed
 
