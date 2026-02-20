@@ -127,13 +127,12 @@ jobs:
           --soft_validation \
           -o $OUTPUT_LOCATION
 
-    - name: Run validate module with upload files (default)
+    - name: Run validate module without --upload-files param (no sftp)
       if: matrix.modules == 'validate'
       run: |
         python3 tests/test_validate.py \
           -j tests/data/map_validate/processed_metadata_lab_test.json \
           -m tests/data/map_validate/metadata_lab_test.xlsx \
-          --upload_files \
           -o tests/data/map_validate/ \
           -s relecov_tools/schema/relecov_schema.json \
           -l tests/data/map_validate/previous_processes_log_summary.json
