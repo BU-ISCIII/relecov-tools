@@ -109,3 +109,41 @@ jobs:
         TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
         TEST_PORT: ${{ secrets.TEST_PORT }}
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
+    
+
+  test_validate_upload:
+    runs-on: ubuntu-latest
+    needs: test_wrapper
+    if: github.repository_owner == 'BU-ISCIII'
+
+    steps:
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.12'
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
+
+    - name: Install package and dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install .
+
+    - name: Load profile config (relecov)
+      run: |
+        relecov-tools add-extra-config \
+          --config_file relecov_tools/conf/initial_config-relecov.yaml --force
+    - name: Run validate module with upload files (expected default)
+      if: github.repository_owner == 'BU-ISCIII'
+      run: |
+        python3 tests/test_validate.py \
+          -j tests/data/map_validate/processed_metadata_lab_test.json \
+          -m tests/data/map_validate/metadata_lab_test.xlsx \
+          --upload_files \
+          -o tests/data/map_validate/ \
+          -s relecov_tools/schema/relecov_schema.json \
+          -l tests/data/map_validate/previous_processes_log_summary.json
