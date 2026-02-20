@@ -364,7 +364,7 @@ sftp_handle:
   required_conf: ["sftp_connection", "platform_storage_folder", "analysis_results_folder", "metadata_processing"]
   sftp_connection:
     sftp_server: sftpgenvigies.isciii.es
-    sftp_port: '50122'
+    sftp_port: '22'
   platform_storage_folder: /tmp/relecov
   analysis_results_folder: ANALYSIS_RESULTS
   metadata_processing:
