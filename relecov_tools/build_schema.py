@@ -461,8 +461,47 @@ class BuildSchema(BaseModule):
         )
         return draft_template
 
+    @staticmethod
+    def _cast_example_to_type(expected_type: str | None, value: any) -> any:
+        """Cast a single example value to the declared JSON-schema type when possible."""
+        if not isinstance(expected_type, str):
+            return value
+        expected = expected_type.strip().lower()
+        if expected == "string":
+            return str(value)
+        if expected == "integer":
+            try:
+                return int(float(value))
+            except (TypeError, ValueError):
+                return value
+        if expected == "number":
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return value
+        if expected == "boolean":
+            if isinstance(value, bool):
+                return value
+            if isinstance(value, str):
+                normalized = value.strip().lower()
+                if normalized in ("true", "1", "yes", "y"):
+                    return True
+                if normalized in ("false", "0", "no", "n"):
+                    return False
+            return value
+        return value
+
+    def _cast_examples_to_declared_type(
+        self, expected_type: str | None, values: list[any]
+    ) -> list[any]:
+        return [self._cast_example_to_type(expected_type, item) for item in values]
+
     def jsonschema_object(
-        self, property_id: str, property_feature_key: str, value: any
+        self,
+        property_id: str,
+        property_feature_key: str,
+        value: any,
+        expected_type: str | None = None,
     ) -> dict[str, any]:
         """
         Process a property keyword with their value and return a dictionary with fields for a property.
@@ -493,15 +532,25 @@ class BuildSchema(BaseModule):
                     jsonschema_value[key] = value
             # FIXME multiple examples will always be loaded as str, regardless of actual type
             case "examples", str(value):
-                jsonschema_value = {property_feature_key: value.split("; ")}
+                parsed_examples = value.split("; ")
+                parsed_examples = self._cast_examples_to_declared_type(
+                    expected_type, parsed_examples
+                )
+                jsonschema_value = {property_feature_key: parsed_examples}
             case "examples", datetime():
                 value = value.strftime("%Y-%m-%dT%H:%M:%S")
                 value = value.replace("T00:00:00", "")
-                jsonschema_value = {property_feature_key: [value]}
+                parsed_examples = self._cast_examples_to_declared_type(
+                    expected_type, [value]
+                )
+                jsonschema_value = {property_feature_key: parsed_examples}
             case "examples", int(value) | float(value):
                 value = float(value)
-                value = [int(value) if value.is_integer() else value]
-                jsonschema_value = {property_feature_key: value}
+                parsed_examples = [int(value) if value.is_integer() else value]
+                parsed_examples = self._cast_examples_to_declared_type(
+                    expected_type, parsed_examples
+                )
+                jsonschema_value = {property_feature_key: parsed_examples}
             case "enum", str():
                 jsonschema_value = {"$ref": f"#/$defs/enums/{property_id}"}
             case _, value if not pd.isna(value):
@@ -583,6 +632,7 @@ class BuildSchema(BaseModule):
                             property_id,
                             mapping_features[db_feature_key],
                             db_feature_value,
+                            expected_type=db_features_dic.get("type"),
                         )
                         if std_json_feature:
                             schema_property[property_id].update(std_json_feature)
