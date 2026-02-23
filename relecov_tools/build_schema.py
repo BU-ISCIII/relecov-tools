@@ -461,8 +461,9 @@ class BuildSchema(BaseModule):
         )
         return draft_template
 
-    @staticmethod
-    def _cast_example_to_type(expected_type: str | None, value: any) -> any:
+    def _cast_example_to_type(
+        self, property_id: str, expected_type: str | None, value: any
+    ) -> any:
         """Cast a single example value to the declared JSON-schema type when possible."""
         if not isinstance(expected_type, str):
             return value
@@ -471,13 +472,31 @@ class BuildSchema(BaseModule):
             return str(value)
         if expected == "integer":
             try:
-                return int(float(value))
+                parsed_number = float(value)
             except (TypeError, ValueError):
+                self.log.warning(
+                    "Example value %r for property '%s' does not match expected type 'integer'. Keeping original value.",
+                    value,
+                    property_id,
+                )
                 return value
+            if not parsed_number.is_integer():
+                self.log.warning(
+                    "Example value %r for property '%s' does not match expected type 'integer'. Keeping original value.",
+                    value,
+                    property_id,
+                )
+                return value
+            return int(parsed_number)
         if expected == "number":
             try:
                 return float(value)
             except (TypeError, ValueError):
+                self.log.warning(
+                    "Example value %r for property '%s' does not match expected type 'number'. Keeping original value.",
+                    value,
+                    property_id,
+                )
                 return value
         if expected == "boolean":
             if isinstance(value, bool):
@@ -488,13 +507,21 @@ class BuildSchema(BaseModule):
                     return True
                 if normalized in ("false", "0", "no", "n"):
                     return False
+            self.log.warning(
+                "Example value %r for property '%s' does not match expected type 'boolean'. Keeping original value.",
+                value,
+                property_id,
+            )
             return value
         return value
 
     def _cast_examples_to_declared_type(
-        self, expected_type: str | None, values: list[any]
+        self, property_id: str, expected_type: str | None, values: list[any]
     ) -> list[any]:
-        return [self._cast_example_to_type(expected_type, item) for item in values]
+        return [
+            self._cast_example_to_type(property_id, expected_type, item)
+            for item in values
+        ]
 
     def jsonschema_object(
         self,
@@ -534,21 +561,21 @@ class BuildSchema(BaseModule):
             case "examples", str(value):
                 parsed_examples = value.split("; ")
                 parsed_examples = self._cast_examples_to_declared_type(
-                    expected_type, parsed_examples
+                    property_id, expected_type, parsed_examples
                 )
                 jsonschema_value = {property_feature_key: parsed_examples}
             case "examples", datetime():
                 value = value.strftime("%Y-%m-%dT%H:%M:%S")
                 value = value.replace("T00:00:00", "")
                 parsed_examples = self._cast_examples_to_declared_type(
-                    expected_type, [value]
+                    property_id, expected_type, [value]
                 )
                 jsonschema_value = {property_feature_key: parsed_examples}
             case "examples", int(value) | float(value):
                 value = float(value)
                 parsed_examples = [int(value) if value.is_integer() else value]
                 parsed_examples = self._cast_examples_to_declared_type(
-                    expected_type, parsed_examples
+                    property_id, expected_type, parsed_examples
                 )
                 jsonschema_value = {property_feature_key: parsed_examples}
             case "enum", str():
