@@ -222,6 +222,11 @@ class BuildSchema(BaseModule):
         Returns two dictionaries with key in the three special fields:
         - dropdowns[field] ........ list ‘<name> [<city>] [<ccn>]’
         - uniques[field] .......... unique names for schema enum
+
+        NOTE:
+        For RELECOV, laboratory_address.json stores institution names under
+        `collecting_institution`. We intentionally reuse that same source for
+        collecting/submitting/sequencing to keep the three schema enums aligned.
         """
         json_path = os.path.join(
             os.path.dirname(__file__),
@@ -241,12 +246,13 @@ class BuildSchema(BaseModule):
 
         for ccn, info in lab_data.items():
             city = info.get("geo_loc_city", "").strip()
-
+            name = info.get("collecting_institution", "").strip()
+            if not name:
+                continue
+            dropdown_entry = f"{name} [{city}] [{ccn}]"
             for f in fields:
-                name = info.get(f, "").strip()
-                if name:
-                    dropdowns[f].append(f"{name} [{city}] [{ccn}]")
-                    uniques[f].add(name)
+                dropdowns[f].append(dropdown_entry)
+                uniques[f].add(name)
 
         dropdowns = {k: sorted(v) for k, v in dropdowns.items()}
         uniques = {k: sorted(v) for k, v in uniques.items()}
