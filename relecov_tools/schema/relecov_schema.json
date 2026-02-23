@@ -147,7 +147,7 @@
             "ontology": "GENEPIO:0001159",
             "description": "The name of the agency that submitted the sequence to the platform.",
             "examples": [
-                "Instituto de Salud Carlos III "
+                "Instituto De Salud Carlos Iii - Centro Nacional De Microbiologia [Majadahonda] [1328021542]"
             ],
             "$ref": "#/$defs/enums/submitting_institution",
             "classification": "Sample collection and processing",
@@ -160,7 +160,7 @@
             "ontology": "GENEPIO:0100416",
             "description": "The name of the agency that generated the sequence",
             "examples": [
-                "Instituto de Salud Carlos III "
+                "Instituto De Salud Carlos Iii - Centro Nacional De Microbiologia [Majadahonda] [1328021542]"
             ],
             "$ref": "#/$defs/enums/sequencing_institution",
             "classification": "Sequencing",
@@ -1281,7 +1281,9 @@
             "label": "processing_date",
             "ontology": "OBI:0002471",
             "description": "The time of a sample analysis process YYYY-MM-DD",
-            "examples": ["2022-07-15"],
+            "examples": [
+                "2022-07-15"
+            ],
             "classification": "Bioinformatics and QC metrics fields",
             "type": "string",
             "format": "date",
@@ -2174,7 +2176,7 @@
             "ontology": "NCIT:C164483",
             "description": "The date on which the activity or entity is created.",
             "examples": [
-                "e.g 2020-08-07"
+                "2020-08-07"
             ],
             "classification": "Public databases",
             "type": "string",
@@ -2570,28 +2572,28 @@
         }
     },
     "required": [
-        "enrichment_panel_version",
         "sequence_file_R1",
-        "sequencing_sample_id",
-        "library_layout",
-        "library_source",
-        "sequencing_instrument_model",
-        "collecting_institution_code_2",
-        "isolate_sample_id",
-        "organism",
-        "collecting_institution_code_1",
-        "host_common_name",
-        "submitting_institution",
-        "collecting_lab_sample_id",
-        "collecting_institution",
-        "geo_loc_state",
+        "host_scientific_name",
         "geo_loc_country",
+        "collecting_lab_sample_id",
+        "isolate_sample_id",
+        "geo_loc_state",
+        "sample_collection_date",
+        "library_layout",
+        "organism",
+        "sequencing_sample_id",
+        "library_source",
+        "collecting_institution",
         "library_strategy",
-        "enrichment_panel",
+        "submitting_institution",
         "sequencing_instrument_platform",
         "geo_loc_state_cod",
-        "sample_collection_date",
-        "host_scientific_name"
+        "sequencing_instrument_model",
+        "collecting_institution_code_1",
+        "host_common_name",
+        "enrichment_panel_version",
+        "enrichment_panel",
+        "collecting_institution_code_2"
     ],
     "$defs": {
         "enums": {
@@ -5758,6 +5760,8 @@
                     "Illumina Respiratory Pathogen ID/AMR Enrichment Panel",
                     "Illumina Viral Surveillance Panel v2",
                     "Twist Bioscience Respiratory Virus Research Panel",
+                    "Universal Influenza A primers (Zhou 2012 protocol)",
+                    "Universal Influenza B primers (Zhou 2014 protocol)",
                     "Other [NCIT:C17649]"
                 ]
             },
