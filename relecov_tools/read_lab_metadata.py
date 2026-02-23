@@ -67,21 +67,6 @@ class LabMetadata(BaseModule):
             )
             raise FileNotFoundError(f"Metadata file {self.metadata_file} not found")
 
-        self.config_json = ConfigJson(extra_config=True)
-        self.configuration = self.config_json
-        self.institution_config = self.config_json.get_configuration(
-            "institutions_config"
-        )
-
-        self.readmeta_config = (
-            self.configuration.get_configuration("read_lab_metadata") or {}
-        )
-        default_project = self.readmeta_config.get("default_project") or "relecov"
-        self.project = (project or default_project).lower()
-        self.project_config = self._load_project_config(
-            self.readmeta_config, self.project, default_project
-        )
-
         if sample_list_file is None:
             stderr.print("[yellow]No samples_data.json file provided")
             self.log.warning("No samples_data.json file provided")
@@ -121,6 +106,8 @@ class LabMetadata(BaseModule):
             self.configuration.get_configuration("read_lab_metadata") or {}
         )
         default_project = self.configuration.get_topic_data("generic", "project_name")
+        if not isinstance(default_project, str) or not default_project.strip():
+            default_project = "relecov"
         self.project = (project or default_project).lower()
         self.project_config = self._load_project_config(
             self.readmeta_config, self.project, default_project
@@ -259,7 +246,6 @@ class LabMetadata(BaseModule):
             )
         merged = self._deep_merge_dicts(base_config, overrides or {})
         merged.pop("projects", None)
-        merged.pop("default_project", None)
         return merged
 
     def _build_schema_field_map(self) -> dict[str, SchemaField]:
