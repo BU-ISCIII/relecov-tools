@@ -10,10 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Enrique Sapena](https://github.com/ESapenaVentura)
 - [Pablo Mata](https://github.com/shettland)
+- [Alejandro Bernabeu](https://github.com/aberdur)
 
 #### Added enhancements
 
 - Added handling of $refs for enums and typo fixing/style formatting for build_schema module [#844](https://github.com/BU-ISCIII/relecov-tools/pull/844)
+- Refactor configuration.json migration to initial-config profiles [#860]https://github.com/BU-ISCIII/relecov-tools/pull/860
 - Included configuration overwriting and validation via add-extra-config module [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
 - Included a new arg `topic_config` in add-extra-config to narrow config removal [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
 - Updated add-extra-config and included Initial configuration description in README.md [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
@@ -28,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed datetime recognition for schema example generation and validation [#854](https://github.com/BU-ISCIII/relecov-tools/pull/854)
 - Restore formatting and validation behavior after header reordering + add Excel warnings for MEPRAM [#856] (https://github.com/BU-ISCIII/relecov-tools/pull/856)
 - Adapted github actions workflows to load extra_config first [#863](https://github.com/BU-ISCIII/relecov-tools/pull/863)
+- Fix missing env vars in test_upload_validate step for test_sftp_modules [#866](https://github.com/BU-ISCIII/relecov-tools/pull/866)
 
 #### Changed
 
