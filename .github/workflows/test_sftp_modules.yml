@@ -147,3 +147,8 @@ jobs:
           -o tests/data/map_validate/ \
           -s relecov_tools/schema/relecov_schema.json \
           -l tests/data/map_validate/previous_processes_log_summary.json
+      env:
+        TEST_USER: ${{ secrets.TEST_USER }}
+        TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+        TEST_PORT: ${{ secrets.TEST_PORT }}
+        OUTPUT_LOCATION: ${{ github.workspace }}/tests/
