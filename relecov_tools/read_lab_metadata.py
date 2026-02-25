@@ -932,6 +932,7 @@ class LabMetadata(BaseModule):
                 )
                 if isinstance(key_for_checks, str) and "date" in key_for_checks.lower():
                     pattern = r"^\d{4}[-/.]\d{2}[-/.]\d{2}"
+                    compact_pattern = r"^\d{8}$"
                     if isinstance(raw_value, dtime):
                         value = str(raw_value.date())
                     elif re.match(pattern, str(raw_value)):
@@ -939,6 +940,16 @@ class LabMetadata(BaseModule):
                             pattern,
                             str(raw_value).replace("/", "-").replace(".", "-"),
                         ).group(0)
+                    elif re.match(compact_pattern, str(raw_value)):
+                        try:
+                            value = dtime.strptime(str(raw_value), "%Y%m%d").strftime(
+                                "%Y-%m-%d"
+                            )
+                        except ValueError:
+                            log_text = f"Invalid date format in {raw_key}: {raw_value}"
+                            self.logsum.add_error(sample=sample_id, entry=log_text)
+                            stderr.print(f"[red]{log_text} for sample {sample_id}")
+                            continue
                     else:
                         try:
                             value = str(int(float(str(raw_value))))
