@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated add-extra-config and included Initial configuration description in README.md [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
 - Updated test workflows to load initial_config-relecov.yaml first [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
 - Included three initial_config.yaml files for three projects: relecov, mepram & EQA2026 [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Normalize compact YYYYMMDD dates in read-lab-metadata [#867]https://github.com/BU-ISCIII/relecov-tools/pull/867
 
 #### Fixes
 
