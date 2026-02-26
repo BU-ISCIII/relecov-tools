@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changed `assets/schema_utils/metadatalab_template.py`: Now supports iterative recursion to flatten nested schemas [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
 - Updated how project name is extracted from config in read-lab-metadata [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
 - Include extra_config=True in all modules that did not have it [#863](https://github.com/BU-ISCIII/relecov-tools/pull/863)
+- Update relecov_schema.json title and add space removal check [#867]https://github.com/BU-ISCIII/relecov-tools/pull/867
 
 #### Removed
 
