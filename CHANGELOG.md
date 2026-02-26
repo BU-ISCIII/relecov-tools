@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Restore formatting and validation behavior after header reordering + add Excel warnings for MEPRAM [#856] (https://github.com/BU-ISCIII/relecov-tools/pull/856)
 - Adapted github actions workflows to load extra_config first [#863](https://github.com/BU-ISCIII/relecov-tools/pull/863)
 - Fix missing env vars in test_upload_validate step for test_sftp_modules [#866](https://github.com/BU-ISCIII/relecov-tools/pull/866)
+- read-lab-metadata: keep submitting_institution_id from metadata in EQA initial-config [#868](https://github.com/BU-ISCIII/relecov-tools/pull/868)
 
 #### Changed
 
