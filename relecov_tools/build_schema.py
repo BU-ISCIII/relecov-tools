@@ -745,8 +745,12 @@ class BuildSchema(BaseModule):
             # Fill schema header
             # FIXME: it gets 'relecov-tools' instead of RELECOV
             project_name = relecov_tools.utils.get_package_name()
+            if isinstance(project_name, str):
+                project_name = project_name.strip()
+            if " " in project_name:
+                project_name = re.sub(r"\s+", "-", project_name)
             new_schema["$id"] = relecov_tools.utils.get_schema_url()
-            new_schema["title"] = f"{project_name} Schema."
+            new_schema["title"] = f"{project_name}-schema"
             new_schema["description"] = (
                 f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
             )
