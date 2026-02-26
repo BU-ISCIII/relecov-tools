@@ -152,10 +152,8 @@ class LabMetadata(BaseModule):
         self.required_post_processing = (
             self.project_config.get("required_post_processing", {}) or {}
         )
-        self.force_submitting_institution_id_from_lab_code = bool(
-            self.project_config.get(
-                "force_submitting_institution_id_from_lab_code", True
-            )
+        self.force_submitting_institution_id_from_lab_code = self.project_config.get(
+            "force_submitting_institution_id_from_lab_code", True
         )
         self.json_req_files = self.project_config.get("lab_metadata_req_json", {}) or {}
         self.schema_name = self.relecov_sch_json["title"]
