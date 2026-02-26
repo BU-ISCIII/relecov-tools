@@ -80,6 +80,7 @@ read_lab_metadata:
   lab_metadata_req_json: {}
   json_enrich:
     on_missing_schema_field: warn
+  force_submitting_institution_id_from_lab_code: false
   required_copy_from_other_field: {}
   samples_json_fields:
   - sequence_file_R1_md5

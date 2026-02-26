@@ -152,6 +152,11 @@ class LabMetadata(BaseModule):
         self.required_post_processing = (
             self.project_config.get("required_post_processing", {}) or {}
         )
+        self.force_submitting_institution_id_from_lab_code = bool(
+            self.project_config.get(
+                "force_submitting_institution_id_from_lab_code", True
+            )
+        )
         self.json_req_files = self.project_config.get("lab_metadata_req_json", {}) or {}
         self.schema_name = self.relecov_sch_json["title"]
         self.schema_version = self.relecov_sch_json["version"]
@@ -499,7 +504,10 @@ class LabMetadata(BaseModule):
                 m_data[idx]["schema_name"] = self.schema_name
             if "schema_version" in self.schema_property_names:
                 m_data[idx]["schema_version"] = self.schema_version
-            if "submitting_institution_id" in self.schema_property_names:
+            if (
+                "submitting_institution_id" in self.schema_property_names
+                and self.force_submitting_institution_id_from_lab_code
+            ):
                 m_data[idx]["submitting_institution_id"] = self.lab_code
         return m_data
 
