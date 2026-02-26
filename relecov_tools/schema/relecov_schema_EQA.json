@@ -1536,6 +1536,7 @@
             "enum": [
                 "IRMA typing",
                 "INSaFLU",
+                "INSaFLU",
                 "Custom typing script"
             ],
             "examples": [
@@ -1601,6 +1602,7 @@
             "enum": [
                 "IRMA subtyping",
                 "INSaFLU",
+                "ABRicate",
                 "Custom subtyping script"
             ],
             "examples": [
