@@ -5,7 +5,7 @@
 # NOTE: Each key in 'modules_outpath' must match with a Command as listed with `relecov-tools --help` (but with '_' instead of '-')
 
 # required_conf lists will be merged with the ones in configuration.json without override, keeping the sum of both
-required_conf: ['generic', 'pipeline_manager', 'sftp_handle', 'read_lab_metadata', 'upload_to_gisaid', 'upload_to_ena', 'update_db', 'build_schema', 'download', 'logs_to_excel', 'mail_sender', 'map', 'metadata_homogeneizer', 'read_bioinfo_metadata', 'upload_results', 'validate', 'wrapper']
+required_conf: ['generic', 'pipeline_manager', 'sftp_handle', 'read_lab_metadata', 'upload_to_ena', 'update_db', 'build_schema', 'download', 'logs_to_excel', 'mail_sender', 'map', 'metadata_homogeneizer', 'read_bioinfo_metadata', 'upload_results', 'validate', 'wrapper']
 
 generic:
   required_conf: ["project_name", "json_schemas", "logs_config"]
@@ -194,23 +194,6 @@ upload_to_ena:
     file_checksum:
     - sequence_file_R1_md5
     - sequence_file_R2_md5
-
-upload_to_gisaid:
-  required_conf: ["args"]
-  args:
-    user: ''
-    password: ''
-    client_id: ''
-    token: ''
-    gisaid_json: ''
-    input_path: ''
-    output_dir: ''
-    frameshift: ''
-    proxy_config: ''
-    single: false
-    gzip: false
-  GISAID_configuration:
-    submitter: GISAID_ID
 
 update_db:
   required_conf: ["args", "platform-params", "iskylims_fixed_values", "relecov_sample_metadata"]
