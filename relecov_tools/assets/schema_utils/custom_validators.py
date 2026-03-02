@@ -32,7 +32,7 @@ def validate_with_exceptions(schema, data, errors):
         if (
             error.validator == "type"
             and error.instance
-            == relecov_tools.config_json.ConfigJson().get_topic_data(
+            == relecov_tools.config_json.ConfigJson(extra_config=True).get_topic_data(
                 "generic", "not_provided_field"
             )
             and prop_schema.get("type") in ["integer", "number"]
@@ -43,7 +43,7 @@ def validate_with_exceptions(schema, data, errors):
         if (
             error.validator == "format"
             and error.instance
-            == relecov_tools.config_json.ConfigJson().get_topic_data(
+            == relecov_tools.config_json.ConfigJson(extra_config=True).get_topic_data(
                 "generic", "not_provided_field"
             )
             and prop_schema.get("type") == "string"

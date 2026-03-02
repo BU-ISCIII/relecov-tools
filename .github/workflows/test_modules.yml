@@ -47,9 +47,15 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install .
+
+    - name: Load profile config (relecov)
+      run: |
+        relecov-tools add-extra-config \
+          --config_file relecov_tools/conf/initial_config-relecov.yaml --force
+
     - name: Run each module tests
       run: |
-        relecov-tools map -j tests/data/map_validate/processed_metadata_lab_test.json -p relecov_tools/schema/relecov_schema.json ${{ matrix.map_args }} -o .
+        relecov-tools --debug map -j tests/data/map_validate/processed_metadata_lab_test.json -p relecov_tools/schema/relecov_schema.json ${{ matrix.map_args }} -o .
       env:
         OUTPUT_LOCATION: ${{ github.workspace }}/tests/
     - name: Upload output file
@@ -87,6 +93,11 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install .
+    
+    - name: Load profile config (relecov)
+      run: |
+        relecov-tools add-extra-config \
+          --config_file relecov_tools/conf/initial_config-relecov.yaml --force
 
     - name: Run read-lab-metadata module
       if: matrix.modules == 'read-lab-metadata'
@@ -110,18 +121,18 @@ jobs:
       run: |
         relecov-tools read-bioinfo-metadata \
           --json_file tests/data/read_bioinfo_metadata/validated_samples.json \
+          --json_schema_file relecov_tools/schema/relecov_schema.json \
           --input_folder tests/data/read_bioinfo_metadata/analysis_folder/ \
           --software_name viralrecon \
           --soft_validation \
           -o $OUTPUT_LOCATION
 
-    - name: Run validate module with upload files (default)
+    - name: Run validate module without --upload-files param (no sftp)
       if: matrix.modules == 'validate'
       run: |
-        python3 tests/test_validate.py \
+        relecov-tools validate \
           -j tests/data/map_validate/processed_metadata_lab_test.json \
           -m tests/data/map_validate/metadata_lab_test.xlsx \
-          --upload_files \
           -o tests/data/map_validate/ \
           -s relecov_tools/schema/relecov_schema.json \
           -l tests/data/map_validate/previous_processes_log_summary.json

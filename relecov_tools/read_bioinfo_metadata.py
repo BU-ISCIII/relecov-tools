@@ -94,7 +94,7 @@ class BioinfoMetadata(BaseModule):
         self.logsum = self.parent_log_summary(output_dir=output_dir)
 
         # Init config
-        self.config_json = ConfigJson()
+        self.config_json = ConfigJson(extra_config=True)
 
         # Init attributes
         self._init_input_folder(input_folder)

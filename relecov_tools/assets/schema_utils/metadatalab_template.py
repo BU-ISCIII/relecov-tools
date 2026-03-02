@@ -10,7 +10,6 @@ from openpyxl.utils import column_index_from_string
 from openpyxl.formatting.rule import FormulaRule
 from openpyxl.styles import PatternFill
 
-
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
@@ -20,7 +19,7 @@ stderr = rich.console.Console(
 )
 
 
-def schema_to_flatten_json(json_data, required_properties=None):
+def schema_to_flatten_json(json_data, required_properties=None, parent_property_id=""):
     """Return the schema flattened to a list while keeping parent metadata."""
     try:
         required_set = set(required_properties or [])
@@ -34,31 +33,21 @@ def schema_to_flatten_json(json_data, required_properties=None):
                 )
                 if is_complex_array:
                     items_schema = features.get("items", {})
-                    complex_properties = items_schema.get("properties", {})
                     required_list = items_schema.get(
                         "required", features.get("required", [])
                     )
-                    complex_required = set(required_list)
-                    for (
-                        complex_property_id,
-                        complex_feature,
-                    ) in complex_properties.items():
-                        row = dict(complex_feature)
-                        row["property_id"] = f"{property_id}.{complex_property_id}"
-                        row["field_id"] = complex_property_id
-                        row["parent_property_id"] = property_id
-                        row["parent_label"] = features.get("label", "")
-                        row["parent_classification"] = features.get(
-                            "classification", ""
-                        )
-                        row["is_required"] = complex_property_id in complex_required
-                        flatten_rows.append(row)
+                    complex_row = schema_to_flatten_json(
+                        items_schema.get("properties", {}),
+                        required_properties=required_list,
+                        parent_property_id=f"{property_id}.",
+                    )
+                    flatten_rows.extend(complex_row)
                 else:
                     row = dict(features)
-                    row["property_id"] = property_id
+                    row["property_id"] = f"{parent_property_id}{property_id}"
                     row["field_id"] = property_id
-                    row["parent_property_id"] = None
-                    row["parent_label"] = ""
+                    row["parent_property_id"] = None  # or parent_property_id
+                    row["parent_label"] = ""  # parent_property_id
                     row["parent_classification"] = ""
                     row["is_required"] = property_id in required_set
                     flatten_rows.append(row)
@@ -150,6 +139,17 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
             }
         )
 
+        # First column format
+        no_fill_formater = workbook.add_format(
+            {
+                "bold": True,
+                "text_wrap": False,
+                "valign": "center",
+                "fg_color": "#D4D3D3",  # Light gray
+                "locked": True,
+            }
+        )
+
         cell_formater = workbook.add_format(
             {
                 "border": 1,  # Apply border to every cell
@@ -204,7 +204,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                             stderr.print(
                                 f"Error writing first column at row {row_num}: {e}"
                             )
-                        if row_num == 0 and col_num >= 0 and sheet == "METADATA_LAB":
+                        if row_num == 3 and col_num >= 0 and sheet == "METADATA_LAB":
                             try:
                                 worksheet.write(
                                     row_num,
@@ -222,6 +222,16 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                     worksheet.write(index_num, 0, index_val, first_col_formater)
                 except Exception as e:
                     stderr.print(f"Error writing first column at row {row_num}: {e}")
+
+        if sheet == "METADATA_LAB":
+            # Format the first column for all data rows (from row 5 onwards)
+            max_rows = 1000  # Maximum number of rows to format
+            for row_num in range(len(df), max_rows):
+                try:
+                    worksheet.write(row_num, 0, "", no_fill_formater)
+                except Exception as e:
+                    stderr.print(f"Error formatting first column at row {row_num}: {e}")
+
     except Exception as e:
         stderr.print(f"Error in excel_formater: {e}")
 
@@ -231,7 +241,7 @@ def create_condition(ws_metadata, conditions, df_filtered):
     label_to_property = dict(zip(df_filtered["label"], df_filtered["property_id"]))
     column_map = {}
 
-    for cell in ws_metadata[4]:
+    for cell in ws_metadata[1]:
         property_id = label_to_property.get(cell.value)
         if property_id in conditions:
             column_map[property_id] = cell.column_letter
@@ -288,7 +298,7 @@ def add_conditional_format_age_check(
     label_to_property = dict(zip(df_filtered["label"], df_filtered["property_id"]))
 
     column_map = {}
-    for cell in ws_metadata[4]:
+    for cell in ws_metadata[1]:
         property_id = label_to_property.get(cell.value)
         if property_id:
             column_map[property_id] = cell.column_letter

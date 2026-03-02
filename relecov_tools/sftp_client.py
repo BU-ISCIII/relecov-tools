@@ -33,7 +33,7 @@ class SftpClient:
 
     def __init__(self, conf_file=None, username=None, password=None):
         if not conf_file:
-            config_json = ConfigJson()
+            config_json = ConfigJson(extra_config=True)
             self.sftp_server = config_json.get_topic_data("sftp_handle", "sftp_server")
             self.sftp_port = config_json.get_topic_data("sftp_handle", "sftp_port")
         else:
@@ -54,6 +54,15 @@ class SftpClient:
                     "[red] Could not find the key " + e + "in config file " + conf_file
                 )
                 sys.exit(1)
+        if self.sftp_port in (None, ""):
+            self.sftp_port = 22
+        try:
+            self.sftp_port = int(self.sftp_port)
+        except (TypeError, ValueError):
+            log.warning(
+                "Could not parse sftp_port '%s'. Falling back to 22.", self.sftp_port
+            )
+            self.sftp_port = 22
         self.user_name = username
         self.password = password
         self.client = paramiko.SSHClient()
@@ -85,6 +94,13 @@ class SftpClient:
     def open_connection(self):
         """Establishing sftp connection"""
         log.info("Setting credentials for SFTP connection with remote server")
+        if not self.sftp_server:
+            msg = (
+                "SFTP server not configured. Missing sftp_handle.sftp_connection.sftp_server "
+                "(or legacy sftp_handle.sftp_server)."
+            )
+            log.error(msg)
+            raise ValueError(msg)
         self.client.connect(
             hostname=self.sftp_server,
             port=self.sftp_port,

@@ -2,11 +2,9 @@
 import os
 import sys
 import argparse
-import yaml
 import json
 from relecov_tools.validate import Validate
 from relecov_tools.download import Download
-from relecov_tools.config_json import ConfigJson
 
 
 def main():
@@ -52,10 +50,6 @@ def main():
         help="Path to the previous process's log summary JSON file.",
     )
     args = parser.parse_args()
-    print("Creating extra_config yaml")
-    conf_file = generate_config_yaml()
-    config_json = ConfigJson()
-    config_json.include_extra_config(conf_file, config_name=None, force=True)
     print("Fixing filepaths in json file")
     update_json_filepaths(args.json_file)
     print("Initiating validate module")
@@ -66,32 +60,6 @@ def main():
     validation.execute_validation_process()
     invalid_sftp_folder = validation.remote_outfold.replace("./", "")
     clean_remote_test(invalid_sftp_folder)
-
-
-def generate_config_yaml():
-    """Generate the wrapper_config.yaml file with the desired structure."""
-    config_data = {
-        "download": {
-            "user": "",
-            "password": "",
-            "conf_file": "",
-            "output_dir": "",
-            "download_option": "download_clean",
-            "subfolder": "RELECOV",
-        },
-        "validate": {
-            "json_file": "",
-            "metadata": "",
-            "output_dir": "",
-            "excel_sheet": "",
-            "json_schema_file": "relecov_tools/schema/relecov_schema.json",
-        },
-    }
-
-    with open("extra_config.yaml", "w") as file:
-        yaml.dump(config_data, file, default_flow_style=False)
-
-    return "extra_config.yaml"
 
 
 def clean_remote_test(invalid_sftp_folder):

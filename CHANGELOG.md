@@ -4,6 +4,50 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2025-27-02 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.8.0>
+
+### Credits
+
+- [Enrique Sapena](https://github.com/ESapenaVentura)
+- [Pablo Mata](https://github.com/shettland)
+- [Alejandro Bernabeu](https://github.com/aberdur)
+
+#### Added enhancements
+
+- Added handling of $refs for enums and typo fixing/style formatting for build_schema module [#844](https://github.com/BU-ISCIII/relecov-tools/pull/844)
+- Refactor configuration.json migration to initial-config profiles [#860]https://github.com/BU-ISCIII/relecov-tools/pull/860
+- Included configuration overwriting and validation via add-extra-config module [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Included a new arg `topic_config` in add-extra-config to narrow config removal [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Updated add-extra-config and included Initial configuration description in README.md [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Updated test workflows to load initial_config-relecov.yaml first [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Included three initial_config.yaml files for three projects: relecov, mepram & EQA2026 [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Normalize compact YYYYMMDD dates in read-lab-metadata [#867]https://github.com/BU-ISCIII/relecov-tools/pull/867
+
+#### Fixes
+
+- Fix small bug on type/examples consistency for float/integer fields in JSON schema generation (build_schema module) [#844](https://github.com/BU-ISCIII/relecov-tools/pull/844)
+- Fix header generation for `METADATA_LAB` and `DATA_VALIDATION`: now "CAMPO" is the first row, "REQUIRED" last [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
+- Now Metadatalab validation sheets (DATA_VALIDATION and DROPDOWNS) only generate the included fields, not all of them [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
+- Fixed datetime recognition for schema example generation and validation [#854](https://github.com/BU-ISCIII/relecov-tools/pull/854)
+- Restore formatting and validation behavior after header reordering + add Excel warnings for MEPRAM [#856] (https://github.com/BU-ISCIII/relecov-tools/pull/856)
+- Adapted github actions workflows to load extra_config first [#863](https://github.com/BU-ISCIII/relecov-tools/pull/863)
+- Fix missing env vars in test_upload_validate step for test_sftp_modules [#866](https://github.com/BU-ISCIII/relecov-tools/pull/866)
+- read-lab-metadata: keep submitting_institution_id from metadata in EQA initial-config [#868](https://github.com/BU-ISCIII/relecov-tools/pull/868)
+
+#### Changed
+
+- Changed `build_schema.build_new_schema` function: Now recursively iterates on complex properties to generate subschemas [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
+- Changed `assets/schema_utils/metadatalab_template.py`: Now supports iterative recursion to flatten nested schemas [#849](https://github.com/BU-ISCIII/relecov-tools/pull/849)
+- Updated how project name is extracted from config in read-lab-metadata [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+- Include extra_config=True in all modules that did not have it [#863](https://github.com/BU-ISCIII/relecov-tools/pull/863)
+- Update relecov_schema.json title and add space removal check [#867]https://github.com/BU-ISCIII/relecov-tools/pull/867
+
+#### Removed
+
+- Removed all project-specific config from configuration.json and moved it to initial_config.yaml files [#861]https://github.com/BU-ISCIII/relecov-tools/pull/861
+
+### Requirements
+
 ## [1.7.4] - 2025-12-15 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.4>
 
 ### Credits

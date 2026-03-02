@@ -3,6 +3,8 @@ import json
 import os
 import yaml
 import logging
+import copy
+from typing import Any, Optional
 
 import relecov_tools.utils
 
@@ -15,17 +17,21 @@ class ConfigJson:
     ----------------------------------------------------------------------------
     Purpose
     -------
-    Load *configuration.json* (defaults) and, optionally, the user
-    *extra_config.json* (overrides). Internally we normalise everything to the
-    dual-level layout **params / commands**:
+    Load *configuration.json* (defaults) and the user's *extra_config.json* (overrides)
+    which should be created using an initial_config***.yaml file via relecov-tools add-extra-config.
+    Internally self.json_data is normalised to a dual-level layout **params / commands**:
 
         {
+          "required_conf":
+              ["download", "generic", ...]      # ← If these keys are not present in the config or are equal to "", config validation will fail.
           "download": {
-              "params": {                    # ← defaults (configuration.json)
+              "params": {                       # ← Params from configuration.json + extra_config.json (Extra_config overrides if found in both).
+                  "required_conf":
+                      ["threads", "output_dir"] # ← required_conf keeps the sum of those in configuration.json and extra_config after merge, not overrided.
                   "threads": 4,
                   "output_dir": "/default/path"
               },
-              "commands": {                  # ← overrides (extra_config.json)
+              "commands": {                     # ← `args` from extra_config.json to be used as *args for the modules if not given via CLI
                   "threads": 8
               }
           },
@@ -52,9 +58,11 @@ class ConfigJson:
 
     def __init__(
         self,
-        json_file=os.path.join(os.path.dirname(__file__), "conf", "configuration.json"),
-        extra_config=False,
-    ):
+        json_file: str = os.path.join(
+            os.path.dirname(__file__), "conf", "configuration.json"
+        ),
+        extra_config: bool = False,
+    ) -> None:
         """Load config content in configuration.json and additional config if required
 
         Parameters
@@ -67,8 +75,7 @@ class ConfigJson:
         """
         # ── 1. Load defaults ------------------------------------------------
         with open(json_file, "r", encoding="utf-8") as fh:
-            base_conf = json.load(fh)
-
+            self.base_conf = json.load(fh)
         # ── 2. Optionally load user overrides -------------------------------
         extra_conf, active_extra = {}, False
         if extra_config and os.path.isfile(ConfigJson._extra_config_path):
@@ -87,23 +94,16 @@ class ConfigJson:
                 "Run `relecov-tools add-extra-config` to include additional configuration"
             )
 
-        # ── 3. Build an index  <leaf-key → first-level-parent> ---------------
-        #    Needed to relocate overrides that appear outside their branch
-        self._leaf_parent = {}
-
-        def _index_parents(node: dict, top_key: str):
-            if not isinstance(node, dict):
-                return
-            for k, v in node.items():
-                self._leaf_parent.setdefault(k, top_key)
-                _index_parents(v, top_key)
-
-        for first_level_key, subtree in base_conf.items():
-            _index_parents(subtree, first_level_key)
-
-        # ── 4. Merge defaults + overrides into params/commands ---------------
-        self.json_data = self._nested_merge_with_commands(base_conf, extra_conf)
-
+        # ── 3. Merge defaults + overrides into params/args ---------------
+        self.json_data = self._nested_merge_with_args(self.base_conf, extra_conf)
+        missing_required = self.validate_configuration(self.json_data)
+        if missing_required:
+            log.error(
+                f"Could not validate current configuration. Missing required config: {missing_required}"
+            )
+            raise ValueError(
+                f"Required configuration missing in current config: {missing_required}"
+            )
         log.debug(
             "Loaded additional configuration."
             if active_extra
@@ -111,7 +111,9 @@ class ConfigJson:
         )
         self.topic_config = list(self.json_data.keys())
 
-    def get_configuration(self, topic: str, *, raw: bool = False):
+    def get_configuration(
+        self, topic: str, *, raw: bool = False
+    ) -> Optional[dict[str, Any]]:
         """
         Return the configuration block for *topic*.
 
@@ -143,14 +145,14 @@ class ConfigJson:
 
         return block
 
-    def get_topic_data(self, topic: str, found: str):
+    def get_topic_data(self, topic: str, found: str) -> Any:
         """
         Fetch a single value *found* from *topic*.
 
         Search priority
         ----------------
         1. **commands** – overrides
-        2. **params**   – defaults
+        2. **params**   – merged from default and extra_config. Overrided by extra_config if in both
         3. Recursive search inside both dicts
         4. Legacy flat section (back-compat)
 
@@ -161,7 +163,7 @@ class ConfigJson:
         """
 
         # ── Helper: depth-first search in nested dicts ──────────────────────
-        def _recursive_lookup(node, key):
+        def _recursive_lookup(node: Any, key: str) -> Any:
             """Searches for `key` at any level of nested dictionaries."""
             if not isinstance(node, dict):
                 return None
@@ -201,7 +203,137 @@ class ConfigJson:
         # ── 4. Legacy with deeper nesting ───────────────────────────────────
         return _recursive_lookup(topic_block, found)
 
-    def include_extra_config(self, config_file, config_name=None, force=False):
+    def validate_configuration(self, config_dict: dict) -> list[str]:
+        """Validate the given configuration dictionary, preferably after merge.
+
+        Args:
+            config_name (dict): Dictionary containing all the configuration from
+            the JSON or YAML file.
+
+        Raises:
+            ValueError: If any there is any required field missing.
+
+        Returns:
+            missing_required (list): List of the missing configuration fields.
+        """
+
+        def recursive_validation(deep_conf: dict, parent: str) -> list[str]:
+            """Recursively check if required keys are present in given config"""
+            missing = []
+            required_list = deep_conf.get(req_key, [])
+            for req in required_list:
+                if deep_conf.get(req, "") == "":
+                    # No he usado `not` porque 0 y False son valores válidos
+                    new_parent = ".".join([parent, req]) if parent else req
+                    missing.append(new_parent)
+            for key, val in deep_conf.items():
+                if isinstance(val, dict):
+                    new_parent = ".".join([parent, key]) if parent else key
+                    missing.extend(recursive_validation(val, new_parent))
+            return missing
+
+        req_key = "required_conf"
+        glob_required = config_dict.pop(req_key) if req_key in config_dict else []
+        log.debug(f"Starting config validation for given keys: {config_dict.keys()}")
+        missing_required = [x for x in glob_required if not config_dict.get(x)]
+        for key in config_dict.keys():
+            conf_data = config_dict[key]
+            if "params" in conf_data and "commands" in conf_data:
+                # Its parsed from _nested_merge_with_args() so config is inside params
+                missing_required.extend(
+                    recursive_validation(config_dict[key]["params"], parent=key)
+                )
+            else:
+                missing_required.extend(
+                    recursive_validation(config_dict[key], parent=key)
+                )
+        return missing_required
+
+    def insert_new_config(
+        self, config_name: str, current_conf: dict, force: bool = False
+    ) -> bool:
+        """Check if config_name is already in configuration"""
+        if config_name in current_conf.keys():
+            if force:
+                log.info(f"`{config_name}` already in config. Replacing its content...")
+                return True
+            else:
+                err_txt = f"Cannot add `{config_name}`: already in config. Set `force` to force replacement"
+                log.error(err_txt)
+                return False
+        else:
+            return True
+
+    def merge_config(
+        self, config_dict: dict, new_config: dict, force: bool = True
+    ) -> tuple[dict, dict]:
+        """
+        Recursively merge a new configuration dictionary into an existing one.
+
+        This method updates ``config_dict`` with values from ``new_config`` while:
+            - Preserving existing keys unless specified with **force**
+            - Recursively merging nested dictionaries
+            - Tracking which changes were applied or canceled
+            - Delegating overwrite decisions to ``self.insert_new_config``
+
+        Args:
+            config_dict (dict):
+                The original configuration dictionary to update.
+
+            new_config (dict):
+                The new configuration values to merge into the original dictionary.
+
+            force (bool, optional):
+                If True, allows overwriting existing values. Defaults to True.
+
+        Returns:
+            tuple:
+                - merged_dict (dict): The updated configuration dictionary.
+                - summary (dict): A dictionary summarizing merge actions with keys:
+                    * "Included": list of applied changes
+                    * "Canceled": list of rejected changes
+        """
+
+        def _rec_merge(
+            current_conf: dict, new_conf: dict, force: bool = False, parent: str = ""
+        ) -> dict:
+            """Recursively add new configuration without deleting the existing keys"""
+            for k, v in new_conf.items():
+                new_parent = ".".join([parent, k]) if parent else k
+                if k in current_conf and current_conf[k] == v:
+                    continue
+                if (
+                    isinstance(v, dict)
+                    and k in current_conf
+                    and isinstance(current_conf[k], dict)
+                ):
+                    _rec_merge(current_conf[k], v, force=force, parent=new_parent)
+                else:
+                    change_msg = f"{new_parent}: {current_conf.get(k, '')} -> {v}"
+                    if not self.insert_new_config(k, current_conf, force=force):
+                        summary["Canceled"].append(change_msg)
+                        continue
+                    if k == "required_conf":
+                        try:
+                            updated_list = list(set(current_conf.get(k, []) + v))
+                            change_msg = f"{new_parent}: {current_conf.get(k, '')} -> {updated_list}"
+                            current_conf[k] = updated_list
+                        except TypeError:
+                            log.error(
+                                f"Skipped {new_parent}. It should be a list instead of {type(v)}"
+                            )
+                    else:
+                        current_conf[k] = v
+                    summary["Included"].append(change_msg)
+            return current_conf
+
+        summary = {"Canceled": [], "Included": []}
+        merged_dict = _rec_merge(config_dict, new_config, force=force)
+        return merged_dict, summary
+
+    def include_extra_config(
+        self, config_file: str, config_name: Optional[str] = None, force: bool = False
+    ) -> None:
         """Include given file content as additional configuration for later usage.
 
         Args:
@@ -212,34 +344,6 @@ class ConfigJson:
         Raises:
             ValueError: If provided config_file does not have a supported extension.
         """
-
-        def validate_new_config(config_name, current_conf, force=False):
-            """Check if config_name is already in configuration"""
-            if config_name in current_conf.keys():
-                if force:
-                    log.info(
-                        f"`{config_name}` already in config. Replacing its content..."
-                    )
-                    return True
-                else:
-                    err_txt = f"Cannot add `{config_name}`: already in config. Set `force` to force replacement"
-                    log.error(err_txt)
-                    return False
-            else:
-                return True
-
-        def rec_merge_config(current_conf, new_conf, force=False):
-            """Recursively add new configuration without deleting the existing keys"""
-            for k, v in new_conf.items():
-                if isinstance(v, dict) and k in current_conf:
-                    rec_merge_config(current_conf[k], v, force=force)
-                else:
-                    change_msg = f"{k}: {current_conf.get(k, '')} -> {v}"
-                    if not validate_new_config(k, current_conf, force=force):
-                        summary["Canceled"].append(change_msg)
-                        continue
-                    summary["Included"].append(change_msg)
-                    current_conf[k] = v
 
         if not os.path.isfile(str(config_file)):
             raise FileNotFoundError(f"Extra config file {config_file} does not exist")
@@ -263,9 +367,11 @@ class ConfigJson:
                 )
         if additional_config is not None:
             if config_name is None:
-                rec_merge_config(additional_config, file_content, force=force)
+                additional_config, summary = self.merge_config(
+                    additional_config, file_content, force=force
+                )
             else:
-                if validate_new_config(config_name, self.json_data, force=force):
+                if self.insert_new_config(config_name, self.json_data, force=force):
                     msg = f"{config_name}: {file_content}"
                     summary["Included"].append(msg)
                     additional_config.update({config_name: file_content})
@@ -275,6 +381,17 @@ class ConfigJson:
             else:
                 additional_config = {config_name: file_content}
             summary["Included"].extend(list(additional_config.keys()))
+        full_test_conf, _ = self.merge_config(
+            copy.deepcopy(self.base_conf), additional_config, force=force
+        )
+        missing_required = self.validate_configuration(full_test_conf)
+        if missing_required:
+            log.error(
+                f"Could not validate incoming extra config. Missing required config: {missing_required}"
+            )
+            raise ValueError(
+                f"Required configuration missing from incoming config: {missing_required}"
+            )
         relecov_tools.utils.write_json_to_file(
             additional_config, ConfigJson._extra_config_path
         )
@@ -284,38 +401,115 @@ class ConfigJson:
             print(state, ":\n", "\n".join([str(msg) for msg in changes]))
         return
 
-    def remove_extra_config(self, config_name):
-        """Remove key from extra_config configuration file
+    def remove_extra_config(
+        self,
+        topic: Optional[str] = None,
+        deep: Optional[str] = None,
+        force: bool = False,
+    ) -> None:
+        """Remove key from extra_config configuration file.
 
         Args:
-            config_name (str): _description_
+            topic (str | None): top-level key
+            deep (str | None): nested key to remove
+            force (bool): if False, ask for confirmation before removing
         """
-        if config_name is None:
+
+        if topic is None and deep is None:
+            # Remove extra_config.json file
+            if not force:
+                confirm = input("Remove entire extra_config file? [y/N]: ")
+                if confirm.lower() != "y":
+                    print("Aborted.")
+                    return
+
             try:
                 os.remove(ConfigJson._extra_config_path)
                 log.info("Removed extra config file.")
             except OSError as e:
                 log.error(f"Could not remove extra config file: {e}")
-                return
-        else:
-            with open(ConfigJson._extra_config_path, "r") as fh:
-                additional_config = json.load(fh)
-            try:
-                additional_config.pop(config_name)
-            except KeyError:
-                log.error(f"{config_name} not found in extra_config for removal")
-                return
-            except OSError as e:
-                log.error(f"Could not remove {config_name} key: {e}")
-                return
-            relecov_tools.utils.write_json_to_file(
-                additional_config, ConfigJson._extra_config_path
-            )
-            log.info(f"Successfully removed {config_name} from extra config")
-        print(f"Finished clearing extra config: {config_name}")
-        return
+            return
 
-    def get_lab_code(self, submitting_institution):
+        with open(ConfigJson._extra_config_path, "r") as fh:
+            additional_config = json.load(fh)
+
+        removed_paths = []
+
+        def recursive_remove(
+            config: Any, key_to_remove: str, current_path: str = ""
+        ) -> bool:
+            """Recursively search and remove configuration"""
+            removed = False
+
+            if isinstance(config, dict):
+                keys_to_delete = []
+                for k, v in config.items():
+                    path = f"{current_path}.{k}" if current_path else k
+
+                    if k == key_to_remove:
+                        keys_to_delete.append((path, k))
+                        removed = True
+                    else:
+                        if recursive_remove(v, key_to_remove, path):
+                            removed = True
+
+                for tup in keys_to_delete:
+                    path = tup[0]
+                    k = tup[1]
+                    if not force:
+                        confirm = input(f"Remove '{path}'? [y/N]: ")
+                        if confirm.lower() != "y":
+                            print(f"Skipped {path}.")
+                            continue
+                    config.pop(k)
+                    removed_paths.append(path)
+
+            elif isinstance(config, list):
+                for idx, item in enumerate(config):
+                    path = f"{current_path}[{idx}]"
+                    if recursive_remove(item, key_to_remove, path):
+                        removed = True
+
+            return removed
+
+        if topic and deep is None:
+            # Only remove topic
+            if topic not in additional_config:
+                log.error(f"Main key `{topic}` not found in extra_config")
+                return
+
+            if not force:
+                confirm = input(f"Remove entire config '{topic}'? [y/N]: ")
+                if confirm.lower() != "y":
+                    print("Aborted.")
+                    return
+
+            additional_config.pop(topic)
+            removed_paths.append(topic)
+
+        elif topic and deep:
+            if topic not in additional_config:
+                log.error(f"Main key `{topic}` not found in extra_config")
+                return
+            # Try to find config deep inside topic
+            recursive_remove(additional_config[topic], deep, topic)
+
+        elif topic is None and deep:
+            # Try to find deep anywhere, even for multiple matches
+            recursive_remove(additional_config, deep)
+
+        if not removed_paths:
+            log.warning(f"No matches found for topic={topic}, deep={deep}")
+            return
+
+        relecov_tools.utils.write_json_to_file(
+            additional_config, ConfigJson._extra_config_path
+        )
+
+        log.info(f"Removed {len(removed_paths)} key(s)")
+        print(f"Finished clearing extra config. Removed: {removed_paths}")
+
+    def get_lab_code(self, submitting_institution: Optional[str]) -> Optional[str]:
         """Get the corresponding code for the given submitting institution"""
         if submitting_institution is None:
             log.warning("No submitting institution could be found to update lab_code")
@@ -331,27 +525,35 @@ class ConfigJson:
             log.warning(f"{submitting_institution} not found in institutions_config")
         return
 
-    def _nested_merge_with_commands(self, base_conf: dict, extra_conf: dict) -> dict:
+    def _nested_merge_with_args(self, base_conf: dict, extra_conf: dict) -> dict:
         """
-        Produce the *params / commands* structure described in the class docstring.
+        Produce the *params / args* structure described in the class docstring.
 
-        • Everything from *configuration.json* → **params**
-        • Everything from *extra_config.json* → **commands**
+        • Everything from 'args' in *extra_config.json* → **commands**
+        • Everything else *configuration.json* or *extra_config.json* → **params**
           (relocating the key to its first-level parent if necessary).
+        • Note: Data from *extra_config.json* will override config in *configuration.json*
         """
         merged = {}
+
+        base_reqs = (
+            base_conf.pop("required_conf") if "required_conf" in base_conf else []
+        )
+        extra_reqs = (
+            extra_conf.pop("required_conf") if "required_conf" in extra_conf else []
+        )
+        merged_reqs = list(set(base_reqs + extra_reqs))
+        merged["required_conf"] = merged_reqs
 
         for key, val in base_conf.items():
             merged[key] = {"params": val, "commands": {}}
 
         for key, val in extra_conf.items():
+            val_args = val.get("args", [])
             if key in merged:
-                merged[key]["commands"] = val
-            elif key in self._leaf_parent:
-                parent = self._leaf_parent[key]
-                merged.setdefault(parent, {"params": {}, "commands": {}})
-                merged[parent]["commands"][key] = val
+                merged[key]["commands"] = val_args
+                current_params = copy.deepcopy(merged[key]["params"])
+                merged[key]["params"], _ = self.merge_config(current_params, val)
             else:
-                merged[key] = {"params": {}, "commands": val}
-
+                merged[key] = {"params": val, "commands": val_args}
         return merged

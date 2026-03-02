@@ -1,0 +1,351 @@
+# THIS INITIAL CONFIG SHOULD BE SET AFTER INSTALLATION
+# MAKE A COPY OF THIS FILE IN YOUR HOME AND CONFIGURE IT TO YOUR NEEDS
+# THEN RUN: relecov-tools add-extra-config --config_file path/to/initial_config_copy.yaml
+# IMPORTANT: Do not remove nor modify the required_conf keys unless you explicitly need to, that would surely break the code
+# NOTE: Each key in 'modules_outpath' must match with a Command as listed with `relecov-tools --help` (but with '_' instead of '-')
+
+# required_conf lists will be merged with the ones in configuration.json without override, keeping the sum of both
+required_conf: ['generic', 'pipeline_manager', 'sftp_handle', 'read_lab_metadata', 'upload_to_gisaid', 'upload_to_ena', 'update_db', 'build_schema', 'download', 'logs_to_excel', 'mail_sender', 'map', 'metadata_homogeneizer', 'read_bioinfo_metadata', 'upload_results', 'validate', 'wrapper']
+
+generic:
+  required_conf: ["project_name", "json_schemas", "logs_config", "validate_config"]
+  # Keep in mind that a required field missing or equal to "" will raise a validation error
+  project_name: "EQA2026"
+  logs_config:
+    default_outpath: /tmp/
+    modules_outpath:
+      wrapper: /tmp/wrapper
+      download: /tmp/download
+      pipeline_manager: /tmp/pipeline_manager
+      read_bioinfo_metadata: /tmp/read_bioinfo_metadata
+  json_schemas:
+    relecov_schema: relecov_schema_EQA.json
+  validate_config:
+    sample_id_ontology: "GENEPIO:0001123"
+
+# CONFIG FOR MODULE PARAMETERS
+mail_sender:
+  required_conf: ["args"]
+  # args can be used to set default values for the modules, can be overriden via CLI
+  args:
+    delivery_template_path_file: /path/templates/
+    email_host: host
+    email_port: port
+    email_host_user: email@gmail.com
+    email_use_tls: true
+    yaml_cred_path: /path/credentials.yml
+    institutions_guide_path: /path/contacts.json
+download:
+  required_conf: ["args"]
+  args:
+    user: ''
+    password: ''
+    conf_file: ''
+    download_option: ''
+    output_dir: ''
+    target_folders: []
+    subfolder: RELECOV
+read_lab_metadata:
+  required_conf: ["args", "unique_sample_id", "metadata_lab_heading_file", "alt_heading_equivalences", "lab_metadata_req_json", "samples_json_fields"]
+  args:
+    metadata_file: ''
+    sample_list_file: ''
+    output_dir: ''
+    files_folder: ''
+    cast_values_from_schema: true
+    sample_data_map_field: collecting_lab_sample_id
+    schema_file: relecov_schema_EQA.json
+  metadata_lab_heading_file: read_lab_metadata_heading_default.json
+  alt_heading_equivalences:
+    Sample ID: Sample ID given for sequencing
+    LAB ID: Originating Laboratory
+    "Sequencing date Formato: YYYY-MM-DD": Sequencing Date
+    Commercial All-in-one library kit: Commercial All-in-one library kit
+    'Library preparation kit ': Library Preparation Kit
+    Enrichment protocol: Enrichment Protocol
+    if enrichment protocol is Other, specify: If Enrichment Protocol Is Other, Specify
+    Amplicon protocol: Enrichment panel/assay
+    if enrichment panel/assay is Other, specify: If Enrichment panel/assay Is Other, Specify
+    Amplicon version: Enrichment panel/assay version
+    Number Of Samples In Run: Number Of Samples In Run
+    Number of variants with effect (missense, frameshit, stop codon): Number of variants with effect
+    Sequencing platforms (Illumina, Nanopore, IonTorrent, PacBio, other): Sequencing Instrument Model
+    Variant designation table filename: Lineage analysis file
+    Library preparation kit: Library Preparation Kit
+    Library layout: Library Layout
+    Read lenght: Read length
+    SARS-CoV-2 Lineage designation: Lineage designation
+    fastq filename R1: Sequence file R1 fastq
+    fastq filename R2: Sequence file R2 fastq
+  lab_metadata_req_json: {}
+  json_enrich:
+    on_missing_schema_field: warn
+  force_submitting_institution_id_from_lab_code: false
+  required_copy_from_other_field: {}
+  samples_json_fields:
+  - sequence_file_R1_md5
+  - sequence_file_R2_md5
+  - sequence_file_R1
+  - sequence_file_R2
+  - sequence_file_path_R1
+  - sequence_file_path_R2
+  - batch_id
+
+validate:
+  required_conf: ["args"]
+  args:
+    json_file: ''
+    json_schema_file: ''
+    metadata: ''
+    output_dir: ''
+    excel_sheet: ''
+    upload_files: false
+    logsum_file: ''
+
+map:
+  required_conf: ["args"]
+  args:
+    destination_schema: ''
+    json_file: ''
+    origin_schema: ''
+    output_dir: ''
+    schema_file: ''
+
+upload_to_ena:
+  required_conf: ["args", "ENA_configuration", "checklist", "ena_fixed_fields", "additional_formating"]
+  args:
+    user: ''
+    password: ''
+    center: ''
+    ena_json: ''
+    template_path: ''
+    action: ADD
+    dev: false
+    upload_fastq: false
+    metadata_types: []
+    output_dir: ''
+  ENA_configuration:
+    study_alias: RELECOV
+    design_description: Design Description
+    experiment_title: Project for ENA submission RELECOV
+    study_title: RELECOV Spanish Network for genomics surveillance
+    study_type: Whole Genome Sequencing
+    study_id: ERP137164
+    ena_broker_name: Instituto de Salud Carlos III
+  checklist: ERC000033
+  ena_fixed_fields:
+    broker_name: Instituto de Salud Carlos III
+    file_format: FASTQ
+    study_alias: RELECOV
+    study_title: RELECOV Spanish Network for genomics surveillance
+    study_abstract: RELECOV is a Spanish Network for genomics surveillance
+    insert_size: '0'
+  additional_formating:
+    sample_description:
+    - host_common_name
+    - anatomical_part
+    - collection_method
+    design_description:
+    - library_layout
+    - library_preparation_kit
+    - library_selection
+    - library_strategy
+    sequence_file_path_R1:
+    - sequence_file_path_R1
+    - sequence_file_R1
+    sequence_file_path_R2:
+    - sequence_file_path_R2
+    - sequence_file_R2
+    experiment_alias:
+    - isolate_sample_id
+    - sample_collection_date
+    run_alias:
+    - isolate_sample_id
+    - sample_collection_date
+    experiment_title:
+    - sequencing_instrument_model
+    - isolate_sample_id
+    file_name:
+    - sequence_file_R1
+    - sequence_file_R2
+    file_checksum:
+    - sequence_file_R1_md5
+    - sequence_file_R2_md5
+
+upload_to_gisaid:
+  required_conf: ["args"]
+  args:
+    user: ''
+    password: ''
+    client_id: ''
+    token: ''
+    gisaid_json: ''
+    input_path: ''
+    output_dir: ''
+    frameshift: ''
+    proxy_config: ''
+    single: false
+    gzip: false
+  GISAID_configuration:
+    submitter: GISAID_ID
+
+update_db:
+  required_conf: ["args", "platform-params", "iskylims_fixed_values", "relecov_sample_metadata"]
+  args:
+    user: ''
+    password: ''
+    json: ''
+    type: ''
+    platform: ''
+    server_url: ''
+    full_update: false
+    long_table: ''
+  platform-params:
+    iskylims:
+      server_url: http://relecov-iskylims.isciiides.es
+      api_url: /wetlab/api/
+      store_samples: create-sample
+      url_project_fields: projects-fields
+      url_sample_fields: sample-fields
+      param_sample_project: project
+      project_name: relecov
+      token: ''
+    relecov:
+      server_url: http://relecov-platform.isciiides.es
+      api_url: /api/
+      store_samples: createSampleData
+      bioinfodata: createBioinfoData
+      variantdata: createVariantData
+      check_sample: checkSampleExists
+      sftp_info: sftpInfo
+      token: ''
+  iskylims_fixed_values:
+    patient_core: ''
+    sample_project: Relecov
+    only_recorded: 'Yes'
+    sample_location: Not defined
+  relecov_sample_metadata:
+  - authors
+  - collecting_institution
+  - collecting_institution_code_1
+  - collecting_lab_sample_id
+  - ena_broker_name
+  - ena_sample_accession
+  - gisaid_accession_id
+  - gisaid_virus_name
+  - microbiology_lab_sample_id
+  - sequence_file_path_R1
+  - sequence_file_path_R2
+  - schema_name
+  - schema_version
+  - sequencing_date
+  - sequence_file_R1_md5
+  - sequence_file_R2_md5
+  - sequence_file_R1
+  - sequence_file_R2
+  - sequencing_sample_id
+  - submitting_institution
+  - submitting_lab_sample_id
+  full_update_steps: [
+    { "id": "1", "type": "sample", "platform": "iskylims" },
+    { "id": "2", "type": "sample", "platform": "relecov" },
+    { "id": "3", "type": "bioinfodata", "platform": "relecov" },
+    { "id": "4", "type": "variantdata", "platform": "relecov" }
+  ]
+
+read_bioinfo_metadata:
+  required_conf: ["args"]
+  args:
+    json_file: ''
+    input_folder: ''
+    output_dir: ''
+    software_name: ''
+    update: false
+
+metadata_homogeneizer:
+  required_conf: ["args"]
+  args:
+    institution: ''
+    directory: ''
+    output_dir: ''
+
+pipeline_manager:
+  required_conf: ["args", "analysis_group", "analysis_user", "organism_config"]
+  args:
+    input: ''
+    templates_root: ''
+    output_dir: ''
+    folder_names: []
+  analysis_group: RLV
+  analysis_user: icasas_C
+  organism_config:
+    Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]:
+      pipeline_template: viralrecon
+      service_tag: SARSCOV2
+      group_by_fields:
+      - sequencing_instrument_platform
+      - enrichment_panel
+      - enrichment_panel_version
+    Respiratory syncytial virus [SNOMED:6415009]:
+      pipeline_template: IRMA
+      service_tag: GENOMERSV
+      group_by_fields:
+      - sequencing_instrument_platform
+      - enrichment_panel
+      - enrichment_panel_version
+    Influenza virus [SNOMED:725894000]:
+      pipeline_templates:
+      - IRMA
+      - taxprofiler
+      service_tag: GENOMEFLU
+      group_by_fields:
+      - sequencing_instrument_platform
+
+build_schema:
+  required_conf: ["args"]
+  args:
+    input_file: ''
+    schema_base: ''
+    draft_version: ''
+    diff: false
+    version: ''
+    project: ''
+    non_interactive: false
+    output_dir: ''
+
+logs_to_excel:
+  required_conf: ["args"]
+  args:
+    lab_code: ''
+    output_dir: ''
+    files: []
+
+wrapper:
+  required_conf: ["args"]
+  args:
+    output_dir: ''
+
+upload_results:
+  required_conf: ["args"]
+  args:
+    user: ''
+    password: ''
+    batch_id: ''
+    template_path: ''
+    project: Relecov
+
+sftp_handle:
+  required_conf: ["sftp_connection", "platform_storage_folder", "analysis_results_folder", "metadata_processing"]
+  sftp_connection:
+    sftp_server: sftpgenvigies.isciii.es
+    sftp_port: '22'
+  platform_storage_folder: /tmp/relecov
+  analysis_results_folder: ANALYSIS_RESULTS
+  metadata_processing:
+    required_conf: ["header_flag", "excel_sheet", "sample_id_col"]
+    header_flag: CAMPO
+    excel_sheet: METADATA_LAB
+    alternative_sheet: 5.Viral Characterisation and Se
+    alternative_flag: CAMPO
+    sample_id_col: Sample ID given by originating laboratory
+    alternative_sample_id_col: Sample ID given by originating laboratory

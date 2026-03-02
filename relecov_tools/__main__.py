@@ -39,7 +39,7 @@ stderr = rich.console.Console(
     stderr=True, force_terminal=relecov_tools.utils.rich_force_colors()
 )
 
-__version__ = "1.7.4"
+__version__ = "1.8.0"
 
 # IMPORTANT: When defining a Click command function in this script,
 # you MUST include both 'ctx' (for @click.pass_context) and ALL the parameters
@@ -102,7 +102,6 @@ def merge_with_extra_config(ctx, add_extra_config=False):
     sig = inspect.signature(func)
     valid_keys = sig.parameters.keys()
     filtered = {k: v for k, v in merged.items() if k in valid_keys}
-
     return filtered
 
 
@@ -1381,13 +1380,20 @@ def upload_results(
     help="Force replacement of existing configuration if needed",
 )
 @click.option(
-    "--clear_config",
+    "-r",
+    "--remove_config",
     is_flag=True,
     default=False,
     help="Remove given config_name from extra config: Use with empty --config_name to remove all",
 )
+@click.option(
+    "-t",
+    "--topic_config",
+    default=None,
+    help="Name of the primary config key. Only used with --remove_config to narrow the search for --config_name",
+)
 @click.pass_context
-def add_extra_config(ctx, config_name, config_file, force, clear_config):
+def add_extra_config(ctx, config_name, config_file, force, remove_config, topic_config):
     """Save given file content as additional configuration"""
     debug = ctx.obj.get("debug", False)
     try:
@@ -1395,8 +1401,10 @@ def add_extra_config(ctx, config_name, config_file, force, clear_config):
             config_json = relecov_tools.config_json.ConfigJson(extra_config=True)
         else:
             config_json = relecov_tools.config_json.ConfigJson()
-        if clear_config:
-            config_json.remove_extra_config(config_name)
+        if remove_config:
+            config_json.remove_extra_config(
+                topic=topic_config, deep=config_name, force=force
+            )
         else:
             config_json.include_extra_config(
                 config_file, config_name=config_name, force=force

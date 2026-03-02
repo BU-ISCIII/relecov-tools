@@ -2,6 +2,7 @@
 """
 Common utility function used for relecov_tools package.
 """
+
 import json
 import logging
 import os

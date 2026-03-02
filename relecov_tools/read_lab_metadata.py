@@ -105,7 +105,9 @@ class LabMetadata(BaseModule):
         self.readmeta_config = (
             self.configuration.get_configuration("read_lab_metadata") or {}
         )
-        default_project = self.readmeta_config.get("default_project") or "relecov"
+        default_project = self.configuration.get_topic_data("generic", "project_name")
+        if not isinstance(default_project, str) or not default_project.strip():
+            default_project = "relecov"
         self.project = (project or default_project).lower()
         self.project_config = self._load_project_config(
             self.readmeta_config, self.project, default_project
@@ -150,6 +152,9 @@ class LabMetadata(BaseModule):
         self.required_post_processing = (
             self.project_config.get("required_post_processing", {}) or {}
         )
+        self.force_submitting_institution_id_from_lab_code = self.project_config.get(
+            "force_submitting_institution_id_from_lab_code", True
+        )
         self.json_req_files = self.project_config.get("lab_metadata_req_json", {}) or {}
         self.schema_name = self.relecov_sch_json["title"]
         self.schema_version = self.relecov_sch_json["version"]
@@ -167,9 +172,18 @@ class LabMetadata(BaseModule):
             self.samples_json_fields = self.config_json.get_topic_data(
                 "read_lab_metadata", "samples_json_fields"
             )
+        cast_from_project = self.project_config.get("cast_values_from_schema")
+        if cast_from_project is None:
+            cast_from_project = self.config_json.get_topic_data(
+                "read_lab_metadata", "cast_values_from_schema"
+            )
+        self.cast_values_from_schema = bool(cast_from_project)
         self.unique_sample_id = self.project_config.get(
             "unique_sample_id", "sequencing_sample_id"
         )
+        self.sample_data_map_field = self.project_config.get("sample_data_map_field")
+        if not self.sample_data_map_field:
+            self.sample_data_map_field = self.unique_sample_id
         self.alt_heading_equivalences = (
             self.project_config.get("alt_heading_equivalences", {}) or {}
         )
@@ -235,7 +249,6 @@ class LabMetadata(BaseModule):
             )
         merged = self._deep_merge_dicts(base_config, overrides or {})
         merged.pop("projects", None)
-        merged.pop("default_project", None)
         return merged
 
     def _build_schema_field_map(self) -> dict[str, SchemaField]:
@@ -359,14 +372,21 @@ class LabMetadata(BaseModule):
         n = 0
         for sample in clean_metadata_rows:
             n += 1
-            sample_id = str(sample.get(self.unique_sample_id))
-            if not sample_id:
-                if sample.get("collecting_lab_sample_id"):
-                    sample_id = sample["collecting_lab_sample_id"]
-                    self.unique_sample_id = "collecting_lab_sample_id"
-                else:
-                    sample_id = sample.get("sequence_file_R1", "").split(".")[0]
-                    self.unique_sample_id = "sequence_file_R1"
+            id_field = self.sample_data_map_field or self.unique_sample_id
+            sample_id = sample.get(id_field)
+            sample_id_str = str(sample_id).strip()
+            if sample_id in (None, "") or sample_id_str.lower() in {"none", "nan"}:
+                sample_id = sample.get("collecting_lab_sample_id")
+                sample_id_str = str(sample_id).strip()
+            if sample_id in (None, "") or sample_id_str.lower() in {"none", "nan"}:
+                sample_id = sample.get("sequencing_sample_id")
+                sample_id_str = str(sample_id).strip()
+            if sample_id in (None, "") or sample_id_str.lower() in {"none", "nan"}:
+                sample_id = sample.get("sequence_file_R1", "").split(".")[0]
+                sample_id_str = str(sample_id).strip()
+            if not sample_id_str or sample_id_str.lower() in {"none", "nan"}:
+                sample_id_str = f"sample_{n}"
+            sample_id = sample_id_str
             files_dict = {}
             r1_file = sample.get("sequence_file_R1")
             r2_file = sample.get("sequence_file_R2")
@@ -482,7 +502,10 @@ class LabMetadata(BaseModule):
                 m_data[idx]["schema_name"] = self.schema_name
             if "schema_version" in self.schema_property_names:
                 m_data[idx]["schema_version"] = self.schema_version
-            if "submitting_institution_id" in self.schema_property_names:
+            if (
+                "submitting_institution_id" in self.schema_property_names
+                and self.force_submitting_institution_id_from_lab_code
+            ):
                 m_data[idx]["submitting_institution_id"] = self.lab_code
         return m_data
 
@@ -528,20 +551,32 @@ class LabMetadata(BaseModule):
         enum_dict = {}
         for prop, values in self.relecov_sch_json["properties"].items():
             enum_values = values.get("enum", [])
+            if not enum_values:
+                ref = values.get("$ref")
+                if isinstance(ref, str) and ref.startswith("#/"):
+                    ref_value = self.relecov_sch_json
+                    for part in ref[2:].split("/"):
+                        if not isinstance(ref_value, dict):
+                            ref_value = None
+                            break
+                        ref_value = ref_value.get(part)
+                        if ref_value is None:
+                            break
+                    if isinstance(ref_value, dict):
+                        enum_values = ref_value.get("enum", []) or []
             ontologies_present = any(
                 isinstance(enum, str) and re.search(r" \[\w+:.*\]$", enum)
                 for enum in enum_values
             )
             if not ontologies_present:
                 continue
-            if "enum" in values:
-                enum_dict[prop] = {}
-                for enum in values["enum"]:
-                    go_match = re.search(r"(.+) \[\w+:.*", enum)
-                    if go_match:
-                        enum_dict[prop][go_match.group(1)] = enum
-                    else:
-                        enum_dict[prop][enum] = enum
+            enum_dict[prop] = {}
+            for enum in enum_values:
+                go_match = re.search(r"(.+) \[\w+:.*", enum)
+                if go_match:
+                    enum_dict[prop][go_match.group(1)] = enum
+                else:
+                    enum_dict[prop][enum] = enum
         ontology_errors = {}
         for idx in range(len(m_data)):
             for key, e_values in enum_dict.items():
@@ -744,7 +779,8 @@ class LabMetadata(BaseModule):
         self.log.info("Processing sample data file")
         s_json = {}
         # TODO: Change sequencing_sample_id for some unique ID used in RELECOV database
-        s_json["map_field"] = self.unique_sample_id
+        s_json["map_field"] = self.sample_data_map_field
+        s_json["file"] = "samples_data.json"
         s_json["adding_fields"] = self.samples_json_fields
         if self.sample_list_file:
             s_json["j_data"] = relecov_tools.utils.read_json_file(self.sample_list_file)
@@ -883,24 +919,26 @@ class LabMetadata(BaseModule):
                         "type", "string"
                     )
                 )
-                try:
-                    value = relecov_tools.utils.cast_value_to_schema_type(
-                        value, schema_type
-                    )
-                except (ValueError, TypeError) as e:
-                    log_text = (
-                        f"Type conversion error for {raw_key} (expected {schema_type}): "
-                        f"{raw_value}. {e}"
-                    )
-                    self.logsum.add_error(sample=sample_id, entry=log_text)
-                    stderr.print(f"[red]{log_text}")
-                    continue
+                if self.cast_values_from_schema:
+                    try:
+                        value = relecov_tools.utils.cast_value_to_schema_type(
+                            value, schema_type
+                        )
+                    except (ValueError, TypeError) as e:
+                        log_text = (
+                            f"Type conversion error for {raw_key} (expected {schema_type}): "
+                            f"{raw_value}. {e}"
+                        )
+                        self.logsum.add_error(sample=sample_id, entry=log_text)
+                        stderr.print(f"[red]{log_text}")
+                        continue
 
                 key_for_checks = (
                     canonical_key if isinstance(canonical_key, str) else str(raw_key)
                 )
                 if isinstance(key_for_checks, str) and "date" in key_for_checks.lower():
                     pattern = r"^\d{4}[-/.]\d{2}[-/.]\d{2}"
+                    compact_pattern = r"^\d{8}$"
                     if isinstance(raw_value, dtime):
                         value = str(raw_value.date())
                     elif re.match(pattern, str(raw_value)):
@@ -908,6 +946,16 @@ class LabMetadata(BaseModule):
                             pattern,
                             str(raw_value).replace("/", "-").replace(".", "-"),
                         ).group(0)
+                    elif re.match(compact_pattern, str(raw_value)):
+                        try:
+                            value = dtime.strptime(str(raw_value), "%Y%m%d").strftime(
+                                "%Y-%m-%d"
+                            )
+                        except ValueError:
+                            log_text = f"Invalid date format in {raw_key}: {raw_value}"
+                            self.logsum.add_error(sample=sample_id, entry=log_text)
+                            stderr.print(f"[red]{log_text} for sample {sample_id}")
+                            continue
                     else:
                         try:
                             value = str(int(float(str(raw_value))))
@@ -925,7 +973,11 @@ class LabMetadata(BaseModule):
                 ):
                     if isinstance(raw_value, (float, int)):
                         value = str(int(raw_value))
-                elif isinstance(raw_value, (float, int)) and not isinstance(value, str):
+                elif (
+                    not self.cast_values_from_schema
+                    and isinstance(raw_value, (float, int))
+                    and not isinstance(value, str)
+                ):
                     value = str(raw_value)
 
                 if (
@@ -935,7 +987,13 @@ class LabMetadata(BaseModule):
                 ):
                     logtxt = f"Non-date field {raw_key} provided as date. Parsed as int"
                     self.logsum.add_warning(sample=sample_id, entry=logtxt)
-                    value = str(relecov_tools.utils.excel_date_to_num(raw_value))
+                    parsed = relecov_tools.utils.excel_date_to_num(raw_value)
+                    if self.cast_values_from_schema:
+                        value = relecov_tools.utils.cast_value_to_schema_type(
+                            parsed, schema_type
+                        )
+                    else:
+                        value = str(parsed)
 
                 if (
                     isinstance(schema_key, str)
