@@ -189,10 +189,11 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
                         )
 
         if sheet == "METADATA_LAB" or sheet == "DATA_VALIDATION":
+            header_rows = 4 if sheet == "METADATA_LAB" else 3
             # Write the column headers with the defined format.
             for col_num in range(0, len(df.columns)):
                 for row_num in range(0, len(df)):
-                    if row_num < 4:
+                    if row_num < header_rows:
                         try:
                             worksheet.write(
                                 row_num,
