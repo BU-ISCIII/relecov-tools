@@ -122,7 +122,7 @@ validate:
   required_conf: ["args"]
   args:
     json_file: ''
-    json_schema_file: '/path/relecov_tools/schema/relecov_schema.json' # Adapt to your local path
+    json_schema_file: 'relecov_tools/schema/relecov_schema.json' # Adapt to your local path
     metadata: ''
     output_dir: ''
     excel_sheet: ''
@@ -285,7 +285,7 @@ read_bioinfo_metadata:
   required_conf: ["args"]
   args:
     json_file: ''
-    json_schema_file: '/path/relecov_tools/schema/relecov_schema.json' # Adapt to your local path
+    json_schema_file: 'relecov_tools/schema/relecov_schema.json' # Adapt to your local path
     input_folder: ''
     output_dir: ''
     software_name: ''
