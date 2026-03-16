@@ -13,7 +13,12 @@ generic:
   project_name: "Relecov"
   logs_config:
     default_outpath: /tmp/
-    modules_outpath: {}
+    modules_outpath: {
+      "download": "", # Recommended: "/data/bioinfoshare/UCCT_Relecov/logs/download"
+      "pipeline_manager": "", # Recommended: "/data/bioinfoshare/UCCT_Relecov/logs/pipeline_manager",
+      "read_bioinfo_metadata": "", # Recommended: "/data/bioinfoshare/UCCT_Relecov/logs/read_bioinfo_metadata",
+      "wrapper": "", # Recommended: "/data/bioinfoshare/UCCT_Relecov/logs/wrapper"
+    }
   json_schemas:
     relecov_schema: relecov_schema.json
     ena_schema: ena_schema.json
@@ -25,19 +30,20 @@ mail_sender:
   # args can be used to set default values for the modules, can be overriden via CLI
   args:
     delivery_template_path_file: /path/templates/
-    email_host: host
-    email_port: port
-    email_host_user: email@gmail.com
+    email_host: host # Fill with your server credentials
+    email_port: port # Fill with your server credentials
+    email_host_user: email@gmail.com # Fill with your server credentials
     email_use_tls: true
-    yaml_cred_path: /path/credentials.yml
-    institutions_guide_path: /path/contacts.json
+    yaml_cred_path: /path/credentials.yml # Adapt to your local path
+    # credentials.yml should have the following keys filled: api_user, api_password, email_password
+    institutions_guide_path: /path/contacts.json # Adapt to your local path
 
 download:
   required_conf: ["args"]
   args:
-    user: ''
-    password: ''
-    conf_file: ''
+    user: '' # Fill with your server credentials
+    password: '' # Fill with your server credentials
+    conf_file: '' 
     download_option: 'download_clean'
     output_dir: ''
     target_folders: []
@@ -116,7 +122,7 @@ validate:
   required_conf: ["args"]
   args:
     json_file: ''
-    json_schema_file: 'relecov_tools/schema/relecov_schema.json'
+    json_schema_file: '/path/relecov_tools/schema/relecov_schema.json' # Adapt to your local path
     metadata: ''
     output_dir: ''
     excel_sheet: ''
@@ -213,11 +219,11 @@ upload_to_gisaid:
 update_db:
   required_conf: ["args", "platform-params", "iskylims_fixed_values", "relecov_sample_metadata"]
   args:
-    user: ''
-    password: ''
+    user: '' # Fill with your platform credentials
+    password: '' # Fill with your platform credentials
     json: ''
     type: ''
-    platform: ''
+    platform: 'relecov'
     server_url: ''
     full_update: false
     long_table: ''
@@ -228,9 +234,10 @@ update_db:
       store_samples: create-sample
       url_project_fields: projects-fields
       url_sample_fields: sample-fields
+      url_lab_request_mapping: lab-request-mapping
       param_sample_project: project
       project_name: relecov
-      token: ''
+      token: '' # Fill with your platform token
     relecov:
       server_url: http://relecov-platform.isciiides.es
       api_url: /api/
@@ -239,7 +246,7 @@ update_db:
       variantdata: createVariantData
       check_sample: checkSampleExists
       sftp_info: sftpInfo
-      token: ''
+      token: '' # Fill with your platform token
   iskylims_fixed_values:
     patient_core: ''
     sample_project: Relecov
@@ -278,7 +285,7 @@ read_bioinfo_metadata:
   required_conf: ["args"]
   args:
     json_file: ''
-    json_schema_file: 'relecov_tools/schema/relecov_schema.json'
+    json_schema_file: '/path/relecov_tools/schema/relecov_schema.json' # Adapt to your local path
     input_folder: ''
     output_dir: ''
     software_name: ''
@@ -345,13 +352,13 @@ logs_to_excel:
 wrapper:
   required_conf: ["args"]
   args:
-    output_dir: ''
+    output_dir: '' # Recommended: /data/bioinfoshare/UCCT_Relecov
 
 upload_results:
   required_conf: ["args"]
   args:
-    user: ''
-    password: ''
+    user: '' # Fill with your server credentials
+    password: '' # Fill with your server credentials
     batch_id: ''
     template_path: ''
     project: Relecov
@@ -361,7 +368,7 @@ sftp_handle:
   sftp_connection:
     sftp_server: sftpgenvigies.isciii.es
     sftp_port: '22'
-  platform_storage_folder: /tmp/relecov
+  platform_storage_folder: /tmp/relecov # Recommended: /data/bioinfoshare/UCCT_Relecov
   analysis_results_folder: ANALYSIS_RESULTS
   metadata_processing:
     required_conf: ["header_flag", "excel_sheet", "sample_id_col"]
