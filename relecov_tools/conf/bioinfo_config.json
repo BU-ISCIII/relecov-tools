@@ -312,7 +312,7 @@
             }
         },
         "versions_yaml": {
-            "fn": "nf_core_pipeline_software_mqc_versions.yml",
+            "fn": "nf_core_taxprofiler_software_mqc_versions.yml",
             "header_row_idx": 1,
             "required": true,
             "function": "utils/get_software_versions_yml",
