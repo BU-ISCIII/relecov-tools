@@ -9,12 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Pablo Mata](https://github.com/shettland)
+- [Pau Pascual Mas](https://github.com/PauPascualMas)
 
 #### Added enhancements
 
 #### Fixes
 
 - Updated initial_config-relecov.yaml and added comments for some params [#875](https://github.com/BU-ISCIII/relecov-tools/pull/875)
+- Fixed new version filename taxprofiler[#877](https://github.com/BU-ISCIII/relecov-tools/pull/877)
 
 #### Changed
 
