@@ -92,7 +92,7 @@ def excel_formater(df, writer, sheet, out_file, have_index=True, have_header=Tru
 
         # Write the DataFrame to the specified sheet
         df.to_excel(
-            writer, sheet_name=sheet, startrow=1, index=have_index, header=have_header
+            writer, sheet_name=sheet, startrow=0, index=have_index, header=have_header
         )
 
         # Get the xlsxwriter workbook and worksheet objects.
