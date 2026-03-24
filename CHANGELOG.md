@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Pablo Mata](https://github.com/shettland)
 - [Pau Pascual Mas](https://github.com/PauPascualMas)
+- [Alba Talavera](https://github.com/albatalavera)
 
 #### Added enhancements
 
@@ -17,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Updated initial_config-relecov.yaml and added comments for some params [#875](https://github.com/BU-ISCIII/relecov-tools/pull/875)
 - Fixed new version filename taxprofiler[#877](https://github.com/BU-ISCIII/relecov-tools/pull/877)
+- Fix duplicated row in metadata form and clean some MEPRAM initial config [#879] https://github.com/BU-ISCIII/relecov-tools/pull/879
 
 #### Changed
 
