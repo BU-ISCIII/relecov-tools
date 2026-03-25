@@ -190,11 +190,11 @@ class BuildSchema(BaseModule):
                     excel_template_path = os.path.join(
                         os.path.dirname(os.path.realpath(__file__)), "assets"
                     )
-                    # FIXME: filenames should inherit project name.
+                    template_prefix = f"{self.project}_metadata_template".lower()
                     excel_template = [
                         f
                         for f in os.listdir(excel_template_path)
-                        if f.startswith("Relecov_metadata_template")
+                        if f.lower().startswith(template_prefix)
                     ]
                     if len(excel_template) > 1:
                         self.log.error(
