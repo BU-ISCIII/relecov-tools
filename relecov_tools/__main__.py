@@ -112,7 +112,7 @@ def _strip_background_options(argv):
     stripped = []
     skip_next = False
     value_options = {"--background-log"}
-    flag_options = {"--background", "--nohup"}
+    flag_options = {"-bg", "--background"}
 
     for index, arg in enumerate(argv):
         if skip_next:
@@ -1362,8 +1362,8 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
     help="Directory where the generated output will be saved",
 )
 @click.option(
+    "-bg",
     "--background",
-    "--nohup",
     "background",
     is_flag=True,
     default=False,
