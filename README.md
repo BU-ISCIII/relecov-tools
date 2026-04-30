@@ -465,7 +465,7 @@ Usage: relecov-tools wrapper [OPTIONS]
 Options:
   -c, --config_file PATH    Path to config file in yaml format  [required]
   -o, --output_dir,         Directory where the generated output will be saved [required].
-  --background, --nohup     Launch wrapper in a detached background process and return immediately.
+  -bg, --background         Launch wrapper in a detached background process and return immediately.
   --background-log PATH     File where detached wrapper stdout/stderr will be written.
   --help                    Show this message and exit.
 ```
