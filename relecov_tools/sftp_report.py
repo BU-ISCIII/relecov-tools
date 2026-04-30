@@ -263,7 +263,9 @@ class SftpReport(BaseModule):
             ),
         ]
 
-        ready = [entry for entry in report["laboratories"] if entry["status"] == "ready"]
+        ready = [
+            entry for entry in report["laboratories"] if entry["status"] == "ready"
+        ]
         incomplete = [
             entry for entry in report["laboratories"] if entry["status"] == "incomplete"
         ]
