@@ -12,6 +12,7 @@ import inspect
 import click
 import relecov_tools.config_json
 import relecov_tools.download
+import relecov_tools.sftp_report
 import relecov_tools.log_summary
 import rich.console
 import rich.traceback
@@ -401,6 +402,138 @@ def download(
     try:
         download = relecov_tools.download.Download(**args_merged)
         download.execute_process()
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
+
+
+# sftp-report
+@relecov_tools_cli.command(help_priority=3)
+@click.option("-u", "--user", help="User name for login to sftp server")
+@click.option("-p", "--password", help="password for the user to login")
+@click.option(
+    "-f",
+    "--conf_file",
+    help="Configuration file (not params file)",
+)
+@click.option(
+    "-t",
+    "--target_folders",
+    default=None,
+    help='Target folders to inspect. For multiple folders use ["folder1", "folder2"]',
+)
+@click.option(
+    "-s",
+    "--subfolder",
+    default=None,
+    help="Subfolder to inspect inside each laboratory folder",
+)
+@click.option(
+    "--metadata-pattern",
+    default=None,
+    help="Regex used to identify metadata files",
+)
+@click.option(
+    "--since-days",
+    type=int,
+    default=7,
+    show_default=True,
+    help="Only include files modified in the last N days",
+)
+@click.option(
+    "--all-files",
+    is_flag=True,
+    default=False,
+    help="Inspect all files regardless of modification date",
+)
+@click.option(
+    "--include-empty",
+    is_flag=True,
+    default=False,
+    help="Include laboratories without pending upload files in the report",
+)
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["text", "slack", "json"], case_sensitive=False),
+    default="text",
+    show_default=True,
+    help="Report output format",
+)
+@click.option(
+    "--send-slack",
+    is_flag=True,
+    default=False,
+    help="Send the report to Slack using an incoming webhook",
+)
+@click.option(
+    "--slack-webhook",
+    default=None,
+    help="Slack incoming webhook URL. Can also be set via environment/config",
+)
+@click.option(
+    "--slack-channel",
+    default=None,
+    help="Optional Slack channel override for compatible incoming webhooks",
+)
+@click.option(
+    "-o",
+    "--output_dir",
+    "--output-dir",
+    "--output_folder",
+    "--out-folder",
+    "--output_location",
+    "--output_path",
+    "--out_dir",
+    "--output",
+    "output_dir",
+    type=click.Path(file_okay=False, resolve_path=True),
+    help="Directory where command logs will be saved",
+)
+@click.pass_context
+def sftp_report(
+    ctx,
+    user,
+    password,
+    conf_file,
+    target_folders,
+    subfolder,
+    metadata_pattern,
+    since_days,
+    all_files,
+    include_empty,
+    output_format,
+    send_slack,
+    slack_webhook,
+    slack_channel,
+    output_dir,
+):
+    """Inspect SFTP uploads without downloading or modifying remote files."""
+    debug = ctx.obj.get("debug", False)
+    args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
+    output_format = args_merged.pop("output_format", output_format)
+    send_slack = args_merged.pop("send_slack", send_slack)
+    slack_webhook = args_merged.pop("slack_webhook", slack_webhook)
+    slack_channel = args_merged.pop("slack_channel", slack_channel)
+    try:
+        report = relecov_tools.sftp_report.SftpReport(**args_merged)
+        if send_slack and output_format == "text":
+            output_format = "slack"
+        rendered_report = report.render_report(output_format=output_format)
+        click.echo(rendered_report)
+        if send_slack:
+            config_webhook, config_channel = report.get_slack_config()
+            report.send_slack_message(
+                rendered_report,
+                webhook_url=slack_webhook or config_webhook,
+                channel=slack_channel or config_channel,
+            )
+            stderr.print("[green]Slack report sent successfully")
     except Exception as e:
         if debug:
             log.exception(f"EXCEPTION FOUND: {e}")
