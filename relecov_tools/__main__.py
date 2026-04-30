@@ -135,7 +135,9 @@ def _default_background_log_path(output_dir=None, log_dir=None):
         log_dir = os.path.dirname(relecov_tools.base_module.BaseModule._cli_log_file)
     log_dir = log_dir or output_dir or os.path.join("/tmp", "relecov_tools")
     timestamp = datetime.today().strftime("%Y%m%d%H%M%S")
-    return os.path.realpath(os.path.join(log_dir, f"wrapper_background_{timestamp}.log"))
+    return os.path.realpath(
+        os.path.join(log_dir, f"wrapper_background_{timestamp}.log")
+    )
 
 
 def _build_background_command(argv=None):
