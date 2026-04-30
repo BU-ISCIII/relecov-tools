@@ -124,6 +124,8 @@ Options:
 
 Commands:
   download               Download files located in sftp server.
+  sftp-report            Inspect SFTP uploads without downloading or modifying
+                         remote files.
   read-lab-metadata      Create the json compliant to the relecov schema...
   send-mail              Send a sample validation report by mail.
   validate               Validate json file against schema.
@@ -154,6 +156,57 @@ Prior to using any module you will need to setup specific configuration for your
 You can also override the config in `relecov_tools/conf/configuration.json` with this method except for the `required_conf` keys which we recommend to preserve as they are always validated at runtime. You can add new `required_conf` elements into your `extra_config.json` but the resulting list will be the sum of both, not overriden.
 
 ## Modules
+
+#### sftp-report
+
+The command `sftp-report` connects to the configured SFTP server and inspects
+laboratory upload folders without downloading, moving, or deleting remote files.
+It reports which laboratories have pending uploads ready to process and which
+ones look incomplete.
+
+```
+$ relecov-tools sftp-report --help
+Usage: relecov-tools sftp-report [OPTIONS]
+
+  Inspect SFTP uploads without downloading or modifying remote files.
+
+Options:
+  -u, --user TEXT              User name for login to sftp server
+  -p, --password TEXT          password for the user to login
+  -f, --conf_file TEXT         Configuration file (not params file)
+  -t, --target_folders TEXT    Target folders to inspect. For multiple folders
+                               use ["folder1", "folder2"]
+  -s, --subfolder TEXT         Subfolder to inspect inside each laboratory folder
+  --metadata-pattern TEXT      Regex used to identify metadata files
+  --since-days INTEGER         Only include files modified in the last N days
+  --all-files                  Inspect all files regardless of modification date
+  --include-empty              Include laboratories without pending upload files
+                               in the report
+  --format [text|slack|json]   Report output format
+  --send-slack                 Send the report to Slack using an incoming webhook
+  --slack-webhook TEXT         Slack incoming webhook URL. Can also be set via
+                               environment/config
+  --slack-channel TEXT         Optional Slack channel override for compatible
+                               incoming webhooks
+  -o, --output_dir, TEXT       Directory where command logs will be saved
+  --help                       Show this message and exit.
+```
+
+Examples:
+
+```
+relecov-tools sftp-report --format text
+relecov-tools sftp-report --format slack
+relecov-tools sftp-report --format json
+relecov-tools sftp-report --format slack --since-days 7
+relecov-tools sftp-report --format slack --all-files
+relecov-tools sftp-report --send-slack
+```
+
+Slack delivery can read the incoming webhook URL from `--slack-webhook`, the
+`RELECOV_SLACK_WEBHOOK_URL` or `SLACK_WEBHOOK_URL` environment variables, or a
+`slack.webhook_url` entry in `extra_config.json`. When `--send-slack` is used
+without setting `--format`, the report is rendered using the Slack-friendly format.
 
 #### download
 
