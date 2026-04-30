@@ -4,15 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.8.X] - 2026-XX-XX : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.8.X>
+## [1.8.1dev] - 2026-XX-XX : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.8.1dev>
 
 ### Credits
 
 - [Pablo Mata](https://github.com/shettland)
 - [Pau Pascual Mas](https://github.com/PauPascualMas)
 - [Alba Talavera](https://github.com/albatalavera)
+- [Alejandro Bernabeu](https://github.com/aberdur)
 
 #### Added enhancements
+
+- Add background execution mode for wrapper [#880](https://github.com/BU-ISCIII/relecov-tools/pull/880)
 
 #### Fixes
 
