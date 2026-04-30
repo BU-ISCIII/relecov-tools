@@ -465,8 +465,22 @@ Usage: relecov-tools wrapper [OPTIONS]
 Options:
   -c, --config_file PATH    Path to config file in yaml format  [required]
   -o, --output_dir,         Directory where the generated output will be saved [required].
+  --background, --nohup     Launch wrapper in a detached background process and return immediately.
+  --background-log PATH     File where detached wrapper stdout/stderr will be written.
   --help                    Show this message and exit.
 ```
+
+To keep a wrapper run alive after closing the VPN/SSH session:
+
+```
+relecov-tools wrapper --output_dir /path/to/output --background
+```
+
+By default, detached output is written to `wrapper_background_<timestamp>.log` in the
+configured wrapper log directory when available. If no wrapper log directory is
+configured, it falls back to the output directory. Use
+`--background-log /path/to/wrapper.log` to choose a custom file. The usual module logs
+and reports are still generated in their configured locations.
 
 #### logs-to-excel
 

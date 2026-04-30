@@ -2,6 +2,8 @@
 import logging
 import os
 import json
+import shlex
+import subprocess
 import sys
 from datetime import datetime
 import inspect
@@ -103,6 +105,71 @@ def merge_with_extra_config(ctx, add_extra_config=False):
     valid_keys = sig.parameters.keys()
     filtered = {k: v for k, v in merged.items() if k in valid_keys}
     return filtered
+
+
+def _strip_background_options(argv):
+    """Return argv without wrapper background-only options."""
+    stripped = []
+    skip_next = False
+    value_options = {"--background-log"}
+    flag_options = {"--background", "--nohup"}
+
+    for index, arg in enumerate(argv):
+        if skip_next:
+            skip_next = False
+            continue
+        if arg in flag_options:
+            continue
+        if arg in value_options:
+            if index + 1 < len(argv):
+                skip_next = True
+            continue
+        if any(arg.startswith(f"{option}=") for option in value_options):
+            continue
+        stripped.append(arg)
+    return stripped
+
+
+def _default_background_log_path(output_dir=None, log_dir=None):
+    if log_dir is None and relecov_tools.base_module.BaseModule._cli_log_file:
+        log_dir = os.path.dirname(relecov_tools.base_module.BaseModule._cli_log_file)
+    log_dir = log_dir or output_dir or os.path.join("/tmp", "relecov_tools")
+    timestamp = datetime.today().strftime("%Y%m%d%H%M%S")
+    return os.path.realpath(os.path.join(log_dir, f"wrapper_background_{timestamp}.log"))
+
+
+def _build_background_command(argv=None):
+    argv = list(argv or sys.argv)
+    stripped_argv = _strip_background_options(argv)
+    if stripped_argv and os.path.isfile(stripped_argv[0]):
+        return [sys.executable] + stripped_argv
+    return [sys.executable, "-m", "relecov_tools"] + stripped_argv[1:]
+
+
+def _launch_background_wrapper(output_dir=None, background_log=None):
+    command = _build_background_command()
+    log_filepath = os.path.realpath(
+        background_log or _default_background_log_path(output_dir)
+    )
+    os.makedirs(os.path.dirname(log_filepath), exist_ok=True)
+
+    env = os.environ.copy()
+    env["RELECOV_TOOLS_BACKGROUND_CHILD"] = "1"
+    with open(log_filepath, "ab", buffering=0) as log_handle:
+        process = subprocess.Popen(
+            command,
+            stdin=subprocess.DEVNULL,
+            stdout=log_handle,
+            stderr=subprocess.STDOUT,
+            close_fds=True,
+            start_new_session=True,
+            env=env,
+        )
+    return process.pid, log_filepath, command
+
+
+def _format_command(command):
+    return " ".join(shlex.quote(part) for part in command)
 
 
 def run_relecov_tools():
@@ -1292,10 +1359,36 @@ def logs_to_excel(ctx, lab_code, output_dir, files):
     type=click.Path(file_okay=False, resolve_path=True),
     help="Directory where the generated output will be saved",
 )
+@click.option(
+    "--background",
+    "--nohup",
+    "background",
+    is_flag=True,
+    default=False,
+    help="Launch wrapper in a detached background process and return immediately.",
+)
+@click.option(
+    "--background-log",
+    type=click.Path(dir_okay=False, resolve_path=True),
+    default=None,
+    help="File where detached wrapper stdout/stderr will be written.",
+)
 @click.pass_context
-def wrapper(ctx, output_dir):
+def wrapper(ctx, output_dir, background, background_log):
     """Executes the modules in config file sequentially"""
+    if background:
+        pid, log_filepath, command = _launch_background_wrapper(
+            output_dir=output_dir, background_log=background_log
+        )
+        log.info("Detached wrapper process started with PID %s", pid)
+        stderr.print(f"[green]Wrapper launched in background with PID {pid}")
+        stderr.print(f"[blue]Output log: {log_filepath}")
+        stderr.print(f"[dim]Command: {_format_command(command)}")
+        return
+
     args_merged = merge_with_extra_config(ctx=ctx, add_extra_config=True)
+    args_merged.pop("background", None)
+    args_merged.pop("background_log", None)
     debug = ctx.obj.get("debug", False)
 
     try:
