@@ -363,6 +363,10 @@ upload_results:
     template_path: ''
     project: Relecov
 
+slack:
+  webhook_url: '' # Optional. Incoming webhook used by sftp-report --send-slack
+  channel: '' # Optional. Only works if the webhook allows channel overrides
+
 sftp_handle:
   required_conf: ["sftp_connection", "platform_storage_folder", "analysis_results_folder", "metadata_processing"]
   sftp_connection:
