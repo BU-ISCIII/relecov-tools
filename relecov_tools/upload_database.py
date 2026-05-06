@@ -322,6 +322,15 @@ class UploadDatabase(BaseModule):
             )
             if project_name:
                 s_dict["sample_project"] = project_name
+            if s_dict.get("sample_name") in (None, "", "Not Provided"):
+                unique_sample_id = row.get("unique_sample_id")
+                if not unique_sample_id:
+                    sid = row.get("sequencing_sample_id", row.get("sequence_file_R1"))
+                    raise ValueError(
+                        "Cannot upload sample to iSkyLIMS without unique_sample_id "
+                        f"(sample: {sid})"
+                    )
+                s_dict["sample_name"] = unique_sample_id
             all_iskylims_fields = s_project_fields + s_fields
             sid = row.get("sequencing_sample_id", row.get("sequence_file_R1"))
             for missing in list(set(list(row.keys())) - set(all_iskylims_fields)):

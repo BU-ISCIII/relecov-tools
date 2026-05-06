@@ -121,7 +121,7 @@ class PipelineManager(BaseModule):
             or "Not Provided [SNOMED:434941000124101]"
         )
 
-        req_conf = ["update_db"] * bool(self.skip_db_upload)
+        req_conf = ["update_db"] * (not bool(self.skip_db_upload))
         missing = [
             conf for conf in req_conf if self.config.get_configuration(conf) is None
         ]
@@ -775,26 +775,109 @@ class PipelineManager(BaseModule):
             raise ValueError(
                 f"Missing required configuration for upload_db: {missing_conf}"
             )
-        upload_db = relecov_tools.upload_database.UploadDatabase(
-            user=upload_db_conf["user"],
-            password=upload_db_conf["password"],
-            json=copy.deepcopy(json_data),
-            type="sample",
-            platform=upload_db_conf["platform"],
-        )
-        upload_db.start_api(upload_db_conf["platform"])
-        result = upload_db.store_data("sample", upload_db_conf["platform"])
+        platforms = self._get_sample_upload_platforms(upload_db_conf)
+        unique_id_result = []
+        uploaded_platforms = []
 
-        if not result:
+        for platform in platforms:
+            upload_db = relecov_tools.upload_database.UploadDatabase(
+                user=upload_db_conf["user"],
+                password=upload_db_conf["password"],
+                json=copy.deepcopy(json_data),
+                type="sample",
+                platform=platform,
+            )
+            upload_db.start_api(platform)
+            platform_name = self._get_platform_display_name(platform)
+            self.log.info("Uploading sample data to %s", platform_name)
+            stderr.print(f"[blue]Uploading sample data to {platform_name}")
+            result = upload_db.store_data("sample", platform)
+
+            if not result:
+                self.log.error("No sample data was uploaded to %s", platform)
+                stderr.print(f"[red] No sample data was uploaded to {platform}")
+                raise ValueError(f"No sample data was uploaded to {platform}")
+
+            uploaded_platforms.append(platform)
+            if any(
+                "sample_fingerprint" in row and "sample_unique_id" in row
+                for row in result
+            ):
+                unique_id_result = result
+                json_data = self.assign_unique_ids_by_fingerprint(
+                    json_data, unique_id_result
+                )
+
+        if not uploaded_platforms:
             self.log.error("No data was uploaded to the database")
             stderr.print("[red] No data was uploaded to the database")
             raise ValueError("No data was uploaded to the database")
-        self.log.info("Database updated with %s samples", len(json_data))
-        stderr.print(f"[blue] Database updated with {len(json_data)} samples")
+        self.log.info(
+            "Database updated with %s samples in %s",
+            len(json_data),
+            ", ".join(uploaded_platforms),
+        )
+        uploaded_platforms_text = ", ".join(uploaded_platforms)
+        stderr.print(
+            f"[blue] Database updated with {len(json_data)} samples "
+            f"in {uploaded_platforms_text}"
+        )
 
-        json_data = self.assign_unique_ids_by_fingerprint(json_data, result)
+        if unique_id_result:
+            missing_unique_ids = [
+                row.get("sequencing_sample_id", "unknown")
+                for row in json_data
+                if not row.get("unique_sample_id")
+            ]
+            if missing_unique_ids:
+                logtxt = (
+                    "Some samples did not receive unique_sample_id: "
+                    f"{missing_unique_ids}"
+                )
+                self.log.warning(logtxt)
+                stderr.print(f"[yellow]{logtxt}")
+        else:
+            logtxt = (
+                "No upload response included sample_unique_id. "
+                "Pipeline sample names will not include unique IDs."
+            )
+            self.log.warning(logtxt)
+            stderr.print(f"[yellow]{logtxt}")
 
         return json_data
+
+    def _get_sample_upload_platforms(self, upload_db_conf: dict) -> list[str]:
+        """Return the ordered platforms where pipeline-manager should upload samples."""
+        configured_platform = upload_db_conf["platform"]
+        full_update_steps = upload_db_conf.get("full_update_steps", [])
+        platforms = [
+            str(step["platform"])
+            for step in full_update_steps
+            if isinstance(step, dict)
+            and step.get("type") == "sample"
+            and step.get("platform")
+        ]
+        if not platforms:
+            platforms = [configured_platform]
+
+        # Keep the configured platform in the sample upload plan, even if an older
+        # configuration has only partial full_update_steps.
+        if configured_platform not in platforms:
+            platforms.append(configured_platform)
+
+        platforms = list(dict.fromkeys(platforms))
+        if "relecov" in platforms:
+            platforms.remove("relecov")
+            platforms.insert(0, "relecov")
+        return platforms
+
+    @staticmethod
+    def _get_platform_display_name(platform: str) -> str:
+        platform_names = {
+            "relecov": "relecov-platform",
+            "iskylims": "iSkyLIMS",
+        }
+        return platform_names.get(platform, platform)
 
     def pipeline_exc(self):
         """Prepare folder for analysis in HPC
@@ -829,10 +912,14 @@ class PipelineManager(BaseModule):
         self.log.info("Batch ID set to %s", batch_id)
         stderr.print(f"[blue]Batch ID set to {batch_id}")
 
-        self.log.info("Updating database with samples data")
-        stderr.print("[blue]Updating database with samples data")
-        # Update the database with the samples data
-        join_validate = self.update_db_samples(join_validate)
+        if self.skip_db_upload:
+            self.log.info("Skipping database upload with samples data")
+            stderr.print("[blue]Skipping database upload with samples data")
+        else:
+            self.log.info("Updating database with samples data")
+            stderr.print("[blue]Updating database with samples data")
+            # Update the database with the samples data
+            join_validate = self.update_db_samples(join_validate)
 
         stderr.print("[blue]Collecting samples by organism")
         self.log.info("Collecting samples by organism")
