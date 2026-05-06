@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Add background execution mode for wrapper [#880](https://github.com/BU-ISCIII/relecov-tools/pull/880)
 - Add weekly SFTP upload report [#881](https://github.com/BU-ISCIII/relecov-tools/pull/881)
+- Upload pipeline-manager samples to iSkyLIMS [#882](https://github.com/BU-ISCIII/relecov-tools/pull/882)
 - Added support for configurable enum sources, template-only fields, and AMR metadata JSON generation. [#883](https://github.com/BU-ISCIII/relecov-tools/pull/883)
 - Make build-schema multi-project and improve template version handling [#888] (https://github.com/BU-ISCIII/relecov-tools/pull/888)
 
@@ -28,7 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix duplicated row in metadata form and clean some MEPRAM initial config [#879] (https://github.com/BU-ISCIII/relecov-tools/pull/879)
 - Fix date validation in Excel metadata templates and add some schema validation checks [#886] (https://github.com/BU-ISCIII/relecov-tools/pull/886)
 - Improve METADATA_LAB template formatting and duplicate sample detection [#887] (https://github.com/BU-ISCIII/relecov-tools/pull/887)
-- Fixed the surveillance script for proper variant data handling [#891] (https://github.com/BU-ISCIII/relecov-tools/pull/891). 
+- Fixed the surveillance script for proper variant data handling [#891] (https://github.com/BU-ISCIII/relecov-tools/pull/891).
 
 #### Changed
 
