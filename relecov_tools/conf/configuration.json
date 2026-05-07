@@ -34,6 +34,10 @@
         "analysis_folder": "ANALYSIS",
         "sample_stored_folder": "RAW",
         "sample_link_folder": "00-reads",
+        "sample_upload_platforms": [
+            "relecov",
+            "iskylims"
+        ],
         "organism_config": {}
     },
     "sftp_handle": {
@@ -248,7 +252,14 @@
     },
     "update_db": {
         "required_conf": ["platform-params", "data_upload_types", "full_update_steps", "iskylims_fixed_values"],
-        "platform-params": {},
+        "platform-params": {
+            "iskylims": {
+                "display_name": "iSkyLIMS"
+            },
+            "relecov": {
+                "display_name": "relecov-platform"
+            }
+        },
         "data_upload_types": [
             "sample",
             "bioinfodata",

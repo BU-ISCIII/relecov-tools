@@ -229,6 +229,7 @@ update_db:
     long_table: ''
   platform-params:
     iskylims:
+      display_name: iSkyLIMS
       server_url: http://relecov-iskylims.isciiides.es
       api_url: /wetlab/api/
       store_samples: create-sample
@@ -239,6 +240,7 @@ update_db:
       project_name: relecov
       token: '' # Fill with your platform token
     relecov:
+      display_name: relecov-platform
       server_url: http://relecov-platform.isciiides.es
       api_url: /api/
       store_samples: createSampleData
@@ -307,6 +309,9 @@ pipeline_manager:
     folder_names: []
   analysis_group: RLV
   analysis_user: icasas_C
+  sample_upload_platforms:
+  - relecov
+  - iskylims
   organism_config:
     Severe acute respiratory syndrome coronavirus 2 [LOINC:LA31065-8]:
       pipeline_template: viralrecon

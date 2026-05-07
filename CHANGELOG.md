@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Add background execution mode for wrapper [#880](https://github.com/BU-ISCIII/relecov-tools/pull/880)
 - Add weekly SFTP upload report [#881](https://github.com/BU-ISCIII/relecov-tools/pull/881)
+- Upload pipeline-manager samples to iSkyLIMS [#882](https://github.com/BU-ISCIII/relecov-tools/pull/882)
 
 #### Fixes
 
