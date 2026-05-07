@@ -116,6 +116,7 @@ class PipelineManager(BaseModule):
         self.linked_sample_folder = config_data["sample_link_folder"]
         self.doc_folder = config_data["doc_folder"]
         self.organism_config = config_data["organism_config"]
+        self.sample_upload_platforms = config_data.get("sample_upload_platforms", [])
         self.not_provided_field = (
             self.config.get_topic_data("generic", "not_provided_field")
             or "Not Provided [SNOMED:434941000124101]"
@@ -788,7 +789,10 @@ class PipelineManager(BaseModule):
                 platform=platform,
             )
             upload_db.start_api(platform)
-            platform_name = self._get_platform_display_name(platform)
+            platform_settings = upload_db_conf.get("platform-params", {})
+            platform_name = platform_settings.get(platform, {}).get(
+                "display_name", platform
+            )
             self.log.info("Uploading sample data to %s", platform_name)
             stderr.print(f"[blue]Uploading sample data to {platform_name}")
             result = upload_db.store_data("sample", platform)
@@ -849,35 +853,29 @@ class PipelineManager(BaseModule):
     def _get_sample_upload_platforms(self, upload_db_conf: dict) -> list[str]:
         """Return the ordered platforms where pipeline-manager should upload samples."""
         configured_platform = upload_db_conf["platform"]
-        full_update_steps = upload_db_conf.get("full_update_steps", [])
-        platforms = [
-            str(step["platform"])
-            for step in full_update_steps
-            if isinstance(step, dict)
-            and step.get("type") == "sample"
-            and step.get("platform")
-        ]
+        platforms = [str(platform) for platform in self.sample_upload_platforms]
         if not platforms:
-            platforms = [configured_platform]
-
-        # Keep the configured platform in the sample upload plan, even if an older
-        # configuration has only partial full_update_steps.
-        if configured_platform not in platforms:
-            platforms.append(configured_platform)
+            full_update_steps = upload_db_conf.get("full_update_steps", [])
+            platforms = [
+                str(step["platform"])
+                for step in full_update_steps
+                if isinstance(step, dict)
+                and step.get("type") == "sample"
+                and step.get("platform")
+            ]
+            if not platforms:
+                platforms = [configured_platform]
 
         platforms = list(dict.fromkeys(platforms))
-        if "relecov" in platforms:
-            platforms.remove("relecov")
-            platforms.insert(0, "relecov")
+        if "iskylims" in platforms and (
+            "relecov" not in platforms
+            or platforms.index("relecov") > platforms.index("iskylims")
+        ):
+            raise ValueError(
+                "pipeline_manager.sample_upload_platforms must upload to "
+                "'relecov' before 'iskylims' so unique_sample_id is available."
+            )
         return platforms
-
-    @staticmethod
-    def _get_platform_display_name(platform: str) -> str:
-        platform_names = {
-            "relecov": "relecov-platform",
-            "iskylims": "iSkyLIMS",
-        }
-        return platform_names.get(platform, platform)
 
     def pipeline_exc(self):
         """Prepare folder for analysis in HPC
