@@ -258,6 +258,12 @@ class BuildSchema(BaseModule):
         uniques = {k: sorted(v) for k, v in uniques.items()}
         return dropdowns, uniques
 
+    def _is_template_only_property(self, property_definition: dict) -> bool:
+        submitting_lab_form = property_definition.get("submitting_lab_form")
+        if not isinstance(submitting_lab_form, str):
+            return False
+        return submitting_lab_form.strip().upper() == "ONLY"
+
     def validate_database_definition(self, json_data):
         """Validate the mandatory features and ensure:
         - No duplicate enum values in the JSON schema.
@@ -741,6 +747,11 @@ class BuildSchema(BaseModule):
         """
         # Pre-properties
         new_schema = schema_draft
+        json_data = {
+            property_id: property_definition
+            for property_id, property_definition in json_data.items()
+            if not self._is_template_only_property(property_definition)
+        }
         if root_schema:
             # Fill schema header
             # FIXME: it gets 'relecov-tools' instead of RELECOV
@@ -892,7 +903,76 @@ class BuildSchema(BaseModule):
 
     # FIXME: overview-tab - FIX first column values
     # FIXME: overview-tab - Still need to add the column that maps to tab metadatalab
-    def create_metadatalab_excel(self, json_schema):
+    def _parse_enum_values(self, enum_value):
+        if isinstance(enum_value, list):
+            return enum_value
+        if isinstance(enum_value, str):
+            loaded_values = self._load_enum_values_from_file(enum_value)
+            if loaded_values:
+                return loaded_values
+            return [value.strip() for value in enum_value.split("; ") if value.strip()]
+        return pd.NA
+
+    def _load_enum_values_from_file(self, enum_value: str) -> list[str]:
+        enum_file = enum_value.strip()
+        if enum_file.startswith("@file:"):
+            enum_file = enum_file.removeprefix("@file:").strip()
+        elif enum_file.startswith("@"):
+            enum_file = enum_file.removeprefix("@").strip()
+
+        if not enum_file.endswith(".txt"):
+            return []
+
+        enum_path = os.path.join(os.path.dirname(__file__), "conf", enum_file)
+        if not os.path.exists(enum_path):
+            return []
+
+        with open(enum_path, encoding="utf-8") as fh:
+            return [
+                line.strip()
+                for line in fh
+                if line.strip() and not line.lstrip().startswith("#")
+            ]
+
+    def _template_only_properties_to_df(self, database_definition: dict | None):
+        if not database_definition:
+            return pd.DataFrame()
+
+        mapping_features = self.configurables.get("database_mapping_features", {})
+        template_rows = []
+        for property_id in database_definition:
+            db_features = database_definition[property_id]
+            if not self._is_template_only_property(db_features):
+                continue
+
+            row = {
+                "property_id": property_id,
+                "field_id": property_id,
+                "parent_property_id": None,
+                "parent_label": "",
+                "parent_classification": "",
+                "is_required": db_features.get("required (Y/N)", "") == "Y",
+            }
+            for db_feature_key, db_feature_value in db_features.items():
+                schema_key = mapping_features.get(db_feature_key)
+                if not schema_key:
+                    continue
+                if schema_key == "enum":
+                    row["enum"] = self._parse_enum_values(db_feature_value)
+                    continue
+                std_json_feature = self.jsonschema_object(
+                    property_id,
+                    schema_key,
+                    db_feature_value,
+                    expected_type=db_features.get("type"),
+                )
+                row.update(std_json_feature)
+
+            template_rows.append(row)
+
+        return pd.DataFrame(template_rows)
+
+    def create_metadatalab_excel(self, json_schema, database_definition=None):
         """
         Generates an Excel template file for Metadata LAB with four sheets:
         Overview, Metadata LAB, Data Validation, and Version History.
@@ -979,6 +1059,11 @@ class BuildSchema(BaseModule):
                 df = relecov_tools.assets.schema_utils.metadatalab_template.schema_properties_to_df(
                     schema_properties_flatten
                 )
+                template_only_df = self._template_only_properties_to_df(
+                    database_definition
+                )
+                if not template_only_df.empty:
+                    df = pd.concat([df, template_only_df], ignore_index=True)
 
                 classification_overrides = self.configurables.get(
                     "classification_filters", {}
@@ -1020,13 +1105,17 @@ class BuildSchema(BaseModule):
                         clean_ontologies(values) if isinstance(values, list) else values
                     )
 
-                df["enum"] = df["$ref"].apply(
+                resolved_enums = df["$ref"].apply(
                     lambda row: (
                         resolve_enum_ref(row, enum_defs=enum_defs)
                         if not pd.isna(row)
                         else row
                     )
                 )
+                if "enum" in df.columns:
+                    df["enum"] = df["enum"].where(pd.notnull(df["enum"]), resolved_enums)
+                else:
+                    df["enum"] = resolved_enums
                 common_dropdown = self._lab_dropdowns["collecting_institution"]
 
                 lab_fields = [
@@ -1050,8 +1139,8 @@ class BuildSchema(BaseModule):
             # 3.  Headers / filtering
             # ------------------------------------------------------------------ #
             if "header" in df.columns:
-                df["header"] = df["header"].astype(str).str.strip()
-                df_filtered = df[df["header"].str.upper() == "Y"]
+                df["header"] = df["header"].astype(str).str.strip().str.upper()
+                df_filtered = df[df["header"].isin(["Y", "ONLY"])]
             else:
                 self.log.warning(
                     "No se encontró la columna 'header', usando df sin filtrar."
@@ -1449,7 +1538,7 @@ class BuildSchema(BaseModule):
         if self.non_interactive or relecov_tools.utils.prompt_yn_question(
             "Do you want to create a metadata lab file?:"
         ):
-            self.create_metadatalab_excel(new_schema_json)
+            self.create_metadatalab_excel(new_schema_json, database_dic)
 
         # Return new schema
         return new_schema_json
