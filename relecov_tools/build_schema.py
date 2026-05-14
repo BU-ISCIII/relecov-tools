@@ -57,6 +57,8 @@ class BuildSchema(BaseModule):
 
         # No metadata is being processed so batch_id will be execution date
         self.set_batch_id(self.basemod_date)
+        # Cache for the optional AMR enum source sheet.
+        self._amr_gene_list_df = None
 
         # Validate output folder creation
         if not output_dir:
@@ -263,6 +265,65 @@ class BuildSchema(BaseModule):
         if not isinstance(submitting_lab_form, str):
             return False
         return submitting_lab_form.strip().upper() == "ONLY"
+
+    def _load_amr_gene_list(self) -> pd.DataFrame:
+        if self._amr_gene_list_df is not None:
+            return self._amr_gene_list_df
+
+        try:
+            df = pd.read_excel(
+                self.excel_file_path,
+                sheet_name="amr_gene_list",
+                na_values=["nan", "N/A", "NA", ""],
+            )
+        except ValueError:
+            df = pd.DataFrame()
+
+        if not df.empty:
+            df.columns = [str(column).strip() for column in df.columns]
+            if "Name" in df.columns:
+                df = df[df["Name"].notna()]
+
+        self._amr_gene_list_df = df
+        return self._amr_gene_list_df
+
+    def _amr_column_values(
+        self, column: str, category: str | None = None
+    ) -> list[str]:
+        df = self._load_amr_gene_list()
+        if df.empty or column not in df.columns:
+            return []
+
+        if category and "Category" in df.columns:
+            df = df[
+                df["Category"].astype(str).str.strip().str.lower()
+                == category.lower()
+            ]
+
+        values = [
+            str(value).strip()
+            for value in df[column].dropna().tolist()
+            if str(value).strip()
+        ]
+        return list(dict.fromkeys(values))
+
+    def _amr_enum_values_for_property(
+        self, property_id: str, parent_property_id: str | None = None
+    ) -> list[str]:
+        if parent_property_id != "amr_acquired_genes":
+            return []
+
+        enum_sources = {
+            "allele_name": ("Name", "allele"),
+            "gene_name": ("Name", "gene"),
+            "classification": ("Classification", None),
+            "description": ("Description", None),
+        }
+        source = enum_sources.get(property_id)
+        if not source:
+            return []
+        column, category = source
+        return self._amr_column_values(column, category=category)
 
     def validate_database_definition(self, json_data):
         """Validate the mandatory features and ensure:
@@ -598,7 +659,9 @@ class BuildSchema(BaseModule):
 
         return jsonschema_value
 
-    def handle_properties(self, json_data: dict[str, dict]) -> tuple[dict, dict, dict]:
+    def handle_properties(
+        self, json_data: dict[str, dict], parent_property_id: str | None = None
+    ) -> tuple[dict, dict, dict]:
         """
         Handle the generation of simple and nested properties from the database definition.
 
@@ -620,6 +683,11 @@ class BuildSchema(BaseModule):
         for property_id, db_features_dic in json_data.items():
             is_required = db_features_dic.get("required (Y/N)", "") == "Y"
             has_enum = db_features_dic.get("enum", False)
+            amr_enum_values = self._amr_enum_values_for_property(
+                property_id, parent_property_id=parent_property_id
+            )
+            if amr_enum_values:
+                has_enum = "; ".join(amr_enum_values)
             if property_id in [
                 "collecting_institution",
                 "submitting_institution",
@@ -637,7 +705,10 @@ class BuildSchema(BaseModule):
                 schema_draft = {"type": "object", "properties": {}, "required": []}
                 subschema = self.read_database_definition(property_id)
                 complex_json_feature = self.build_new_schema(
-                    subschema, schema_draft, root_schema=False
+                    subschema,
+                    schema_draft,
+                    root_schema=False,
+                    parent_property_id=property_id,
                 )
                 if complex_json_feature:
                     if complex_json_feature.get("$defs"):
@@ -661,6 +732,8 @@ class BuildSchema(BaseModule):
                         continue
                     # Extra check to avoid non-mapping properties.
                     if db_feature_key in mapping_features:
+                        if db_feature_key == "enum" and isinstance(has_enum, str):
+                            db_feature_value = has_enum
                         std_json_feature = self.jsonschema_object(
                             property_id,
                             mapping_features[db_feature_key],
@@ -729,7 +802,11 @@ class BuildSchema(BaseModule):
         return {"allOf": all_of_base} if all_of_base else {}
 
     def build_new_schema(
-        self, json_data: dict[str, dict], schema_draft: dict, root_schema: bool = True
+        self,
+        json_data: dict[str, dict],
+        schema_draft: dict,
+        root_schema: bool = True,
+        parent_property_id: str | None = None,
     ) -> dict[str, any]:
         """
         Build a new JSON Schema based on the provided JSON data and draft template, in three stages:
@@ -770,7 +847,9 @@ class BuildSchema(BaseModule):
         # Fill schema properties
         # Properties
         try:
-            properties, required, defs = self.handle_properties(json_data)
+            properties, required, defs = self.handle_properties(
+                json_data, parent_property_id=parent_property_id
+            )
         except Exception as e:
             self.log.error(f"Error building properties: {str(e)}")
             stderr.print(f"[red]Error building properties: {str(e)}")
@@ -907,11 +986,32 @@ class BuildSchema(BaseModule):
         if isinstance(enum_value, list):
             return enum_value
         if isinstance(enum_value, str):
+            loaded_values = self._load_enum_values_from_sheet(enum_value)
+            if loaded_values:
+                return loaded_values
             loaded_values = self._load_enum_values_from_file(enum_value)
             if loaded_values:
                 return loaded_values
             return [value.strip() for value in enum_value.split("; ") if value.strip()]
         return pd.NA
+
+    def _load_enum_values_from_sheet(self, enum_value: str) -> list[str]:
+        enum_reference = enum_value.strip()
+        if enum_reference == "amr_gene_list":
+            return self._amr_column_values("Name")
+
+        if not enum_reference.startswith("@sheet:"):
+            return []
+
+        reference_parts = [
+            part.strip() for part in enum_reference.removeprefix("@sheet:").split(":")
+        ]
+        sheet_name = reference_parts[0] if reference_parts else ""
+        column_name = reference_parts[1] if len(reference_parts) > 1 else "Name"
+        if sheet_name != "amr_gene_list":
+            return []
+
+        return self._amr_column_values(column_name)
 
     def _load_enum_values_from_file(self, enum_value: str) -> list[str]:
         enum_file = enum_value.strip()
