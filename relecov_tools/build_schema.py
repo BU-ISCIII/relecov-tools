@@ -305,7 +305,7 @@ class BuildSchema(BaseModule):
             for value in df[column].dropna().tolist()
             if str(value).strip()
         ]
-        return list(dict.fromkeys(values))
+        return self._sort_enum_values(list(dict.fromkeys(values)))
 
     def _amr_enum_values_for_property(
         self, property_id: str, parent_property_id: str | None = None
@@ -748,7 +748,9 @@ class BuildSchema(BaseModule):
                 required_properties.append(property_id)
             # If there is an enum in the property, parse it and add it to definitions
             if isinstance(has_enum, str):
-                enum = [value.strip() for value in has_enum.split("; ")]
+                enum = self._sort_enum_values(
+                    [value.strip() for value in has_enum.split("; ") if value.strip()]
+                )
                 definitions["$defs"]["enums"][property_id] = {}
                 definitions["$defs"]["enums"][property_id]["enum"] = enum
 
@@ -982,17 +984,40 @@ class BuildSchema(BaseModule):
 
     # FIXME: overview-tab - FIX first column values
     # FIXME: overview-tab - Still need to add the column that maps to tab metadatalab
+    def _sort_enum_values(self, enum_values: list[str]) -> list[str]:
+        last_values = {
+            "not sequenced": 0,
+            "no enrichment": 1,
+            "not applicable": 2,
+            "not collected": 3,
+            "not provided": 4,
+            "missing": 5,
+            "restricted access": 6,
+            "other": 7,
+        }
+
+        def sort_key(value: str):
+            normalized_value = value.strip().casefold()
+            for last_value, last_order in last_values.items():
+                if last_value in normalized_value:
+                    return (1, last_order)
+            return (0, normalized_value)
+
+        return sorted(enum_values, key=sort_key)
+
     def _parse_enum_values(self, enum_value):
         if isinstance(enum_value, list):
-            return enum_value
+            return self._sort_enum_values(enum_value)
         if isinstance(enum_value, str):
             loaded_values = self._load_enum_values_from_sheet(enum_value)
             if loaded_values:
-                return loaded_values
+                return self._sort_enum_values(loaded_values)
             loaded_values = self._load_enum_values_from_file(enum_value)
             if loaded_values:
-                return loaded_values
-            return [value.strip() for value in enum_value.split("; ") if value.strip()]
+                return self._sort_enum_values(loaded_values)
+            return self._sort_enum_values(
+                [value.strip() for value in enum_value.split("; ") if value.strip()]
+            )
         return pd.NA
 
     def _load_enum_values_from_sheet(self, enum_value: str) -> list[str]:
