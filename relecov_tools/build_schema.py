@@ -325,6 +325,78 @@ class BuildSchema(BaseModule):
         column, category = source
         return self._amr_column_values(column, category=category)
 
+    @staticmethod
+    def _clean_amr_value(value) -> str:
+        return "" if pd.isna(value) else str(value).strip()
+
+    def _build_amr_genes_json(self) -> dict:
+        df = self._load_amr_gene_list()
+        if df.empty:
+            return {}
+
+        if "Category" in df.columns:
+            gene_rows = df[
+                df["Category"].astype(str).str.strip().str.lower() == "gene"
+            ]
+        else:
+            gene_rows = pd.DataFrame()
+        gene_name_by_card = {
+            self._clean_amr_value(row.get("Name_CARD")): self._clean_amr_value(
+                row.get("Name")
+            )
+            for _, row in gene_rows.iterrows()
+            if self._clean_amr_value(row.get("Name_CARD"))
+            and self._clean_amr_value(row.get("Name"))
+        }
+
+        terms = {}
+        for _, row in df.iterrows():
+            name = self._clean_amr_value(row.get("Name"))
+            if not name:
+                continue
+
+            category = self._clean_amr_value(row.get("Category")).lower()
+            name_card = self._clean_amr_value(row.get("Name_CARD"))
+            gene_for_alleles = self._clean_amr_value(row.get("gen_for_alleles"))
+
+            term = {
+                "name_card": name_card,
+                "aro_accession": self._clean_amr_value(row.get("ARO Accession")),
+                "name": name,
+                "category": category,
+                "classification": self._clean_amr_value(row.get("Classification")),
+                "description": self._clean_amr_value(row.get("Description")),
+            }
+
+            if category == "allele":
+                term["allele_name"] = name
+                term["gene_name_card"] = gene_for_alleles
+                term["gene_name"] = gene_name_by_card.get(
+                    gene_for_alleles, gene_for_alleles
+                )
+            elif category == "gene":
+                term["gene_name_card"] = name_card
+                term["gene_name"] = name
+
+            terms[name] = term
+
+        return {
+            "version": self.version,
+            "source_sheet": "amr_gene_list",
+            "terms": terms,
+        }
+
+    def _save_amr_genes_json(self):
+        amr_genes = self._build_amr_genes_json()
+        if not amr_genes:
+            return
+
+        output_path = os.path.join(self.output_dir, "amr_genes.json")
+        with open(output_path, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps(amr_genes, indent=4, ensure_ascii=False))
+        self.log.info("AMR genes JSON saved to %s", output_path)
+        stderr.print(f"[green]AMR genes JSON saved to: {output_path}")
+
     def validate_database_definition(self, json_data):
         """Validate the mandatory features and ensure:
         - No duplicate enum values in the JSON schema.
@@ -1658,6 +1730,7 @@ class BuildSchema(BaseModule):
 
         # Saves new JSON schema
         self.save_new_schema(new_schema_json)
+        self._save_amr_genes_json()
 
         # Create metadata lab template
         if self.non_interactive or relecov_tools.utils.prompt_yn_question(
