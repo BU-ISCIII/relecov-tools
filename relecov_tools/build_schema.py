@@ -287,17 +287,14 @@ class BuildSchema(BaseModule):
         self._amr_gene_list_df = df
         return self._amr_gene_list_df
 
-    def _amr_column_values(
-        self, column: str, category: str | None = None
-    ) -> list[str]:
+    def _amr_column_values(self, column: str, category: str | None = None) -> list[str]:
         df = self._load_amr_gene_list()
         if df.empty or column not in df.columns:
             return []
 
         if category and "Category" in df.columns:
             df = df[
-                df["Category"].astype(str).str.strip().str.lower()
-                == category.lower()
+                df["Category"].astype(str).str.strip().str.lower() == category.lower()
             ]
 
         values = [
@@ -335,9 +332,7 @@ class BuildSchema(BaseModule):
             return {}
 
         if "Category" in df.columns:
-            gene_rows = df[
-                df["Category"].astype(str).str.strip().str.lower() == "gene"
-            ]
+            gene_rows = df[df["Category"].astype(str).str.strip().str.lower() == "gene"]
         else:
             gene_rows = pd.DataFrame()
         gene_name_by_card = {
@@ -1310,7 +1305,9 @@ class BuildSchema(BaseModule):
                     )
                 )
                 if "enum" in df.columns:
-                    df["enum"] = df["enum"].where(pd.notnull(df["enum"]), resolved_enums)
+                    df["enum"] = df["enum"].where(
+                        pd.notnull(df["enum"]), resolved_enums
+                    )
                 else:
                     df["enum"] = resolved_enums
                 common_dropdown = self._lab_dropdowns["collecting_institution"]
