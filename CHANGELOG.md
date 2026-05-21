@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Add background execution mode for wrapper [#880](https://github.com/BU-ISCIII/relecov-tools/pull/880)
 - Add weekly SFTP upload report [#881](https://github.com/BU-ISCIII/relecov-tools/pull/881)
+- Added support for configurable enum sources, template-only fields, and AMR metadata JSON generation. [#883](https://github.com/BU-ISCIII/relecov-tools/pull/883)
 
 #### Fixes
 
