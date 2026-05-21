@@ -10,6 +10,7 @@ import difflib
 import inspect
 
 import relecov_tools.utils
+import relecov_tools.assets.schema_utils.amr_metadata
 import relecov_tools.assets.schema_utils.jsonschema_draft
 import relecov_tools.assets.schema_utils.metadatalab_template
 from relecov_tools.config_json import ConfigJson
@@ -57,8 +58,6 @@ class BuildSchema(BaseModule):
 
         # No metadata is being processed so batch_id will be execution date
         self.set_batch_id(self.basemod_date)
-        # Cache for the optional AMR enum source sheet.
-        self._amr_gene_list_df = None
         # Cache for generic enum source sheets referenced from the input Excel.
         self._enum_sheet_cache = {}
 
@@ -263,111 +262,24 @@ class BuildSchema(BaseModule):
         return dropdowns, uniques
 
     def _is_template_only_property(self, property_definition: dict) -> bool:
+        """Return True when a database definition row is only for the lab template."""
         submitting_lab_form = property_definition.get("submitting_lab_form")
         if not isinstance(submitting_lab_form, str):
             return False
         return submitting_lab_form.strip().upper() == "ONLY"
 
-    def _load_amr_gene_list(self) -> pd.DataFrame:
-        if self._amr_gene_list_df is not None:
-            return self._amr_gene_list_df
-
-        try:
-            df = pd.read_excel(
-                self.excel_file_path,
-                sheet_name="amr_gene_list",
-                na_values=["nan", "N/A", "NA", ""],
-            )
-        except ValueError:
-            df = pd.DataFrame()
-
-        if not df.empty:
-            df.columns = [str(column).strip() for column in df.columns]
-            if "Name" in df.columns:
-                df = df[df["Name"].notna()]
-
-        self._amr_gene_list_df = df
-        return self._amr_gene_list_df
-
-    def _amr_column_values(self, column: str) -> list[str]:
-        df = self._load_amr_gene_list()
-        if df.empty or column not in df.columns:
-            return []
-
-        values = [
-            str(value).strip()
-            for value in df[column].dropna().tolist()
-            if str(value).strip()
-        ]
-        return self._sort_enum_values(list(dict.fromkeys(values)))
-
-    @staticmethod
-    def _clean_amr_value(value) -> str:
-        return "" if pd.isna(value) else str(value).strip()
-
-    def _build_amr_genes_json(self) -> dict:
-        df = self._load_amr_gene_list()
-        if df.empty:
-            return {}
-
-        if "Category" in df.columns:
-            gene_rows = df[df["Category"].astype(str).str.strip().str.lower() == "gene"]
-        else:
-            gene_rows = pd.DataFrame()
-        gene_name_by_card = {
-            self._clean_amr_value(row.get("Name_CARD")): self._clean_amr_value(
-                row.get("Name")
-            )
-            for _, row in gene_rows.iterrows()
-            if self._clean_amr_value(row.get("Name_CARD"))
-            and self._clean_amr_value(row.get("Name"))
-        }
-
-        terms = {}
-        for _, row in df.iterrows():
-            name = self._clean_amr_value(row.get("Name"))
-            if not name:
-                continue
-
-            category = self._clean_amr_value(row.get("Category")).lower()
-            name_card = self._clean_amr_value(row.get("Name_CARD"))
-            gene_for_alleles = self._clean_amr_value(row.get("gen_for_alleles"))
-
-            term = {
-                "name_card": name_card,
-                "aro_accession": self._clean_amr_value(row.get("ARO Accession")),
-                "name": name,
-                "category": category,
-                "classification": self._clean_amr_value(row.get("Classification")),
-                "description": self._clean_amr_value(row.get("Description")),
-            }
-
-            if category == "allele":
-                term["allele_name"] = name
-                term["gene_name_card"] = gene_for_alleles
-                term["gene_name"] = gene_name_by_card.get(
-                    gene_for_alleles, gene_for_alleles
-                )
-            elif category == "gene":
-                term["gene_name_card"] = name_card
-                term["gene_name"] = name
-
-            terms[name] = term
-
-        return {
-            "version": self.version,
-            "source_sheet": "amr_gene_list",
-            "terms": terms,
-        }
-
     def _save_amr_genes_json(self):
-        amr_genes = self._build_amr_genes_json()
-        if not amr_genes:
+        """Ask the AMR schema utility to write amr_genes.json when data is available."""
+        output_path = (
+            relecov_tools.assets.schema_utils.amr_metadata.save_amr_genes_json(
+                self.excel_file_path,
+                self.output_dir,
+                self.version,
+            )
+        )
+        if not output_path:
             return
 
-        output_path = os.path.join(self.output_dir, "amr_genes.json")
-        with open(output_path, "w", encoding="utf-8") as fh:
-            fh.write(json.dumps(amr_genes, indent=4, ensure_ascii=False))
         self.log.info("AMR genes JSON saved to %s", output_path)
         stderr.print(f"[green]AMR genes JSON saved to: {output_path}")
 
@@ -1018,6 +930,7 @@ class BuildSchema(BaseModule):
     # FIXME: overview-tab - FIX first column values
     # FIXME: overview-tab - Still need to add the column that maps to tab metadatalab
     def _sort_enum_values(self, enum_values: list[str]) -> list[str]:
+        """Sort enum values alphabetically, keeping configured missing-value terms last."""
         last_values = {
             "not sequenced": 0,
             "no enrichment": 1,
@@ -1039,6 +952,14 @@ class BuildSchema(BaseModule):
         return sorted(enum_values, key=sort_key)
 
     def _parse_enum_values(self, enum_value):
+        """
+        Resolve enum definitions from lists, Excel sheet references, txt files, or cells.
+
+        Supported references:
+        - @sheet:sheet_name:column_name
+        - @sheet:sheet_name:column_name:filter_column=filter_value
+        - @file:file_name.txt or @file_name.txt
+        """
         if isinstance(enum_value, list):
             return self._sort_enum_values(enum_value)
         if isinstance(enum_value, str):
@@ -1054,9 +975,7 @@ class BuildSchema(BaseModule):
         return pd.NA
 
     def _load_enum_source_sheet(self, sheet_name: str) -> pd.DataFrame:
-        if sheet_name == "amr_gene_list":
-            return self._load_amr_gene_list()
-
+        """Read and cache an enum source sheet from the input Excel file."""
         if sheet_name not in self._enum_sheet_cache:
             try:
                 df = pd.read_excel(
@@ -1075,6 +994,7 @@ class BuildSchema(BaseModule):
     def _filter_enum_source_sheet(
         self, df: pd.DataFrame, filter_references: list[str]
     ) -> pd.DataFrame:
+        """Apply case-insensitive filters written as column=value to an enum sheet."""
         for filter_reference in filter_references:
             if "=" not in filter_reference:
                 return pd.DataFrame()
@@ -1090,10 +1010,8 @@ class BuildSchema(BaseModule):
         return df
 
     def _load_enum_values_from_sheet(self, enum_value: str) -> list[str]:
+        """Load enum values from an Excel sheet reference in the enum column."""
         enum_reference = enum_value.strip()
-        if enum_reference == "amr_gene_list":
-            return self._amr_column_values("Name")
-
         if not enum_reference.startswith("@sheet:"):
             return []
 
@@ -1120,6 +1038,7 @@ class BuildSchema(BaseModule):
         return list(dict.fromkeys(values))
 
     def _load_enum_values_from_file(self, enum_value: str) -> list[str]:
+        """Load enum values from a txt file in relecov_tools/conf."""
         enum_file = enum_value.strip()
         if enum_file.startswith("@file:"):
             enum_file = enum_file.removeprefix("@file:").strip()
@@ -1141,6 +1060,7 @@ class BuildSchema(BaseModule):
             ]
 
     def _template_only_properties_to_df(self, database_definition: dict | None):
+        """Build template rows for properties marked as ONLY in submitting_lab_form."""
         if not database_definition:
             return pd.DataFrame()
 
