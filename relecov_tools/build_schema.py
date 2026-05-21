@@ -449,6 +449,9 @@ class BuildSchema(BaseModule):
             sheet_name=sheet_id,
             na_values=["nan", "N/A", "NA", ""],
         )
+        property_column = df.columns[0]
+        df = df[df[property_column].notna()]
+        df = df[df[property_column].astype(str).str.strip() != ""]
         # Convert database to json format
         json_data = {}
         for row in df.itertuples(index=False):
