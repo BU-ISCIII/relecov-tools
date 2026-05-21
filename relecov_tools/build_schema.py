@@ -59,6 +59,8 @@ class BuildSchema(BaseModule):
         self.set_batch_id(self.basemod_date)
         # Cache for the optional AMR enum source sheet.
         self._amr_gene_list_df = None
+        # Cache for generic enum source sheets referenced from the input Excel.
+        self._enum_sheet_cache = {}
 
         # Validate output folder creation
         if not output_dir:
@@ -287,15 +289,10 @@ class BuildSchema(BaseModule):
         self._amr_gene_list_df = df
         return self._amr_gene_list_df
 
-    def _amr_column_values(self, column: str, category: str | None = None) -> list[str]:
+    def _amr_column_values(self, column: str) -> list[str]:
         df = self._load_amr_gene_list()
         if df.empty or column not in df.columns:
             return []
-
-        if category and "Category" in df.columns:
-            df = df[
-                df["Category"].astype(str).str.strip().str.lower() == category.lower()
-            ]
 
         values = [
             str(value).strip()
@@ -303,24 +300,6 @@ class BuildSchema(BaseModule):
             if str(value).strip()
         ]
         return self._sort_enum_values(list(dict.fromkeys(values)))
-
-    def _amr_enum_values_for_property(
-        self, property_id: str, parent_property_id: str | None = None
-    ) -> list[str]:
-        if parent_property_id != "amr_acquired_genes":
-            return []
-
-        enum_sources = {
-            "allele_name": ("Name", "allele"),
-            "gene_name": ("Name", "gene"),
-            "classification": ("Classification", None),
-            "description": ("Description", None),
-        }
-        source = enum_sources.get(property_id)
-        if not source:
-            return []
-        column, category = source
-        return self._amr_column_values(column, category=category)
 
     @staticmethod
     def _clean_amr_value(value) -> str:
@@ -726,9 +705,7 @@ class BuildSchema(BaseModule):
 
         return jsonschema_value
 
-    def handle_properties(
-        self, json_data: dict[str, dict], parent_property_id: str | None = None
-    ) -> tuple[dict, dict, dict]:
+    def handle_properties(self, json_data: dict[str, dict]) -> tuple[dict, dict, dict]:
         """
         Handle the generation of simple and nested properties from the database definition.
 
@@ -750,11 +727,6 @@ class BuildSchema(BaseModule):
         for property_id, db_features_dic in json_data.items():
             is_required = db_features_dic.get("required (Y/N)", "") == "Y"
             has_enum = db_features_dic.get("enum", False)
-            amr_enum_values = self._amr_enum_values_for_property(
-                property_id, parent_property_id=parent_property_id
-            )
-            if amr_enum_values:
-                has_enum = "; ".join(amr_enum_values)
             if property_id in [
                 "collecting_institution",
                 "submitting_institution",
@@ -775,7 +747,6 @@ class BuildSchema(BaseModule):
                     subschema,
                     schema_draft,
                     root_schema=False,
-                    parent_property_id=property_id,
                 )
                 if complex_json_feature:
                     if complex_json_feature.get("$defs"):
@@ -815,9 +786,7 @@ class BuildSchema(BaseModule):
                 required_properties.append(property_id)
             # If there is an enum in the property, parse it and add it to definitions
             if isinstance(has_enum, str):
-                enum = self._sort_enum_values(
-                    [value.strip() for value in has_enum.split("; ") if value.strip()]
-                )
+                enum = self._parse_enum_values(has_enum)
                 definitions["$defs"]["enums"][property_id] = {}
                 definitions["$defs"]["enums"][property_id]["enum"] = enum
 
@@ -875,7 +844,6 @@ class BuildSchema(BaseModule):
         json_data: dict[str, dict],
         schema_draft: dict,
         root_schema: bool = True,
-        parent_property_id: str | None = None,
     ) -> dict[str, any]:
         """
         Build a new JSON Schema based on the provided JSON data and draft template, in three stages:
@@ -916,9 +884,7 @@ class BuildSchema(BaseModule):
         # Fill schema properties
         # Properties
         try:
-            properties, required, defs = self.handle_properties(
-                json_data, parent_property_id=parent_property_id
-            )
+            properties, required, defs = self.handle_properties(json_data)
         except Exception as e:
             self.log.error(f"Error building properties: {str(e)}")
             stderr.print(f"[red]Error building properties: {str(e)}")
@@ -1077,15 +1043,51 @@ class BuildSchema(BaseModule):
             return self._sort_enum_values(enum_value)
         if isinstance(enum_value, str):
             loaded_values = self._load_enum_values_from_sheet(enum_value)
-            if loaded_values:
+            if loaded_values or enum_value.strip().startswith("@sheet:"):
                 return self._sort_enum_values(loaded_values)
             loaded_values = self._load_enum_values_from_file(enum_value)
-            if loaded_values:
+            if loaded_values or enum_value.strip().startswith(("@file:", "@")):
                 return self._sort_enum_values(loaded_values)
             return self._sort_enum_values(
                 [value.strip() for value in enum_value.split("; ") if value.strip()]
             )
         return pd.NA
+
+    def _load_enum_source_sheet(self, sheet_name: str) -> pd.DataFrame:
+        if sheet_name == "amr_gene_list":
+            return self._load_amr_gene_list()
+
+        if sheet_name not in self._enum_sheet_cache:
+            try:
+                df = pd.read_excel(
+                    self.excel_file_path,
+                    sheet_name=sheet_name,
+                    na_values=["nan", "N/A", "NA", ""],
+                )
+            except ValueError:
+                self._enum_sheet_cache[sheet_name] = pd.DataFrame()
+            else:
+                df.columns = [str(column).strip() for column in df.columns]
+                self._enum_sheet_cache[sheet_name] = df
+
+        return self._enum_sheet_cache[sheet_name]
+
+    def _filter_enum_source_sheet(
+        self, df: pd.DataFrame, filter_references: list[str]
+    ) -> pd.DataFrame:
+        for filter_reference in filter_references:
+            if "=" not in filter_reference:
+                return pd.DataFrame()
+            column_name, expected_value = [
+                item.strip() for item in filter_reference.split("=", maxsplit=1)
+            ]
+            if not column_name or column_name not in df.columns:
+                return pd.DataFrame()
+            df = df[
+                df[column_name].astype(str).str.strip().str.casefold()
+                == expected_value.casefold()
+            ]
+        return df
 
     def _load_enum_values_from_sheet(self, enum_value: str) -> list[str]:
         enum_reference = enum_value.strip()
@@ -1098,12 +1100,24 @@ class BuildSchema(BaseModule):
         reference_parts = [
             part.strip() for part in enum_reference.removeprefix("@sheet:").split(":")
         ]
-        sheet_name = reference_parts[0] if reference_parts else ""
-        column_name = reference_parts[1] if len(reference_parts) > 1 else "Name"
-        if sheet_name != "amr_gene_list":
+        if len(reference_parts) < 2:
             return []
 
-        return self._amr_column_values(column_name)
+        sheet_name, column_name = reference_parts[:2]
+        if not sheet_name or not column_name:
+            return []
+
+        df = self._load_enum_source_sheet(sheet_name)
+        df = self._filter_enum_source_sheet(df, reference_parts[2:])
+        if df.empty or column_name not in df.columns:
+            return []
+
+        values = [
+            str(value).strip()
+            for value in df[column_name].dropna().tolist()
+            if str(value).strip()
+        ]
+        return list(dict.fromkeys(values))
 
     def _load_enum_values_from_file(self, enum_value: str) -> list[str]:
         enum_file = enum_value.strip()
