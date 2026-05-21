@@ -2,7 +2,7 @@
     "projects" : {
         "relecov": {
             "host_age_years": {
-                "header_row_idx": 1,
+                "header_row_idx": 5,
                 "max_rows": 1000,
                 "validation_type": "whole",
                 "operator": "between",
@@ -12,7 +12,7 @@
                 "error_title": "Valor no permitido"
             },
             "host_age_months": {
-                "header_row_idx": 1,
+                "header_row_idx": 5,
                 "max_rows": 1000,
                 "validation_type": "whole",
                 "operator": "between",
@@ -22,36 +22,36 @@
                 "error_title": "Valor no permitido"
             },
             "sample_collection_date": {
-                "header_row_idx": 1,
+                "header_row_idx": 5,
                 "max_rows": 1000,
                 "validation_type": "custom",
-                "formula1": "=ISNUMBER({col_letter}5)",
+                "formula1": "=OR({col_letter}5=\"\",IFERROR(AND(ISTEXT({col_letter}5),LEN({col_letter}5)=10,MID({col_letter}5,5,1)=\"-\",MID({col_letter}5,8,1)=\"-\",VALUE(MID({col_letter}5,6,2))>=1,VALUE(MID({col_letter}5,6,2))<=12,VALUE(RIGHT({col_letter}5,2))>=1,VALUE(RIGHT({col_letter}5,2))<=31,ISNUMBER(DATEVALUE({col_letter}5))),FALSE))",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
                 "error_title": "Formato de fecha incorrecto",
-                "format_cells_as_date": true
+                "format_cells_as_text": true
             },
             "sample_received_date": {
-                "header_row_idx": 1,
+                "header_row_idx": 5,
                 "max_rows": 1000,
                 "validation_type": "custom",
-                "formula1": "=ISNUMBER({col_letter}5)",
+                "formula1": "=OR({col_letter}5=\"\",IFERROR(AND(ISTEXT({col_letter}5),LEN({col_letter}5)=10,MID({col_letter}5,5,1)=\"-\",MID({col_letter}5,8,1)=\"-\",VALUE(MID({col_letter}5,6,2))>=1,VALUE(MID({col_letter}5,6,2))<=12,VALUE(RIGHT({col_letter}5,2))>=1,VALUE(RIGHT({col_letter}5,2))<=31,ISNUMBER(DATEVALUE({col_letter}5))),FALSE))",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
                 "error_title": "Formato de fecha incorrecto",
-                "format_cells_as_date": true
+                "format_cells_as_text": true
             },
             "sequencing_date": {
-                "header_row_idx": 1,
+                "header_row_idx": 5,
                 "max_rows": 1000,
                 "validation_type": "custom",
-                "formula1": "=ISNUMBER({col_letter}5)",
+                "formula1": "=OR({col_letter}5=\"\",IFERROR(AND(ISTEXT({col_letter}5),LEN({col_letter}5)=10,MID({col_letter}5,5,1)=\"-\",MID({col_letter}5,8,1)=\"-\",VALUE(MID({col_letter}5,6,2))>=1,VALUE(MID({col_letter}5,6,2))<=12,VALUE(RIGHT({col_letter}5,2))>=1,VALUE(RIGHT({col_letter}5,2))<=31,ISNUMBER(DATEVALUE({col_letter}5))),FALSE))",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
                 "error_title": "Formato de fecha incorrecto",
-                "format_cells_as_date": true
+                "format_cells_as_text": true
             }
         },
         "mepram": {
             "host_age_years": {
-                "header_row_idx": 1,
+                "header_row_idx": 5,
                 "max_rows": 1000,
                 "validation_type": "whole",
                 "operator": "between",
@@ -61,7 +61,7 @@
                 "error_title": "Valor no permitido"
             },
             "host_age_months": {
-                "header_row_idx": 1,
+                "header_row_idx": 5,
                 "max_rows": 1000,
                 "validation_type": "whole",
                 "operator": "between",
@@ -71,22 +71,22 @@
                 "error_title": "Valor no permitido"
             },
             "patient_birth_date": {
-                "header_row_idx": 1,
+                "header_row_idx": 5,
                 "max_rows": 1000,
                 "validation_type": "custom",
-                "formula1": "=ISNUMBER({col_letter}5)",
+                "formula1": "=OR({col_letter}5=\"\",IFERROR(AND(ISTEXT({col_letter}5),LEN({col_letter}5)=10,MID({col_letter}5,5,1)=\"-\",MID({col_letter}5,8,1)=\"-\",VALUE(MID({col_letter}5,6,2))>=1,VALUE(MID({col_letter}5,6,2))<=12,VALUE(RIGHT({col_letter}5,2))>=1,VALUE(RIGHT({col_letter}5,2))<=31,ISNUMBER(DATEVALUE({col_letter}5))),FALSE))",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
                 "error_title": "Formato de fecha incorrecto",
-                "format_cells_as_date": true
+                "format_cells_as_text": true
             },
             "sample_collection_date": {
-                "header_row_idx": 1,
+                "header_row_idx": 5,
                 "max_rows": 1000,
                 "validation_type": "custom",
-                "formula1": "=ISNUMBER({col_letter}5)",
+                "formula1": "=OR({col_letter}5=\"\",IFERROR(AND(ISTEXT({col_letter}5),LEN({col_letter}5)=10,MID({col_letter}5,5,1)=\"-\",MID({col_letter}5,8,1)=\"-\",VALUE(MID({col_letter}5,6,2))>=1,VALUE(MID({col_letter}5,6,2))<=12,VALUE(RIGHT({col_letter}5,2))>=1,VALUE(RIGHT({col_letter}5,2))<=31,ISNUMBER(DATEVALUE({col_letter}5))),FALSE))",
                 "error_message": "Ingrese la fecha en formato correcto YYYY-MM-DD (ejemplo: 2024-02-12).",
                 "error_title": "Formato de fecha incorrecto",
-                "format_cells_as_date": true
+                "format_cells_as_text": true
             }
         }
     },

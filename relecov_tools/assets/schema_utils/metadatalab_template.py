@@ -273,7 +273,14 @@ def create_condition(ws_metadata, conditions, df_filtered):
                 ws_metadata.add_data_validation(validation)
                 validation.add(cell_range)
 
-            if rules.get("format_cells_as_date", False):
+            if rules.get("format_cells_as_text", False):
+                col_idx = column_index_from_string(col_letter)
+                for row in ws_metadata.iter_rows(
+                    min_row=start_row, max_row=end_row, min_col=col_idx, max_col=col_idx
+                ):
+                    for cell in row:
+                        cell.number_format = "@"
+            elif rules.get("format_cells_as_date", False):
                 col_idx = column_index_from_string(col_letter)
                 for row in ws_metadata.iter_rows(
                     min_row=start_row, max_row=end_row, min_col=col_idx, max_col=col_idx
