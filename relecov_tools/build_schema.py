@@ -257,7 +257,7 @@ class BuildSchema(BaseModule):
                 dropdowns[f].append(dropdown_entry)
                 uniques[f].add(name)
 
-        dropdowns = {k: sorted(v) for k, v in dropdowns.items()}
+        dropdowns = {k: sorted(self._unique_enum_values(v)) for k, v in dropdowns.items()}
         uniques = {k: sorted(v) for k, v in uniques.items()}
         return dropdowns, uniques
 
@@ -841,9 +841,69 @@ class BuildSchema(BaseModule):
         Raises:
             ValueError: If the schema does not conform to the JSON Schema specification.
         """
+        self.validate_schema_enum_duplicates(schema)
         relecov_tools.assets.schema_utils.jsonschema_draft.check_schema_draft(
             schema, self.draft_version
         )
+
+    @staticmethod
+    def _find_duplicate_values(values: list) -> list:
+        """Return duplicated values preserving first duplicate encounter order."""
+        seen = set()
+        duplicates = []
+        duplicate_seen = set()
+        for value in values:
+            lookup_value = value.strip() if isinstance(value, str) else value
+            try:
+                is_seen = lookup_value in seen
+            except TypeError:
+                lookup_value = json.dumps(value, sort_keys=True, ensure_ascii=False)
+                is_seen = lookup_value in seen
+
+            if is_seen and lookup_value not in duplicate_seen:
+                duplicates.append(value)
+                duplicate_seen.add(lookup_value)
+            else:
+                seen.add(lookup_value)
+        return duplicates
+
+    def validate_schema_enum_duplicates(self, schema: dict):
+        """Validate that every enum list in a generated schema has unique values."""
+        duplicate_enums = {}
+
+        def walk_schema(node, path="$"):
+            if isinstance(node, dict):
+                enum_values = node.get("enum")
+                if isinstance(enum_values, list):
+                    duplicates = self._find_duplicate_values(enum_values)
+                    if duplicates:
+                        duplicate_enums[path] = duplicates
+                for key, value in node.items():
+                    walk_schema(value, f"{path}.{key}")
+            elif isinstance(node, list):
+                for index, value in enumerate(node):
+                    walk_schema(value, f"{path}[{index}]")
+
+        walk_schema(schema)
+
+        if duplicate_enums:
+            df_errors = pd.DataFrame(
+                [
+                    {
+                        "Enum Path": enum_path,
+                        "Duplicate Values": "; ".join(map(str, duplicates)),
+                    }
+                    for enum_path, duplicates in duplicate_enums.items()
+                ]
+            )
+            error_file_path = f"{self.output_dir}/schema_enum_duplicates.csv"
+            df_errors.to_csv(error_file_path, index=False, encoding="utf-8")
+            relecov_tools.utils.display_dataframe_to_user(
+                name="Schema Enum Duplicates", dataframe=df_errors
+            )
+            stderr.print(f"[red]Duplicated enum values found. Log saved to:")
+            stderr.print(f"\t{error_file_path}")
+            raise ValueError("Duplicated enum values found in generated schema.")
 
     def get_schema_diff(self, base_schema, new_schema):
         """
@@ -945,7 +1005,7 @@ class BuildSchema(BaseModule):
 
     def _sort_enum_values(self, enum_values: list[str]) -> list[str]:
         """
-        Sort enum values alphabetically while keeping configured special terms last.
+        Deduplicate and sort enum values alphabetically while keeping configured special terms last.
 
         Args:
             enum_values (list[str]): Enum values to sort.
@@ -964,6 +1024,8 @@ class BuildSchema(BaseModule):
             "other": 7,
         }
 
+        unique_values = self._unique_enum_values(enum_values)
+
         def sort_key(value: str):
             normalized_value = value.strip().casefold()
             for last_value, last_order in last_values.items():
@@ -971,7 +1033,24 @@ class BuildSchema(BaseModule):
                     return (1, last_order)
             return (0, normalized_value)
 
-        return sorted(enum_values, key=sort_key)
+        return sorted(unique_values, key=sort_key)
+
+    @staticmethod
+    def _unique_enum_values(enum_values: list) -> list:
+        """Return enum values without duplicates, preserving first occurrence order."""
+        unique_values = []
+        seen = set()
+        for value in enum_values:
+            lookup_value = value.strip() if isinstance(value, str) else value
+            try:
+                is_seen = lookup_value in seen
+            except TypeError:
+                lookup_value = json.dumps(value, sort_keys=True, ensure_ascii=False)
+                is_seen = lookup_value in seen
+            if not is_seen:
+                unique_values.append(value)
+                seen.add(lookup_value)
+        return unique_values
 
     def _parse_enum_values(self, enum_value):
         """
@@ -1092,7 +1171,7 @@ class BuildSchema(BaseModule):
             for value in df[column_name].dropna().tolist()
             if str(value).strip()
         ]
-        return list(dict.fromkeys(values))
+        return values
 
     def _load_enum_values_from_file(self, enum_value: str) -> list[str]:
         """
@@ -1286,7 +1365,9 @@ class BuildSchema(BaseModule):
                     )
 
                 def clean_ontologies(enums):
-                    return [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
+                    return self._unique_enum_values(
+                        [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
+                    )
 
                 def resolve_enum_ref(ref: str, enum_defs: dict) -> list[str]:
                     property_key = ref.split("enums/")[-1]
