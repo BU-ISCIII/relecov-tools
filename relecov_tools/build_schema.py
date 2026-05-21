@@ -262,14 +262,27 @@ class BuildSchema(BaseModule):
         return dropdowns, uniques
 
     def _is_template_only_property(self, property_definition: dict) -> bool:
-        """Return True when a database definition row is only for the lab template."""
+        """
+        Check whether a database definition row should only be included in the template.
+
+        Args:
+            property_definition (dict): Definition of one property from the input Excel.
+
+        Returns:
+            bool: True if submitting_lab_form is set to ONLY, False otherwise.
+        """
         submitting_lab_form = property_definition.get("submitting_lab_form")
         if not isinstance(submitting_lab_form, str):
             return False
         return submitting_lab_form.strip().upper() == "ONLY"
 
     def _save_amr_genes_json(self):
-        """Ask the AMR schema utility to write amr_genes.json when data is available."""
+        """
+        Generate the AMR genes metadata JSON file when amr_gene_list is available.
+
+        The AMR-specific parsing and writing logic lives in schema_utils. This
+        method only integrates that output into the build-schema workflow.
+        """
         output_path = (
             relecov_tools.assets.schema_utils.amr_metadata.save_amr_genes_json(
                 self.excel_file_path,
@@ -930,10 +943,16 @@ class BuildSchema(BaseModule):
             stderr.print(f"[red]An unexpected error occurred: {str(e)}")
         return False
 
-    # FIXME: overview-tab - FIX first column values
-    # FIXME: overview-tab - Still need to add the column that maps to tab metadatalab
     def _sort_enum_values(self, enum_values: list[str]) -> list[str]:
-        """Sort enum values alphabetically, keeping configured missing-value terms last."""
+        """
+        Sort enum values alphabetically while keeping configured special terms last.
+
+        Args:
+            enum_values (list[str]): Enum values to sort.
+
+        Returns:
+            list[str]: Sorted enum values.
+        """
         last_values = {
             "not sequenced": 0,
             "no enrichment": 1,
@@ -962,6 +981,12 @@ class BuildSchema(BaseModule):
         - @sheet:sheet_name:column_name
         - @sheet:sheet_name:column_name:filter_column=filter_value
         - @file:file_name.txt or @file_name.txt
+
+        Args:
+            enum_value: Raw enum value from the input Excel or an already parsed list.
+
+        Returns:
+            list[str] | pandas.NA: Parsed and sorted enum values, or pd.NA if empty.
         """
         if isinstance(enum_value, list):
             return self._sort_enum_values(enum_value)
@@ -978,7 +1003,15 @@ class BuildSchema(BaseModule):
         return pd.NA
 
     def _load_enum_source_sheet(self, sheet_name: str) -> pd.DataFrame:
-        """Read and cache an enum source sheet from the input Excel file."""
+        """
+        Read and cache an enum source sheet from the input Excel file.
+
+        Args:
+            sheet_name (str): Name of the Excel sheet to load.
+
+        Returns:
+            pd.DataFrame: Sheet contents, or an empty DataFrame if the sheet is absent.
+        """
         if sheet_name not in self._enum_sheet_cache:
             try:
                 df = pd.read_excel(
@@ -997,7 +1030,20 @@ class BuildSchema(BaseModule):
     def _filter_enum_source_sheet(
         self, df: pd.DataFrame, filter_references: list[str]
     ) -> pd.DataFrame:
-        """Apply case-insensitive filters written as column=value to an enum sheet."""
+        """
+        Apply case-insensitive column=value filters to an enum source sheet.
+
+        For example, the reference
+        @sheet:amr_gene_list:Name:Category=allele
+        loads the Name column from the amr_gene_list sheet, keeping rows where Category is allele.
+
+        Args:
+            df (pd.DataFrame): Enum source sheet contents.
+            filter_references (list[str]): Filters from @sheet references.
+
+        Returns:
+            pd.DataFrame: Filtered data, or an empty DataFrame if a filter is invalid.
+        """
         for filter_reference in filter_references:
             if "=" not in filter_reference:
                 return pd.DataFrame()
@@ -1013,7 +1059,15 @@ class BuildSchema(BaseModule):
         return df
 
     def _load_enum_values_from_sheet(self, enum_value: str) -> list[str]:
-        """Load enum values from an Excel sheet reference in the enum column."""
+        """
+        Load enum values from an Excel sheet reference in the enum column.
+
+        Args:
+            enum_value (str): Reference using @sheet:sheet_name:column_name syntax.
+
+        Returns:
+            list[str]: Unique enum values from the referenced sheet column.
+        """
         enum_reference = enum_value.strip()
         if not enum_reference.startswith("@sheet:"):
             return []
@@ -1041,7 +1095,15 @@ class BuildSchema(BaseModule):
         return list(dict.fromkeys(values))
 
     def _load_enum_values_from_file(self, enum_value: str) -> list[str]:
-        """Load enum values from a txt file in relecov_tools/conf."""
+        """
+        Load enum values from a txt file in relecov_tools/conf.
+
+        Args:
+            enum_value (str): File reference using @file:file_name.txt or @file_name.txt.
+
+        Returns:
+            list[str]: Enum values read from the file, ignoring blank/comment lines.
+        """
         enum_file = enum_value.strip()
         if enum_file.startswith("@file:"):
             enum_file = enum_file.removeprefix("@file:").strip()
@@ -1063,7 +1125,19 @@ class BuildSchema(BaseModule):
             ]
 
     def _template_only_properties_to_df(self, database_definition: dict | None):
-        """Build template rows for properties marked as ONLY in submitting_lab_form."""
+        """
+        Build metadata template rows for properties marked as ONLY.
+
+        Properties with submitting_lab_form set to ONLY are excluded from the JSON
+        schema, so they need to be converted directly from the input Excel definition
+        into template rows.
+
+        Args:
+            database_definition (dict | None): Full database definition from the input Excel.
+
+        Returns:
+            pd.DataFrame: Template rows for ONLY properties.
+        """
         if not database_definition:
             return pd.DataFrame()
 
