@@ -1672,6 +1672,7 @@ class BuildSchema(BaseModule):
                     ws_metadata, end_col=len(df_filtered) + 1
                 )
                 mt.create_condition(ws_metadata, self.project_config, df_filtered)
+                mt.add_duplicate_value_formatting(ws_metadata)
                 mt.add_conditional_format_age_check(ws_metadata, df_filtered)
 
                 # Hidden sheet for dropdowns

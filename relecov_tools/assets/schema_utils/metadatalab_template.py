@@ -312,6 +312,46 @@ def format_metadata_data_entry_area(
             cell.alignment = data_alignment
 
 
+DUPLICATE_ID_COLUMN_LABELS = (
+    "Public Health sample id (SIVIES)",
+    "Isolate ID given by the COLLECTING institution",
+    "Sample ID given by the COLLECTING institution",
+    "Isolate ID given by the SUBMITTING institution",
+    "Sample ID given by the SUBMITTING institution",
+    "Sample/Isolate ID given for GIPI submission",
+    "Sample/Isolate ID given for sequencing",
+    "ENA Sample Id",
+    "ENA Sample ID",
+)
+
+
+def add_duplicate_value_formatting(
+    ws_metadata,
+    target_column_labels=DUPLICATE_ID_COLUMN_LABELS,
+    header_row=1,
+    start_row=5,
+    end_row=1000,
+):
+    """Highlight repeated non-empty values within each selected data column."""
+    red_fill = PatternFill(start_color="F54627", end_color="F54627", fill_type="solid")
+
+    for cell in ws_metadata[header_row]:
+        # Header labels are only used to locate the columns; duplicates are checked below start_row.
+        if cell.value not in target_column_labels:
+            continue
+
+        col_letter = cell.column_letter
+        cell_range = f"${col_letter}${start_row}:${col_letter}${end_row}"
+        formula = (
+            f'AND(${col_letter}{start_row}<>"",'
+            f"COUNTIF({cell_range},${col_letter}{start_row})>1)"
+        )
+        rule = FormulaRule(formula=[formula], fill=red_fill)
+        ws_metadata.conditional_formatting.add(
+            f"{col_letter}{start_row}:{col_letter}{end_row}", rule
+        )
+
+
 def add_conditional_format_age_check(
     ws_metadata,
     df_filtered,
