@@ -311,6 +311,7 @@ class BuildSchema(BaseModule):
                 - Missing features
                 - Duplicate enums
                 - Missing examples
+                - Invalid enum examples
                 - Invalid example types
                 - Incorrect date formats
         """
@@ -318,6 +319,7 @@ class BuildSchema(BaseModule):
             "missing_features": {},
             "missing_examples": {},
             "duplicate_enums": {},
+            "invalid_enum_examples": {},
             "invalid_example_types": {},
             "invalid_date_formats": {},
         }
@@ -364,6 +366,17 @@ class BuildSchema(BaseModule):
                 log_errors["missing_examples"][prop_name] = ["Missing example."]
 
             feature_type = prop_features["type"]
+
+            # Check examples are included in the enum values, when an enum exists.
+            invalid_enum_examples = self._validate_examples_in_enum(
+                prop_name,
+                example,
+                prop_features.get("enum"),
+                feature_type,
+            )
+            if invalid_enum_examples:
+                log_errors["invalid_enum_examples"][prop_name] = invalid_enum_examples
+
             match feature_type:
                 # Check date format for properties with type=string and format=date
                 case "string":
@@ -431,6 +444,62 @@ class BuildSchema(BaseModule):
 
         # If no errors found
         return None
+
+    def _validate_examples_in_enum(
+        self,
+        property_id: str,
+        example_value: any,
+        enum_value: any,
+        expected_type: str | None,
+    ) -> list[str]:
+        """Return validation errors for examples that are not present in enum."""
+        if self._is_empty_validation_value(enum_value):
+            return []
+        if self._is_empty_validation_value(example_value):
+            return []
+
+        enum_values = self._parse_enum_values(enum_value)
+        if not isinstance(enum_values, list) or not enum_values:
+            return []
+
+        examples = self._parse_examples_for_validation(example_value)
+        examples = self._cast_examples_to_declared_type(
+            property_id, expected_type, examples
+        )
+
+        enum_lookup = {self._normalize_enum_example_value(value) for value in enum_values}
+        return [
+            f"Example '{example}' is not defined in enum."
+            for example in examples
+            if self._normalize_enum_example_value(example) not in enum_lookup
+        ]
+
+    @staticmethod
+    def _normalize_enum_example_value(value: any) -> any:
+        if not isinstance(value, str):
+            return value
+        return re.sub(r"\s*\[[^\]]+\]$", "", value).strip()
+
+    @staticmethod
+    def _is_empty_validation_value(value: any) -> bool:
+        if value is None or isinstance(value, list):
+            return value is None
+        return pd.isna(value)
+
+    @staticmethod
+    def _parse_examples_for_validation(example_value: any) -> list[any]:
+        """Parse the examples cell using the same separator used for schema examples."""
+        if isinstance(example_value, str):
+            return [
+                value.strip()
+                for value in example_value.split("; ")
+                if value.strip()
+            ]
+        if isinstance(example_value, datetime):
+            return [example_value.strftime("%Y-%m-%d")]
+        if isinstance(example_value, float) and example_value.is_integer():
+            return [int(example_value)]
+        return [example_value]
 
     def get_available_projects(self, json):
         """Get list of available software in configuration
