@@ -10,6 +10,7 @@ import difflib
 import inspect
 
 import relecov_tools.utils
+import relecov_tools.assets.schema_utils.amr_metadata
 import relecov_tools.assets.schema_utils.jsonschema_draft
 import relecov_tools.assets.schema_utils.metadatalab_template
 from relecov_tools.config_json import ConfigJson
@@ -57,6 +58,8 @@ class BuildSchema(BaseModule):
 
         # No metadata is being processed so batch_id will be execution date
         self.set_batch_id(self.basemod_date)
+        # Cache for generic enum source sheets referenced from the input Excel.
+        self._enum_sheet_cache = {}
 
         # Validate output folder creation
         if not output_dir:
@@ -258,6 +261,41 @@ class BuildSchema(BaseModule):
         uniques = {k: sorted(v) for k, v in uniques.items()}
         return dropdowns, uniques
 
+    def _is_template_only_property(self, property_definition: dict) -> bool:
+        """
+        Check whether a database definition row should only be included in the template.
+
+        Args:
+            property_definition (dict): Definition of one property from the input Excel.
+
+        Returns:
+            bool: True if submitting_lab_form is set to ONLY, False otherwise.
+        """
+        submitting_lab_form = property_definition.get("submitting_lab_form")
+        if not isinstance(submitting_lab_form, str):
+            return False
+        return submitting_lab_form.strip().upper() == "ONLY"
+
+    def _save_amr_genes_json(self):
+        """
+        Generate the AMR genes metadata JSON file when amr_gene_list is available.
+
+        The AMR-specific parsing and writing logic lives in schema_utils. This
+        method only integrates that output into the build-schema workflow.
+        """
+        output_path = (
+            relecov_tools.assets.schema_utils.amr_metadata.save_amr_genes_json(
+                self.excel_file_path,
+                self.output_dir,
+                self.version,
+            )
+        )
+        if not output_path:
+            return
+
+        self.log.info("AMR genes JSON saved to %s", output_path)
+        stderr.print(f"[green]AMR genes JSON saved to: {output_path}")
+
     def validate_database_definition(self, json_data):
         """Validate the mandatory features and ensure:
         - No duplicate enum values in the JSON schema.
@@ -424,6 +462,9 @@ class BuildSchema(BaseModule):
             sheet_name=sheet_id,
             na_values=["nan", "N/A", "NA", ""],
         )
+        property_column = df.columns[0]
+        df = df[df[property_column].notna()]
+        df = df[df[property_column].astype(str).str.strip() != ""]
         # Convert database to json format
         json_data = {}
         for row in df.itertuples(index=False):
@@ -631,7 +672,9 @@ class BuildSchema(BaseModule):
                 schema_draft = {"type": "object", "properties": {}, "required": []}
                 subschema = self.read_database_definition(property_id)
                 complex_json_feature = self.build_new_schema(
-                    subschema, schema_draft, root_schema=False
+                    subschema,
+                    schema_draft,
+                    root_schema=False,
                 )
                 if complex_json_feature:
                     if complex_json_feature.get("$defs"):
@@ -655,6 +698,8 @@ class BuildSchema(BaseModule):
                         continue
                     # Extra check to avoid non-mapping properties.
                     if db_feature_key in mapping_features:
+                        if db_feature_key == "enum" and isinstance(has_enum, str):
+                            db_feature_value = has_enum
                         std_json_feature = self.jsonschema_object(
                             property_id,
                             mapping_features[db_feature_key],
@@ -669,7 +714,7 @@ class BuildSchema(BaseModule):
                 required_properties.append(property_id)
             # If there is an enum in the property, parse it and add it to definitions
             if isinstance(has_enum, str):
-                enum = [value.strip() for value in has_enum.split("; ")]
+                enum = self._parse_enum_values(has_enum)
                 definitions["$defs"]["enums"][property_id] = {}
                 definitions["$defs"]["enums"][property_id]["enum"] = enum
 
@@ -723,7 +768,10 @@ class BuildSchema(BaseModule):
         return {"allOf": all_of_base} if all_of_base else {}
 
     def build_new_schema(
-        self, json_data: dict[str, dict], schema_draft: dict, root_schema: bool = True
+        self,
+        json_data: dict[str, dict],
+        schema_draft: dict,
+        root_schema: bool = True,
     ) -> dict[str, any]:
         """
         Build a new JSON Schema based on the provided JSON data and draft template, in three stages:
@@ -741,6 +789,11 @@ class BuildSchema(BaseModule):
         """
         # Pre-properties
         new_schema = schema_draft
+        json_data = {
+            property_id: property_definition
+            for property_id, property_definition in json_data.items()
+            if not self._is_template_only_property(property_definition)
+        }
         if root_schema:
             # Fill schema header
             # FIXME: it gets 'relecov-tools' instead of RELECOV
@@ -890,9 +943,239 @@ class BuildSchema(BaseModule):
             stderr.print(f"[red]An unexpected error occurred: {str(e)}")
         return False
 
-    # FIXME: overview-tab - FIX first column values
-    # FIXME: overview-tab - Still need to add the column that maps to tab metadatalab
-    def create_metadatalab_excel(self, json_schema):
+    def _sort_enum_values(self, enum_values: list[str]) -> list[str]:
+        """
+        Sort enum values alphabetically while keeping configured special terms last.
+
+        Args:
+            enum_values (list[str]): Enum values to sort.
+
+        Returns:
+            list[str]: Sorted enum values.
+        """
+        last_values = {
+            "not sequenced": 0,
+            "no enrichment": 1,
+            "not applicable": 2,
+            "not collected": 3,
+            "not provided": 4,
+            "missing": 5,
+            "restricted access": 6,
+            "other": 7,
+        }
+
+        def sort_key(value: str):
+            normalized_value = value.strip().casefold()
+            for last_value, last_order in last_values.items():
+                if last_value in normalized_value:
+                    return (1, last_order)
+            return (0, normalized_value)
+
+        return sorted(enum_values, key=sort_key)
+
+    def _parse_enum_values(self, enum_value):
+        """
+        Resolve enum definitions from lists, Excel sheet references, txt files, or cells.
+
+        Supported references:
+        - @sheet:sheet_name:column_name
+        - @sheet:sheet_name:column_name:filter_column=filter_value
+        - @file:file_name.txt or @file_name.txt
+
+        Args:
+            enum_value: Raw enum value from the input Excel or an already parsed list.
+
+        Returns:
+            list[str] | pandas.NA: Parsed and sorted enum values, or pd.NA if empty.
+        """
+        if isinstance(enum_value, list):
+            return self._sort_enum_values(enum_value)
+        if isinstance(enum_value, str):
+            loaded_values = self._load_enum_values_from_sheet(enum_value)
+            if loaded_values or enum_value.strip().startswith("@sheet:"):
+                return self._sort_enum_values(loaded_values)
+            loaded_values = self._load_enum_values_from_file(enum_value)
+            if loaded_values or enum_value.strip().startswith(("@file:", "@")):
+                return self._sort_enum_values(loaded_values)
+            return self._sort_enum_values(
+                [value.strip() for value in enum_value.split("; ") if value.strip()]
+            )
+        return pd.NA
+
+    def _load_enum_source_sheet(self, sheet_name: str) -> pd.DataFrame:
+        """
+        Read and cache an enum source sheet from the input Excel file.
+
+        Args:
+            sheet_name (str): Name of the Excel sheet to load.
+
+        Returns:
+            pd.DataFrame: Sheet contents, or an empty DataFrame if the sheet is absent.
+        """
+        if sheet_name not in self._enum_sheet_cache:
+            try:
+                df = pd.read_excel(
+                    self.excel_file_path,
+                    sheet_name=sheet_name,
+                    na_values=["nan", "N/A", "NA", ""],
+                )
+            except ValueError:
+                self._enum_sheet_cache[sheet_name] = pd.DataFrame()
+            else:
+                df.columns = [str(column).strip() for column in df.columns]
+                self._enum_sheet_cache[sheet_name] = df
+
+        return self._enum_sheet_cache[sheet_name]
+
+    def _filter_enum_source_sheet(
+        self, df: pd.DataFrame, filter_references: list[str]
+    ) -> pd.DataFrame:
+        """
+        Apply case-insensitive column=value filters to an enum source sheet.
+
+        For example, the reference
+        @sheet:amr_gene_list:Name:Category=allele
+        loads the Name column from the amr_gene_list sheet, keeping rows where Category is allele.
+
+        Args:
+            df (pd.DataFrame): Enum source sheet contents.
+            filter_references (list[str]): Filters from @sheet references.
+
+        Returns:
+            pd.DataFrame: Filtered data, or an empty DataFrame if a filter is invalid.
+        """
+        for filter_reference in filter_references:
+            if "=" not in filter_reference:
+                return pd.DataFrame()
+            column_name, expected_value = [
+                item.strip() for item in filter_reference.split("=", maxsplit=1)
+            ]
+            if not column_name or column_name not in df.columns:
+                return pd.DataFrame()
+            df = df[
+                df[column_name].astype(str).str.strip().str.casefold()
+                == expected_value.casefold()
+            ]
+        return df
+
+    def _load_enum_values_from_sheet(self, enum_value: str) -> list[str]:
+        """
+        Load enum values from an Excel sheet reference in the enum column.
+
+        Args:
+            enum_value (str): Reference using @sheet:sheet_name:column_name syntax.
+
+        Returns:
+            list[str]: Unique enum values from the referenced sheet column.
+        """
+        enum_reference = enum_value.strip()
+        if not enum_reference.startswith("@sheet:"):
+            return []
+
+        reference_parts = [
+            part.strip() for part in enum_reference.removeprefix("@sheet:").split(":")
+        ]
+        if len(reference_parts) < 2:
+            return []
+
+        sheet_name, column_name = reference_parts[:2]
+        if not sheet_name or not column_name:
+            return []
+
+        df = self._load_enum_source_sheet(sheet_name)
+        df = self._filter_enum_source_sheet(df, reference_parts[2:])
+        if df.empty or column_name not in df.columns:
+            return []
+
+        values = [
+            str(value).strip()
+            for value in df[column_name].dropna().tolist()
+            if str(value).strip()
+        ]
+        return list(dict.fromkeys(values))
+
+    def _load_enum_values_from_file(self, enum_value: str) -> list[str]:
+        """
+        Load enum values from a txt file in relecov_tools/conf.
+
+        Args:
+            enum_value (str): File reference using @file:file_name.txt or @file_name.txt.
+
+        Returns:
+            list[str]: Enum values read from the file, ignoring blank/comment lines.
+        """
+        enum_file = enum_value.strip()
+        if enum_file.startswith("@file:"):
+            enum_file = enum_file.removeprefix("@file:").strip()
+        elif enum_file.startswith("@"):
+            enum_file = enum_file.removeprefix("@").strip()
+
+        if not enum_file.endswith(".txt"):
+            return []
+
+        enum_path = os.path.join(os.path.dirname(__file__), "conf", enum_file)
+        if not os.path.exists(enum_path):
+            return []
+
+        with open(enum_path, encoding="utf-8") as fh:
+            return [
+                line.strip()
+                for line in fh
+                if line.strip() and not line.lstrip().startswith("#")
+            ]
+
+    def _template_only_properties_to_df(self, database_definition: dict | None):
+        """
+        Build metadata template rows for properties marked as ONLY.
+
+        Properties with submitting_lab_form set to ONLY are excluded from the JSON
+        schema, so they need to be converted directly from the input Excel definition
+        into template rows.
+
+        Args:
+            database_definition (dict | None): Full database definition from the input Excel.
+
+        Returns:
+            pd.DataFrame: Template rows for ONLY properties.
+        """
+        if not database_definition:
+            return pd.DataFrame()
+
+        mapping_features = self.configurables.get("database_mapping_features", {})
+        template_rows = []
+        for property_id in database_definition:
+            db_features = database_definition[property_id]
+            if not self._is_template_only_property(db_features):
+                continue
+
+            row = {
+                "property_id": property_id,
+                "field_id": property_id,
+                "parent_property_id": None,
+                "parent_label": "",
+                "parent_classification": "",
+                "is_required": db_features.get("required (Y/N)", "") == "Y",
+            }
+            for db_feature_key, db_feature_value in db_features.items():
+                schema_key = mapping_features.get(db_feature_key)
+                if not schema_key:
+                    continue
+                if schema_key == "enum":
+                    row["enum"] = self._parse_enum_values(db_feature_value)
+                    continue
+                std_json_feature = self.jsonschema_object(
+                    property_id,
+                    schema_key,
+                    db_feature_value,
+                    expected_type=db_features.get("type"),
+                )
+                row.update(std_json_feature)
+
+            template_rows.append(row)
+
+        return pd.DataFrame(template_rows)
+
+    def create_metadatalab_excel(self, json_schema, database_definition=None):
         """
         Generates an Excel template file for Metadata LAB with four sheets:
         Overview, Metadata LAB, Data Validation, and Version History.
@@ -979,6 +1262,11 @@ class BuildSchema(BaseModule):
                 df = relecov_tools.assets.schema_utils.metadatalab_template.schema_properties_to_df(
                     schema_properties_flatten
                 )
+                template_only_df = self._template_only_properties_to_df(
+                    database_definition
+                )
+                if not template_only_df.empty:
+                    df = pd.concat([df, template_only_df], ignore_index=True)
 
                 classification_overrides = self.configurables.get(
                     "classification_filters", {}
@@ -1020,13 +1308,19 @@ class BuildSchema(BaseModule):
                         clean_ontologies(values) if isinstance(values, list) else values
                     )
 
-                df["enum"] = df["$ref"].apply(
+                resolved_enums = df["$ref"].apply(
                     lambda row: (
                         resolve_enum_ref(row, enum_defs=enum_defs)
                         if not pd.isna(row)
                         else row
                     )
                 )
+                if "enum" in df.columns:
+                    df["enum"] = df["enum"].where(
+                        pd.notnull(df["enum"]), resolved_enums
+                    )
+                else:
+                    df["enum"] = resolved_enums
                 common_dropdown = self._lab_dropdowns["collecting_institution"]
 
                 lab_fields = [
@@ -1050,8 +1344,8 @@ class BuildSchema(BaseModule):
             # 3.  Headers / filtering
             # ------------------------------------------------------------------ #
             if "header" in df.columns:
-                df["header"] = df["header"].astype(str).str.strip()
-                df_filtered = df[df["header"].str.upper() == "Y"]
+                df["header"] = df["header"].astype(str).str.strip().str.upper()
+                df_filtered = df[df["header"].isin(["Y", "ONLY"])]
             else:
                 self.log.warning(
                     "No se encontró la columna 'header', usando df sin filtrar."
@@ -1444,12 +1738,13 @@ class BuildSchema(BaseModule):
 
         # Saves new JSON schema
         self.save_new_schema(new_schema_json)
+        self._save_amr_genes_json()
 
         # Create metadata lab template
         if self.non_interactive or relecov_tools.utils.prompt_yn_question(
             "Do you want to create a metadata lab file?:"
         ):
-            self.create_metadatalab_excel(new_schema_json)
+            self.create_metadatalab_excel(new_schema_json, database_dic)
 
         # Return new schema
         return new_schema_json
