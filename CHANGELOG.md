@@ -23,7 +23,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Updated initial_config-relecov.yaml and added comments for some params [#875](https://github.com/BU-ISCIII/relecov-tools/pull/875)
 - Fixed new version filename taxprofiler[#877](https://github.com/BU-ISCIII/relecov-tools/pull/877)
-- Fix duplicated row in metadata form and clean some MEPRAM initial config [#879] https://github.com/BU-ISCIII/relecov-tools/pull/879
+- Fix duplicated row in metadata form and clean some MEPRAM initial config [#879] (https://github.com/BU-ISCIII/relecov-tools/pull/879)
+- Fix date validation in Excel metadata templates and add some schema validation checks [#886] (https://github.com/BU-ISCIII/relecov-tools/pull/886)
 
 #### Changed
 
