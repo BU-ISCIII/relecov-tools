@@ -257,7 +257,9 @@ class BuildSchema(BaseModule):
                 dropdowns[f].append(dropdown_entry)
                 uniques[f].add(name)
 
-        dropdowns = {k: sorted(self._unique_enum_values(v)) for k, v in dropdowns.items()}
+        dropdowns = {
+            k: sorted(self._unique_enum_values(v)) for k, v in dropdowns.items()
+        }
         uniques = {k: sorted(v) for k, v in uniques.items()}
         return dropdowns, uniques
 
@@ -467,7 +469,9 @@ class BuildSchema(BaseModule):
             property_id, expected_type, examples
         )
 
-        enum_lookup = {self._normalize_enum_example_value(value) for value in enum_values}
+        enum_lookup = {
+            self._normalize_enum_example_value(value) for value in enum_values
+        }
         return [
             f"Example '{example}' is not defined in enum."
             for example in examples
@@ -491,9 +495,7 @@ class BuildSchema(BaseModule):
         """Parse the examples cell using the same separator used for schema examples."""
         if isinstance(example_value, str):
             return [
-                value.strip()
-                for value in example_value.split("; ")
-                if value.strip()
+                value.strip() for value in example_value.split("; ") if value.strip()
             ]
         if isinstance(example_value, datetime):
             return [example_value.strftime("%Y-%m-%d")]
