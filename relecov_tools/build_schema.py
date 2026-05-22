@@ -972,7 +972,7 @@ class BuildSchema(BaseModule):
             relecov_tools.utils.display_dataframe_to_user(
                 name="Schema Enum Duplicates", dataframe=df_errors
             )
-            stderr.print(f"[red]Duplicated enum values found. Log saved to:")
+            stderr.print("[red]Duplicated enum values found. Log saved to:")
             stderr.print(f"\t{error_file_path}")
             raise ValueError("Duplicated enum values found in generated schema.")
 
