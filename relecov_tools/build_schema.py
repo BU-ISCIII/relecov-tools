@@ -28,6 +28,19 @@ stderr = rich.console.Console(
 )
 
 
+def _slugify_project(value):
+    """Return a filesystem-friendly project identifier."""
+    project = str(value).strip().lower()
+    project = re.sub(r"\s+", "_", project)
+    project = re.sub(r"[^a-z0-9_-]+", "_", project)
+    return project.strip("_")
+
+
+def _display_project(value):
+    """Return a readable project label for generated metadata."""
+    return str(value).strip().replace("_", " ").replace("-", " ").title()
+
+
 class BuildSchema(BaseModule):
     def __init__(
         self,
@@ -47,6 +60,7 @@ class BuildSchema(BaseModule):
         """
         super().__init__(output_dir=output_dir, called_module=__name__)
         self.excel_file_path = input_file
+        self.excel_template = excel_template
         self.non_interactive = non_interactive
         # Validate params
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
@@ -105,7 +119,12 @@ class BuildSchema(BaseModule):
         if project is None:
             project = relecov_tools.utils.prompt_text("Write the desired project:")
 
-        self.project = project
+        self.project = _slugify_project(project)
+        if not self.project:
+            raise ValueError("A valid project must be provided.")
+        self.project_label = _display_project(self.project)
+        self.schema_output_filename = f"{self.project}_schema.json"
+        self.template_output_prefix = f"{self.project_label}_metadata_template"
 
         available_projects = self.get_available_projects(self.build_schema_json_file)
 
@@ -118,8 +137,6 @@ class BuildSchema(BaseModule):
         self.configurables = (
             config_build_schema.get_configuration("configurables") or {}
         )
-        config_json = ConfigJson(extra_config=True)
-
         if self.project in available_projects:
             self.project_config = config_data.get(self.project, {})
         else:
@@ -148,38 +165,32 @@ class BuildSchema(BaseModule):
                     f"Defined base schema file not found: {schema_base}."
                 )
         else:
-            try:
-                relecov_schema = config_json.get_topic_data("generic", "relecov_schema")
-            except KeyError as key_error:
-                self.log.error(f"Configuration key error: {key_error}")
-                stderr.print(f"[orange]Configuration key error: {key_error}")
-                raise
-
-            try:
-                self.base_schema_path = os.path.join(
-                    os.path.dirname(os.path.realpath(__file__)),
-                    "schema",
-                    relecov_schema,
-                )
-            except FileNotFoundError as fnf_error:
-                self.log.error(f"Configuration file not found: {fnf_error}")
-                stderr.print(f"[red]Configuration file not found: {fnf_error}")
-                raise
+            project_schema = self.project_config.get(
+                "schema_file", self.schema_output_filename
+            )
+            self.base_schema_path = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                "schema",
+                project_schema,
+            )
 
             if not relecov_tools.utils.file_exists(self.base_schema_path):
                 self.log.error(
-                    "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning."
+                    f"[Error]Fatal error. {self.project_label} schema was not found in current relecov-tools installation: {self.base_schema_path}."
                 )
                 stderr.print(
-                    "[Error]Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning. Exiting..."
+                    f"[Error]Fatal error. {self.project_label} schema was not found in current relecov-tools installation: {self.base_schema_path}. Exiting..."
                 )
                 raise FileNotFoundError(
-                    "Fatal error. Relecov schema were not found in current relecov-tools installation. Make sure relecov-tools command is functioning."
+                    f"Fatal error. {self.project_label} schema was not found in current relecov-tools installation: {self.base_schema_path}."
                 )
 
-            self.log.info("RELECOV schema successfully found in the configuration.")
+            self.log.info(
+                "%s schema successfully found in the installation.",
+                self.project_label,
+            )
             stderr.print(
-                "[green]RELECOV schema successfully found in the configuration."
+                f"[green]{self.project_label} schema successfully found in the installation."
             )
 
             # TODO: What if no previous template exist?
@@ -212,13 +223,14 @@ class BuildSchema(BaseModule):
                     )
 
                 except (FileNotFoundError, IndexError):
-                    self.log.error(
-                        "[Error]Fatal error. Excel template was not found in current relecov-tools installation (assets)"
+                    self.excel_template = None
+                    self.log.warning(
+                        "%s excel template was not found in assets. A new version history will be started.",
+                        self.project_label,
                     )
                     stderr.print(
-                        "[Error]Fatal error. Excel template not found in current relecov-tools installation (assets). Exiting..."
+                        f"[yellow]{self.project_label} excel template was not found in assets. A new version history will be started."
                     )
-                    raise
 
     def _load_laboratory_addresses(self):
         """
@@ -867,16 +879,17 @@ class BuildSchema(BaseModule):
         }
         if root_schema:
             # Fill schema header
-            # FIXME: it gets 'relecov-tools' instead of RELECOV
-            project_name = relecov_tools.utils.get_package_name()
-            if isinstance(project_name, str):
-                project_name = project_name.strip()
-            if " " in project_name:
-                project_name = re.sub(r"\s+", "-", project_name)
-            new_schema["$id"] = relecov_tools.utils.get_schema_url()
-            new_schema["title"] = f"{project_name}-schema"
+            package_name = relecov_tools.utils.get_package_name()
+            branch_name = relecov_tools.utils.get_git_branch()
+            package_path = package_name.replace("-", "_")
+            new_schema["$id"] = (
+                "https://github.com/BU-ISCIII/"
+                f"{package_name}/blob/{branch_name}/{package_path}/schema/{self.schema_output_filename}"
+            )
+            new_schema["title"] = f"{self.project}-schema"
             new_schema["description"] = (
-                f"Json Schema that specifies the structure, content, and validation rules for {project_name}"
+                "Json Schema that specifies the structure, content, and validation "
+                f"rules for {self.project}"
             )
             new_schema["version"] = self.version
 
@@ -1057,7 +1070,7 @@ class BuildSchema(BaseModule):
             bool: True if the schema was successfully saved, False otherwise.
         """
         try:
-            path_to_save = f"{self.output_dir}/relecov_schema.json"
+            path_to_save = os.path.join(self.output_dir, self.schema_output_filename)
             with open(path_to_save, "w") as schema_file:
                 json.dump(json_data, schema_file, ensure_ascii=False, indent=4)
             self.log.info(f"New JSON schema saved to: {path_to_save}")
@@ -1366,7 +1379,7 @@ class BuildSchema(BaseModule):
                 version_history = pd.DataFrame(
                     [
                         {
-                            "FILE_VERSION": "Relecov_metadata_template_v1.0.0",
+                            "FILE_VERSION": f"{self.template_output_prefix}_v1.0.0",
                             "CODE": "1.0.0",
                             "NOTES CONTROL": "Initial version",
                             "DATE": datetime.now().strftime("%Y-%m-%d"),
@@ -1376,7 +1389,7 @@ class BuildSchema(BaseModule):
 
             next_version = self.version
             version_info = {
-                "FILE_VERSION": f"Relecov_metadata_template_v{next_version}",
+                "FILE_VERSION": f"{self.template_output_prefix}_v{next_version}",
                 "CODE": next_version,
                 "NOTES CONTROL": notes_control_input,
                 "DATE": datetime.now().strftime("%Y-%m-%d"),
@@ -1385,7 +1398,7 @@ class BuildSchema(BaseModule):
                 [version_history, pd.DataFrame([version_info])], ignore_index=True
             )
             out_file = os.path.join(
-                self.output_dir, f"Relecov_metadata_template_v{next_version}.xlsx"
+                self.output_dir, f"{self.template_output_prefix}_v{next_version}.xlsx"
             )
 
             # ------------------------------------------------------------------ #
@@ -1849,10 +1862,16 @@ class BuildSchema(BaseModule):
             ],
             "Path": [
                 shorten_path(self.output_dir),
-                shorten_path(f"{self.output_dir}/relecov_schema.json"),
+                shorten_path(
+                    os.path.join(self.output_dir, self.schema_output_filename)
+                ),
                 shorten_path(self.base_schema_path),
                 shorten_path(f"{self.output_dir}/build_schema_diff.txt"),
-                shorten_path(f"{self.output_dir}/Relecov_metadata_template_v*.xlsx"),
+                shorten_path(
+                    os.path.join(
+                        self.output_dir, f"{self.template_output_prefix}_v*.xlsx"
+                    )
+                ),
             ],
         }
 
@@ -1873,11 +1892,11 @@ class BuildSchema(BaseModule):
         stderr.print("[white]Start reading xlsx database")
         database_dic = self.read_database_definition()
 
-        # Verify current schema used by relecov-tools:
+        # Verify current schema used as base for this project:
         base_schema_json = relecov_tools.utils.read_json_file(self.base_schema_path)
         if not base_schema_json:
-            self.log.error("Couldn't find relecov base schema.)")
-            stderr.print("[red]Couldn't find relecov base schema. Exiting...)")
+            self.log.error(f"Couldn't find {self.project} base schema.)")
+            stderr.print(f"[red]Couldn't find {self.project} base schema. Exiting...)")
             sys.exit(1)
 
         # Create schema draft template (leave empty to be prompted to list of available schema versions)
