@@ -53,6 +53,7 @@ class BuildSchema(BaseModule):
         version=None,
         project=None,
         non_interactive=False,
+        initial_version=False,
     ):
         """
         Initialize the SchemaBuilder class. This class generates a JSON Schema file based on the provided draft version.
@@ -62,7 +63,12 @@ class BuildSchema(BaseModule):
         self.excel_file_path = input_file
         self.excel_template = excel_template
         self.non_interactive = non_interactive
+        self.initial_version = initial_version
         # Validate params
+        if self.initial_version and self.excel_template:
+            raise ValueError(
+                "--initial-version and --excel_template are incompatible options."
+            )
         if not self.excel_file_path or not os.path.isfile(self.excel_file_path):
             self.log.error("A valid Excel file path must be provided.")
             raise ValueError("A valid Excel file path must be provided.")
@@ -124,7 +130,7 @@ class BuildSchema(BaseModule):
             raise ValueError("A valid project must be provided.")
         self.project_label = _display_project(self.project)
         self.schema_output_filename = f"{self.project}_schema.json"
-        self.template_output_prefix = f"{self.project_label}_metadata_template"
+        self.template_output_prefix = f"{self.project}_metadata_template"
 
         available_projects = self.get_available_projects(self.build_schema_json_file)
 
@@ -193,44 +199,49 @@ class BuildSchema(BaseModule):
                 f"[green]{self.project_label} schema successfully found in the installation."
             )
 
-            # TODO: What if no previous template exist?
-            if excel_template:
-                self.excel_template = excel_template
-            else:
-                try:
-                    excel_template_path = os.path.join(
-                        os.path.dirname(os.path.realpath(__file__)), "assets"
-                    )
-                    template_prefix = f"{self.project}_metadata_template".lower()
-                    excel_template = [
-                        f
-                        for f in os.listdir(excel_template_path)
-                        if f.lower().startswith(template_prefix)
-                    ]
-                    if len(excel_template) > 1:
-                        self.log.error(
-                            "[Error]Fatal error. More than one excel template was found in current relecov-tools installation (assets)"
-                        )
-                        stderr.print(
-                            "[Error]Fatal error.More than one excel template was found in current relecov-tools installation (assets)..Exiting"
-                        )
-                        raise FileExistsError(
-                            "Fatal error. More than one excel template was found in current relecov-tools installation (assets)"
-                        )
+        self._resolve_version_history_template()
 
-                    self.excel_template = os.path.join(
-                        excel_template_path, excel_template[0]
-                    )
+    def _resolve_version_history_template(self):
+        if self.initial_version:
+            self.excel_template = None
+            return
 
-                except (FileNotFoundError, IndexError):
-                    self.excel_template = None
-                    self.log.warning(
-                        "%s excel template was not found in assets. A new version history will be started.",
-                        self.project_label,
-                    )
-                    stderr.print(
-                        f"[yellow]{self.project_label} excel template was not found in assets. A new version history will be started."
-                    )
+        if self.excel_template:
+            if not os.path.isfile(self.excel_template):
+                raise FileNotFoundError(
+                    f"Defined excel template file not found: {self.excel_template}."
+                )
+            return
+
+        excel_template_path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "assets"
+        )
+        template_prefix = f"{self.project}_metadata_template".lower()
+        excel_templates = [
+            f
+            for f in os.listdir(excel_template_path)
+            if f.lower().startswith(template_prefix) and f.lower().endswith(".xlsx")
+        ]
+        if len(excel_templates) > 1:
+            self.log.error(
+                "[Error]Fatal error. More than one excel template was found in current relecov-tools installation (assets)"
+            )
+            stderr.print(
+                "[Error]Fatal error. More than one excel template was found in current relecov-tools installation (assets). Exiting..."
+            )
+            raise FileExistsError(
+                "Fatal error. More than one excel template was found in current relecov-tools installation (assets)"
+            )
+        if not excel_templates:
+            msg = (
+                f"{self.project_label} excel template was not found in assets. "
+                "Use --initial-version to start a new VERSION history explicitly."
+            )
+            self.log.error(msg)
+            stderr.print(f"[red]{msg}")
+            raise FileNotFoundError(msg)
+
+        self.excel_template = os.path.join(excel_template_path, excel_templates[0])
 
     def _load_laboratory_addresses(self):
         """
@@ -1351,42 +1362,21 @@ class BuildSchema(BaseModule):
             None: If an error occurs during the process.
         """
         try:
+            default_note = (
+                "Initial version" if self.initial_version else "Auto-generated update"
+            )
             notes_control_input = (
-                "Auto-generated update"
+                default_note
                 if self.non_interactive
                 else input(
                     "\033[93mEnter a note about changes made to the schema: \033[0m"
                 )
+                or default_note
             )
 
             # ------------------------------------------------------------------ #
             # 1.  Versioning & paths
             # ------------------------------------------------------------------ #
-            version_history = pd.DataFrame(
-                columns=["FILE_VERSION", "CODE", "NOTES CONTROL", "DATE"]
-            )
-
-            try:
-                wb = openpyxl.load_workbook(self.excel_template)
-                ws_version = wb["VERSION"]
-                data = ws_version.values
-                columns = next(data)
-                version_history = pd.DataFrame(data, columns=columns)
-            except Exception as e:
-                self.log.warning(
-                    f"Error reading previous VERSION sheet: {e}. Setting 1.0.0 as default."
-                )
-                version_history = pd.DataFrame(
-                    [
-                        {
-                            "FILE_VERSION": f"{self.template_output_prefix}_v1.0.0",
-                            "CODE": "1.0.0",
-                            "NOTES CONTROL": "Initial version",
-                            "DATE": datetime.now().strftime("%Y-%m-%d"),
-                        }
-                    ]
-                )
-
             next_version = self.version
             version_info = {
                 "FILE_VERSION": f"{self.template_output_prefix}_v{next_version}",
@@ -1394,9 +1384,29 @@ class BuildSchema(BaseModule):
                 "NOTES CONTROL": notes_control_input,
                 "DATE": datetime.now().strftime("%Y-%m-%d"),
             }
-            version_history = pd.concat(
-                [version_history, pd.DataFrame([version_info])], ignore_index=True
-            )
+
+            if self.initial_version:
+                version_history = pd.DataFrame([version_info])
+            else:
+                try:
+                    wb = openpyxl.load_workbook(self.excel_template)
+                    ws_version = wb["VERSION"]
+                    data = ws_version.values
+                    columns = next(data)
+                    version_history = pd.DataFrame(data, columns=columns)
+                except Exception as e:
+                    msg = (
+                        f"Error reading previous VERSION sheet from "
+                        f"{self.excel_template}: {e}"
+                    )
+                    self.log.error(msg)
+                    stderr.print(f"[red]{msg}")
+                    raise ValueError(msg)
+
+                version_history = pd.concat(
+                    [version_history, pd.DataFrame([version_info])],
+                    ignore_index=True,
+                )
             out_file = os.path.join(
                 self.output_dir, f"{self.template_output_prefix}_v{next_version}.xlsx"
             )
@@ -1782,6 +1792,8 @@ class BuildSchema(BaseModule):
                 stderr.print(f"[red]Error adding dropdowns: {e}")
                 return None
 
+        except ValueError:
+            raise
         except Exception as e:
             self.log.error(f"Error in create_metadatalab_excel: {e}")
             stderr.print(f"[red]Error in create_metadatalab_excel: {e}")

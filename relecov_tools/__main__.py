@@ -1316,6 +1316,11 @@ def pipeline_manager(
 )
 @click.option("--version", help="Specify the schema version.")
 @click.option(
+    "--initial-version",
+    is_flag=True,
+    help="Start VERSION history explicitly with only the current schema version.",
+)
+@click.option(
     "-p",
     "--project",
     help="Specify the project key used to build the schema and metadata template.",
@@ -1349,6 +1354,7 @@ def build_schema(
     diff,
     output_dir,
     version,
+    initial_version,
     project,
     non_interactive,
 ):
