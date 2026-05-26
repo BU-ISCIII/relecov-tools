@@ -599,7 +599,9 @@ Options:
   -d, --diff                      Prints a changelog/diff between the base and
                                   incoming versions of the schema.
   --version TEXT                  Specify the schema version.
-  -p, --project TEXT              Specficy the project to build the metadata
+  --initial-version               Start VERSION history explicitly with only
+                                  the current schema version.
+  -p, --project TEXT              Specify the project to build the metadata
                                   template.
   --non-interactive               Run the script without user interaction,
                                   using default values.
