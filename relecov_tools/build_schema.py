@@ -1354,6 +1354,20 @@ class BuildSchema(BaseModule):
 
         return pd.DataFrame(template_rows)
 
+    @staticmethod
+    def _format_template_required_value(value):
+        """Return the visible required label used in the metadata template."""
+        required_value = str(value or "").strip()
+        if required_value.upper() == "Y":
+            return "Y"
+        if required_value.upper() in ["N", "NO"]:
+            return ""
+        if required_value.lower() == "y if sequenced":
+            return "YES if sequenced"
+        if required_value.lower() == "y if sequenced + paired-en lectures":
+            return "YES if sequenced + Paired-en lectures"
+        return required_value
+
     def create_metadatalab_excel(self, json_schema, database_definition=None):
         """
         Generates an Excel template file for Metadata LAB with four sheets:
@@ -1462,6 +1476,20 @@ class BuildSchema(BaseModule):
                     df["required"] = df["property_id"].apply(
                         lambda x: "Y" if x in required_properties else "N"
                     )
+                if database_definition:
+                    required_values = {
+                        property_id: self._format_template_required_value(
+                            features.get("required (Y/N)")
+                        )
+                        for property_id, features in database_definition.items()
+                    }
+                    df["required"] = df.apply(
+                        lambda row: required_values.get(
+                            row["property_id"], row["required"]
+                        )
+                        or row["required"],
+                        axis=1,
+                    )
 
                 def clean_ontologies(enums):
                     return self._unique_enum_values(
@@ -1562,7 +1590,11 @@ class BuildSchema(BaseModule):
                 metadatalab_header = ["CAMPO", "DESCRIPCIÓN", "EJEMPLOS", "REQUERIDO"]
                 df_metadata = pd.DataFrame(columns=metadatalab_header)
                 df_metadata["REQUERIDO"] = df_filtered["required"].apply(
-                    lambda x: "YES" if str(x).upper() in ["Y", "YES"] else ""
+                    lambda x: (
+                        "YES"
+                        if str(x).upper() in ["Y", "YES"]
+                        else "" if str(x).upper() in ["N", "NO"] else x
+                    )
                 )
                 df_metadata["EJEMPLOS"] = df_filtered["examples"].apply(
                     lambda x: x[0] if isinstance(x, list) else x
