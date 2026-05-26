@@ -1668,7 +1668,11 @@ class BuildSchema(BaseModule):
                 ws_metadata = wb["METADATA_LAB"]
                 ws_metadata.freeze_panes = self.configurables.get("freeze_panel", "D1")
                 ws_metadata.delete_rows(5)
+                mt.format_metadata_data_entry_area(
+                    ws_metadata, end_col=len(df_filtered) + 1
+                )
                 mt.create_condition(ws_metadata, self.project_config, df_filtered)
+                mt.add_duplicate_value_formatting(ws_metadata)
                 mt.add_conditional_format_age_check(ws_metadata, df_filtered)
 
                 # Hidden sheet for dropdowns

@@ -8,7 +8,7 @@ import relecov_tools.utils
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import column_index_from_string
 from openpyxl.formatting.rule import FormulaRule
-from openpyxl.styles import PatternFill
+from openpyxl.styles import Alignment, Font, PatternFill
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -288,6 +288,68 @@ def create_condition(ws_metadata, conditions, df_filtered):
                     for cell in row:
                         cell.number_format = "yyyy-mm-dd"
     return ws_metadata
+
+
+def format_metadata_data_entry_area(
+    ws_metadata,
+    start_row=5,
+    end_row=1000,
+    start_col=2,
+    end_col=None,
+):
+    """Give empty input cells an explicit data style so Excel does not extend the header style."""
+    end_col = end_col or ws_metadata.max_column
+    no_fill = PatternFill(fill_type=None)
+    data_font = Font(bold=False, color="000000")
+    data_alignment = Alignment(wrap_text=False, vertical="top")
+
+    for row in ws_metadata.iter_rows(
+        min_row=start_row, max_row=end_row, min_col=start_col, max_col=end_col
+    ):
+        for cell in row:
+            cell.fill = no_fill
+            cell.font = data_font
+            cell.alignment = data_alignment
+
+
+DUPLICATE_ID_COLUMN_LABELS = (
+    "Public Health sample id (SIVIES)",
+    "Isolate ID given by the COLLECTING institution",
+    "Sample ID given by the COLLECTING institution",
+    "Isolate ID given by the SUBMITTING institution",
+    "Sample ID given by the SUBMITTING institution",
+    "Sample/Isolate ID given for GIPI submission",
+    "Sample/Isolate ID given for sequencing",
+    "ENA Sample Id",
+    "ENA Sample ID",
+)
+
+
+def add_duplicate_value_formatting(
+    ws_metadata,
+    target_column_labels=DUPLICATE_ID_COLUMN_LABELS,
+    header_row=1,
+    start_row=5,
+    end_row=1000,
+):
+    """Highlight repeated non-empty values within each selected data column."""
+    red_fill = PatternFill(start_color="F54627", end_color="F54627", fill_type="solid")
+
+    for cell in ws_metadata[header_row]:
+        # Header labels are only used to locate the columns; duplicates are checked below start_row.
+        if cell.value not in target_column_labels:
+            continue
+
+        col_letter = cell.column_letter
+        cell_range = f"${col_letter}${start_row}:${col_letter}${end_row}"
+        formula = (
+            f'AND(${col_letter}{start_row}<>"",'
+            f"COUNTIF({cell_range},${col_letter}{start_row})>1)"
+        )
+        rule = FormulaRule(formula=[formula], fill=red_fill)
+        ws_metadata.conditional_formatting.add(
+            f"{col_letter}{start_row}:{col_letter}{end_row}", rule
+        )
 
 
 def add_conditional_format_age_check(
