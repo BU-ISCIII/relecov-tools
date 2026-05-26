@@ -338,6 +338,7 @@ build_schema:
     draft_version: ''
     diff: false
     version: ''
+    initial_version: false
     project: ''
     non_interactive: false
     output_dir: ''
