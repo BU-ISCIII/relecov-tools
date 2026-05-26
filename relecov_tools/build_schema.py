@@ -202,6 +202,11 @@ class BuildSchema(BaseModule):
         self._resolve_version_history_template()
 
     def _resolve_version_history_template(self):
+        """Resolve the previous Excel template used to read VERSION history.
+
+        Initial versions skip previous template lookup; regular versions use either
+        the explicit template path or the installed project template in assets.
+        """
         if self.initial_version:
             self.excel_template = None
             return
