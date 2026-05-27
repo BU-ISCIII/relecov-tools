@@ -1,9 +1,9 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/mepram_schema.json",
-    "title": "mepram-schema",
-    "description": "Json Schema that specifies the structure, content, and validation rules for mepram",
-    "version": "1.0.0",
+    "$id": "https://github.com/BU-ISCIII/relecov-tools/blob/main/relecov_tools/schema/redlabra_schema.json",
+    "title": "redlabra-schema",
+    "description": "Json Schema that specifies the structure, content, and validation rules for redlabra",
+    "version": "1.0.2",
     "type": "object",
     "properties": {
         "project_name": {
@@ -688,8 +688,8 @@
                     }
                 },
                 "required": [
-                    "species_group",
-                    "species"
+                    "species",
+                    "species_group"
                 ]
             }
         },
@@ -1126,8 +1126,8 @@
                     }
                 },
                 "required": [
-                    "locus_genes",
-                    "reference_genome"
+                    "reference_genome",
+                    "locus_genes"
                 ]
             }
         },
@@ -2136,25 +2136,25 @@
         }
     },
     "required": [
-        "assembly_sequence_filepath",
-        "collecting_institution_code_2",
-        "project_name",
-        "geo_loc_state",
-        "pathogen_invasion_status",
-        "specimen_source",
-        "host_scientific_name",
-        "assembly_md5",
-        "assembly_filename",
-        "patient_id",
         "collecting_institution_code_1",
-        "submitting_institution",
-        "collecting_institution",
+        "collecting_institution_code_2",
         "geo_loc_country",
-        "bioinformatics_protocol_software_version",
-        "submitting_lab_isolate_id",
-        "host_common_name",
         "isolate_delivery_type",
-        "sample_collection_date"
+        "assembly_md5",
+        "specimen_source",
+        "host_common_name",
+        "submitting_institution",
+        "geo_loc_state",
+        "collecting_institution",
+        "assembly_sequence_filepath",
+        "bioinformatics_protocol_software_version",
+        "sample_collection_date",
+        "project_name",
+        "pathogen_invasion_status",
+        "patient_id",
+        "submitting_lab_isolate_id",
+        "assembly_filename",
+        "host_scientific_name"
     ],
     "$defs": {
         "enums": {
