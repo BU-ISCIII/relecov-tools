@@ -1374,13 +1374,14 @@ class BuildSchema(BaseModule):
         """Return the visible required label used in the metadata template."""
         required_value = str(value or "").strip()
         if required_value.upper() == "Y":
-            return "Y"
+            return "YES"
         if required_value.upper() in ["N", "NO"]:
-            return ""
-        if required_value.lower() == "y if sequenced":
-            return "YES if sequenced"
-        if required_value.lower() == "y if sequenced + paired-en lectures":
-            return "YES if sequenced + Paired-en lectures"
+            return "NO"
+        if required_value.lower().startswith("y if "):
+            condition = required_value[5:].strip()
+            if condition.lower() == "sequenced":
+                condition = "sequenced"
+            return f"YES if {condition}"
         return required_value
 
     def create_metadatalab_excel(self, json_schema, database_definition=None):
@@ -1505,6 +1506,9 @@ class BuildSchema(BaseModule):
                         or row["required"],
                         axis=1,
                     )
+                df["required"] = df["required"].apply(
+                    self._format_template_required_value
+                )
 
                 def resolve_enum_ref(ref: str, enum_defs: dict) -> list[str]:
                     property_key = ref.split("enums/")[-1]
