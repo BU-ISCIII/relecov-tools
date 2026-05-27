@@ -1137,6 +1137,7 @@ class BuildSchema(BaseModule):
             "missing": 5,
             "restricted access": 6,
             "other": 7,
+            "none": 8,
         }
 
         unique_values = self._unique_enum_values(enum_values)
