@@ -1292,14 +1292,14 @@ def pipeline_manager(
     "-s",
     "--schema_base",
     type=click.Path(),
-    help="Path to the base schema file. This file is used as a reference to compare it with the schema generated using this module. (Default: installed schema in 'relecov-tools/relecov_tools/schema/relecov_schema.json')",
+    help="Path to the base schema file. This file is used as a reference to compare it with the generated schema. By default, build-schema uses the installed schema for the selected project: '<project>_schema.json'.",
     required=False,
 )
 @click.option(
     "-e",
     "--excel_template",
     type=click.Path(),
-    help="Path to the excel template file. This file is used to get version history of the excel template (stored in assets/Relecov_metadata_*.xlsx)",
+    help="Path to the excel template file. This file is used to get version history of the selected project's excel template.",
     required=False,
 )
 @click.option(
@@ -1316,7 +1316,14 @@ def pipeline_manager(
 )
 @click.option("--version", help="Specify the schema version.")
 @click.option(
-    "-p", "--project", help="Specficy the project to build the metadata template."
+    "--initial-version",
+    is_flag=True,
+    help="Start VERSION history explicitly with only the current schema version.",
+)
+@click.option(
+    "-p",
+    "--project",
+    help="Specify the project key used to build the schema and metadata template.",
 )
 @click.option(
     "--non-interactive",
@@ -1347,6 +1354,7 @@ def build_schema(
     diff,
     output_dir,
     version,
+    initial_version,
     project,
     non_interactive,
 ):
