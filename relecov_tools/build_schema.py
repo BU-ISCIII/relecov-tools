@@ -510,7 +510,22 @@ class BuildSchema(BaseModule):
     def _normalize_enum_example_value(value: any) -> any:
         if not isinstance(value, str):
             return value
-        return re.sub(r"\s*\[[^\]]+\]$", "", value).strip()
+        return BuildSchema._clean_enum_ontology_annotation(value)
+
+    @staticmethod
+    def _clean_enum_ontology_annotation(value: any) -> any:
+        """Remove ontology annotations displayed between brackets from enum labels."""
+        if not isinstance(value, str):
+            return value
+        return re.sub(r"\s*\[[^\]]+\]", "", value).strip()
+
+    def _clean_template_enum_values(self, values: any) -> any:
+        """Return enum values as displayed in the Excel template dropdowns."""
+        if not isinstance(values, list):
+            return values
+        return self._unique_enum_values(
+            [self._clean_enum_ontology_annotation(value) for value in values]
+        )
 
     @staticmethod
     def _is_empty_validation_value(value: any) -> bool:
@@ -1491,11 +1506,6 @@ class BuildSchema(BaseModule):
                         axis=1,
                     )
 
-                def clean_ontologies(enums):
-                    return self._unique_enum_values(
-                        [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
-                    )
-
                 def resolve_enum_ref(ref: str, enum_defs: dict) -> list[str]:
                     property_key = ref.split("enums/")[-1]
                     property_id = property_key.split("/")
@@ -1512,9 +1522,7 @@ class BuildSchema(BaseModule):
                             f"[red]Error finding enum for property '{'.'.join(property_id)}'; not found in $defs"
                         )
                         return []
-                    return (
-                        clean_ontologies(values) if isinstance(values, list) else values
-                    )
+                    return self._clean_template_enum_values(values)
 
                 resolved_enums = df["$ref"].apply(
                     lambda row: (
@@ -1529,6 +1537,8 @@ class BuildSchema(BaseModule):
                     )
                 else:
                     df["enum"] = resolved_enums
+
+                df["enum"] = df["enum"].apply(self._clean_template_enum_values)
                 common_dropdown = self._lab_dropdowns["collecting_institution"]
 
                 lab_fields = [
