@@ -29,7 +29,15 @@ stderr = rich.console.Console(
 
 
 def _slugify_project(value):
-    """Return a filesystem-friendly project identifier."""
+    """
+    Return a filesystem-friendly project identifier.
+
+    Args:
+        value: Project name or label to normalize.
+
+    Returns:
+        str: Normalized project identifier.
+    """
     project = str(value).strip().lower()
     project = re.sub(r"\s+", "_", project)
     project = re.sub(r"[^a-z0-9_-]+", "_", project)
@@ -37,7 +45,15 @@ def _slugify_project(value):
 
 
 def _display_project(value):
-    """Return a readable project label for generated metadata."""
+    """
+    Return a readable project label for generated metadata.
+
+    Args:
+        value: Project name or identifier to display.
+
+    Returns:
+        str: Title-cased project label.
+    """
     return str(value).strip().replace("_", " ").replace("-", " ").title()
 
 
@@ -202,7 +218,8 @@ class BuildSchema(BaseModule):
         self._resolve_version_history_template()
 
     def _resolve_version_history_template(self):
-        """Resolve the previous Excel template used to read VERSION history.
+        """
+        Resolve the previous Excel template used to read VERSION history.
 
         Initial versions skip previous template lookup; regular versions use either
         the explicit template path or the installed project template in assets.
@@ -482,7 +499,18 @@ class BuildSchema(BaseModule):
         enum_value: any,
         expected_type: str | None,
     ) -> list[str]:
-        """Return validation errors for examples that are not present in enum."""
+        """
+        Return validation errors for examples that are not present in enum.
+
+        Args:
+            property_id (str): Property name used for warning messages.
+            example_value: Raw examples value from the database definition.
+            enum_value: Raw enum definition or reference.
+            expected_type (str | None): Declared JSON Schema type for the property.
+
+        Returns:
+            list[str]: Validation error messages.
+        """
         if BuildSchema._is_empty_validation_value(enum_value):
             return []
         if BuildSchema._is_empty_validation_value(example_value):
@@ -514,13 +542,29 @@ class BuildSchema(BaseModule):
 
     @staticmethod
     def _clean_enum_ontology_annotation(value: any) -> any:
-        """Remove ontology annotations displayed between brackets from enum labels."""
+        """
+        Remove ontology annotations displayed between brackets from enum labels.
+
+        Args:
+            value: Enum value to clean.
+
+        Returns:
+            Cleaned enum value when it is a string; otherwise the original value.
+        """
         if not isinstance(value, str):
             return value
         return re.sub(r"\s*\[[^\]]+\]", "", value).strip()
 
     def _clean_template_enum_values(self, values: any) -> any:
-        """Return enum values as displayed in the Excel template dropdowns."""
+        """
+        Return enum values as displayed in the Excel template dropdowns.
+
+        Args:
+            values: Enum values to clean.
+
+        Returns:
+            Cleaned enum list, or the original value when it is not a list.
+        """
         if not isinstance(values, list):
             return values
         return BuildSchema._unique_enum_values(
@@ -535,7 +579,15 @@ class BuildSchema(BaseModule):
 
     @staticmethod
     def _parse_examples_for_validation(example_value: any) -> list[any]:
-        """Parse the examples cell using the same separator used for schema examples."""
+        """
+        Parse the examples cell using the same separator used for schema examples.
+
+        Args:
+            example_value: Raw examples value from the database definition.
+
+        Returns:
+            list: Parsed examples.
+        """
         if isinstance(example_value, str):
             return [
                 value.strip() for value in example_value.split("; ") if value.strip()
@@ -963,7 +1015,15 @@ class BuildSchema(BaseModule):
 
     @staticmethod
     def _find_duplicate_values(values: list) -> list:
-        """Return duplicated values preserving first duplicate encounter order."""
+        """
+        Return duplicated values preserving first duplicate encounter order.
+
+        Args:
+            values (list): Values to inspect for duplicates.
+
+        Returns:
+            list: Duplicate values.
+        """
         seen = set()
         duplicates = []
         duplicate_seen = set()
@@ -983,7 +1043,15 @@ class BuildSchema(BaseModule):
         return duplicates
 
     def validate_schema_enum_duplicates(self, schema: dict):
-        """Validate that every enum list in a generated schema has unique values."""
+        """
+        Validate that every enum list in a generated schema has unique values.
+
+        Args:
+            schema (dict): JSON Schema to inspect.
+
+        Returns:
+            None
+        """
         duplicate_enums = {}
 
         def walk_schema(node, path="$"):
@@ -1153,7 +1221,15 @@ class BuildSchema(BaseModule):
 
     @staticmethod
     def _unique_enum_values(enum_values: list) -> list:
-        """Return enum values without duplicates, preserving first occurrence order."""
+        """
+        Return enum values without duplicates, preserving first occurrence order.
+
+        Args:
+            enum_values (list): Enum values to deduplicate.
+
+        Returns:
+            list: Unique enum values.
+        """
         unique_values = []
         seen = set()
         for value in enum_values:
@@ -1372,7 +1448,15 @@ class BuildSchema(BaseModule):
 
     @staticmethod
     def _format_template_required_value(value):
-        """Return the visible required label used in the metadata template."""
+        """
+        Return the visible required label used in the metadata template.
+
+        Args:
+            value: Raw required value from the database definition.
+
+        Returns:
+            str: Normalized required label.
+        """
         required_value = str(value or "").strip()
         if required_value.upper() == "Y":
             return "YES"
