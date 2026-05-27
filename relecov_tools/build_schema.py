@@ -29,7 +29,15 @@ stderr = rich.console.Console(
 
 
 def _slugify_project(value):
-    """Return a filesystem-friendly project identifier."""
+    """
+    Return a filesystem-friendly project identifier.
+
+    Args:
+        value: Project name or label to normalize.
+
+    Returns:
+        str: Normalized project identifier.
+    """
     project = str(value).strip().lower()
     project = re.sub(r"\s+", "_", project)
     project = re.sub(r"[^a-z0-9_-]+", "_", project)
@@ -37,7 +45,15 @@ def _slugify_project(value):
 
 
 def _display_project(value):
-    """Return a readable project label for generated metadata."""
+    """
+    Return a readable project label for generated metadata.
+
+    Args:
+        value: Project name or identifier to display.
+
+    Returns:
+        str: Title-cased project label.
+    """
     return str(value).strip().replace("_", " ").replace("-", " ").title()
 
 
@@ -202,7 +218,8 @@ class BuildSchema(BaseModule):
         self._resolve_version_history_template()
 
     def _resolve_version_history_template(self):
-        """Resolve the previous Excel template used to read VERSION history.
+        """
+        Resolve the previous Excel template used to read VERSION history.
 
         Initial versions skip previous template lookup; regular versions use either
         the explicit template path or the installed project template in assets.
@@ -286,7 +303,7 @@ class BuildSchema(BaseModule):
                 uniques[f].add(name)
 
         dropdowns = {
-            k: sorted(self._unique_enum_values(v)) for k, v in dropdowns.items()
+            k: sorted(BuildSchema._unique_enum_values(v)) for k, v in dropdowns.items()
         }
         uniques = {k: sorted(v) for k, v in uniques.items()}
         return dropdowns, uniques
@@ -482,35 +499,77 @@ class BuildSchema(BaseModule):
         enum_value: any,
         expected_type: str | None,
     ) -> list[str]:
-        """Return validation errors for examples that are not present in enum."""
-        if self._is_empty_validation_value(enum_value):
+        """
+        Return validation errors for examples that are not present in enum.
+
+        Args:
+            property_id (str): Property name used for warning messages.
+            example_value: Raw examples value from the database definition.
+            enum_value: Raw enum definition or reference.
+            expected_type (str | None): Declared JSON Schema type for the property.
+
+        Returns:
+            list[str]: Validation error messages.
+        """
+        if BuildSchema._is_empty_validation_value(enum_value):
             return []
-        if self._is_empty_validation_value(example_value):
+        if BuildSchema._is_empty_validation_value(example_value):
             return []
 
         enum_values = self._parse_enum_values(enum_value)
         if not isinstance(enum_values, list) or not enum_values:
             return []
 
-        examples = self._parse_examples_for_validation(example_value)
+        examples = BuildSchema._parse_examples_for_validation(example_value)
         examples = self._cast_examples_to_declared_type(
             property_id, expected_type, examples
         )
 
         enum_lookup = {
-            self._normalize_enum_example_value(value) for value in enum_values
+            BuildSchema._normalize_enum_example_value(value) for value in enum_values
         }
         return [
             f"Example '{example}' is not defined in enum."
             for example in examples
-            if self._normalize_enum_example_value(example) not in enum_lookup
+            if BuildSchema._normalize_enum_example_value(example) not in enum_lookup
         ]
 
     @staticmethod
     def _normalize_enum_example_value(value: any) -> any:
         if not isinstance(value, str):
             return value
-        return re.sub(r"\s*\[[^\]]+\]$", "", value).strip()
+        return BuildSchema._clean_enum_ontology_annotation(value)
+
+    @staticmethod
+    def _clean_enum_ontology_annotation(value: any) -> any:
+        """
+        Remove ontology annotations displayed between brackets from enum labels.
+
+        Args:
+            value: Enum value to clean.
+
+        Returns:
+            Cleaned enum value when it is a string; otherwise the original value.
+        """
+        if not isinstance(value, str):
+            return value
+        return re.sub(r"\s*\[[^\]]+\]", "", value).strip()
+
+    def _clean_template_enum_values(self, values: any) -> any:
+        """
+        Return enum values as displayed in the Excel template dropdowns.
+
+        Args:
+            values: Enum values to clean.
+
+        Returns:
+            Cleaned enum list, or the original value when it is not a list.
+        """
+        if not isinstance(values, list):
+            return values
+        return BuildSchema._unique_enum_values(
+            [BuildSchema._clean_enum_ontology_annotation(value) for value in values]
+        )
 
     @staticmethod
     def _is_empty_validation_value(value: any) -> bool:
@@ -520,7 +579,15 @@ class BuildSchema(BaseModule):
 
     @staticmethod
     def _parse_examples_for_validation(example_value: any) -> list[any]:
-        """Parse the examples cell using the same separator used for schema examples."""
+        """
+        Parse the examples cell using the same separator used for schema examples.
+
+        Args:
+            example_value: Raw examples value from the database definition.
+
+        Returns:
+            list: Parsed examples.
+        """
         if isinstance(example_value, str):
             return [
                 value.strip() for value in example_value.split("; ") if value.strip()
@@ -948,7 +1015,15 @@ class BuildSchema(BaseModule):
 
     @staticmethod
     def _find_duplicate_values(values: list) -> list:
-        """Return duplicated values preserving first duplicate encounter order."""
+        """
+        Return duplicated values preserving first duplicate encounter order.
+
+        Args:
+            values (list): Values to inspect for duplicates.
+
+        Returns:
+            list: Duplicate values.
+        """
         seen = set()
         duplicates = []
         duplicate_seen = set()
@@ -968,14 +1043,22 @@ class BuildSchema(BaseModule):
         return duplicates
 
     def validate_schema_enum_duplicates(self, schema: dict):
-        """Validate that every enum list in a generated schema has unique values."""
+        """
+        Validate that every enum list in a generated schema has unique values.
+
+        Args:
+            schema (dict): JSON Schema to inspect.
+
+        Returns:
+            None
+        """
         duplicate_enums = {}
 
         def walk_schema(node, path="$"):
             if isinstance(node, dict):
                 enum_values = node.get("enum")
                 if isinstance(enum_values, list):
-                    duplicates = self._find_duplicate_values(enum_values)
+                    duplicates = BuildSchema._find_duplicate_values(enum_values)
                     if duplicates:
                         duplicate_enums[path] = duplicates
                 for key, value in node.items():
@@ -1122,9 +1205,10 @@ class BuildSchema(BaseModule):
             "missing": 5,
             "restricted access": 6,
             "other": 7,
+            "none": 8,
         }
 
-        unique_values = self._unique_enum_values(enum_values)
+        unique_values = BuildSchema._unique_enum_values(enum_values)
 
         def sort_key(value: str):
             normalized_value = value.strip().casefold()
@@ -1137,7 +1221,15 @@ class BuildSchema(BaseModule):
 
     @staticmethod
     def _unique_enum_values(enum_values: list) -> list:
-        """Return enum values without duplicates, preserving first occurrence order."""
+        """
+        Return enum values without duplicates, preserving first occurrence order.
+
+        Args:
+            enum_values (list): Enum values to deduplicate.
+
+        Returns:
+            list: Unique enum values.
+        """
         unique_values = []
         seen = set()
         for value in enum_values:
@@ -1354,6 +1446,29 @@ class BuildSchema(BaseModule):
 
         return pd.DataFrame(template_rows)
 
+    @staticmethod
+    def _format_template_required_value(value):
+        """
+        Return the visible required label used in the metadata template.
+
+        Args:
+            value: Raw required value from the database definition.
+
+        Returns:
+            str: Normalized required label.
+        """
+        required_value = str(value or "").strip()
+        if required_value.upper() == "Y":
+            return "YES"
+        if required_value.upper() in ["N", "NO"]:
+            return "NO"
+        if required_value.lower().startswith("y if "):
+            condition = required_value[5:].strip()
+            if condition.lower() == "sequenced":
+                condition = "sequenced"
+            return f"YES if {condition}"
+        return required_value
+
     def create_metadatalab_excel(self, json_schema, database_definition=None):
         """
         Generates an Excel template file for Metadata LAB with four sheets:
@@ -1462,11 +1577,23 @@ class BuildSchema(BaseModule):
                     df["required"] = df["property_id"].apply(
                         lambda x: "Y" if x in required_properties else "N"
                     )
-
-                def clean_ontologies(enums):
-                    return self._unique_enum_values(
-                        [re.sub(r"\s*\[.*?\]", "", item).strip() for item in enums]
+                if database_definition:
+                    required_values = {
+                        property_id: BuildSchema._format_template_required_value(
+                            features.get("required (Y/N)")
+                        )
+                        for property_id, features in database_definition.items()
+                    }
+                    df["required"] = df.apply(
+                        lambda row: required_values.get(
+                            row["property_id"], row["required"]
+                        )
+                        or row["required"],
+                        axis=1,
                     )
+                df["required"] = df["required"].apply(
+                    BuildSchema._format_template_required_value
+                )
 
                 def resolve_enum_ref(ref: str, enum_defs: dict) -> list[str]:
                     property_key = ref.split("enums/")[-1]
@@ -1484,9 +1611,7 @@ class BuildSchema(BaseModule):
                             f"[red]Error finding enum for property '{'.'.join(property_id)}'; not found in $defs"
                         )
                         return []
-                    return (
-                        clean_ontologies(values) if isinstance(values, list) else values
-                    )
+                    return self._clean_template_enum_values(values)
 
                 resolved_enums = df["$ref"].apply(
                     lambda row: (
@@ -1501,6 +1626,8 @@ class BuildSchema(BaseModule):
                     )
                 else:
                     df["enum"] = resolved_enums
+
+                df["enum"] = df["enum"].apply(self._clean_template_enum_values)
                 common_dropdown = self._lab_dropdowns["collecting_institution"]
 
                 lab_fields = [
@@ -1562,7 +1689,11 @@ class BuildSchema(BaseModule):
                 metadatalab_header = ["CAMPO", "DESCRIPCIÓN", "EJEMPLOS", "REQUERIDO"]
                 df_metadata = pd.DataFrame(columns=metadatalab_header)
                 df_metadata["REQUERIDO"] = df_filtered["required"].apply(
-                    lambda x: "YES" if str(x).upper() in ["Y", "YES"] else ""
+                    lambda x: (
+                        "YES"
+                        if str(x).upper() in ["Y", "YES"]
+                        else "" if str(x).upper() in ["N", "NO"] else x
+                    )
                 )
                 df_metadata["EJEMPLOS"] = df_filtered["examples"].apply(
                     lambda x: x[0] if isinstance(x, list) else x
