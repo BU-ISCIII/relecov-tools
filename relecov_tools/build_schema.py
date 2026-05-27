@@ -286,7 +286,7 @@ class BuildSchema(BaseModule):
                 uniques[f].add(name)
 
         dropdowns = {
-            k: sorted(self._unique_enum_values(v)) for k, v in dropdowns.items()
+            k: sorted(BuildSchema._unique_enum_values(v)) for k, v in dropdowns.items()
         }
         uniques = {k: sorted(v) for k, v in uniques.items()}
         return dropdowns, uniques
@@ -483,27 +483,27 @@ class BuildSchema(BaseModule):
         expected_type: str | None,
     ) -> list[str]:
         """Return validation errors for examples that are not present in enum."""
-        if self._is_empty_validation_value(enum_value):
+        if BuildSchema._is_empty_validation_value(enum_value):
             return []
-        if self._is_empty_validation_value(example_value):
+        if BuildSchema._is_empty_validation_value(example_value):
             return []
 
         enum_values = self._parse_enum_values(enum_value)
         if not isinstance(enum_values, list) or not enum_values:
             return []
 
-        examples = self._parse_examples_for_validation(example_value)
+        examples = BuildSchema._parse_examples_for_validation(example_value)
         examples = self._cast_examples_to_declared_type(
             property_id, expected_type, examples
         )
 
         enum_lookup = {
-            self._normalize_enum_example_value(value) for value in enum_values
+            BuildSchema._normalize_enum_example_value(value) for value in enum_values
         }
         return [
             f"Example '{example}' is not defined in enum."
             for example in examples
-            if self._normalize_enum_example_value(example) not in enum_lookup
+            if BuildSchema._normalize_enum_example_value(example) not in enum_lookup
         ]
 
     @staticmethod
@@ -523,8 +523,8 @@ class BuildSchema(BaseModule):
         """Return enum values as displayed in the Excel template dropdowns."""
         if not isinstance(values, list):
             return values
-        return self._unique_enum_values(
-            [self._clean_enum_ontology_annotation(value) for value in values]
+        return BuildSchema._unique_enum_values(
+            [BuildSchema._clean_enum_ontology_annotation(value) for value in values]
         )
 
     @staticmethod
@@ -990,7 +990,7 @@ class BuildSchema(BaseModule):
             if isinstance(node, dict):
                 enum_values = node.get("enum")
                 if isinstance(enum_values, list):
-                    duplicates = self._find_duplicate_values(enum_values)
+                    duplicates = BuildSchema._find_duplicate_values(enum_values)
                     if duplicates:
                         duplicate_enums[path] = duplicates
                 for key, value in node.items():
@@ -1140,7 +1140,7 @@ class BuildSchema(BaseModule):
             "none": 8,
         }
 
-        unique_values = self._unique_enum_values(enum_values)
+        unique_values = BuildSchema._unique_enum_values(enum_values)
 
         def sort_key(value: str):
             normalized_value = value.strip().casefold()
@@ -1495,7 +1495,7 @@ class BuildSchema(BaseModule):
                     )
                 if database_definition:
                     required_values = {
-                        property_id: self._format_template_required_value(
+                        property_id: BuildSchema._format_template_required_value(
                             features.get("required (Y/N)")
                         )
                         for property_id, features in database_definition.items()
@@ -1508,7 +1508,7 @@ class BuildSchema(BaseModule):
                         axis=1,
                     )
                 df["required"] = df["required"].apply(
-                    self._format_template_required_value
+                    BuildSchema._format_template_required_value
                 )
 
                 def resolve_enum_ref(ref: str, enum_defs: dict) -> list[str]:
