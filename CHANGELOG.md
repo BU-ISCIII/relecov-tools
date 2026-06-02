@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Pau Pascual Mas](https://github.com/PauPascualMas)
 - [Alba Talavera](https://github.com/albatalavera)
 - [Alejandro Bernabeu](https://github.com/aberdur)
+- [Victor Lopez](https://github.com/victor5lm)
 
 #### Added enhancements
 
@@ -27,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix duplicated row in metadata form and clean some MEPRAM initial config [#879] (https://github.com/BU-ISCIII/relecov-tools/pull/879)
 - Fix date validation in Excel metadata templates and add some schema validation checks [#886] (https://github.com/BU-ISCIII/relecov-tools/pull/886)
 - Improve METADATA_LAB template formatting and duplicate sample detection [#887] (https://github.com/BU-ISCIII/relecov-tools/pull/887)
+- Fixed the surveillance script for proper variant data handling [#891] (https://github.com/BU-ISCIII/relecov-tools/pull/891). 
 
 #### Changed
 
