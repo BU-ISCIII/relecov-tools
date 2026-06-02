@@ -110,7 +110,7 @@ def process_json_files(
                         season = get_epi_season(sample["sample_collection_date"])
                         if specified_week and week != specified_week:
                             continue
-                        
+
                         if specified_season and season != specified_season:
                             continue
 
@@ -365,8 +365,7 @@ def process_json_files(
                 df_variants_existing = pd.read_csv(variant_csv_path, dtype=str)
 
                 df_variants = pd.concat(
-                    [df_variants_existing, df_variants_new],
-                    ignore_index=True
+                    [df_variants_existing, df_variants_new], ignore_index=True
                 )
             else:
                 df_variants = df_variants_new
@@ -464,7 +463,7 @@ if __name__ == "__main__":
         "-s",
         "--season",
         help="Filter for specific epidemiological season (format: YYYY_YYYY)",
-    )   
+    )
     parser.add_argument(
         "-c",
         "--copy-fasta",
