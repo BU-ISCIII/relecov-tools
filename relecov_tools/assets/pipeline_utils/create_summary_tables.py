@@ -49,6 +49,7 @@ def process_json_files(
     long_table_file=None,
     output_dir="surveillance_files",
     specified_week=None,
+    specified_season=None,
     copy_fasta=False,
 ):
     os.makedirs(output_dir, exist_ok=True)
@@ -108,6 +109,9 @@ def process_json_files(
                         week = get_epi_week(sample["sample_collection_date"])
                         season = get_epi_season(sample["sample_collection_date"])
                         if specified_week and week != specified_week:
+                            continue
+                        
+                        if specified_season and season != specified_season:
                             continue
 
                         analysis_date = sample.get("bioinformatics_analysis_date", "-")
@@ -355,7 +359,23 @@ def process_json_files(
             season_dir = os.path.join(sars_output_dir, f"season_{season}")
             os.makedirs(season_dir, exist_ok=True)
             variant_csv_path = os.path.join(season_dir, "variant_data.csv")
-            df_variants = pd.DataFrame(variant_rows)
+            df_variants_new = pd.DataFrame(variant_rows)
+
+            if os.path.exists(variant_csv_path):
+                df_variants_existing = pd.read_csv(variant_csv_path, dtype=str)
+
+                df_variants = pd.concat(
+                    [df_variants_existing, df_variants_new],
+                    ignore_index=True
+                )
+            else:
+                df_variants = df_variants_new
+
+            # clave biológica mínima de unicidad
+            df_variants = df_variants.drop_duplicates(
+                subset=["SAMPLE", "CHROM", "POS", "REF", "ALT"]
+            )
+
             df_variants.to_csv(variant_csv_path, index=False)
             print(
                 f"Written variant data for SARS season {season} to {variant_csv_path}"
@@ -442,6 +462,11 @@ if __name__ == "__main__":
         help="Filter for specific epidemiological week (format: YYYY-WW)",
     )
     parser.add_argument(
+        "-s",
+        "--season",
+        help="Filter for specific epidemiological season (format: YYYY_YYYY)",
+    )   
+    parser.add_argument(
         "-c",
         "--copy-fasta",
         action="store_true",
@@ -467,5 +492,6 @@ if __name__ == "__main__":
         args.long_table_file,
         args.output,
         args.week,
+        args.season,
         args.copy_fasta,
     )
