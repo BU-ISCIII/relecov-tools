@@ -371,7 +371,6 @@ def process_json_files(
             else:
                 df_variants = df_variants_new
 
-            # clave biológica mínima de unicidad
             df_variants = df_variants.drop_duplicates(
                 subset=["SAMPLE", "CHROM", "POS", "REF", "ALT"]
             )
