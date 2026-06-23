@@ -37,6 +37,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
+- Pinned all direct dependencies to exact versions for reproducible installations.
+- Updated vulnerable dependencies, including the `requests`/`urllib3` stack, and verified the resulting dependency set with `pip-audit`.
+- Replaced the `bio` and `bs4` wrapper packages with their direct dependencies, added missing direct dependencies, and pinned a secure `lxml` version compatible with `ena-upload-cli`.
 
 ## [1.8.0] - 2026-27-02 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.8.0>
 
