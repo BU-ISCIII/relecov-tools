@@ -359,5 +359,5 @@ sftp_handle:
     excel_sheet: METADATA_LAB
     alternative_sheet: 5.Viral Characterisation and Se
     alternative_flag: CAMPO
-    sample_id_col: Sample ID given for sequencing
-    alternative_sample_id_col: Sample ID given for sequencing
+    sample_id_col: Sample/Isolate ID given for sequencing
+    alternative_sample_id_col: Isolate ID given by the SUBMITTING institution
