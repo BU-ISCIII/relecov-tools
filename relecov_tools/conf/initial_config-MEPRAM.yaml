@@ -53,7 +53,7 @@ read_lab_metadata:
     output_dir: ''
     files_folder: ''
     cast_values_from_schema: true
-  metadata_lab_heading_file: read_lab_metadata_heading_default.json
+  metadata_lab_heading_file: read_lab_metadata_heading_default-MEPRAM.json
   alt_heading_equivalences:
     Sample ID: Sample ID given for sequencing
     LAB ID: Originating Laboratory
