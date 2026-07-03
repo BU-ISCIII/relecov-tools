@@ -544,8 +544,12 @@ class Download(BaseModule):
         index_layout = meta_header.index("Library Layout")
         index_fastq_r1 = meta_header.index("Sequence file R1")
         index_fastq_r2 = meta_header.index("Sequence file R2")
-        counter = header_row
-        for row in islice(metadata_ws.values, header_row, metadata_ws.max_row):
+        skip_rows_after_header = int(
+            self.metadata_processing.get("skip_rows_after_header") or 0
+        )
+        first_data_row = header_row + skip_rows_after_header
+        counter = first_data_row
+        for row in islice(metadata_ws.values, first_data_row, metadata_ws.max_row):
             counter += 1
             sample_id = row[index_sampleID]
             if sample_id:
@@ -570,6 +574,13 @@ class Download(BaseModule):
                         stderr.print(log_text)
                         self.include_warning(log_text, sample=s_name)
                         continue
+                if self.metadata_only:
+                    sample_file_dict[s_name] = {
+                        "sequence_file_R1": "",
+                        "sequence_file_R2": "",
+                        "_metadata_only": True,
+                    }
+                    continue
                 if not row[index_fastq_r1]:
                     log_text = "Sequence File R1 not defined in Metadata for sample %s"
                     stderr.print(f"[red]{str(log_text % s_name)}")
@@ -1066,8 +1077,17 @@ class Download(BaseModule):
             containing all sheets in the excel file as pandas dataframes.
         """
 
+        def skip_template_rows(meta_df):
+            skip_rows_after_header = int(
+                self.metadata_processing.get("skip_rows_after_header") or 0
+            )
+            if skip_rows_after_header:
+                return meta_df.iloc[skip_rows_after_header:].reset_index(drop=True)
+            return meta_df
+
         def filldf_unique_id_col(meta_df):
             """Fill the unique ID col if missing with other alternative IDs"""
+            meta_df = skip_template_rows(meta_df)
             unique_id_col = self.metadata_processing.get("sample_id_col")
             if not unique_id_col:
                 raise MetadataError(

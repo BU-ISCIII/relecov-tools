@@ -361,3 +361,4 @@ sftp_handle:
     alternative_flag: CAMPO
     sample_id_col: Sample/Isolate ID given for sequencing
     alternative_sample_id_col: Isolate ID given by the SUBMITTING institution
+    skip_rows_after_header: 3
