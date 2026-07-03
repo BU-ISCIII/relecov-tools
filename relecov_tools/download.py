@@ -1068,22 +1068,37 @@ class Download(BaseModule):
 
         def filldf_unique_id_col(meta_df):
             """Fill the unique ID col if missing with other alternative IDs"""
-            unique_id_col = "Sample ID given for sequencing"
+            unique_id_col = self.metadata_processing.get("sample_id_col")
+            if not unique_id_col:
+                raise MetadataError(
+                    "Missing metadata_processing.sample_id_col in configuration"
+                )
+            if unique_id_col not in meta_df.columns:
+                raise MetadataError(
+                    f"Configured sample_id_col '{unique_id_col}' not found in metadata header"
+                )
             alt_id_cols = [
-                "Sample ID given by originating laboratory",
+                self.metadata_processing.get("alternative_sample_id_col"),
                 "Sequence file R1",
             ]
+            alt_id_cols = [col for col in alt_id_cols if col]
+            missing_alt_cols = [col for col in alt_id_cols if col not in meta_df.columns]
+            if missing_alt_cols:
+                raise MetadataError(
+                    f"Configured alternative ID column(s) not found in metadata header: {missing_alt_cols}"
+                )
             if meta_df[unique_id_col].isnull().any():
                 for index, row in meta_df.iterrows():
                     if pd.isnull(row[unique_id_col]):
-                        if pd.notnull(row[alt_id_cols[0]]):
-                            new_id = row[alt_id_cols[0]]
-                            errtxt = f"Missing value for {unique_id_col}. Replaced by {alt_id_cols[0]}: {new_id}"
-                        elif pd.notnull(row[alt_id_cols[1]]):
-                            new_id = row[alt_id_cols[1]]
-                            errtxt = f"Missing value for {unique_id_col}. Replaced by {alt_id_cols[1]}: {new_id}"
+                        replacement_col = next(
+                            (col for col in alt_id_cols if pd.notnull(row[col])),
+                            None,
+                        )
+                        if replacement_col:
+                            new_id = row[replacement_col]
+                            errtxt = f"Missing value for {unique_id_col}. Replaced by {replacement_col}: {new_id}"
                         else:
-                            errtxt = f"Sample {index-1} skipped: missing values for {unique_id_col}, {alt_id_cols[0]} and {alt_id_cols[1]}"
+                            errtxt = f"Sample {index-1} skipped: missing values for {unique_id_col} and {', '.join(alt_id_cols)}"
                             self.include_error(entry=errtxt)
                             continue
                         meta_df.at[index, unique_id_col] = new_id
@@ -1234,8 +1249,10 @@ class Download(BaseModule):
             processed_folders.append(folder)
         # End of loop
 
-        # Write last dataframe to file once loop is finished
-        if folders_with_metadata.get(last_main_folder):
+        # Write last dataframe to file once loop is finished.
+        # Metadata-only folders can have no sequence files, so an empty list still
+        # needs the merged Excel uploaded into the tmp_processing folder.
+        if last_main_folder in folders_with_metadata:
             if excel_name not in folders_with_metadata[last_main_folder]:
                 upload_merged_df(merged_excel_path, last_main_folder, merged_df)
                 folders_with_metadata[last_main_folder].append(excel_name)
