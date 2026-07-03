@@ -382,6 +382,12 @@ def relecov_tools_cli(ctx, verbose, log_path, debug, hex_code):
     default=None,
     help="Flag: Specify which subfolder to process",
 )
+@click.option(
+    "--metadata-only",
+    is_flag=True,
+    default=False,
+    help="Include samples with metadata but no FASTQ files in samples_data.json.",
+)
 @click.pass_context
 def download(
     ctx,
@@ -392,6 +398,7 @@ def download(
     output_dir,
     target_folders,
     subfolder,
+    metadata_only,
 ):
     """Download files located in sftp server."""
     debug = ctx.obj.get("debug", False)

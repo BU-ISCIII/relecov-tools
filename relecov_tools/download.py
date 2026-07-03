@@ -45,6 +45,7 @@ class Download(BaseModule):
         output_dir=None,
         target_folders=None,
         subfolder=None,
+        metadata_only=False,
     ):
         """Initializes the sftp object"""
         super().__init__(output_dir=output_dir, called_module="download")
@@ -57,6 +58,7 @@ class Download(BaseModule):
         sftp_passwd = password
         self.target_folders = target_folders
         self.subfolder = subfolder
+        self.metadata_only = metadata_only
         self.allowed_download_options = config_json.get_topic_data(
             "sftp_handle", "allowed_download_options"
         )
@@ -162,6 +164,15 @@ class Download(BaseModule):
         self.finished_folders = {}
         self.set_batch_id(datetime.today().strftime("%Y%m%d%H%M%S"))
         self.defer_cleanup = False
+
+    @staticmethod
+    def _sample_sequence_files(sample_files):
+        """Return only declared sequence filenames from a sample file dictionary."""
+        return [
+            value
+            for key, value in sample_files.items()
+            if key in ("sequence_file_R1", "sequence_file_R2") and value
+        ]
 
     def create_local_folder(self, folder):
         """Create folder to download files in local path using date
@@ -292,6 +303,15 @@ class Download(BaseModule):
         corrupted_set = {os.path.basename(x) for x in corrupted_files or []}
         data = copy.deepcopy(samples_dict)
         for sample, values in data.items():
+            if values.pop("_metadata_only", False):
+                values["sequence_file_R1"] = values.get("sequence_file_R1", "")
+                values["sequence_file_path_R1"] = ""
+                values["sequence_file_R1_md5"] = ""
+                values["sequence_file_R2"] = values.get("sequence_file_R2", "")
+                values["sequence_file_path_R2"] = ""
+                values["sequence_file_R2_md5"] = ""
+                values["batch_id"] = self.batch_id
+                continue
             if not all(val for val in values):
                 self.include_error(str(error_text % sample), sample)
                 samples_to_delete.append(sample)
@@ -334,8 +354,14 @@ class Download(BaseModule):
         """
         inverted_dict = {}
         for sample, fastq_dict in sample_file_dict.items():
+            if fastq_dict.get("_metadata_only"):
+                continue
             # Dictionary values are not hashable, so you need to create a tuple of them
-            samp_fastqs = tuple(fastq_dict.values())
+            samp_fastqs = tuple(
+                val
+                for key, val in fastq_dict.items()
+                if key.startswith("sequence_file_") and val
+            )
             # Setting values as keys to find those samples refering to the same file
             for fastq in samp_fastqs:
                 inverted_dict[fastq] = inverted_dict.get(fastq, []) + [sample]
@@ -547,7 +573,17 @@ class Download(BaseModule):
                 if not row[index_fastq_r1]:
                     log_text = "Sequence File R1 not defined in Metadata for sample %s"
                     stderr.print(f"[red]{str(log_text % s_name)}")
-                    self.include_error(entry=str(log_text % s_name), sample=s_name)
+                    if self.metadata_only:
+                        self.include_warning(
+                            entry=str(log_text % s_name), sample=s_name
+                        )
+                        sample_file_dict[s_name] = {
+                            "sequence_file_R1": "",
+                            "sequence_file_R2": "",
+                            "_metadata_only": True,
+                        }
+                    else:
+                        self.include_error(entry=str(log_text % s_name), sample=s_name)
                     continue
                 try:
                     if not row[index_layout]:
@@ -716,7 +752,10 @@ class Download(BaseModule):
         for sample in sample_files_dict.keys():
             self.include_new_key(sample=sample)
         metafiles_list = sorted(
-            sum([list(fi.values()) for _, fi in sample_files_dict.items()], [])
+            sum(
+                [self._sample_sequence_files(fi) for _, fi in sample_files_dict.items()],
+                [],
+            )
         )
         if sorted(filtered_files_list) == sorted(metafiles_list):
             self.log.info("Files in %s match with metadata file", remote_folder)
@@ -1102,9 +1141,16 @@ class Download(BaseModule):
         def pre_validate_folder(folder, folder_files):
             """Check if remote folder has sequencing files and a valid metadata file"""
             if not any(file.endswith(tuple(exts)) for file in folder_files):
-                error_text = "Remote folder %s skipped. No sequencing files found."
-                self.include_error(error_text % folder)
-                return
+                if self.metadata_only:
+                    warning_text = (
+                        "Remote folder %s has no sequencing files. "
+                        "Processing metadata-only samples."
+                    )
+                    self.include_warning(warning_text % folder)
+                else:
+                    error_text = "Remote folder %s skipped. No sequencing files found."
+                    self.include_error(error_text % folder)
+                    return
             try:
                 downloaded_metadata = self.get_metadata_file(folder, output_dir)
             except (FileNotFoundError, OSError, PermissionError, MetadataError) as err:
@@ -1322,6 +1368,9 @@ class Download(BaseModule):
         for sample, vals in valid_filedict.items():
             processed_dict[sample] = {}
             for key, val in vals.items():
+                if key not in ("sequence_file_R1", "sequence_file_R2"):
+                    processed_dict[sample][key] = val
+                    continue
                 if val in corrupted:
                     self.include_error(error_text % val, sample=sample)
                 if val in md5miss:
@@ -1428,7 +1477,9 @@ class Download(BaseModule):
                 continue
             # Get the files in each folder
             files_to_download = [
-                fi for vals in valid_filedict.values() for fi in vals.values() if fi
+                fi
+                for vals in valid_filedict.values()
+                for fi in self._sample_sequence_files(vals)
             ]
             fetched_files = self.get_remote_folder_files(
                 folder, local_folder, files_to_download
@@ -1436,7 +1487,10 @@ class Download(BaseModule):
             if not fetched_files:
                 error_text = "No files could be downloaded in folder %s" % str(folder)
                 stderr.print(f"{error_text}")
-                self.include_error(error_text)
+                if self.metadata_only and not files_to_download:
+                    self.include_warning(error_text)
+                else:
+                    self.include_error(error_text)
             self.log.info("Finished download for folder: %s", folder)
             stderr.print(f"Finished download for folder {folder}")
             remote_md5sum = self.find_remote_md5sum(folder)
