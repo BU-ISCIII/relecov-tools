@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.8.1dev] - 2026-XX-XX : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.8.1dev>
+## [1.9.0] - 2026-08-24 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.9.0](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.9.0)
 
 ### Credits
 
@@ -39,7 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Pinned dependencies to exact versions and updated vulnerable packages for secure, reproducible installations [BU-ISCIII/relecov-tools#892](https://github.com/BU-ISCIII/relecov-tools/pull/892)
 
-## [1.8.0] - 2026-27-02 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.8.0>
+## [1.8.0] - 2026-27-02 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.8.0](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.8.0)
 
 ### Credits
 
@@ -83,7 +83,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.7.4] - 2025-12-15 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.4>
+## [1.7.4] - 2025-12-15 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.4](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.4)
 
 ### Credits
 
@@ -112,7 +112,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated GitHub action: `python_lint` now uses Python 3.10 [#839](https://github.com/BU-ISCIII/relecov-tools/issues/839)
 - Updated `README.md`: Python requirements now correctly display Python>=3.10 [#839](https://github.com/BU-ISCIII/relecov-tools/issues/839)
 
-## [1.7.3] - 2025-11-24 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.3>
+## [1.7.3] - 2025-11-24 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.3](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.3)
 
 ### Credits
 
@@ -133,7 +133,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.7.2] - 2025-11-12 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.2>
+## [1.7.2] - 2025-11-12 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.2](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.2)
 
 ### Credits
 
@@ -148,7 +148,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add UCCT status analytics script & send collecting_institution_code_1 to Relecov Platform [#806](https://github.com/BU-ISCIII/relecov-tools/pull/806)
 - Added Midnight amplicon panel versions in the schema [#807](https://github.com/BU-ISCIII/relecov-tools/pull/807)
 - Add input_directories to upload-results [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808)
-- update ERROR handling in mail [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808) 
+- update ERROR handling in mail [#808](https://github.com/BU-ISCIII/relecov-tools/pull/808)
 - Add labs to laboratory_adress.json [#813](https://github.com/BU-ISCIII/relecov-tools/pull/813)
 
 #### Fixes
@@ -168,7 +168,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.7.1] - 2025-09-22 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.1>
+## [1.7.1] - 2025-09-22 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.1](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.1)
 
 ### Credits
 
@@ -194,7 +194,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.7.0] - 2025-09-03 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.0>
+## [1.7.0] - 2025-09-03 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.0](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.7.0)
 
 ### Credits
 
@@ -250,7 +250,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.6.2] - 2025-08-01 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.2>
+## [1.6.2] - 2025-08-01 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.2](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.2)
 
 ### Credits
 
@@ -278,7 +278,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.6.1] - 2025-07-28 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.1>
+## [1.6.1] - 2025-07-28 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.1](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.1)
 
 ### Credits
 
@@ -315,7 +315,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.6.0] - 2025-07-04 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.0>
+## [1.6.0] - 2025-07-04 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.0](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.6.0)
 
 ### Credits
 
@@ -403,7 +403,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.5.5] - 2025-06-16 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.5>
+## [1.5.5] - 2025-06-16 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.5](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.5)
 
 ### Credits
 
@@ -465,7 +465,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - A new dependency has been added to `relecov-tools`: the 7-Zip software is now required. [#622](https://github.com/BU-ISCIII/relecov-tools/pull/622)
 
-## [1.5.4] - 2025-05-19 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.4>
+## [1.5.4] - 2025-05-19 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.4](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.4)
 
 ### Credits
 
@@ -487,7 +487,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.5.3] - 2025-05-14 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.3>
+## [1.5.3] - 2025-05-14 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.3](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.3)
 
 ### Credits
 
@@ -513,7 +513,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.5.2] - 2025-05-13 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.2>
+## [1.5.2] - 2025-05-13 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.2](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.2)
 
 ### Credits
 
@@ -540,7 +540,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.5.1] - 2025-05-12 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.1>
+## [1.5.1] - 2025-05-12 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.1](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.1)
 
 ### Credits
 
@@ -596,7 +596,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
-## [1.5.0] - 2025-05-06 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.0>
+## [1.5.0] - 2025-05-06 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.0](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.5.0)
 
 ### Credits
 
@@ -702,7 +702,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.4.0] - 2025-01-27 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.4.0>
+## [1.4.0] - 2025-01-27 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.4.0](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.4.0)
 
 ### Credits
 
@@ -733,7 +733,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.3.0] - 2024-12-23 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.3.0>
+## [1.3.0] - 2024-12-23 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.3.0](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.3.0)
 
 ### Credits
 
@@ -783,7 +783,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.2.0] - 2024-10-11 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.2.0>
+## [1.2.0] - 2024-10-11 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.2.0](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.2.0)
 
 ### Credits
 
@@ -802,7 +802,7 @@ Code contributions to the release:
 
 - Now also check for gzip file integrity after download. Moved cleaning process to end of workflow [#313](https://github.com/BU-ISCIII/relecov-tools/pull/313)
 - Introduced a decorator in sftp_client.py to reconnect when conection is lost [#313](https://github.com/BU-ISCIII/relecov-tools/pull/313)
-- Add Hospital Universitari Doctor Josep Trueta to laboratory_address.json [#316] (<https://github.com/BU-ISCIII/relecov-tools/pull/316>)
+- Add Hospital Universitari Doctor Josep Trueta to laboratory_address.json [#316] ([https://github.com/BU-ISCIII/relecov-tools/pull/316](https://github.com/BU-ISCIII/relecov-tools/pull/316))
 - samples_data json file is no longer mandatory as input in read-lab-metadata [#314](https://github.com/BU-ISCIII/relecov-tools/pull/314)
 - Included handling of alternative column names to support two distinct headers using the same schema in read-lab-metadata [#314](https://github.com/BU-ISCIII/relecov-tools/pull/314)
 - Included a new hospital (Hospital Universitario Araba) to laboratory_address.json [#315](https://github.com/BU-ISCIII/relecov-tools/pull/315)
@@ -846,7 +846,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.1.0] - 2024-09-13 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.1.0>
+## [1.1.0] - 2024-09-13 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.1.0](https://github.com/BU-ISCIII/relecov-tools/releases/tag/v1.1.0)
 
 ### Credits
 
@@ -881,7 +881,7 @@ Code contributions to the release:
 
 ### Requirements
 
-## [1.0.0] - 2024-09-02 : <https://github.com/BU-ISCIII/relecov-tools/releases/tag/1.0.0>
+## [1.0.0] - 2024-09-02 : [https://github.com/BU-ISCIII/relecov-tools/releases/tag/1.0.0](https://github.com/BU-ISCIII/relecov-tools/releases/tag/1.0.0)
 
 ### Credits
 
