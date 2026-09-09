@@ -574,13 +574,6 @@ class Download(BaseModule):
                         stderr.print(log_text)
                         self.include_warning(log_text, sample=s_name)
                         continue
-                if self.metadata_only:
-                    sample_file_dict[s_name] = {
-                        "sequence_file_R1": "",
-                        "sequence_file_R2": "",
-                        "_metadata_only": True,
-                    }
-                    continue
                 if not row[index_fastq_r1]:
                     log_text = "Sequence File R1 not defined in Metadata for sample %s"
                     stderr.print(f"[red]{str(log_text % s_name)}")
@@ -1403,17 +1396,18 @@ class Download(BaseModule):
         warning_text = "File %s not found in md5sum. Creating hash"
 
         for sample, vals in valid_filedict.items():
-            processed_dict[sample] = {}
+            sample_values = {}
+            metadata_only_sample = bool(vals.get("_metadata_only"))
             for key, val in vals.items():
                 if key not in ("sequence_file_R1", "sequence_file_R2"):
-                    processed_dict[sample][key] = val
+                    sample_values[key] = val
                     continue
                 if val in corrupted:
                     self.include_error(error_text % val, sample=sample)
                 if val in md5miss:
                     self.include_warning(warning_text % val, sample=sample)
                 if not val:
-                    processed_dict[sample][key] = val
+                    sample_values[key] = val
                     continue
 
                 matched_file = None
@@ -1425,7 +1419,7 @@ class Download(BaseModule):
                         break
 
                 if matched_file:
-                    processed_dict[sample][key] = matched_file
+                    sample_values[key] = matched_file
                 else:
                     err = f"File in metadata {val} does not match any file in sftp"
                     folder_logs = self.logsum.logs.get(self.current_folder, {})
@@ -1433,7 +1427,12 @@ class Download(BaseModule):
                         "errors", []
                     ):
                         self.include_error(err, sample)
-                    processed_dict[sample][key] = val
+                    sample_values[key] = val
+            if metadata_only_sample:
+                sample_values["sequence_file_R1"] = ""
+                sample_values["sequence_file_R2"] = ""
+                sample_values["_metadata_only"] = True
+            processed_dict[sample] = sample_values
         return processed_dict
 
     def _cleanup_remote_locks(self, parent: str = "."):
