@@ -174,6 +174,21 @@ class Download(BaseModule):
             if key in ("sequence_file_R1", "sequence_file_R2") and value
         ]
 
+    def _is_template_help_row(self, row):
+        """Return True when a metadata row starts with a template helper label."""
+        labels = self.metadata_processing.get(
+            "template_help_row_labels",
+            ["DESCRIPCIÓN", "DESCRIPCION", "EJEMPLOS", "REQUERIDO"],
+        )
+        labels = {str(label).strip().upper() for label in labels}
+        try:
+            first_cell = row.iloc[0]
+        except AttributeError:
+            first_cell = row[0] if row else None
+        if first_cell is None:
+            return False
+        return str(first_cell).strip().upper() in labels
+
     def create_local_folder(self, folder):
         """Create folder to download files in local path using date
 
@@ -547,7 +562,11 @@ class Download(BaseModule):
         skip_rows_after_header = int(
             self.metadata_processing.get("skip_rows_after_header") or 0
         )
-        first_data_row = header_row + skip_rows_after_header
+        first_data_row = header_row
+        first_row = next(islice(metadata_ws.values, header_row, header_row + 1), None)
+        if skip_rows_after_header and first_row:
+            if self._is_template_help_row(first_row):
+                first_data_row += skip_rows_after_header
         counter = first_data_row
         for row in islice(metadata_ws.values, first_data_row, metadata_ws.max_row):
             counter += 1
@@ -1074,7 +1093,9 @@ class Download(BaseModule):
             skip_rows_after_header = int(
                 self.metadata_processing.get("skip_rows_after_header") or 0
             )
-            if skip_rows_after_header:
+            if skip_rows_after_header and not meta_df.empty:
+                if not self._is_template_help_row(meta_df.iloc[0]):
+                    return meta_df
                 return meta_df.iloc[skip_rows_after_header:].reset_index(drop=True)
             return meta_df
 
