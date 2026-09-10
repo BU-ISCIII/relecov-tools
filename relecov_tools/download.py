@@ -776,7 +776,10 @@ class Download(BaseModule):
             self.include_new_key(sample=sample)
         metafiles_list = sorted(
             sum(
-                [self._sample_sequence_files(fi) for _, fi in sample_files_dict.items()],
+                [
+                    self._sample_sequence_files(fi)
+                    for _, fi in sample_files_dict.items()
+                ],
                 [],
             )
         )
@@ -1116,7 +1119,9 @@ class Download(BaseModule):
                 "Sequence file R1",
             ]
             alt_id_cols = [col for col in alt_id_cols if col]
-            missing_alt_cols = [col for col in alt_id_cols if col not in meta_df.columns]
+            missing_alt_cols = [
+                col for col in alt_id_cols if col not in meta_df.columns
+            ]
             if missing_alt_cols:
                 raise MetadataError(
                     f"Configured alternative ID column(s) not found in metadata header: {missing_alt_cols}"
