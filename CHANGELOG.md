@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix date validation in Excel metadata templates and add some schema validation checks [#886] (https://github.com/BU-ISCIII/relecov-tools/pull/886)
 - Improve METADATA_LAB template formatting and duplicate sample detection [#887] (https://github.com/BU-ISCIII/relecov-tools/pull/887)
 - Fixed the surveillance script for proper variant data handling [#891] (https://github.com/BU-ISCIII/relecov-tools/pull/891).
+- Updated GitHub Actions PR workflow handling for module and SFTP tests after recent actions security changes [899] (https://github.com/BU-ISCIII/relecov-tools/pull/899)
 
 #### Changed
 
