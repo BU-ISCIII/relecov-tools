@@ -50,6 +50,7 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: 0
+        allow-unsafe-pr-checkout: true
       
     - name: Install package and dependencies
       run: |
@@ -90,6 +91,7 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: 0
+        allow-unsafe-pr-checkout: true
       
     - name: Install package and dependencies
       run: |
@@ -127,6 +129,7 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: 0
+        allow-unsafe-pr-checkout: true
 
     - name: Install package and dependencies
       run: |
