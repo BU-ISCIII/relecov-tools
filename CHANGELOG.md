@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Upload pipeline-manager samples to iSkyLIMS [#882](https://github.com/BU-ISCIII/relecov-tools/pull/882)
 - Added support for configurable enum sources, template-only fields, and AMR metadata JSON generation. [#883](https://github.com/BU-ISCIII/relecov-tools/pull/883)
 - Make build-schema multi-project and improve template version handling [#888] (https://github.com/BU-ISCIII/relecov-tools/pull/888)
+- Support MEPRAM metadata-only downloads [901] (https://github.com/BU-ISCIII/relecov-tools/pull/901)
 
 #### Fixes
 
