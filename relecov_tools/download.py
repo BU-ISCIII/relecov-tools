@@ -45,6 +45,7 @@ class Download(BaseModule):
         output_dir=None,
         target_folders=None,
         subfolder=None,
+        metadata_only=False,
     ):
         """Initializes the sftp object"""
         super().__init__(output_dir=output_dir, called_module="download")
@@ -57,6 +58,7 @@ class Download(BaseModule):
         sftp_passwd = password
         self.target_folders = target_folders
         self.subfolder = subfolder
+        self.metadata_only = metadata_only
         self.allowed_download_options = config_json.get_topic_data(
             "sftp_handle", "allowed_download_options"
         )
@@ -162,6 +164,30 @@ class Download(BaseModule):
         self.finished_folders = {}
         self.set_batch_id(datetime.today().strftime("%Y%m%d%H%M%S"))
         self.defer_cleanup = False
+
+    @staticmethod
+    def _sample_sequence_files(sample_files):
+        """Return only declared sequence filenames from a sample file dictionary."""
+        return [
+            value
+            for key, value in sample_files.items()
+            if key in ("sequence_file_R1", "sequence_file_R2") and value
+        ]
+
+    def _is_template_help_row(self, row):
+        """Return True when a metadata row starts with a template helper label."""
+        labels = self.metadata_processing.get(
+            "template_help_row_labels",
+            ["DESCRIPCIÓN", "DESCRIPCION", "EJEMPLOS", "REQUERIDO"],
+        )
+        labels = {str(label).strip().upper() for label in labels}
+        try:
+            first_cell = row.iloc[0]
+        except AttributeError:
+            first_cell = row[0] if row else None
+        if first_cell is None:
+            return False
+        return str(first_cell).strip().upper() in labels
 
     def create_local_folder(self, folder):
         """Create folder to download files in local path using date
@@ -292,6 +318,15 @@ class Download(BaseModule):
         corrupted_set = {os.path.basename(x) for x in corrupted_files or []}
         data = copy.deepcopy(samples_dict)
         for sample, values in data.items():
+            if values.pop("_metadata_only", False):
+                values["sequence_file_R1"] = values.get("sequence_file_R1", "")
+                values["sequence_file_path_R1"] = ""
+                values["sequence_file_R1_md5"] = ""
+                values["sequence_file_R2"] = values.get("sequence_file_R2", "")
+                values["sequence_file_path_R2"] = ""
+                values["sequence_file_R2_md5"] = ""
+                values["batch_id"] = self.batch_id
+                continue
             if not all(val for val in values):
                 self.include_error(str(error_text % sample), sample)
                 samples_to_delete.append(sample)
@@ -334,8 +369,14 @@ class Download(BaseModule):
         """
         inverted_dict = {}
         for sample, fastq_dict in sample_file_dict.items():
+            if fastq_dict.get("_metadata_only"):
+                continue
             # Dictionary values are not hashable, so you need to create a tuple of them
-            samp_fastqs = tuple(fastq_dict.values())
+            samp_fastqs = tuple(
+                val
+                for key, val in fastq_dict.items()
+                if key.startswith("sequence_file_") and val
+            )
             # Setting values as keys to find those samples refering to the same file
             for fastq in samp_fastqs:
                 inverted_dict[fastq] = inverted_dict.get(fastq, []) + [sample]
@@ -518,8 +559,16 @@ class Download(BaseModule):
         index_layout = meta_header.index("Library Layout")
         index_fastq_r1 = meta_header.index("Sequence file R1")
         index_fastq_r2 = meta_header.index("Sequence file R2")
-        counter = header_row
-        for row in islice(metadata_ws.values, header_row, metadata_ws.max_row):
+        skip_rows_after_header = int(
+            self.metadata_processing.get("skip_rows_after_header") or 0
+        )
+        first_data_row = header_row
+        first_row = next(islice(metadata_ws.values, header_row, header_row + 1), None)
+        if skip_rows_after_header and first_row:
+            if self._is_template_help_row(first_row):
+                first_data_row += skip_rows_after_header
+        counter = first_data_row
+        for row in islice(metadata_ws.values, first_data_row, metadata_ws.max_row):
             counter += 1
             sample_id = row[index_sampleID]
             if sample_id:
@@ -547,7 +596,17 @@ class Download(BaseModule):
                 if not row[index_fastq_r1]:
                     log_text = "Sequence File R1 not defined in Metadata for sample %s"
                     stderr.print(f"[red]{str(log_text % s_name)}")
-                    self.include_error(entry=str(log_text % s_name), sample=s_name)
+                    if self.metadata_only:
+                        self.include_warning(
+                            entry=str(log_text % s_name), sample=s_name
+                        )
+                        sample_file_dict[s_name] = {
+                            "sequence_file_R1": "",
+                            "sequence_file_R2": "",
+                            "_metadata_only": True,
+                        }
+                    else:
+                        self.include_error(entry=str(log_text % s_name), sample=s_name)
                     continue
                 try:
                     if not row[index_layout]:
@@ -716,7 +775,13 @@ class Download(BaseModule):
         for sample in sample_files_dict.keys():
             self.include_new_key(sample=sample)
         metafiles_list = sorted(
-            sum([list(fi.values()) for _, fi in sample_files_dict.items()], [])
+            sum(
+                [
+                    self._sample_sequence_files(fi)
+                    for _, fi in sample_files_dict.items()
+                ],
+                [],
+            )
         )
         if sorted(filtered_files_list) == sorted(metafiles_list):
             self.log.info("Files in %s match with metadata file", remote_folder)
@@ -1027,24 +1092,52 @@ class Download(BaseModule):
             containing all sheets in the excel file as pandas dataframes.
         """
 
+        def skip_template_rows(meta_df):
+            skip_rows_after_header = int(
+                self.metadata_processing.get("skip_rows_after_header") or 0
+            )
+            if skip_rows_after_header and not meta_df.empty:
+                if not self._is_template_help_row(meta_df.iloc[0]):
+                    return meta_df
+                return meta_df.iloc[skip_rows_after_header:].reset_index(drop=True)
+            return meta_df
+
         def filldf_unique_id_col(meta_df):
             """Fill the unique ID col if missing with other alternative IDs"""
-            unique_id_col = "Sample ID given for sequencing"
+            meta_df = skip_template_rows(meta_df)
+            unique_id_col = self.metadata_processing.get("sample_id_col")
+            if not unique_id_col:
+                raise MetadataError(
+                    "Missing metadata_processing.sample_id_col in configuration"
+                )
+            if unique_id_col not in meta_df.columns:
+                raise MetadataError(
+                    f"Configured sample_id_col '{unique_id_col}' not found in metadata header"
+                )
             alt_id_cols = [
-                "Sample ID given by originating laboratory",
+                self.metadata_processing.get("alternative_sample_id_col"),
                 "Sequence file R1",
             ]
+            alt_id_cols = [col for col in alt_id_cols if col]
+            missing_alt_cols = [
+                col for col in alt_id_cols if col not in meta_df.columns
+            ]
+            if missing_alt_cols:
+                raise MetadataError(
+                    f"Configured alternative ID column(s) not found in metadata header: {missing_alt_cols}"
+                )
             if meta_df[unique_id_col].isnull().any():
                 for index, row in meta_df.iterrows():
                     if pd.isnull(row[unique_id_col]):
-                        if pd.notnull(row[alt_id_cols[0]]):
-                            new_id = row[alt_id_cols[0]]
-                            errtxt = f"Missing value for {unique_id_col}. Replaced by {alt_id_cols[0]}: {new_id}"
-                        elif pd.notnull(row[alt_id_cols[1]]):
-                            new_id = row[alt_id_cols[1]]
-                            errtxt = f"Missing value for {unique_id_col}. Replaced by {alt_id_cols[1]}: {new_id}"
+                        replacement_col = next(
+                            (col for col in alt_id_cols if pd.notnull(row[col])),
+                            None,
+                        )
+                        if replacement_col:
+                            new_id = row[replacement_col]
+                            errtxt = f"Missing value for {unique_id_col}. Replaced by {replacement_col}: {new_id}"
                         else:
-                            errtxt = f"Sample {index-1} skipped: missing values for {unique_id_col}, {alt_id_cols[0]} and {alt_id_cols[1]}"
+                            errtxt = f"Sample {index-1} skipped: missing values for {unique_id_col} and {', '.join(alt_id_cols)}"
                             self.include_error(entry=errtxt)
                             continue
                         meta_df.at[index, unique_id_col] = new_id
@@ -1102,9 +1195,16 @@ class Download(BaseModule):
         def pre_validate_folder(folder, folder_files):
             """Check if remote folder has sequencing files and a valid metadata file"""
             if not any(file.endswith(tuple(exts)) for file in folder_files):
-                error_text = "Remote folder %s skipped. No sequencing files found."
-                self.include_error(error_text % folder)
-                return
+                if self.metadata_only:
+                    warning_text = (
+                        "Remote folder %s has no sequencing files. "
+                        "Processing metadata-only samples."
+                    )
+                    self.include_warning(warning_text % folder)
+                else:
+                    error_text = "Remote folder %s skipped. No sequencing files found."
+                    self.include_error(error_text % folder)
+                    return
             try:
                 downloaded_metadata = self.get_metadata_file(folder, output_dir)
             except (FileNotFoundError, OSError, PermissionError, MetadataError) as err:
@@ -1188,8 +1288,10 @@ class Download(BaseModule):
             processed_folders.append(folder)
         # End of loop
 
-        # Write last dataframe to file once loop is finished
-        if folders_with_metadata.get(last_main_folder):
+        # Write last dataframe to file once loop is finished.
+        # Metadata-only folders can have no sequence files, so an empty list still
+        # needs the merged Excel uploaded into the tmp_processing folder.
+        if last_main_folder in folders_with_metadata:
             if excel_name not in folders_with_metadata[last_main_folder]:
                 upload_merged_df(merged_excel_path, last_main_folder, merged_df)
                 folders_with_metadata[last_main_folder].append(excel_name)
@@ -1320,14 +1422,18 @@ class Download(BaseModule):
         warning_text = "File %s not found in md5sum. Creating hash"
 
         for sample, vals in valid_filedict.items():
-            processed_dict[sample] = {}
+            sample_values = {}
+            metadata_only_sample = bool(vals.get("_metadata_only"))
             for key, val in vals.items():
+                if key not in ("sequence_file_R1", "sequence_file_R2"):
+                    sample_values[key] = val
+                    continue
                 if val in corrupted:
                     self.include_error(error_text % val, sample=sample)
                 if val in md5miss:
                     self.include_warning(warning_text % val, sample=sample)
                 if not val:
-                    processed_dict[sample][key] = val
+                    sample_values[key] = val
                     continue
 
                 matched_file = None
@@ -1339,7 +1445,7 @@ class Download(BaseModule):
                         break
 
                 if matched_file:
-                    processed_dict[sample][key] = matched_file
+                    sample_values[key] = matched_file
                 else:
                     err = f"File in metadata {val} does not match any file in sftp"
                     folder_logs = self.logsum.logs.get(self.current_folder, {})
@@ -1347,7 +1453,12 @@ class Download(BaseModule):
                         "errors", []
                     ):
                         self.include_error(err, sample)
-                    processed_dict[sample][key] = val
+                    sample_values[key] = val
+            if metadata_only_sample:
+                sample_values["sequence_file_R1"] = ""
+                sample_values["sequence_file_R2"] = ""
+                sample_values["_metadata_only"] = True
+            processed_dict[sample] = sample_values
         return processed_dict
 
     def _cleanup_remote_locks(self, parent: str = "."):
@@ -1428,7 +1539,9 @@ class Download(BaseModule):
                 continue
             # Get the files in each folder
             files_to_download = [
-                fi for vals in valid_filedict.values() for fi in vals.values() if fi
+                fi
+                for vals in valid_filedict.values()
+                for fi in self._sample_sequence_files(vals)
             ]
             fetched_files = self.get_remote_folder_files(
                 folder, local_folder, files_to_download
@@ -1436,7 +1549,10 @@ class Download(BaseModule):
             if not fetched_files:
                 error_text = "No files could be downloaded in folder %s" % str(folder)
                 stderr.print(f"{error_text}")
-                self.include_error(error_text)
+                if self.metadata_only and not files_to_download:
+                    self.include_warning(error_text)
+                else:
+                    self.include_error(error_text)
             self.log.info("Finished download for folder: %s", folder)
             stderr.print(f"Finished download for folder {folder}")
             remote_md5sum = self.find_remote_md5sum(folder)
