@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import sys
-
 import logging
 import rich.console
 import relecov_tools.utils
@@ -26,7 +24,6 @@ def replace_originating_lab(metadata, f_data, mapped_fields, heading):
             except KeyError as e:
                 log.error("Value  %s does not exist ", e)
                 stderr.print(f"[red] Value {e} does not exist")
-                sys.exit(1)
     return metadata
 
 
@@ -41,7 +38,7 @@ def added_seq_inst_model(metadata, f_data, mapped_fields, heading):
             except KeyError as e:
                 log.error("Value  %s does not exist ", e)
                 stderr.print(f"[red] Value {e} does not exist")
-                sys.exit(1)
+                continue
             if "nextseq" in run_name:
                 row[m_idx] = "Illumina NextSeq 500"
             elif "next_seq" in run_name:
@@ -55,7 +52,6 @@ def added_seq_inst_model(metadata, f_data, mapped_fields, heading):
             else:
                 log.error("Value  %s is not defined in the mapping ", run_name)
                 stderr.print(f"[red] Value {run_name} is not defined in the mapping")
-                sys.exit(1)
     return metadata
 
 
@@ -70,20 +66,19 @@ def translate_gender_to_english(metadata, f_data, mapped_fields, heading):
         "unknown": "Not Provided",
     }
     for row in metadata[1:]:
-        for key, val in mapped_fields.items():
+        for key, _ in mapped_fields.items():
             m_idx = heading.index(key)
             if row[m_idx] is None or row[m_idx] == "":
                 row[m_idx] = "Not Provided"
                 continue
-            item = row[m_idx].lower()
+            item = str(row[m_idx]).lower()
             if item in map_dict:
                 row[m_idx] = map_dict[item]
             else:
-                log.error("The '%s' is not a valid data for translation", row[m_idx])
+                log.error("The %s is not a valid data for translation", row[m_idx])
                 stderr.print(
-                    "f[red] The '{row[m_idx]}' is not a valid data for translation"
+                    f"[red] The '{row[m_idx]}' is not a valid data for translation"
                 )
-                sys.exit(1)
     return metadata
 
 
@@ -93,7 +88,7 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
         for key, val in mapped_fields.items():
             m_idx = heading.index(key)
             if row[m_idx] is None:
-                row[m_idx] = "not provided"
+                row[m_idx] = "Not Provided"
             elif "ASPIRADO NASOFARÍNGEO" in row[m_idx].upper():
                 row[m_idx] = "Nasopharynx Aspiration"
             elif "ASPIRADO BRONQUIAL" in row[m_idx].upper():
@@ -103,11 +98,11 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
             elif "EXTRACTO" in row[m_idx].upper():
                 row[m_idx] = "Scraping"
             elif "EXUDADO FARÍNGEO" in row[m_idx].upper():
-                row[m_idx] = "Pharynx Swabbing"
+                row[m_idx] = "Pharynx Swab"
             elif "EXUDADO NASOFARÍNGEO" in row[m_idx].upper():
-                row[m_idx] = "Nasopharynx Swabbing"
+                row[m_idx] = "Nasopharynx swab"
             elif "EXUDADO OROFARINGEO" in row[m_idx].upper():
-                row[m_idx] = "Oropharynx Swabbing"
+                row[m_idx] = "Oropharynx Swab"
             elif "PLACENTA" in row[m_idx].upper():
                 row[m_idx] = "Placenta"
             elif "SALIVA" in row[m_idx].upper():
@@ -115,7 +110,6 @@ def translate_specimen_source(metadata, f_data, mapped_fields, heading):
             else:
                 log.error("The field is not correctly written or is not filled")
                 stderr.print("The field is not correctly written or not filled")
-                sys.exit(1)
     return metadata
 
 
@@ -157,7 +151,6 @@ def translate_purpose_seq_to_english(metadata, f_data, mapped_fields, heading):
                 stderr.print(
                     "f[red] The {row[m_idx]} is not a valid data for translation"
                 )
-                sys.exit(1)
     return metadata
 
 
@@ -195,5 +188,4 @@ def findout_library_layout(metadata, f_data, mapped_fields, heading):
                 stderr.print(
                     f"[red] {e} is not defined in function findout_library_layout"
                 )
-                sys.exit(1)
     return metadata

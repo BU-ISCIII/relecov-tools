@@ -88,14 +88,6 @@
             "mapped_key": "Runid",
             "function": "None"
         },
-        "read_length": {
-            "file_name": "samples_run_services_length.tsv",
-            "mapped_fields": {
-                "Read Length" : "read1_cycles"
-            },
-            "mapped_key": "Sample ID given for sequencing",
-            "function": "None"
-        },
         "samples_in_run": {
             "file_name": "run_and_num_of_samples.csv",
             "mapped_fields": {
@@ -114,7 +106,7 @@
         },
         "purpose_of_sequencing": {
             "file_name": "",
-            "mapped_fields" : {"Purpose of Sequencing" : "" },
+            "mapped_fields" : {"Purpose of sampling" : "" },
             "mapped_key" : "",
             "function": "translate_purpose_seq_to_english"
         },
